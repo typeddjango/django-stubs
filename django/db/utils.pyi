@@ -1,4 +1,7 @@
 from django.apps.config import AppConfig
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.sessions.models import Session
+from django.contrib.sites.models import Site
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
@@ -7,6 +10,8 @@ from typing import (
     Callable,
     Dict,
     List,
+    Type,
+    Union,
 )
 
 
@@ -27,16 +32,16 @@ class ConnectionHandler:
 class ConnectionRouter:
     def __init__(self, routers: None = ...) -> None: ...
     def allow_migrate(self, db: str, app_label: str, **hints) -> bool: ...
-    def allow_migrate_model(self, db: str, model: Any) -> bool: ...
+    def allow_migrate_model(self, db: str, model: Type[Model]) -> bool: ...
     def allow_relation(self, obj1: Model, obj2: Model, **hints) -> bool: ...
     def get_migratable_models(
         self,
         app_config: AppConfig,
         db: str,
         include_auto_created: bool = ...
-    ) -> Any: ...
+    ) -> Union[List[Type[Model]], List[Type[Site]], List[Type[Session]], List[Type[ContentType]]]: ...
     @cached_property
-    def routers(self) -> Any: ...
+    def routers(self) -> List[object]: ...
 
 
 class DatabaseErrorWrapper:

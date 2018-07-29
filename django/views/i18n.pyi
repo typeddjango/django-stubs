@@ -39,6 +39,6 @@ class JavaScriptCatalog:
     def get_plural(self) -> Optional[str]: ...
     def render_to_response(
         self,
-        context: Dict[str, Union[Dict[str, Union[str, int, List[str]]], None, Dict[str, str], Dict[str, Union[str, List[str]]]]],
+        context: Dict[str, Optional[Union[Dict[str, str], Dict[str, Union[str, int, List[str]]], Dict[str, Union[str, List[str]]]]]],
         **response_kwargs
     ) -> HttpResponse: ...

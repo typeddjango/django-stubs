@@ -17,12 +17,17 @@ from typing import (
     Dict,
     List,
     Optional,
+    Type,
     Union,
 )
 from uuid import UUID
 
 
-def build_instance(Model: Any, data: Dict[str, Any], db: str) -> Model: ...
+def build_instance(
+    Model: Type[Model],
+    data: Dict[str, Any],
+    db: str
+) -> Model: ...
 
 
 def deserialize_fk_value(
@@ -34,7 +39,7 @@ def deserialize_fk_value(
 
 def deserialize_m2m_values(
     field: ManyToManyField,
-    field_value: Union[List[List[str]], List[Union[int, str]], List[int]],
+    field_value: Union[List[List[str]], List[int], List[Union[int, str]]],
     using: str
 ) -> List[int]: ...
 
@@ -57,7 +62,7 @@ class DeserializedObject:
 
 
 class Deserializer:
-    def __init__(self, stream_or_string: Union[str, BufferedReader, TextIOWrapper], **options) -> None: ...
+    def __init__(self, stream_or_string: Union[str, TextIOWrapper, BufferedReader], **options) -> None: ...
     def __iter__(self) -> Deserializer: ...
 
 

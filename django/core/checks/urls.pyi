@@ -22,8 +22,8 @@ def _load_all_namespaces(resolver: URLResolver, parents: Tuple = ...) -> List[st
 
 
 def check_resolver(
-    resolver: Union[URLResolver, URLPattern]
-) -> Union[List[Error], List[Warning]]: ...
+    resolver: Union[URLPattern, URLResolver]
+) -> Union[List[Warning], List[Error]]: ...
 
 
 def check_url_config(app_configs: None, **kwargs) -> List[Warning]: ...

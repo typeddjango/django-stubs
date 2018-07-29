@@ -1,8 +1,10 @@
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
-from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.models import (
     AlterUniqueTogether,
+    CreateModel,
     DeleteModel,
+    FieldRelatedOptionOperation,
+    ModelOperation,
 )
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import (
@@ -47,7 +49,7 @@ class AddField:
     def describe(self) -> str: ...
     def reduce(
         self,
-        operation: Operation,
+        operation: Union[FieldOperation, CreateModel, FieldRelatedOptionOperation],
         in_between: List[AddField],
         app_label: Optional[str] = ...
     ) -> Union[bool, List[AddField]]: ...
@@ -82,7 +84,7 @@ class AlterField:
     def describe(self) -> str: ...
     def reduce(
         self,
-        operation: Union[DeleteModel, AlterField, AlterUniqueTogether],
+        operation: Union[AlterField, DeleteModel, AlterUniqueTogether],
         in_between: List[Any],
         app_label: str = ...
     ) -> bool: ...
@@ -99,7 +101,7 @@ class FieldOperation:
     def name_lower(self) -> str: ...
     def reduce(
         self,
-        operation: Operation,
+        operation: Union[ModelOperation, FieldOperation],
         in_between: Any,
         app_label: str = ...
     ) -> bool: ...

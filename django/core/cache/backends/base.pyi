@@ -27,7 +27,7 @@ class BaseCache:
     def get_or_set(
         self,
         key: str,
-        default: Optional[Union[str, Callable, int]],
+        default: Optional[Union[str, int, Callable]],
         timeout: object = ...,
         version: Optional[int] = ...
     ) -> Optional[Union[str, int]]: ...
@@ -36,7 +36,7 @@ class BaseCache:
     def make_key(self, key: Union[str, int], version: Optional[Union[str, int]] = ...) -> str: ...
     def set_many(
         self,
-        data: Union[Dict[str, str], Dict[str, Union[Dict[str, int], str]], Dict[str, int], OrderedDict],
+        data: Union[Dict[str, Union[Dict[str, int], str]], OrderedDict, Dict[str, str], Dict[str, int]],
         timeout: object = ...,
         version: Optional[int] = ...
     ) -> List[Any]: ...

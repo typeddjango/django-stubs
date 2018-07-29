@@ -13,7 +13,6 @@ from django.db.models.fields.related import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
 from typing import (
-    Any,
     Callable,
     Dict,
     List,
@@ -79,20 +78,20 @@ class DateFieldListFilter:
 class FieldListFilter:
     def __init__(
         self,
-        field: Any,
+        field: Union[ForeignObjectRel, Field],
         request: WSGIRequest,
         params: Dict[str, str],
-        model: Any,
+        model: Type[Model],
         model_admin: ModelAdmin,
         field_path: str
     ) -> None: ...
     @classmethod
     def create(
         cls,
-        field: Any,
+        field: Union[ForeignObjectRel, Field],
         request: WSGIRequest,
         params: Dict[str, str],
-        model: Any,
+        model: Type[Model],
         model_admin: ModelAdmin,
         field_path: str
     ) -> FieldListFilter: ...
@@ -103,7 +102,12 @@ class FieldListFilter:
         queryset: QuerySet
     ) -> QuerySet: ...
     @classmethod
-    def register(cls, test: Callable, list_filter_class: Any, take_priority: bool = ...) -> None: ...
+    def register(
+        cls,
+        test: Callable,
+        list_filter_class: Type[FieldListFilter],
+        take_priority: bool = ...
+    ) -> None: ...
 
 
 class ListFilter:
@@ -111,7 +115,7 @@ class ListFilter:
         self,
         request: WSGIRequest,
         params: Dict[str, str],
-        model: Any,
+        model: Type[Model],
         model_admin: ModelAdmin
     ) -> None: ...
 
@@ -122,7 +126,7 @@ class RelatedFieldListFilter:
         field: Union[ForeignObjectRel, ManyToManyField, ForeignKey],
         request: WSGIRequest,
         params: Dict[str, str],
-        model: Any,
+        model: Type[Model],
         model_admin: ModelAdmin,
         field_path: str
     ) -> None: ...
@@ -144,7 +148,7 @@ class RelatedOnlyFieldListFilter:
         field: Union[ManyToManyField, ForeignKey],
         request: WSGIRequest,
         model_admin: ModelAdmin
-    ) -> Union[List[Tuple[int, str]], List[Tuple[str, str]]]: ...
+    ) -> Union[List[Tuple[str, str]], List[Tuple[int, str]]]: ...
 
 
 class SimpleListFilter:

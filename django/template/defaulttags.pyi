@@ -268,9 +268,9 @@ class RegroupNode:
     def render(self, context: Context) -> str: ...
     def resolve_expression(
         self,
-        obj: Dict[str, Union[date, str, int, List[str]]],
+        obj: Dict[str, Union[str, int, date, List[str]]],
         context: Context
-    ) -> Union[str, int]: ...
+    ) -> Union[int, str]: ...
 
 
 class ResetCycleNode:

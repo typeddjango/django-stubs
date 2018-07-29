@@ -31,7 +31,7 @@ class BaseTable:
 class Join:
     def __eq__(
         self,
-        other: Union[Join, BaseTable]
+        other: Union[BaseTable, Join]
     ) -> bool: ...
     def __init__(
         self,
@@ -47,17 +47,17 @@ class Join:
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[int]], Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[int]], Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
     def demote(self) -> Join: ...
     def equals(
         self,
-        other: Union[Join, BaseTable],
+        other: Union[BaseTable, Join],
         with_filtered_relation: bool
     ) -> bool: ...
     def promote(self) -> Join: ...
     def relabeled_clone(
         self,
-        change_map: Union[Dict[str, str], OrderedDict]
+        change_map: Union[OrderedDict, Dict[str, str]]
     ) -> Join: ...
 
 

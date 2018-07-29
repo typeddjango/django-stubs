@@ -1,4 +1,5 @@
 from datetime import date
+from django.db.models.base import Model
 from typing import (
     Any,
     Optional,
@@ -35,7 +36,12 @@ def is_protected_type(obj: Any) -> bool: ...
 def repercent_broken_unicode(path: bytes) -> bytes: ...
 
 
-def smart_text(s: Any, encoding: str = ..., strings_only: bool = ..., errors: str = ...) -> str: ...
+def smart_text(
+    s: Union[Model, int, str],
+    encoding: str = ...,
+    strings_only: bool = ...,
+    errors: str = ...
+) -> str: ...
 
 
 def uri_to_iri(uri: Optional[str]) -> Optional[str]: ...

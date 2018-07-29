@@ -32,13 +32,13 @@ class MultiColSource:
         self,
         alias: str,
         targets: Union[Tuple[IntegerField, related.ForeignKey], Tuple[IntegerField, IntegerField]],
-        sources: Union[Tuple[AutoField, IntegerField], Tuple[IntegerField, AutoField]],
+        sources: Union[Tuple[IntegerField, AutoField], Tuple[AutoField, IntegerField]],
         field: related.ForeignObject
     ) -> None: ...
     def get_lookup(
         self,
         lookup: str
-    ) -> Type[Union[RelatedIn, RelatedExact]]: ...
+    ) -> Type[Union[RelatedExact, RelatedIn]]: ...
     def relabeled_clone(
         self,
         relabels: OrderedDict
@@ -50,8 +50,8 @@ class RelatedIn:
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[int]], Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
-    def get_prep_lookup(self) -> Union[List[UUID], Query, List[int], List[str]]: ...
+    ) -> Union[Tuple[str, List[int]], Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
+    def get_prep_lookup(self) -> Union[Query, List[int], List[UUID], List[str]]: ...
 
 
 class RelatedLookupMixin:
@@ -59,5 +59,5 @@ class RelatedLookupMixin:
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[int]], Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[int]], Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
     def get_prep_lookup(self) -> Any: ...

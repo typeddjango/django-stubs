@@ -2,9 +2,16 @@ from collections import OrderedDict
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import F
-from django.db.models.fields import Field
+from django.db.models.fields import (
+    DateTimeCheckMixin,
+    Field,
+)
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToOneRel
+from django.db.models.lookups import (
+    Lookup,
+    Transform,
+)
 from django.db.models.options import Options
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
@@ -17,12 +24,13 @@ from typing import (
     Optional,
     Set,
     Tuple,
+    Type,
     Union,
 )
 
 
 def check_rel_lookup_compatibility(
-    model: Any,
+    model: Type[Model],
     target_opts: Options,
     field: Union[ManyToOneRel, ForeignKey]
 ) -> bool: ...
@@ -32,7 +40,7 @@ def refs_expression(lookup_parts: List[str], annotations: OrderedDict) -> Any: .
 
 
 def select_related_descend(
-    field: Field,
+    field: Union[Field, DateTimeCheckMixin],
     restricted: bool,
     requested: Any,
     load_fields: Optional[Set[str]],
@@ -40,15 +48,17 @@ def select_related_descend(
 ) -> bool: ...
 
 
-def subclasses(cls: Any) -> Iterator[Any]: ...
+def subclasses(
+    cls: Type[Union[Field, Transform]]
+) -> Iterator[Type[Union[Field, Transform]]]: ...
 
 
 class DeferredAttribute:
     def __get__(
         self,
-        instance: Any,
-        cls: Any = ...
-    ) -> Optional[Union[DeferredAttribute, str, int]]: ...
+        instance: Optional[Model],
+        cls: Type[Model] = ...
+    ) -> Optional[Union[str, int, DeferredAttribute]]: ...
     def __init__(self, field_name: str) -> None: ...
     def _check_parent_chain(self, instance: Model, name: str) -> None: ...
 
@@ -60,7 +70,7 @@ class FilteredRelation:
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[str]], Tuple[str, List[int]], Tuple[str, List[Union[int, str]]], Tuple[str, List[Any]]]: ...
+    ) -> Union[Tuple[str, List[int]], Tuple[str, List[str]], Tuple[str, List[Any]], Tuple[str, List[Union[int, str]]]]: ...
     def clone(self) -> FilteredRelation: ...
 
 
@@ -72,7 +82,7 @@ class Q:
     def _combine(self, other: Q, conn: str) -> Q: ...
     def deconstruct(
         self
-    ) -> Union[Tuple[str, Tuple, Dict[str, F]], Tuple[str, Tuple[Tuple[str, F], Tuple[str, F]], Dict[Any, Any]], Tuple[str, Tuple[Q], Dict[Any, Any]]]: ...
+    ) -> Union[Tuple[str, Tuple[Tuple[str, F], Tuple[str, F]], Dict[Any, Any]], Tuple[str, Tuple, Dict[str, F]], Tuple[str, Tuple[Q], Dict[Any, Any]]]: ...
     def resolve_expression(
         self,
         query: Query = ...,
@@ -98,12 +108,22 @@ class RegisterLookupMixin:
     @classmethod
     def _get_lookup(cls, lookup_name: str) -> Any: ...
     @classmethod
-    def _unregister_lookup(cls, lookup: Any, lookup_name: Optional[str] = ...) -> None: ...
+    def _unregister_lookup(
+        cls,
+        lookup: Type[Union[Lookup, Transform]],
+        lookup_name: Optional[str] = ...
+    ) -> None: ...
     def get_lookup(self, lookup_name: str) -> Any: ...
     @classmethod
-    def get_lookups(cls) -> Dict[str, Any]: ...
-    def get_transform(self, lookup_name: str) -> Any: ...
+    def get_lookups(cls) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
+    def get_transform(self, lookup_name: str) -> object: ...
     @staticmethod
-    def merge_dicts(dicts: Any) -> Dict[str, Any]: ...
+    def merge_dicts(
+        dicts: Any
+    ) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
     @classmethod
-    def register_lookup(cls, lookup: Any, lookup_name: Optional[str] = ...) -> Any: ...
+    def register_lookup(
+        cls,
+        lookup: Type[Union[Lookup, Transform]],
+        lookup_name: Optional[str] = ...
+    ) -> Type[Union[Lookup, Transform]]: ...

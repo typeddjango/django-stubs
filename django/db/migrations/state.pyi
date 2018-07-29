@@ -1,9 +1,11 @@
 from django.apps.registry import Apps
+from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from typing import (
     Any,
     Iterator,
+    Type,
 )
 
 
@@ -27,7 +29,11 @@ class ModelState:
     def clone(self) -> ModelState: ...
     def construct_managers(self) -> Iterator[Any]: ...
     @classmethod
-    def from_model(cls, model: Any, exclude_rels: bool = ...) -> ModelState: ...
+    def from_model(
+        cls,
+        model: Type[Model],
+        exclude_rels: bool = ...
+    ) -> ModelState: ...
     def get_field_by_name(self, name: str) -> Field: ...
     def get_index_by_name(self, name: str) -> Index: ...
     @cached_property

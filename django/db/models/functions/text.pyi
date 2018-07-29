@@ -35,7 +35,7 @@ class Concat:
     def __init__(self, *expressions, **extra) -> None: ...
     def _paired(
         self,
-        expressions: Union[Tuple[Value, str], Tuple[str, str], Tuple[Value, str, Value]]
+        expressions: Union[Tuple[Value, str, Value], Tuple[Value, str], Tuple[str, str]]
     ) -> ConcatPair: ...
 
 
@@ -75,7 +75,7 @@ class Ord:
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         **extra_context
-    ) -> Union[Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
 
 
 class Replace:

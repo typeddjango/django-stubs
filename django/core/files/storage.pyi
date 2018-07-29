@@ -6,11 +6,12 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Type,
     Union,
 )
 
 
-def get_storage_class(import_path: Optional[str] = ...) -> Any: ...
+def get_storage_class(import_path: Optional[str] = ...) -> Type[Storage]: ...
 
 
 class FileSystemStorage:
@@ -46,7 +47,7 @@ class FileSystemStorage:
     def listdir(
         self,
         path: str
-    ) -> Union[Tuple[List[Any], List[Any]], Tuple[List[Any], List[str]], Tuple[List[str], List[Any]], Tuple[List[str], List[str]]]: ...
+    ) -> Union[Tuple[List[str], List[Any]], Tuple[List[Any], List[Any]], Tuple[List[Any], List[str]], Tuple[List[str], List[str]]]: ...
     @cached_property
     def location(self) -> str: ...
     def path(self, name: str) -> str: ...

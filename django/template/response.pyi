@@ -15,7 +15,7 @@ class SimpleTemplateResponse:
     def __getstate__(self) -> Dict[str, Any]: ...
     def __init__(
         self,
-        template: Union[str, Template, List[str]],
+        template: Union[str, List[str], Template],
         context: Any = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
@@ -31,7 +31,7 @@ class SimpleTemplateResponse:
     def resolve_context(self, context: Any) -> Any: ...
     def resolve_template(
         self,
-        template: Union[str, Template, List[str]]
+        template: Union[str, List[str], Template]
     ) -> Template: ...
 
 
@@ -39,7 +39,7 @@ class TemplateResponse:
     def __init__(
         self,
         request: HttpRequest,
-        template: Union[str, Template, List[str]],
+        template: Union[str, List[str], Template],
         context: Any = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,

@@ -20,13 +20,13 @@ class DatabaseSchemaEditor:
     def __exit__(self, exc_type: None, exc_value: None, traceback: None) -> None: ...
     def _alter_field(
         self,
-        model: Any,
+        model: Type[Model],
         old_field: Field,
         new_field: Field,
         old_type: str,
         new_type: str,
-        old_db_params: Dict[str, Union[str, None]],
-        new_db_params: Dict[str, Union[str, None]],
+        old_db_params: Dict[str, Optional[str]],
+        new_db_params: Dict[str, Optional[str]],
         strict: bool = ...
     ) -> None: ...
     def _is_referenced_by_fk_constraint(
@@ -37,7 +37,7 @@ class DatabaseSchemaEditor:
     ) -> bool: ...
     def _remake_table(
         self,
-        model: Any,
+        model: Type[Model],
         create_field: Optional[Union[IntegerField, TimeField]] = ...,
         delete_field: Optional[Union[AutoField, SlugField]] = ...,
         alter_field: Any = ...
@@ -45,18 +45,18 @@ class DatabaseSchemaEditor:
     def add_field(self, model: Type[Model], field: Field) -> None: ...
     def alter_db_table(
         self,
-        model: Any,
+        model: Type[Model],
         old_db_table: str,
         new_db_table: str,
         disable_constraints: bool = ...
     ) -> None: ...
     def alter_field(
         self,
-        model: Any,
+        model: Type[Model],
         old_field: Field,
         new_field: Field,
         strict: bool = ...
     ) -> None: ...
-    def delete_model(self, model: Any, handle_autom2m: bool = ...) -> None: ...
+    def delete_model(self, model: Type[Model], handle_autom2m: bool = ...) -> None: ...
     def quote_value(self, value: Optional[Union[int, memoryview, str]]) -> str: ...
     def remove_field(self, model: Type[Model], field: Field) -> None: ...

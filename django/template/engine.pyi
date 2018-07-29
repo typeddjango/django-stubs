@@ -24,7 +24,7 @@ class Engine:
         self,
         dirs: Optional[List[str]] = ...,
         app_dirs: bool = ...,
-        context_processors: Optional[Union[Tuple[str, str], List[str]]] = ...,
+        context_processors: Optional[Union[List[str], Tuple[str, str]]] = ...,
         debug: bool = ...,
         loaders: Any = ...,
         string_if_invalid: str = ...,
@@ -41,7 +41,7 @@ class Engine:
     ) -> Tuple[Template, Origin]: ...
     def find_template_loader(
         self,
-        loader: Union[str, Tuple[str, List[Tuple[str, Dict[str, str]]]], Tuple[str, Dict[str, str]], Tuple[str, List[str]]]
+        loader: Union[Tuple[str, List[Tuple[str, Dict[str, str]]]], Tuple[str, List[str]], Tuple[str, Dict[str, str]], str]
     ) -> Loader: ...
     def from_string(self, template_code: str) -> Template: ...
     @staticmethod
@@ -55,7 +55,7 @@ class Engine:
     @cached_property
     def template_context_processors(
         self
-    ) -> Union[Tuple[Callable, Callable, Callable], Tuple[Callable, Callable, Callable, Callable, Callable], Tuple[Callable, Callable], Tuple[Callable]]: ...
+    ) -> Union[Tuple[Callable, Callable, Callable], Tuple[Callable], Tuple[Callable, Callable, Callable, Callable, Callable], Tuple[Callable, Callable]]: ...
     @cached_property
     def template_loaders(
         self

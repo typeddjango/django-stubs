@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from django.forms.utils import ErrorDict
 from typing import (
     Any,
@@ -11,7 +12,12 @@ from typing import (
 
 
 class ValidationError:
-    def __init__(self, message: Any, code: Optional[str] = ..., params: Any = ...) -> None: ...
+    def __init__(
+        self,
+        message: Iterable,
+        code: Optional[str] = ...,
+        params: Any = ...
+    ) -> None: ...
     def __iter__(self) -> Iterator[Union[str, Tuple[str, List[str]]]]: ...
     def __str__(self) -> str: ...
     @property

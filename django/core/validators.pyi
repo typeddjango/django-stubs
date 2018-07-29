@@ -4,7 +4,6 @@ from django.core.files.base import ContentFile
 from django.utils.functional import SimpleLazyObject
 from re import RegexFlag
 from typing import (
-    Any,
     List,
     Optional,
     Union,
@@ -38,12 +37,16 @@ def validate_ipv6_address(value: str) -> None: ...
 
 
 class BaseValidator:
-    def __call__(self, value: Any) -> None: ...
-    def __init__(self, limit_value: Any, message: None = ...) -> None: ...
+    def __call__(self, value: Union[Decimal, float, str, datetime]) -> None: ...
+    def __init__(
+        self,
+        limit_value: Optional[Union[Decimal, float, datetime]],
+        message: None = ...
+    ) -> None: ...
     def clean(
         self,
-        x: Union[float, datetime, int, Decimal]
-    ) -> Union[float, datetime, int, Decimal]: ...
+        x: Union[Decimal, datetime, float]
+    ) -> Union[Decimal, datetime, float]: ...
     def compare(self, a: bool, b: bool) -> bool: ...
 
 
@@ -82,7 +85,7 @@ class MaxLengthValidator:
 
 
 class MaxValueValidator:
-    def compare(self, a: Union[float, Decimal, int], b: Union[float, Decimal, int]) -> bool: ...
+    def compare(self, a: Union[float, Decimal], b: Union[float, Decimal]) -> bool: ...
 
 
 class MinLengthValidator:
@@ -93,8 +96,8 @@ class MinLengthValidator:
 class MinValueValidator:
     def compare(
         self,
-        a: Union[float, Decimal, int, datetime],
-        b: Union[float, Decimal, int, datetime]
+        a: Union[float, Decimal, datetime],
+        b: Union[float, Decimal, datetime]
     ) -> bool: ...
 
 
@@ -102,7 +105,7 @@ class ProhibitNullCharactersValidator:
     def __call__(self, value: Optional[str]) -> None: ...
     def __eq__(
         self,
-        other: Union[RegexValidator, ProhibitNullCharactersValidator]
+        other: Union[ProhibitNullCharactersValidator, RegexValidator]
     ) -> bool: ...
     def __init__(self, message: Optional[str] = ..., code: Optional[str] = ...) -> None: ...
 

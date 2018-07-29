@@ -1,8 +1,12 @@
 from django.apps.registry import Apps
+from django.contrib.sites.models import Site
+from django.db.models.base import Model
 from typing import (
     Any,
     Callable,
     Optional,
+    Type,
+    Union,
 )
 
 
@@ -18,7 +22,7 @@ class ModelSignal:
     def connect(
         self,
         receiver: Callable,
-        sender: Any = ...,
+        sender: Optional[Union[Type[Site], Type[Model]]] = ...,
         weak: bool = ...,
         dispatch_uid: None = ...,
         apps: None = ...
@@ -26,7 +30,7 @@ class ModelSignal:
     def disconnect(
         self,
         receiver: Callable = ...,
-        sender: Any = ...,
+        sender: Optional[Type[Model]] = ...,
         dispatch_uid: None = ...,
         apps: None = ...
     ) -> bool: ...

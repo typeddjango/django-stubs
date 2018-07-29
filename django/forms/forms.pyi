@@ -23,7 +23,7 @@ class BaseForm:
     def __init__(
         self,
         data: Any = ...,
-        files: Optional[Union[Dict[str, SimpleUploadedFile], MultiValueDict]] = ...,
+        files: Optional[Union[MultiValueDict, Dict[str, SimpleUploadedFile]]] = ...,
         auto_id: Optional[Union[str, bool]] = ...,
         prefix: Optional[str] = ...,
         initial: Any = ...,

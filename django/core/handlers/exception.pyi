@@ -1,7 +1,18 @@
+from django.core.exceptions import (
+    PermissionDenied,
+    SuspiciousOperation,
+)
 from django.core.handlers.wsgi import WSGIRequest
-from django.http.response import HttpResponse
+from django.http.multipartparser import MultiPartParserError
+from django.http.response import (
+    Http404,
+    HttpResponse,
+)
 from django.urls.resolvers import URLResolver
-from typing import Callable
+from typing import (
+    Callable,
+    Union,
+)
 
 
 def convert_exception_to_response(get_response: Callable) -> Callable: ...
@@ -11,7 +22,7 @@ def get_exception_response(
     request: WSGIRequest,
     resolver: URLResolver,
     status_code: int,
-    exception: Exception,
+    exception: Union[MultiPartParserError, PermissionDenied, Http404, SuspiciousOperation],
     sender: None = ...
 ) -> HttpResponse: ...
 

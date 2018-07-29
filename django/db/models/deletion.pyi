@@ -1,3 +1,8 @@
+from django.contrib.auth.models import (
+    Permission,
+    User,
+)
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToOneRel
@@ -11,6 +16,7 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Type,
     Union,
 )
 
@@ -50,7 +56,7 @@ class Collector:
     def add(
         self,
         objs: Any,
-        source: Any = ...,
+        source: Optional[Union[Type[Model], Type[ContentType]]] = ...,
         nullable: bool = ...,
         reverse_dependency: bool = ...
     ) -> Any: ...
@@ -68,15 +74,19 @@ class Collector:
     def collect(
         self,
         objs: Any,
-        source: Any = ...,
+        source: Optional[Union[Type[Model], Type[ContentType]]] = ...,
         nullable: bool = ...,
         collect_related: bool = ...,
         source_attr: Optional[str] = ...,
         reverse_dependency: bool = ...,
         keep_parents: bool = ...
     ) -> None: ...
-    def delete(self) -> Union[Tuple[int, Dict[Any, Any]], Tuple[int, Dict[str, int]]]: ...
-    def get_del_batches(self, objs: Any, field: ForeignKey) -> Any: ...
+    def delete(self) -> Union[Tuple[int, Dict[str, int]], Tuple[int, Dict[Any, Any]]]: ...
+    def get_del_batches(
+        self,
+        objs: Union[List[User], List[Model], List[ContentType], List[Permission]],
+        field: ForeignKey
+    ) -> Union[List[List[Model]], List[List[ContentType]], List[List[User]], List[List[Permission]]]: ...
     def instances_with_model(self) -> Iterator[Any]: ...
     def related_objects(
         self,
@@ -90,5 +100,5 @@ class ProtectedError:
     def __init__(
         self,
         msg: str,
-        protected_objects: Union[QuerySet, List[Model]]
+        protected_objects: Union[List[Model], QuerySet]
     ) -> None: ...

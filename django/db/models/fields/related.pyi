@@ -3,11 +3,13 @@ from django.core.checks.messages import (
     Warning,
 )
 from django.db.backends.sqlite3.base import DatabaseWrapper
+from django.db.models.base import Model
 from django.db.models.expressions import Col
 from django.db.models.fields import Field
 from django.db.models.fields.reverse_related import (
     ForeignObjectRel,
     ManyToOneRel,
+    OneToOneRel,
 )
 from django.db.models.query_utils import (
     FilteredRelation,
@@ -21,6 +23,7 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Type,
     Union,
 )
 from uuid import UUID
@@ -44,10 +47,10 @@ class ForeignKey:
     def check(
         self,
         **kwargs
-    ) -> Union[List[Error], List[Warning]]: ...
+    ) -> Union[List[Warning], List[Error]]: ...
     def contribute_to_related_class(
         self,
-        cls: Any,
+        cls: Type[Model],
         related: ManyToOneRel
     ) -> None: ...
     def db_check(self, connection: DatabaseWrapper) -> List[Any]: ...
@@ -57,16 +60,20 @@ class ForeignKey:
     def formfield(self, *, using = ..., **kwargs) -> ModelChoiceField: ...
     def get_attname(self) -> str: ...
     def get_attname_column(self) -> Tuple[str, str]: ...
-    def get_col(self, alias: str, output_field: Any = ...) -> Col: ...
+    def get_col(
+        self,
+        alias: str,
+        output_field: Optional[Union[Field, reverse_related.OneToOneRel]] = ...
+    ) -> Col: ...
     def get_db_converters(self, connection: DatabaseWrapper) -> List[Any]: ...
     def get_db_prep_save(
         self,
-        value: Any,
+        value: object,
         connection: DatabaseWrapper
     ) -> Optional[Union[str, int]]: ...
     def get_db_prep_value(
         self,
-        value: Union[str, UUID, int],
+        value: Union[str, int, UUID],
         connection: DatabaseWrapper,
         prepared: bool = ...
     ) -> Union[str, int]: ...
@@ -78,7 +85,7 @@ class ForeignKey:
     @property
     def target_field(self) -> Field: ...
     def to_python(self, value: Union[str, int]) -> Union[str, int]: ...
-    def validate(self, value: int, model_instance: Any) -> None: ...
+    def validate(self, value: int, model_instance: Optional[Model]) -> None: ...
 
 
 class ForeignObject:
@@ -86,8 +93,8 @@ class ForeignObject:
         self,
         to: Any,
         on_delete: Callable,
-        from_fields: Union[Tuple[str, str], List[str]],
-        to_fields: Union[List[str], List[None], Tuple[str, str]],
+        from_fields: Union[List[str], Tuple[str, str]],
+        to_fields: Union[List[None], List[str], Tuple[str, str]],
         rel: Optional[ForeignObjectRel] = ...,
         related_name: Optional[str] = ...,
         related_query_name: None = ...,

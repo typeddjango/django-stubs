@@ -2,7 +2,6 @@ from django.core.mail.backends.base import BaseEmailBackend
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from typing import (
-    Any,
     Dict,
     List,
     Optional,
@@ -28,7 +27,7 @@ class EmailMessage:
         from_email: Optional[str] = ...,
         to: Optional[List[str]] = ...,
         bcc: None = ...,
-        connection: Any = ...,
+        connection: Optional[BaseEmailBackend] = ...,
         attachments: Optional[List[MIMEText]] = ...,
         headers: Optional[Dict[str, str]] = ...,
         cc: Optional[List[str]] = ...,
@@ -37,7 +36,7 @@ class EmailMessage:
     def _create_attachment(
         self,
         filename: Optional[str],
-        content: Union[str, bytes, SafeMIMEText],
+        content: Union[bytes, str, SafeMIMEText],
         mimetype: str = ...
     ) -> MIMEBase: ...
     def _create_attachments(
@@ -71,7 +70,7 @@ class EmailMultiAlternatives:
         from_email: Optional[str] = ...,
         to: List[str] = ...,
         bcc: None = ...,
-        connection: Any = ...,
+        connection: Optional[BaseEmailBackend] = ...,
         attachments: None = ...,
         headers: Optional[Dict[str, str]] = ...,
         alternatives: None = ...,

@@ -80,7 +80,7 @@ def has_vary_header(response: HttpResponse, header_query: str) -> bool: ...
 def learn_cache_key(
     request: WSGIRequest,
     response: HttpResponse,
-    cache_timeout: Optional[Union[float, int]] = ...,
+    cache_timeout: Optional[float] = ...,
     key_prefix: Optional[str] = ...,
     cache: Optional[Union[DefaultCacheProxy, backends.locmem.LocMemCache]] = ...
 ) -> str: ...
@@ -94,7 +94,7 @@ def patch_response_headers(response: HttpResponse, cache_timeout: int = ...) -> 
 
 def patch_vary_headers(
     response: HttpResponseBase,
-    newheaders: Union[Tuple[str], Tuple[str, str]]
+    newheaders: Union[Tuple[str, str], Tuple[str]]
 ) -> None: ...
 
 

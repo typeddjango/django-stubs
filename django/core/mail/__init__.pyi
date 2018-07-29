@@ -1,5 +1,4 @@
 from django.core.mail.backends.base import BaseEmailBackend
-from mail.custombackend import EmailBackend
 from typing import (
     List,
     Optional,
@@ -50,5 +49,5 @@ def send_mass_mail(
     fail_silently: bool = ...,
     auth_user: None = ...,
     auth_password: None = ...,
-    connection: EmailBackend = ...
+    connection: BaseEmailBackend = ...
 ) -> int: ...

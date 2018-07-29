@@ -14,7 +14,7 @@ class DummyCache:
     def set(
         self,
         key: str,
-        value: Union[str, int, Dict[str, Any]],
+        value: Union[str, Dict[str, Any], int],
         timeout: object = ...,
         version: Optional[str] = ...
     ) -> None: ...

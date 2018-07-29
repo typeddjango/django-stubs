@@ -8,10 +8,10 @@ from typing import (
 
 
 class Page:
-    def __getitem__(self, index: Union[slice, int]) -> Union[str, List[Model]]: ...
+    def __getitem__(self, index: Union[slice, int]) -> Union[List[Model], str]: ...
     def __init__(
         self,
-        object_list: Union[QuerySet, str, List[object], List[int]],
+        object_list: Union[List[int], str, List[object], QuerySet],
         number: int,
         paginator: Paginator
     ) -> None: ...
@@ -28,7 +28,7 @@ class Page:
 class Paginator:
     def __init__(
         self,
-        object_list: Union[List[object], QuerySet, List[int]],
+        object_list: Union[List[int], QuerySet, List[object]],
         per_page: Union[str, int],
         orphans: Union[str, int] = ...,
         allow_empty_first_page: bool = ...
@@ -43,4 +43,4 @@ class Paginator:
     def page(self, number: Union[str, int]) -> Page: ...
     @property
     def page_range(self) -> range: ...
-    def validate_number(self, number: Optional[Union[str, float, int]]) -> int: ...
+    def validate_number(self, number: Optional[Union[float, str]]) -> int: ...

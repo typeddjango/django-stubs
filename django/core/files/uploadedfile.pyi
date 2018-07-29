@@ -45,7 +45,7 @@ class TemporaryUploadedFile:
 class UploadedFile:
     def __init__(
         self,
-        file: Optional[Union[_TemporaryFileWrapper, StringIO, BytesIO]] = ...,
+        file: Optional[Union[StringIO, _TemporaryFileWrapper, BytesIO]] = ...,
         name: str = ...,
         content_type: str = ...,
         size: Optional[int] = ...,

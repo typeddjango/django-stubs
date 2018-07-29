@@ -45,7 +45,7 @@ class AdminSplitDateTime:
         name: str,
         value: Optional[datetime],
         attrs: Dict[str, Union[bool, str]]
-    ) -> Dict[str, Any]: ...
+    ) -> Dict[str, Union[Dict[str, Any], str, Dict[str, Union[str, bool, Dict[str, Union[bool, str]], List[Dict[str, Union[str, bool, Dict[str, Union[bool, str]]]]]]], Dict[str, Union[str, bool, Dict[str, str], List[Dict[str, Union[str, bool, Dict[str, str]]]]]]]]: ...
 
 
 class AdminTextInputWidget:

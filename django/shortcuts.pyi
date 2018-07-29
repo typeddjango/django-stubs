@@ -38,7 +38,7 @@ def redirect(
 def render(
     request: WSGIRequest,
     template_name: str,
-    context: Optional[Union[Dict[str, bool], Dict[str, str], Dict[str, Union[str, None]]]] = ...,
+    context: Optional[Union[Dict[str, bool], Dict[str, Union[str, None]], Dict[str, str]]] = ...,
     content_type: None = ...,
     status: Optional[int] = ...,
     using: None = ...

@@ -15,6 +15,6 @@ class SeleniumTestCaseBase:
     def __new__(
         cls: Type[SeleniumTestCaseBase],
         name: str,
-        bases: Union[Tuple[Type[SeleniumTestCase], Type[StaticLiveServerTestCase]], Tuple[Type[AdminSeleniumTestCase]]],
+        bases: Union[Tuple[Type[AdminSeleniumTestCase]], Tuple[Type[SeleniumTestCase], Type[StaticLiveServerTestCase]]],
         attrs: Dict[str, Union[str, List[str], Callable]]
     ) -> Type[AdminSeleniumTestCase]: ...

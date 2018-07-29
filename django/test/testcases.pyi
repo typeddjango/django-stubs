@@ -23,7 +23,7 @@ from unittest.runner import TextTestResult
 
 
 class CheckCondition:
-    def __get__(self, instance: None, cls: Any = ...) -> bool: ...
+    def __get__(self, instance: None, cls: Type[TestCase] = ...) -> bool: ...
     def __init__(self, *conditions) -> None: ...
 
 
@@ -56,7 +56,7 @@ class SimpleTestCase:
         self,
         func: Callable,
         cm_attr: str,
-        expected_exception: Any,
+        expected_exception: Type[Exception],
         expected_message: str,
         *args,
         **kwargs
@@ -73,7 +73,7 @@ class SimpleTestCase:
         self,
         func: Callable,
         cm_attr: str,
-        expected_exception: Any,
+        expected_exception: Type[Exception],
         expected_message: str
     ) -> Iterator[Union[_AssertRaisesContext, _AssertWarnsContext]]: ...
     def _assert_template_used(

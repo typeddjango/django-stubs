@@ -37,12 +37,12 @@ class BaseDatabaseSchemaEditor:
     def _create_index_name(
         self,
         table_name: str,
-        column_names: Union[Tuple[str, str, str], Tuple[str], List[str]],
+        column_names: Union[Tuple[str, str, str], List[str], Tuple[str]],
         suffix: str = ...
     ) -> str: ...
     def _create_index_sql(
         self,
-        model: Any,
+        model: Type[Model],
         fields: Any,
         *,
         name = ...,
@@ -52,7 +52,11 @@ class BaseDatabaseSchemaEditor:
         col_suffixes = ...,
         sql = ...
     ) -> Statement: ...
-    def _create_unique_sql(self, model: Any, columns: List[str]) -> Statement: ...
+    def _create_unique_sql(
+        self,
+        model: Type[Model],
+        columns: List[str]
+    ) -> Statement: ...
     def _delete_composed_index(
         self,
         model: Type[Model],
@@ -64,6 +68,6 @@ class BaseDatabaseSchemaEditor:
     def _digest(cls, *args) -> str: ...
     def _field_indexes_sql(
         self,
-        model: Any,
+        model: Type[Model],
         field: Field
     ) -> List[Statement]: ...

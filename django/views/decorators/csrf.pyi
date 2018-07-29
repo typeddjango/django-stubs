@@ -1,4 +1,3 @@
-from csrf_tests.tests import TestingHttpRequest
 from django.http.request import HttpRequest
 from typing import (
     Any,
@@ -12,10 +11,10 @@ def csrf_exempt(view_func: Callable) -> Callable: ...
 
 
 class _EnsureCsrfCookie:
-    def _reject(self, request: TestingHttpRequest, reason: str) -> None: ...
+    def _reject(self, request: HttpRequest, reason: str) -> None: ...
     def process_view(
         self,
-        request: TestingHttpRequest,
+        request: HttpRequest,
         callback: Callable,
         callback_args: Tuple,
         callback_kwargs: Dict[Any, Any]

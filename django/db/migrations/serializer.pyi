@@ -12,7 +12,7 @@ def serializer_factory(value: Any) -> BaseSerializer: ...
 
 
 class BaseSequenceSerializer:
-    def serialize(self) -> Union[Tuple[str, Set[Any]], Tuple[str, Set[str]]]: ...
+    def serialize(self) -> Union[Tuple[str, Set[str]], Tuple[str, Set[Any]]]: ...
 
 
 class BaseSerializer:
@@ -38,8 +38,8 @@ class DeconstructableSerializer:
     @staticmethod
     def serialize_deconstructed(
         path: str,
-        args: Union[Tuple, List[str]],
-        kwargs: Dict[str, Any]
+        args: Union[List[str], Tuple],
+        kwargs: Dict[str, object]
     ) -> Tuple[str, Set[str]]: ...
 
 
@@ -96,7 +96,7 @@ class TupleSerializer:
 
 
 class TypeSerializer:
-    def serialize(self) -> Union[Tuple[str, Set[Any]], Tuple[str, Set[str]]]: ...
+    def serialize(self) -> Union[Tuple[str, Set[str]], Tuple[str, Set[Any]]]: ...
 
 
 class UUIDSerializer:

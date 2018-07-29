@@ -1,12 +1,16 @@
-from django.contrib.sitemaps import Sitemap
+from django.contrib.flatpages.sitemaps import FlatPageSitemap
+from django.contrib.sitemaps import (
+    GenericSitemap,
+    Sitemap,
+)
 from django.core.handlers.wsgi import WSGIRequest
 from django.template.response import TemplateResponse
 from typing import (
-    Any,
     Callable,
     Dict,
     Optional,
     Type,
+    Union,
 )
 
 
@@ -21,7 +25,7 @@ def index(
 
 def sitemap(
     request: WSGIRequest,
-    sitemaps: Dict[str, Any],
+    sitemaps: Dict[str, Union[Type[Sitemap], Type[FlatPageSitemap], GenericSitemap]],
     section: Optional[str] = ...,
     template_name: str = ...,
     content_type: str = ...

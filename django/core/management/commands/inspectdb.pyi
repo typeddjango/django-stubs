@@ -19,7 +19,7 @@ class Command:
         connection: DatabaseWrapper,
         table_name: str,
         row: FieldInfo
-    ) -> Union[Tuple[str, OrderedDict, List[str]], Tuple[str, OrderedDict, List[Any]]]: ...
+    ) -> Union[Tuple[str, OrderedDict, List[Any]], Tuple[str, OrderedDict, List[str]]]: ...
     def get_meta(
         self,
         table_name: str,
@@ -34,4 +34,4 @@ class Command:
         col_name: str,
         used_column_names: List[str],
         is_relation: bool
-    ) -> Union[Tuple[str, Dict[str, str], List[str]], Tuple[str, Dict[Any, Any], List[Any]]]: ...
+    ) -> Union[Tuple[str, Dict[Any, Any], List[Any]], Tuple[str, Dict[str, str], List[str]]]: ...

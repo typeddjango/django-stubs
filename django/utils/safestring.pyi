@@ -9,8 +9,8 @@ def _safety_decorator(safety_marker: Callable, func: Callable) -> Callable: ...
 
 
 def mark_safe(
-    s: Union[str, Callable, BoundField]
-) -> Union[SafeText, Callable, BoundField]: ...
+    s: Union[str, BoundField, Callable]
+) -> Union[SafeText, BoundField, Callable]: ...
 
 
 class SafeData:

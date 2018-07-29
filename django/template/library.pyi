@@ -30,7 +30,7 @@ def parse_bits(
     kwonly_defaults: Optional[Dict[str, int]],
     takes_context: Optional[bool],
     name: str
-) -> Union[Tuple[List[Any], Dict[str, FilterExpression]], Tuple[List[FilterExpression], Dict[str, FilterExpression]], Tuple[List[FilterExpression], Dict[Any, Any]], Tuple[List[Any], Dict[Any, Any]]]: ...
+) -> Union[Tuple[List[Any], Dict[Any, Any]], Tuple[List[FilterExpression], Dict[str, FilterExpression]], Tuple[List[Any], Dict[str, FilterExpression]], Tuple[List[FilterExpression], Dict[Any, Any]]]: ...
 
 
 class InclusionNode:

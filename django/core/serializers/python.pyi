@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import datetime
 from django.core.serializers.base import DeserializedObject
 from django.db.models.base import Model
 from django.db.models.fields import Field
@@ -10,6 +11,9 @@ from typing import (
     Any,
     Iterator,
     List,
+    Optional,
+    Type,
+    Union,
 )
 
 
@@ -22,11 +26,15 @@ def Deserializer(
 ) -> Iterator[DeserializedObject]: ...
 
 
-def _get_model(model_identifier: str) -> Any: ...
+def _get_model(model_identifier: str) -> Type[Model]: ...
 
 
 class Serializer:
-    def _value_from_field(self, obj: Model, field: Field) -> Any: ...
+    def _value_from_field(
+        self,
+        obj: Model,
+        field: Field
+    ) -> Optional[Union[str, float, datetime]]: ...
     def end_object(self, obj: Model) -> None: ...
     def end_serialization(self) -> None: ...
     def get_dump_object(self, obj: Model) -> OrderedDict: ...

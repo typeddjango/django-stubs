@@ -4,13 +4,18 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Type,
     Union,
 )
 
 
 class Operation:
     @staticmethod
-    def __new__(cls: Any, *args, **kwargs) -> Operation: ...
+    def __new__(
+        cls: Type[Operation],
+        *args,
+        **kwargs
+    ) -> Operation: ...
     def _get_model_tuple(self, remote_model: str, app_label: str, model_name: str) -> Tuple[str, str]: ...
     def reduce(
         self,

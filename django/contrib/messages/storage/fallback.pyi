@@ -14,7 +14,7 @@ class FallbackStorage:
         self,
         *args,
         **kwargs
-    ) -> Union[Tuple[List[str], bool], Tuple[List[Any], bool], Tuple[List[Message], bool]]: ...
+    ) -> Union[Tuple[List[Any], bool], Tuple[List[str], bool], Tuple[List[Message], bool]]: ...
     def _store(
         self,
         messages: List[Message],

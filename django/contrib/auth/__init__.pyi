@@ -9,7 +9,6 @@ from django.db.models.base import Model
 from django.db.models.options import Options
 from django.http.request import HttpRequest
 from django.utils.functional import SimpleLazyObject
-from test_client.auth_backends import BackendWithoutGetUserMethod
 from typing import (
     Any,
     Dict,
@@ -20,7 +19,7 @@ from typing import (
 )
 
 
-def _clean_credentials(credentials: Dict[str, Union[str, None]]) -> Dict[str, Union[str, None]]: ...
+def _clean_credentials(credentials: Dict[str, Optional[str]]) -> Dict[str, Optional[str]]: ...
 
 
 def _get_backends(return_tuples: bool = ...) -> Any: ...
@@ -49,9 +48,7 @@ def get_user(
 def get_user_model() -> Type[Model]: ...
 
 
-def load_backend(
-    path: str
-) -> Union[ModelBackend, BackendWithoutGetUserMethod]: ...
+def load_backend(path: str) -> object: ...
 
 
 def login(

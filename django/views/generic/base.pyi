@@ -16,7 +16,7 @@ from typing import (
 
 
 class ContextMixin:
-    def get_context_data(self, **kwargs) -> Dict[str, Any]: ...
+    def get_context_data(self, **kwargs) -> Dict[str, object]: ...
 
 
 class RedirectView:

@@ -20,10 +20,10 @@ def base64_hmac(salt: str, value: Union[str, bytes], key: Union[str, bytes]) -> 
 
 
 def dumps(
-    obj: Union[str, Dict[str, str], Dict[str, Union[str, datetime]], List[str]],
+    obj: Union[str, List[str], Dict[str, Union[str, datetime]], Dict[str, str]],
     key: None = ...,
     salt: str = ...,
-    serializer: Type[Union[JSONSerializer, PickleSerializer]] = ...,
+    serializer: Type[Union[PickleSerializer, JSONSerializer]] = ...,
     compress: bool = ...
 ) -> str: ...
 
@@ -35,14 +35,14 @@ def loads(
     s: str,
     key: None = ...,
     salt: str = ...,
-    serializer: Type[Union[JSONSerializer, PickleSerializer]] = ...,
+    serializer: Type[Union[PickleSerializer, JSONSerializer]] = ...,
     max_age: Optional[int] = ...
-) -> Union[str, Dict[str, str], List[str]]: ...
+) -> Union[str, List[str], Dict[str, str]]: ...
 
 
 class JSONSerializer:
     def dumps(self, obj: Any) -> bytes: ...
-    def loads(self, data: bytes) -> Union[Dict[str, str], List[str]]: ...
+    def loads(self, data: bytes) -> Union[List[str], Dict[str, str]]: ...
 
 
 class Signer:

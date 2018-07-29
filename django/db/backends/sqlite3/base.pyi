@@ -78,5 +78,5 @@ class SQLiteCursorWrapper:
     def executemany(
         self,
         query: str,
-        param_list: Union[List[Tuple[int]], List[Tuple[int, int]]]
+        param_list: Union[List[Tuple[int, int]], List[Tuple[int]]]
     ) -> SQLiteCursorWrapper: ...

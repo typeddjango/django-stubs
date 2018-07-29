@@ -1,14 +1,17 @@
 from django.core.mail.backends.locmem import EmailBackend
 from logging import LogRecord
 from typing import (
-    Any,
     Callable,
     Dict,
+    List,
     Union,
 )
 
 
-def configure_logging(logging_config: str, logging_settings: Dict[str, Any]) -> None: ...
+def configure_logging(
+    logging_config: str,
+    logging_settings: Dict[str, Union[int, Dict[str, Dict[str, str]], Dict[str, Dict[str, Union[str, List[str]]]], Dict[str, Dict[str, Union[List[str], str, bool]]]]]
+) -> None: ...
 
 
 def log_response(

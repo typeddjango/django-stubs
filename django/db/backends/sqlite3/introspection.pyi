@@ -27,7 +27,7 @@ class DatabaseIntrospection:
         self,
         cursor: CursorWrapper,
         name: str
-    ) -> List[Dict[str, Union[str, None, int]]]: ...
+    ) -> List[Dict[str, Optional[Union[str, int]]]]: ...
     def get_constraints(
         self,
         cursor: CursorWrapper,

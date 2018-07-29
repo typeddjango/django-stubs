@@ -14,7 +14,7 @@ class LocMemCache:
     def add(
         self,
         key: str,
-        value: Union[int, Dict[str, int], str, Dict[str, str]],
+        value: Union[int, str, Dict[str, str], Dict[str, int]],
         timeout: object = ...,
         version: Optional[int] = ...
     ): ...
@@ -31,7 +31,7 @@ class LocMemCache:
     def set(
         self,
         key: Union[str, int],
-        value: Any,
+        value: object,
         timeout: object = ...,
         version: Optional[int] = ...
     ) -> None: ...

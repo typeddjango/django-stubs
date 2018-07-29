@@ -14,12 +14,12 @@ def _password_validators_help_text_html(password_validators: None = ...) -> str:
 
 
 def get_default_password_validators(
-) -> Union[List[UserAttributeSimilarityValidator], List[NumericPasswordValidator]]: ...
+) -> Union[List[NumericPasswordValidator], List[UserAttributeSimilarityValidator]]: ...
 
 
 def get_password_validators(
     validator_config: List[Dict[str, str]]
-) -> Union[List[UserAttributeSimilarityValidator], List[NumericPasswordValidator]]: ...
+) -> Union[List[NumericPasswordValidator], List[UserAttributeSimilarityValidator]]: ...
 
 
 def password_changed(

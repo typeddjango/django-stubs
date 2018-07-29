@@ -95,7 +95,7 @@ class BlockTranslateNode:
     def render_token_list(
         self,
         tokens: List[Token]
-    ) -> Union[Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
 
 
 class GetAvailableLanguagesNode:

@@ -10,9 +10,9 @@ from django.db.models.fields.related import (
     ManyToManyField,
 )
 from typing import (
-    Any,
     List,
     Optional,
+    Type,
     Union,
 )
 from xml.dom.minidom import Element
@@ -36,7 +36,7 @@ class Deserializer:
         **options
     ) -> None: ...
     def __next__(self) -> DeserializedObject: ...
-    def _get_model_from_node(self, node: Element, attr: str) -> Any: ...
+    def _get_model_from_node(self, node: Element, attr: str) -> Type[Model]: ...
     def _handle_fk_field_node(
         self,
         node: Element,

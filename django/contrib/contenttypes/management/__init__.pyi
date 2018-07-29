@@ -2,10 +2,14 @@ from django.apps.config import AppConfig
 from django.apps.registry import Apps
 from django.contrib.contenttypes.models import ContentType
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+from django.db.migrations.migration import Migration
 from django.db.migrations.state import StateApps
 from typing import (
     Any,
+    List,
+    Tuple,
     Type,
+    Union,
 )
 
 
@@ -27,7 +31,7 @@ def get_contenttypes_and_models(
 
 
 def inject_rename_contenttypes_operations(
-    plan: Any = ...,
+    plan: Union[List[Any], List[Tuple[Migration, bool]]] = ...,
     apps: StateApps = ...,
     using: str = ...,
     **kwargs

@@ -13,7 +13,7 @@ from typing import (
 )
 
 
-def _write_content(f: Union[BufferedRandom, BufferedWriter], expiry: float, value: Any) -> None: ...
+def _write_content(f: Union[BufferedRandom, BufferedWriter], expiry: float, value: object) -> None: ...
 
 
 class FileBasedCache:

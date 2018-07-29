@@ -7,6 +7,7 @@ from django.db.models.expressions import (
     Expression,
     Ref,
 )
+from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 from django.utils.datastructures import OrderedSet
@@ -34,7 +35,7 @@ class BuiltinLookup:
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         lhs: Optional[Col] = ...
-    ) -> Union[Tuple[str, List[str]], Tuple[str, List[int]], Tuple[str, List[Union[str, int]]], Tuple[str, List[Any]]]: ...
+    ) -> Union[Tuple[str, List[int]], Tuple[str, List[Union[str, int]]], Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
 
 
 class Exact:
@@ -64,11 +65,11 @@ class FieldGetDbPrepValueIterableMixin:
         connection: DatabaseWrapper,
         sql: str,
         param: Any
-    ) -> Union[Tuple[str, List[None]], Tuple[str, List[int]], Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[None]], Tuple[str, List[int]], Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
 
 
 class FieldGetDbPrepValueMixin:
-    def get_db_prep_lookup(self, value: Any, connection: DatabaseWrapper) -> Any: ...
+    def get_db_prep_lookup(self, value: object, connection: DatabaseWrapper) -> Any: ...
 
 
 class IExact:
@@ -76,7 +77,7 @@ class IExact:
         self,
         qn: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
 
 
 class In:
@@ -108,7 +109,11 @@ class IsNull:
 
 
 class Lookup:
-    def __init__(self, lhs: Any, rhs: Any) -> None: ...
+    def __init__(
+        self,
+        lhs: Union[MultiColSource, Expression],
+        rhs: object
+    ) -> None: ...
     def apply_bilateral_transforms(
         self,
         value: Expression
@@ -130,7 +135,7 @@ class Lookup:
     ) -> Union[Tuple[str, List[int]], Tuple[str, List[SafeText]], Tuple[str, List[str]]]: ...
     def get_group_by_cols(
         self
-    ) -> Union[List[Col], List[CombinedExpression]]: ...
+    ) -> Union[List[CombinedExpression], List[Col]]: ...
     def get_prep_lookup(self) -> Any: ...
     def get_source_expressions(self) -> List[Col]: ...
     def process_lhs(
@@ -147,7 +152,7 @@ class Lookup:
     def relabeled_clone(
         self,
         relabels: Union[OrderedDict, Dict[str, str], Dict[Union[str, None], str]]
-    ) -> BuiltinLookup: ...
+    ) -> Union[IsNull, StartsWith, FieldGetDbPrepValueMixin, IContains]: ...
     def rhs_is_direct_value(self) -> bool: ...
     def set_source_expressions(self, new_exprs: List[Ref]) -> None: ...
 
@@ -158,7 +163,7 @@ class PatternLookup:
         self,
         qn: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[str]], Tuple[str, List[int]], Tuple[str, List[Any]]]: ...
+    ) -> Union[Tuple[str, List[int]], Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
 
 
 class Range:
@@ -194,7 +199,7 @@ class YearExact:
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper
-    ) -> Union[Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+    ) -> Union[Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
 
 
 class YearGt:

@@ -6,6 +6,7 @@ from typing import (
     Iterator,
     Optional,
     Tuple,
+    Type,
     Union,
 )
 
@@ -37,7 +38,7 @@ class NamedValuesListIterable:
 
 class Prefetch:
     def __eq__(self, other: None) -> bool: ...
-    def __getstate__(self) -> Dict[str, Union[str, QuerySet, None]]: ...
+    def __getstate__(self) -> Dict[str, Optional[Union[str, QuerySet]]]: ...
     def __hash__(self) -> int: ...
     def __init__(
         self,
@@ -58,7 +59,7 @@ class QuerySet:
     def __getstate__(self) -> Dict[str, Any]: ...
     def __init__(
         self,
-        model: Any = ...,
+        model: Type[Model] = ...,
         query: Optional[Query] = ...,
         using: Optional[str] = ...,
         hints: Dict[str, Model] = ...

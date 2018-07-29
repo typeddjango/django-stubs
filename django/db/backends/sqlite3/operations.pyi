@@ -10,14 +10,19 @@ from django.db.backends.sqlite3.base import (
     SQLiteCursorWrapper,
 )
 from django.db.backends.utils import CursorDebugWrapper
-from django.db.models.aggregates import Aggregate
+from django.db.models.aggregates import (
+    Aggregate,
+    Max,
+)
 from django.db.models.expressions import (
-    BaseExpression,
     Col,
     CombinedExpression,
     Expression,
     F,
+    OrderBy,
 )
+from django.db.models.functions.comparison import Cast
+from django.db.models.functions.datetime import TruncBase
 from typing import (
     Any,
     Callable,
@@ -40,7 +45,10 @@ class DatabaseOperations:
     def adapt_timefield_value(self, value: Optional[time]) -> Optional[str]: ...
     def bulk_batch_size(self, fields: Any, objs: Any) -> int: ...
     def bulk_insert_sql(self, fields: Any, placeholder_rows: Any) -> str: ...
-    def check_expression_support(self, expression: BaseExpression) -> None: ...
+    def check_expression_support(
+        self,
+        expression: Union[OrderBy, Expression]
+    ) -> None: ...
     def combine_duration_expression(self, connector: str, sub_expressions: List[str]) -> str: ...
     def combine_expression(self, connector: str, sub_expressions: List[str]) -> str: ...
     def convert_booleanfield_value(
@@ -52,7 +60,7 @@ class DatabaseOperations:
     def convert_datefield_value(
         self,
         value: Optional[Union[str, date]],
-        expression: Expression,
+        expression: Union[Col, Cast, Aggregate, django.db.models.functions.TruncBase],
         connection: DatabaseWrapper
     ) -> Optional[date]: ...
     def convert_datetimefield_value(
@@ -64,7 +72,7 @@ class DatabaseOperations:
     def convert_timefield_value(
         self,
         value: Optional[Union[str, time]],
-        expression: Expression,
+        expression: Union[Col, Max, django.db.models.functions.TruncBase],
         connection: DatabaseWrapper
     ) -> Optional[time]: ...
     def convert_uuidfield_value(
@@ -92,7 +100,7 @@ class DatabaseOperations:
         self,
         cursor: Union[SQLiteCursorWrapper, CursorDebugWrapper],
         sql: str,
-        params: Optional[Union[Tuple, List[str]]]
+        params: Optional[Union[List[str], Tuple]]
     ) -> str: ...
     def no_limit_value(self) -> int: ...
     def pk_default_value(self) -> str: ...
@@ -108,7 +116,7 @@ class DatabaseOperations:
         self,
         internal_type: str,
         lhs: Tuple[str, List[Any]],
-        rhs: Union[Tuple[str, List[Any]], Tuple[str, List[str]]]
-    ) -> Union[Tuple[str, List[Any]], Tuple[str, List[str]]]: ...
+        rhs: Union[Tuple[str, List[str]], Tuple[str, List[Any]]]
+    ) -> Union[Tuple[str, List[str]], Tuple[str, List[Any]]]: ...
     def time_extract_sql(self, lookup_type: str, field_name: str) -> str: ...
     def time_trunc_sql(self, lookup_type: str, field_name: str) -> str: ...

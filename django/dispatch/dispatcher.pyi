@@ -1,4 +1,4 @@
-from dispatch.tests import Callable
+from django.db.models.base import Model
 from functools import partial
 from typing import (
     Any,
@@ -6,6 +6,7 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Type,
     Union,
 )
 
@@ -13,10 +14,7 @@ from typing import (
 class Signal:
     def __init__(self, providing_args: List[str] = ..., use_caching: bool = ...) -> None: ...
     def _clear_dead_receivers(self) -> None: ...
-    def _live_receivers(
-        self,
-        sender: object
-    ) -> Union[List[Callable], List[object], List[Callable], List[partial]]: ...
+    def _live_receivers(self, sender: object) -> Union[List[partial], List[Callable], List[object]]: ...
     def _remove_receiver(self, receiver: None = ...) -> None: ...
     def connect(
         self,
@@ -32,4 +30,8 @@ class Signal:
         dispatch_uid: Optional[str] = ...
     ) -> bool: ...
     def has_listeners(self, sender: object = ...) -> bool: ...
-    def send(self, sender: Any, **named) -> Union[List[Tuple[Callable, None]], List[Tuple[object, None]]]: ...
+    def send(
+        self,
+        sender: Type[Model],
+        **named
+    ) -> Union[List[Tuple[object, None]], List[Tuple[Callable, None]]]: ...

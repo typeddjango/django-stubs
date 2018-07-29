@@ -1,7 +1,4 @@
-from typing import (
-    Any,
-    Optional,
-)
+from typing import Optional
 
 
 class CheckMessage:
@@ -11,7 +8,7 @@ class CheckMessage:
         level: int,
         msg: str,
         hint: Optional[str] = ...,
-        obj: Any = ...,
+        obj: object = ...,
         id: Optional[str] = ...
     ) -> None: ...
     def __str__(self) -> str: ...

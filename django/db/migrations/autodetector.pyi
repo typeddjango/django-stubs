@@ -1,12 +1,13 @@
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.migration import Migration
-from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.operations.models import (
+    AddIndex,
     CreateModel,
     DeleteModel,
     FieldRelatedOptionOperation,
     ModelOperation,
+    RemoveIndex,
 )
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState
@@ -62,7 +63,7 @@ class MigrationAutodetector:
     def add_operation(
         self,
         app_label: str,
-        operation: Operation,
+        operation: Union[FieldOperation, RemoveIndex, ModelOperation],
         dependencies: Any = ...,
         beginning: bool = ...
     ) -> None: ...
@@ -81,11 +82,11 @@ class MigrationAutodetector:
     ) -> Dict[str, List[Migration]]: ...
     def check_dependency(
         self,
-        operation: Operation,
-        dependency: Union[Tuple[str, str, str, str], Tuple[str, str, str, bool], Tuple[str, str, None, bool]]
+        operation: Union[FieldOperation, AddIndex, ModelOperation],
+        dependency: Union[Tuple[str, str, None, bool], Tuple[str, str, str, str], Tuple[str, str, str, bool]]
     ) -> bool: ...
     def create_altered_indexes(self) -> None: ...
-    def deep_deconstruct(self, obj: Any) -> Any: ...
+    def deep_deconstruct(self, obj: object) -> Any: ...
     def generate_added_fields(self) -> None: ...
     def generate_added_indexes(self) -> None: ...
     def generate_altered_db_table(self) -> None: ...

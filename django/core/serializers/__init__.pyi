@@ -50,7 +50,7 @@ def serialize(
 
 
 def sort_dependencies(
-    app_list: Union[List[Union[Tuple[SitesConfig, None], Tuple[SimpleAdminConfig, None], Tuple[AppConfig, None]]], List[Tuple[str, List[Type[Model]]]], List[Union[Tuple[SitesConfig, None], Tuple[SimpleAdminConfig, None]]]]
+    app_list: Union[List[Tuple[str, List[Type[Model]]]], List[Union[Tuple[SitesConfig, None], Tuple[SimpleAdminConfig, None], Tuple[AppConfig, None]]], List[Union[Tuple[SitesConfig, None], Tuple[SimpleAdminConfig, None]]]]
 ) -> List[Type[Model]]: ...
 
 

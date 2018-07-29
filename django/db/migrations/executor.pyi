@@ -20,12 +20,17 @@ class MigrationExecutor:
         progress_callback: Optional[Callable] = ...
     ) -> None: ...
     def _create_project_state(self, with_applied_migrations: bool = ...) -> ProjectState: ...
-    def _migrate_all_backwards(self, plan: Any, full_plan: Any, fake: bool) -> ProjectState: ...
+    def _migrate_all_backwards(
+        self,
+        plan: List[Tuple[Migration, bool]],
+        full_plan: Union[List[Any], List[Tuple[Migration, bool]]],
+        fake: bool
+    ) -> ProjectState: ...
     def _migrate_all_forwards(
         self,
         state: ProjectState,
-        plan: Any,
-        full_plan: Any,
+        plan: Union[List[Any], List[Tuple[Migration, bool]]],
+        full_plan: Union[List[Any], List[Tuple[Migration, bool]]],
         fake: bool,
         fake_initial: bool
     ) -> ProjectState: ...
@@ -44,17 +49,17 @@ class MigrationExecutor:
     ) -> Tuple[bool, ProjectState]: ...
     def migrate(
         self,
-        targets: Optional[Union[List[Tuple[str, str]], List[Tuple[str, None]]]],
-        plan: Any = ...,
+        targets: Optional[Union[List[Tuple[str, None]], List[Tuple[str, str]]]],
+        plan: Optional[Union[List[Any], List[Tuple[Migration, bool]]]] = ...,
         state: Optional[ProjectState] = ...,
         fake: bool = ...,
         fake_initial: bool = ...
     ) -> ProjectState: ...
     def migration_plan(
         self,
-        targets: Union[Set[Tuple[str, str]], List[Tuple[str, str]], List[Tuple[str, None]]],
+        targets: Union[List[Tuple[str, None]], List[Tuple[str, str]], Set[Tuple[str, str]]],
         clean_start: bool = ...
-    ) -> Any: ...
+    ) -> Union[List[Any], List[Tuple[Migration, bool]], List[Tuple[object, bool]]]: ...
     def unapply_migration(
         self,
         state: ProjectState,

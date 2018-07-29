@@ -1,5 +1,6 @@
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ProjectState
 from django.db.models.indexes import Index
 from typing import (
@@ -183,7 +184,7 @@ class DeleteModel:
 class FieldRelatedOptionOperation:
     def reduce(
         self,
-        operation: Operation,
+        operation: Union[FieldOperation, CreateModel, AlterIndexTogether],
         in_between: List[DeleteModel],
         app_label: Optional[str] = ...
     ) -> Any: ...
@@ -200,7 +201,7 @@ class ModelOperation:
     def name_lower(self) -> str: ...
     def reduce(
         self,
-        operation: Operation,
+        operation: Union[FieldOperation, ModelOperation],
         in_between: Any,
         app_label: Optional[str] = ...
     ) -> bool: ...
@@ -210,7 +211,7 @@ class ModelOperation:
 class ModelOptionOperation:
     def reduce(
         self,
-        operation: Operation,
+        operation: Union[FieldOperation, CreateModel, FieldRelatedOptionOperation],
         in_between: List[DeleteModel],
         app_label: Optional[str] = ...
     ) -> Union[bool, List[AlterUniqueTogether]]: ...
