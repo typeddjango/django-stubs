@@ -19,6 +19,6 @@ setup(
     version="0.1.0",
     license='BSD',
     install_requires='Django==2.1rc1',
-    packages=['numpy-stubs'],
+    packages=['django-stubs'],
     package_data=find_stubs('django-stubs')
 )
