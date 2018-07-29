@@ -7,6 +7,7 @@ from typing import Any, Optional
 
 from datetime import datetime
 from typing import Dict, Optional, Union
+
 class SessionStore(SessionBase):
     def load(self) -> Dict[str, Union[str, datetime]]: ...
     modified: bool = ...

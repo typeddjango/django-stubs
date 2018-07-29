@@ -5,6 +5,7 @@
 from typing import Any
 
 from django.utils.functional import SimpleLazyObject
+
 COMPILED_REGEX_TYPE: Any
 
 class RegexObject:

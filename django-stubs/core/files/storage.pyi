@@ -1,18 +1,9 @@
 from io import StringIO
 from datetime import datetime
 from django.core.files.base import File
-from typing import (
-    Any,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
-
+from typing import Any, List, Optional, Tuple, Type, Union
 
 def get_storage_class(import_path: Optional[str] = ...) -> Type[Storage]: ...
-
 
 class FileSystemStorage:
     def __init__(
@@ -20,16 +11,14 @@ class FileSystemStorage:
         location: Optional[str] = ...,
         base_url: Optional[str] = ...,
         file_permissions_mode: Optional[int] = ...,
-        directory_permissions_mode: Optional[int] = ...
+        directory_permissions_mode: Optional[int] = ...,
     ) -> None: ...
     def _clear_cached_properties(self, setting: str, **kwargs) -> None: ...
     def _datetime_from_timestamp(self, ts: float) -> datetime: ...
     def _open(self, name: str, mode: str = ...) -> File: ...
     def _save(self, name: str, content: File) -> str: ...
     def _value_or_setting(
-        self,
-        value: Optional[Union[str, int]],
-        setting: Optional[Union[str, int]]
+        self, value: Optional[Union[str, int]], setting: Optional[Union[str, int]]
     ) -> Optional[Union[str, int]]: ...
     @cached_property
     def base_location(self) -> str: ...
@@ -45,15 +34,18 @@ class FileSystemStorage:
     def get_created_time(self, name: str) -> datetime: ...
     def get_modified_time(self, name: str) -> datetime: ...
     def listdir(
-        self,
-        path: str
-    ) -> Union[Tuple[List[str], List[Any]], Tuple[List[Any], List[Any]], Tuple[List[Any], List[str]], Tuple[List[str], List[str]]]: ...
+        self, path: str
+    ) -> Union[
+        Tuple[List[str], List[Any]],
+        Tuple[List[Any], List[Any]],
+        Tuple[List[Any], List[str]],
+        Tuple[List[str], List[str]],
+    ]: ...
     @cached_property
     def location(self) -> str: ...
     def path(self, name: str) -> str: ...
     def size(self, name: str) -> int: ...
     def url(self, name: str) -> str: ...
-
 
 class Storage:
     def generate_filename(self, filename: str) -> str: ...
@@ -64,5 +56,5 @@ class Storage:
         self,
         name: Optional[str],
         content: Union[StringIO, File],
-        max_length: Optional[int] = ...
+        max_length: Optional[int] = ...,
     ) -> str: ...

@@ -5,6 +5,7 @@
 from typing import Any
 
 from django.http.request import HttpRequest
+
 class RequestSite:
     domain: Any = ...
     def __init__(self, request: HttpRequest) -> None: ...

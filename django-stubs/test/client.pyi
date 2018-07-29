@@ -3,10 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.wsgi import WSGIRequest
 from django.dispatch.dispatcher import Signal
-from django.http.request import (
-    HttpRequest,
-    QueryDict,
-)
+from django.http.request import HttpRequest, QueryDict
 from django.http.response import (
     FileResponse,
     HttpResponse,
@@ -17,41 +14,23 @@ from django.http.response import (
 from django.template.base import Template
 from django.template.context import Context
 from django.test.utils import ContextList
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Union,
-)
+from typing import Any, Callable, Dict, List, Optional, Union
 from urllib.parse import ParseResult
 
-
 def closing_iterator_wrapper(iterable: map, close: Callable) -> None: ...
-
-
 def conditional_content_removal(
-    request: HttpRequest,
-    response: HttpResponseBase
+    request: HttpRequest, response: HttpResponseBase
 ) -> HttpResponseBase: ...
-
-
 def encode_file(boundary: str, key: str, file: object) -> List[bytes]: ...
-
-
 def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
-
-
 def store_rendered_templates(
     store: Dict[str, Union[List[Template], ContextList]],
     signal: Signal,
     sender: Template,
     template: Template,
     context: Context,
-    **kwargs
+    **kwargs,
 ) -> None: ...
-
 
 class Client:
     def __init__(self, enforce_csrf_checks: bool = ..., **defaults) -> None: ...
@@ -60,10 +39,12 @@ class Client:
         response: Union[HttpResponseForbidden, HttpResponseRedirect],
         data: Any = ...,
         content_type: str = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def _login(self, user: AbstractBaseUser, backend: Optional[str] = ...) -> None: ...
-    def _parse_json(self, response: HttpResponse, **extra) -> Dict[str, Union[int, str]]: ...
+    def _parse_json(
+        self, response: HttpResponse, **extra
+    ) -> Dict[str, Union[int, str]]: ...
     def delete(
         self,
         path: str,
@@ -71,7 +52,7 @@ class Client:
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def force_login(self, user: User, backend: Optional[str] = ...) -> None: ...
     def get(
@@ -80,7 +61,7 @@ class Client:
         data: Optional[Union[Dict[str, str], QueryDict]] = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponseBase: ...
     def head(
         self,
@@ -88,7 +69,7 @@ class Client:
         data: Optional[Dict[str, str]] = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def login(self, **credentials) -> bool: ...
     def logout(self) -> None: ...
@@ -99,7 +80,7 @@ class Client:
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def patch(
         self,
@@ -108,7 +89,7 @@ class Client:
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def post(
         self,
@@ -117,7 +98,7 @@ class Client:
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def put(
         self,
@@ -126,7 +107,7 @@ class Client:
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def request(self, **request): ...
     @property
@@ -138,14 +119,12 @@ class Client:
         data: Dict[str, str] = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
-
 
 class ClientHandler:
     def __call__(self, environ: Dict[str, Any]) -> HttpResponseBase: ...
     def __init__(self, enforce_csrf_checks: bool = ..., *args, **kwargs) -> None: ...
-
 
 class FakePayload:
     def __init__(self, content: Optional[Union[str, bytes]] = ...) -> None: ...
@@ -153,9 +132,8 @@ class FakePayload:
     def read(self, num_bytes: int = ...) -> bytes: ...
     def write(self, content: Union[str, bytes]) -> None: ...
 
-
 class RequestFactory:
-    def __init__(self, *, json_encoder = ..., **defaults) -> None: ...
+    def __init__(self, *, json_encoder=..., **defaults) -> None: ...
     def _base_environ(self, **request) -> Dict[str, Any]: ...
     def _encode_data(self, data: Any, content_type: str) -> bytes: ...
     def _encode_json(self, data: Any, content_type: str) -> Any: ...
@@ -166,7 +144,7 @@ class RequestFactory:
         data: Union[str, Dict[str, int]] = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> Union[WSGIRequest, HttpResponse]: ...
     def generic(
         self,
@@ -175,21 +153,13 @@ class RequestFactory:
         data: Union[str, bytes, Dict[str, str]] = ...,
         content_type: Optional[str] = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def get(
-        self,
-        path: str,
-        data: Any = ...,
-        secure: bool = ...,
-        **extra
+        self, path: str, data: Any = ..., secure: bool = ..., **extra
     ) -> Union[WSGIRequest, HttpResponse, FileResponse]: ...
     def head(
-        self,
-        path: str,
-        data: Optional[Dict[str, str]] = ...,
-        secure: bool = ...,
-        **extra
+        self, path: str, data: Optional[Dict[str, str]] = ..., secure: bool = ..., **extra
     ) -> Union[WSGIRequest, HttpResponse]: ...
     def options(
         self,
@@ -197,7 +167,7 @@ class RequestFactory:
         data: Dict[str, str] = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponseRedirect: ...
     def patch(
         self,
@@ -205,7 +175,7 @@ class RequestFactory:
         data: str = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def post(
         self,
@@ -213,7 +183,7 @@ class RequestFactory:
         data: Any = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def put(
         self,
@@ -221,12 +191,9 @@ class RequestFactory:
         data: Union[str, Dict[str, str]] = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra
+        **extra,
     ) -> HttpResponse: ...
     def request(self, **request) -> WSGIRequest: ...
     def trace(
-        self,
-        path: str,
-        secure: bool = ...,
-        **extra
+        self, path: str, secure: bool = ..., **extra
     ) -> Union[WSGIRequest, HttpResponse]: ...

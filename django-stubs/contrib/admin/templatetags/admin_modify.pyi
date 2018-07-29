@@ -9,6 +9,7 @@ from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.templatetags.base import InclusionAdminNode
 from django.template.base import Parser, Token
 from django.template.context import Context, RequestContext
+
 register: Any
 
 def prepopulated_fields_js(context: RequestContext) -> RequestContext: ...

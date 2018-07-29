@@ -5,6 +5,7 @@
 from typing import Any, Optional
 
 from typing import Optional, Union
+
 class OrderedSet:
     dict: Any = ...
     def __init__(self, iterable: Optional[Any] = ...) -> None: ...

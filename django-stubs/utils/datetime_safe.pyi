@@ -7,6 +7,7 @@ from typing import Any
 
 from datetime import date, datetime
 from typing import List, Union
+
 class date(real_date):
     def strftime(self, fmt: str) -> str: ...
 

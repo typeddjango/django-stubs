@@ -8,6 +8,7 @@ from typing import Any, Optional
 from django.core.mail.message import EmailMessage
 from smtplib import SMTP
 from typing import List, Optional, Type
+
 class EmailBackend(BaseEmailBackend):
     host: Any = ...
     port: Any = ...
@@ -20,7 +21,20 @@ class EmailBackend(BaseEmailBackend):
     ssl_certfile: Any = ...
     connection: Any = ...
     _lock: Any = ...
-    def __init__(self, host: None = ..., port: None = ..., username: Optional[str] = ..., password: Optional[str] = ..., use_tls: None = ..., fail_silently: bool = ..., use_ssl: None = ..., timeout: None = ..., ssl_keyfile: None = ..., ssl_certfile: None = ..., **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        host: None = ...,
+        port: None = ...,
+        username: Optional[str] = ...,
+        password: Optional[str] = ...,
+        use_tls: None = ...,
+        fail_silently: bool = ...,
+        use_ssl: None = ...,
+        timeout: None = ...,
+        ssl_keyfile: None = ...,
+        ssl_certfile: None = ...,
+        **kwargs: Any,
+    ) -> None: ...
     @property
     def connection_class(self) -> Type[SMTP]: ...
     def open(self) -> bool: ...

@@ -5,6 +5,7 @@
 from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
+
 class BaseDatabaseFeatures:
     gis_enabled: bool = ...
     allows_group_by_pk: bool = ...

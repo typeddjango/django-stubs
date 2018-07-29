@@ -1,8 +1,5 @@
 from collections import OrderedDict
-from django.contrib.auth.forms import (
-    UserChangeForm,
-    UserCreationForm,
-)
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.base import Model
@@ -11,29 +8,16 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.forms.fields import Field
 from django.forms.utils import ErrorList
-from typing import (
-    Any,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 from uuid import UUID
-
 
 def _get_foreign_key(
     parent_model: Type[Model],
     model: Type[Model],
     fk_name: Optional[str] = ...,
-    can_fail: bool = ...
+    can_fail: bool = ...,
 ) -> ForeignKey: ...
-
-
 def apply_limit_choices_to_to_formfield(formfield: Field) -> None: ...
-
 
 class BaseModelForm:
     def __init__(
@@ -48,7 +32,7 @@ class BaseModelForm:
         empty_permitted: bool = ...,
         instance: Optional[Model] = ...,
         use_required_attribute: None = ...,
-        renderer: None = ...
+        renderer: None = ...,
     ) -> None: ...
     def _get_validation_exclusions(self) -> List[str]: ...
     def _post_clean(self) -> None: ...
@@ -58,19 +42,14 @@ class BaseModelForm:
     def save(self, commit: bool = ...) -> Model: ...
     def validate_unique(self) -> None: ...
 
-
 class InlineForeignKeyField:
     def __init__(
-        self,
-        parent_instance: Model,
-        *args,
-        pk_field = ...,
-        to_field = ...,
-        **kwargs
+        self, parent_instance: Model, *args, pk_field=..., to_field=..., **kwargs
     ) -> None: ...
     def clean(self, value: Optional[Union[str, int]]) -> Model: ...
-    def has_changed(self, initial: Optional[Union[str, int]], data: Optional[Union[str, int]]) -> bool: ...
-
+    def has_changed(
+        self, initial: Optional[Union[str, int]], data: Optional[Union[str, int]]
+    ) -> bool: ...
 
 class ModelChoiceField:
     def __deepcopy__(self, memo: Dict[int, Any]) -> ModelChoiceField: ...
@@ -78,26 +57,29 @@ class ModelChoiceField:
         self,
         queryset: QuerySet,
         *,
-        empty_label = ...,
-        required = ...,
-        widget = ...,
-        label = ...,
-        initial = ...,
-        help_text = ...,
-        to_field_name = ...,
-        limit_choices_to = ...,
-        **kwargs
+        empty_label=...,
+        required=...,
+        widget=...,
+        label=...,
+        initial=...,
+        help_text=...,
+        to_field_name=...,
+        limit_choices_to=...,
+        **kwargs,
     ) -> None: ...
     def _get_choices(self) -> ModelChoiceIterator: ...
     def _get_queryset(self) -> QuerySet: ...
     def _set_queryset(self, queryset: Union[QuerySet, Manager]) -> None: ...
     def get_limit_choices_to(self) -> Any: ...
-    def has_changed(self, initial: Optional[Union[UUID, int]], data: Optional[Union[str, int]]) -> bool: ...
+    def has_changed(
+        self, initial: Optional[Union[UUID, int]], data: Optional[Union[str, int]]
+    ) -> bool: ...
     def label_from_instance(self, obj: Model) -> str: ...
     def prepare_value(self, value: Any) -> Optional[Union[str, UUID, int]]: ...
-    def to_python(self, value: Optional[Union[str, List[List[str]], int]]) -> Optional[Model]: ...
+    def to_python(
+        self, value: Optional[Union[str, List[List[str]], int]]
+    ) -> Optional[Model]: ...
     def validate(self, value: Optional[Model]) -> None: ...
-
 
 class ModelChoiceIterator:
     def __bool__(self) -> bool: ...
@@ -106,34 +88,141 @@ class ModelChoiceIterator:
     def __len__(self) -> int: ...
     def choice(self, obj: Model) -> Tuple[int, str]: ...
 
-
 class ModelFormMetaclass:
     @staticmethod
     def __new__(
         mcs: Type[ModelFormMetaclass],
         name: str,
         bases: Tuple[Type[ModelForm]],
-        attrs: OrderedDict
+        attrs: OrderedDict,
     ) -> Type[ModelForm]: ...
-
 
 class ModelFormOptions:
     def __init__(
         self,
-        options: Optional[Union[Type[object], Type[UserChangeForm.Meta], Type[UserCreationForm.Meta]]] = ...
+        options: Optional[
+            Union[Type[object], Type[UserChangeForm.Meta], Type[UserCreationForm.Meta]]
+        ] = ...,
     ) -> None: ...
-
 
 class ModelMultipleChoiceField:
     def __init__(self, queryset: QuerySet, **kwargs) -> None: ...
     def _check_values(
         self,
-        value: Union[List[int], Tuple[int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int], List[str]]
+        value: Union[
+            List[int],
+            Tuple[
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+                int,
+            ],
+            List[str],
+        ],
     ) -> QuerySet: ...
-    def clean(self, value: Union[List[List[str]], List[int], str, List[str]]) -> QuerySet: ...
+    def clean(
+        self, value: Union[List[List[str]], List[int], str, List[str]]
+    ) -> QuerySet: ...
     def has_changed(self, initial: List[Model], data: List[str]) -> bool: ...
     def prepare_value(self, value: Any) -> Any: ...
     def to_python(
         self,
-        value: Tuple[int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int]
+        value: Tuple[
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+            int,
+        ],
     ) -> List[Model]: ...

@@ -9,6 +9,7 @@ from datetime import date
 from django.template.base import NodeList
 from django.template.context import Context
 from django.utils.safestring import SafeText
+
 register: Any
 
 def localize(value: Any): ...

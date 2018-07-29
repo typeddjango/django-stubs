@@ -5,5 +5,10 @@
 from .filesystem import Loader as FilesystemLoader
 
 from typing import Tuple, Union
+
 class Loader(FilesystemLoader):
-    def get_dirs(self) -> Union[Tuple[str, str], Tuple[str, str, str], Tuple[str], Tuple[str, str, str, str]]: ...
+    def get_dirs(
+        self
+    ) -> Union[
+        Tuple[str, str], Tuple[str, str, str], Tuple[str], Tuple[str, str, str, str]
+    ]: ...

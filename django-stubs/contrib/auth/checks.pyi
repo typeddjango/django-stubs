@@ -6,5 +6,6 @@ from .management import _get_builtin_permissions
 from typing import Any, Optional
 
 from typing import Any, List
+
 def check_user_model(app_configs: None = ..., **kwargs: Any) -> List[Any]: ...
 def check_models_permissions(app_configs: None = ..., **kwargs: Any) -> List[Any]: ...

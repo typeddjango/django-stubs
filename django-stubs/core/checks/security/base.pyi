@@ -6,6 +6,7 @@ from typing import Any
 
 from django.core.checks.messages import Warning
 from typing import Any, List
+
 SECRET_KEY_MIN_LENGTH: int
 SECRET_KEY_MIN_UNIQUE_CHARACTERS: int
 W001: Any

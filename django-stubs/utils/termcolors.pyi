@@ -5,6 +5,7 @@
 from typing import Any
 
 from typing import Callable, Dict, Optional, Tuple, Union
+
 color_names: Any
 foreground: Any
 background: Any
@@ -20,4 +21,8 @@ LIGHT_PALETTE: str
 PALETTES: Any
 DEFAULT_PALETTE = DARK_PALETTE
 
-def parse_color_setting(config_string: str) -> Optional[Union[Dict[str, Dict[str, Union[str, Tuple[str]]]], Dict[str, Dict[str, str]]]]: ...
+def parse_color_setting(
+    config_string: str
+) -> Optional[
+    Union[Dict[str, Dict[str, Union[str, Tuple[str]]]], Dict[str, Dict[str, str]]]
+]: ...

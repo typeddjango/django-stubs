@@ -5,4 +5,5 @@
 from typing import Any, Optional
 
 from typing import Callable
+
 def register(*models: Any, site: Optional[Any] = ...) -> Callable: ...

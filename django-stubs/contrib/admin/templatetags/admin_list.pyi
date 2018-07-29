@@ -14,6 +14,7 @@ from django.template.base import Parser, Token
 from django.template.context import RequestContext
 from django.utils.safestring import SafeText
 from typing import Any, Callable, Dict, Iterator, Optional, Union
+
 register: Any
 DOT: str
 

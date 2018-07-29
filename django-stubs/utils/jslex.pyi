@@ -5,6 +5,7 @@
 from typing import Any, Optional
 
 from typing import Dict, Iterator, List, Optional, Tuple
+
 class Tok:
     num: int = ...
     id: Any = ...

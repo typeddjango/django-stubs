@@ -7,6 +7,7 @@ from typing import Any
 from django.contrib.auth.models import AnonymousUser, User
 from django.http.request import HttpRequest
 from typing import Dict, Union
+
 class PermLookupDict:
     def __init__(self, user: object, app_label: str) -> None: ...
     def __repr__(self): ...

@@ -5,6 +5,7 @@
 from typing import Any
 
 from typing import Dict
+
 SimpleCookie: Any
 
 def parse_cookie(cookie: str) -> Dict[str, str]: ...

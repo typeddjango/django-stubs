@@ -6,7 +6,9 @@ from django.utils.functional import LazyObject
 from typing import Any, Optional
 
 from typing import Any, List
+
 ENVIRONMENT_VARIABLE: str
+
 class LazySettings(LazyObject):
     _wrapped: Any = ...
     def _setup(self, name: None = ...) -> None: ...

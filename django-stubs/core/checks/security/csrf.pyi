@@ -6,6 +6,7 @@ from typing import Any
 
 from django.core.checks.messages import Warning
 from typing import List
+
 W003: Any
 W016: Any
 

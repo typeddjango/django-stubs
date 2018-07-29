@@ -6,6 +6,7 @@ from typing import Any
 
 from django.template.defaulttags import TemplateLiteral
 from typing import Any, Dict, List, Optional, Union
+
 class TokenBase:
     id: Any = ...
     value: Any = ...

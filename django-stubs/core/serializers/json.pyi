@@ -11,6 +11,7 @@ from decimal import Decimal
 from django.db.models.base import Model
 from typing import Any, Optional, Union
 from uuid import UUID
+
 class Serializer(PythonSerializer):
     internal_use_only: bool = ...
     _current: Any = ...

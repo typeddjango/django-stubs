@@ -1,8 +1,6 @@
 from typing import Dict
 
-
 def get_internal_wsgi_application() -> object: ...
-
 
 class WSGIRequestHandler:
     def address_string(self) -> str: ...

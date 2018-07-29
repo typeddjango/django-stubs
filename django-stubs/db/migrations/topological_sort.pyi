@@ -5,5 +5,6 @@
 from typing import Any
 
 from typing import Any, Iterator
+
 def topological_sort_as_sets(dependency_graph: Any) -> Iterator[Any]: ...
 def stable_topological_sort(l: Any, dependency_graph: Any) -> Any: ...

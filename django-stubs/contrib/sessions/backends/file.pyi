@@ -6,6 +6,7 @@ from django.contrib.sessions.backends.base import SessionBase
 from typing import Any, Optional
 
 from typing import Dict, Optional
+
 class SessionStore(SessionBase):
     storage_path: Any = ...
     file_prefix: Any = ...

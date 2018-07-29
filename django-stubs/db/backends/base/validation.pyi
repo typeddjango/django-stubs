@@ -7,6 +7,7 @@ from typing import Any
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.fields import Field
 from typing import Any, List
+
 class BaseDatabaseValidation:
     connection: Any = ...
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...

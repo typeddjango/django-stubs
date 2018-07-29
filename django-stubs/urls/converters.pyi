@@ -6,6 +6,7 @@ from typing import Any
 
 from typing import Dict, Union
 from uuid import UUID
+
 class IntConverter:
     regex: str = ...
     def to_python(self, value: str) -> int: ...

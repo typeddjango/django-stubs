@@ -11,6 +11,7 @@ from django.template.context import Context
 from django.utils.safestring import SafeText
 from django.utils.timezone import FixedOffset
 from typing import Optional, Union
+
 register: Any
 
 class datetimeobject(datetime): ...

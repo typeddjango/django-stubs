@@ -5,6 +5,7 @@
 from typing import Any
 
 from typing import Any, List
+
 def add_session_cookie_message(message: Any): ...
 
 W010: Any

@@ -8,10 +8,22 @@ from typing import Any, Optional
 from django.core.mail.backends.locmem import EmailBackend
 from logging import LogRecord
 from typing import Callable, Dict, List, Union
+
 request_logger: Any
 DEFAULT_LOGGING: Any
 
-def configure_logging(logging_config: str, logging_settings: Dict[str, Union[int, Dict[str, Dict[str, str]], Dict[str, Dict[str, Union[str, List[str]]]], Dict[str, Dict[str, Union[List[str], str, bool]]]]]) -> None: ...
+def configure_logging(
+    logging_config: str,
+    logging_settings: Dict[
+        str,
+        Union[
+            int,
+            Dict[str, Dict[str, str]],
+            Dict[str, Dict[str, Union[str, List[str]]]],
+            Dict[str, Dict[str, Union[List[str], str, bool]]],
+        ],
+    ],
+) -> None: ...
 
 class AdminEmailHandler(logging.Handler):
     include_html: Any = ...
@@ -39,4 +51,12 @@ class ServerFormatter(logging.Formatter):
     def format(self, record: LogRecord) -> str: ...
     def uses_server_time(self) -> bool: ...
 
-def log_response(message: str, *args: Any, response: Optional[Any] = ..., request: Optional[Any] = ..., logger: Any = ..., level: Optional[Any] = ..., exc_info: Optional[Any] = ...) -> None: ...
+def log_response(
+    message: str,
+    *args: Any,
+    response: Optional[Any] = ...,
+    request: Optional[Any] = ...,
+    logger: Any = ...,
+    level: Optional[Any] = ...,
+    exc_info: Optional[Any] = ...,
+) -> None: ...

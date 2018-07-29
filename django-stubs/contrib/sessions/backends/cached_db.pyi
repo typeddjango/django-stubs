@@ -6,6 +6,7 @@ from django.contrib.sessions.backends.db import SessionStore as DBStore
 from typing import Any, Optional
 
 from typing import Any, Dict, Optional
+
 KEY_PREFIX: str
 
 class SessionStore(DBStore):

@@ -8,6 +8,7 @@ from typing import Any, Optional
 from django.core.checks.messages import Error
 from django.db.models.query import QuerySet
 from typing import List
+
 class CurrentSiteManager(models.Manager):
     use_in_migrations: bool = ...
     __field_name: Any = ...

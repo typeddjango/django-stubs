@@ -7,9 +7,12 @@ from typing import Any, Optional
 
 from django.urls.resolvers import URLPattern, URLResolver
 from typing import Any, Optional, Union
+
 handler400: Any
 handler403: Any
 handler404: Any
 handler500: Any
 
-def url(regex: str, view: Any, kwargs: Any = ..., name: Optional[str] = ...) -> Union[URLPattern, URLResolver]: ...
+def url(
+    regex: str, view: Any, kwargs: Any = ..., name: Optional[str] = ...
+) -> Union[URLPattern, URLResolver]: ...

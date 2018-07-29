@@ -1,13 +1,6 @@
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
-from typing import (
-    Any,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
-
+from typing import Any, Set, Tuple, Type, Union
 
 class MigrationWriter:
     def __init__(self, migration: Migration) -> None: ...
@@ -21,7 +14,6 @@ class MigrationWriter:
     @classmethod
     def serialize(cls, value: Any) -> Union[Tuple[str, Set[str]], Tuple[str, Set[Any]]]: ...
 
-
 class OperationWriter:
     def __init__(self, operation: Operation, indentation: int = ...) -> None: ...
     def feed(self, line: str) -> None: ...
@@ -30,12 +22,9 @@ class OperationWriter:
     def serialize(self) -> Union[Tuple[str, Set[str]], Tuple[str, Set[Any]]]: ...
     def unindent(self) -> None: ...
 
-
 class SettingsReference:
     def __init__(self, value: str, setting_name: str) -> None: ...
     @staticmethod
     def __new__(
-        self: Type[SettingsReference],
-        value: str,
-        setting_name: str
+        self: Type[SettingsReference], value: str, setting_name: str
     ) -> SettingsReference: ...

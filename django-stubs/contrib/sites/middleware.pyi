@@ -7,5 +7,6 @@ from django.utils.deprecation import MiddlewareMixin
 from typing import Any
 
 from django.http.request import HttpRequest
+
 class CurrentSiteMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest) -> None: ...

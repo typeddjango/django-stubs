@@ -8,6 +8,7 @@ from typing import Any
 from django.template.base import Origin
 from django.template.engine import Engine
 from typing import Dict, Iterator
+
 class Loader(BaseLoader):
     templates_dict: Any = ...
     def __init__(self, engine: Engine, templates_dict: Dict[str, str]) -> None: ...

@@ -9,11 +9,18 @@ from typing import Any, Optional
 
 from django.urls.resolvers import ResolverMatch
 from typing import Any, Callable, Optional, Type, Union
+
 _prefixes: Any
 _urlconfs: Any
 
 def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
-def reverse(viewname: Optional[Union[str, Callable]], urlconf: Optional[str] = ..., args: Any = ..., kwargs: Any = ..., current_app: Optional[str] = ...) -> str: ...
+def reverse(
+    viewname: Optional[Union[str, Callable]],
+    urlconf: Optional[str] = ...,
+    args: Any = ...,
+    kwargs: Any = ...,
+    current_app: Optional[str] = ...,
+) -> str: ...
 
 reverse_lazy: Any
 

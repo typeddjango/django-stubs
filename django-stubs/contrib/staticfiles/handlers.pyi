@@ -6,6 +6,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from typing import Any
 
 from django.core.handlers.wsgi import WSGIRequest
+
 class StaticFilesHandler(WSGIHandler):
     handles_files: bool = ...
     application: Any = ...

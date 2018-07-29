@@ -9,6 +9,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
 from django.http.response import JsonResponse
+
 class AutocompleteJsonView(BaseListView):
     paginate_by: int = ...
     model_admin: Any = ...

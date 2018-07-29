@@ -5,5 +5,6 @@
 from typing import Any
 
 from typing import Callable
+
 def sensitive_variables(*variables: Any) -> Callable: ...
 def sensitive_post_parameters(*parameters: Any) -> Callable: ...

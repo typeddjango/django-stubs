@@ -5,6 +5,7 @@
 from typing import Any
 
 from typing import List, Tuple, Type, Union
+
 class ArchiveException(Exception): ...
 class UnrecognizedArchiveFormat(ArchiveException): ...
 

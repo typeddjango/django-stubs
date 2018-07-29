@@ -7,6 +7,7 @@ from typing import Any
 
 from django.http.request import HttpRequest
 from typing import Any, Callable, Dict, Tuple
+
 csrf_protect: Any
 
 class _EnsureCsrfToken(CsrfViewMiddleware):
@@ -16,7 +17,13 @@ requires_csrf_token: Any
 
 class _EnsureCsrfCookie(CsrfViewMiddleware):
     def _reject(self, request: HttpRequest, reason: str) -> None: ...
-    def process_view(self, request: HttpRequest, callback: Callable, callback_args: Tuple, callback_kwargs: Dict[Any, Any]) -> None: ...
+    def process_view(
+        self,
+        request: HttpRequest,
+        callback: Callable,
+        callback_args: Tuple,
+        callback_kwargs: Dict[Any, Any],
+    ) -> None: ...
 
 ensure_csrf_cookie: Any
 

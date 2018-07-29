@@ -5,6 +5,7 @@
 from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
+
 class BaseDatabaseClient:
     executable_name: Any = ...
     connection: Any = ...

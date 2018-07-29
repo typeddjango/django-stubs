@@ -4,7 +4,10 @@
 
 from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
-from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
+from django.views.generic.list import (
+    MultipleObjectMixin,
+    MultipleObjectTemplateResponseMixin,
+)
 from typing import Any, Optional
 
 from datetime import date
@@ -13,6 +16,7 @@ from django.db.models.base import Model
 from django.db.models.query import QuerySet
 from django.template.response import TemplateResponse
 from typing import Any, Dict, Optional, Tuple, Union
+
 class YearMixin:
     year_format: str = ...
     year: Any = ...
@@ -71,7 +75,9 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
     def get_ordering(self) -> Union[str, Tuple[str, str]]: ...
     def get_dated_queryset(self, **lookup: Any) -> QuerySet: ...
     def get_date_list_period(self) -> str: ...
-    def get_date_list(self, queryset: QuerySet, date_type: None = ..., ordering: str = ...) -> QuerySet: ...
+    def get_date_list(
+        self, queryset: QuerySet, date_type: None = ..., ordering: str = ...
+    ) -> QuerySet: ...
 
 class BaseArchiveIndexView(BaseDateListView):
     context_object_name: str = ...
@@ -83,7 +89,12 @@ class ArchiveIndexView(MultipleObjectTemplateResponseMixin, BaseArchiveIndexView
 class BaseYearArchiveView(YearMixin, BaseDateListView):
     date_list_period: str = ...
     make_object_list: bool = ...
-    def get_dated_items(self) -> Union[Tuple[QuerySet, QuerySet, Dict[str, Union[date, None]]], Tuple[QuerySet, QuerySet, Dict[str, date]]]: ...
+    def get_dated_items(
+        self
+    ) -> Union[
+        Tuple[QuerySet, QuerySet, Dict[str, Union[date, None]]],
+        Tuple[QuerySet, QuerySet, Dict[str, date]],
+    ]: ...
     def get_make_object_list(self) -> bool: ...
 
 class YearArchiveView(MultipleObjectTemplateResponseMixin, BaseYearArchiveView):
@@ -91,7 +102,12 @@ class YearArchiveView(MultipleObjectTemplateResponseMixin, BaseYearArchiveView):
 
 class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
     date_list_period: str = ...
-    def get_dated_items(self) -> Union[Tuple[QuerySet, QuerySet, Dict[str, Union[date, None]]], Tuple[QuerySet, QuerySet, Dict[str, date]]]: ...
+    def get_dated_items(
+        self
+    ) -> Union[
+        Tuple[QuerySet, QuerySet, Dict[str, Union[date, None]]],
+        Tuple[QuerySet, QuerySet, Dict[str, date]],
+    ]: ...
 
 class MonthArchiveView(MultipleObjectTemplateResponseMixin, BaseMonthArchiveView):
     template_name_suffix: str = ...
@@ -103,8 +119,18 @@ class WeekArchiveView(MultipleObjectTemplateResponseMixin, BaseWeekArchiveView):
     template_name_suffix: str = ...
 
 class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
-    def get_dated_items(self) -> Union[Tuple[None, QuerySet, Dict[str, date]], Tuple[None, QuerySet, Dict[str, Union[date, None]]]]: ...
-    def _get_dated_items(self, date: date) -> Union[Tuple[None, QuerySet, Dict[str, date]], Tuple[None, QuerySet, Dict[str, Union[date, None]]]]: ...
+    def get_dated_items(
+        self
+    ) -> Union[
+        Tuple[None, QuerySet, Dict[str, date]],
+        Tuple[None, QuerySet, Dict[str, Union[date, None]]],
+    ]: ...
+    def _get_dated_items(
+        self, date: date
+    ) -> Union[
+        Tuple[None, QuerySet, Dict[str, date]],
+        Tuple[None, QuerySet, Dict[str, Union[date, None]]],
+    ]: ...
 
 class DayArchiveView(MultipleObjectTemplateResponseMixin, BaseDayArchiveView):
     template_name_suffix: str = ...
@@ -121,6 +147,19 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
 class DateDetailView(SingleObjectTemplateResponseMixin, BaseDateDetailView):
     template_name_suffix: str = ...
 
-def _date_from_string(year: int, year_format: str, month: str = ..., month_format: str = ..., day: Union[str, int] = ..., day_format: str = ..., delim: str = ...) -> date: ...
-def _get_next_prev(generic_view: MultipleObjectTemplateResponseMixin, date: date, is_previous: bool, period: str) -> Optional[date]: ...
+def _date_from_string(
+    year: int,
+    year_format: str,
+    month: str = ...,
+    month_format: str = ...,
+    day: Union[str, int] = ...,
+    day_format: str = ...,
+    delim: str = ...,
+) -> date: ...
+def _get_next_prev(
+    generic_view: MultipleObjectTemplateResponseMixin,
+    date: date,
+    is_previous: bool,
+    period: str,
+) -> Optional[date]: ...
 def timezone_today() -> date: ...

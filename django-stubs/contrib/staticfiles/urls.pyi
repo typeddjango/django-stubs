@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 from django.urls.resolvers import URLPattern
 from typing import List
+
 urlpatterns: Any
 
 def staticfiles_urlpatterns(prefix: None = ...) -> List[URLPattern]: ...

@@ -8,6 +8,7 @@ from typing import Any
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase, HttpResponseForbidden
 from typing import Any, Callable, Dict, Optional, Tuple
+
 logger: Any
 REASON_NO_REFERER: str
 REASON_BAD_REFERER: str
@@ -36,5 +37,13 @@ class CsrfViewMiddleware(MiddlewareMixin):
     def _get_token(self, request: HttpRequest) -> Optional[str]: ...
     def _set_token(self, request: HttpRequest, response: HttpResponse) -> None: ...
     def process_request(self, request: HttpRequest) -> None: ...
-    def process_view(self, request: HttpRequest, callback: Callable, callback_args: Tuple, callback_kwargs: Dict[str, Any]) -> Optional[HttpResponseForbidden]: ...
-    def process_response(self, request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
+    def process_view(
+        self,
+        request: HttpRequest,
+        callback: Callable,
+        callback_args: Tuple,
+        callback_kwargs: Dict[str, Any],
+    ) -> Optional[HttpResponseForbidden]: ...
+    def process_response(
+        self, request: HttpRequest, response: HttpResponseBase
+    ) -> HttpResponseBase: ...

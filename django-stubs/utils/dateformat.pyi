@@ -6,6 +6,7 @@ from typing import Any
 
 from datetime import date, time
 from typing import Union
+
 re_formatchars: Any
 re_escaped: Any
 

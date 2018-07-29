@@ -25,7 +25,13 @@ class FirstValue(Func):
 
 class LagLeadFunction(Func):
     window_compatible: bool = ...
-    def __init__(self, expression: Optional[str], offset: int = ..., default: None = ..., **extra: Any) -> None: ...
+    def __init__(
+        self,
+        expression: Optional[str],
+        offset: int = ...,
+        default: None = ...,
+        **extra: Any,
+    ) -> None: ...
     def _resolve_output_field(self): ...
 
 class Lag(LagLeadFunction):

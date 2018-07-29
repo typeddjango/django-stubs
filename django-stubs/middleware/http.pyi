@@ -7,6 +7,9 @@ from typing import Any
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
+
 class ConditionalGetMiddleware(MiddlewareMixin):
-    def process_response(self, request: WSGIRequest, response: HttpResponse) -> HttpResponse: ...
+    def process_response(
+        self, request: WSGIRequest, response: HttpResponse
+    ) -> HttpResponse: ...
     def needs_etag(self, response: HttpResponse) -> bool: ...

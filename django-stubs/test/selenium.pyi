@@ -8,10 +8,19 @@ from typing import Any
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from typing import Callable, Dict, List, Tuple, Type, Union
+
 class SeleniumTestCaseBase:
     browsers: Any = ...
     browser: Any = ...
-    def __new__(cls: Type[SeleniumTestCaseBase], name: str, bases: Union[Tuple[Type[AdminSeleniumTestCase]], Tuple[Type[SeleniumTestCase], Type[StaticLiveServerTestCase]]], attrs: Dict[str, Union[str, List[str], Callable]]) -> Type[AdminSeleniumTestCase]: ...
+    def __new__(
+        cls: Type[SeleniumTestCaseBase],
+        name: str,
+        bases: Union[
+            Tuple[Type[AdminSeleniumTestCase]],
+            Tuple[Type[SeleniumTestCase], Type[StaticLiveServerTestCase]],
+        ],
+        attrs: Dict[str, Union[str, List[str], Callable]],
+    ) -> Type[AdminSeleniumTestCase]: ...
     @classmethod
     def import_webdriver(cls, browser: Any): ...
     def create_webdriver(self): ...

@@ -6,6 +6,7 @@ from django.db.backends.base.client import BaseDatabaseClient
 from typing import Any
 
 from typing import Dict
+
 def _escape_pgpass(txt: str) -> str: ...
 
 class DatabaseClient(BaseDatabaseClient):

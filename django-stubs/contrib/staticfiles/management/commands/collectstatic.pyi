@@ -1,15 +1,6 @@
-from django.core.files.storage import (
-    DefaultStorage,
-    FileSystemStorage,
-)
+from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.management.base import CommandParser
-from typing import (
-    Dict,
-    List,
-    Optional,
-    Union,
-)
-
+from typing import Dict, List, Optional, Union
 
 class Command:
     def __init__(self, *args, **kwargs) -> None: ...
@@ -20,13 +11,13 @@ class Command:
         self,
         path: str,
         prefixed_path: str,
-        source_storage: Union[FileSystemStorage, DefaultStorage]
+        source_storage: Union[FileSystemStorage, DefaultStorage],
     ) -> None: ...
     def delete_file(
         self,
         path: str,
         prefixed_path: str,
-        source_storage: Union[FileSystemStorage, DefaultStorage]
+        source_storage: Union[FileSystemStorage, DefaultStorage],
     ) -> bool: ...
     def handle(self, **options) -> Optional[str]: ...
     def is_local_storage(self) -> bool: ...
@@ -34,7 +25,7 @@ class Command:
         self,
         path: str,
         prefixed_path: str,
-        source_storage: Union[FileSystemStorage, DefaultStorage]
+        source_storage: Union[FileSystemStorage, DefaultStorage],
     ) -> None: ...
     @cached_property
     def local(self) -> bool: ...

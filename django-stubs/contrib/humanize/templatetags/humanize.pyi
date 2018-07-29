@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 from datetime import date, datetime
 from typing import Optional, Union
+
 register: Any
 
 def ordinal(value: Optional[str]) -> Optional[str]: ...

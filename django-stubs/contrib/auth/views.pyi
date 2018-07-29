@@ -10,34 +10,17 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.datastructures import MultiValueDict
-from typing import (
-    Any,
-    Dict,
-    Optional,
-    Set,
-    Type,
-    Union,
-)
-
+from typing import Any, Dict, Optional, Set, Type, Union
 
 def redirect_to_login(
-    next: str,
-    login_url: Optional[str] = ...,
-    redirect_field_name: Optional[str] = ...
+    next: str, login_url: Optional[str] = ..., redirect_field_name: Optional[str] = ...
 ) -> HttpResponseRedirect: ...
-
 
 class LoginView:
     def dispatch(
-        self,
-        request: HttpRequest,
-        *args,
-        **kwargs
+        self, request: HttpRequest, *args, **kwargs
     ) -> Union[TemplateResponse, HttpResponseRedirect]: ...
-    def form_valid(
-        self,
-        form: AuthenticationForm
-    ) -> HttpResponseRedirect: ...
+    def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect: ...
     def get_context_data(self, **kwargs) -> Dict[str, Any]: ...
     def get_form_class(self) -> Type[AuthenticationForm]: ...
     def get_form_kwargs(
@@ -46,63 +29,36 @@ class LoginView:
     def get_redirect_url(self) -> str: ...
     def get_success_url(self) -> str: ...
 
-
 class LogoutView:
     def dispatch(
-        self,
-        request: HttpRequest,
-        *args,
-        **kwargs
+        self, request: HttpRequest, *args, **kwargs
     ) -> Union[TemplateResponse, HttpResponseRedirect]: ...
     def get_next_page(self) -> Optional[str]: ...
-    def post(
-        self,
-        request: WSGIRequest,
-        *args,
-        **kwargs
-    ) -> TemplateResponse: ...
-
+    def post(self, request: WSGIRequest, *args, **kwargs) -> TemplateResponse: ...
 
 class PasswordChangeDoneView:
     def dispatch(self, *args, **kwargs) -> TemplateResponse: ...
 
-
 class PasswordChangeView:
     def dispatch(
-        self,
-        *args,
-        **kwargs
+        self, *args, **kwargs
     ) -> Union[TemplateResponse, HttpResponseRedirect]: ...
-    def form_valid(
-        self,
-        form: PasswordChangeForm
-    ) -> HttpResponseRedirect: ...
-    def get_form_kwargs(
-        self
-    ) -> Dict[str, Optional[Union[MultiValueDict, User]]]: ...
-
+    def form_valid(self, form: PasswordChangeForm) -> HttpResponseRedirect: ...
+    def get_form_kwargs(self) -> Dict[str, Optional[Union[MultiValueDict, User]]]: ...
 
 class PasswordResetConfirmView:
     def dispatch(
-        self,
-        *args,
-        **kwargs
+        self, *args, **kwargs
     ) -> Union[TemplateResponse, HttpResponseRedirect]: ...
     def form_valid(self, form: SetPasswordForm) -> HttpResponseRedirect: ...
-    def get_form_kwargs(
-        self
-    ) -> Dict[str, Optional[Union[MultiValueDict, User]]]: ...
+    def get_form_kwargs(self) -> Dict[str, Optional[Union[MultiValueDict, User]]]: ...
     def get_user(self, uidb64: str) -> Optional[User]: ...
-
 
 class PasswordResetView:
     def dispatch(
-        self,
-        *args,
-        **kwargs
+        self, *args, **kwargs
     ) -> Union[TemplateResponse, HttpResponseRedirect]: ...
     def form_valid(self, form: PasswordResetForm) -> HttpResponseRedirect: ...
-
 
 class SuccessURLAllowedHostsMixin:
     def get_success_url_allowed_hosts(self) -> Set[str]: ...

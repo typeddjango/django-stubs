@@ -6,6 +6,7 @@ from django.db.backends.base.client import BaseDatabaseClient
 from typing import Any
 
 from typing import Dict, List, Optional
+
 class DatabaseClient(BaseDatabaseClient):
     executable_name: str = ...
     @classmethod

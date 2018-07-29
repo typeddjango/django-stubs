@@ -1,6 +1,5 @@
 from django.core.management.base import CommandParser
 
-
 class Command:
     def add_arguments(self, parser: CommandParser) -> None: ...
     def create_table(self, database: str, tablename: str, dry_run: bool) -> None: ...

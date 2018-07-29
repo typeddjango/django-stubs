@@ -1,13 +1,7 @@
 from django.core.management.base import CommandParser
-from typing import (
-    List,
-    Tuple,
-    Union,
-)
-
+from typing import List, Tuple, Union
 
 def humanize(dirname: str) -> str: ...
-
 
 class Command:
     def add_arguments(self, parser: CommandParser) -> None: ...
@@ -18,10 +12,8 @@ class Command:
     def load_label(self, fixture_label: str) -> None: ...
     def loaddata(self, fixture_labels: Union[Tuple[str, str], Tuple[str]]) -> None: ...
     def parse_name(
-        self,
-        fixture_name: str
+        self, fixture_name: str
     ) -> Union[Tuple[str, None, None], Tuple[str, str, None], Tuple[str, str, str]]: ...
-
 
 class SingleZipReader:
     def read(self) -> bytes: ...

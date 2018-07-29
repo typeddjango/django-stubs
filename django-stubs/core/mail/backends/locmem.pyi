@@ -7,6 +7,9 @@ from typing import Any
 
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from typing import List, Union
+
 class EmailBackend(BaseEmailBackend):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def send_messages(self, messages: Union[List[EmailMultiAlternatives], List[EmailMessage]]) -> int: ...
+    def send_messages(
+        self, messages: Union[List[EmailMultiAlternatives], List[EmailMessage]]
+    ) -> int: ...

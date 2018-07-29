@@ -6,6 +6,7 @@ from django.core.files.utils import FileProxyMixin
 from typing import Any, Optional
 
 from typing import Any, Iterator, Optional, Union
+
 class File(FileProxyMixin):
     DEFAULT_CHUNK_SIZE: Any = ...
     file: Any = ...

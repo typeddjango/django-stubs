@@ -5,6 +5,7 @@
 from typing import Any, Optional
 
 from typing import Callable, List
+
 conditional_page: Any
 
 def require_http_methods(request_method_list: List[str]) -> Callable: ...

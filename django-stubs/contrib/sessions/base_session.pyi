@@ -1,6 +1,5 @@
 from typing import Dict
 
-
 class AbstractBaseSession:
     def __str__(self) -> str: ...
     def get_decoded(self) -> Dict[str, int]: ...

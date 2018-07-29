@@ -1,10 +1,5 @@
 from decimal import Decimal
-from typing import (
-    Optional,
-    Tuple,
-    Union,
-)
-
+from typing import Optional, Tuple, Union
 
 def format(
     number: Union[float, Decimal, str],
@@ -13,5 +8,5 @@ def format(
     grouping: Union[Tuple[int, int, int, int, int], Tuple[int, int, int], int] = ...,
     thousand_sep: str = ...,
     force_grouping: bool = ...,
-    use_l10n: Optional[bool] = ...
+    use_l10n: Optional[bool] = ...,
 ) -> str: ...
