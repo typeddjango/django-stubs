@@ -1,0 +1,26 @@
+from django.core.management.base import BaseCommand
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Union,
+)
+
+
+def call_command(command_name: Union[str, BaseCommand], *args, **options) -> Optional[str]: ...
+
+
+def find_commands(management_dir: str) -> List[str]: ...
+
+
+def get_commands() -> Dict[str, str]: ...
+
+
+def load_command_class(app_name: str, name: str) -> BaseCommand: ...
+
+
+class ManagementUtility:
+    def __init__(self, argv: List[str] = ...) -> None: ...
+    def autocomplete(self): ...
+    def execute(self) -> None: ...
+    def fetch_command(self, subcommand: str) -> BaseCommand: ...

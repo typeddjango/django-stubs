@@ -1,0 +1,3 @@
+class DatabaseFeatures:
+    @cached_property
+    def supports_stddev(self) -> bool: ...

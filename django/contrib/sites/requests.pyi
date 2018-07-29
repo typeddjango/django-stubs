@@ -1,0 +1,6 @@
+from django.http.request import HttpRequest
+
+
+class RequestSite:
+    def __init__(self, request: HttpRequest) -> None: ...
+    def __str__(self) -> str: ...

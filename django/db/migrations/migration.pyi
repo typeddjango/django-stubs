@@ -1,0 +1,43 @@
+from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+from django.db.migrations.state import ProjectState
+from typing import (
+    Tuple,
+    Type,
+)
+
+
+def swappable_dependency(value: str) -> SwappableTuple: ...
+
+
+class Migration:
+    def __eq__(self, other: Migration) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __init__(self, name: str, app_label: str) -> None: ...
+    def __repr__(self) -> str: ...
+    def __str__(self) -> str: ...
+    def apply(
+        self,
+        project_state: ProjectState,
+        schema_editor: DatabaseSchemaEditor,
+        collect_sql: bool = ...
+    ) -> ProjectState: ...
+    def mutate_state(
+        self,
+        project_state: ProjectState,
+        preserve: bool = ...
+    ) -> ProjectState: ...
+    def unapply(
+        self,
+        project_state: ProjectState,
+        schema_editor: DatabaseSchemaEditor,
+        collect_sql: bool = ...
+    ) -> ProjectState: ...
+
+
+class SwappableTuple:
+    @staticmethod
+    def __new__(
+        cls: Type[SwappableTuple],
+        value: Tuple[str, str],
+        setting: str
+    ) -> SwappableTuple: ...

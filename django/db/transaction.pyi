@@ -1,0 +1,39 @@
+from django.db.backends.sqlite3.base import DatabaseWrapper
+from typing import (
+    Callable,
+    Optional,
+    Union,
+)
+
+
+def atomic(using: Optional[Union[str, Callable]] = ..., savepoint: bool = ...) -> Callable: ...
+
+
+def commit(using: None = ...): ...
+
+
+def get_autocommit(using: str = ...) -> bool: ...
+
+
+def get_connection(using: Optional[str] = ...) -> DatabaseWrapper: ...
+
+
+def get_rollback(using: None = ...) -> bool: ...
+
+
+def non_atomic_requests(using: Callable = ...) -> Callable: ...
+
+
+def on_commit(func: Callable, using: None = ...) -> None: ...
+
+
+def savepoint_rollback(sid: str, using: None = ...) -> None: ...
+
+
+def set_rollback(rollback: bool, using: Optional[str] = ...) -> None: ...
+
+
+class Atomic:
+    def __enter__(self) -> None: ...
+    def __exit__(self, exc_type: None, exc_value: None, traceback: None) -> None: ...
+    def __init__(self, using: Optional[str], savepoint: bool) -> None: ...

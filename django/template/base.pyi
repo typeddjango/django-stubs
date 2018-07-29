@@ -1,0 +1,186 @@
+from django.template.backends.dummy import TemplateStrings
+from django.template.context import Context
+from django.template.defaulttags import LoadNode
+from django.template.engine import Engine
+from django.template.exceptions import TemplateSyntaxError
+from django.template.library import Library
+from django.template.loader_tags import (
+    BlockNode,
+    ExtendsNode,
+)
+from django.template.loaders.base import Loader
+from django.utils.safestring import SafeText
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
+
+
+def linebreak_iter(template_source: str) -> Iterator[int]: ...
+
+
+def render_value_in_context(value: Any, context: Context) -> str: ...
+
+
+def token_kwargs(
+    bits: List[str],
+    parser: Parser,
+    support_legacy: bool = ...
+) -> Dict[str, FilterExpression]: ...
+
+
+class DebugLexer:
+    def tokenize(self) -> List[Token]: ...
+
+
+class FilterExpression:
+    def __init__(self, token: str, parser: Parser) -> None: ...
+    def __str__(self) -> str: ...
+    @staticmethod
+    def args_check(
+        name: str,
+        func: Callable,
+        provided: Union[List[Tuple[bool, SafeText]], List[Tuple[bool, Variable]]]
+    ) -> bool: ...
+    def resolve(
+        self,
+        context: Union[Dict[str, Dict[str, str]], Context],
+        ignore_failures: bool = ...
+    ) -> Any: ...
+
+
+class Lexer:
+    def __init__(self, template_string: str) -> None: ...
+    def create_token(
+        self,
+        token_string: str,
+        position: Optional[Tuple[int, int]],
+        lineno: int,
+        in_tag: bool
+    ) -> Token: ...
+    def tokenize(self) -> List[Token]: ...
+
+
+class Node:
+    def get_nodes_by_type(
+        self,
+        nodetype: Type[Node]
+    ) -> Union[List[VariableNode], List[BlockNode], List[LoadNode], List[ExtendsNode]]: ...
+    def render_annotated(self, context: Context) -> Union[str, int]: ...
+
+
+class NodeList:
+    def get_nodes_by_type(
+        self,
+        nodetype: Type[Node]
+    ) -> Union[List[BlockNode], List[VariableNode]]: ...
+    def render(self, context: Context) -> SafeText: ...
+
+
+class Origin:
+    def __eq__(self, other: Origin) -> bool: ...
+    def __init__(
+        self,
+        name: str,
+        template_name: Optional[str] = ...,
+        loader: Optional[Union[Loader, TemplateStrings]] = ...
+    ) -> None: ...
+    @property
+    def loader_name(self) -> Optional[str]: ...
+
+
+class Parser:
+    def __init__(
+        self,
+        tokens: Union[str, List[Token]],
+        libraries: Optional[Dict[str, Library]] = ...,
+        builtins: List[Library] = ...,
+        origin: Optional[Origin] = ...
+    ) -> None: ...
+    def add_library(self, lib: Library) -> None: ...
+    def compile_filter(self, token: str) -> FilterExpression: ...
+    def delete_first_token(self) -> None: ...
+    def error(
+        self,
+        token: Token,
+        e: Union[str, TemplateSyntaxError, RuntimeError]
+    ) -> Union[TemplateSyntaxError, RuntimeError]: ...
+    def extend_nodelist(
+        self,
+        nodelist: NodeList,
+        node: Node,
+        token: Token
+    ) -> None: ...
+    def find_filter(self, filter_name: str) -> Callable: ...
+    def invalid_block_tag(
+        self,
+        token: Token,
+        command: str,
+        parse_until: Union[Tuple[str], Tuple[str, str]] = ...
+    ): ...
+    def next_token(self) -> Token: ...
+    def parse(
+        self,
+        parse_until: Optional[Union[Tuple[str, str, str], Tuple[str], Tuple[str, str]]] = ...
+    ) -> NodeList: ...
+    def prepend_token(self, token: Token) -> None: ...
+    def skip_past(self, endtag: str) -> None: ...
+    def unclosed_block_tag(self, parse_until: Union[Tuple[str, str, str], Tuple[str]]): ...
+
+
+class Template:
+    def __init__(
+        self,
+        template_string: str,
+        origin: Optional[Origin] = ...,
+        name: Optional[str] = ...,
+        engine: Optional[Engine] = ...
+    ) -> None: ...
+    def compile_nodelist(self) -> NodeList: ...
+    def get_exception_info(
+        self,
+        exception: Exception,
+        token: Token
+    ) -> Dict[str, Union[str, List[Tuple[int, SafeText]], int]]: ...
+    def render(self, context: Context): ...
+
+
+class TextNode:
+    def __init__(self, s: str) -> None: ...
+    def __repr__(self) -> str: ...
+    def render(self, context: Context) -> str: ...
+
+
+class Token:
+    def __init__(
+        self,
+        token_type: TokenType,
+        contents: str,
+        position: Optional[Tuple[int, int]] = ...,
+        lineno: Optional[int] = ...
+    ) -> None: ...
+    def split_contents(self) -> List[str]: ...
+
+
+class Variable:
+    def __init__(self, var: str) -> None: ...
+    def _resolve_lookup(self, context: Any) -> Any: ...
+    def resolve(self, context: Any) -> Any: ...
+
+
+class VariableDoesNotExist:
+    def __init__(self, msg: str, params: Any = ...) -> None: ...
+    def __str__(self) -> str: ...
+
+
+class VariableNode:
+    def __init__(self, filter_expression: FilterExpression) -> None: ...
+    def __repr__(self) -> str: ...
+    def render(self, context: Context) -> str: ...

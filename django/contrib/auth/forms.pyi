@@ -1,0 +1,93 @@
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import ValidationError
+from django.core.handlers.wsgi import WSGIRequest
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Union,
+)
+
+
+class AdminPasswordChangeForm:
+    def __init__(self, user: User, *args, **kwargs) -> None: ...
+    @property
+    def changed_data(self) -> List[str]: ...
+    def clean_password2(self) -> str: ...
+    def save(self, commit: bool = ...) -> User: ...
+
+
+class AuthenticationForm:
+    def __init__(self, request: object = ..., *args, **kwargs) -> None: ...
+    def clean(self) -> Dict[str, str]: ...
+    def confirm_login_allowed(self, user: User) -> None: ...
+    def get_invalid_login_error(self) -> ValidationError: ...
+    def get_user(self) -> User: ...
+
+
+class PasswordChangeForm:
+    def clean_old_password(self) -> str: ...
+
+
+class PasswordResetForm:
+    def get_users(self, email: str) -> Iterator[Any]: ...
+    def save(
+        self,
+        domain_override: None = ...,
+        subject_template_name: str = ...,
+        email_template_name: str = ...,
+        use_https: bool = ...,
+        token_generator: PasswordResetTokenGenerator = ...,
+        from_email: None = ...,
+        request: Optional[WSGIRequest] = ...,
+        html_email_template_name: None = ...,
+        extra_email_context: Optional[Dict[str, str]] = ...
+    ) -> None: ...
+    def send_mail(
+        self,
+        subject_template_name: str,
+        email_template_name: str,
+        context: Dict[str, Union[str, User]],
+        from_email: Optional[str],
+        to_email: str,
+        html_email_template_name: None = ...
+    ) -> None: ...
+
+
+class ReadOnlyPasswordHashField:
+    def __init__(self, *args, **kwargs) -> None: ...
+    def has_changed(self, initial: str, data: None) -> bool: ...
+
+
+class ReadOnlyPasswordHashWidget:
+    def get_context(
+        self,
+        name: str,
+        value: str,
+        attrs: Dict[str, str]
+    ) -> Dict[str, Union[Dict[str, Union[str, bool, Dict[str, str]]], List[Dict[str, str]]]]: ...
+
+
+class SetPasswordForm:
+    def __init__(self, user: Optional[User], *args, **kwargs) -> None: ...
+    def clean_new_password2(self) -> str: ...
+    def save(self, commit: bool = ...) -> User: ...
+
+
+class UserChangeForm:
+    def __init__(self, *args, **kwargs) -> None: ...
+    def clean_password(self) -> str: ...
+
+
+class UserCreationForm:
+    def __init__(self, *args, **kwargs) -> None: ...
+    def _post_clean(self) -> None: ...
+    def clean_password2(self) -> str: ...
+    def save(self, commit: bool = ...) -> User: ...
+
+
+class UsernameField:
+    def to_python(self, value: Optional[str]) -> str: ...
