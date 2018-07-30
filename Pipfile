@@ -1,0 +1,12 @@
+[[source]]
+name = "pypi"
+verify_ssl = true
+url = "https://pypi.org/simple"
+
+[requires]
+python_version = "3.6"
+
+[packages]
+
+[dev-packages]
+retype = {editable = true, git = "git@github.com:TypedDjango/retype.git"}
