@@ -36,7 +36,7 @@ free time, if you have some motivation to help, please do so.
 Right now, the best way to start helping is:
 
   * Introduce yourself on the [Gitter chat room].
-  * Start picking up one of [the issues]
+  * Start picking up one of [the issues].
   * Review and help triage the [project management board].
 
 [Gitter chat room]: https://gitter.im/mypy-django/Lobby
