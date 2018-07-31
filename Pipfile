@@ -9,4 +9,3 @@ python_version = "3.6"
 [packages]
 
 [dev-packages]
-retype = {editable = true, git = "git@github.com:TypedDjango/retype.git"}
