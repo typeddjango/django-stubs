@@ -11,7 +11,7 @@ We currently focus on supporting Django >= 2.1 to simplify work in the beginning
 ## The Plan
 
   * Use [retype]/[MonkeyType]/[stubgen] to auto-generate [django-stubs] Django 2.1.
-  * Integrate [machinalis/mypy-django] stubs into [django-stubs].
+  * Integrate existing stubs into [django-stubs]. See [django-stubs/#4] for more.
   * Create a [mypy plugin] to support Django model dynamic behaviour. See [django-stubs/#5] for more.
   * Create a test-suite to keep synced with upstream Django. See [django-stubs/#3] for more.
   * Commence refining auto-generated stubs and plugin until it is useful.
@@ -23,7 +23,7 @@ This plan is not set in stone and can change.
 [retype]: https://github.com/ambv/retype
 [MonkeyType]: https://github.com/Instagram/MonkeyType
 [stubgen]: https://github.com/python/mypy/blob/master/mypy/stubgen.py
-[machinalis/mypy-django]: https://github.com/machinalis/mypy-django
+[django-stubs/#4]: https://github.com/TypedDjango/django-stubs/issues/4
 [django-stubs/#3]: https://github.com/TypedDjango/django-stubs/issues/3
 [mypy plugin]: https://github.com/python/mypy/tree/master/mypy/plugins
 [django-stubs/#5]: https://github.com/TypedDjango/django-stubs/issues/5
