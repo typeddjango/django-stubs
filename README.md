@@ -45,6 +45,13 @@ Right now, the best way to start helping is:
 [the issues]: https://github.com/TypedDjango/django-stubs/issues
 [project management board]: https://github.com/orgs/TypedDjango/projects/1
 
+## Working With Type Hints
+
+  * https://mypy.readthedocs.io/en/latest/cheat_sheet_py3.html
+  * https://docs.python.org/3/library/typing.html
+  * https://www.python.org/dev/peps/pep-0483/
+  * https://www.python.org/dev/peps/pep-0484/
+
 ## Other Django Stub Efforts
 
 We'll hopefully merge these existing efforts here as we move along.
