@@ -4,6 +4,8 @@
 
 The aim of this project is to bring [PEP 484 type hints] to Django.
 
+We currently focus on supporting Django >= 2.1 to simplify work in the beginning.
+
 [PEP 484 type hints]: https://www.python.org/dev/peps/pep-0484/
 
 ## The Plan
@@ -42,6 +44,15 @@ Right now, the best way to start helping is:
 [Gitter chat room]: https://gitter.im/mypy-django/Lobby
 [the issues]: https://github.com/TypedDjango/django-stubs/issues
 [project management board]: https://github.com/orgs/TypedDjango/projects/1
+
+## Other Django Stub Efforts
+
+We'll hopefully merge these existing efforts here as we move along.
+
+  * https://github.com/machinalis/mypy-django
+  * https://github.com/facebook/pyre-check/tree/master/stubs/3/django
+  * https://github.com/zulip/zulip/issues/991
+  * https://gitlab.com/melvyn-sopacua/typeshed/commits/django
 
 ## How was django-stubs initially auto-generated?
 
