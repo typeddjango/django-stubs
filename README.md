@@ -60,6 +60,9 @@ We'll hopefully merge these existing efforts here as we move along.
   * https://github.com/facebook/pyre-check/tree/master/stubs/3/django
   * https://github.com/zulip/zulip/issues/991
   * https://gitlab.com/melvyn-sopacua/typeshed/commits/django
+  * https://github.com/suutari/mypy-django (See [this comment] for more)
+
+[this comment]: https://github.com/TypedDjango/django-stubs/issues/4#issuecomment-409478397
 
 ## How was django-stubs initially auto-generated?
 
