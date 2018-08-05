@@ -1,14 +1,17 @@
-from django.core.management.base import CommandParser
-from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.migrations.loader import MigrationLoader
-from typing import List
+from typing import Any, List, Optional
 
-class Command:
-    def _validate_app_names(
-        self, loader: MigrationLoader, app_names: List[str]
-    ) -> None: ...
+from django.core.management.base import BaseCommand, CommandParser
+from django.db.backends.sqlite3.base import DatabaseWrapper
+
+
+class Command(BaseCommand):
+    stderr: django.core.management.base.OutputWrapper
+    stdout: django.core.management.base.OutputWrapper
+    style: django.core.management.color.Style
+    help: str = ...
     def add_arguments(self, parser: CommandParser) -> None: ...
-    def handle(self, *args, **options) -> None: ...
+    verbosity: Any = ...
+    def handle(self, *args: Any, **options: Any) -> None: ...
     def show_list(
         self, connection: DatabaseWrapper, app_names: List[str] = ...
     ) -> None: ...

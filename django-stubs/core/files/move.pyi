@@ -1,4 +1,6 @@
-def _samefile(src: str, dst: str) -> bool: ...
+from typing import Any, Optional
+
+
 def file_move_safe(
     old_file_name: str,
     new_file_name: str,

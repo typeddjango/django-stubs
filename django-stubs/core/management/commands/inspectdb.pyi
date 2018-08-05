@@ -1,25 +1,34 @@
 from collections import OrderedDict
-from django.core.management.base import CommandParser
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+
+from django.core.management.base import BaseCommand, CommandParser
 from django.db.backends.base.introspection import FieldInfo
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from typing import Any, Dict, Iterator, List, Tuple, Union
 
-class Command:
+
+class Command(BaseCommand):
+    stderr: django.core.management.base.OutputWrapper
+    stdout: django.core.management.base.OutputWrapper
+    style: django.core.management.color.Style
+    help: str = ...
+    requires_system_checks: bool = ...
+    stealth_options: Any = ...
+    db_module: str = ...
     def add_arguments(self, parser: CommandParser) -> None: ...
-    def get_field_type(
-        self, connection: DatabaseWrapper, table_name: str, row: FieldInfo
-    ) -> Union[Tuple[str, OrderedDict, List[Any]], Tuple[str, OrderedDict, List[str]]]: ...
-    def get_meta(
-        self,
-        table_name: str,
-        constraints: Dict[str, Dict[str, Union[List[str], bool, str, Tuple[str, str]]]],
-        column_to_field_name: Dict[str, str],
-        is_view: bool,
-    ) -> List[str]: ...
-    def handle(self, **options) -> None: ...
+    def handle(self, **options: Any) -> None: ...
     def handle_inspection(self, options: Dict[str, Any]) -> Iterator[str]: ...
     def normalize_col_name(
         self, col_name: str, used_column_names: List[str], is_relation: bool
-    ) -> Union[
-        Tuple[str, Dict[Any, Any], List[Any]], Tuple[str, Dict[str, str], List[str]]
-    ]: ...
+    ) -> Tuple[str, Dict[str, str], List[str]]: ...
+    def get_field_type(
+        self, connection: DatabaseWrapper, table_name: str, row: FieldInfo
+    ) -> Tuple[str, OrderedDict, List[str]]: ...
+    def get_meta(
+        self,
+        table_name: str,
+        constraints: Dict[
+            str, Dict[str, Union[str, List[str], bool, Tuple[str, str]]]
+        ],
+        column_to_field_name: Dict[str, str],
+        is_view: bool,
+    ) -> List[str]: ...

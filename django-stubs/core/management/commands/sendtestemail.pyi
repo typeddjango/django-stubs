@@ -1,5 +1,13 @@
-from django.core.management.base import CommandParser
+from typing import Any, Optional
 
-class Command:
+from django.core.management.base import BaseCommand, CommandParser
+
+
+class Command(BaseCommand):
+    stderr: django.core.management.base.OutputWrapper
+    stdout: django.core.management.base.OutputWrapper
+    style: django.core.management.color.Style
+    help: str = ...
+    missing_args_message: str = ...
     def add_arguments(self, parser: CommandParser) -> None: ...
-    def handle(self, *args, **kwargs) -> None: ...
+    def handle(self, *args: Any, **kwargs: Any) -> None: ...
