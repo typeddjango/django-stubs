@@ -15,7 +15,7 @@ def is_iterable(
                 ]
             ],
             List[Tuple[int, int, int]],
-            List[Union[List[Union[List[List[str]], str]], CheckMessage]],
+            List[CheckMessage],
             List[int],
             List[str],
             Tuple[

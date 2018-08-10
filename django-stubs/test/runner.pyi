@@ -14,20 +14,10 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     buffer: bool
     descriptions: bool
     dots: bool
-    errors: List[
-        Union[
-            Tuple[django.test.testcases.TestCase, str, str],
-            Tuple[unittest.case._SubTest, str, str],
-        ]
-    ]
+    errors: List[Tuple[unittest.case.TestCase, str, str]]
     expectedFailures: List[Any]
     failfast: bool
-    failures: List[
-        Union[
-            Tuple[django.test.testcases.TestCase, str, str],
-            Tuple[unittest.case._SubTest, str, str],
-        ]
-    ]
+    failures: List[Tuple[unittest.case.TestCase, str, str]]
     shouldStop: bool
     showAll: bool
     skipped: List[Any]

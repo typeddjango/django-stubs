@@ -1,13 +1,11 @@
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
-from django.core.validators import RegexValidator
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState
-from django.db.migrations.utils import RegexObject
-from django.db.models.fields import Field, IntegerField
+from django.db.models.fields import Field
 
 from .topological_sort import stable_topological_sort
 
@@ -30,46 +28,7 @@ class MigrationAutodetector:
         convert_apps: Optional[Set[str]] = ...,
         migration_name: Optional[str] = ...,
     ) -> Dict[str, List[Migration]]: ...
-    def deep_deconstruct(
-        self,
-        obj: Optional[
-            Union[
-                Callable,
-                Dict[str, int],
-                Dict[str, str],
-                List[RegexValidator],
-                List[int],
-                Tuple[str],
-                Type[IntegerField],
-                Field,
-                int,
-                str,
-            ]
-        ],
-    ) -> Optional[
-        Union[
-            Callable,
-            Dict[str, Union[Tuple[str, List[Any], Dict[Any, Any]], int]],
-            Dict[str, str],
-            List[
-                Union[
-                    Tuple[str, List[Union[RegexObject, str]], Dict[Any, Any]],
-                    int,
-                ]
-            ],
-            Tuple[Callable, Tuple[str], Dict[Any, Any]],
-            Tuple[Tuple[str, List[Any], Dict[Any, Any]], int],
-            Tuple[
-                Tuple[str, List[str], Dict[Any, Any]],
-                Tuple[str, List[str], Dict[Any, Any]],
-            ],
-            Tuple[str],
-            Type[IntegerField],
-            RegexObject,
-            int,
-            str,
-        ]
-    ]: ...
+    def deep_deconstruct(self, obj: Any) -> Any: ...
     def only_relation_agnostic_fields(
         self, fields: List[Tuple[str, Field]]
     ) -> List[
@@ -77,7 +36,6 @@ class MigrationAutodetector:
             str,
             List[Any],
             Union[
-                Dict[Any, Any],
                 Dict[str, Callable],
                 Dict[str, Union[Callable, bool]],
                 Dict[str, Union[bool, str]],

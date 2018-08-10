@@ -2,7 +2,6 @@ from io import BytesIO
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.test.client import FakePayload
 from django.utils.datastructures import MultiValueDict
 
 RAISE_ERROR: Any
@@ -56,14 +55,7 @@ class HttpRequest:
     def upload_handlers(self, upload_handlers: Any) -> None: ...
     upload_handlers: Any = ...
     def parse_file_upload(
-        self,
-        META: Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
-        post_data: Union[BytesIO, WSGIRequest],
+        self, META: Dict[str, Any], post_data: Union[BytesIO, WSGIRequest]
     ) -> Tuple[QueryDict, MultiValueDict]: ...
     @property
     def body(self) -> bytes: ...

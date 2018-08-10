@@ -6,15 +6,7 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
 from unittest.mock import MagicMock
 from uuid import UUID
 
-from django.contrib.admin.widgets import (AdminEmailInputWidget,
-                                          AdminFileWidget, AdminSplitDateTime,
-                                          AdminTextInputWidget,
-                                          AdminURLFieldWidget,
-                                          FilteredSelectMultiple,
-                                          RelatedFieldWidgetWrapper)
-from django.contrib.auth.forms import (ReadOnlyPasswordHashField,
-                                       ReadOnlyPasswordHashWidget,
-                                       UserChangeForm, UserCreationForm)
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.flatpages.forms import FlatpageForm
 from django.core.files.base import File
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -23,15 +15,11 @@ from django.db.models.fields.files import FieldFile
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
-from django.forms.fields import (BooleanField, CharField, ChoiceField,
-                                 DateField, DateTimeField, Field, FileField,
-                                 IntegerField, SplitDateTimeField, URLField)
+from django.forms.fields import CharField, ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.utils import ErrorList
-from django.forms.widgets import (CheckboxInput, DateTimeInput, NumberInput,
-                                  RadioSelect, Select, SelectMultiple,
-                                  Textarea, TextInput, Widget)
+from django.forms.widgets import Widget
 
 ALL_FIELDS: str
 
@@ -84,7 +72,6 @@ class ModelFormOptions:
         options: Optional[
             Type[
                 Union[
-                    Any,
                     UserChangeForm.Meta,
                     UserCreationForm.Meta,
                     FlatpageForm.Meta,
@@ -136,7 +123,7 @@ class BaseModelForm(BaseForm):
         Dict[str, Optional[Union[bool, datetime, QuerySet, str]]],
         Dict[str, Optional[Union[date, Model, QuerySet, str]]],
         Dict[str, Optional[Union[Model, int, str]]],
-        Dict[str, Union[date, Decimal, int, str]],
+        Dict[str, Union[datetime, Decimal, int, str]],
         Dict[str, Union[File, str]],
     ]: ...
     def validate_unique(self) -> None: ...
@@ -339,96 +326,13 @@ class ModelChoiceField(ChoiceField):
     ]: ...
     def __deepcopy__(
         self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    List[
-                        Union[
-                            AdminEmailInputWidget,
-                            AdminTextInputWidget,
-                            FilteredSelectMultiple,
-                            RelatedFieldWidgetWrapper,
-                            ReadOnlyPasswordHashField,
-                            ReadOnlyPasswordHashWidget,
-                            BooleanField,
-                            CharField,
-                            ModelMultipleChoiceField,
-                            CheckboxInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            AdminSplitDateTime,
-                            RelatedFieldWidgetWrapper,
-                            CharField,
-                            DateField,
-                            SplitDateTimeField,
-                            ModelChoiceField,
-                            Select,
-                            TextInput,
-                            Textarea,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            AdminSplitDateTime,
-                            BooleanField,
-                            CharField,
-                            SplitDateTimeField,
-                            CheckboxInput,
-                            TextInput,
-                            Textarea,
-                        ]
-                    ],
-                    List[Union[AdminURLFieldWidget, URLField]],
-                    List[
-                        Union[
-                            ReadOnlyPasswordHashField,
-                            ReadOnlyPasswordHashWidget,
-                            BooleanField,
-                            DateTimeField,
-                            ModelMultipleChoiceField,
-                            CheckboxInput,
-                            DateTimeInput,
-                            SelectMultiple,
-                        ]
-                    ],
-                    List[Union[IntegerField, NumberInput]],
-                    List[Union[ModelChoiceField, RadioSelect]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[
-                        Union[
-                            AdminFileWidget,
-                            AdminTextInputWidget,
-                            CharField,
-                            FileField,
-                        ]
-                    ],
-                    OrderedDict,
-                    AdminFileWidget,
-                    AdminTextInputWidget,
-                    CharField,
-                    FileField,
-                ],
-            ],
+        memo: Dict[
+            int, Union[List[Union[Field, Widget]], OrderedDict, Field, Widget]
         ],
     ) -> ModelChoiceField: ...
     def label_from_instance(self, obj: Model) -> str: ...
     choices: Any = ...
-    def prepare_value(
-        self,
-        value: Optional[
-            Union[Dict[str, str], List[str], Model, int, str, UUID]
-        ],
-    ) -> Optional[Union[Dict[str, str], List[str], int, str, UUID]]: ...
+    def prepare_value(self, value: Any) -> Any: ...
     def to_python(
         self,
         value: Optional[Union[List[Dict[str, str]], List[List[str]], int, str]],
@@ -526,19 +430,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         ],
     ) -> QuerySet: ...
     def prepare_value(
-        self,
-        value: Optional[
-            Union[
-                List[Dict[str, str]],
-                List[List[str]],
-                List[Union[int, str]],
-                List[Model],
-                Tuple,
-                Model,
-                QuerySet,
-                str,
-            ]
-        ],
+        self, value: Any
     ) -> Optional[
         Union[
             List[Dict[str, str]],

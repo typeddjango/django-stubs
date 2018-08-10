@@ -7,21 +7,14 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
 
 from django.apps.registry import Apps
 from django.conf import LazySettings
-from django.contrib.admin.helpers import AdminForm
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.messages.storage.fallback import FallbackStorage
 from django.db import DefaultConnectionProxy
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.models.base import Model
-from django.forms.forms import BaseForm
-from django.forms.widgets import Media
 from django.template.base import Template
 from django.template.context import Context
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
 from django.utils.safestring import SafeText
-from django.views.generic.detail import SingleObjectTemplateResponseMixin
 
 
 class Approximate:
@@ -33,23 +26,7 @@ class Approximate:
     def __eq__(self, other: Union[Decimal, float]) -> bool: ...
 
 class ContextList(list):
-    def __getitem__(
-        self, key: Union[int, str]
-    ) -> Optional[
-        Union[
-            List[Union[List[str], str]],
-            bool,
-            AdminForm,
-            ChangeList,
-            FallbackStorage,
-            Model,
-            BaseForm,
-            Media,
-            Context,
-            SingleObjectTemplateResponseMixin,
-            str,
-        ]
-    ]: ...
+    def __getitem__(self, key: Union[int, str]) -> Any: ...
     def get(self, key: str, default: Optional[str] = ...) -> str: ...
     def __contains__(self, key: str) -> bool: ...
     def keys(self) -> Set[str]: ...
@@ -60,7 +37,7 @@ def setup_test_environment(debug: Optional[bool] = ...) -> None: ...
 def teardown_test_environment() -> None: ...
 def get_runner(
     settings: LazySettings, test_runner_class: Optional[str] = ...
-) -> Type[Union[Any, DiscoverRunner]]: ...
+) -> Type[DiscoverRunner]: ...
 
 class TestContextDecorator:
     attr_name: Any = ...
@@ -95,35 +72,45 @@ class override_settings(TestContextDecorator):
             Dict[
                 str,
                 Union[
-                    Dict[str, Optional[str]],
-                    Dict[str, Union[Callable, Dict[str, int], str]],
-                    Dict[str, Union[Dict[str, int], int, str]],
+                    Dict[
+                        str,
+                        Union[
+                            Callable, Dict[str, Union[Dict[str, bool], bool]]
+                        ],
+                    ],
+                    Dict[
+                        str, Union[Dict[str, Union[Dict[str, bool], bool]], int]
+                    ],
+                    Dict[
+                        str, Union[Dict[str, Union[Dict[str, bool], bool]], str]
+                    ],
                 ],
             ],
         ],
         Dict[
             str,
-            List[
-                Dict[
-                    str, Union[Dict[str, List[Tuple[str, Dict[str, str]]]], str]
-                ]
+            Dict[
+                str,
+                Union[
+                    Dict[str, Union[Callable, Dict[str, int], str]],
+                    Dict[str, Union[Dict[str, int], int, str]],
+                ],
             ],
         ],
+        Dict[str, List[Dict[str, Union[Dict[Any, Any], bool, str]]]],
         Dict[
             str,
             List[
                 Union[
-                    Dict[str, Union[Dict[Any, Any], bool, str]],
-                    Dict[str, Union[Dict[str, bool], bool, str]],
-                ]
-            ],
-        ],
-        Dict[
-            str,
-            List[
-                Union[
+                    Dict[
+                        str,
+                        Union[
+                            Dict[str, List[Tuple[str, Dict[str, str]]]],
+                            bool,
+                            str,
+                        ],
+                    ],
                     Dict[str, Union[Dict[str, List[str]], str]],
-                    Dict[str, Union[bool, str]],
                 ]
             ],
         ],
@@ -131,16 +118,7 @@ class override_settings(TestContextDecorator):
             str,
             List[
                 Union[
-                    Dict[str, Union[Dict[str, bool], str]],
-                    Dict[str, Union[Dict[str, int], str]],
-                ]
-            ],
-        ],
-        Dict[
-            str,
-            List[
-                Union[
-                    Dict[str, Union[Dict[str, int], str]],
+                    Dict[str, Union[Dict[str, int], bool, str]],
                     Dict[str, Union[Dict[str, str], str]],
                 ]
             ],
@@ -152,67 +130,23 @@ class override_settings(TestContextDecorator):
         Dict[str, Type[Any]],
         Dict[str, Union[Callable, bool]],
         Dict[str, Union[Dict[int, None], bool]],
-        Dict[str, Union[Dict[str, None], List[str]]],
-        Dict[str, Union[Dict[str, Optional[str]], str]],
         Dict[
             str,
             Union[
-                Dict[
-                    str,
-                    Union[
-                        Dict[Any, Any],
-                        Dict[str, Callable],
-                        Dict[str, int],
-                        Dict[str, str],
-                    ],
-                ],
-                List[
-                    Dict[str, Union[Dict[str, List[str]], List[str], bool, str]]
-                ],
-                List[Union[Tuple[str, str], str]],
-                int,
-                str,
+                Dict[str, Dict[str, Optional[str]]], List[Tuple[str, str]], str
             ],
         ],
+        Dict[str, Union[Dict[str, Optional[str]], List[str]]],
         Dict[
             str,
             Union[
                 Dict[
                     str,
                     Union[
-                        Dict[str, Dict[str, Union[List[str], bool, str]]],
-                        Dict[str, Dict[str, str]],
-                        int,
+                        Dict[str, Dict[str, Union[List[str], bool, str]]], int
                     ],
                 ],
                 str,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                Dict[str, Union[Dict[str, bool], bool]],
-                            ],
-                        ],
-                        Dict[
-                            str,
-                            Union[Dict[str, Union[Dict[str, bool], bool]], int],
-                        ],
-                        Dict[
-                            str,
-                            Union[Dict[str, Union[Dict[str, bool], bool]], str],
-                        ],
-                        str,
-                    ],
-                ],
-                List[str],
             ],
         ],
         Dict[
@@ -224,13 +158,15 @@ class override_settings(TestContextDecorator):
                         Dict[str, Union[Callable, str]],
                         Dict[str, Union[Dict[str, int], str]],
                         Dict[str, Union[int, str]],
-                        Dict[str, str],
                     ],
                 ],
                 bool,
             ],
         ],
-        Dict[str, Union[Dict[str, Union[Dict[str, str], str]], bool]],
+        Dict[
+            str,
+            Union[Dict[str, Union[Dict[str, str], str]], List[str], int, str],
+        ],
         Dict[
             str,
             Union[
@@ -238,6 +174,17 @@ class override_settings(TestContextDecorator):
                     Dict[str, Union[Dict[str, List[Any]], List[Any], bool, str]]
                 ],
                 List[str],
+            ],
+        ],
+        Dict[
+            str,
+            Union[
+                List[
+                    Dict[str, Union[Dict[str, List[str]], List[str], bool, str]]
+                ],
+                List[Union[Tuple[str, str], str]],
+                int,
+                str,
             ],
         ],
         Dict[
@@ -271,7 +218,7 @@ class modify_settings(override_settings):
     kwarg_name: None
     wrapped: Union[django.conf.Settings, django.conf.UserSettingsHolder]
     operations: List[
-        Union[Tuple[str, Dict[str, List[str]]], Tuple[str, Dict[str, str]]]
+        Tuple[str, Union[Dict[str, List[str]], Dict[str, str]]]
     ] = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def save_options(self, test_func: Type[SimpleTestCase]) -> None: ...

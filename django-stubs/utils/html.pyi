@@ -3,7 +3,6 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.db.models.base import Model
 from django.db.models.fields.files import FieldFile
-from django.forms.utils import ErrorList
 from django.utils.safestring import SafeText
 
 TRAILING_PUNCTUATION_CHARS: str
@@ -19,9 +18,7 @@ def escapejs(value: str) -> SafeText: ...
 def json_script(
     value: Union[Dict[str, str], str], element_id: str
 ) -> SafeText: ...
-def conditional_escape(
-    text: Optional[Union[Model, FieldFile, ErrorList, int, str]]
-) -> str: ...
+def conditional_escape(text: Any) -> str: ...
 def format_html(format_string: str, *args: Any, **kwargs: Any) -> SafeText: ...
 def format_html_join(
     sep: str,

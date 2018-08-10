@@ -5,14 +5,12 @@ from uuid import UUID
 
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.sessions.base_session import AbstractBaseSession
 from django.core.checks.messages import Warning
 from django.core.exceptions import (MultipleObjectsReturned,
                                     ObjectDoesNotExist, ValidationError)
 from django.db.models.fields import CharField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.manager import Manager
-from django.db.models.options import Options
 
 
 class Deferred: ...
@@ -22,7 +20,8 @@ DEFERRED: Any
 def subclass_exception(
     name: str,
     bases: Tuple[
-        Union[Type[MultipleObjectsReturned], Type[ObjectDoesNotExist]]
+        Union[Type[MultipleObjectsReturned], Type[ObjectDoesNotExist]],
+        Type[Exception],
     ],
     module: str,
     attached_to: Type[Model],
@@ -34,36 +33,20 @@ class ModelBase(type):
         name: str,
         bases: Tuple[Type[Model]],
         attrs: Union[
+            Dict[str, Any],
             Dict[
                 str,
                 Union[
                     Callable,
                     Tuple[Tuple[int, str], Tuple[int, str]],
-                    Type[AbstractUser.Meta],
                     Field,
-                    property,
                     str,
                 ],
             ],
-            Dict[
-                str,
-                Union[
-                    Callable, Type[Any], Type[PermissionsMixin.Meta], Field, str
-                ],
-            ],
-            Dict[str, Union[Callable, Type[Any], CharField, Manager, str]],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Type[AbstractBaseSession.Meta],
-                    classmethod,
-                    GenericForeignKey,
-                    Field,
-                    Manager,
-                    str,
-                ],
-            ],
+            Dict[str, Union[Callable, Type[Any], Field, Manager, str]],
+            Dict[str, Union[Callable, Type[PermissionsMixin.Meta], Field, str]],
+            Dict[str, Union[Callable, GenericForeignKey, Field, str]],
+            Dict[str, Union[Callable, Field, property, str]],
             Dict[
                 str,
                 Union[
@@ -75,33 +58,11 @@ class ModelBase(type):
                     str,
                 ],
             ],
+            Dict[str, Union[Type[AbstractUser.Meta], str]],
         ],
         **kwargs: Any
     ) -> Type[Model]: ...
-    def add_to_class(
-        cls,
-        name: str,
-        value: Optional[
-            Union[
-                Callable,
-                List[str],
-                Tuple[Tuple[int, str], Tuple[int, str]],
-                Tuple[
-                    Tuple[str, Tuple[Tuple[str, str], Tuple[str, str]]],
-                    Tuple[str, str],
-                ],
-                Type[Union[MultipleObjectsReturned, ObjectDoesNotExist]],
-                bool,
-                classmethod,
-                GenericForeignKey,
-                Field,
-                Manager,
-                Options,
-                property,
-                str,
-            ]
-        ],
-    ) -> None: ...
+    def add_to_class(cls, name: str, value: Any) -> None: ...
 
 class ModelStateFieldsCacheDescriptor:
     def __get__(
@@ -129,12 +90,7 @@ class Model:
             Tuple[Union[int, str]],
         ],
     ) -> Model: ...
-    def __eq__(
-        self,
-        other: Optional[
-            Union[Dict[Any, Any], List[Any], Tuple, Model, int, str]
-        ],
-    ) -> bool: ...
+    def __eq__(self, other: Any) -> bool: ...
     def __hash__(self) -> int: ...
     def __reduce__(self): ...
     pk: Any = ...

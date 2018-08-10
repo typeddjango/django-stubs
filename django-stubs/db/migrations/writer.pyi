@@ -1,8 +1,7 @@
-from typing import Any, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Optional, Set, Tuple, Type
 
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
-from django.db.models.fields import Field
 
 
 class SettingsReference(str):
@@ -37,16 +36,6 @@ class MigrationWriter:
     @property
     def path(self) -> str: ...
     @classmethod
-    def serialize(
-        cls,
-        value: Union[
-            List[Tuple[str, str]],
-            Set[Tuple[str, str]],
-            Tuple[str, Union[Field, str]],
-            bool,
-            Field,
-            str,
-        ],
-    ) -> Tuple[str, Set[str]]: ...
+    def serialize(cls, value: Any) -> Tuple[str, Set[str]]: ...
 
 MIGRATION_TEMPLATE: str

@@ -5,14 +5,13 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
 from unittest.case import TestCase
 from uuid import UUID
 
-from django.contrib.sitemaps import Sitemap
+from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.core.files.uploadedfile import InMemoryUploadedFile, UploadedFile
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.test.testcases import SerializeMixin
 from django.test.utils import LoggingCaptureMixin
-from django.urls.converters import (IntConverter, PathConverter, SlugConverter,
-                                    StringConverter, UUIDConverter)
+from django.urls.converters import IntConverter, StringConverter, UUIDConverter
 
 
 class OrderedSet:
@@ -23,8 +22,9 @@ class OrderedSet:
             Union[
                 List[Optional[int]],
                 List[Tuple[str, str]],
-                List[Union[Combinable, str]],
                 List[datetime],
+                List[Combinable],
+                List[str],
                 List[UUID],
                 OrderedDict,
             ]
@@ -76,37 +76,27 @@ class MultiValueDict(dict):
         self, key: Union[Callable, str], default_list: None = ...
     ) -> Union[
         List[
-            Union[
-                Tuple[
-                    List[Tuple[str, List[Any]]],
-                    str,
-                    Dict[str, Dict[str, Type[Sitemap]]],
-                    Dict[Any, Any],
-                ],
-                Tuple[
-                    List[Tuple[str, List[str]]],
-                    str,
-                    Dict[str, int],
-                    Union[
-                        Dict[Any, Any],
-                        Dict[str, IntConverter],
-                        Dict[str, PathConverter],
-                        Dict[str, SlugConverter],
-                        Dict[str, StringConverter],
-                        Dict[str, UUIDConverter],
-                    ],
-                ],
-                Tuple[
-                    List[Union[Tuple[str, List[Any]], Tuple[str, List[str]]]],
-                    str,
-                    Dict[Any, Any],
-                    Union[
-                        Dict[Any, Any],
-                        Dict[str, Any],
-                        Dict[str, IntConverter],
-                        Dict[str, StringConverter],
-                    ],
-                ],
+            Tuple[
+                List[Tuple[str, List[str]]],
+                str,
+                Dict[str, Dict[str, GenericSitemap]],
+                Dict[str, Any],
+            ]
+        ],
+        List[
+            Tuple[
+                List[Tuple[str, List[str]]],
+                str,
+                Dict[str, Union[Dict[str, Type[Sitemap]], str]],
+                Union[Dict[str, StringConverter], Dict[str, UUIDConverter]],
+            ]
+        ],
+        List[
+            Tuple[
+                List[Tuple[str, List[str]]],
+                str,
+                Dict[str, int],
+                Union[Dict[str, IntConverter], Dict[str, StringConverter]],
             ]
         ],
         List[UploadedFile],
@@ -117,22 +107,18 @@ class MultiValueDict(dict):
         key: Union[Callable, str],
         value: Union[
             Tuple[
-                List[Tuple[str, List[Any]]],
-                str,
-                Dict[str, Dict[str, Sitemap]],
-                Dict[Any, Any],
-            ],
-            Tuple[
                 List[Tuple[str, List[str]]],
                 str,
-                Dict[str, Union[int, str]],
-                Dict[str, Union[IntConverter, StringConverter]],
-            ],
-            Tuple[
-                List[Union[Tuple[str, List[Any]], Tuple[str, List[str]]]],
-                str,
-                Dict[str, Union[Dict[str, Type[Sitemap]], str]],
-                Dict[str, UUIDConverter],
+                Union[
+                    Dict[Any, Any],
+                    Dict[str, Any],
+                    Dict[str, Union[IntConverter, StringConverter]],
+                ],
+                Union[
+                    Dict[str, Any],
+                    Dict[str, Union[IntConverter, StringConverter]],
+                    Dict[str, UUIDConverter],
+                ],
             ],
             UploadedFile,
             str,

@@ -1,46 +1,9 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, time, timedelta
 from decimal import Decimal
-from io import BytesIO
-from sqlite3 import OperationalError
-from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
-                    Union)
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
-from django.contrib.admin.helpers import AdminErrorList
-from django.contrib.admin.options import ModelAdmin
-from django.contrib.admin.templatetags.admin_list import ResultList
-from django.contrib.admin.templatetags.base import InclusionAdminNode
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.auth.views import LoginView
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.files.uploadhandler import FileUploadHandler
-from django.core.handlers.wsgi import WSGIRequest
-from django.db.backends.sqlite3.base import (DatabaseWrapper,
-                                             SQLiteCursorWrapper)
-from django.db.backends.utils import CursorWrapper
-from django.db.models.base import Model
-from django.db.models.options import Options
 from django.db.models.query import QuerySet
-from django.db.utils import OperationalError
-from django.http.multipartparser import LazyStream, MultiPartParser
-from django.http.response import HttpResponse
-from django.template.backends.django import DjangoTemplates, Template
-from django.template.base import Node, Template
-from django.template.context import RequestContext
-from django.template.exceptions import TemplateDoesNotExist
-from django.template.loader_tags import BlockContext, BlockNode
-from django.test.client import FakePayload, RequestFactory
-from django.urls.resolvers import ResolverMatch, URLResolver
-from django.utils.datastructures import MultiValueDict
-from django.utils.feedgenerator import Enclosure, Rss201rev2Feed
-from django.utils.functional import cached_property
 from django.utils.safestring import SafeText
-from django.utils.xmlutils import SimplerXMLGenerator
-from django.views.debug import CallableSettingWrapper, ExceptionReporter
-from django.views.generic.base import TemplateResponseMixin, TemplateView
-from django.views.generic.dates import BaseDateDetailView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView, ModelFormMixin
-from django.views.generic.list import MultipleObjectTemplateResponseMixin
 
 from .base import Variable, VariableDoesNotExist
 from .library import Library
@@ -53,7 +16,7 @@ def capfirst(value: str) -> str: ...
 def escapejs_filter(value: str) -> SafeText: ...
 def json_script(value: Dict[str, str], element_id: SafeText) -> SafeText: ...
 def floatformat(
-    text: Optional[Union[Decimal, float, int, str]], arg: Union[int, str] = ...
+    text: Optional[Union[Decimal, float, str]], arg: Union[int, str] = ...
 ) -> str: ...
 def iriencode(value: str) -> str: ...
 def linenumbers(value: str, autoescape: bool = ...) -> SafeText: ...
@@ -119,26 +82,11 @@ def last(value: List[str]) -> str: ...
 def length(
     value: Optional[
         Union[
-            List[Optional[Union[Dict[Any, Any], int, str]]],
-            AdminErrorList,
-            QuerySet,
-            int,
-            str,
+            List[Optional[Union[Dict[Any, Any], int, str]]], QuerySet, int, str
         ]
     ]
 ) -> int: ...
-def length_is(
-    value: Optional[
-        Union[
-            List[Callable],
-            List[Optional[Union[Dict[Any, Any], int, str]]],
-            Tuple[str, str],
-            int,
-            str,
-        ]
-    ],
-    arg: Union[SafeText, int],
-) -> Union[bool, str]: ...
+def length_is(value: Any, arg: Union[SafeText, int]) -> Union[bool, str]: ...
 def random(value: List[str]) -> str: ...
 def slice_filter(value: Any, arg: str) -> Any: ...
 def unordered_list(
@@ -179,118 +127,4 @@ def yesno(
 def filesizeformat(bytes_: Union[complex, int, str]) -> str: ...
 def pluralize(value: Any, arg: str = ...) -> str: ...
 def phone2numeric_filter(value: str) -> str: ...
-def pprint(
-    value: Optional[
-        Union[
-            Callable,
-            Dict[int, None],
-            Dict[
-                str, Optional[Union[List[Enclosure], List[str], datetime, str]]
-            ],
-            Dict[str, Optional[Union[TemplateResponseMixin, int]]],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Optional[
-                            Union[Dict[Any, Any], Dict[str, None], int, str]
-                        ],
-                    ],
-                    Tuple[str, Dict[str, bytes]],
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[str, Union[List[str], bool, str]],
-                            Dict[str, Union[List[str], str]],
-                        ],
-                    ],
-                    Dict[
-                        str,
-                        Union[Dict[str, Union[List[str], str]], Dict[str, str]],
-                    ],
-                    date,
-                    int,
-                ],
-            ],
-            Dict[str, Union[Dict[str, str], str]],
-            Dict[str, Union[Tuple[int, int], BytesIO, FakePayload, int, str]],
-            Dict[
-                str,
-                Union[django.db.backends.base.DatabaseWrapper, CursorWrapper],
-            ],
-            Dict[str, bytes],
-            Dict[str, Model],
-            Dict[str, BlockNode],
-            Exception,
-            List[Callable],
-            List[Dict[str, Union[Dict[str, List[str]], List[str], bool, str]]],
-            List[Tuple[str, str]],
-            List[ChangeList],
-            List[DjangoTemplates],
-            List[TemplateDoesNotExist],
-            List[Enclosure],
-            List[int],
-            List[str],
-            Tuple,
-            Type[
-                Union[
-                    ValueError,
-                    bool,
-                    ResultList,
-                    InclusionAdminNode,
-                    LoginView,
-                    OperationalError,
-                    URLResolver,
-                    MultiValueDict,
-                    TemplateView,
-                    BaseDateDetailView,
-                    DetailView,
-                    DeleteView,
-                    ModelFormMixin,
-                    MultipleObjectTemplateResponseMixin,
-                    OperationalError,
-                ]
-            ],
-            BytesIO,
-            bytes,
-            date,
-            ModelAdmin,
-            ChangeList,
-            InMemoryUploadedFile,
-            FileUploadHandler,
-            WSGIRequest,
-            django.db.backends.base.SQLiteCursorWrapper,
-            CursorWrapper,
-            Model,
-            Options,
-            QuerySet,
-            LazyStream,
-            MultiPartParser,
-            HttpResponse,
-            DjangoTemplates,
-            Template,
-            Node,
-            Template,
-            RequestContext,
-            BlockContext,
-            FakePayload,
-            RequestFactory,
-            ResolverMatch,
-            URLResolver,
-            Rss201rev2Feed,
-            cached_property,
-            SimplerXMLGenerator,
-            CallableSettingWrapper,
-            ExceptionReporter,
-            TemplateResponseMixin,
-            int,
-            str,
-        ]
-    ]
-) -> str: ...
+def pprint(value: Any) -> str: ...

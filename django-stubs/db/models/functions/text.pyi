@@ -36,12 +36,7 @@ class ConcatPair(Func):
     extra: Dict[Any, Any]
     is_summary: bool
     output_field: django.db.models.fields.CharField
-    source_expressions: List[
-        Union[
-            django.db.models.expressions.Expression,
-            django.db.models.expressions.F,
-        ]
-    ]
+    source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     def as_sqlite(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
@@ -157,12 +152,7 @@ class Repeat(BytesToCharFieldConversionMixin, Func):
     extra: Dict[Any, Any]
     is_summary: bool
     output_field: django.db.models.fields.CharField
-    source_expressions: List[
-        Union[
-            django.db.models.expressions.Expression,
-            django.db.models.expressions.F,
-        ]
-    ]
+    source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     def __init__(
         self,

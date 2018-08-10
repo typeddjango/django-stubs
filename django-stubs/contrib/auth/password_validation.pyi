@@ -11,9 +11,7 @@ def get_default_password_validators() -> Union[
     List[NumericPasswordValidator],
 ]: ...
 def get_password_validators(
-    validator_config: List[
-        Union[Dict[str, Union[Dict[str, int], str]], Dict[str, str]]
-    ]
+    validator_config: List[Dict[str, Union[Dict[str, int], str]]]
 ) -> Union[
     List[Union[CommonPasswordValidator, MinimumLengthValidator]],
     List[Union[MinimumLengthValidator, UserAttributeSimilarityValidator]],
@@ -48,7 +46,7 @@ class UserAttributeSimilarityValidator:
     def __init__(
         self,
         user_attributes: Union[List[str], Tuple[str, str, str, str]] = ...,
-        max_similarity: Union[float, int] = ...,
+        max_similarity: float = ...,
     ) -> None: ...
     def validate(self, password: str, user: Optional[User] = ...) -> None: ...
     def get_help_text(self) -> str: ...

@@ -18,7 +18,7 @@ def get_conditional_response(
     response: Optional[HttpResponse] = ...,
 ) -> Optional[HttpResponse]: ...
 def patch_response_headers(
-    response: HttpResponseBase, cache_timeout: Union[float, int] = ...
+    response: HttpResponseBase, cache_timeout: float = ...
 ) -> None: ...
 def add_never_cache_headers(response: HttpResponseBase) -> None: ...
 def patch_vary_headers(
@@ -29,12 +29,14 @@ def get_cache_key(
     request: WSGIRequest,
     key_prefix: Optional[str] = ...,
     method: str = ...,
-    cache: Optional[Union[DefaultCacheProxy, BaseCache]] = ...,
+    cache: Optional[Union[DefaultCacheProxy, backends.base.BaseCache]] = ...,
 ) -> Optional[str]: ...
 def learn_cache_key(
     request: WSGIRequest,
     response: HttpResponse,
-    cache_timeout: Optional[Union[float, int]] = ...,
+    cache_timeout: Optional[float] = ...,
     key_prefix: Optional[str] = ...,
-    cache: Optional[Union[DefaultCacheProxy, LocMemCache]] = ...,
+    cache: Optional[
+        Union[DefaultCacheProxy, backends.locmem.LocMemCache]
+    ] = ...,
 ) -> str: ...

@@ -1,12 +1,12 @@
 from collections import OrderedDict
-from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
-from django.contrib.admin.filters import FieldListFilter, SimpleListFilter
+from django.contrib.admin.filters import ListFilter, SimpleListFilter
 from django.contrib.admin.options import ModelAdmin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
-from django.db.models.expressions import BaseExpression, CombinedExpression, F
+from django.db.models.expressions import (Combinable, CombinedExpression,
+                                          OrderBy)
 from django.db.models.query import QuerySet
 
 ALL_VAR: str
@@ -64,16 +64,7 @@ class ChangeList:
     def get_filters_params(self, params: None = ...) -> Dict[str, str]: ...
     def get_filters(
         self, request: WSGIRequest
-    ) -> Union[
-        Tuple[List[Any], bool, Dict[str, datetime], bool],
-        Tuple[
-            List[Union[FieldListFilter, SimpleListFilter]],
-            bool,
-            Dict[str, bool],
-            bool,
-        ],
-        Tuple[List[FieldListFilter], bool, Dict[str, str], bool],
-    ]: ...
+    ) -> Tuple[List[ListFilter], bool, bool, bool]: ...
     def get_query_string(
         self,
         new_params: Optional[
@@ -95,7 +86,7 @@ class ChangeList:
     ) -> Optional[Union[CombinedExpression, str]]: ...
     def get_ordering(
         self, request: WSGIRequest, queryset: QuerySet
-    ) -> List[Union[BaseExpression, F, str]]: ...
+    ) -> Union[List[Union[Combinable, str]], List[Union[OrderBy, str]]]: ...
     def get_ordering_field_columns(self) -> OrderedDict: ...
     def get_queryset(self, request: WSGIRequest) -> QuerySet: ...
     def apply_select_related(self, qs: QuerySet) -> QuerySet: ...

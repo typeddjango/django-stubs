@@ -1,11 +1,11 @@
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
+from django.contrib.postgres.fields.citext import CIText
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
 from django.db.models.base import Model
-from django.db.models.fields import (AutoField, BooleanField, CharField, Field,
-                                     IntegerField, SlugField)
+from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
 
@@ -36,7 +36,7 @@ class CreateModel(ModelOperation):
     def __init__(
         self,
         name: str,
-        fields: List[Tuple[str, Field]],
+        fields: List[Tuple[str, Union[CIText, Field]]],
         options: Optional[
             Union[
                 Dict[str, Union[List[Any], bool]],
@@ -52,55 +52,7 @@ class CreateModel(ModelOperation):
     ) -> Tuple[
         str,
         List[Any],
-        Union[
-            Dict[
-                str,
-                Union[
-                    Dict[str, str],
-                    List[Union[Tuple[str, AutoField], Tuple[str, CharField]]],
-                    str,
-                ],
-            ],
-            Dict[str, Union[List[Tuple[str, AutoField]], str]],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Union[
-                            Tuple[str, AutoField],
-                            Tuple[str, BooleanField],
-                            Tuple[str, CharField],
-                            Tuple[str, IntegerField],
-                            Tuple[str, SlugField],
-                        ]
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Union[Tuple[str, AutoField], Tuple[str, BooleanField]]
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Union[
-                            Tuple[str, AutoField],
-                            Tuple[str, CharField],
-                            Tuple[str, IntegerField],
-                            Tuple[str, SlugField],
-                        ]
-                    ],
-                    str,
-                ],
-            ],
-        ],
+        Dict[str, Union[Dict[str, str], List[Tuple[str, Field]], str]],
     ]: ...
     def state_forwards(self, app_label: str, state: ProjectState) -> None: ...
     def database_forwards(

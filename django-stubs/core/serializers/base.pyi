@@ -5,7 +5,6 @@ from io import BufferedReader, StringIO, TextIOWrapper
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.management.base import OutputWrapper
 from django.core.serializers.xml_serializer import Deserializer
 from django.db.models.base import Model
@@ -20,7 +19,7 @@ class DeserializationError(Exception):
     @classmethod
     def WithData(
         cls,
-        original_exc: Union[ObjectDoesNotExist, ValidationError],
+        original_exc: Exception,
         model: str,
         fk: Union[int, str],
         field_value: Optional[Union[List[str], str]],
@@ -30,9 +29,7 @@ class M2MDeserializationError(Exception):
     original_exc: django.core.exceptions.ObjectDoesNotExist = ...
     pk: List[str] = ...
     def __init__(
-        self,
-        original_exc: Union[ObjectDoesNotExist, ValidationError],
-        pk: Union[List[str], str],
+        self, original_exc: Exception, pk: Union[List[str], str]
     ) -> None: ...
 
 class ProgressBar:
@@ -91,9 +88,7 @@ class DeserializedObject:
     object: django.db.models.base.Model = ...
     m2m_data: Dict[Any, Any] = ...
     def __init__(
-        self,
-        obj: Model,
-        m2m_data: Optional[Dict[str, Union[List[Any], List[int]]]] = ...,
+        self, obj: Model, m2m_data: Optional[Dict[str, List[int]]] = ...
     ) -> None: ...
     def save(
         self, save_m2m: bool = ..., using: Optional[str] = ..., **kwargs: Any
@@ -109,7 +104,7 @@ def build_instance(
         Dict[str, Union[date, int, str]],
         Dict[str, Union[time, int]],
         Dict[str, Union[Decimal, int, str]],
-        Dict[str, Union[float, int, str]],
+        Dict[str, Union[float, str]],
         Dict[str, Union[int, memoryview]],
         Dict[str, Union[int, UUID]],
     ],

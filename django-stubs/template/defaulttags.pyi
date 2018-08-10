@@ -1,24 +1,10 @@
 from collections import namedtuple
-from datetime import date, time
-from decimal import Decimal
-from sqlite3 import OperationalError
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from datetime import date
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from django.contrib.admin.helpers import ActionForm, AdminForm
-from django.contrib.auth.context_processors import PermLookupDict, PermWrapper
-from django.contrib.messages.storage.base import BaseStorage
-from django.core.exceptions import FieldDoesNotExist
-from django.core.handlers.wsgi import WSGIRequest
-from django.db.models.base import Model
-from django.db.models.fields import AutoField
-from django.db.models.query import QuerySet
-from django.forms.boundfield import BoundField
 from django.template.base import FilterExpression, NodeList, Parser, Token
 from django.template.context import Context, RequestContext
-from django.template.exceptions import TemplateDoesNotExist
 from django.template.library import Library
-from django.urls.resolvers import URLPattern, URLResolver
-from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeText
 
 from .base import (BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END,
@@ -144,19 +130,10 @@ class IfNode(Node):
     origin: django.template.base.Origin
     token: django.template.base.Token
     conditions_nodelists: List[
-        Union[
-            Tuple[None, django.template.base.NodeList],
-            Tuple[
-                django.template.defaulttags.TemplateLiteral,
-                django.template.base.NodeList,
-            ],
-        ]
+        Tuple[django.template.base.NodeList, django.template.base.NodeList]
     ] = ...
     def __init__(
-        self,
-        conditions_nodelists: List[
-            Union[Tuple[None, NodeList], Tuple[TemplateLiteral, NodeList]]
-        ],
+        self, conditions_nodelists: List[Tuple[NodeList, NodeList]]
     ) -> None: ...
     def __iter__(self) -> None: ...
     @property
@@ -308,50 +285,7 @@ class TemplateLiteral(Literal):
     text: str = ...
     def __init__(self, value: FilterExpression, text: str) -> None: ...
     def display(self) -> str: ...
-    def eval(
-        self, context: Context
-    ) -> Optional[
-        Union[
-            AttributeError,
-            Dict[str, Union[List[Tuple[int, SafeText]], int, str]],
-            KeyError,
-            List[List[Union[URLPattern, URLResolver]]],
-            List[Tuple[str, str]],
-            List[
-                Union[
-                    Dict[str, Union[List[Any], str]],
-                    Dict[
-                        str, Union[List[Dict[str, Union[List[Any], str]]], str]
-                    ],
-                ]
-            ],
-            List[BoundField],
-            List[TemplateDoesNotExist],
-            List[int],
-            List[str],
-            Set[Any],
-            Tuple,
-            TypeError,
-            date,
-            time,
-            Decimal,
-            ActionForm,
-            AdminForm,
-            PermLookupDict,
-            PermWrapper,
-            BaseStorage,
-            FieldDoesNotExist,
-            WSGIRequest,
-            Model,
-            AutoField,
-            QuerySet,
-            MultiValueDict,
-            float,
-            int,
-            OperationalError,
-            str,
-        ]
-    ]: ...
+    def eval(self, context: Context) -> Any: ...
 
 class TemplateIfParser(IfParser):
     current_token: django.template.defaulttags.TemplateLiteral

@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, Optional, Union
 
 from django.core.cache.backends.base import BaseCache
 
@@ -21,22 +21,7 @@ class DummyCache(BaseCache):
     def set(
         self,
         key: str,
-        value: Union[
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Dict[str, int],
-                    List[int],
-                    Tuple[int, int, int, int],
-                    Type[Any],
-                    int,
-                    str,
-                ],
-            ],
-            int,
-            str,
-        ],
+        value: Union[Dict[str, Any], int, str],
         timeout: Any = ...,
         version: Optional[str] = ...,
     ) -> None: ...

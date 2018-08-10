@@ -36,16 +36,13 @@ def decorator_from_middleware_with_args(
 ) -> Callable: ...
 def decorator_from_middleware(
     middleware_class: Type[
-        Union[
-            Any, XViewMiddleware, CsrfViewMiddleware, ConditionalGetMiddleware
-        ]
+        Union[XViewMiddleware, CsrfViewMiddleware, ConditionalGetMiddleware]
     ]
 ) -> Callable: ...
 def available_attrs(fn: Any): ...
 def make_middleware_decorator(
     middleware_class: Type[
         Union[
-            Any,
             XViewMiddleware,
             CacheMiddleware,
             CsrfViewMiddleware,

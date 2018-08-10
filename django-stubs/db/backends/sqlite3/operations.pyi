@@ -8,7 +8,8 @@ from django.db.backends.sqlite3.base import (DatabaseWrapper,
                                              SQLiteCursorWrapper)
 from django.db.backends.utils import CursorDebugWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import BaseExpression, Col, Expression, F
+from django.db.models.expressions import (BaseExpression, Col, Expression, F,
+                                          SQLiteNumericMixin)
 from django.db.models.fields import Field
 from django.utils.datastructures import ImmutableList
 
@@ -85,7 +86,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         connection: DatabaseWrapper,
     ) -> Optional[time]: ...
     def get_decimalfield_converter(
-        self, expression: Expression
+        self, expression: Union[Col, SQLiteNumericMixin]
     ) -> Callable: ...
     def convert_uuidfield_value(
         self, value: Optional[str], expression: Col, connection: DatabaseWrapper

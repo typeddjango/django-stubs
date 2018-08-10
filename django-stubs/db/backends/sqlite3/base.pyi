@@ -77,7 +77,7 @@ class SQLiteCursorWrapper(Database.Cursor):
         query: str,
         params: Optional[
             Union[
-                List[Optional[Union[float, int, str]]],
+                List[Optional[Union[float, str]]],
                 List[Optional[Union[int, memoryview, str]]],
                 List[datetime],
                 Tuple,

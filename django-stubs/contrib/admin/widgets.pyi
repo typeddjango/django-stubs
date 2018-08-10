@@ -1,19 +1,14 @@
 from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from uuid import UUID
 
 from django import forms
 from django.contrib.admin.sites import AdminSite, DefaultAdminSite
-from django.contrib.auth.forms import (ReadOnlyPasswordHashField,
-                                       ReadOnlyPasswordHashWidget)
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q
-from django.forms.fields import (BooleanField, CharField, Field, FileField,
-                                 IntegerField, SplitDateTimeField, URLField)
-from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
-from django.forms.widgets import (CheckboxInput, ChoiceWidget, DateInput,
-                                  Media, Select, TimeInput, Widget)
+from django.forms.fields import Field
+from django.forms.widgets import ChoiceWidget, Media, Widget
 from django.http.request import QueryDict
 from django.utils.datastructures import MultiValueDict
 
@@ -35,23 +30,28 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         name: str,
         value: Union[List[Any], str],
         attrs: Optional[Dict[str, str]],
-    ) -> Dict[
-        str,
+    ) -> Union[
         Dict[
             str,
-            Union[
-                Dict[str, Union[int, str]],
-                List[
-                    Tuple[
-                        None,
-                        List[Dict[str, Union[Dict[Any, Any], int, str]]],
-                        int,
-                    ]
-                ],
-                List[str],
-                bool,
+            Dict[
                 str,
+                Union[
+                    Dict[str, Union[int, str]],
+                    List[
+                        Tuple[
+                            None,
+                            List[Dict[str, Union[Dict[Any, Any], int, str]]],
+                            int,
+                        ]
+                    ],
+                    bool,
+                    str,
+                ],
             ],
+        ],
+        Dict[
+            str,
+            Dict[str, Union[Dict[str, Union[int, str]], List[str], bool, str]],
         ],
     ]: ...
 
@@ -291,62 +291,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     ) -> None: ...
     def __deepcopy__(
         self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    List[
-                        Union[
-                            AdminEmailInputWidget,
-                            AdminTextInputWidget,
-                            FilteredSelectMultiple,
-                            RelatedFieldWidgetWrapper,
-                            ReadOnlyPasswordHashField,
-                            ReadOnlyPasswordHashWidget,
-                            BooleanField,
-                            CharField,
-                            ModelMultipleChoiceField,
-                            CheckboxInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            AdminFileWidget,
-                            AdminTextInputWidget,
-                            CharField,
-                            FileField,
-                        ]
-                    ],
-                    List[Union[AdminIntegerFieldWidget, IntegerField]],
-                    List[
-                        Union[
-                            AdminSplitDateTime,
-                            AdminTextInputWidget,
-                            AdminTextareaWidget,
-                            RelatedFieldWidgetWrapper,
-                            CharField,
-                            SplitDateTimeField,
-                            ModelChoiceField,
-                            DateInput,
-                            Select,
-                            TimeInput,
-                        ]
-                    ],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[Union[AdminURLFieldWidget, URLField]],
-                    OrderedDict,
-                    AdminURLFieldWidget,
-                    URLField,
-                    ModelChoiceField,
-                ],
-            ],
+        memo: Dict[
+            int, Union[List[Union[Field, Widget]], OrderedDict, Field, Widget]
         ],
     ) -> RelatedFieldWidgetWrapper: ...
     @property
@@ -432,18 +378,7 @@ class AutocompleteMixin:
         name: str,
         value: List[str],
         attr: Dict[str, Union[bool, str]] = ...,
-    ) -> List[
-        Tuple[
-            None,
-            List[
-                Union[
-                    Dict[str, Union[Dict[Any, Any], bool, str]],
-                    Dict[str, Union[Dict[str, bool], Set[str], int, str]],
-                ]
-            ],
-            int,
-        ]
-    ]: ...
+    ) -> List[Tuple[None, int, int]]: ...
     @property
     def media(self) -> Media: ...
 

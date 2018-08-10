@@ -1,4 +1,3 @@
-from datetime import date
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
@@ -43,22 +42,10 @@ class MultipleObjectMixin(ContextMixin):
     def get_context_data(
         self, *, object_list: Optional[Any] = ..., **kwargs: Any
     ) -> Union[
+        Dict[str, Any],
         Dict[
             str,
             Optional[Union[List[Dict[str, str]], bool, MultipleObjectMixin]],
-        ],
-        Dict[
-            str,
-            Optional[
-                Union[
-                    bool,
-                    date,
-                    Page,
-                    Paginator,
-                    QuerySet,
-                    MultipleObjectTemplateResponseMixin,
-                ]
-            ],
         ],
         Dict[str, Union[List[Dict[str, str]], bool, Page, Paginator, ListView]],
         Dict[str, Union[bool, AutocompleteJsonView, Page, Paginator, QuerySet]],

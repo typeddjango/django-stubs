@@ -23,13 +23,7 @@ class LogEntryManager(models.Manager):
         action_flag: int,
         change_message: Union[
             Dict[str, Dict[str, List[str]]],
-            List[
-                Union[
-                    Dict[str, Dict[str, List[str]]],
-                    Dict[str, Dict[str, Union[List[str], str]]],
-                    Dict[str, Dict[str, str]],
-                ]
-            ],
+            List[Dict[str, Dict[str, Union[List[str], str]]]],
             str,
         ] = ...,
     ) -> LogEntry: ...

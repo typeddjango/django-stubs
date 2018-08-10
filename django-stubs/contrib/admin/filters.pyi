@@ -6,6 +6,7 @@ from django.db.models.base import Model
 from django.db.models.fields import BooleanField, DateField, Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import RelatedField
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
 
 
@@ -47,7 +48,7 @@ class FieldListFilter(ListFilter):
     title: Any = ...
     def __init__(
         self,
-        field: Union[Field, mixins.FieldCacheMixin],
+        field: Union[Field, ForeignObjectRel],
         request: WSGIRequest,
         params: Dict[str, str],
         model: Type[Model],
@@ -76,7 +77,7 @@ class FieldListFilter(ListFilter):
     @classmethod
     def create(
         cls,
-        field: Union[Field, mixins.FieldCacheMixin],
+        field: Union[Field, ForeignObjectRel],
         request: WSGIRequest,
         params: Dict[str, str],
         model: Type[Model],

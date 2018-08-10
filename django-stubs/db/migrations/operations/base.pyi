@@ -1,18 +1,4 @@
-from typing import Any, List, Optional, Type, Union
-
-from django.contrib.postgres.operations import CreateExtension
-from django.db.migrations.operations.fields import (AddField, AlterField,
-                                                    RemoveField, RenameField)
-from django.db.migrations.operations.models import (AddIndex,
-                                                    AlterIndexTogether,
-                                                    AlterModelOptions,
-                                                    AlterModelTable,
-                                                    AlterOrderWithRespectTo,
-                                                    AlterUniqueTogether,
-                                                    CreateModel, DeleteModel,
-                                                    RenameModel)
-from django.db.migrations.operations.special import (RunPython,
-                                                     SeparateDatabaseAndState)
+from typing import Any, List, Optional, Type
 
 
 class Operation:
@@ -21,30 +7,7 @@ class Operation:
     atomic: bool = ...
     elidable: bool = ...
     serialization_expand_args: Any = ...
-    def __new__(
-        cls: Type[
-            Union[
-                CreateExtension,
-                AddField,
-                AlterField,
-                RemoveField,
-                RenameField,
-                AddIndex,
-                AlterIndexTogether,
-                AlterModelOptions,
-                AlterModelTable,
-                AlterOrderWithRespectTo,
-                AlterUniqueTogether,
-                CreateModel,
-                DeleteModel,
-                RenameModel,
-                RunPython,
-                SeparateDatabaseAndState,
-            ]
-        ],
-        *args: Any,
-        **kwargs: Any
-    ) -> Operation: ...
+    def __new__(cls: Type[Any], *args: Any, **kwargs: Any) -> Operation: ...
     def deconstruct(self): ...
     def state_forwards(self, app_label: Any, state: Any) -> None: ...
     def database_forwards(

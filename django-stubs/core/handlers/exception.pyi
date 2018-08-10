@@ -1,9 +1,7 @@
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest
-from django.http.multipartparser import MultiPartParserError
-from django.http.response import Http404, HttpResponse
+from django.http.response import HttpResponse
 from django.urls.resolvers import URLResolver
 
 
@@ -15,9 +13,7 @@ def get_exception_response(
     request: WSGIRequest,
     resolver: URLResolver,
     status_code: int,
-    exception: Union[
-        PermissionDenied, SuspiciousOperation, MultiPartParserError, Http404
-    ],
+    exception: Exception,
     sender: None = ...,
 ) -> HttpResponse: ...
 def handle_uncaught_exception(request: Any, resolver: Any, exc_info: Any): ...

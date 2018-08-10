@@ -21,7 +21,9 @@ class MigrationLoader:
     def __init__(
         self,
         connection: Optional[
-            Union[DefaultConnectionProxy, BaseDatabaseWrapper]
+            Union[
+                DefaultConnectionProxy, backends.base.base.BaseDatabaseWrapper
+            ]
         ],
         load: bool = ...,
         ignore_no_migrations: bool = ...,

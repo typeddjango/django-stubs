@@ -5,6 +5,8 @@ from django.apps.config import AppConfig
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.postgres.fields.array import ArrayField
+from django.contrib.postgres.fields.citext import CIText
 from django.contrib.sessions.base_session import AbstractBaseSession
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
@@ -22,27 +24,17 @@ IMMUTABLE_WARNING: str
 DEFAULT_NAMES: Any
 
 def normalize_together(
-    option_together: Optional[
-        Union[
-            List[List[str]],
-            List[Union[Tuple[str, str], int]],
-            List[str],
-            Set[Union[Tuple[str, str, str, str], Tuple[str, str]]],
-            Tuple[Tuple[str, str]],
-            Tuple[str, str],
-            int,
-            str,
-        ]
-    ]
+    option_together: Any
 ) -> Union[
-    List[Union[Tuple[str, str], int]],
-    Set[Union[Tuple[str, str, str, str], Tuple[str, str]]],
-    Tuple,
-    int,
-    str,
+    List[Union[Tuple[str, str], int]], Set[Tuple[str, str]], Tuple, int, str
 ]: ...
 def make_immutable_fields_list(
-    name: str, data: Union[Iterator[Any], List[Union[Field, FieldCacheMixin]]]
+    name: str,
+    data: Union[
+        Iterator[Any],
+        List[Union[ArrayField, CIText]],
+        List[Union[Field, mixins.FieldCacheMixin]],
+    ],
 ) -> ImmutableList: ...
 
 class Options:
@@ -57,11 +49,7 @@ class Options:
     FORWARD_PROPERTIES: Any = ...
     REVERSE_PROPERTIES: Any = ...
     default_apps: Any = ...
-    local_fields: List[
-        Union[
-            django.db.models.fields.AutoField, django.db.models.fields.CharField
-        ]
-    ] = ...
+    local_fields: List[django.db.models.fields.Field] = ...
     local_many_to_many: List[
         django.db.models.fields.related.ManyToManyField
     ] = ...
@@ -90,7 +78,6 @@ class Options:
     meta: Optional[
         Type[
             Union[
-                Any,
                 django.contrib.auth.base_user.AbstractBaseUser.Meta,
                 django.contrib.auth.models.AbstractUser.Meta,
                 django.contrib.auth.models.PermissionsMixin.Meta,
@@ -116,7 +103,6 @@ class Options:
         meta: Optional[
             Type[
                 Union[
-                    Any,
                     AbstractBaseUser.Meta,
                     AbstractUser.Meta,
                     PermissionsMixin.Meta,
@@ -163,7 +149,7 @@ class Options:
     def fields_map(self) -> Dict[str, ForeignObjectRel]: ...
     def get_field(
         self, field_name: Union[Callable, str]
-    ) -> Union[Field, mixins.FieldCacheMixin]: ...
+    ) -> Union[Field, FieldCacheMixin]: ...
     def get_base_chain(self, model: Type[Model]) -> List[Type[Model]]: ...
     def get_parent_list(self) -> List[Type[Model]]: ...
     def get_ancestor_link(

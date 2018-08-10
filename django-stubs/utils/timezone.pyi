@@ -1,26 +1,11 @@
 from contextlib import ContextDecorator
 from datetime import date, datetime, time, timedelta, tzinfo
-from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.messages.storage.base import Message
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models.base import Model
-from django.db.models.fields.files import FieldFile
-from django.db.models.query import QuerySet
-from django.forms.boundfield import BoundField, BoundWidget
-from django.forms.forms import BaseForm
-from django.forms.utils import ErrorDict
-from django.forms.widgets import Media
-from django.urls.resolvers import CheckURLMixin, LocalePrefixPattern
+from typing import Any, Optional, Union
 
 
 class FixedOffset(tzinfo):
     def __init__(
-        self,
-        offset: Optional[Union[float, int]] = ...,
-        name: Optional[str] = ...,
+        self, offset: Optional[float] = ..., name: Optional[str] = ...
     ) -> None: ...
     def utcoffset(self, dt: Union[datetime, str]) -> timedelta: ...
     def tzname(self, dt: Optional[Union[datetime, str]]) -> str: ...

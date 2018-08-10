@@ -100,14 +100,7 @@ class BaseModelAdmin:
         ],
         Tuple[Tuple[None, Dict[str, Tuple[Tuple[str, str]]]]],
         Tuple[
-            Tuple[str, Dict[str, Union[Tuple[str, str], Tuple[str]]]],
-            Tuple[
-                str,
-                Union[
-                    Dict[str, Union[Tuple[str, str, str], Tuple[str]]],
-                    Dict[str, Union[Tuple[str, str], Tuple[str]]],
-                ],
-            ],
+            Tuple[str, Dict[str, Tuple[str]]], Tuple[str, Dict[str, Tuple[str]]]
         ],
     ]: ...
     def get_ordering(self, request: WSGIRequest) -> Union[List[str], Tuple]: ...
@@ -137,16 +130,7 @@ class BaseModelAdmin:
 
 class ModelAdmin(BaseModelAdmin):
     formfield_overrides: Dict[
-        Type[
-            Union[
-                django.db.models.fields.CharField,
-                django.db.models.fields.DateField,
-                django.db.models.fields.IntegerField,
-                django.db.models.fields.TextField,
-                django.db.models.fields.TimeField,
-                django.db.models.fields.files.FileField,
-            ]
-        ],
+        Type[Any],
         Dict[
             str,
             Type[
@@ -234,8 +218,7 @@ class ModelAdmin(BaseModelAdmin):
         request: WSGIRequest,
         object: Model,
         message: Union[
-            Dict[str, Dict[Any, Any]],
-            List[Union[Dict[str, Dict[Any, Any]], Dict[str, Dict[str, str]]]],
+            Dict[str, Dict[Any, Any]], List[Dict[str, Dict[str, str]]]
         ],
     ) -> LogEntry: ...
     def log_change(
@@ -244,13 +227,7 @@ class ModelAdmin(BaseModelAdmin):
         object: Model,
         message: Union[
             Dict[str, Dict[str, List[str]]],
-            List[
-                Union[
-                    Dict[str, Dict[str, List[str]]],
-                    Dict[str, Dict[str, Union[List[str], str]]],
-                    Dict[str, Dict[str, str]],
-                ]
-            ],
+            List[Dict[str, Dict[str, Union[List[str], str]]]],
         ],
     ) -> LogEntry: ...
     def log_deletion(

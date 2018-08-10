@@ -44,6 +44,5 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Union[
             Dict[str, Union[List[str], Tuple[str, str], bool]],
             Dict[str, Union[List[str], bool, str]],
-            Dict[str, Union[List[str], bool]],
         ],
     ]: ...

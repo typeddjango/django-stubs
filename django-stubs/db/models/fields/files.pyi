@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.core.checks.messages import Error
@@ -20,12 +19,7 @@ class FieldFile(File):
     def __init__(
         self, instance: Model, field: FileField, name: Optional[str]
     ) -> None: ...
-    def __eq__(
-        self,
-        other: Optional[
-            Union[Dict[Any, Any], List[Any], Tuple, FieldFile, str]
-        ],
-    ) -> bool: ...
+    def __eq__(self, other: Any) -> bool: ...
     def __hash__(self): ...
     file: Any = ...
     @property
@@ -69,36 +63,16 @@ class FileField(Field):
     def check(self, **kwargs: Any) -> List[Error]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            None,
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[Callable, FileSystemStorage]],
-                Dict[str, Union[partial, int]],
-            ],
+    ) -> Tuple[
+        str,
+        List[Any],
+        Union[
+            Dict[str, Union[Callable, FileSystemStorage, int]],
+            Dict[str, Union[FileSystemStorage, int, str]],
         ],
-        Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[Callable, FileSystemStorage, int]],
-                Dict[str, Union[FileSystemStorage, int, str]],
-            ],
-            Union[
-                Dict[str, Union[Callable, FileSystemStorage, int]],
-                Dict[str, Union[FileSystemStorage, int, str]],
-            ],
-        ],
-        Tuple[
-            str,
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[Callable, bool, FileSystemStorage]],
-                Dict[str, str],
-            ],
+        Union[
+            Dict[str, Union[Callable, FileSystemStorage, int]],
+            Dict[str, Union[FileSystemStorage, int, str]],
         ],
     ]: ...
     def get_internal_type(self) -> str: ...
@@ -141,16 +115,11 @@ class ImageField(FileField):
     def check(self, **kwargs: Any) -> List[Any]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            str,
-            List[Any],
-            Dict[str, Union[Callable, bool, FileSystemStorage, str]],
-            Dict[str, Union[Callable, bool, FileSystemStorage, str]],
-        ],
-        Tuple[
-            str, str, List[Any], Dict[str, Union[Callable, FileSystemStorage]]
-        ],
+    ) -> Tuple[
+        str,
+        List[Any],
+        Dict[str, Union[Callable, bool, FileSystemStorage, str]],
+        Dict[str, Union[Callable, bool, FileSystemStorage, str]],
     ]: ...
     def contribute_to_class(
         self, cls: Type[Model], name: str, **kwargs: Any

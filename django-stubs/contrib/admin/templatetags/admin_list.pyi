@@ -40,14 +40,7 @@ def result_list(
 ) -> Dict[
     str,
     Union[
-        List[
-            Union[
-                Dict[str, Optional[Union[int, str]]],
-                Dict[str, Union[bool, SafeText]],
-                Dict[str, Union[bool, str]],
-                Dict[str, Union[int, str]],
-            ]
-        ],
+        List[Dict[str, Optional[Union[int, str]]]],
         List[ResultList],
         List[BoundField],
         ChangeList,

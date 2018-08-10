@@ -1,7 +1,6 @@
 from typing import Any, Callable, List, Optional, Set, Union
 
-from django.contrib.admin.apps import SimpleAdminConfig
-from django.contrib.auth.apps import AuthConfig
+from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
 
 
@@ -28,7 +27,7 @@ class CheckRegistry:
     ) -> Callable: ...
     def run_checks(
         self,
-        app_configs: Optional[List[Union[SimpleAdminConfig, AuthConfig]]] = ...,
+        app_configs: Optional[List[AppConfig]] = ...,
         tags: Optional[List[str]] = ...,
         include_deployment_checks: bool = ...,
     ) -> Union[List[CheckMessage], List[int], List[str]]: ...

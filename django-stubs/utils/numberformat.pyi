@@ -3,7 +3,7 @@ from typing import Any, Optional, Tuple, Union
 
 
 def format(
-    number: Union[Decimal, float, int, str],
+    number: Union[Decimal, float, str],
     decimal_sep: str,
     decimal_pos: Optional[int] = ...,
     grouping: Union[Tuple[int, int, int], int] = ...,

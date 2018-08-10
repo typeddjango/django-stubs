@@ -29,7 +29,6 @@ class Engine:
                     str,
                     Union[
                         Dict[str, str],
-                        List[Any],
                         List[Tuple[str, Dict[str, str]]],
                         List[str],
                     ],
@@ -59,7 +58,6 @@ class Engine:
                             str,
                             Union[
                                 Dict[str, str],
-                                List[Any],
                                 List[Tuple[str, Dict[str, str]]],
                                 List[str],
                             ],
@@ -93,7 +91,6 @@ class Engine:
                         str,
                         Union[
                             Dict[str, str],
-                            List[Any],
                             List[Tuple[str, Dict[str, str]]],
                             List[str],
                         ],
@@ -133,10 +130,9 @@ class Engine:
                 Dict[str, Dict[str, List[Tuple[str, int]]]],
                 Dict[str, Dict[str, Tuple[str, str, str, str]]],
                 Dict[str, List[Dict[str, Union[List[int], int]]]],
-                Dict[str, List[Dict[str, Union[List[str], str]]]],
                 Dict[str, List[Dict[str, Union[int, str]]]],
-                Dict[str, List[Dict[str, date]]],
                 Dict[str, List[List[Tuple[int, str]]]],
+                Dict[str, List[Union[List[SafeText], str]]],
                 Dict[str, List[Template]],
                 Dict[str, Optional[int]],
                 Dict[str, Optional[str]],
@@ -155,15 +151,28 @@ class Engine:
                 Dict[str, Union[Dict[str, int], str]],
                 Dict[
                     str,
-                    Union[List[Optional[Union[Dict[Any, Any], int, str]]], int],
+                    Union[
+                        List[
+                            Optional[
+                                Union[
+                                    Dict[str, Union[List[str], str]], int, str
+                                ]
+                            ]
+                        ],
+                        str,
+                    ],
                 ],
-                Dict[str, Union[List[Union[List[SafeText], str]], str]],
-                Dict[str, Union[List[int], str]],
+                Dict[
+                    str,
+                    Union[
+                        List[Optional[Union[Dict[str, date], int, str]]], int
+                    ],
+                ],
                 Dict[str, Union[date, timedelta]],
-                Dict[str, Union[float, int]],
                 Dict[str, Union[int, str]],
                 Dict[str, time],
                 Dict[str, Template],
+                Dict[str, float],
                 Dict[str, range],
             ]
         ] = ...,

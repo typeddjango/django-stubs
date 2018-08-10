@@ -55,9 +55,9 @@ class TagHelperNode(Node):
     ) -> None: ...
     def get_resolved_arguments(
         self, context: Context
-    ) -> Union[
-        Tuple[Dict[Any, Any], Dict[Any, Any]],
-        Tuple[List[int], Dict[str, Union[SafeText, int]]],
+    ) -> Tuple[
+        Union[Dict[str, Union[SafeText, int]], List[Union[Context, int]]],
+        Union[Dict[Any, Any], Dict[str, Union[SafeText, int]], Dict[str, int]],
     ]: ...
 
 class SimpleNode(TagHelperNode):

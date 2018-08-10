@@ -1,6 +1,7 @@
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
 
 from django.apps.registry import Apps
+from django.contrib.postgres.fields.citext import CIText
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
@@ -23,21 +24,21 @@ class ModelState:
         self,
         app_label: str,
         name: str,
-        fields: List[Tuple[str, Field]],
+        fields: List[Tuple[str, Union[CIText, Field]]],
         options: Optional[
             Union[
                 Dict[str, Optional[List[Index]]],
-                Dict[str, Union[List[Any], List[Tuple[str, str]], str]],
-                Dict[str, Union[List[Index], bool, str]],
                 Dict[
                     str,
                     Union[
-                        List[str],
-                        Set[Union[Tuple[str, str, str, str], Tuple[str, str]]],
+                        List[Tuple[str, str]],
+                        Set[Tuple[str, str]],
                         Tuple[str],
                         str,
                     ],
                 ],
+                Dict[str, Union[List[Index], bool]],
+                Dict[str, Union[List[str], Set[Tuple[str, str]]]],
                 Dict[str, Union[List[str], Tuple, bool]],
                 Dict[str, Union[List[str], bool, str]],
                 Dict[str, Union[Set[Tuple[str, str]], bool]],

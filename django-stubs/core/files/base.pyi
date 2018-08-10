@@ -1,7 +1,3 @@
-from http.client import HTTPResponse
-from io import (BufferedRandom, BufferedReader, BufferedWriter, BytesIO,
-                StringIO, TextIOWrapper)
-from tempfile import SpooledTemporaryFile, _TemporaryFileWrapper
 from typing import Any, Iterator, Optional, Union
 
 from django.core.files.utils import FileProxyMixin
@@ -12,23 +8,7 @@ class File(FileProxyMixin):
     file: _io.BufferedReader = ...
     name: str = ...
     mode: str = ...
-    def __init__(
-        self,
-        file: Optional[
-            Union[
-                BufferedRandom,
-                BufferedReader,
-                BufferedWriter,
-                BytesIO,
-                StringIO,
-                TextIOWrapper,
-                HTTPResponse,
-                SpooledTemporaryFile,
-                _TemporaryFileWrapper,
-            ]
-        ],
-        name: Optional[str] = ...,
-    ) -> None: ...
+    def __init__(self, file: Any, name: Optional[str] = ...) -> None: ...
     def __bool__(self) -> bool: ...
     def __len__(self) -> int: ...
     def size(self) -> int: ...

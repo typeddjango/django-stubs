@@ -1,12 +1,10 @@
 import threading
 import unittest
 from contextlib import _GeneratorContextManager
-from datetime import date, time, timedelta
-from decimal import Decimal
+from datetime import date
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 from unittest.runner import TextTestResult
-from uuid import UUID
 
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core.handlers.wsgi import WSGIHandler
@@ -19,8 +17,8 @@ from django.forms.fields import EmailField
 from django.http.response import HttpResponse, HttpResponseBase
 from django.template.context import Context
 from django.test.html import Element
-from django.test.utils import (Approximate, CaptureQueriesContext,
-                               modify_settings, override_settings)
+from django.test.utils import (CaptureQueriesContext, modify_settings,
+                               override_settings)
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.safestring import SafeText
 
@@ -209,45 +207,12 @@ class TransactionTestCase(SimpleTestCase):
         qs: Union[Iterator[Any], List[Model], QuerySet, RawQuerySet],
         values: Union[
             List[Optional[str]],
+            List[Tuple[Any, Any]],
             List[Tuple[Model, Model]],
             List[Tuple[Model, int, int]],
             List[Tuple[str, Type[Model], int]],
-            List[
-                Union[
-                    Tuple[
-                        Optional[
-                            Union[
-                                bytes,
-                                date,
-                                time,
-                                timedelta,
-                                Decimal,
-                                Approximate,
-                                float,
-                                int,
-                                str,
-                                UUID,
-                            ]
-                        ],
-                        Optional[
-                            Union[
-                                bytes,
-                                date,
-                                time,
-                                timedelta,
-                                Decimal,
-                                Approximate,
-                                float,
-                                int,
-                                str,
-                                UUID,
-                            ]
-                        ],
-                    ],
-                    int,
-                ]
-            ],
             List[date],
+            List[int],
             Set[str],
             QuerySet,
         ],

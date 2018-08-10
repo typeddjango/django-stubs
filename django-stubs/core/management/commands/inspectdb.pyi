@@ -1,6 +1,5 @@
 from collections import OrderedDict
-from io import StringIO
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.core.management.base import BaseCommand, CommandParser
 from django.db.backends.base.introspection import FieldInfo
@@ -17,12 +16,7 @@ class Command(BaseCommand):
     db_module: str = ...
     def add_arguments(self, parser: CommandParser) -> None: ...
     def handle(self, **options: Any) -> None: ...
-    def handle_inspection(
-        self,
-        options: Dict[
-            str, Optional[Union[Callable, List[str], StringIO, int, str]]
-        ],
-    ) -> Iterator[str]: ...
+    def handle_inspection(self, options: Dict[str, Any]) -> Iterator[str]: ...
     def normalize_col_name(
         self, col_name: str, used_column_names: List[str], is_relation: bool
     ) -> Tuple[str, Dict[str, str], List[str]]: ...
@@ -37,7 +31,6 @@ class Command(BaseCommand):
             Union[
                 Dict[str, Union[List[str], Tuple[str, str], bool]],
                 Dict[str, Union[List[str], bool, str]],
-                Dict[str, Union[List[str], bool]],
             ],
         ],
         column_to_field_name: Dict[str, str],

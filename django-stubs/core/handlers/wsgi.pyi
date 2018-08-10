@@ -51,28 +51,7 @@ class WSGIRequest(HttpRequest):
     method: str = ...
     encoding: Any = ...
     resolver_match: None = ...
-    def __init__(
-        self,
-        environ: Union[
-            Dict[
-                str,
-                Optional[
-                    Union[Tuple[int, int], BytesIO, FakePayload, int, str]
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[str, str],
-                    Tuple[int, int],
-                    BytesIO,
-                    FakePayload,
-                    int,
-                    str,
-                ],
-            ],
-        ],
-    ) -> None: ...
+    def __init__(self, environ: Dict[str, Any]) -> None: ...
     def GET(self) -> QueryDict: ...
     def COOKIES(self) -> Dict[str, str]: ...
     @property
@@ -90,63 +69,11 @@ class WSGIHandler(base.BaseHandler):
         start_response: Callable,
     ) -> HttpResponse: ...
 
-def get_path_info(
-    environ: Union[
-        Dict[
-            str,
-            Optional[Union[Tuple[int, int], BytesIO, FakePayload, int, str]],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
-    ]
-) -> str: ...
-def get_script_name(
-    environ: Union[
-        Dict[
-            str,
-            Optional[Union[Tuple[int, int], BytesIO, FakePayload, int, str]],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
-    ]
-) -> str: ...
+def get_path_info(environ: Dict[str, Any]) -> str: ...
+def get_script_name(environ: Dict[str, Any]) -> str: ...
 def get_bytes_from_wsgi(
-    environ: Union[
-        Dict[
-            str,
-            Optional[Union[Tuple[int, int], BytesIO, FakePayload, int, str]],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
-    ],
-    key: str,
-    default: str,
+    environ: Dict[str, Any], key: str, default: str
 ) -> bytes: ...
 def get_str_from_wsgi(
-    environ: Union[
-        Dict[
-            str,
-            Optional[Union[Tuple[int, int], BytesIO, FakePayload, int, str]],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
-    ],
-    key: str,
-    default: str,
+    environ: Dict[str, Any], key: str, default: str
 ) -> str: ...

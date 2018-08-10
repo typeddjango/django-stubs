@@ -22,7 +22,7 @@ class RegexValidator:
         inverse_match: Optional[bool] = ...,
         flags: Optional[RegexFlag] = ...,
     ) -> None: ...
-    def __call__(self, value: Optional[Union[float, int, str]]) -> None: ...
+    def __call__(self, value: Optional[Union[float, str]]) -> None: ...
     def __eq__(
         self, other: Union[ProhibitNullCharactersValidator, RegexValidator]
     ) -> bool: ...
@@ -45,7 +45,7 @@ class URLValidator(RegexValidator):
 
 integer_validator: Any
 
-def validate_integer(value: Optional[Union[float, int, str]]) -> None: ...
+def validate_integer(value: Optional[Union[float, str]]) -> None: ...
 
 class EmailValidator:
     message: Any = ...
@@ -92,17 +92,17 @@ class BaseValidator:
     limit_value: bool = ...
     def __init__(
         self,
-        limit_value: Optional[Union[datetime, Decimal, float, int, str]],
+        limit_value: Optional[Union[datetime, Decimal, float, str]],
         message: Optional[str] = ...,
     ) -> None: ...
     def __call__(
-        self, value: Union[bytes, datetime, Decimal, float, int, str]
+        self, value: Union[bytes, datetime, Decimal, float, str]
     ) -> None: ...
     def __eq__(self, other: BaseValidator) -> bool: ...
     def compare(self, a: bool, b: bool) -> bool: ...
     def clean(
-        self, x: Union[datetime, Decimal, float, int]
-    ) -> Union[datetime, Decimal, float, int]: ...
+        self, x: Union[datetime, Decimal, float]
+    ) -> Union[datetime, Decimal, float]: ...
 
 class MaxValueValidator(BaseValidator):
     limit_value: decimal.Decimal
@@ -110,8 +110,8 @@ class MaxValueValidator(BaseValidator):
     code: str = ...
     def compare(
         self,
-        a: Union[datetime, Decimal, float, int],
-        b: Union[datetime, Decimal, float, int],
+        a: Union[datetime, Decimal, float],
+        b: Union[datetime, Decimal, float],
     ) -> bool: ...
 
 class MinValueValidator(BaseValidator):
@@ -120,8 +120,8 @@ class MinValueValidator(BaseValidator):
     code: str = ...
     def compare(
         self,
-        a: Union[datetime, Decimal, float, int],
-        b: Union[datetime, Decimal, float, int],
+        a: Union[datetime, Decimal, float],
+        b: Union[datetime, Decimal, float],
     ) -> bool: ...
 
 class MinLengthValidator(BaseValidator):

@@ -3,7 +3,6 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import QueryDict
-from django.test.client import FakePayload
 from django.utils.datastructures import ImmutableList, MultiValueDict
 
 
@@ -13,12 +12,7 @@ class InputStreamExhausted(Exception): ...
 class MultiPartParser:
     def __init__(
         self,
-        META: Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
+        META: Dict[str, Any],
         input_data: Union[BytesIO, StringIO, WSGIRequest],
         upload_handlers: Union[List[Any], ImmutableList],
         encoding: Optional[str] = ...,
@@ -73,7 +67,6 @@ class Parser:
                 Tuple[
                     str,
                     Union[
-                        Dict[Any, Any],
                         Dict[str, Union[bytes, str]],
                         Dict[str, bytes],
                         Dict[str, str],

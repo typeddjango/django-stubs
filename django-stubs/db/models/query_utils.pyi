@@ -1,6 +1,4 @@
 from collections import OrderedDict, namedtuple
-from datetime import date
-from decimal import Decimal
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
@@ -8,7 +6,8 @@ from django.db.models.base import Model
 from django.db.models.expressions import Expression, F
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.lookups import Lookup, Transform
+from django.db.models.functions.datetime import TimezoneMixin
+from django.db.models.lookups import BuiltinLookup, Lookup, Transform
 from django.db.models.options import Options
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
@@ -37,89 +36,7 @@ class QueryWrapper:
 class Q(tree.Node):
     children: Union[
         List[Dict[str, str]],
-        List[
-            Union[
-                Tuple[
-                    str,
-                    Optional[
-                        Union[
-                            Any,
-                            Dict[Any, Any],
-                            Iterator[Any],
-                            List[Any],
-                            List[Dict[str, str]],
-                            List[List[str]],
-                            List[None],
-                            List[Union[django.db.models.base.Model, int]],
-                            List[
-                                Union[
-                                    django.db.models.expressions.CombinedExpression,
-                                    django.db.models.expressions.F,
-                                ]
-                            ],
-                            List[Union[int, str]],
-                            List[datetime.datetime],
-                            List[django.contrib.auth.models.Group],
-                            List[django.contrib.auth.models.Permission],
-                            List[django.contrib.auth.models.User],
-                            List[
-                                django.contrib.contenttypes.models.ContentType
-                            ],
-                            List[django.db.models.base.Model],
-                            List[
-                                django.db.models.expressions.CombinedExpression
-                            ],
-                            List[django.db.models.expressions.F],
-                            List[int],
-                            List[str],
-                            Set[Any],
-                            Set[Optional[int]],
-                            Set[django.contrib.contenttypes.models.ContentType],
-                            Set[int],
-                            Set[str],
-                            Set[uuid.UUID],
-                            Tuple,
-                            bytes,
-                            datetime.date,
-                            datetime.timedelta,
-                            decimal.Decimal,
-                            django.db.models.base.Model,
-                            django.db.models.expressions.Case,
-                            django.db.models.expressions.CombinedExpression,
-                            django.db.models.expressions.F,
-                            django.db.models.expressions.Subquery,
-                            django.db.models.functions.datetime.Extract,
-                            django.db.models.functions.datetime.Now,
-                            django.db.models.functions.datetime.Trunc,
-                            django.db.models.functions.datetime.TruncDate,
-                            django.db.models.functions.datetime.TruncDay,
-                            django.db.models.functions.datetime.TruncHour,
-                            django.db.models.functions.datetime.TruncMinute,
-                            django.db.models.functions.datetime.TruncMonth,
-                            django.db.models.functions.datetime.TruncSecond,
-                            django.db.models.functions.datetime.TruncTime,
-                            django.db.models.functions.datetime.TruncWeek,
-                            django.db.models.functions.datetime.TruncYear,
-                            django.db.models.functions.text.Chr,
-                            django.db.models.functions.text.Length,
-                            django.db.models.functions.text.Ord,
-                            django.db.models.functions.text.Substr,
-                            django.db.models.functions.text.Upper,
-                            django.db.models.query.QuerySet,
-                            django.db.models.sql.query.Query,
-                            django.utils.functional.SimpleLazyObject,
-                            float,
-                            frozenset,
-                            int,
-                            range,
-                            str,
-                            uuid.UUID,
-                        ]
-                    ],
-                ],
-                django.db.models.query_utils.Q,
-            ]
-        ],
+        List[Union[Tuple[str, Any], django.db.models.query_utils.Q]],
     ]
     connector: str
     negated: bool
@@ -150,7 +67,7 @@ class DeferredAttribute:
     def __init__(self, field_name: str) -> None: ...
     def __get__(
         self, instance: Optional[Model], cls: Type[Model] = ...
-    ) -> Optional[Union[date, Decimal, DeferredAttribute, float, int, str]]: ...
+    ) -> Any: ...
 
 class RegisterLookupMixin:
     @classmethod
@@ -159,7 +76,10 @@ class RegisterLookupMixin:
     def get_transform(self, lookup_name: str) -> Optional[Type[Transform]]: ...
     @staticmethod
     def merge_dicts(
-        dicts: List[Dict[str, Type[Union[Lookup, Transform]]]]
+        dicts: Union[
+            List[Dict[str, Type[Union[TimezoneMixin, BuiltinLookup]]]],
+            List[Dict[str, Type[Union[Lookup, Transform]]]],
+        ]
     ) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
     @classmethod
     def register_lookup(
@@ -193,10 +113,8 @@ def select_related_descend(
 ) -> bool: ...
 def refs_expression(
     lookup_parts: List[str], annotations: OrderedDict
-) -> Union[
-    Tuple[List[str], List[str]],
-    Tuple[bool, Tuple],
-    Tuple[Expression, List[Any]],
+) -> Tuple[
+    Union[List[str], Tuple, Expression], Union[List[Any], List[str], Tuple]
 ]: ...
 def check_rel_lookup_compatibility(
     model: Type[Model], target_opts: Options, field: FieldCacheMixin

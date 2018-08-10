@@ -10,7 +10,6 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.datastructures import MultiValueDict
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -35,12 +34,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     def get_form_class(self) -> Type[AuthenticationForm]: ...
     def get_form_kwargs(
         self
-    ) -> Dict[
-        str,
-        Optional[
-            Union[Dict[Any, Any], Dict[str, str], HttpRequest, MultiValueDict]
-        ],
-    ]: ...
+    ) -> Dict[str, Optional[Union[Dict[str, str], HttpRequest]]]: ...
     def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect: ...
     def get_context_data(
         self, **kwargs: Any
@@ -111,9 +105,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     def get_user(self, uidb64: str) -> Optional[AbstractBaseUser]: ...
     def get_form_kwargs(
         self
-    ) -> Dict[
-        str, Optional[Union[Dict[Any, Any], AbstractBaseUser, MultiValueDict]]
-    ]: ...
+    ) -> Dict[str, Optional[Union[Dict[Any, Any], AbstractBaseUser]]]: ...
     def form_valid(self, form: SetPasswordForm) -> HttpResponseRedirect: ...
     def get_context_data(self, **kwargs: Any): ...
 

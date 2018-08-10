@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from decimal import Decimal
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
 from uuid import UUID
 
@@ -11,10 +10,8 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.deletion import Collector
 from django.db.models.fields import Field
-from django.db.models.fields.files import FieldFile
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.reverse_related import (ForeignObjectRel,
-                                                     ManyToOneRel)
+from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 
@@ -48,27 +45,19 @@ def flatten_fieldsets(
                 ],
             ]
         ],
-        List[Tuple[str, Dict[str, Union[Tuple[str, str], Tuple[str]]]]],
+        List[Tuple[str, Dict[str, Tuple[str]]]],
         Tuple[
-            Tuple[
-                None,
-                Union[
-                    Dict[str, Tuple[Tuple[str, str]]],
-                    Dict[str, Tuple[str, str, List[str]]],
-                    Dict[str, Tuple[str, str, Tuple[str, str]]],
-                    Dict[str, Union[Tuple[str, str, str], Tuple[str]]],
+            Union[
+                Tuple[Dict[str, Tuple[str]], Dict[str, Tuple[str]]],
+                Tuple[
+                    None,
+                    Union[
+                        Dict[str, Tuple[Tuple[str, str]]],
+                        Dict[str, Tuple[str, str, List[str]]],
+                        Dict[str, Tuple[str, str, Tuple[str, str]]],
+                    ],
                 ],
             ]
-        ],
-        Tuple[
-            Tuple[str, Dict[str, Union[Tuple[str, str], Tuple[str]]]],
-            Tuple[
-                str,
-                Union[
-                    Dict[str, Union[Tuple[str, str, str], Tuple[str]]],
-                    Dict[str, Union[Tuple[str, str], Tuple[str]]],
-                ],
-            ],
         ],
     ]
 ) -> List[Union[Callable, str]]: ...
@@ -112,12 +101,9 @@ def model_ngettext(
 def lookup_field(
     name: Union[Callable, str], obj: Model, model_admin: BaseModelAdmin = ...
 ) -> Union[
-    Tuple[None, Callable, Optional[Union[Callable, date, int, str]]],
-    Tuple[
-        Optional[Union[date, Model, FieldFile, float, int, str]],
-        Optional[Union[date, Model, FieldFile, float, int, str]],
-        Optional[Union[date, Model, FieldFile, float, int, str]],
-    ],
+    Tuple[None, Callable, Optional[Callable]],
+    Tuple[None, Union[date, Model, int, str], Union[date, Model, int, str]],
+    Tuple[Field, None, Any],
 ]: ...
 def label_for_field(
     name: Union[Callable, str],
@@ -125,35 +111,32 @@ def label_for_field(
     model_admin: Optional[BaseModelAdmin] = ...,
     return_attr: bool = ...,
 ) -> Union[
-    Tuple[Callable, Callable],
-    Tuple[str, Optional[Union[Type[str], GenericForeignKey]]],
+    Tuple[
+        Optional[Union[Callable, GenericForeignKey]],
+        Optional[Union[Callable, GenericForeignKey]],
+    ],
+    Tuple[str, Type[str]],
     str,
 ]: ...
 def help_text_for_field(name: str, model: Type[Model]) -> str: ...
 def display_for_field(
-    value: Optional[Union[date, Decimal, Model, FieldFile, float, int, str]],
-    field: Union[Field, mixins.FieldCacheMixin],
-    empty_value_display: str,
+    value: Any, field: Union[Field, OneToOneRel], empty_value_display: str
 ) -> str: ...
 def display_for_value(
-    value: Optional[
-        Union[Callable, List[Union[int, str]], date, Model, FieldFile, int, str]
-    ],
-    empty_value_display: str,
-    boolean: bool = ...,
+    value: Any, empty_value_display: str, boolean: bool = ...
 ) -> str: ...
 
 class NotRelationField(Exception): ...
 
 def get_model_from_relation(
-    field: Union[Field, ForeignObjectRel]
+    field: Union[Field, mixins.FieldCacheMixin]
 ) -> Type[Model]: ...
 def reverse_field_path(
     model: Type[Model], path: str
 ) -> Tuple[Type[Model], str]: ...
 def get_fields_from_path(
     model: Type[Model], path: str
-) -> List[Union[Field, ForeignObjectRel]]: ...
+) -> List[Union[Field, mixins.FieldCacheMixin]]: ...
 def construct_change_message(
     form: AdminPasswordChangeForm, formsets: None, add: bool
 ) -> List[Dict[str, Dict[str, List[str]]]]: ...

@@ -10,18 +10,7 @@ DEFAULT_LOGGING: Any
 def configure_logging(
     logging_config: str,
     logging_settings: Dict[
-        str,
-        Union[
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[List[str], bool, str]],
-                    Dict[str, Union[List[str], str]],
-                ],
-            ],
-            Dict[str, Union[Dict[str, Union[List[str], str]], Dict[str, str]]],
-            int,
-        ],
+        str, Union[Dict[str, Dict[str, Union[List[str], bool, str]]], int]
     ],
 ) -> None: ...
 

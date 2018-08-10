@@ -1,10 +1,9 @@
 from io import BytesIO
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Union
 
 from django.core.files.uploadedfile import (InMemoryUploadedFile,
                                             TemporaryUploadedFile)
 from django.core.handlers.wsgi import WSGIRequest
-from django.test.client import FakePayload
 
 
 class UploadFileException(Exception): ...
@@ -28,12 +27,7 @@ class FileUploadHandler:
     def handle_raw_input(
         self,
         input_data: Union[BytesIO, WSGIRequest],
-        META: Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
+        META: Dict[str, Any],
         content_length: int,
         boundary: bytes,
         encoding: str = ...,
@@ -75,12 +69,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
     def handle_raw_input(
         self,
         input_data: Union[BytesIO, WSGIRequest],
-        META: Dict[
-            str,
-            Union[
-                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
-            ],
-        ],
+        META: Dict[str, Any],
         content_length: int,
         boundary: bytes,
         encoding: str = ...,

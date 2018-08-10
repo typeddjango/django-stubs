@@ -14,7 +14,6 @@ from django.http.response import (HttpResponse, HttpResponseBase,
                                   HttpResponseRedirect)
 from django.template.base import Template
 from django.template.context import Context
-from django.test.utils import ContextList
 
 
 class RedirectCycleError(Exception):
@@ -36,28 +35,7 @@ class ClientHandler(BaseHandler):
     def __init__(
         self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any
     ) -> None: ...
-    def __call__(
-        self,
-        environ: Union[
-            Dict[
-                str,
-                Optional[
-                    Union[Tuple[int, int], BytesIO, FakePayload, int, str]
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[str, str],
-                    Tuple[int, int],
-                    BytesIO,
-                    FakePayload,
-                    int,
-                    str,
-                ],
-            ],
-        ],
-    ) -> HttpResponseBase: ...
+    def __call__(self, environ: Dict[str, Any]) -> HttpResponseBase: ...
 
 def encode_multipart(
     boundary: str,
@@ -80,18 +58,7 @@ def encode_multipart(
         Dict[str, SimpleUploadedFile],
     ],
 ) -> bytes: ...
-def encode_file(
-    boundary: str,
-    key: str,
-    file: Union[
-        BufferedRandom,
-        BufferedReader,
-        BytesIO,
-        StringIO,
-        SimpleUploadedFile,
-        _TemporaryFileWrapper,
-    ],
-) -> List[bytes]: ...
+def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
 
 class RequestFactory:
     json_encoder: Type[django.core.serializers.json.DjangoJSONEncoder] = ...

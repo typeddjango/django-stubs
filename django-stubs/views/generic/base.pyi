@@ -1,21 +1,19 @@
-from datetime import date
 from typing import Any, Callable, Dict, List, Optional, Union
 from unittest.mock import MagicMock
 
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.contrib.sites.requests import RequestSite
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Page, Paginator
 from django.db.models.base import Model
-from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
 from django.http.request import HttpRequest
 from django.http.response import (HttpResponse, HttpResponseNotAllowed,
                                   HttpResponseRedirect)
 from django.template.response import TemplateResponse
 from django.views.generic.detail import DetailView
-from django.views.generic.list import (ListView, MultipleObjectMixin,
-                                       MultipleObjectTemplateResponseMixin)
+from django.views.generic.list import ListView, MultipleObjectMixin
 
 logger: Any
 
@@ -24,26 +22,13 @@ class ContextMixin:
     def get_context_data(
         self, **kwargs: Any
     ) -> Union[
+        Dict[str, Any],
         Dict[
             str,
             Optional[Union[List[Dict[str, str]], bool, MultipleObjectMixin]],
         ],
-        Dict[
-            str,
-            Optional[
-                Union[
-                    bool,
-                    date,
-                    Page,
-                    Paginator,
-                    QuerySet,
-                    MultipleObjectTemplateResponseMixin,
-                ]
-            ],
-        ],
         Dict[str, Union[Dict[str, str], DetailView]],
         Dict[str, Union[List[Dict[str, str]], bool, Page, Paginator, ListView]],
-        Dict[str, Union[bool, AutocompleteJsonView, Page, Paginator, QuerySet]],
         Dict[str, Union[Model, BaseForm, TemplateResponseMixin]],
         Dict[str, Union[Model, ContextMixin, str]],
     ]: ...
@@ -74,26 +59,14 @@ class TemplateResponseMixin:
     def render_to_response(
         self,
         context: Union[
+            Dict[str, Any],
             Dict[str, Optional[Union[List[Dict[str, str]], bool, ListView]]],
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        bool,
-                        date,
-                        Page,
-                        Paginator,
-                        QuerySet,
-                        TemplateResponseMixin,
-                    ]
-                ],
-            ],
             Dict[str, Union[Dict[str, str], DetailView]],
             Dict[
                 str,
                 Union[List[Dict[str, str]], bool, Page, Paginator, ListView],
             ],
-            Dict[str, Union[RequestSite, BaseForm, TemplateResponseMixin, str]],
+            Dict[str, Union[AuthenticationForm, LoginView, RequestSite, str]],
             Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
             MagicMock,
         ],

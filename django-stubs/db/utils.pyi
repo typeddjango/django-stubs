@@ -35,30 +35,10 @@ class ConnectionDoesNotExist(Exception): ...
 class ConnectionHandler:
     databases: Union[
         Dict[
-            str,
-            Dict[
-                str, Optional[Union[Dict[Any, Any], Dict[str, bool], int, str]]
-            ],
+            str, Dict[str, Optional[Union[Dict[str, Optional[bool]], int, str]]]
         ],
         Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Optional[Union[Dict[Any, Any], Dict[str, None], int, str]],
-                ],
-                Dict[
-                    str,
-                    Optional[
-                        Union[
-                            Dict[str, Optional[bool]],
-                            Dict[str, Optional[str]],
-                            int,
-                            str,
-                        ]
-                    ],
-                ],
-            ],
+            str, Dict[str, Optional[Union[Dict[str, Optional[str]], int, str]]]
         ],
     ]
     def __init__(

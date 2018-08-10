@@ -1,11 +1,8 @@
-from argparse import (ArgumentParser, HelpFormatter, Namespace, _AppendAction,
-                      _HelpAction, _StoreAction, _StoreFalseAction,
-                      _StoreTrueAction, _VersionAction)
+from argparse import ArgumentParser, HelpFormatter, Namespace
 from io import StringIO, TextIOBase, TextIOWrapper
 from typing import Any, Callable, List, Optional, Tuple, Union
 
-from django.contrib.admin.apps import SimpleAdminConfig
-from django.contrib.auth.apps import AuthConfig
+from django.apps.config import AppConfig
 
 
 class CommandError(Exception): ...
@@ -37,34 +34,9 @@ def no_translations(handle_func: Callable) -> Callable: ...
 class DjangoHelpFormatter(HelpFormatter):
     show_last: Any = ...
     def add_usage(
-        self,
-        usage: None,
-        actions: List[
-            Union[
-                _AppendAction,
-                _HelpAction,
-                _StoreAction,
-                _StoreFalseAction,
-                _StoreTrueAction,
-                _VersionAction,
-            ]
-        ],
-        *args: Any,
-        **kwargs: Any
+        self, usage: None, actions: List[Any], *args: Any, **kwargs: Any
     ) -> None: ...
-    def add_arguments(
-        self,
-        actions: List[
-            Union[
-                _AppendAction,
-                _HelpAction,
-                _StoreAction,
-                _StoreFalseAction,
-                _StoreTrueAction,
-                _VersionAction,
-            ]
-        ],
-    ) -> None: ...
+    def add_arguments(self, actions: List[Any]) -> None: ...
 
 class OutputWrapper(TextIOBase):
     @property
@@ -116,7 +88,7 @@ class BaseCommand:
     ) -> Optional[Union[Tuple, str]]: ...
     def check(
         self,
-        app_configs: Optional[List[Union[SimpleAdminConfig, AuthConfig]]] = ...,
+        app_configs: Optional[List[AppConfig]] = ...,
         tags: Optional[List[str]] = ...,
         display_num_errors: bool = ...,
         include_deployment_checks: bool = ...,

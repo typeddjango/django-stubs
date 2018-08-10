@@ -1,22 +1,9 @@
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
-from django.db.models.fields import Field
-
 
 class BaseSerializer:
     value: Any = ...
-    def __init__(
-        self,
-        value: Union[
-            Callable,
-            List[Tuple[str, str]],
-            Set[Tuple[str, str]],
-            Tuple[str, Union[Field, str]],
-            Field,
-            int,
-            str,
-        ],
-    ) -> None: ...
+    def __init__(self, value: Any) -> None: ...
     def serialize(self) -> None: ...
 
 class BaseSequenceSerializer(BaseSerializer):
@@ -97,14 +84,4 @@ class TypeSerializer(BaseSerializer):
 class UUIDSerializer(BaseSerializer):
     def serialize(self): ...
 
-def serializer_factory(
-    value: Union[
-        Callable,
-        List[Tuple[str, str]],
-        Set[Tuple[str, str]],
-        Tuple[str, Union[Field, str]],
-        Field,
-        int,
-        str,
-    ]
-) -> BaseSerializer: ...
+def serializer_factory(value: Any) -> BaseSerializer: ...

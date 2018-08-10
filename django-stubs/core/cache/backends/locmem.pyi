@@ -1,10 +1,7 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 from django.core.cache.backends.base import BaseCache
-from django.db.models.base import Model
-from django.db.models.query import QuerySet
-from django.http.response import HttpResponse
 
 
 class LocMemCache(BaseCache):
@@ -37,52 +34,11 @@ class LocMemCache(BaseCache):
         key: Union[int, str],
         default: Optional[Union[int, str]] = ...,
         version: Optional[int] = ...,
-    ) -> Union[
-        Dict[
-            str,
-            Union[
-                Callable,
-                Dict[str, int],
-                List[int],
-                Tuple[int, int, int, int],
-                Type[Any],
-                int,
-                str,
-            ],
-        ],
-        List[str],
-        bytes,
-        Model,
-        QuerySet,
-        HttpResponse,
-        int,
-        str,
-    ]: ...
+    ) -> Any: ...
     def set(
         self,
         key: Union[int, str],
-        value: Union[
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Dict[str, int],
-                    List[int],
-                    Tuple[int, int, int, int],
-                    Type[Any],
-                    int,
-                    str,
-                ],
-            ],
-            Dict[str, Union[datetime, str]],
-            List[str],
-            bytes,
-            Model,
-            QuerySet,
-            HttpResponse,
-            int,
-            str,
-        ],
+        value: Any,
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> None: ...

@@ -5,27 +5,15 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 from uuid import UUID
 
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import (BaseExpression, Col, Combinable,
-                                          Expression, OrderBy, RawSQL,
-                                          SQLiteNumericMixin)
-from django.db.models.fields import Field
-from django.db.models.fields.files import FieldFile
-from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import (ForeignKey, ForeignObject,
-                                             OneToOneField)
+from django.db.models.expressions import (BaseExpression, Col, Expression,
+                                          OrderBy, SQLiteNumericMixin)
+from django.db.models.fields import DateTimeCheckMixin, Field
 from django.db.models.functions.text import Lower
-from django.db.models.lookups import Lookup
 from django.db.models.options import Options
-from django.db.models.query_utils import FilteredRelation, QueryWrapper
-from django.db.models.sql.datastructures import BaseTable, Join
 from django.db.models.sql.query import Query, RawQuery
-from django.db.models.sql.where import (ExtraWhere, NothingNode,
-                                        SubqueryConstraint, WhereNode)
 from django.utils.datastructures import ImmutableList
 
 FORCE: Any
@@ -50,46 +38,29 @@ class SQLCompiler:
     has_extra_select: Any = ...
     def pre_sql_setup(
         self
-    ) -> Union[
-        Tuple[
-            List[Any],
-            List[Any],
-            List[Union[Tuple[str, List[Any]], Tuple[str, List[str]]]],
+    ) -> Tuple[
+        Union[
+            List[Tuple[OrderBy, Tuple[str, Tuple[str, str], bool]]],
+            List[Tuple[str, List[int]]],
+            List[Tuple[str, Union[List[float], List[str]]]],
         ],
-        Tuple[
-            List[Any],
-            List[
-                Tuple[
-                    OrderBy,
-                    Union[
-                        Tuple[str, List[Any], bool],
-                        Tuple[str, List[int], bool],
-                        Tuple[str, List[str], bool],
-                        Tuple[str, Tuple, bool],
-                    ],
-                ]
-            ],
-            List[
-                Union[Any, Tuple[str, Union[List[Any], List[float], List[int]]]]
-            ],
+        Union[
+            List[Tuple[OrderBy, Tuple[str, List[Any], bool]]],
+            List[Tuple[str, List[int]]],
+            List[Tuple[str, Union[List[float], List[str]]]],
         ],
-        Tuple[
-            List[Tuple[OrderBy, None, None]],
-            List[
-                Tuple[
-                    OrderBy,
-                    Union[
-                        Tuple[str, List[Union[int, str]], bool],
-                        Tuple[str, Tuple[str, str], bool],
-                    ],
-                ]
-            ],
-            List[Union[Any, Tuple[str, List[int]]]],
+        Union[
+            List[Any],
+            List[Tuple[str, List[int]]],
+            List[Tuple[str, Union[List[float], List[str]]]],
         ],
     ]: ...
     def get_group_by(
         self,
-        select: List[Tuple[BaseExpression, Optional[str], Optional[str]]],
+        select: Union[
+            List[Tuple[BaseExpression, Optional[str], Optional[str]]],
+            List[Tuple[SQLiteNumericMixin, Tuple[str, List[int]], str]],
+        ],
         order_by: List[
             Tuple[
                 OrderBy,
@@ -103,9 +74,7 @@ class SQLCompiler:
                 ],
             ]
         ],
-    ) -> List[
-        Tuple[str, Union[List[Any], List[float], List[int], List[str]]]
-    ]: ...
+    ) -> List[Tuple[str, Union[List[float], List[int], List[str]]]]: ...
     def collapse_group_by(
         self,
         expressions: List[Expression],
@@ -113,202 +82,10 @@ class SQLCompiler:
     ) -> List[Expression]: ...
     def get_select(
         self
-    ) -> Union[
-        Tuple[
-            List[Tuple[Col, Tuple[str, List[Any]], None]],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[Any],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                OneToOneField,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                ],
-            ],
-            Dict[Any, Any],
-        ],
-        Tuple[
-            List[Tuple[Expression, Optional[str], Optional[str]]],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Union[
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[Any],
-                                    List[int],
-                                    Type[User],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ],
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[Any],
-                                    List[int],
-                                    Type[ContentType],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                ],
-            ],
-            Dict[str, int],
-        ],
-        Tuple[
-            List[Tuple[Expression, Tuple[str, List[int]], Optional[str]]],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Union[
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[Any],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ],
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[
-                                                Callable,
-                                                List[Any],
-                                                List[int],
-                                                Type[Model],
-                                                bool,
-                                                ForeignKey,
-                                            ],
-                                        ]
-                                    ],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                ],
-            ],
-            Dict[str, int],
-        ],
-        Tuple[List[Tuple[Expression, str, str]], None, Dict[str, int]],
-        Tuple[
-            List[
-                Union[
-                    Tuple[Col, Tuple[str, List[Any]], None],
-                    Tuple[RawSQL, Tuple[str, List[Any]], str],
-                ]
-            ],
-            Dict[
-                str,
-                Union[
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Callable,
-                                                        List[
-                                                            Dict[
-                                                                str,
-                                                                Union[
-                                                                    Callable,
-                                                                    List[
-                                                                        Dict[
-                                                                            str,
-                                                                            Union[
-                                                                                Callable,
-                                                                                List[
-                                                                                    Any
-                                                                                ],
-                                                                                List[
-                                                                                    int
-                                                                                ],
-                                                                                Type[
-                                                                                    Model
-                                                                                ],
-                                                                                bool,
-                                                                                ForeignKey,
-                                                                            ],
-                                                                        ]
-                                                                    ],
-                                                                    List[int],
-                                                                    Type[Model],
-                                                                    bool,
-                                                                    ForeignKey,
-                                                                ],
-                                                            ]
-                                                        ],
-                                                        List[int],
-                                                        Type[Model],
-                                                        bool,
-                                                        ForeignKey,
-                                                    ],
-                                                ]
-                                            ],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                ],
-            ],
-            Dict[str, int],
-        ],
-        Tuple[None, Dict[str, int], Dict[str, int]],
+    ) -> Tuple[
+        Optional[Dict[str, int]],
+        Union[Dict[Any, Any], Dict[str, int]],
+        Union[Dict[Any, Any], Dict[str, int]],
     ]: ...
     def get_order_by(
         self
@@ -338,26 +115,14 @@ class SQLCompiler:
                 ],
             ]
         ],
-        select: List[Tuple[Expression, Optional[str], Optional[str]]],
+        select: Union[
+            List[Tuple[Expression, Optional[str], Optional[str]]],
+            List[Tuple[SQLiteNumericMixin, Tuple[str, List[int]], str]],
+        ],
     ) -> List[Tuple[OrderBy, Tuple[str, List[Any]], None]]: ...
     def quote_name_unless_alias(self, name: str) -> str: ...
     def compile(
-        self,
-        node: Union[
-            Combinable,
-            OrderBy,
-            Lookup,
-            FilteredRelation,
-            QueryWrapper,
-            BaseTable,
-            Join,
-            Query,
-            ExtraWhere,
-            NothingNode,
-            SubqueryConstraint,
-            WhereNode,
-        ],
-        select_format: Any = ...,
+        self, node: Any, select_format: Any = ...
     ) -> Tuple[
         str,
         Union[
@@ -365,9 +130,9 @@ class SQLCompiler:
             List[Union[date, int]],
             List[Union[date, str]],
             List[Union[Decimal, int]],
-            List[Union[float, int]],
             List[Union[int, memoryview]],
             List[Union[int, str]],
+            List[float],
             Tuple,
         ],
     ]: ...
@@ -393,12 +158,7 @@ class SQLCompiler:
         already_seen: Optional[
             Union[
                 Set[
-                    Tuple[
-                        None,
-                        Tuple[Tuple[str, str]],
-                        Tuple[Tuple[str, str]],
-                        Tuple[Tuple[str, str]],
-                    ]
+                    Tuple[None, Tuple[Tuple[str, str]], Tuple[Tuple[str, str]]]
                 ],
                 Set[Tuple[Tuple[Tuple[str, str]], Tuple[Tuple[str, str]]]],
             ]
@@ -415,318 +175,23 @@ class SQLCompiler:
             Union[Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]], bool]
         ] = ...,
         restricted: Optional[bool] = ...,
-    ) -> Union[
-        List[
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[Any],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            OneToOneField,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                OneToOneField,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    FieldCacheMixin,
-                ],
-            ]
-        ],
-        List[
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Callable,
-                                                        List[
-                                                            Dict[
-                                                                str,
-                                                                Union[
-                                                                    Callable,
-                                                                    List[Any],
-                                                                    List[int],
-                                                                    Type[Model],
-                                                                    bool,
-                                                                    ForeignKey,
-                                                                ],
-                                                            ]
-                                                        ],
-                                                        List[int],
-                                                        Type[Model],
-                                                        bool,
-                                                        ForeignKey,
-                                                    ],
-                                                ]
-                                            ],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    ForeignKey,
-                ],
-            ]
-        ],
-        List[
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[Any],
-                        List[int],
-                        Type[User],
-                        bool,
-                        ForeignKey,
-                    ],
-                ],
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[Any],
-                        List[int],
-                        Type[ContentType],
-                        bool,
-                        ForeignKey,
-                    ],
-                ],
-            ]
-        ],
-        List[
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[Any],
-                        List[int],
-                        Type[Model],
-                        bool,
-                        ForeignKey,
-                    ],
-                ],
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[Any],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ]
-                        ],
-                        List[int],
-                        Type[Model],
-                        bool,
-                        FieldCacheMixin,
-                    ],
-                ],
-            ]
-        ],
-        List[
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[Any],
-                        List[int],
-                        Type[Model],
-                        bool,
-                        ForeignKey,
-                    ],
-                ],
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[
-                            Union[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[Any],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        ForeignKey,
-                                    ],
-                                ],
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[Any],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        OneToOneField,
-                                    ],
-                                ],
-                            ]
-                        ],
-                        List[int],
-                        Type[Model],
-                        bool,
-                        ForeignObject,
-                    ],
-                ],
-            ]
-        ],
-        List[
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[
-                                                Callable,
-                                                List[Any],
-                                                List[int],
-                                                Type[Model],
-                                                bool,
-                                                ForeignKey,
-                                            ],
-                                        ]
-                                    ],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ]
-                        ],
-                        List[int],
-                        Type[Model],
-                        bool,
-                        ForeignKey,
-                    ],
-                ],
-                Dict[
-                    str,
-                    Union[
-                        Callable,
-                        List[
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[
-                                                Callable,
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Union[
-                                                            Callable,
-                                                            List[Any],
-                                                            List[int],
-                                                            Type[Model],
-                                                            bool,
-                                                            ForeignKey,
-                                                        ],
-                                                    ]
-                                                ],
-                                                List[int],
-                                                Type[Model],
-                                                bool,
-                                                ForeignKey,
-                                            ],
-                                        ]
-                                    ],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ]
-                        ],
-                        List[int],
-                        Type[Model],
-                        bool,
-                        ForeignKey,
-                    ],
-                ],
-            ]
-        ],
-    ]: ...
+    ) -> List[Dict[str, Any]]: ...
     def get_select_for_update_of_arguments(self): ...
-    def deferred_to_columns(
-        self
-    ) -> Dict[Type[Model], Union[Set[Any], Set[str]]]: ...
+    def deferred_to_columns(self) -> Dict[Type[Model], Set[str]]: ...
     def get_converters(
-        self, expressions: List[Optional[Expression]]
-    ) -> Dict[int, Tuple[List[Callable], Expression]]: ...
+        self,
+        expressions: Union[
+            List[Optional[Expression]], List[SQLiteNumericMixin]
+        ],
+    ) -> Dict[
+        int, Tuple[List[Callable], Union[Expression, SQLiteNumericMixin]]
+    ]: ...
     def apply_converters(
         self,
         rows: chain,
-        converters: Dict[int, Tuple[List[Callable], Expression]],
+        converters: Dict[
+            int, Tuple[List[Callable], Union[Expression, SQLiteNumericMixin]]
+        ],
     ) -> Iterator[
         Union[
             List[Optional[Union[bool, datetime, str, UUID]]],
@@ -734,10 +199,10 @@ class SQLCompiler:
             List[Optional[Union[bytes, time, int, str]]],
             List[Optional[Union[bytes, timedelta, int, str]]],
             List[Optional[Union[bytes, Decimal, int, str]]],
-            List[Optional[Union[bytes, float, int, str]]],
+            List[Optional[Union[bytes, float, str]]],
             List[Optional[Union[bytes, int, str, UUID]]],
             List[Optional[Union[date, time, int, str]]],
-            List[Optional[Union[date, Decimal, float, int, str]]],
+            List[Optional[Union[date, Decimal, float, str]]],
             List[Union[date, time, timedelta, int, str]],
             List[Union[datetime, time, Decimal, int, str]],
             List[Union[timedelta, Decimal, int, str]],
@@ -748,49 +213,7 @@ class SQLCompiler:
         self,
         results: Optional[
             Union[
-                Iterator[Any],
-                List[
-                    List[
-                        Union[
-                            Tuple[
-                                int,
-                                None,
-                                str,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                            ],
-                            Tuple[
-                                int,
-                                int,
-                                str,
-                                int,
-                                int,
-                                str,
-                                int,
-                                int,
-                                str,
-                                int,
-                                int,
-                                str,
-                            ],
-                        ]
-                    ]
-                ],
-                List[
-                    Union[
-                        List[Tuple[Union[date, float, int, str]]],
-                        List[
-                            Union[Tuple[int, str, None], Tuple[int, str, str]]
-                        ],
-                    ]
-                ],
+                Iterator[Any], List[List[Tuple[Union[date, float, int, str]]]]
             ]
         ] = ...,
         tuple_expected: bool = ...,
@@ -814,67 +237,50 @@ class SQLInsertCompiler(SQLCompiler):
     def field_as_sql(
         self,
         field: Optional[Field],
-        val: Optional[Union[Lower, float, int, memoryview, str]],
+        val: Optional[Union[Lower, float, memoryview, str]],
     ) -> Tuple[
         str,
         Union[List[None], List[float], List[int], List[memoryview], List[str]],
     ]: ...
     def prepare_value(
-        self,
-        field: Field,
-        value: Optional[
-            Union[
-                Dict[str, Dict[str, List[str]]],
-                bytes,
-                date,
-                time,
-                timedelta,
-                Decimal,
-                Model,
-                SQLiteNumericMixin,
-                files.FieldFile,
-                float,
-                int,
-                memoryview,
-                str,
-                UUID,
-            ]
-        ],
-    ) -> Optional[Union[Lower, float, int, memoryview, str]]: ...
-    def pre_save_val(
-        self, field: Field, obj: Model
-    ) -> Optional[
-        Union[
-            Dict[str, Dict[str, List[str]]],
-            bytes,
-            date,
-            time,
-            timedelta,
-            Decimal,
-            Model,
-            SQLiteNumericMixin,
-            files.FieldFile,
-            float,
-            int,
-            memoryview,
-            str,
-            UUID,
-        ]
-    ]: ...
+        self, field: Field, value: Any
+    ) -> Optional[Union[Lower, float, memoryview, str]]: ...
+    def pre_save_val(self, field: Field, obj: Model) -> Any: ...
     def assemble_as_sql(
         self,
-        fields: Union[List[None], List[Field], ImmutableList],
-        value_rows: List[
-            Union[
-                List[Optional[Union[Lower, int]]],
-                List[Optional[Union[float, int, memoryview, str]]],
-            ]
+        fields: Union[
+            List[None], List[DateTimeCheckMixin], List[Field], ImmutableList
         ],
-    ) -> Union[
-        Tuple[List[Any], List[Any]],
-        Tuple[
+        value_rows: Union[
+            List[
+                Union[
+                    List[Optional[Union[Lower, int]]],
+                    List[Optional[Union[int, memoryview, str]]],
+                ]
+            ],
+            List[
+                Union[
+                    List[Optional[Union[float, memoryview, str]]],
+                    List[Optional[Union[int, memoryview, str]]],
+                ]
+            ],
+        ],
+    ) -> Tuple[
+        Union[
+            List[List[Optional[Union[float, str]]]],
+            List[List[Optional[Union[int, str]]]],
+            List[List[Union[int, memoryview]]],
             Tuple[Tuple[str]],
-            List[List[Optional[Union[float, int, memoryview, str]]]],
+        ],
+        Union[
+            List[List[Optional[Union[float, str]]]],
+            List[List[Optional[Union[int, str]]]],
+            List[
+                Union[
+                    List[Optional[Union[float, memoryview, str]]],
+                    List[Optional[Union[int, memoryview, str]]],
+                ]
+            ],
         ],
     ]: ...
     def as_sql(
@@ -886,21 +292,13 @@ class SQLInsertCompiler(SQLCompiler):
                 List[Any],
                 List[None],
                 List[Optional[Union[bool, str]]],
-                List[Optional[Union[bool, str]]],
-                List[Optional[Union[float, int, str]]],
+                List[Optional[Union[float, str]]],
                 List[Optional[Union[int, memoryview, str]]],
-                List[Optional[Union[int, str]]],
-                List[Optional[Union[int, str]]],
                 List[Optional[Union[int, str]]],
                 List[Optional[bool]],
                 List[Optional[int]],
-                List[Optional[int]],
-                List[Optional[str]],
                 List[Optional[str]],
                 List[Union[bool, str]],
-                List[Union[float, int, str]],
-                List[Union[float, int]],
-                List[Union[float, str]],
                 List[Union[float, str]],
                 List[Union[int, str]],
                 List[bool],
@@ -931,4 +329,4 @@ def cursor_iter(
     sentinel: List[Any],
     col_count: Optional[int],
     itersize: int,
-) -> Iterator[List[Tuple[Optional[Union[date, float, int, str]]]]]: ...
+) -> Iterator[List[Tuple[Any]]]: ...

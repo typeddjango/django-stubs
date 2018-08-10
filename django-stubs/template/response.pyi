@@ -1,11 +1,12 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from unittest.mock import MagicMock
 
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.contrib.sites.requests import RequestSite
 from django.core.paginator import Page, Paginator
 from django.db.models.base import Model
-from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
 from django.http import HttpResponse
 from django.http.request import HttpRequest
@@ -13,8 +14,7 @@ from django.template.backends.django import Template
 from django.template.backends.jinja2 import Template
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import DetailView
-from django.views.generic.list import (ListView,
-                                       MultipleObjectTemplateResponseMixin)
+from django.views.generic.list import ListView
 
 from .loader import get_template, select_template
 
@@ -38,19 +38,17 @@ class SimpleTemplateResponse(HttpResponse):
         template: Union[List[str], Template, str],
         context: Optional[
             Union[
-                Dict[
-                    str, Optional[Union[List[Dict[str, str]], bool, ListView]]
-                ],
+                Dict[str, Any],
+                Dict[str, List[Dict[str, Any]]],
                 Dict[
                     str,
                     Optional[
                         Union[
+                            List[
+                                Dict[str, Optional[Union[datetime, Model, str]]]
+                            ],
                             bool,
-                            date,
-                            Page,
-                            Paginator,
-                            QuerySet,
-                            MultipleObjectTemplateResponseMixin,
+                            ListView,
                         ]
                     ],
                 ],
@@ -59,17 +57,12 @@ class SimpleTemplateResponse(HttpResponse):
                 Dict[
                     str,
                     Union[
-                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
-                        bool,
-                        Page,
-                        Paginator,
-                        ListView,
+                        List[Dict[str, str]], bool, Page, Paginator, ListView
                     ],
                 ],
                 Dict[str, Union[List[str], str]],
                 Dict[
-                    str,
-                    Union[RequestSite, BaseForm, TemplateResponseMixin, str],
+                    str, Union[AuthenticationForm, LoginView, RequestSite, str]
                 ],
                 Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
                 MagicMock,
@@ -87,19 +80,17 @@ class SimpleTemplateResponse(HttpResponse):
         self,
         context: Optional[
             Union[
-                Dict[
-                    str, Optional[Union[List[Dict[str, str]], bool, ListView]]
-                ],
+                Dict[str, Any],
+                Dict[str, List[Dict[str, Any]]],
                 Dict[
                     str,
                     Optional[
                         Union[
+                            List[
+                                Dict[str, Optional[Union[datetime, Model, str]]]
+                            ],
                             bool,
-                            date,
-                            Page,
-                            Paginator,
-                            QuerySet,
-                            MultipleObjectTemplateResponseMixin,
+                            ListView,
                         ]
                     ],
                 ],
@@ -108,17 +99,12 @@ class SimpleTemplateResponse(HttpResponse):
                 Dict[
                     str,
                     Union[
-                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
-                        bool,
-                        Page,
-                        Paginator,
-                        ListView,
+                        List[Dict[str, str]], bool, Page, Paginator, ListView
                     ],
                 ],
                 Dict[str, Union[List[str], str]],
                 Dict[
-                    str,
-                    Union[RequestSite, BaseForm, TemplateResponseMixin, str],
+                    str, Union[AuthenticationForm, LoginView, RequestSite, str]
                 ],
                 Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
                 MagicMock,
@@ -126,17 +112,15 @@ class SimpleTemplateResponse(HttpResponse):
         ],
     ) -> Optional[
         Union[
-            Dict[str, Optional[Union[List[Dict[str, str]], bool, ListView]]],
+            Dict[str, Any],
+            Dict[str, List[Dict[str, Any]]],
             Dict[
                 str,
                 Optional[
                     Union[
+                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
                         bool,
-                        date,
-                        Page,
-                        Paginator,
-                        QuerySet,
-                        MultipleObjectTemplateResponseMixin,
+                        ListView,
                     ]
                 ],
             ],
@@ -144,16 +128,10 @@ class SimpleTemplateResponse(HttpResponse):
             Dict[str, Union[Dict[str, str], DetailView]],
             Dict[
                 str,
-                Union[
-                    List[Dict[str, Optional[Union[datetime, Model, str]]]],
-                    bool,
-                    Page,
-                    Paginator,
-                    ListView,
-                ],
+                Union[List[Dict[str, str]], bool, Page, Paginator, ListView],
             ],
             Dict[str, Union[List[str], str]],
-            Dict[str, Union[RequestSite, BaseForm, TemplateResponseMixin, str]],
+            Dict[str, Union[AuthenticationForm, LoginView, RequestSite, str]],
             Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
             MagicMock,
         ]
@@ -177,26 +155,26 @@ class TemplateResponse(SimpleTemplateResponse):
     context: django.template.context.RequestContext
     context_data: Optional[
         Union[
+            Dict[str, Any],
+            Dict[str, List[Dict[str, Any]]],
             Dict[
                 str,
                 Optional[
                     Union[
-                        List[Dict[str, str]],
+                        List[
+                            Dict[
+                                str,
+                                Optional[
+                                    Union[
+                                        datetime.datetime,
+                                        django.db.models.base.Model,
+                                        str,
+                                    ]
+                                ],
+                            ]
+                        ],
                         bool,
                         django.views.generic.list.ListView,
-                    ]
-                ],
-            ],
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        bool,
-                        datetime.date,
-                        django.core.paginator.Page,
-                        django.core.paginator.Paginator,
-                        django.db.models.query.QuerySet,
-                        django.views.generic.list.MultipleObjectTemplateResponseMixin,
                     ]
                 ],
             ],
@@ -208,18 +186,7 @@ class TemplateResponse(SimpleTemplateResponse):
             Dict[
                 str,
                 Union[
-                    List[
-                        Dict[
-                            str,
-                            Optional[
-                                Union[
-                                    datetime.datetime,
-                                    django.db.models.base.Model,
-                                    str,
-                                ]
-                            ],
-                        ]
-                    ],
+                    List[Dict[str, str]],
                     bool,
                     django.core.paginator.Page,
                     django.core.paginator.Paginator,
@@ -230,9 +197,9 @@ class TemplateResponse(SimpleTemplateResponse):
             Dict[
                 str,
                 Union[
+                    django.contrib.auth.forms.AuthenticationForm,
+                    django.contrib.auth.views.LoginView,
                     django.contrib.sites.requests.RequestSite,
-                    django.forms.forms.BaseForm,
-                    django.views.generic.base.TemplateResponseMixin,
                     str,
                 ],
             ],
@@ -268,19 +235,17 @@ class TemplateResponse(SimpleTemplateResponse):
         template: Union[List[str], Template, str],
         context: Optional[
             Union[
-                Dict[
-                    str, Optional[Union[List[Dict[str, str]], bool, ListView]]
-                ],
+                Dict[str, Any],
+                Dict[str, List[Dict[str, Any]]],
                 Dict[
                     str,
                     Optional[
                         Union[
+                            List[
+                                Dict[str, Optional[Union[datetime, Model, str]]]
+                            ],
                             bool,
-                            date,
-                            Page,
-                            Paginator,
-                            QuerySet,
-                            MultipleObjectTemplateResponseMixin,
+                            ListView,
                         ]
                     ],
                 ],
@@ -289,17 +254,12 @@ class TemplateResponse(SimpleTemplateResponse):
                 Dict[
                     str,
                     Union[
-                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
-                        bool,
-                        Page,
-                        Paginator,
-                        ListView,
+                        List[Dict[str, str]], bool, Page, Paginator, ListView
                     ],
                 ],
                 Dict[str, Union[List[str], str]],
                 Dict[
-                    str,
-                    Union[RequestSite, BaseForm, TemplateResponseMixin, str],
+                    str, Union[AuthenticationForm, LoginView, RequestSite, str]
                 ],
                 Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
                 MagicMock,

@@ -57,8 +57,8 @@ class BaseForm:
         prefix: Optional[str] = ...,
         initial: Optional[
             Union[
+                Dict[str, List[int]],
                 Dict[str, Optional[Union[List[Model], date, int, str]]],
-                Dict[str, Optional[Union[List[int], date, int, str]]],
                 Dict[str, Union[List[Model], Model, QuerySet]],
                 Dict[str, Union[List[str], str]],
                 Dict[str, Union[FieldFile, int, str]],
@@ -93,7 +93,7 @@ class BaseForm:
         self
     ) -> Union[
         Dict[str, Optional[Union[int, str]]],
-        Dict[str, Union[date, time, Decimal, float, int]],
+        Dict[str, Union[date, time, Decimal, float]],
         Dict[str, Union[date, str]],
         Dict[str, SimpleUploadedFile],
         Dict[str, QuerySet],
@@ -105,20 +105,6 @@ class BaseForm:
     def is_multipart(self): ...
     def hidden_fields(self): ...
     def visible_fields(self): ...
-    def get_initial_for_field(
-        self, field: Field, field_name: str
-    ) -> Optional[
-        Union[
-            List[Model],
-            List[int],
-            List[str],
-            date,
-            Model,
-            FieldFile,
-            QuerySet,
-            int,
-            str,
-        ]
-    ]: ...
+    def get_initial_for_field(self, field: Field, field_name: str) -> Any: ...
 
 class Form(BaseForm): ...

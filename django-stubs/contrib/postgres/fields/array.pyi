@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.contrib.postgres import lookups
+from django.contrib.postgres.fields.mixins import CheckFieldDefaultMixin
 from django.db.models import Field, Transform
 from django.db.models.fields import Field
 from django.db.models.lookups import Exact, In
@@ -16,7 +17,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     default_validators: Any = ...
     from_db_value: Any = ...
     def __init__(
-        self, base_field: Field, size: None = ..., **kwargs: Any
+        self,
+        base_field: Union[CheckFieldDefaultMixin, Field],
+        size: None = ...,
+        **kwargs: Any
     ) -> None: ...
     @property
     def model(self): ...

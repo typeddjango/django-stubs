@@ -19,12 +19,4 @@ DEFAULT_PALETTE = DARK_PALETTE
 
 def parse_color_setting(
     config_string: str
-) -> Optional[
-    Dict[
-        str,
-        Union[
-            Dict[str, Union[Tuple[str, str], str]],
-            Dict[str, Union[Tuple[str], str]],
-        ],
-    ]
-]: ...
+) -> Optional[Dict[str, Dict[str, Union[Tuple[str], str]]]]: ...

@@ -55,10 +55,10 @@ class SyndicationFeed:
     def item_attributes(
         self,
         item: Union[
+            Dict[str, Any],
             Dict[
                 str, Optional[Union[List[Enclosure], List[str], datetime, str]]
             ],
-            Dict[str, Optional[Union[List[str], Tuple, bool, datetime, str]]],
         ],
     ) -> Dict[Any, Any]: ...
     def add_item_elements(self, handler: Any, item: Any) -> None: ...
@@ -101,6 +101,7 @@ class Rss201rev2Feed(RssFeed):
         Dict[str, Optional[Union[Tuple, str]]],
     ]
     items: Union[
+        List[Dict[str, Any]],
         List[
             Dict[
                 str,
@@ -114,21 +115,15 @@ class Rss201rev2Feed(RssFeed):
                 ],
             ]
         ],
-        List[
-            Dict[
-                str,
-                Optional[Union[List[str], Tuple, bool, datetime.datetime, str]],
-            ]
-        ],
     ]
     def add_item_elements(
         self,
         handler: SimplerXMLGenerator,
         item: Union[
+            Dict[str, Any],
             Dict[
                 str, Optional[Union[List[Enclosure], List[str], datetime, str]]
             ],
-            Dict[str, Optional[Union[List[str], Tuple, bool, datetime, str]]],
         ],
     ) -> None: ...
 

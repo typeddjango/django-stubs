@@ -1,25 +1,20 @@
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from itertools import chain
-from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
-                    Type, Union)
+from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
+                    Union)
 from unittest.mock import MagicMock
 from uuid import UUID
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.base import Model, ModelState
-from django.db.models.expressions import Col, Expression
+from django.db.models.expressions import Expression
 from django.db.models.fields import Field
-from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import (ForeignKey, ForeignObject,
-                                             OneToOneField)
+from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.related_descriptors import (ForwardManyToOneDescriptor,
                                                          ReverseOneToOneDescriptor)
-from django.db.models.fields.reverse_related import ManyToOneRel
-from django.db.models.functions.comparison import Greatest
-from django.db.models.functions.text import Right
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query, RawQuery
 
@@ -52,7 +47,9 @@ class ValuesIterable(BaseIterable):
     ) -> Iterator[
         Union[
             Dict[str, Optional[Union[int, str]]],
-            Dict[str, Union[date, Decimal, float, int, str]],
+            Dict[str, Union[date, Decimal, float, str]],
+            Dict[str, Union[date, int, str]],
+            Dict[str, Union[Decimal, int]],
         ]
     ]: ...
 
@@ -74,9 +71,7 @@ class FlatValuesListIterable(BaseIterable):
     chunk_size: int
     chunked_fetch: bool
     queryset: django.db.models.query.QuerySet
-    def __iter__(
-        self
-    ) -> Iterator[Optional[Union[date, Decimal, float, int, str, UUID]]]: ...
+    def __iter__(self) -> Iterator[Any]: ...
 
 class QuerySet:
     model: Optional[Type[django.db.models.base.Model]] = ...
@@ -105,33 +100,7 @@ class QuerySet:
     def __len__(self) -> int: ...
     def __iter__(self) -> Any: ...
     def __bool__(self) -> bool: ...
-    def __getitem__(
-        self, k: Union[int, slice, str]
-    ) -> Optional[
-        Union[
-            Dict[str, Optional[Union[int, str]]],
-            Dict[str, Union[datetime, int, str]],
-            Dict[str, Union[Decimal, int]],
-            Dict[str, Union[float, str]],
-            List[Dict[str, Optional[Union[int, str]]]],
-            List[Dict[str, Union[datetime, int, str]]],
-            List[Dict[str, Union[Decimal, int]]],
-            List[Optional[str]],
-            List[Tuple[Union[int, str]]],
-            List[date],
-            List[Model],
-            List[int],
-            List[UUID],
-            Tuple[Union[int, str]],
-            date,
-            Decimal,
-            Model,
-            QuerySet,
-            int,
-            str,
-            UUID,
-        ]
-    ]: ...
+    def __getitem__(self, k: Union[int, slice, str]) -> Any: ...
     def __and__(self, other: QuerySet) -> QuerySet: ...
     def __or__(self, other: QuerySet) -> QuerySet: ...
     def iterator(self, chunk_size: int = ...) -> Iterator[Any]: ...
@@ -140,14 +109,15 @@ class QuerySet:
     ) -> Union[
         Dict[str, Optional[int]],
         Dict[str, Union[date, time]],
-        Dict[str, Union[Decimal, float, int]],
+        Dict[str, Union[Decimal, float]],
         Dict[str, timedelta],
     ]: ...
     def count(self) -> int: ...
     def get(
         self, *args: Any, **kwargs: Any
     ) -> Union[
-        Dict[str, Union[date, Decimal, float, int, str]],
+        Dict[str, Union[date, Decimal, float, str]],
+        Dict[str, Union[int, str]],
         Tuple[Decimal],
         Tuple[str, int, int],
         Model,
@@ -190,20 +160,7 @@ class QuerySet:
     def first(self) -> Optional[Union[Dict[str, int], Model]]: ...
     def last(self) -> Optional[Model]: ...
     def in_bulk(
-        self,
-        id_list: Optional[
-            Union[
-                Dict[int, Model],
-                List[Model],
-                List[int],
-                List[str],
-                Set[int],
-                Tuple[int],
-                frozenset,
-            ]
-        ] = ...,
-        *,
-        field_name: str = ...
+        self, id_list: Any = ..., *, field_name: str = ...
     ) -> Union[Dict[int, Model], Dict[str, Model]]: ...
     def delete(self) -> Tuple[int, Dict[str, int]]: ...
     def update(self, **kwargs: Any) -> int: ...
@@ -214,16 +171,7 @@ class QuerySet:
     def raw(
         self,
         raw_query: str,
-        params: Optional[
-            Union[
-                Dict[str, str],
-                List[datetime],
-                List[Decimal],
-                List[str],
-                Set[str],
-                Tuple[int],
-            ]
-        ] = ...,
+        params: Any = ...,
         translations: Optional[Dict[str, str]] = ...,
         using: None = ...,
     ) -> RawQuerySet: ...
@@ -307,16 +255,7 @@ class RawQuerySet:
         raw_query: str,
         model: Optional[Type[Model]] = ...,
         query: Optional[RawQuery] = ...,
-        params: Optional[
-            Union[
-                Dict[str, str],
-                List[datetime],
-                List[Decimal],
-                List[str],
-                Set[str],
-                Tuple,
-            ]
-        ] = ...,
+        params: Any = ...,
         translations: Optional[Dict[str, str]] = ...,
         using: Optional[str] = ...,
         hints: Optional[Dict[Any, Any]] = ...,
@@ -392,220 +331,7 @@ class RelatedPopulator:
     remote_setter: Callable = ...
     def __init__(
         self,
-        klass_info: Union[
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[Any],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    ForeignKey,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[Any],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            OneToOneField,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                OneToOneField,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    ForeignKey,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Callable,
-                                                        List[Any],
-                                                        List[int],
-                                                        Type[Model],
-                                                        bool,
-                                                        ForeignKey,
-                                                    ],
-                                                ]
-                                            ],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    ForeignKey,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Callable,
-                                                        List[
-                                                            Dict[
-                                                                str,
-                                                                Union[
-                                                                    Callable,
-                                                                    List[Any],
-                                                                    List[int],
-                                                                    Type[Model],
-                                                                    bool,
-                                                                    ForeignKey,
-                                                                ],
-                                                            ]
-                                                        ],
-                                                        List[int],
-                                                        Type[Model],
-                                                        bool,
-                                                        ForeignKey,
-                                                    ],
-                                                ]
-                                            ],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    ForeignKey,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[
-                        Union[
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[Any],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    ForeignKey,
-                                ],
-                            ],
-                            Dict[
-                                str,
-                                Union[
-                                    Callable,
-                                    List[Any],
-                                    List[int],
-                                    Type[Model],
-                                    bool,
-                                    OneToOneField,
-                                ],
-                            ],
-                        ]
-                    ],
-                    List[int],
-                    Type[Model],
-                    bool,
-                    FieldCacheMixin,
-                ],
-            ],
-        ],
+        klass_info: Dict[str, Any],
         select: List[Tuple[Expression, Tuple[str, List[int]], Optional[str]]],
         db: str,
     ) -> None: ...
@@ -613,21 +339,11 @@ class RelatedPopulator:
         self,
         row: Union[
             List[Optional[Union[date, int, str]]],
-            List[Union[date, Decimal, float, int, str]],
+            List[Union[date, Decimal, float, str]],
             List[Union[datetime, time, Decimal, int, str]],
-            Tuple[int, None, None],
-            Tuple[int, None, str, None, None, None],
-            Tuple[int, Union[int, str], Union[int, str]],
-            Tuple[int, int, None, None, None, None],
+            Tuple[int, Optional[str], Optional[str]],
+            Tuple[int, Union[int, str], Union[float, int, str]],
             Tuple[int, int, None, None, int, str, str, None, None, None],
-            Tuple[
-                int, str, None, None, None, None, None, None, None, None, None
-            ],
-            Tuple[int, str, None, None, int, int, int, str],
-            Tuple[int, str, None, None, int, str, int, int, str, int, str],
-            Tuple[int, str, None, int, None, None, None],
-            Tuple[int, str, None, int, int, str],
-            Tuple[int, str, None, int, str, int],
             Tuple[str, int, int, int, str, int],
         ],
         from_obj: Model,
@@ -635,761 +351,43 @@ class RelatedPopulator:
 
 def get_related_populators(
     klass_info: Union[
+        Dict[str, Any],
+        Dict[str, Union[List[Dict[str, Any]], List[int], Type[Model]]],
         Dict[
             str,
             Union[
-                Callable,
                 List[
                     Dict[
                         str,
                         Union[
-                            Callable,
-                            List[Any],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            ForeignObject,
+                            Callable, List[int], Type[User], bool, ForeignKey
                         ],
                     ]
                 ],
                 List[int],
                 Type[Model],
-                bool,
-                OneToOneField,
             ],
         ],
         Dict[
             str,
             Union[
-                Callable,
                 List[
                     Dict[
                         str,
                         Union[
                             Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[Any],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        ForeignKey,
-                                    ],
-                                ]
-                            ],
                             List[int],
-                            Type[Model],
-                            bool,
-                            ManyToOneRel,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-                bool,
-                FieldCacheMixin,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Callable,
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[Any],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        OneToOneField,
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            OneToOneField,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-                bool,
-                ForeignKey,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Callable,
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Callable,
-                                                    List[
-                                                        Dict[
-                                                            str,
-                                                            Union[
-                                                                Callable,
-                                                                List[
-                                                                    Dict[
-                                                                        str,
-                                                                        Union[
-                                                                            Callable,
-                                                                            List[
-                                                                                Any
-                                                                            ],
-                                                                            List[
-                                                                                int
-                                                                            ],
-                                                                            Type[
-                                                                                Model
-                                                                            ],
-                                                                            bool,
-                                                                            ForeignKey,
-                                                                        ],
-                                                                    ]
-                                                                ],
-                                                                List[int],
-                                                                Type[Model],
-                                                                bool,
-                                                                ForeignKey,
-                                                            ],
-                                                        ]
-                                                    ],
-                                                    List[int],
-                                                    Type[Model],
-                                                    bool,
-                                                    ForeignKey,
-                                                ],
-                                            ]
-                                        ],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        ForeignKey,
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
+                            Type[ContentType],
                             bool,
                             ForeignKey,
                         ],
                     ]
                 ],
                 List[int],
-                Type[Model],
-                bool,
-                ForeignKey,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Callable,
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Callable,
-                                                    List[
-                                                        Dict[
-                                                            str,
-                                                            Union[
-                                                                Callable,
-                                                                List[
-                                                                    Dict[
-                                                                        str,
-                                                                        Union[
-                                                                            Callable,
-                                                                            List[
-                                                                                Dict[
-                                                                                    str,
-                                                                                    Union[
-                                                                                        Callable,
-                                                                                        List[
-                                                                                            Any
-                                                                                        ],
-                                                                                        List[
-                                                                                            int
-                                                                                        ],
-                                                                                        Type[
-                                                                                            Model
-                                                                                        ],
-                                                                                        bool,
-                                                                                        ForeignKey,
-                                                                                    ],
-                                                                                ]
-                                                                            ],
-                                                                            List[
-                                                                                int
-                                                                            ],
-                                                                            Type[
-                                                                                Model
-                                                                            ],
-                                                                            bool,
-                                                                            ForeignKey,
-                                                                        ],
-                                                                    ]
-                                                                ],
-                                                                List[int],
-                                                                Type[Model],
-                                                                bool,
-                                                                ForeignKey,
-                                                            ],
-                                                        ]
-                                                    ],
-                                                    List[int],
-                                                    Type[Model],
-                                                    bool,
-                                                    ForeignKey,
-                                                ],
-                                            ]
-                                        ],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        ForeignKey,
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            ForeignKey,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-                bool,
-                ForeignKey,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Callable,
-                List[
-                    Union[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[Any],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[Any],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                OneToOneField,
-                            ],
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-                bool,
-                OneToOneField,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Callable,
-                List[
-                    Union[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[Any],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[Any],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-                bool,
-                FieldCacheMixin,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Callable,
-                List[
-                    Union[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Callable,
-                                                        List[Any],
-                                                        List[int],
-                                                        Type[Model],
-                                                        bool,
-                                                        ForeignKey,
-                                                    ],
-                                                ]
-                                            ],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Callable,
-                                                        List[
-                                                            Dict[
-                                                                str,
-                                                                Union[
-                                                                    Callable,
-                                                                    List[Any],
-                                                                    List[int],
-                                                                    Type[Model],
-                                                                    bool,
-                                                                    ForeignKey,
-                                                                ],
-                                                            ]
-                                                        ],
-                                                        List[int],
-                                                        Type[Model],
-                                                        bool,
-                                                        ForeignKey,
-                                                    ],
-                                                ]
-                                            ],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ]
-                                ],
-                                List[int],
-                                Type[Model],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-                bool,
-                ForeignKey,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[Any],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            ManyToOneRel,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Callable,
-                                                    List[Any],
-                                                    List[int],
-                                                    Type[Model],
-                                                    bool,
-                                                    ForeignKey,
-                                                ],
-                                            ]
-                                        ],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        ForeignKey,
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            OneToOneField,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Callable,
-                                                    List[Any],
-                                                    List[int],
-                                                    Type[Model],
-                                                    bool,
-                                                    OneToOneField,
-                                                ],
-                                            ]
-                                        ],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        OneToOneField,
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            ForeignKey,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Callable,
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Callable,
-                                                    List[
-                                                        Dict[
-                                                            str,
-                                                            Union[
-                                                                Callable,
-                                                                List[
-                                                                    Dict[
-                                                                        str,
-                                                                        Union[
-                                                                            Callable,
-                                                                            List[
-                                                                                Dict[
-                                                                                    str,
-                                                                                    Union[
-                                                                                        Callable,
-                                                                                        List[
-                                                                                            Dict[
-                                                                                                str,
-                                                                                                Union[
-                                                                                                    Callable,
-                                                                                                    List[
-                                                                                                        Any
-                                                                                                    ],
-                                                                                                    List[
-                                                                                                        int
-                                                                                                    ],
-                                                                                                    Type[
-                                                                                                        Model
-                                                                                                    ],
-                                                                                                    bool,
-                                                                                                    ForeignKey,
-                                                                                                ],
-                                                                                            ]
-                                                                                        ],
-                                                                                        List[
-                                                                                            int
-                                                                                        ],
-                                                                                        Type[
-                                                                                            Model
-                                                                                        ],
-                                                                                        bool,
-                                                                                        ForeignKey,
-                                                                                    ],
-                                                                                ]
-                                                                            ],
-                                                                            List[
-                                                                                int
-                                                                            ],
-                                                                            Type[
-                                                                                Model
-                                                                            ],
-                                                                            bool,
-                                                                            ForeignKey,
-                                                                        ],
-                                                                    ]
-                                                                ],
-                                                                List[int],
-                                                                Type[Model],
-                                                                bool,
-                                                                ForeignKey,
-                                                            ],
-                                                        ]
-                                                    ],
-                                                    List[int],
-                                                    Type[Model],
-                                                    bool,
-                                                    ForeignKey,
-                                                ],
-                                            ]
-                                        ],
-                                        List[int],
-                                        Type[Model],
-                                        bool,
-                                        ForeignKey,
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            ForeignKey,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[
-                                Union[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[Any],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            ForeignKey,
-                                        ],
-                                    ],
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Callable,
-                                            List[Any],
-                                            List[int],
-                                            Type[Model],
-                                            bool,
-                                            OneToOneField,
-                                        ],
-                                    ],
-                                ]
-                            ],
-                            List[int],
-                            Type[Model],
-                            bool,
-                            OneToOneField,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Union[
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[Any],
-                                List[int],
-                                Type[User],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                        Dict[
-                            str,
-                            Union[
-                                Callable,
-                                List[Any],
-                                List[int],
-                                Type[ContentType],
-                                bool,
-                                ForeignKey,
-                            ],
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
+                Type[Permission],
             ],
         ],
     ],
-    select: Union[
-        List[
-            Union[
-                Tuple[Optional[str], Optional[str], Optional[str]],
-                Tuple[Col, Tuple[str, List[Any]], None],
-            ]
-        ],
-        List[
-            Union[
-                Tuple[Col, Tuple[str, List[Any]], None],
-                Tuple[Greatest, Tuple[str, List[datetime]], str],
-            ]
-        ],
-        List[
-            Union[
-                Tuple[Col, Tuple[str, List[Any]], None],
-                Tuple[Right, Tuple[str, List[int]], str],
-            ]
-        ],
-    ],
+    select: List[Tuple[Expression, Optional[str], Optional[str]]],
     db: str,
 ) -> List[RelatedPopulator]: ...

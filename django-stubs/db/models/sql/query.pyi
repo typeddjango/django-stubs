@@ -1,26 +1,22 @@
 from collections import OrderedDict, namedtuple
-from datetime import date, datetime, time, timedelta
+from datetime import date, time, timedelta
 from decimal import Decimal
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 from uuid import UUID
 
-from django.contrib.contenttypes.models import ContentType
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.models.aggregates import Aggregate
 from django.db.models.base import Model, ModelState
-from django.db.models.expressions import (Combinable, CombinedExpression,
-                                          Expression, F, SQLiteNumericMixin)
+from django.db.models.expressions import (Combinable, Expression,
+                                          SQLiteNumericMixin)
 from django.db.models.fields import Field, TextField
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.fields.reverse_related import (ForeignObjectRel,
                                                      ManyToOneRel)
-from django.db.models.functions.datetime import TimezoneMixin
 from django.db.models.lookups import (FieldGetDbPrepValueMixin, Lookup,
                                       Transform)
 from django.db.models.options import Options
-from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.datastructures import BaseTable, Join
@@ -47,21 +43,7 @@ class RawQuery:
     cursor: Optional[django.db.backends.utils.CursorWrapper] = ...
     extra_select: Dict[Any, Any] = ...
     annotation_select: Dict[Any, Any] = ...
-    def __init__(
-        self,
-        sql: str,
-        using: str,
-        params: Optional[
-            Union[
-                Dict[str, str],
-                List[datetime],
-                List[Decimal],
-                List[str],
-                Set[str],
-                Tuple[int],
-            ]
-        ] = ...,
-    ) -> None: ...
+    def __init__(self, sql: str, using: str, params: Any = ...) -> None: ...
     def chain(self, using: str) -> RawQuery: ...
     def clone(self, using: str) -> RawQuery: ...
     def get_columns(self) -> List[str]: ...
@@ -82,27 +64,12 @@ class Query:
             List[Tuple[django.db.models.fields.IntegerField, None, int]],
         ],
     ]
-    values: Union[
-        List[
-            Tuple[
-                django.db.models.fields.CharField,
-                Type[django.db.models.base.Model],
-                django.db.models.aggregates.Max,
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.IntegerField,
-                Type[django.db.models.base.Model],
-                int,
-            ]
-        ],
-        List[
-            Union[
-                Tuple[django.db.models.fields.BooleanField, bool, bool],
-                Tuple[django.db.models.fields.CharField, str, str],
-            ]
-        ],
+    values: List[
+        Tuple[
+            django.db.models.fields.Field,
+            Union[django.db.models.aggregates.Max, int, str],
+            Union[django.db.models.aggregates.Max, int, str],
+        ]
     ]
     alias_prefix: str = ...
     subq_aliases: frozenset = ...
@@ -172,11 +139,7 @@ class Query:
             int,
             Union[
                 Dict[str, Union[ModelState, int, str]],
-                List[
-                    Union[
-                        Dict[Any, Any], Dict[str, Union[bool, str]], ModelState
-                    ]
-                ],
+                List[Union[Dict[str, Union[bool, str]], ModelState]],
                 Model,
                 ModelState,
             ],
@@ -199,13 +162,11 @@ class Query:
     def get_aggregation(
         self,
         using: str,
-        added_aggregate_names: Union[
-            Dict[str, Union[Aggregate, CombinedExpression]], List[str]
-        ],
+        added_aggregate_names: Union[Dict[str, SQLiteNumericMixin], List[str]],
     ) -> Union[
         Dict[str, Optional[int]],
         Dict[str, Union[date, time]],
-        Dict[str, Union[Decimal, float, int]],
+        Dict[str, Union[Decimal, float]],
         Dict[str, timedelta],
     ]: ...
     def get_count(self, using: str) -> int: ...
@@ -256,70 +217,8 @@ class Query:
         self, compiler: SQLCompiler, connection: DatabaseWrapper
     ) -> Tuple[str, Tuple]: ...
     def resolve_lookup_value(
-        self,
-        value: Optional[
-            Union[
-                Dict[Any, Any],
-                Iterator[Any],
-                List[Dict[str, str]],
-                List[None],
-                List[Union[List[str], Combinable]],
-                List[Union[Model, int]],
-                List[Union[int, str]],
-                List[datetime],
-                Set[Optional[int]],
-                Set[ContentType],
-                Set[str],
-                Set[UUID],
-                Tuple,
-                bytes,
-                date,
-                timedelta,
-                Decimal,
-                Model,
-                Combinable,
-                QuerySet,
-                Query,
-                float,
-                frozenset,
-                int,
-                range,
-                str,
-                UUID,
-            ]
-        ],
-        can_reuse: Optional[Set[str]],
-        allow_joins: bool,
-    ) -> Optional[
-        Union[
-            Dict[Any, Any],
-            Iterator[Any],
-            List[Dict[str, str]],
-            List[None],
-            List[Union[List[str], Combinable]],
-            List[Union[Model, int]],
-            List[Union[int, str]],
-            List[datetime],
-            Set[Optional[int]],
-            Set[ContentType],
-            Set[str],
-            Set[UUID],
-            Tuple,
-            bytes,
-            date,
-            timedelta,
-            Decimal,
-            Model,
-            Combinable,
-            Query,
-            float,
-            frozenset,
-            int,
-            range,
-            str,
-            UUID,
-        ]
-    ]: ...
+        self, value: Any, can_reuse: Optional[Set[str]], allow_joins: bool
+    ) -> Any: ...
     def solve_lookup_type(
         self, lookup: str
     ) -> Union[
@@ -333,115 +232,18 @@ class Query:
         field: FieldCacheMixin,
     ) -> None: ...
     def check_related_objects(
-        self,
-        field: Union[Field, ForeignObjectRel],
-        value: Optional[
-            Union[
-                Dict[Any, Any],
-                List[Dict[str, str]],
-                List[None],
-                List[Union[List[str], Combinable]],
-                List[Union[Model, int]],
-                List[Union[int, str]],
-                List[datetime],
-                Set[Optional[int]],
-                Set[ContentType],
-                Set[str],
-                Set[UUID],
-                Tuple,
-                bytes,
-                date,
-                timedelta,
-                Decimal,
-                Model,
-                Combinable,
-                Query,
-                float,
-                frozenset,
-                int,
-                range,
-                str,
-                UUID,
-            ]
-        ],
-        opts: Options,
+        self, field: Union[Field, ForeignObjectRel], value: Any, opts: Options
     ) -> None: ...
     def build_lookup(
         self,
         lookups: List[str],
         lhs: Union[Expression, TextField, related_lookups.MultiColSource],
-        rhs: Optional[
-            Union[
-                Dict[Any, Any],
-                List[Dict[str, str]],
-                List[None],
-                List[Union[List[str], Combinable]],
-                List[Union[Model, int]],
-                List[Union[int, str]],
-                List[datetime],
-                Set[Optional[int]],
-                Set[ContentType],
-                Set[str],
-                Set[UUID],
-                Tuple,
-                bytes,
-                date,
-                timedelta,
-                Decimal,
-                Model,
-                Combinable,
-                Query,
-                float,
-                frozenset,
-                int,
-                range,
-                str,
-                UUID,
-            ]
-        ],
+        rhs: Any,
     ) -> Lookup: ...
     def try_transform(self, lhs: Expression, name: str) -> Transform: ...
     def build_filter(
         self,
-        filter_expr: Union[
-            Dict[str, str],
-            Tuple[
-                str,
-                Optional[
-                    Union[
-                        Dict[Any, Any],
-                        Iterator[Any],
-                        List[Dict[str, str]],
-                        List[List[str]],
-                        List[None],
-                        List[Union[Model, int]],
-                        List[Union[int, str]],
-                        List[datetime],
-                        List[Combinable],
-                        Set[Optional[int]],
-                        Set[ContentType],
-                        Set[str],
-                        Set[UUID],
-                        Tuple,
-                        bytes,
-                        date,
-                        timedelta,
-                        Decimal,
-                        Model,
-                        Combinable,
-                        django.db.models.functions.TimezoneMixin,
-                        QuerySet,
-                        Query,
-                        float,
-                        frozenset,
-                        int,
-                        range,
-                        str,
-                        UUID,
-                    ]
-                ],
-            ],
-        ],
+        filter_expr: Union[Dict[str, str], Tuple[str, Any]],
         branch_negated: bool = ...,
         current_negated: bool = ...,
         can_reuse: Optional[Set[str]] = ...,
@@ -449,26 +251,7 @@ class Query:
         split_subq: bool = ...,
         reuse_with_filtered_relation: bool = ...,
     ) -> Tuple[WhereNode, Union[List[Any], Set[str], Tuple]]: ...
-    def add_filter(
-        self,
-        filter_clause: Tuple[
-            str,
-            Optional[
-                Union[
-                    List[Model],
-                    List[int],
-                    List[str],
-                    Tuple[str, str],
-                    Model,
-                    F,
-                    QuerySet,
-                    Query,
-                    int,
-                    str,
-                ]
-            ],
-        ],
-    ) -> None: ...
+    def add_filter(self, filter_clause: Tuple[str, Any]) -> None: ...
     def add_q(self, q_object: Q) -> None: ...
     def build_filtered_relation_q(
         self,
@@ -487,8 +270,10 @@ class Query:
         allow_many: bool = ...,
         fail_on_missing: bool = ...,
     ) -> Union[
-        Tuple[List[PathInfo], Tuple[Field], List[str], List[str]],
-        Tuple[List[PathInfo], ForeignObjectRel, Tuple[Field], List[str]],
+        Tuple[
+            List[PathInfo], Tuple[Field], List[str], Union[List[Any], List[str]]
+        ],
+        Tuple[List[PathInfo], Field, Tuple[Field], List[str]],
     ]: ...
     def setup_joins(
         self,
@@ -511,21 +296,7 @@ class Query:
     ) -> Expression: ...
     def split_exclude(
         self,
-        filter_expr: Tuple[
-            str,
-            Optional[
-                Union[
-                    List[Model],
-                    List[str],
-                    Tuple[str, str],
-                    Model,
-                    F,
-                    QuerySet,
-                    int,
-                    str,
-                ]
-            ],
-        ],
+        filter_expr: Tuple[str, Any],
         can_reuse: Set[str],
         names_with_path: List[Tuple[str, List[PathInfo]]],
     ) -> Tuple[WhereNode, Tuple]: ...
@@ -564,12 +335,10 @@ class Query:
     def clear_deferred_loading(self) -> None: ...
     def add_deferred_loading(self, field_names: Tuple[str]) -> None: ...
     def add_immediate_loading(self, field_names: Tuple[str]) -> None: ...
-    def get_loaded_field_names(
-        self
-    ) -> Dict[Type[Model], Union[Set[Any], Set[str]]]: ...
+    def get_loaded_field_names(self) -> Dict[Type[Model], Set[str]]: ...
     def get_loaded_field_names_cb(
         self,
-        target: Dict[Type[Model], Union[Set[Any], Set[str]]],
+        target: Dict[Type[Model], Set[str]],
         model: Type[Model],
         fields: Union[Set[Field], Set[ManyToOneRel]],
     ) -> None: ...

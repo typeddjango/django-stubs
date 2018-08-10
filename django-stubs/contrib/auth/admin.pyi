@@ -14,16 +14,7 @@ sensitive_post_parameters_m: Any
 class GroupAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[
-            Union[
-                django.db.models.fields.CharField,
-                django.db.models.fields.DateField,
-                django.db.models.fields.IntegerField,
-                django.db.models.fields.TextField,
-                django.db.models.fields.TimeField,
-                django.db.models.fields.files.FileField,
-            ]
-        ],
+        Type[Any],
         Dict[
             str,
             Type[
@@ -49,16 +40,7 @@ class GroupAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[
-            Union[
-                django.db.models.fields.CharField,
-                django.db.models.fields.DateField,
-                django.db.models.fields.IntegerField,
-                django.db.models.fields.TextField,
-                django.db.models.fields.TimeField,
-                django.db.models.fields.files.FileField,
-            ]
-        ],
+        Type[Any],
         Dict[
             str,
             Type[

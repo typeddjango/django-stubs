@@ -1,7 +1,7 @@
 from datetime import datetime
-from io import BufferedReader, BytesIO, TextIOWrapper
+from io import BufferedReader, BytesIO
 from tempfile import _TemporaryFileWrapper
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
 from django.core.files.base import ContentFile
@@ -93,12 +93,7 @@ class HttpResponse(HttpResponseBase):
     streaming: bool = ...
     content: Any = ...
     def __init__(
-        self,
-        content: Union[
-            Iterator[Any], List[str], TextIOWrapper, bytes, int, str
-        ] = ...,
-        *args: Any,
-        **kwargs: Any
+        self, content: Any = ..., *args: Any, **kwargs: Any
     ) -> None: ...
     def serialize(self): ...
     __bytes__: Any = ...
@@ -127,20 +122,7 @@ class StreamingHttpResponse(HttpResponseBase):
     streaming: bool = ...
     streaming_content: Any = ...
     def __init__(
-        self,
-        streaming_content: Union[
-            Iterator[Any],
-            List[bytes],
-            List[str],
-            BufferedReader,
-            BytesIO,
-            TextIOWrapper,
-            ContentFile,
-            str,
-            _TemporaryFileWrapper,
-        ] = ...,
-        *args: Any,
-        **kwargs: Any
+        self, streaming_content: Any = ..., *args: Any, **kwargs: Any
     ) -> None: ...
     @property
     def content(self) -> Any: ...
@@ -306,8 +288,9 @@ class JsonResponse(HttpResponse):
     def __init__(
         self,
         data: Union[
+            Dict[str, Dict[str, str]],
             Dict[str, Union[Dict[str, bool], List[Dict[str, str]]]],
-            Dict[str, Union[Dict[str, str], int]],
+            Dict[str, int],
             Dict[str, str],
             List[int],
             List[str],

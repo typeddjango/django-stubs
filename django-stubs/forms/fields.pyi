@@ -4,27 +4,12 @@ from decimal import Decimal
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from uuid import UUID
 
-from django.contrib.admin.widgets import (AdminEmailInputWidget,
-                                          AdminIntegerFieldWidget,
-                                          AdminSplitDateTime,
-                                          AdminTextareaWidget,
-                                          AdminTextInputWidget,
-                                          AdminURLFieldWidget,
-                                          RelatedFieldWidgetWrapper)
-from django.contrib.auth.forms import (ReadOnlyPasswordHashField,
-                                       ReadOnlyPasswordHashWidget)
 from django.core.files.base import File
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models.base import Model
 from django.db.models.fields.files import FieldFile
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
-from django.forms.models import ModelChoiceField
-from django.forms.widgets import (CheckboxInput, ClearableFileInput,
-                                  EmailInput, HiddenInput, Input, MultiWidget,
-                                  NumberInput, PasswordInput, RadioSelect,
-                                  Select, SplitDateTimeWidget, Textarea,
-                                  TextInput, Widget)
+from django.forms.widgets import Input, Select, Widget
 
 
 class Field:
@@ -58,125 +43,14 @@ class Field:
         disabled: bool = ...,
         label_suffix: Optional[Any] = ...
     ) -> None: ...
-    def prepare_value(
-        self,
-        value: Optional[
-            Union[
-                Dict[str, str],
-                List[Union[List[str], str]],
-                date,
-                time,
-                Decimal,
-                File,
-                float,
-                int,
-                str,
-                UUID,
-            ]
-        ],
-    ) -> Optional[
-        Union[
-            Dict[str, str],
-            List[Union[List[str], str]],
-            date,
-            time,
-            Decimal,
-            File,
-            float,
-            int,
-            str,
-            UUID,
-        ]
-    ]: ...
-    def to_python(
-        self,
-        value: Optional[
-            Union[List[None], List[str], datetime, float, int, str]
-        ],
-    ) -> Optional[Union[List[None], List[str], datetime, float, int, str]]: ...
-    def validate(
-        self,
-        value: Optional[
-            Union[
-                date,
-                time,
-                timedelta,
-                Decimal,
-                SimpleUploadedFile,
-                Model,
-                float,
-                int,
-                str,
-                UUID,
-            ]
-        ],
-    ) -> None: ...
-    def run_validators(
-        self,
-        value: Optional[
-            Union[
-                List[Union[int, str]],
-                date,
-                time,
-                timedelta,
-                Decimal,
-                SimpleUploadedFile,
-                Model,
-                float,
-                int,
-                str,
-                UUID,
-            ]
-        ],
-    ) -> None: ...
-    def clean(
-        self,
-        value: Optional[
-            Union[
-                Dict[Any, Any],
-                List[Dict[str, str]],
-                List[List[str]],
-                List[Union[int, str]],
-                Tuple,
-                date,
-                time,
-                Decimal,
-                SimpleUploadedFile,
-                float,
-                int,
-                str,
-            ]
-        ],
-    ) -> Optional[
-        Union[
-            List[str],
-            date,
-            time,
-            timedelta,
-            Decimal,
-            SimpleUploadedFile,
-            Model,
-            float,
-            int,
-            str,
-            UUID,
-        ]
-    ]: ...
-    def bound_data(
-        self,
-        data: Optional[
-            Union[List[Union[List[str], str]], datetime, Decimal, int, str]
-        ],
-        initial: Optional[Union[List[str], date, float, int, str, UUID]],
-    ) -> Optional[
-        Union[List[Union[List[str], str]], date, Decimal, int, str]
-    ]: ...
+    def prepare_value(self, value: Any) -> Any: ...
+    def to_python(self, value: Any) -> Any: ...
+    def validate(self, value: Any) -> None: ...
+    def run_validators(self, value: Any) -> None: ...
+    def clean(self, value: Any) -> Any: ...
+    def bound_data(self, data: Any, initial: Any) -> Any: ...
     def widget_attrs(self, widget: Widget) -> Dict[Any, Any]: ...
-    def has_changed(
-        self,
-        initial: Optional[Union[date, time, Decimal, float, int, str]],
-        data: Optional[str],
-    ) -> bool: ...
+    def has_changed(self, initial: Any, data: Optional[str]) -> bool: ...
     def get_bound_field(
         self, form: BaseForm, field_name: str
     ) -> BoundField: ...
@@ -187,34 +61,7 @@ class Field:
                 int,
                 Union[
                     List[Tuple[str, str]],
-                    List[
-                        Union[
-                            List[Tuple[str, str]],
-                            CharField,
-                            ChoiceField,
-                            IntegerField,
-                            EmailInput,
-                            NumberInput,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            CharField,
-                            DateField,
-                            EmailInput,
-                            PasswordInput,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[CharField, DateTimeField, DecimalField, TextInput]
-                    ],
-                    List[Union[CharField, HiddenInput, TextInput]],
-                    List[
-                        Union[DateTimeField, TimeField, HiddenInput, TextInput]
-                    ],
+                    List[Union[List[Tuple[str, str]], Field, Widget]],
                     OrderedDict,
                     Field,
                     Widget,
@@ -223,176 +70,10 @@ class Field:
             Dict[
                 int,
                 Union[
-                    List[Tuple[str, str]],
-                    List[
-                        Union[
-                            List[Tuple[str, str]],
-                            CharField,
-                            DateField,
-                            TypedChoiceField,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            AdminIntegerFieldWidget,
-                            RelatedFieldWidgetWrapper,
-                            IntegerField,
-                            ModelChoiceField,
-                            Select,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            BooleanField,
-                            CharField,
-                            CheckboxInput,
-                            TextInput,
-                            Textarea,
-                        ]
-                    ],
-                    List[Union[NullBooleanField, RadioSelect]],
+                    List[Union[List[Any], ChoiceField, Select]],
                     OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[
-                        Union[
-                            List[Any],
-                            List[Union[Tuple[int, str], Tuple[str, str]]],
-                            AdminSplitDateTime,
-                            RelatedFieldWidgetWrapper,
-                            ReadOnlyPasswordHashField,
-                            ReadOnlyPasswordHashWidget,
-                            BooleanField,
-                            CharField,
-                            ChoiceField,
-                            SplitDateTimeField,
-                            CheckboxInput,
-                            EmailInput,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            List[Tuple[str, str]],
-                            RelatedFieldWidgetWrapper,
-                            CharField,
-                            ModelChoiceField,
-                            MultiWidget,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[Union[Tuple[int, str], Tuple[str, str]]],
-                    List[
-                        Union[
-                            AdminTextareaWidget,
-                            AdminURLFieldWidget,
-                            CharField,
-                            DateField,
-                            IntegerField,
-                            TimeField,
-                            ModelChoiceField,
-                            NumberInput,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            RelatedFieldWidgetWrapper,
-                            CharField,
-                            DateField,
-                            SplitDateTimeField,
-                            ModelChoiceField,
-                            PasswordInput,
-                            Select,
-                            SplitDateTimeWidget,
-                            TextInput,
-                            Textarea,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            ReadOnlyPasswordHashField,
-                            ReadOnlyPasswordHashWidget,
-                            BooleanField,
-                            CharField,
-                            DateTimeField,
-                            ModelChoiceField,
-                            CheckboxInput,
-                            EmailInput,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            CharField,
-                            DateField,
-                            TimeField,
-                            ModelChoiceField,
-                            EmailInput,
-                            MultiWidget,
-                            TextInput,
-                            Textarea,
-                        ]
-                    ],
-                    List[Union[NullBooleanField, HiddenInput]],
-                    List[Union[ModelChoiceField, RadioSelect]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[
-                        Union[
-                            List[Union[Tuple[int, str], Tuple[str, str]]],
-                            AdminIntegerFieldWidget,
-                            AdminTextInputWidget,
-                            CharField,
-                            IntegerField,
-                            TypedChoiceField,
-                            Select,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            List[Union[Tuple[int, str], Tuple[str, str]]],
-                            RelatedFieldWidgetWrapper,
-                            TypedChoiceField,
-                            ModelChoiceField,
-                            Select,
-                        ]
-                    ],
-                    List[Union[Tuple[int, str], Tuple[str, str]]],
-                    List[
-                        Union[
-                            CharField, FileField, ClearableFileInput, TextInput
-                        ]
-                    ],
-                    List[
-                        Union[
-                            DateField,
-                            DateTimeField,
-                            IntegerField,
-                            TimeField,
-                            HiddenInput,
-                            TextInput,
-                        ]
-                    ],
-                    OrderedDict,
-                    Field,
-                    Widget,
+                    ChoiceField,
+                    Select,
                 ],
             ],
         ],
@@ -410,8 +91,7 @@ class CharField(Field):
     show_hidden_initial: bool
     validators: List[
         Union[
-            django.core.validators.MaxLengthValidator,
-            django.core.validators.MinLengthValidator,
+            django.core.validators.BaseValidator,
             django.core.validators.ProhibitNullCharactersValidator,
         ]
     ]
@@ -446,12 +126,7 @@ class IntegerField(Field):
     min_value: Optional[int]
     required: bool
     show_hidden_initial: bool
-    validators: List[
-        Union[
-            django.core.validators.MaxValueValidator,
-            django.core.validators.MinValueValidator,
-        ]
-    ]
+    validators: List[django.core.validators.BaseValidator]
     widget: django.forms.widgets.NumberInput = ...
     default_error_messages: Any = ...
     re_decimal: Any = ...
@@ -463,7 +138,7 @@ class IntegerField(Field):
         **kwargs: Any
     ) -> None: ...
     def to_python(
-        self, value: Optional[Union[float, int, str]]
+        self, value: Optional[Union[float, str]]
     ) -> Optional[int]: ...
     def widget_attrs(
         self, widget: Widget
@@ -477,20 +152,15 @@ class FloatField(IntegerField):
     label: Optional[str]
     label_suffix: None
     localize: bool
-    max_value: Optional[Union[float, int]]
-    min_value: Optional[Union[float, int]]
+    max_value: Optional[float]
+    min_value: Optional[float]
     required: bool
     show_hidden_initial: bool
-    validators: List[
-        Union[
-            django.core.validators.MaxValueValidator,
-            django.core.validators.MinValueValidator,
-        ]
-    ]
+    validators: List[django.core.validators.BaseValidator]
     widget: django.forms.widgets.NumberInput
     default_error_messages: Any = ...
     def to_python(
-        self, value: Optional[Union[float, int, str]]
+        self, value: Optional[Union[float, str]]
     ) -> Optional[float]: ...
     def validate(self, value: Optional[float]) -> None: ...
     def widget_attrs(
@@ -513,9 +183,8 @@ class DecimalField(IntegerField):
     show_hidden_initial: bool
     validators: List[
         Union[
+            django.core.validators.BaseValidator,
             django.core.validators.DecimalValidator,
-            django.core.validators.MaxValueValidator,
-            django.core.validators.MinValueValidator,
         ]
     ]
     widget: django.forms.widgets.NumberInput
@@ -636,8 +305,7 @@ class RegexField(CharField):
     strip: bool
     validators: List[
         Union[
-            django.core.validators.MaxLengthValidator,
-            django.core.validators.MinLengthValidator,
+            django.core.validators.BaseValidator,
             django.core.validators.ProhibitNullCharactersValidator,
             django.core.validators.RegexValidator,
         ]
@@ -662,9 +330,8 @@ class EmailField(CharField):
     strip: bool
     validators: List[
         Union[
+            django.core.validators.BaseValidator,
             django.core.validators.EmailValidator,
-            django.core.validators.MaxLengthValidator,
-            django.core.validators.MinLengthValidator,
             django.core.validators.ProhibitNullCharactersValidator,
         ]
     ]
@@ -809,66 +476,14 @@ class ChoiceField(Field):
     def __init__(self, *, choices: Any = ..., **kwargs: Any) -> None: ...
     def __deepcopy__(
         self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    List[
-                        Union[
-                            List[Tuple[str, str]],
-                            CharField,
-                            ChoiceField,
-                            IntegerField,
-                            EmailInput,
-                            NumberInput,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            List[Tuple[str, str]],
-                            CharField,
-                            DateField,
-                            TypedChoiceField,
-                            Select,
-                            TextInput,
-                        ]
-                    ],
-                    List[
-                        Union[
-                            List[Union[Tuple[int, str], Tuple[str, str]]],
-                            RelatedFieldWidgetWrapper,
-                            TypedChoiceField,
-                            ModelChoiceField,
-                            Select,
-                        ]
-                    ],
-                    List[Union[Tuple[int, str], Tuple[str, str]]],
-                    List[
-                        Union[
-                            CharField,
-                            DateField,
-                            ModelChoiceField,
-                            Select,
-                            TextInput,
-                            Textarea,
-                        ]
-                    ],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[Union[CharField, PasswordInput, TextInput]],
-                    List[Union[MultiWidget, TextInput]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
+        memo: Dict[
+            int,
+            Union[
+                List[Tuple[str, str]],
+                List[Union[List[Tuple[str, str]], Field, Widget]],
+                OrderedDict,
+                Field,
+                Widget,
             ],
         ],
     ) -> ChoiceField: ...
@@ -892,7 +507,7 @@ class TypedChoiceField(ChoiceField):
     ) -> None: ...
     def clean(
         self, value: Optional[str]
-    ) -> Optional[Union[Decimal, float, int, str]]: ...
+    ) -> Optional[Union[Decimal, float, str]]: ...
 
 class MultipleChoiceField(ChoiceField):
     disabled: bool
@@ -969,33 +584,20 @@ class MultiValueField(Field):
     ) -> None: ...
     def __deepcopy__(
         self,
-        memo: Dict[
-            int,
-            Union[
-                List[Tuple[str, str]],
-                List[
-                    Union[
-                        List[Tuple[str, str]],
-                        AdminEmailInputWidget,
-                        RelatedFieldWidgetWrapper,
-                        ReadOnlyPasswordHashField,
-                        ReadOnlyPasswordHashWidget,
-                        BooleanField,
-                        CharField,
-                        SplitDateTimeField,
-                        ModelChoiceField,
-                        CheckboxInput,
-                        MultiWidget,
-                        Select,
-                        TextInput,
-                    ]
+        memo: Union[
+            Dict[
+                int,
+                Union[
+                    List[Tuple[str, str]],
+                    List[Union[List[Tuple[str, str]], Widget]],
+                    OrderedDict,
+                    Field,
+                    Widget,
                 ],
-                List[
-                    Union[AdminTextInputWidget, AdminTextareaWidget, CharField]
-                ],
-                OrderedDict,
-                Field,
-                Widget,
+            ],
+            Dict[
+                int,
+                Union[List[Union[Field, Widget]], OrderedDict, Field, Widget],
             ],
         ],
     ) -> MultiValueField: ...

@@ -34,8 +34,8 @@ class WhereNode(tree.Node):
             List[Optional[int]],
             List[Union[date, str]],
             List[Union[Decimal, int]],
-            List[Union[float, int]],
             List[Union[int, str]],
+            List[float],
             List[memoryview],
         ],
     ]: ...
@@ -50,10 +50,14 @@ class WhereNode(tree.Node):
         ],
         List[
             Union[
-                django.db.models.lookups.FieldGetDbPrepValueMixin,
-                django.db.models.lookups.Lookup,
-                django.db.models.sql.where.NothingNode,
+                django.db.models.lookups.BuiltinLookup,
                 django.db.models.sql.where.WhereNode,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.lookups.FieldGetDbPrepValueMixin,
+                django.db.models.lookups.IsNull,
             ]
         ],
         List[
@@ -64,10 +68,35 @@ class WhereNode(tree.Node):
         ],
         List[
             Union[
+                django.db.models.lookups.FieldGetDbPrepValueMixin,
+                django.db.models.sql.where.NothingNode,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.lookups.FieldGetDbPrepValueMixin,
+                django.db.models.sql.where.WhereNode,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.lookups.Lookup,
+                django.db.models.sql.where.NothingNode,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.sql.where.NothingNode,
+                django.db.models.sql.where.WhereNode,
+            ]
+        ],
+        List[
+            Union[
                 django.db.models.sql.where.SubqueryConstraint,
                 django.db.models.sql.where.WhereNode,
             ]
         ],
+        List[django.db.models.fields.related_lookups.RelatedLookupMixin],
     ] = ...
     def set_source_expressions(
         self, children: List[FieldGetDbPrepValueMixin]

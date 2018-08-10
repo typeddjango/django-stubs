@@ -4,7 +4,7 @@ from uuid import UUID
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import Col, Combinable, OuterRef
+from django.db.models.expressions import Col, OuterRef
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignObject
 from django.db.models.lookups import (Exact, GreaterThan, GreaterThanOrEqual,
@@ -33,10 +33,7 @@ class MultiColSource:
     ) -> Type[Union[RelatedExact, RelatedIn, RelatedIsNull]]: ...
 
 def get_normalized_value(
-    value: Optional[
-        Union[Tuple[Union[int, str]], Model, OuterRef, int, str, UUID]
-    ],
-    lhs: Union[Col, MultiColSource],
+    value: Any, lhs: Union[Col, MultiColSource]
 ) -> Tuple[Optional[Union[OuterRef, int, str, UUID]]]: ...
 
 class RelatedIn(In):
@@ -65,9 +62,7 @@ class RelatedIn(In):
 
 class RelatedLookupMixin:
     rhs: Any = ...
-    def get_prep_lookup(
-        self
-    ) -> Optional[Union[Model, Combinable, Query, int, str, UUID]]: ...
+    def get_prep_lookup(self) -> Any: ...
     def as_sql(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
     ) -> Tuple[str, List[Union[int, str]]]: ...

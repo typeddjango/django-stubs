@@ -1,12 +1,10 @@
-from datetime import date, datetime, time
-from decimal import Decimal
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
-from django.db.models.fields import Field
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields import DateTimeCheckMixin, Field
 from django.db.models.query import QuerySet
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
@@ -110,43 +108,7 @@ class UpdateQuery(Query):
     subquery: bool
     table_map: Dict[str, List[str]]
     used_aliases: Set[str]
-    values: List[
-        Tuple[
-            django.db.models.fields.Field,
-            Optional[
-                Union[
-                    bytes,
-                    datetime.date,
-                    datetime.time,
-                    decimal.Decimal,
-                    django.db.models.base.Model,
-                    django.db.models.expressions.Expression,
-                    django.db.models.fields.files.FieldFile,
-                    float,
-                    int,
-                    memoryview,
-                    str,
-                    uuid.UUID,
-                ]
-            ],
-            Optional[
-                Union[
-                    bytes,
-                    datetime.date,
-                    datetime.time,
-                    decimal.Decimal,
-                    django.db.models.base.Model,
-                    django.db.models.expressions.Expression,
-                    django.db.models.fields.files.FieldFile,
-                    float,
-                    int,
-                    memoryview,
-                    str,
-                    uuid.UUID,
-                ]
-            ],
-        ]
-    ]
+    values: List[Tuple[django.db.models.fields.Field, Any, Any]]
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
@@ -171,44 +133,7 @@ class UpdateQuery(Query):
         ],
     ) -> None: ...
     def add_update_fields(
-        self,
-        values_seq: List[
-            Tuple[
-                Field,
-                Optional[
-                    Union[
-                        Type[Model],
-                        date,
-                        time,
-                        Decimal,
-                        Model,
-                        Combinable,
-                        files.FieldFile,
-                        float,
-                        int,
-                        memoryview,
-                        str,
-                        UUID,
-                    ]
-                ],
-                Optional[
-                    Union[
-                        bytes,
-                        date,
-                        time,
-                        Decimal,
-                        Model,
-                        Combinable,
-                        files.FieldFile,
-                        float,
-                        int,
-                        memoryview,
-                        str,
-                        UUID,
-                    ]
-                ],
-            ]
-        ],
+        self, values_seq: List[Tuple[Field, Any, Any]]
     ) -> None: ...
     def add_related_update(
         self, model: Type[Model], field: Field, value: Union[int, str]
@@ -256,6 +181,7 @@ class InsertQuery(Query):
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
     fields: Union[
+        List[django.db.models.fields.DateTimeCheckMixin],
         List[django.db.models.fields.Field],
         django.utils.datastructures.ImmutableList,
     ] = ...
@@ -264,7 +190,7 @@ class InsertQuery(Query):
     raw: bool = ...
     def insert_values(
         self,
-        fields: Union[List[Field], ImmutableList],
+        fields: Union[List[DateTimeCheckMixin], List[Field], ImmutableList],
         objs: List[Model],
         raw: bool = ...,
     ) -> None: ...

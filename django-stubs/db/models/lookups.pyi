@@ -1,13 +1,12 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
-from django.contrib.contenttypes.models import ContentType
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import (Col, Combinable, CombinedExpression,
-                                          Expression, F, Func, Ref, Subquery)
+from django.db.models.expressions import (Col, Combinable, Expression, Func,
+                                          Ref, Subquery)
 from django.db.models.fields import TextField
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.query_utils import RegisterLookupMixin
@@ -23,37 +22,7 @@ class Lookup:
     rhs: Any = ...
     bilateral_transforms: Any = ...
     def __init__(
-        self,
-        lhs: Union[Expression, TextField, MultiColSource],
-        rhs: Optional[
-            Union[
-                Dict[Any, Any],
-                List[Dict[str, str]],
-                List[List[str]],
-                List[Optional[Combinable]],
-                List[Union[Model, int]],
-                List[Union[int, str]],
-                List[datetime],
-                Set[Optional[int]],
-                Set[ContentType],
-                Set[str],
-                Set[UUID],
-                Tuple,
-                bytes,
-                date,
-                timedelta,
-                Decimal,
-                Model,
-                Combinable,
-                Query,
-                float,
-                frozenset,
-                int,
-                range,
-                str,
-                UUID,
-            ]
-        ],
+        self, lhs: Union[Expression, TextField, MultiColSource], rhs: Any
     ) -> None: ...
     def apply_bilateral_transforms(self, value: Expression) -> Transform: ...
     def batch_process_rhs(
@@ -68,25 +37,7 @@ class Lookup:
     def get_source_expressions(self) -> List[Expression]: ...
     lhs: Any = ...
     def set_source_expressions(self, new_exprs: List[Ref]) -> None: ...
-    def get_prep_lookup(
-        self
-    ) -> Optional[
-        Union[
-            Dict[Any, Any],
-            List[Any],
-            bytes,
-            date,
-            timedelta,
-            Decimal,
-            Model,
-            Combinable,
-            Query,
-            float,
-            int,
-            str,
-            UUID,
-        ]
-    ]: ...
+    def get_prep_lookup(self) -> Any: ...
     def get_db_prep_lookup(
         self, value: Union[int, str], connection: DatabaseWrapper
     ) -> Tuple[str, Union[List[int], List[str]]]: ...
@@ -143,8 +94,8 @@ class BuiltinLookup(Lookup):
             List[Optional[int]],
             List[Union[date, str]],
             List[Union[Decimal, int]],
-            List[Union[float, int]],
             List[Union[int, str]],
+            List[float],
             List[memoryview],
         ],
     ]: ...
@@ -153,29 +104,12 @@ class BuiltinLookup(Lookup):
 class FieldGetDbPrepValueMixin:
     get_db_prep_lookup_value_is_iterable: bool = ...
     def get_db_prep_lookup(
-        self,
-        value: Union[
-            Dict[Any, Any],
-            List[Union[Combinable, int]],
-            List[datetime],
-            bytes,
-            date,
-            timedelta,
-            Decimal,
-            OrderedSet,
-            float,
-            int,
-            str,
-            UUID,
-        ],
-        connection: DatabaseWrapper,
+        self, value: Any, connection: DatabaseWrapper
     ) -> Tuple[
         str,
         Union[
             List[Optional[int]],
-            List[Union[CombinedExpression, F]],
-            List[Union[CombinedExpression, int]],
-            List[Union[F, int]],
+            List[Union[Combinable, int]],
             List[Decimal],
             List[float],
             List[memoryview],
@@ -219,23 +153,7 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     contains_aggregate: bool
     contains_over_clause: bool
     lhs: django.db.models.expressions.Expression
-    rhs: Optional[
-        Union[
-            Dict[Any, Any],
-            List[Dict[str, str]],
-            List[List[str]],
-            bytes,
-            datetime.date,
-            datetime.timedelta,
-            decimal.Decimal,
-            django.db.models.expressions.Combinable,
-            django.db.models.expressions.SQLiteNumericMixin,
-            float,
-            int,
-            str,
-            uuid.UUID,
-        ]
-    ]
+    rhs: Any
     lookup_name: str = ...
     def process_rhs(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
@@ -265,62 +183,40 @@ class IExact(BuiltinLookup):
 class GreaterThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
-    rhs: Optional[
-        Union[
-            datetime.date,
-            datetime.timedelta,
-            decimal.Decimal,
-            django.db.models.expressions.Col,
-            django.db.models.expressions.SQLiteNumericMixin,
-            django.db.models.sql.query.Query,
-            float,
-            int,
-            str,
-        ]
+    lhs: Union[
+        django.db.models.expressions.Expression,
+        django.db.models.expressions.SQLiteNumericMixin,
     ]
+    rhs: Any
     lookup_name: str = ...
 
 class GreaterThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
     lhs: django.db.models.expressions.Expression
-    rhs: Union[
-        datetime.date,
-        datetime.timedelta,
-        decimal.Decimal,
-        django.db.models.expressions.Combinable,
-        int,
-        str,
-    ]
+    rhs: Any
     lookup_name: str = ...
 
 class LessThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
     lhs: django.db.models.expressions.Expression
-    rhs: Union[
-        datetime.date,
-        datetime.timedelta,
-        decimal.Decimal,
-        django.db.models.expressions.CombinedExpression,
-        float,
-        int,
-        str,
-    ]
+    rhs: Any
     lookup_name: str = ...
 
 class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
     contains_aggregate: bool
     contains_over_clause: bool
-    lhs: django.db.models.expressions.Expression
+    lhs: Union[
+        django.db.models.expressions.Expression,
+        django.db.models.expressions.SQLiteNumericMixin,
+    ]
     rhs: Union[
         datetime.date,
         decimal.Decimal,
         django.db.models.expressions.Expression,
         float,
-        int,
     ]
     lookup_name: str = ...
 
@@ -337,20 +233,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
     contains_aggregate: bool
     lhs: django.db.models.expressions.Expression
-    rhs: Union[
-        List[Optional[django.db.models.expressions.Combinable]],
-        List[Optional[int]],
-        List[datetime.datetime],
-        List[django.db.models.base.Model],
-        List[str],
-        Set[Optional[int]],
-        Set[str],
-        Tuple,
-        django.db.models.expressions.Subquery,
-        django.db.models.sql.query.Query,
-        frozenset,
-        range,
-    ]
+    rhs: Any
     lookup_name: str = ...
     def process_rhs(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
@@ -421,7 +304,7 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         List[Union[django.db.models.expressions.Combinable, int]],
         List[datetime.datetime],
         Tuple[
-            Union[django.db.models.expressions.CombinedExpression, int],
+            Union[django.db.models.expressions.Combinable, int],
             Union[django.db.models.expressions.CombinedExpression, int],
         ],
         Tuple[datetime.datetime, datetime.datetime],
