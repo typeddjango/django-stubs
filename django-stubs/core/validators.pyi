@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
 from django.core.files.base import File
-from django.utils.functional import SimpleLazyObject
 
 EMPTY_VALUES: Any
 
@@ -17,15 +16,15 @@ class RegexValidator:
     flags: int = ...
     def __init__(
         self,
-        regex: Optional[Union[str, SimpleLazyObject]] = ...,
+        regex: Optional[str] = ...,
         message: Optional[str] = ...,
         code: Optional[str] = ...,
         inverse_match: Optional[bool] = ...,
         flags: Optional[RegexFlag] = ...,
     ) -> None: ...
-    def __call__(self, value: Optional[Union[str, float]]) -> None: ...
+    def __call__(self, value: Optional[Union[float, int, str]]) -> None: ...
     def __eq__(
-        self, other: Union[RegexValidator, ProhibitNullCharactersValidator]
+        self, other: Union[ProhibitNullCharactersValidator, RegexValidator]
     ) -> bool: ...
 
 class URLValidator(RegexValidator):
@@ -46,7 +45,7 @@ class URLValidator(RegexValidator):
 
 integer_validator: Any
 
-def validate_integer(value: Optional[Union[float, str]]) -> None: ...
+def validate_integer(value: Optional[Union[float, int, str]]) -> None: ...
 
 class EmailValidator:
     message: Any = ...
@@ -93,17 +92,17 @@ class BaseValidator:
     limit_value: bool = ...
     def __init__(
         self,
-        limit_value: Optional[Union[Decimal, float, str, datetime]],
+        limit_value: Optional[Union[datetime, Decimal, float, int, str]],
         message: Optional[str] = ...,
     ) -> None: ...
     def __call__(
-        self, value: Union[Decimal, float, bytes, str, datetime]
+        self, value: Union[bytes, datetime, Decimal, float, int, str]
     ) -> None: ...
     def __eq__(self, other: BaseValidator) -> bool: ...
     def compare(self, a: bool, b: bool) -> bool: ...
     def clean(
-        self, x: Union[Decimal, float, datetime]
-    ) -> Union[Decimal, float, datetime]: ...
+        self, x: Union[datetime, Decimal, float, int]
+    ) -> Union[datetime, Decimal, float, int]: ...
 
 class MaxValueValidator(BaseValidator):
     limit_value: decimal.Decimal
@@ -111,8 +110,8 @@ class MaxValueValidator(BaseValidator):
     code: str = ...
     def compare(
         self,
-        a: Union[float, datetime, Decimal],
-        b: Union[Decimal, datetime, float],
+        a: Union[datetime, Decimal, float, int],
+        b: Union[datetime, Decimal, float, int],
     ) -> bool: ...
 
 class MinValueValidator(BaseValidator):
@@ -121,8 +120,8 @@ class MinValueValidator(BaseValidator):
     code: str = ...
     def compare(
         self,
-        a: Union[float, datetime, Decimal],
-        b: Union[float, datetime, Decimal],
+        a: Union[datetime, Decimal, float, int],
+        b: Union[datetime, Decimal, float, int],
     ) -> bool: ...
 
 class MinLengthValidator(BaseValidator):
@@ -137,7 +136,7 @@ class MaxLengthValidator(BaseValidator):
     message: Any = ...
     code: str = ...
     def compare(self, a: int, b: int) -> bool: ...
-    def clean(self, x: Union[str, bytes]) -> int: ...
+    def clean(self, x: Union[bytes, str]) -> int: ...
 
 class DecimalValidator:
     messages: Any = ...
@@ -145,12 +144,12 @@ class DecimalValidator:
     decimal_places: int = ...
     def __init__(
         self,
-        max_digits: Optional[Union[str, int]],
-        decimal_places: Optional[Union[str, int]],
+        max_digits: Optional[Union[int, str]],
+        decimal_places: Optional[Union[int, str]],
     ) -> None: ...
     def __call__(self, value: Decimal) -> None: ...
     def __eq__(
-        self, other: Union[MinValueValidator, DecimalValidator]
+        self, other: Union[DecimalValidator, MinValueValidator]
     ) -> bool: ...
 
 class FileExtensionValidator:
@@ -176,8 +175,8 @@ class ProhibitNullCharactersValidator:
         self, message: Optional[str] = ..., code: Optional[str] = ...
     ) -> None: ...
     def __call__(
-        self, value: Optional[Union[str, Dict[Any, Any], UUID]]
+        self, value: Optional[Union[Dict[Any, Any], str, UUID]]
     ) -> None: ...
     def __eq__(
-        self, other: Union[RegexValidator, ProhibitNullCharactersValidator]
+        self, other: Union[ProhibitNullCharactersValidator, RegexValidator]
     ) -> bool: ...

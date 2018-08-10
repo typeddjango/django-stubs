@@ -3,24 +3,25 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
-from django.utils.functional import SimpleLazyObject
 
 
 def get_default_password_validators() -> Union[
     List[Union[CommonPasswordValidator, MinimumLengthValidator]],
-    List[Union[UserAttributeSimilarityValidator, MinimumLengthValidator]],
+    List[Union[MinimumLengthValidator, UserAttributeSimilarityValidator]],
     List[NumericPasswordValidator],
 ]: ...
 def get_password_validators(
-    validator_config: List[Dict[str, Union[str, Dict[str, int]]]]
+    validator_config: List[
+        Union[Dict[str, Union[Dict[str, int], str]], Dict[str, str]]
+    ]
 ) -> Union[
     List[Union[CommonPasswordValidator, MinimumLengthValidator]],
-    List[Union[UserAttributeSimilarityValidator, MinimumLengthValidator]],
+    List[Union[MinimumLengthValidator, UserAttributeSimilarityValidator]],
     List[NumericPasswordValidator],
 ]: ...
 def validate_password(
     password: str,
-    user: Optional[Union[AbstractBaseUser, SimpleLazyObject]] = ...,
+    user: Optional[AbstractBaseUser] = ...,
     password_validators: Optional[List[Any]] = ...,
 ) -> None: ...
 def password_changed(
@@ -46,8 +47,8 @@ class UserAttributeSimilarityValidator:
     max_similarity: float = ...
     def __init__(
         self,
-        user_attributes: Union[Tuple[str, str, str, str], List[str]] = ...,
-        max_similarity: float = ...,
+        user_attributes: Union[List[str], Tuple[str, str, str, str]] = ...,
+        max_similarity: Union[float, int] = ...,
     ) -> None: ...
     def validate(self, password: str, user: Optional[User] = ...) -> None: ...
     def get_help_text(self) -> str: ...
@@ -56,7 +57,7 @@ class CommonPasswordValidator:
     DEFAULT_PASSWORD_LIST_PATH: Any = ...
     passwords: Set[str] = ...
     def __init__(
-        self, password_list_path: Union[str, PosixPath] = ...
+        self, password_list_path: Union[PosixPath, str] = ...
     ) -> None: ...
     def validate(self, password: str, user: None = ...) -> None: ...
     def get_help_text(self) -> str: ...

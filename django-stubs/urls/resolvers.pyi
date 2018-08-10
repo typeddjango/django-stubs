@@ -1,6 +1,7 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
+from django.contrib.sitemaps import Sitemap
 from django.core.checks.messages import CheckMessage, Warning
 from django.utils.datastructures import MultiValueDict
 
@@ -12,7 +13,13 @@ from .utils import get_callable
 class ResolverMatch:
     func: Callable = ...
     args: Tuple = ...
-    kwargs: Dict[str, Any] = ...
+    kwargs: Union[
+        Dict[str, Dict[str, django.contrib.sitemaps.Sitemap]],
+        Dict[str, Union[Dict[str, Type[django.contrib.sitemaps.Sitemap]], str]],
+        Dict[str, Union[int, str]],
+        Dict[str, bytes],
+        Dict[str, uuid.UUID],
+    ] = ...
     url_name: Optional[str] = ...
     app_names: List[str] = ...
     app_name: str = ...
@@ -23,15 +30,29 @@ class ResolverMatch:
         self,
         func: Callable,
         args: Tuple,
-        kwargs: Dict[str, Any],
+        kwargs: Union[
+            Dict[str, Dict[str, Sitemap]],
+            Dict[str, Union[Dict[str, Type[Sitemap]], str]],
+            Dict[str, Union[int, str]],
+            Dict[str, bytes],
+            Dict[str, UUID],
+        ],
         url_name: Optional[str] = ...,
         app_names: Optional[List[Optional[str]]] = ...,
         namespaces: Optional[List[Optional[str]]] = ...,
     ) -> None: ...
-    def __getitem__(self, index: int) -> Any: ...
+    def __getitem__(
+        self, index: int
+    ) -> Union[
+        Callable,
+        Dict[str, Dict[str, Sitemap]],
+        Dict[str, Union[Dict[str, Type[Sitemap]], str]],
+        Dict[str, Union[int, str]],
+        Tuple,
+    ]: ...
 
 def get_resolver(
-    urlconf: Optional[Union[str, Type[Any]]] = ...
+    urlconf: Optional[Union[Type[Any], str]] = ...
 ) -> URLResolver: ...
 def get_ns_resolver(
     ns_pattern: str, resolver: URLResolver, converters: Tuple
@@ -62,14 +83,15 @@ class RegexPattern(CheckURLMixin):
 class RoutePattern(CheckURLMixin):
     regex: Any = ...
     name: Optional[str] = ...
-    converters: Dict[
-        str,
-        Union[
-            django.urls.converters.IntConverter,
-            django.urls.converters.StringConverter,
-            django.urls.converters.UUIDConverter,
-            Any,
+    converters: Union[
+        Dict[
+            str,
+            Union[
+                django.urls.converters.IntConverter,
+                django.urls.converters.StringConverter,
+            ],
         ],
+        Dict[str, django.urls.converters.UUIDConverter],
     ] = ...
     def __init__(
         self, route: str, name: Optional[str] = ..., is_endpoint: bool = ...
@@ -81,12 +103,7 @@ class RoutePattern(CheckURLMixin):
             str,
             Tuple,
             Union[
-                Dict[str, bytes],
-                Dict[str, UUID],
-                Dict[str, int],
-                Dict[str, Union[int, str]],
-                Dict[str, str],
-                Dict[Any, Any],
+                Dict[str, Union[int, str]], Dict[str, bytes], Dict[str, UUID]
             ],
         ]
     ]: ...
@@ -110,22 +127,23 @@ class URLPattern:
     lookup_str: str
     pattern: django.urls.resolvers.CheckURLMixin = ...
     callback: Callable = ...
-    default_args: Dict[
-        str,
-        Union[
-            Dict[str, django.contrib.sitemaps.Sitemap],
-            str,
-            Dict[str, Type[django.contrib.sitemaps.Sitemap]],
-            int,
-            collections.OrderedDict,
-        ],
+    default_args: Union[
+        Dict[str, Dict[str, django.contrib.sitemaps.Sitemap]],
+        Dict[str, Union[Dict[str, Type[django.contrib.sitemaps.Sitemap]], str]],
+        Dict[str, Union[int, str]],
     ] = ...
     name: Optional[str] = ...
     def __init__(
         self,
         pattern: CheckURLMixin,
         callback: Callable,
-        default_args: Any = ...,
+        default_args: Optional[
+            Union[
+                Dict[str, Dict[str, Sitemap]],
+                Dict[str, Union[Dict[str, Type[Sitemap]], str]],
+                Dict[str, Union[int, str]],
+            ]
+        ] = ...,
         name: Optional[str] = ...,
     ) -> None: ...
     def check(self) -> List[Warning]: ...
@@ -134,39 +152,60 @@ class URLPattern:
 
 class URLResolver:
     url_patterns: Union[
+        List[Tuple[str, Callable]],
         List[
             Union[
-                django.urls.resolvers.URLResolver,
                 django.urls.resolvers.URLPattern,
+                django.urls.resolvers.URLResolver,
             ]
         ],
-        List[Tuple[str, Callable]],
     ]
     urlconf_module: Optional[
         Union[
-            Type[Any],
+            List[Tuple[str, Callable]],
             List[
                 Union[
-                    django.urls.resolvers.URLResolver,
                     django.urls.resolvers.URLPattern,
+                    django.urls.resolvers.URLResolver,
                 ]
             ],
-            List[Tuple[str, Callable]],
+            Type[Any],
         ]
     ]
     pattern: Union[
         django.urls.resolvers.CheckURLMixin,
         django.urls.resolvers.LocalePrefixPattern,
     ] = ...
-    urlconf_name: Any = ...
+    urlconf_name: Optional[
+        Union[
+            List[List[Any]],
+            List[Tuple[str, Callable]],
+            List[
+                Union[
+                    django.urls.resolvers.URLPattern,
+                    django.urls.resolvers.URLResolver,
+                ]
+            ],
+            Type[Any],
+            str,
+        ]
+    ] = ...
     callback: None = ...
-    default_kwargs: Dict[str, Union[Dict[Any, Any], str]] = ...
+    default_kwargs: Union[Dict[str, Dict[Any, Any]], Dict[str, str]] = ...
     namespace: Optional[str] = ...
     app_name: Optional[str] = ...
     def __init__(
         self,
         pattern: Union[CheckURLMixin, LocalePrefixPattern],
-        urlconf_name: Any,
+        urlconf_name: Optional[
+            Union[
+                List[List[Any]],
+                List[Tuple[str, Callable]],
+                List[Union[URLPattern, URLResolver]],
+                Type[Any],
+                str,
+            ]
+        ],
         default_kwargs: Optional[
             Union[Dict[str, Dict[Any, Any]], Dict[str, str]]
         ] = ...,
@@ -185,15 +224,15 @@ class URLResolver:
         self
     ) -> Optional[
         Union[
-            Type[Any],
-            List[Union[URLResolver, URLPattern]],
             List[Tuple[str, Callable]],
+            List[Union[URLPattern, URLResolver]],
+            Type[Any],
         ]
     ]: ...
     def url_patterns(
         self
     ) -> Union[
-        List[Union[URLResolver, URLPattern]], List[Tuple[str, Callable]]
+        List[Tuple[str, Callable]], List[Union[URLPattern, URLResolver]]
     ]: ...
     def resolve_error_handler(
         self, view_type: int

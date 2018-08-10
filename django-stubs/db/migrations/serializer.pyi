@@ -1,16 +1,30 @@
-from typing import Any, Optional
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+
+from django.db.models.fields import Field
 
 
 class BaseSerializer:
     value: Any = ...
-    def __init__(self, value: Any) -> None: ...
+    def __init__(
+        self,
+        value: Union[
+            Callable,
+            List[Tuple[str, str]],
+            Set[Tuple[str, str]],
+            Tuple[str, Union[Field, str]],
+            Field,
+            int,
+            str,
+        ],
+    ) -> None: ...
     def serialize(self) -> None: ...
 
 class BaseSequenceSerializer(BaseSerializer):
-    def serialize(self): ...
+    def serialize(self) -> Tuple[str, Set[str]]: ...
 
 class BaseSimpleSerializer(BaseSerializer):
-    def serialize(self): ...
+    value: str
+    def serialize(self) -> Tuple[str, Set[Any]]: ...
 
 class DatetimeSerializer(BaseSerializer):
     value: Any = ...
@@ -24,7 +38,9 @@ class DecimalSerializer(BaseSerializer):
 
 class DeconstructableSerializer(BaseSerializer):
     @staticmethod
-    def serialize_deconstructed(path: Any, args: Any, kwargs: Any): ...
+    def serialize_deconstructed(
+        path: str, args: List[Any], kwargs: Dict[str, Union[Callable, int, str]]
+    ) -> Tuple[str, Set[str]]: ...
     def serialize(self): ...
 
 class DictionarySerializer(BaseSerializer):
@@ -39,7 +55,8 @@ class FloatSerializer(BaseSimpleSerializer):
 class FrozensetSerializer(BaseSequenceSerializer): ...
 
 class FunctionTypeSerializer(BaseSerializer):
-    def serialize(self): ...
+    value: Callable
+    def serialize(self) -> Tuple[str, Set[str]]: ...
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self): ...
@@ -48,7 +65,8 @@ class IterableSerializer(BaseSerializer):
     def serialize(self): ...
 
 class ModelFieldSerializer(DeconstructableSerializer):
-    def serialize(self): ...
+    value: django.db.models.fields.AutoField
+    def serialize(self) -> Tuple[str, Set[str]]: ...
 
 class ModelManagerSerializer(DeconstructableSerializer):
     def serialize(self): ...
@@ -79,4 +97,14 @@ class TypeSerializer(BaseSerializer):
 class UUIDSerializer(BaseSerializer):
     def serialize(self): ...
 
-def serializer_factory(value: Any): ...
+def serializer_factory(
+    value: Union[
+        Callable,
+        List[Tuple[str, str]],
+        Set[Tuple[str, str]],
+        Tuple[str, Union[Field, str]],
+        Field,
+        int,
+        str,
+    ]
+) -> BaseSerializer: ...

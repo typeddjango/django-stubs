@@ -18,17 +18,17 @@ class classonlymethod(classmethod):
         instance: Optional[View],
         cls: Type[
             Union[
-                View,
-                UserPassesTestMixin,
-                PermissionRequiredMixin,
-                SuccessMessageMixin,
                 LoginRequiredMixin,
+                PermissionRequiredMixin,
+                UserPassesTestMixin,
+                SuccessMessageMixin,
+                View,
             ]
         ] = ...,
     ) -> Callable: ...
 
 def method_decorator(
-    decorator: Union[Callable, Tuple[Callable, Callable], Set[Callable]],
+    decorator: Union[Callable, Set[Callable], Tuple[Callable, Callable]],
     name: str = ...,
 ) -> Callable: ...
 def decorator_from_middleware_with_args(
@@ -37,7 +37,7 @@ def decorator_from_middleware_with_args(
 def decorator_from_middleware(
     middleware_class: Type[
         Union[
-            CsrfViewMiddleware, Any, XViewMiddleware, ConditionalGetMiddleware
+            Any, XViewMiddleware, CsrfViewMiddleware, ConditionalGetMiddleware
         ]
     ]
 ) -> Callable: ...
@@ -45,10 +45,10 @@ def available_attrs(fn: Any): ...
 def make_middleware_decorator(
     middleware_class: Type[
         Union[
-            CsrfViewMiddleware,
             Any,
             XViewMiddleware,
             CacheMiddleware,
+            CsrfViewMiddleware,
             ConditionalGetMiddleware,
         ]
     ]

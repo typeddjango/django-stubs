@@ -16,11 +16,11 @@ class GroupAdmin(admin.ModelAdmin):
     formfield_overrides: Dict[
         Type[
             Union[
-                django.db.models.fields.DateField,
-                django.db.models.fields.TimeField,
-                django.db.models.fields.TextField,
-                django.db.models.fields.IntegerField,
                 django.db.models.fields.CharField,
+                django.db.models.fields.DateField,
+                django.db.models.fields.IntegerField,
+                django.db.models.fields.TextField,
+                django.db.models.fields.TimeField,
                 django.db.models.fields.files.FileField,
             ]
         ],
@@ -29,15 +29,7 @@ class GroupAdmin(admin.ModelAdmin):
             Type[
                 Union[
                     django.forms.fields.SplitDateTimeField,
-                    django.contrib.admin.widgets.AdminSplitDateTime,
-                    django.contrib.admin.widgets.AdminDateWidget,
-                    django.contrib.admin.widgets.AdminTimeWidget,
-                    django.contrib.admin.widgets.AdminTextareaWidget,
-                    django.contrib.admin.widgets.AdminURLFieldWidget,
-                    django.contrib.admin.widgets.AdminIntegerFieldWidget,
-                    django.contrib.admin.widgets.AdminTextInputWidget,
-                    django.contrib.admin.widgets.AdminFileWidget,
-                    django.contrib.admin.widgets.AdminEmailInputWidget,
+                    django.forms.widgets.Widget,
                 ]
             ],
         ],
@@ -59,11 +51,11 @@ class UserAdmin(admin.ModelAdmin):
     formfield_overrides: Dict[
         Type[
             Union[
-                django.db.models.fields.DateField,
-                django.db.models.fields.TimeField,
-                django.db.models.fields.TextField,
-                django.db.models.fields.IntegerField,
                 django.db.models.fields.CharField,
+                django.db.models.fields.DateField,
+                django.db.models.fields.IntegerField,
+                django.db.models.fields.TextField,
+                django.db.models.fields.TimeField,
                 django.db.models.fields.files.FileField,
             ]
         ],
@@ -72,15 +64,7 @@ class UserAdmin(admin.ModelAdmin):
             Type[
                 Union[
                     django.forms.fields.SplitDateTimeField,
-                    django.contrib.admin.widgets.AdminSplitDateTime,
-                    django.contrib.admin.widgets.AdminDateWidget,
-                    django.contrib.admin.widgets.AdminTimeWidget,
-                    django.contrib.admin.widgets.AdminTextareaWidget,
-                    django.contrib.admin.widgets.AdminURLFieldWidget,
-                    django.contrib.admin.widgets.AdminIntegerFieldWidget,
-                    django.contrib.admin.widgets.AdminTextInputWidget,
-                    django.contrib.admin.widgets.AdminFileWidget,
-                    django.contrib.admin.widgets.AdminEmailInputWidget,
+                    django.forms.widgets.Widget,
                 ]
             ],
         ],

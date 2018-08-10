@@ -3,6 +3,7 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import QueryDict
+from django.test.client import FakePayload
 from django.utils.datastructures import ImmutableList, MultiValueDict
 
 
@@ -12,9 +13,14 @@ class InputStreamExhausted(Exception): ...
 class MultiPartParser:
     def __init__(
         self,
-        META: Dict[str, Any],
-        input_data: Union[WSGIRequest, StringIO, BytesIO],
-        upload_handlers: Union[ImmutableList, List[Any]],
+        META: Dict[
+            str,
+            Union[
+                Dict[str, str], Tuple[int, int], BytesIO, FakePayload, int, str
+            ],
+        ],
+        input_data: Union[BytesIO, StringIO, WSGIRequest],
+        upload_handlers: Union[List[Any], ImmutableList],
         encoding: Optional[str] = ...,
     ) -> None: ...
     def parse(self) -> Tuple[QueryDict, MultiValueDict]: ...
@@ -37,10 +43,10 @@ class LazyStream:
     def unget(self, bytes: bytes) -> None: ...
 
 class ChunkIter:
-    flo: Union[django.core.handlers.wsgi.WSGIRequest, _io.BytesIO] = ...
+    flo: Union[_io.BytesIO, django.core.handlers.wsgi.WSGIRequest] = ...
     chunk_size: int = ...
     def __init__(
-        self, flo: Union[WSGIRequest, BytesIO], chunk_size: int = ...
+        self, flo: Union[BytesIO, WSGIRequest], chunk_size: int = ...
     ) -> None: ...
     def __next__(self) -> bytes: ...
     def __iter__(self): ...
@@ -57,4 +63,23 @@ class BoundaryIter:
 
 class Parser:
     def __init__(self, stream: LazyStream, boundary: bytes) -> None: ...
-    def __iter__(self) -> Iterator[Tuple[str, LazyStream, LazyStream]]: ...
+    def __iter__(
+        self
+    ) -> Iterator[
+        Tuple[
+            str,
+            Dict[
+                str,
+                Tuple[
+                    str,
+                    Union[
+                        Dict[Any, Any],
+                        Dict[str, Union[bytes, str]],
+                        Dict[str, bytes],
+                        Dict[str, str],
+                    ],
+                ],
+            ],
+            LazyStream,
+        ]
+    ]: ...

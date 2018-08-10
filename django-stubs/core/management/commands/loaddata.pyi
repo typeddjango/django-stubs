@@ -1,5 +1,5 @@
 import zipfile
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple
 
 from django.core.management.base import BaseCommand, CommandParser
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
     def load_label(self, fixture_label: str) -> None: ...
     def find_fixtures(
         self, fixture_label: str
-    ) -> Union[List[Tuple[str, None, str]], List[Tuple[str, str, str]]]: ...
+    ) -> List[Tuple[str, str, str]]: ...
     def fixture_dirs(self) -> List[str]: ...
     def parse_name(
         self, fixture_name: str

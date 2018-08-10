@@ -10,7 +10,7 @@ class ModelBackend:
     def authenticate(
         self,
         request: Any,
-        username: Optional[Union[str, int]] = ...,
+        username: Optional[Union[int, str]] = ...,
         password: Optional[str] = ...,
         **kwargs: Any
     ) -> Optional[AbstractBaseUser]: ...
@@ -28,7 +28,7 @@ class ModelBackend:
     ) -> Set[str]: ...
     def has_perm(
         self,
-        user_obj: Union[AnonymousUser, AbstractBaseUser],
+        user_obj: Union[AbstractBaseUser, AnonymousUser],
         perm: str,
         obj: Optional[str] = ...,
     ) -> bool: ...

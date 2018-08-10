@@ -21,9 +21,7 @@ class MigrationLoader:
     def __init__(
         self,
         connection: Optional[
-            Union[
-                DefaultConnectionProxy, backends.base.base.BaseDatabaseWrapper
-            ]
+            Union[DefaultConnectionProxy, BaseDatabaseWrapper]
         ],
         load: bool = ...,
         ignore_no_migrations: bool = ...,
@@ -38,7 +36,7 @@ class MigrationLoader:
         self, app_label: str, name_prefix: str
     ) -> Migration: ...
     def check_key(
-        self, key: Union[SwappableTuple, Tuple[str, str]], current_app: str
+        self, key: Union[Tuple[str, str], SwappableTuple], current_app: str
     ) -> Optional[Tuple[str, str]]: ...
     def add_internal_dependencies(
         self, key: Tuple[str, str], migration: Migration
@@ -50,10 +48,7 @@ class MigrationLoader:
     replacements: Any = ...
     def build_graph(self) -> None: ...
     def check_consistent_history(
-        self,
-        connection: Union[
-            DefaultConnectionProxy, backends.sqlite3.base.DatabaseWrapper
-        ],
+        self, connection: Union[DefaultConnectionProxy, DatabaseWrapper]
     ) -> None: ...
     def detect_conflicts(self) -> Dict[str, Set[str]]: ...
     def project_state(

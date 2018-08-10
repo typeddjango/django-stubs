@@ -1,5 +1,5 @@
 import json
-from typing import Any, Collection, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from django.contrib.messages.storage.base import BaseStorage, Message
 
@@ -14,10 +14,60 @@ class MessageEncoder(json.JSONEncoder):
     skipkeys: bool
     sort_keys: bool
     message_key: str = ...
-    def default(self, obj: Message) -> List[Union[str, int]]: ...
+    def default(self, obj: Message) -> List[Union[int, str]]: ...
 
 class MessageDecoder(json.JSONDecoder):
-    def process_messages(self, obj: Collection) -> Any: ...
+    def process_messages(
+        self,
+        obj: Union[
+            Dict[
+                str,
+                Union[
+                    List[
+                        Union[
+                            Dict[str, List[Union[int, str]]],
+                            List[Union[int, str]],
+                        ]
+                    ],
+                    List[Union[int, str]],
+                ],
+            ],
+            List[
+                Union[
+                    Dict[
+                        str,
+                        Union[
+                            List[
+                                Union[
+                                    Dict[str, List[Union[int, str]]],
+                                    List[Union[int, str]],
+                                ]
+                            ],
+                            List[Union[int, str]],
+                        ],
+                    ],
+                    List[Union[int, str]],
+                ]
+            ],
+            List[Union[List[Union[int, str]], str]],
+            List[Union[int, str]],
+            str,
+        ],
+    ) -> Union[
+        Dict[str, Union[List[Union[Dict[str, Message], Message]], Message]],
+        List[
+            Union[
+                Dict[
+                    str,
+                    Union[List[Union[Dict[str, Message], Message]], Message],
+                ],
+                Message,
+            ]
+        ],
+        List[Union[Message, str]],
+        Message,
+        str,
+    ]: ...
     def decode(
         self, s: str, **kwargs: Any
     ) -> Union[
@@ -25,13 +75,13 @@ class MessageDecoder(json.JSONDecoder):
             Union[
                 Dict[
                     str,
-                    Union[Message, List[Union[Message, Dict[str, Message]]]],
+                    Union[List[Union[Dict[str, Message], Message]], Message],
                 ],
                 Message,
             ]
         ],
-        Message,
         List[Union[Message, str]],
+        Message,
     ]: ...
 
 class CookieStorage(BaseStorage):

@@ -20,12 +20,14 @@ class SingleObjectMixin(ContextMixin):
     def get_queryset(self) -> QuerySet: ...
     def get_slug_field(self) -> str: ...
     def get_context_object_name(
-        self, obj: Union[Model, Dict[str, str]]
+        self, obj: Union[Dict[str, str], Model]
     ) -> Optional[str]: ...
     def get_context_data(
         self, **kwargs: Any
-    ) -> Dict[
-        str, Union[Model, str, SingleObjectMixin, Dict[str, str], ModelForm]
+    ) -> Union[
+        Dict[str, Union[Dict[str, str], DetailView]],
+        Dict[str, Union[Model, ModelForm, SingleObjectTemplateResponseMixin]],
+        Dict[str, Union[Model, SingleObjectMixin, str]],
     ]: ...
 
 class BaseDetailView(SingleObjectMixin, View):

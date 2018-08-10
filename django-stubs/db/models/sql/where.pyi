@@ -1,4 +1,5 @@
-from collections import OrderedDict
+from datetime import date
+from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.db import DefaultConnectionProxy
@@ -26,22 +27,55 @@ class WhereNode(tree.Node):
     def as_sql(
         self,
         compiler: SQLCompiler,
-        connection: Union[
-            DefaultConnectionProxy, backends.sqlite3.base.DatabaseWrapper
+        connection: Union[DefaultConnectionProxy, DatabaseWrapper],
+    ) -> Tuple[
+        str,
+        Union[
+            List[Optional[int]],
+            List[Union[date, str]],
+            List[Union[Decimal, int]],
+            List[Union[float, int]],
+            List[Union[int, str]],
+            List[memoryview],
         ],
-    ) -> Tuple[str, List]: ...
+    ]: ...
     def get_group_by_cols(self) -> List[Expression]: ...
     def get_source_expressions(self) -> List[FieldGetDbPrepValueMixin]: ...
-    children: List = ...
+    children: Union[
+        List[
+            Union[
+                django.db.models.lookups.BuiltinLookup,
+                django.db.models.sql.where.ExtraWhere,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.lookups.FieldGetDbPrepValueMixin,
+                django.db.models.lookups.Lookup,
+                django.db.models.sql.where.NothingNode,
+                django.db.models.sql.where.WhereNode,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.lookups.FieldGetDbPrepValueMixin,
+                django.db.models.query_utils.QueryWrapper,
+            ]
+        ],
+        List[
+            Union[
+                django.db.models.sql.where.SubqueryConstraint,
+                django.db.models.sql.where.WhereNode,
+            ]
+        ],
+    ] = ...
     def set_source_expressions(
         self, children: List[FieldGetDbPrepValueMixin]
     ) -> None: ...
-    def relabel_aliases(
-        self, change_map: Union[Dict[Union[str, None], str], OrderedDict]
-    ) -> None: ...
+    def relabel_aliases(self, change_map: Dict[Optional[str], str]) -> None: ...
     def clone(self) -> WhereNode: ...
     def relabeled_clone(
-        self, change_map: Union[OrderedDict, Dict[Union[str, None], str]]
+        self, change_map: Dict[Optional[str], str]
     ) -> WhereNode: ...
     def contains_aggregate(self) -> bool: ...
     def contains_over_clause(self) -> bool: ...
@@ -54,9 +88,7 @@ class NothingNode:
     def as_sql(
         self,
         compiler: SQLCompiler = ...,
-        connection: Union[
-            DefaultConnectionProxy, backends.sqlite3.base.DatabaseWrapper
-        ] = ...,
+        connection: Union[DefaultConnectionProxy, DatabaseWrapper] = ...,
     ) -> Any: ...
 
 class ExtraWhere:
@@ -68,7 +100,7 @@ class ExtraWhere:
     ) -> None: ...
     def as_sql(
         self, compiler: SQLCompiler = ..., connection: DatabaseWrapper = ...
-    ) -> Tuple[str, Union[List[str], List[int]]]: ...
+    ) -> Tuple[str, Union[List[int], List[str]]]: ...
 
 class SubqueryConstraint:
     contains_aggregate: bool = ...

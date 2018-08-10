@@ -6,7 +6,6 @@ from django.db.models.base import Model
 from django.db.models.fields import BooleanField, DateField, Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import RelatedField
-from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
 
 
@@ -48,7 +47,7 @@ class FieldListFilter(ListFilter):
     title: Any = ...
     def __init__(
         self,
-        field: Union[Field, reverse_related.ForeignObjectRel],
+        field: Union[Field, mixins.FieldCacheMixin],
         request: WSGIRequest,
         params: Dict[str, str],
         model: Type[Model],
@@ -65,11 +64,11 @@ class FieldListFilter(ListFilter):
         test: Callable,
         list_filter_class: Type[
             Union[
-                BooleanFieldListFilter,
                 AllValuesFieldListFilter,
+                BooleanFieldListFilter,
+                ChoicesFieldListFilter,
                 DateFieldListFilter,
                 RelatedFieldListFilter,
-                ChoicesFieldListFilter,
             ]
         ],
         take_priority: bool = ...,
@@ -77,7 +76,7 @@ class FieldListFilter(ListFilter):
     @classmethod
     def create(
         cls,
-        field: Union[Field, reverse_related.ForeignObjectRel],
+        field: Union[Field, mixins.FieldCacheMixin],
         request: WSGIRequest,
         params: Dict[str, str],
         model: Type[Model],
@@ -115,7 +114,7 @@ class RelatedFieldListFilter(FieldListFilter):
         field: FieldCacheMixin,
         request: WSGIRequest,
         model_admin: ModelAdmin,
-    ) -> Union[List[Tuple[str, str]], List[Tuple[int, str]]]: ...
+    ) -> List[Tuple[str, str]]: ...
     def choices(self, changelist: Any) -> None: ...
 
 class BooleanFieldListFilter(FieldListFilter):
@@ -209,4 +208,4 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     used_parameters: Dict[Any, Any]
     def field_choices(
         self, field: RelatedField, request: WSGIRequest, model_admin: ModelAdmin
-    ) -> Union[List[Tuple[str, str]], List[Tuple[int, str]]]: ...
+    ) -> List[Tuple[str, str]]: ...

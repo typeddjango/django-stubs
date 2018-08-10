@@ -22,12 +22,10 @@ class Sitemap:
     def paginator(self) -> Paginator: ...
     def get_urls(
         self,
-        page: Union[str, int] = ...,
-        site: Optional[Union[RequestSite, Site]] = ...,
+        page: Union[int, str] = ...,
+        site: Optional[Union[Site, RequestSite]] = ...,
         protocol: Optional[str] = ...,
-    ) -> Union[
-        List[Dict[str, Union[Model, str, datetime, None]]], List[Dict[str, Any]]
-    ]: ...
+    ) -> List[Dict[str, Optional[Union[datetime, Model, str]]]]: ...
 
 class GenericSitemap(Sitemap):
     priority: None = ...
@@ -37,7 +35,10 @@ class GenericSitemap(Sitemap):
     protocol: None = ...
     def __init__(
         self,
-        info_dict: Dict[str, Union[QuerySet, datetime, str]],
+        info_dict: Union[
+            Dict[str, Union[datetime, QuerySet]],
+            Dict[str, Union[QuerySet, str]],
+        ],
         priority: Optional[float] = ...,
         changefreq: Optional[str] = ...,
         protocol: Optional[str] = ...,

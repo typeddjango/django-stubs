@@ -1,11 +1,15 @@
+from datetime import date
+from io import BufferedRandom, BufferedReader, BytesIO, StringIO
+from tempfile import _TemporaryFileWrapper
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from django.contrib.auth.models import User
 from django.contrib.sessions.backends.base import SessionBase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.dispatch.dispatcher import Signal
-from django.http.request import HttpRequest, QueryDict
+from django.http.request import HttpRequest
 from django.http.response import (HttpResponse, HttpResponseBase,
                                   HttpResponseRedirect)
 from django.template.base import Template
@@ -22,20 +26,72 @@ class RedirectCycleError(Exception):
 
 class FakePayload:
     read_started: bool = ...
-    def __init__(self, content: Optional[Union[str, bytes]] = ...) -> None: ...
+    def __init__(self, content: Optional[Union[bytes, str]] = ...) -> None: ...
     def __len__(self) -> int: ...
     def read(self, num_bytes: int = ...) -> bytes: ...
-    def write(self, content: Union[str, bytes]) -> None: ...
+    def write(self, content: Union[bytes, str]) -> None: ...
 
 class ClientHandler(BaseHandler):
     enforce_csrf_checks: bool = ...
     def __init__(
         self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any
     ) -> None: ...
-    def __call__(self, environ: Dict[str, Any]) -> HttpResponseBase: ...
+    def __call__(
+        self,
+        environ: Union[
+            Dict[
+                str,
+                Optional[
+                    Union[Tuple[int, int], BytesIO, FakePayload, int, str]
+                ],
+            ],
+            Dict[
+                str,
+                Union[
+                    Dict[str, str],
+                    Tuple[int, int],
+                    BytesIO,
+                    FakePayload,
+                    int,
+                    str,
+                ],
+            ],
+        ],
+    ) -> HttpResponseBase: ...
 
-def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
-def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
+def encode_multipart(
+    boundary: str,
+    data: Union[
+        Dict[str, Union[List[int], List[str], int]],
+        Dict[str, Union[List[int], int, str]],
+        Dict[str, Union[List[str], int, str]],
+        Dict[str, Union[Tuple[str, str, str], int, str]],
+        Dict[
+            str,
+            Union[
+                Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
+                str,
+                _TemporaryFileWrapper,
+            ],
+        ],
+        Dict[str, Union[BufferedReader, str]],
+        Dict[str, Union[BytesIO, StringIO, _TemporaryFileWrapper]],
+        Dict[str, BufferedRandom],
+        Dict[str, SimpleUploadedFile],
+    ],
+) -> bytes: ...
+def encode_file(
+    boundary: str,
+    key: str,
+    file: Union[
+        BufferedRandom,
+        BufferedReader,
+        BytesIO,
+        StringIO,
+        SimpleUploadedFile,
+        _TemporaryFileWrapper,
+    ],
+) -> List[bytes]: ...
 
 class RequestFactory:
     json_encoder: Type[django.core.serializers.json.DjangoJSONEncoder] = ...
@@ -45,12 +101,44 @@ class RequestFactory:
     def __init__(self, *, json_encoder: Any = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> WSGIRequest: ...
     def get(
-        self, path: str, data: Any = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Optional[
+            Union[
+                Dict[str, Union[Tuple[str, str, str], str]],
+                Dict[str, Union[int, str]],
+                Dict[str, date],
+                str,
+            ]
+        ] = ...,
+        secure: bool = ...,
+        **extra: Any
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def post(
         self,
         path: str,
-        data: Any = ...,
+        data: Optional[
+            Union[
+                Dict[str, Union[List[int], List[str], int]],
+                Dict[str, Union[List[int], int, str]],
+                Dict[str, Union[List[str], int, str]],
+                Dict[str, Union[Tuple[str, str, str], int, str]],
+                Dict[
+                    str,
+                    Union[
+                        Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
+                        str,
+                        _TemporaryFileWrapper,
+                    ],
+                ],
+                Dict[str, Union[BufferedReader, str]],
+                Dict[str, Union[BytesIO, StringIO, _TemporaryFileWrapper]],
+                Dict[str, BufferedRandom],
+                Dict[str, SimpleUploadedFile],
+                bytes,
+                str,
+            ]
+        ] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -58,7 +146,7 @@ class RequestFactory:
     def head(
         self,
         path: str,
-        data: Optional[Union[str, Dict[str, str]]] = ...,
+        data: Optional[Union[Dict[str, str], str]] = ...,
         secure: bool = ...,
         **extra: Any
     ) -> Union[WSGIRequest, HttpResponse]: ...
@@ -68,7 +156,7 @@ class RequestFactory:
     def options(
         self,
         path: str,
-        data: Union[str, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -76,7 +164,7 @@ class RequestFactory:
     def put(
         self,
         path: str,
-        data: Union[str, bytes, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], bytes, str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -84,7 +172,7 @@ class RequestFactory:
     def patch(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -92,7 +180,7 @@ class RequestFactory:
     def delete(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -101,7 +189,7 @@ class RequestFactory:
         self,
         method: str,
         path: str,
-        data: Union[str, bytes, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], bytes, str] = ...,
         content_type: Optional[str] = ...,
         secure: bool = ...,
         **extra: Any
@@ -111,8 +199,8 @@ class Client(RequestFactory):
     defaults: Dict[str, str]
     errors: _io.BytesIO
     json_encoder: Union[
-        unittest.mock.MagicMock,
         Type[django.core.serializers.json.DjangoJSONEncoder],
+        unittest.mock.MagicMock,
     ]
     handler: django.test.client.ClientHandler = ...
     exc_info: None = ...
@@ -128,10 +216,9 @@ class Client(RequestFactory):
         path: str,
         data: Optional[
             Union[
-                Dict[str, Union[str, int]],
-                QueryDict,
+                Dict[str, Union[Tuple[str, str, str], str]],
+                Dict[str, Union[int, str]],
                 str,
-                Dict[str, Union[str, Tuple[str, str, str]]],
             ]
         ] = ...,
         follow: bool = ...,
@@ -141,7 +228,28 @@ class Client(RequestFactory):
     def post(
         self,
         path: str,
-        data: Any = ...,
+        data: Optional[
+            Union[
+                Dict[str, Union[List[int], List[str], int]],
+                Dict[str, Union[List[int], int, str]],
+                Dict[str, Union[List[str], int, str]],
+                Dict[str, Union[Tuple[str, str, str], int, str]],
+                Dict[
+                    str,
+                    Union[
+                        Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
+                        str,
+                        _TemporaryFileWrapper,
+                    ],
+                ],
+                Dict[str, Union[BufferedReader, str]],
+                Dict[str, Union[BytesIO, StringIO, _TemporaryFileWrapper]],
+                Dict[str, BufferedRandom],
+                Dict[str, SimpleUploadedFile],
+                bytes,
+                str,
+            ]
+        ] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -150,7 +258,7 @@ class Client(RequestFactory):
     def head(
         self,
         path: str,
-        data: Optional[Union[str, Dict[str, str]]] = ...,
+        data: Optional[Union[Dict[str, str], str]] = ...,
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
@@ -158,7 +266,7 @@ class Client(RequestFactory):
     def options(
         self,
         path: str,
-        data: Union[str, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -167,7 +275,7 @@ class Client(RequestFactory):
     def put(
         self,
         path: str,
-        data: Union[str, bytes, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], bytes, str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -176,7 +284,7 @@ class Client(RequestFactory):
     def patch(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -185,7 +293,7 @@ class Client(RequestFactory):
     def delete(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -194,7 +302,7 @@ class Client(RequestFactory):
     def trace(
         self,
         path: str,
-        data: Union[str, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], str] = ...,
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any

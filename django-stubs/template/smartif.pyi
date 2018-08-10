@@ -40,9 +40,9 @@ class IfParser:
     def __init__(
         self,
         tokens: Union[
-            List[Union[int, str, List[int]]],
-            List[Union[None, str, List[int]]],
-            List[Union[int, str, None]],
+            List[Optional[Union[List[int], str]]],
+            List[Optional[Union[int, str]]],
+            List[Union[List[int], int, str]],
         ],
     ) -> None: ...
     def translate_token(

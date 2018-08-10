@@ -1,7 +1,10 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.core.cache.backends.base import BaseCache
+from django.db.models.base import Model
+from django.db.models.query import QuerySet
+from django.http.response import HttpResponse
 
 
 class LocMemCache(BaseCache):
@@ -12,27 +15,74 @@ class LocMemCache(BaseCache):
     def __init__(
         self,
         name: str,
-        params: Dict[str, Optional[Union[Dict[str, int], Callable, str, int]]],
+        params: Union[
+            Dict[str, Callable],
+            Dict[str, Dict[str, int]],
+            Dict[str, None],
+            Dict[str, int],
+            Dict[str, str],
+        ],
     ) -> None: ...
     def add(
         self,
         key: str,
         value: Union[
-            Dict[str, Union[str, datetime]], int, bytes, str, Dict[str, int]
+            Dict[str, Union[datetime, str]], Dict[str, int], bytes, int, str
         ],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> Any: ...
     def get(
         self,
-        key: Union[str, int],
-        default: Optional[Union[str, int]] = ...,
+        key: Union[int, str],
+        default: Optional[Union[int, str]] = ...,
         version: Optional[int] = ...,
-    ) -> Any: ...
+    ) -> Union[
+        Dict[
+            str,
+            Union[
+                Callable,
+                Dict[str, int],
+                List[int],
+                Tuple[int, int, int, int],
+                Type[Any],
+                int,
+                str,
+            ],
+        ],
+        List[str],
+        bytes,
+        Model,
+        QuerySet,
+        HttpResponse,
+        int,
+        str,
+    ]: ...
     def set(
         self,
-        key: Union[str, int],
-        value: Any,
+        key: Union[int, str],
+        value: Union[
+            Dict[
+                str,
+                Union[
+                    Callable,
+                    Dict[str, int],
+                    List[int],
+                    Tuple[int, int, int, int],
+                    Type[Any],
+                    int,
+                    str,
+                ],
+            ],
+            Dict[str, Union[datetime, str]],
+            List[str],
+            bytes,
+            Model,
+            QuerySet,
+            HttpResponse,
+            int,
+            str,
+        ],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> None: ...
@@ -41,7 +91,7 @@ class LocMemCache(BaseCache):
     ) -> Any: ...
     def incr(
         self,
-        key: Union[str, int],
+        key: Union[int, str],
         delta: int = ...,
         version: Optional[int] = ...,
     ) -> int: ...

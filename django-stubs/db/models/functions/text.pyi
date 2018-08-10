@@ -2,8 +2,7 @@ from typing import Any, List, Optional, Tuple, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import (Combinable, Expression,
-                                          SQLiteNumericMixin, Value)
+from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler
 
 
@@ -37,7 +36,12 @@ class ConcatPair(Func):
     extra: Dict[Any, Any]
     is_summary: bool
     output_field: django.db.models.fields.CharField
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[
+        Union[
+            django.db.models.expressions.Expression,
+            django.db.models.expressions.F,
+        ]
+    ]
     function: str = ...
     def as_sqlite(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
@@ -145,7 +149,7 @@ class Ord(Transform):
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         **extra_context: Any
-    ) -> Tuple[str, Union[List[str], List[int]]]: ...
+    ) -> Tuple[str, Union[List[int], List[str]]]: ...
 
 class Repeat(BytesToCharFieldConversionMixin, Func):
     contains_aggregate: bool
@@ -153,11 +157,16 @@ class Repeat(BytesToCharFieldConversionMixin, Func):
     extra: Dict[Any, Any]
     is_summary: bool
     output_field: django.db.models.fields.CharField
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[
+        Union[
+            django.db.models.expressions.Expression,
+            django.db.models.expressions.F,
+        ]
+    ]
     function: str = ...
     def __init__(
         self,
-        expression: Union[str, Value],
+        expression: Union[Value, str],
         number: Union[Length, int],
         **extra: Any
     ) -> None: ...
@@ -234,9 +243,9 @@ class Substr(Func):
     function: str = ...
     def __init__(
         self,
-        expression: Union[str, Expression],
-        pos: Union[SQLiteNumericMixin, Value, int],
-        length: Optional[Union[int, Value]] = ...,
+        expression: Union[Expression, str],
+        pos: Union[Expression, int],
+        length: Optional[Union[Value, int]] = ...,
         **extra: Any
     ) -> None: ...
     def as_sqlite(

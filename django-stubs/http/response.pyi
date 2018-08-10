@@ -1,11 +1,11 @@
 from datetime import datetime
-from io import BufferedReader, BytesIO
+from io import BufferedReader, BytesIO, TextIOWrapper
 from tempfile import _TemporaryFileWrapper
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
+from uuid import UUID
 
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.functional import SimpleLazyObject
 
 
 class BadHeaderError(ValueError): ...
@@ -32,7 +32,7 @@ class HttpResponseBase:
     def serialize_headers(self) -> bytes: ...
     __bytes__: Any = ...
     def __setitem__(
-        self, header: Union[str, bytes], value: Union[str, bytes, int]
+        self, header: Union[bytes, str], value: Union[bytes, int, str]
     ) -> None: ...
     def __delitem__(self, header: str) -> None: ...
     def __getitem__(self, header: str) -> str: ...
@@ -40,14 +40,14 @@ class HttpResponseBase:
     __contains__: Any = ...
     def items(self): ...
     def get(
-        self, header: str, alternate: Optional[Union[str, Tuple]] = ...
-    ) -> Optional[Union[str, Tuple]]: ...
+        self, header: str, alternate: Optional[Union[Tuple, str]] = ...
+    ) -> Optional[Union[Tuple, str]]: ...
     def set_cookie(
         self,
         key: str,
         value: str = ...,
         max_age: Optional[int] = ...,
-        expires: Optional[Union[str, datetime]] = ...,
+        expires: Optional[Union[datetime, str]] = ...,
         path: str = ...,
         domain: Optional[str] = ...,
         secure: Optional[bool] = ...,
@@ -61,9 +61,7 @@ class HttpResponseBase:
     def delete_cookie(
         self, key: str, path: str = ..., domain: Optional[str] = ...
     ) -> None: ...
-    def make_bytes(
-        self, value: Union[int, SimpleLazyObject, bytes, str]
-    ) -> bytes: ...
+    def make_bytes(self, value: Union[bytes, int, str]) -> bytes: ...
     def close(self) -> None: ...
     def write(self, content: str) -> Any: ...
     def flush(self) -> None: ...
@@ -83,11 +81,8 @@ class HttpResponse(HttpResponseBase):
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
-    request: Dict[str, Union[str, int, django.test.client.FakePayload]]
-    resolver_match: Union[
-        django.utils.functional.SimpleLazyObject,
-        django.urls.resolvers.ResolverMatch,
-    ]
+    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
+    resolver_match: django.urls.resolvers.ResolverMatch
     sameorigin: bool
     status_code: int
     templates: List[django.template.base.Template]
@@ -98,7 +93,12 @@ class HttpResponse(HttpResponseBase):
     streaming: bool = ...
     content: Any = ...
     def __init__(
-        self, content: Any = ..., *args: Any, **kwargs: Any
+        self,
+        content: Union[
+            Iterator[Any], List[str], TextIOWrapper, bytes, int, str
+        ] = ...,
+        *args: Any,
+        **kwargs: Any
     ) -> None: ...
     def serialize(self): ...
     __bytes__: Any = ...
@@ -107,7 +107,7 @@ class HttpResponse(HttpResponseBase):
     @content.setter
     def content(self, value: Any) -> None: ...
     def __iter__(self): ...
-    def write(self, content: Union[str, bytes]) -> None: ...
+    def write(self, content: Union[bytes, str]) -> None: ...
     def tell(self) -> int: ...
     def getvalue(self) -> bytes: ...
     def writable(self) -> bool: ...
@@ -119,7 +119,7 @@ class StreamingHttpResponse(HttpResponseBase):
     context: None
     cookies: http.cookies.SimpleCookie
     json: functools.partial
-    request: Dict[str, Union[str, int, django.test.client.FakePayload]]
+    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
     resolver_match: django.utils.functional.SimpleLazyObject
     status_code: int
     templates: List[Any]
@@ -127,7 +127,20 @@ class StreamingHttpResponse(HttpResponseBase):
     streaming: bool = ...
     streaming_content: Any = ...
     def __init__(
-        self, streaming_content: Any = ..., *args: Any, **kwargs: Any
+        self,
+        streaming_content: Union[
+            Iterator[Any],
+            List[bytes],
+            List[str],
+            BufferedReader,
+            BytesIO,
+            TextIOWrapper,
+            ContentFile,
+            str,
+            _TemporaryFileWrapper,
+        ] = ...,
+        *args: Any,
+        **kwargs: Any
     ) -> None: ...
     @property
     def content(self) -> Any: ...
@@ -145,10 +158,10 @@ class FileResponse(StreamingHttpResponse):
     cookies: http.cookies.SimpleCookie
     file_to_stream: Optional[
         Union[
-            _io.BytesIO,
-            tempfile._TemporaryFileWrapper,
             _io.BufferedReader,
+            _io.BytesIO,
             django.core.files.base.ContentFile,
+            tempfile._TemporaryFileWrapper,
         ]
     ]
     json: functools.partial
@@ -169,7 +182,7 @@ class FileResponse(StreamingHttpResponse):
     def set_headers(
         self,
         filelike: Union[
-            _TemporaryFileWrapper, ContentFile, BufferedReader, BytesIO
+            BufferedReader, BytesIO, ContentFile, _TemporaryFileWrapper
         ],
     ) -> None: ...
 
@@ -187,7 +200,7 @@ class HttpResponseRedirect(HttpResponseRedirectBase):
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
     request: Dict[
-        str, Union[str, int, django.test.client.FakePayload, Dict[str, str]]
+        str, Union[Dict[str, str], django.test.client.FakePayload, int, str]
     ]
     resolver_match: django.utils.functional.SimpleLazyObject
     templates: List[django.template.base.Template]
@@ -241,7 +254,7 @@ class HttpResponseForbidden(HttpResponse):
     cookies: http.cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
-    request: Dict[str, Union[str, int, django.test.client.FakePayload]]
+    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
     resolver_match: django.utils.functional.SimpleLazyObject
     templates: List[django.template.base.Template]
     wsgi_request: django.core.handlers.wsgi.WSGIRequest
@@ -253,7 +266,7 @@ class HttpResponseNotAllowed(HttpResponse):
     status_code: int = ...
     def __init__(
         self,
-        permitted_methods: Union[Tuple[str, str], List[str]],
+        permitted_methods: Union[List[str], Tuple[str, str]],
         *args: Any,
         **kwargs: Any
     ) -> None: ...
@@ -285,14 +298,22 @@ class JsonResponse(HttpResponse):
     context: None
     cookies: http.cookies.SimpleCookie
     json: functools.partial
-    request: Dict[str, Union[str, int, django.test.client.FakePayload]]
+    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
     resolver_match: django.utils.functional.SimpleLazyObject
     status_code: int
     templates: List[Any]
     wsgi_request: django.core.handlers.wsgi.WSGIRequest
     def __init__(
         self,
-        data: Any,
+        data: Union[
+            Dict[str, Union[Dict[str, bool], List[Dict[str, str]]]],
+            Dict[str, Union[Dict[str, str], int]],
+            Dict[str, str],
+            List[int],
+            List[str],
+            str,
+            UUID,
+        ],
         encoder: Type[DjangoJSONEncoder] = ...,
         safe: bool = ...,
         json_dumps_params: Optional[Dict[str, int]] = ...,

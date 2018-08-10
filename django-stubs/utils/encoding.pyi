@@ -1,7 +1,10 @@
-from datetime import date
-from typing import Any, Optional, Union
+from datetime import date, time, timedelta
+from decimal import Decimal
+from typing import Any, Dict, Optional, Union
+from uuid import UUID
 
 from django.db.models.base import Model
+from django.db.models.fields.files import FieldFile
 
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
@@ -16,19 +19,42 @@ def smart_text(
     strings_only: bool = ...,
     errors: str = ...,
 ) -> str: ...
-def is_protected_type(obj: Any) -> bool: ...
+def is_protected_type(
+    obj: Optional[
+        Union[
+            date,
+            time,
+            timedelta,
+            Decimal,
+            FieldFile,
+            float,
+            int,
+            memoryview,
+            str,
+            UUID,
+        ]
+    ]
+) -> bool: ...
 def force_text(
-    s: Any, encoding: str = ..., strings_only: bool = ..., errors: str = ...
-) -> Optional[Union[str, int]]: ...
+    s: Optional[Union[bytes, Model, int, str]],
+    encoding: str = ...,
+    strings_only: bool = ...,
+    errors: str = ...,
+) -> Optional[Union[int, str]]: ...
 def smart_bytes(
-    s: Union[str, int],
+    s: Union[int, str],
     encoding: str = ...,
     strings_only: bool = ...,
     errors: str = ...,
 ) -> bytes: ...
 def force_bytes(
-    s: Any, encoding: str = ..., strings_only: bool = ..., errors: str = ...
-) -> Union[date, bytes]: ...
+    s: Union[
+        Dict[str, str], ValueError, bytes, date, int, memoryview, str, UUID
+    ],
+    encoding: str = ...,
+    strings_only: bool = ...,
+    errors: str = ...,
+) -> Union[bytes, date]: ...
 
 smart_str = smart_text
 force_str = force_text

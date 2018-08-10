@@ -16,7 +16,7 @@ def get_exception_response(
     resolver: URLResolver,
     status_code: int,
     exception: Union[
-        MultiPartParserError, PermissionDenied, SuspiciousOperation, Http404
+        PermissionDenied, SuspiciousOperation, MultiPartParserError, Http404
     ],
     sender: None = ...,
 ) -> HttpResponse: ...

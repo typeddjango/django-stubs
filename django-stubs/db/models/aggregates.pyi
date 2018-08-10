@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Any, List, Optional, Tuple, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.models.expressions import Expression, F, Func
+from django.db.models.expressions import Combinable, Expression, Func
 from django.db.models.fields import Field
 from django.db.models.query_utils import Q
 from django.db.models.sql.compiler import SQLCompiler
@@ -20,11 +20,9 @@ class Aggregate(Func):
         self, *args: Any, filter: Optional[Any] = ..., **kwargs: Any
     ) -> None: ...
     def get_source_fields(self) -> Union[List[None], List[Field]]: ...
-    def get_source_expressions(
-        self
-    ) -> Union[List[Union[WhereNode, Expression]], List[F]]: ...
+    def get_source_expressions(self) -> List[Union[Combinable, WhereNode]]: ...
     def set_source_expressions(
-        self, exprs: List[Union[WhereNode, Expression]]
+        self, exprs: List[Union[Expression, WhereNode]]
     ) -> None: ...
     def resolve_expression(
         self,
@@ -43,14 +41,7 @@ class Aggregate(Func):
         connection: DatabaseWrapper,
         **extra_context: Any
     ) -> Tuple[
-        str,
-        Union[
-            List[float],
-            List[str],
-            List[int],
-            List[Decimal],
-            List[Union[int, str]],
-        ],
+        str, Union[List[Union[int, str]], List[Decimal], List[float]]
     ]: ...
 
 class Avg(Aggregate):

@@ -8,5 +8,5 @@ class EmailBackend(BaseEmailBackend):
     fail_silently: bool
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def send_messages(
-        self, messages: Union[List[EmailMessage], Iterator[Any]]
+        self, messages: Union[Iterator[Any], List[EmailMessage]]
     ) -> int: ...

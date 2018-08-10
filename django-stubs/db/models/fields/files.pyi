@@ -20,8 +20,13 @@ class FieldFile(File):
     def __init__(
         self, instance: Model, field: FileField, name: Optional[str]
     ) -> None: ...
-    def __eq__(self, other: Any) -> bool: ...
-    def __hash__(self) -> int: ...
+    def __eq__(
+        self,
+        other: Optional[
+            Union[Dict[Any, Any], List[Any], Tuple, FieldFile, str]
+        ],
+    ) -> bool: ...
+    def __hash__(self): ...
     file: Any = ...
     @property
     def path(self) -> str: ...
@@ -42,9 +47,9 @@ class FileDescriptor:
     def __init__(self, field: FileField) -> None: ...
     def __get__(
         self, instance: Optional[Model], cls: Type[Model] = ...
-    ) -> Union[FileDescriptor, FieldFile]: ...
+    ) -> Union[FieldFile, FileDescriptor]: ...
     def __set__(
-        self, instance: Model, value: Optional[Union[str, File]]
+        self, instance: Model, value: Optional[Union[File, str]]
     ) -> None: ...
 
 class FileField(Field):
@@ -57,7 +62,7 @@ class FileField(Field):
         self,
         verbose_name: Optional[str] = ...,
         name: None = ...,
-        upload_to: Union[str, Callable] = ...,
+        upload_to: Union[Callable, str] = ...,
         storage: Optional[Storage] = ...,
         **kwargs: Any
     ) -> None: ...
@@ -66,60 +71,38 @@ class FileField(Field):
         self
     ) -> Union[
         Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[int, partial]],
-                Dict[str, Union[Callable, FileSystemStorage]],
-                Dict[str, Union[int, str, FileSystemStorage]],
-                Dict[str, Union[int, str]],
-            ],
-            Union[
-                Dict[str, Union[int, partial]],
-                Dict[str, Union[Callable, FileSystemStorage]],
-                Dict[str, Union[int, str, FileSystemStorage]],
-                Dict[str, Union[int, str]],
-            ],
-        ],
-        Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[bool, Callable, FileSystemStorage]],
-                Dict[str, Union[str, bool]],
-                Dict[str, Union[int, str]],
-                Dict[str, Union[int, partial]],
-                Dict[str, Union[int, str, FileSystemStorage]],
-                Dict[str, Union[bool, str, FileSystemStorage]],
-            ],
-            Union[
-                Dict[str, Union[bool, Callable, FileSystemStorage]],
-                Dict[str, Union[str, bool]],
-                Dict[str, Union[int, str]],
-                Dict[str, Union[int, partial]],
-                Dict[str, Union[int, str, FileSystemStorage]],
-                Dict[str, Union[bool, str, FileSystemStorage]],
-            ],
-        ],
-        Tuple[
-            str,
-            List[Any],
-            Dict[str, Union[str, FileSystemStorage]],
-            Union[Dict[str, Union[str, FileSystemStorage]], Dict[str, str]],
-        ],
-        Tuple[
             None,
             str,
             List[Any],
             Union[
-                Dict[str, Union[bool, Callable, FileSystemStorage]],
-                Dict[str, Union[str, bool]],
+                Dict[str, Union[Callable, FileSystemStorage]],
+                Dict[str, Union[partial, int]],
             ],
         ],
-        Tuple[str, str, List[Any], Dict[str, Union[str, FileSystemStorage]]],
+        Tuple[
+            str,
+            List[Any],
+            Union[
+                Dict[str, Union[Callable, FileSystemStorage, int]],
+                Dict[str, Union[FileSystemStorage, int, str]],
+            ],
+            Union[
+                Dict[str, Union[Callable, FileSystemStorage, int]],
+                Dict[str, Union[FileSystemStorage, int, str]],
+            ],
+        ],
+        Tuple[
+            str,
+            str,
+            List[Any],
+            Union[
+                Dict[str, Union[Callable, bool, FileSystemStorage]],
+                Dict[str, str],
+            ],
+        ],
     ]: ...
     def get_internal_type(self) -> str: ...
-    def get_prep_value(self, value: Union[str, FieldFile]) -> str: ...
+    def get_prep_value(self, value: Union[FieldFile, str]) -> str: ...
     def pre_save(self, model_instance: Model, add: bool) -> FieldFile: ...
     def contribute_to_class(
         self, cls: Type[Model], name: str, **kwargs: Any
@@ -134,18 +117,13 @@ class FileField(Field):
 
 class ImageFileDescriptor(FileDescriptor):
     field: django.db.models.fields.files.ImageField
-    def __set__(
-        self, instance: Model, value: Optional[Union[str, File]]
-    ) -> None: ...
+    def __set__(self, instance: Model, value: Optional[str]) -> None: ...
 
 class ImageFieldFile(ImageFile, FieldFile):
     field: django.db.models.fields.files.ImageField
     instance: django.db.models.base.Model
     name: Optional[str]
-    storage: Union[
-        django.core.files.storage.DefaultStorage,
-        django.core.files.storage.FileSystemStorage,
-    ]
+    storage: django.core.files.storage.DefaultStorage
     def delete(self, save: bool = ...) -> None: ...
 
 class ImageField(FileField):
@@ -167,33 +145,11 @@ class ImageField(FileField):
         Tuple[
             str,
             List[Any],
-            Union[
-                Dict[str, Union[Callable, FileSystemStorage, str]],
-                Dict[str, Union[bool, str, FileSystemStorage]],
-                Dict[str, Union[bool, Callable, FileSystemStorage, str]],
-            ],
-            Union[
-                Dict[str, Union[Callable, FileSystemStorage, str]],
-                Dict[str, Union[str, FileSystemStorage]],
-                Dict[str, Union[bool, str, FileSystemStorage]],
-                Dict[str, Union[bool, Callable, FileSystemStorage, str]],
-            ],
+            Dict[str, Union[Callable, bool, FileSystemStorage, str]],
+            Dict[str, Union[Callable, bool, FileSystemStorage, str]],
         ],
         Tuple[
-            str,
-            List[Any],
-            Dict[str, Union[str, bool]],
-            Union[Dict[str, Union[str, bool]], Dict[str, str]],
-        ],
-        Tuple[
-            None,
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[str, FileSystemStorage]],
-                Dict[str, Union[str, bool]],
-                Dict[str, Union[bool, str, FileSystemStorage]],
-            ],
+            str, str, List[Any], Dict[str, Union[Callable, FileSystemStorage]]
         ],
     ]: ...
     def contribute_to_class(

@@ -9,8 +9,19 @@ DEFAULT_LOGGING: Any
 
 def configure_logging(
     logging_config: str,
-    logging_settings: Union[
-        str, int, Dict[str, Dict[str, Union[List[str], str, bool]]]
+    logging_settings: Dict[
+        str,
+        Union[
+            Dict[
+                str,
+                Union[
+                    Dict[str, Union[List[str], bool, str]],
+                    Dict[str, Union[List[str], str]],
+                ],
+            ],
+            Dict[str, Union[Dict[str, Union[List[str], str]], Dict[str, str]]],
+            int,
+        ],
     ],
 ) -> None: ...
 
@@ -39,12 +50,12 @@ class CallbackFilter(logging.Filter):
 class RequireDebugFalse(logging.Filter):
     name: str
     nlen: int
-    def filter(self, record: Union[str, LogRecord]) -> bool: ...
+    def filter(self, record: Union[LogRecord, str]) -> bool: ...
 
 class RequireDebugTrue(logging.Filter):
     name: str
     nlen: int
-    def filter(self, record: Union[str, LogRecord]) -> bool: ...
+    def filter(self, record: Union[LogRecord, str]) -> bool: ...
 
 class ServerFormatter(logging.Formatter):
     datefmt: None

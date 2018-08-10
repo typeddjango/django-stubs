@@ -1,11 +1,13 @@
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
 
+from django.core.validators import RegexValidator
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState
-from django.db.models.fields import Field
+from django.db.migrations.utils import RegexObject
+from django.db.models.fields import Field, IntegerField
 
 from .topological_sort import stable_topological_sort
 
@@ -28,35 +30,74 @@ class MigrationAutodetector:
         convert_apps: Optional[Set[str]] = ...,
         migration_name: Optional[str] = ...,
     ) -> Dict[str, List[Migration]]: ...
-    def deep_deconstruct(self, obj: Any) -> Any: ...
-    def only_relation_agnostic_fields(
-        self, fields: List[Tuple[str, Field]]
-    ) -> Union[
-        List[
-            Tuple[
+    def deep_deconstruct(
+        self,
+        obj: Optional[
+            Union[
+                Callable,
+                Dict[str, int],
+                Dict[str, str],
+                List[RegexValidator],
+                List[int],
+                Tuple[str],
+                Type[IntegerField],
+                Field,
+                int,
                 str,
-                List[Any],
-                Union[Dict[str, Callable], Dict[str, bool], Dict[str, int]],
             ]
         ],
-        List[Tuple[str, List[Any], Dict[str, Union[bool, Callable]]]],
-        List[Tuple[str, List[Any], Dict[str, Union[str, int]]]],
+    ) -> Optional[
+        Union[
+            Callable,
+            Dict[str, Union[Tuple[str, List[Any], Dict[Any, Any]], int]],
+            Dict[str, str],
+            List[
+                Union[
+                    Tuple[str, List[Union[RegexObject, str]], Dict[Any, Any]],
+                    int,
+                ]
+            ],
+            Tuple[Callable, Tuple[str], Dict[Any, Any]],
+            Tuple[Tuple[str, List[Any], Dict[Any, Any]], int],
+            Tuple[
+                Tuple[str, List[str], Dict[Any, Any]],
+                Tuple[str, List[str], Dict[Any, Any]],
+            ],
+            Tuple[str],
+            Type[IntegerField],
+            RegexObject,
+            int,
+            str,
+        ]
+    ]: ...
+    def only_relation_agnostic_fields(
+        self, fields: List[Tuple[str, Field]]
+    ) -> List[
+        Tuple[
+            str,
+            List[Any],
+            Union[
+                Dict[Any, Any],
+                Dict[str, Callable],
+                Dict[str, Union[Callable, bool]],
+                Dict[str, Union[bool, str]],
+                Dict[str, Union[int, str]],
+                Dict[str, bool],
+                Dict[str, int],
+            ],
+        ]
     ]: ...
     def check_dependency(
         self,
         operation: Operation,
-        dependency: Tuple[str, str, Union[str, bool], Union[str, bool]],
+        dependency: Tuple[str, str, Union[bool, str], Union[bool, str]],
     ) -> bool: ...
     def add_operation(
         self,
         app_label: str,
         operation: Operation,
         dependencies: Optional[
-            Union[
-                List[Tuple[str, str, str, Union[str, bool]]],
-                List[Tuple[str, str, bool, bool]],
-                List[Tuple[str, str, None, bool]],
-            ]
+            List[Tuple[str, str, Union[bool, str], Union[bool, str]]]
         ] = ...,
         beginning: bool = ...,
     ) -> None: ...

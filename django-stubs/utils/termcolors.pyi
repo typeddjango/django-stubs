@@ -7,7 +7,7 @@ RESET: str
 opt_dict: Any
 
 def colorize(
-    text: Optional[str] = ..., opts: Union[str, Tuple] = ..., **kwargs: Any
+    text: Optional[str] = ..., opts: Union[Tuple, str] = ..., **kwargs: Any
 ) -> str: ...
 def make_style(opts: Tuple = ..., **kwargs: Any) -> Callable: ...
 
@@ -20,8 +20,11 @@ DEFAULT_PALETTE = DARK_PALETTE
 def parse_color_setting(
     config_string: str
 ) -> Optional[
-    Union[
-        Dict[str, Dict[str, Union[str, Tuple[str]]]],
-        Dict[str, Dict[str, Union[str, Tuple[str, str]]]],
+    Dict[
+        str,
+        Union[
+            Dict[str, Union[Tuple[str, str], str]],
+            Dict[str, Union[Tuple[str], str]],
+        ],
     ]
 ]: ...

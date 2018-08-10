@@ -13,7 +13,7 @@ class UploadedFile(File):
     content_type_extra: Any = ...
     def __init__(
         self,
-        file: Optional[Union[_TemporaryFileWrapper, StringIO, BytesIO]] = ...,
+        file: Optional[Union[BytesIO, StringIO, _TemporaryFileWrapper]] = ...,
         name: str = ...,
         content_type: str = ...,
         size: Optional[int] = ...,
@@ -41,7 +41,7 @@ class InMemoryUploadedFile(UploadedFile):
     field_name: Any = ...
     def __init__(
         self,
-        file: Union[StringIO, BytesIO],
+        file: Union[BytesIO, StringIO],
         field_name: Optional[str],
         name: str,
         content_type: str,
@@ -50,7 +50,7 @@ class InMemoryUploadedFile(UploadedFile):
         content_type_extra: Optional[Dict[str, bytes]] = ...,
     ) -> None: ...
     def open(self, mode: Optional[str] = ...) -> InMemoryUploadedFile: ...
-    def chunks(self, chunk_size: None = ...) -> Iterator[Union[str, bytes]]: ...
+    def chunks(self, chunk_size: None = ...) -> Iterator[Union[bytes, str]]: ...
     def multiple_chunks(self, chunk_size: Optional[Any] = ...): ...
 
 class SimpleUploadedFile(InMemoryUploadedFile):
@@ -58,7 +58,7 @@ class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(
         self,
         name: str,
-        content: Optional[Union[str, bytes]],
+        content: Optional[Union[bytes, str]],
         content_type: str = ...,
     ) -> None: ...
     @classmethod

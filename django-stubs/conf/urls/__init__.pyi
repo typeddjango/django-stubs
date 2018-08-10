@@ -1,5 +1,6 @@
-from typing import Any, Callable, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
 
+from django.contrib.sitemaps import Sitemap
 from django.urls import include as include
 from django.urls.resolvers import URLPattern, URLResolver
 
@@ -11,8 +12,14 @@ handler500: Any
 def url(
     regex: str,
     view: Optional[
-        Union[Tuple[None, None, None], Tuple[str, str, str], Callable]
+        Union[Callable, Tuple[None, None, None], Tuple[str, str, str]]
     ],
-    kwargs: Any = ...,
+    kwargs: Optional[
+        Union[
+            Dict[str, Dict[str, Sitemap]],
+            Dict[str, Union[Dict[str, Type[Sitemap]], str]],
+            Dict[str, Union[int, str]],
+        ]
+    ] = ...,
     name: Optional[str] = ...,
-) -> Union[URLResolver, URLPattern]: ...
+) -> Union[URLPattern, URLResolver]: ...

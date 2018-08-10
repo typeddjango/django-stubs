@@ -1,12 +1,11 @@
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.postgres.fields.citext import CIText
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
 from django.db.models.base import Model
-from django.db.models.fields import AutoField, Field
+from django.db.models.fields import (AutoField, BooleanField, CharField, Field,
+                                     IntegerField, SlugField)
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
 
@@ -37,20 +36,15 @@ class CreateModel(ModelOperation):
     def __init__(
         self,
         name: str,
-        fields: List[Tuple[str, Union[Field, CIText]]],
+        fields: List[Tuple[str, Field]],
         options: Optional[
             Union[
-                Dict[str, Union[bool, List[Any]]],
-                Dict[str, Union[Tuple[str], Set[Tuple[str, str]], str]],
-                Dict[
-                    str, Union[Tuple[str, str, str], Set[Tuple[str, str]], str]
-                ],
+                Dict[str, Union[List[Any], bool]],
+                Dict[str, Union[Set[Tuple[str, str]], Tuple[str], str]],
                 Dict[str, Union[bool, str]],
             ]
         ] = ...,
-        bases: Optional[
-            Tuple[Union[str, Type[Model], Type[AbstractBaseUser]]]
-        ] = ...,
+        bases: Optional[Tuple[Union[Type[Model], str]]] = ...,
         managers: Optional[List[Tuple[str, Manager]]] = ...,
     ) -> None: ...
     def deconstruct(
@@ -58,13 +52,53 @@ class CreateModel(ModelOperation):
     ) -> Tuple[
         str,
         List[Any],
-        Dict[
-            str,
-            Union[
+        Union[
+            Dict[
                 str,
-                List[Tuple[str, Field]],
-                List[Tuple[str, AutoField]],
-                Dict[str, str],
+                Union[
+                    Dict[str, str],
+                    List[Union[Tuple[str, AutoField], Tuple[str, CharField]]],
+                    str,
+                ],
+            ],
+            Dict[str, Union[List[Tuple[str, AutoField]], str]],
+            Dict[
+                str,
+                Union[
+                    List[
+                        Union[
+                            Tuple[str, AutoField],
+                            Tuple[str, BooleanField],
+                            Tuple[str, CharField],
+                            Tuple[str, IntegerField],
+                            Tuple[str, SlugField],
+                        ]
+                    ],
+                    str,
+                ],
+            ],
+            Dict[
+                str,
+                Union[
+                    List[
+                        Union[Tuple[str, AutoField], Tuple[str, BooleanField]]
+                    ],
+                    str,
+                ],
+            ],
+            Dict[
+                str,
+                Union[
+                    List[
+                        Union[
+                            Tuple[str, AutoField],
+                            Tuple[str, CharField],
+                            Tuple[str, IntegerField],
+                            Tuple[str, SlugField],
+                        ]
+                    ],
+                    str,
+                ],
             ],
         ],
     ]: ...
@@ -91,7 +125,7 @@ class CreateModel(ModelOperation):
         operation: Operation,
         in_between: List[Operation],
         app_label: str = ...,
-    ) -> Union[bool, List[CreateModel]]: ...
+    ) -> Union[List[CreateModel], bool]: ...
 
 class DeleteModel(ModelOperation):
     def deconstruct(self) -> Tuple[str, List[Any], Dict[str, str]]: ...
@@ -170,7 +204,7 @@ class ModelOptionOperation(ModelOperation):
 class FieldRelatedOptionOperation(ModelOptionOperation):
     def reduce(
         self, operation: Operation, in_between: List[Any], app_label: str = ...
-    ) -> Union[bool, List[Operation]]: ...
+    ) -> Union[List[Operation], bool]: ...
 
 class AlterUniqueTogether(FieldRelatedOptionOperation):
     option_name: str = ...
@@ -180,7 +214,7 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[str, List[Any], Dict[str, Union[str, Set[Tuple[str, str]]]]]: ...
+    ) -> Tuple[str, List[Any], Dict[str, Union[Set[Tuple[str, str]], str]]]: ...
     def state_forwards(self, app_label: str, state: ProjectState) -> None: ...
     def database_forwards(
         self,

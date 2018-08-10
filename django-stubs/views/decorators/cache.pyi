@@ -1,8 +1,8 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 
 
 def cache_page(
-    timeout: float,
+    timeout: Union[float, int],
     *,
     cache: Optional[Any] = ...,
     key_prefix: Optional[Any] = ...

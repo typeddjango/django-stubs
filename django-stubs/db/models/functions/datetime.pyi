@@ -137,7 +137,7 @@ class TruncBase(TimezoneMixin, Transform):
     tzinfo: Any = ...
     def __init__(
         self,
-        expression: Union[str, Col],
+        expression: Union[Col, str],
         output_field: Optional[Field] = ...,
         tzinfo: None = ...,
         **extra: Any

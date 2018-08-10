@@ -1,6 +1,9 @@
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.core.cache.backends.base import BaseCache
+from django.db.models.base import Model
+from django.db.models.query import QuerySet
+from django.http.response import HttpResponse
 
 
 class FileBasedCache(BaseCache):
@@ -12,25 +15,50 @@ class FileBasedCache(BaseCache):
     def __init__(
         self,
         dir: str,
-        params: Dict[str, Union[Dict[str, int], Callable, str, int]],
+        params: Union[
+            Dict[str, Callable],
+            Dict[str, Dict[str, int]],
+            Dict[str, int],
+            Dict[str, str],
+        ],
     ) -> None: ...
     def add(
         self,
         key: str,
-        value: Union[int, bytes, str, Dict[str, int]],
+        value: Union[Dict[str, int], bytes, int, str],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> bool: ...
     def get(
         self,
         key: str,
-        default: Optional[Union[str, int]] = ...,
+        default: Optional[Union[int, str]] = ...,
         version: Optional[int] = ...,
     ) -> Optional[str]: ...
     def set(
         self,
         key: str,
-        value: Any,
+        value: Union[
+            Dict[
+                str,
+                Union[
+                    Callable,
+                    Dict[str, int],
+                    List[int],
+                    Tuple[int, int, int, int],
+                    Type[Any],
+                    int,
+                    str,
+                ],
+            ],
+            List[Any],
+            bytes,
+            Model,
+            QuerySet,
+            HttpResponse,
+            int,
+            str,
+        ],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> None: ...

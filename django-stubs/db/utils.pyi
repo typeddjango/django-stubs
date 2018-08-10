@@ -1,6 +1,8 @@
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List, Optional, Type, Union
+from unittest.mock import Mock
 
 from django.apps.config import AppConfig
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
 
@@ -31,21 +33,46 @@ def load_backend(backend_name: str) -> Any: ...
 class ConnectionDoesNotExist(Exception): ...
 
 class ConnectionHandler:
-    databases: Dict[
-        str,
-        Union[
-            Dict[str, Union[str, int, Dict[str, None], None]],
-            Dict[str, Union[str, int, Dict[Any, Any], None]],
-            Dict[str, Union[str, Dict[str, Union[str, None]], int, None]],
-            Dict[str, Union[str, Dict[str, Union[bool, None]], int, None]],
-            Dict[str, Union[str, Dict[str, bool], int, None]],
+    databases: Union[
+        Dict[
+            str,
+            Dict[
+                str, Optional[Union[Dict[Any, Any], Dict[str, bool], int, str]]
+            ],
+        ],
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str,
+                    Optional[Union[Dict[Any, Any], Dict[str, None], int, str]],
+                ],
+                Dict[
+                    str,
+                    Optional[
+                        Union[
+                            Dict[str, Optional[bool]],
+                            Dict[str, Optional[str]],
+                            int,
+                            str,
+                        ]
+                    ],
+                ],
+            ],
         ],
     ]
-    def __init__(self, databases: Optional[Any] = ...) -> None: ...
-    def databases(self) -> Dict[str, Dict[str, str]]: ...
+    def __init__(
+        self, databases: Dict[str, Dict[str, Union[Dict[str, str], str]]] = ...
+    ) -> None: ...
+    def databases(
+        self
+    ) -> Union[
+        Dict[str, Dict[str, Union[Dict[str, bool], str]]],
+        Dict[str, Dict[str, Union[Dict[str, str], str]]],
+    ]: ...
     def ensure_defaults(self, alias: str) -> None: ...
     def prepare_test_settings(self, alias: str) -> None: ...
-    def __getitem__(self, alias: str) -> DatabaseWrapper: ...
+    def __getitem__(self, alias: str) -> BaseDatabaseWrapper: ...
     def __setitem__(self, key: Any, value: Any) -> None: ...
     def __delitem__(self, key: Any) -> None: ...
     def __iter__(self): ...
@@ -54,8 +81,8 @@ class ConnectionHandler:
 
 class ConnectionRouter:
     routers: List[Any]
-    def __init__(self, routers: Optional[Any] = ...) -> None: ...
-    def routers(self) -> List[Any]: ...
+    def __init__(self, routers: None = ...) -> None: ...
+    def routers(self) -> List[Mock]: ...
     db_for_read: Any = ...
     db_for_write: Any = ...
     def allow_relation(

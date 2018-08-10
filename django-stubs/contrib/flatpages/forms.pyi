@@ -6,12 +6,12 @@ from django.db.models.query import QuerySet
 
 class FlatpageForm(forms.ModelForm):
     auto_id: str
-    data: Dict[str, Union[str, List[int]]]
+    data: Dict[str, Union[List[int], str]]
     empty_permitted: bool
     error_class: Type[django.forms.utils.ErrorList]
     fields: collections.OrderedDict
     files: Dict[Any, Any]
-    initial: Dict[str, Union[int, str, List[django.contrib.sites.models.Site]]]
+    initial: Dict[str, Union[List[django.contrib.sites.models.Site], int, str]]
     instance: django.contrib.flatpages.models.FlatPage
     is_bound: bool
     label_suffix: str
@@ -20,4 +20,4 @@ class FlatpageForm(forms.ModelForm):
         model: Any = ...
         fields: str = ...
     def clean_url(self) -> str: ...
-    def clean(self) -> Dict[str, Union[str, bool, QuerySet]]: ...
+    def clean(self) -> Dict[str, Union[bool, QuerySet, str]]: ...

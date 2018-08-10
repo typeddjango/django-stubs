@@ -1,11 +1,20 @@
-from http.cookies import SimpleCookie
+from datetime import date, datetime
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from unittest.mock import MagicMock
 
+from django.contrib.sites.requests import RequestSite
+from django.core.paginator import Page, Paginator
+from django.db.models.base import Model
+from django.db.models.query import QuerySet
+from django.forms.forms import BaseForm
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.template.backends.django import Template
 from django.template.backends.jinja2 import Template
-from django.utils.safestring import SafeText
+from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.detail import DetailView
+from django.views.generic.list import (ListView,
+                                       MultipleObjectTemplateResponseMixin)
 
 from .loader import get_template, select_template
 
@@ -18,33 +27,145 @@ class SimpleTemplateResponse(HttpResponse):
     status_code: int
     rendering_attrs: Any = ...
     template_name: Union[
-        str, django.template.backends.django.Template, List[str]
+        List[str], django.template.backends.django.Template, str
     ] = ...
     context_data: Optional[
-        Union[Dict[str, str], Dict[str, Union[int, Callable]]]
+        Union[Dict[str, Union[Callable, int]], Dict[str, str]]
     ] = ...
     using: Optional[str] = ...
     def __init__(
         self,
-        template: Union[str, Template, List[str]],
-        context: Any = ...,
+        template: Union[List[str], Template, str],
+        context: Optional[
+            Union[
+                Dict[
+                    str, Optional[Union[List[Dict[str, str]], bool, ListView]]
+                ],
+                Dict[
+                    str,
+                    Optional[
+                        Union[
+                            bool,
+                            date,
+                            Page,
+                            Paginator,
+                            QuerySet,
+                            MultipleObjectTemplateResponseMixin,
+                        ]
+                    ],
+                ],
+                Dict[str, Union[Callable, int]],
+                Dict[str, Union[Dict[str, str], DetailView]],
+                Dict[
+                    str,
+                    Union[
+                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
+                        bool,
+                        Page,
+                        Paginator,
+                        ListView,
+                    ],
+                ],
+                Dict[str, Union[List[str], str]],
+                Dict[
+                    str,
+                    Union[RequestSite, BaseForm, TemplateResponseMixin, str],
+                ],
+                Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
+                MagicMock,
+            ]
+        ] = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
-        charset: None = ...,
+        charset: Optional[str] = ...,
         using: Optional[str] = ...,
     ) -> None: ...
     def resolve_template(
-        self, template: Union[str, List[str]]
+        self, template: Union[List[str], Template, str]
     ) -> Union[Template, Template]: ...
-    def resolve_context(self, context: Any) -> Any: ...
+    def resolve_context(
+        self,
+        context: Optional[
+            Union[
+                Dict[
+                    str, Optional[Union[List[Dict[str, str]], bool, ListView]]
+                ],
+                Dict[
+                    str,
+                    Optional[
+                        Union[
+                            bool,
+                            date,
+                            Page,
+                            Paginator,
+                            QuerySet,
+                            MultipleObjectTemplateResponseMixin,
+                        ]
+                    ],
+                ],
+                Dict[str, Union[Callable, int]],
+                Dict[str, Union[Dict[str, str], DetailView]],
+                Dict[
+                    str,
+                    Union[
+                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
+                        bool,
+                        Page,
+                        Paginator,
+                        ListView,
+                    ],
+                ],
+                Dict[str, Union[List[str], str]],
+                Dict[
+                    str,
+                    Union[RequestSite, BaseForm, TemplateResponseMixin, str],
+                ],
+                Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
+                MagicMock,
+            ]
+        ],
+    ) -> Optional[
+        Union[
+            Dict[str, Optional[Union[List[Dict[str, str]], bool, ListView]]],
+            Dict[
+                str,
+                Optional[
+                    Union[
+                        bool,
+                        date,
+                        Page,
+                        Paginator,
+                        QuerySet,
+                        MultipleObjectTemplateResponseMixin,
+                    ]
+                ],
+            ],
+            Dict[str, Union[Callable, int]],
+            Dict[str, Union[Dict[str, str], DetailView]],
+            Dict[
+                str,
+                Union[
+                    List[Dict[str, Optional[Union[datetime, Model, str]]]],
+                    bool,
+                    Page,
+                    Paginator,
+                    ListView,
+                ],
+            ],
+            Dict[str, Union[List[str], str]],
+            Dict[str, Union[RequestSite, BaseForm, TemplateResponseMixin, str]],
+            Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
+            MagicMock,
+        ]
+    ]: ...
     @property
-    def rendered_content(self) -> SafeText: ...
+    def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
     content: Any = ...
-    def render(self) -> TemplateResponse: ...
+    def render(self) -> SimpleTemplateResponse: ...
     @property
     def is_rendered(self) -> bool: ...
-    def __iter__(self): ...
+    def __iter__(self) -> Any: ...
     @property
     def content(self): ...
     @content.setter
@@ -54,16 +175,88 @@ class TemplateResponse(SimpleTemplateResponse):
     client: django.test.client.Client
     closed: bool
     context: django.template.context.RequestContext
-    context_data: Any
+    context_data: Optional[
+        Union[
+            Dict[
+                str,
+                Optional[
+                    Union[
+                        List[Dict[str, str]],
+                        bool,
+                        django.views.generic.list.ListView,
+                    ]
+                ],
+            ],
+            Dict[
+                str,
+                Optional[
+                    Union[
+                        bool,
+                        datetime.date,
+                        django.core.paginator.Page,
+                        django.core.paginator.Paginator,
+                        django.db.models.query.QuerySet,
+                        django.views.generic.list.MultipleObjectTemplateResponseMixin,
+                    ]
+                ],
+            ],
+            Dict[str, Union[Callable, int]],
+            Dict[
+                str,
+                Union[Dict[str, str], django.views.generic.detail.DetailView],
+            ],
+            Dict[
+                str,
+                Union[
+                    List[
+                        Dict[
+                            str,
+                            Optional[
+                                Union[
+                                    datetime.datetime,
+                                    django.db.models.base.Model,
+                                    str,
+                                ]
+                            ],
+                        ]
+                    ],
+                    bool,
+                    django.core.paginator.Page,
+                    django.core.paginator.Paginator,
+                    django.views.generic.list.ListView,
+                ],
+            ],
+            Dict[str, Union[List[str], str]],
+            Dict[
+                str,
+                Union[
+                    django.contrib.sites.requests.RequestSite,
+                    django.forms.forms.BaseForm,
+                    django.views.generic.base.TemplateResponseMixin,
+                    str,
+                ],
+            ],
+            Dict[
+                str,
+                Union[
+                    django.db.models.base.Model,
+                    django.forms.forms.BaseForm,
+                    django.views.generic.base.TemplateResponseMixin,
+                    str,
+                ],
+            ],
+            unittest.mock.MagicMock,
+        ]
+    ]
     cookies: http.cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
-    request: Dict[str, str]
+    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
     resolver_match: django.utils.functional.SimpleLazyObject
     status_code: int
     template_name: Union[
-        str, django.template.backends.django.Template, List[str]
+        List[str], django.template.backends.django.Template, str
     ]
     templates: List[django.template.base.Template]
     using: Optional[str]
@@ -72,8 +265,46 @@ class TemplateResponse(SimpleTemplateResponse):
     def __init__(
         self,
         request: HttpRequest,
-        template: Union[str, Template, List[str]],
-        context: Any = ...,
+        template: Union[List[str], Template, str],
+        context: Optional[
+            Union[
+                Dict[
+                    str, Optional[Union[List[Dict[str, str]], bool, ListView]]
+                ],
+                Dict[
+                    str,
+                    Optional[
+                        Union[
+                            bool,
+                            date,
+                            Page,
+                            Paginator,
+                            QuerySet,
+                            MultipleObjectTemplateResponseMixin,
+                        ]
+                    ],
+                ],
+                Dict[str, Union[Callable, int]],
+                Dict[str, Union[Dict[str, str], DetailView]],
+                Dict[
+                    str,
+                    Union[
+                        List[Dict[str, Optional[Union[datetime, Model, str]]]],
+                        bool,
+                        Page,
+                        Paginator,
+                        ListView,
+                    ],
+                ],
+                Dict[str, Union[List[str], str]],
+                Dict[
+                    str,
+                    Union[RequestSite, BaseForm, TemplateResponseMixin, str],
+                ],
+                Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
+                MagicMock,
+            ]
+        ] = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
         charset: None = ...,

@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import Any, Iterator, List, Optional
+from datetime import date, datetime
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 from django.core.serializers import base
 from django.core.serializers.base import DeserializedObject
@@ -24,10 +25,175 @@ class Serializer(base.Serializer):
     def handle_field(self, obj: Model, field: Field) -> None: ...
     def handle_fk_field(self, obj: Model, field: ForeignKey) -> None: ...
     def handle_m2m_field(self, obj: Model, field: ManyToManyField) -> None: ...
-    def getvalue(self): ...
+    def getvalue(self) -> List[OrderedDict]: ...
 
 def Deserializer(
-    object_list: List,
+    object_list: Union[
+        List[
+            Dict[
+                str,
+                Union[
+                    Dict[str, Union[List[Any], List[int], datetime, int, str]],
+                    int,
+                    str,
+                ],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Optional[Union[Dict[str, Optional[str]], str]]],
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[List[List[str]], List[str], str]],
+                        int,
+                        str,
+                    ],
+                ],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str, Optional[Union[Dict[str, Union[float, int, str]], str]]
+                ],
+                Dict[str, Optional[Union[Dict[str, str], str]]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Union[Dict[Any, Any], date, str]],
+                Dict[str, Union[Dict[Any, Any], float, str]],
+                Dict[str, Union[Dict[Any, Any], int, str]],
+                Dict[str, Union[Dict[str, List[Any]], int, str]],
+                Dict[str, Union[Dict[str, List[int]], int, str]],
+                Dict[str, Union[Dict[str, None], int, str]],
+                Dict[str, Union[Dict[str, Union[List[Any], List[str]]], str]],
+                Dict[
+                    str,
+                    Union[Dict[str, Union[List[List[str]], List[str]]], str],
+                ],
+                Dict[str, Union[Dict[str, Union[int, str]], int, str]],
+                Dict[str, Union[Dict[str, bool], int, str]],
+                Dict[str, Union[Dict[str, date], int, str]],
+                Dict[str, Union[Dict[str, datetime], int, str]],
+                Dict[str, Union[Dict[str, float], int, str]],
+                Dict[str, Union[Dict[str, int], int, str]],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Union[Dict[str, List[Any]], int, str]],
+                Dict[str, Union[Dict[str, Union[List[Any], str]], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Union[Dict[str, List[str]], int, str]],
+                Dict[str, Union[Dict[str, None], int, str]],
+                Dict[str, Union[Dict[str, Optional[str]], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[List[Any], List[List[str]], bool, str]],
+                        int,
+                        str,
+                    ],
+                ],
+                Dict[str, Union[Dict[str, Union[List[Any], str]], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[List[Any], List[int], bool, str]],
+                        int,
+                        str,
+                    ],
+                ],
+                Dict[str, Union[Dict[str, Union[List[Any], str]], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Union[Dict[str, Union[List[Any], str]], int, str]],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[List[List[str]], int, str]], int, str
+                    ],
+                ],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str, Union[Dict[str, Union[List[List[str]], str]], int, str]
+                ],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[List[Union[int, str]], int, str]],
+                        int,
+                        str,
+                    ],
+                ],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[List[int], datetime, int, str]],
+                        int,
+                        str,
+                    ],
+                ],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[
+                    str, Union[Dict[str, Union[List[int], int, str]], int, str]
+                ],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Union[Dict[str, Union[List[int], str]], int, str]],
+                Dict[str, Union[Dict[str, str], int, str]],
+            ]
+        ],
+        List[
+            Union[
+                Dict[str, Union[Dict[str, Union[List[str], str]], int, str]],
+                Dict[str, Union[Dict[str, str], str]],
+            ]
+        ],
+    ],
     *,
     using: Any = ...,
     ignorenonexistent: bool = ...,

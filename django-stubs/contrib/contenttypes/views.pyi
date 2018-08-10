@@ -6,6 +6,6 @@ from django.http.response import HttpResponseRedirect
 
 def shortcut(
     request: HttpRequest,
-    content_type_id: Union[str, int],
-    object_id: Union[str, int],
+    content_type_id: Union[int, str],
+    object_id: Union[int, str],
 ) -> HttpResponseRedirect: ...

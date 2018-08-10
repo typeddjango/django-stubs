@@ -14,6 +14,6 @@ class ImageFile(File):
     def height(self) -> int: ...
 
 def get_image_dimensions(
-    file_or_path: Union[BytesIO, BufferedReader, str, ImageFile],
+    file_or_path: Union[BufferedReader, BytesIO, ImageFile, str],
     close: bool = ...,
 ) -> Any: ...

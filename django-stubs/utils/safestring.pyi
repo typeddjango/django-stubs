@@ -15,5 +15,5 @@ class SafeText(str, SafeData):
 SafeString = SafeText
 
 def mark_safe(
-    s: Union[Callable, str, BoundField]
-) -> Union[Callable, str, BoundField]: ...
+    s: Union[Callable, BoundField, str]
+) -> Union[Callable, BoundField, str]: ...

@@ -4,11 +4,9 @@ from django.forms import Form
 
 
 class ManagementForm(Form):
-    auto_id: Union[str, bool]
+    auto_id: Union[bool, str]
     cleaned_data: Dict[str, Optional[int]]
-    data: Union[
-        Dict[str, Union[int, str, List[int]]], django.http.request.QueryDict
-    ]
+    data: Dict[str, Union[List[int], int, str]]
     empty_permitted: bool
     error_class: Type[django.forms.utils.ErrorList]
     fields: collections.OrderedDict

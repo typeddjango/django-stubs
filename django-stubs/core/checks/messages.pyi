@@ -1,4 +1,10 @@
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Type, Union
+
+from django.contrib.admin.options import ModelAdmin
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db.models.base import Model
+from django.db.models.fields import Field
+from django.db.models.manager import Manager
 
 DEBUG: int
 INFO: int
@@ -17,10 +23,19 @@ class CheckMessage:
         level: int,
         msg: str,
         hint: Optional[str] = ...,
-        obj: Any = ...,
+        obj: Optional[
+            Union[
+                Callable,
+                Type[Union[ModelAdmin, Model]],
+                GenericForeignKey,
+                Field,
+                Manager,
+                str,
+            ]
+        ] = ...,
         id: Optional[str] = ...,
     ) -> None: ...
-    def __eq__(self, other: Union[str, CheckMessage]) -> bool: ...
+    def __eq__(self, other: Union[CheckMessage, str]) -> bool: ...
     def is_serious(self, level: int = ...) -> bool: ...
     def is_silenced(self) -> bool: ...
 

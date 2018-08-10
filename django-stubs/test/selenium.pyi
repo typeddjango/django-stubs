@@ -10,7 +10,7 @@ class SeleniumTestCaseBase:
         cls: Type[SeleniumTestCaseBase],
         name: str,
         bases: Tuple[Type[SeleniumTestCase]],
-        attrs: Dict[str, Union[str, List[str], Callable]],
+        attrs: Dict[str, Union[Callable, List[str], str]],
     ) -> Type[SeleniumTestCase]: ...
     @classmethod
     def import_webdriver(cls, browser: Any): ...

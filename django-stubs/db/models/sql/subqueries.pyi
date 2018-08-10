@@ -1,10 +1,12 @@
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from datetime import date, datetime, time
+from decimal import Decimal
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
 from django.db.models.base import Model
-from django.db.models.expressions import Func
+from django.db.models.expressions import Combinable
 from django.db.models.fields import Field
+from django.db.models.fields.files import FieldFile
 from django.db.models.query import QuerySet
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
@@ -51,10 +53,7 @@ class DeleteQuery(Query):
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
-    alias_map: Union[
-        collections.OrderedDict,
-        Dict[str, django.db.models.sql.datastructures.BaseTable],
-    ] = ...
+    alias_map: Dict[str, django.db.models.sql.datastructures.BaseTable] = ...
     where: django.db.models.sql.where.WhereNode = ...
     def do_query(self, table: str, where: WhereNode, using: str) -> int: ...
     def delete_batch(
@@ -65,7 +64,7 @@ class DeleteQuery(Query):
 class UpdateQuery(Query):
     alias_map: collections.OrderedDict
     alias_refcount: Dict[str, int]
-    annotation_select_mask: None
+    annotation_select_mask: Optional[Set[Any]]
     base_table: str
     combinator: None
     combinator_all: bool
@@ -80,7 +79,7 @@ class UpdateQuery(Query):
     explain_query: bool
     external_aliases: Set[Any]
     extra_order_by: Tuple
-    extra_select_mask: None
+    extra_select_mask: Optional[Set[Any]]
     extra_tables: Tuple
     filter_is_sticky: bool
     group_by: Optional[bool]
@@ -89,8 +88,17 @@ class UpdateQuery(Query):
     max_depth: int
     model: Type[django.db.models.base.Model]
     order_by: Tuple
-    related_ids: None
-    related_updates: Dict[Any, Any]
+    related_ids: Optional[List[int]]
+    related_updates: Union[
+        Dict[
+            Type[django.db.models.base.Model],
+            List[Tuple[django.db.models.fields.CharField, None, str]],
+        ],
+        Dict[
+            Type[django.db.models.base.Model],
+            List[Tuple[django.db.models.fields.IntegerField, None, int]],
+        ],
+    ]
     select: Tuple
     select_for_update: bool
     select_for_update_nowait: bool
@@ -102,55 +110,114 @@ class UpdateQuery(Query):
     subquery: bool
     table_map: Dict[str, List[str]]
     used_aliases: Set[str]
-    values: Union[
-        List[
-            Tuple[
-                django.db.models.fields.Field,
-                None,
-                Union[str, datetime.date, int, None],
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.related.ForeignKey,
-                Type[django.db.models.base.Model],
-                django.db.models.base.Model,
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.related.ForeignKey,
-                Type[django.db.models.base.Model],
-                None,
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.CharField,
-                Type[django.db.models.base.Model],
-                str,
-            ]
-        ],
+    values: List[
+        Tuple[
+            django.db.models.fields.Field,
+            Optional[
+                Union[
+                    bytes,
+                    datetime.date,
+                    datetime.time,
+                    decimal.Decimal,
+                    django.db.models.base.Model,
+                    django.db.models.expressions.Expression,
+                    django.db.models.fields.files.FieldFile,
+                    float,
+                    int,
+                    memoryview,
+                    str,
+                    uuid.UUID,
+                ]
+            ],
+            Optional[
+                Union[
+                    bytes,
+                    datetime.date,
+                    datetime.time,
+                    decimal.Decimal,
+                    django.db.models.base.Model,
+                    django.db.models.expressions.Expression,
+                    django.db.models.fields.files.FieldFile,
+                    float,
+                    int,
+                    memoryview,
+                    str,
+                    uuid.UUID,
+                ]
+            ],
+        ]
     ]
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def clone(self): ...
+    def clone(self) -> UpdateQuery: ...
     where: django.db.models.sql.where.WhereNode = ...
-    def update_batch(self, pk_list: Any, values: Any, using: Any) -> None: ...
+    def update_batch(
+        self,
+        pk_list: List[int],
+        values: Union[Dict[str, None], Dict[str, int]],
+        using: str,
+    ) -> None: ...
     def add_update_values(
-        self, values: Dict[str, Union[Model, Func, UUID, datetime]]
+        self,
+        values: Union[
+            Dict[str, None],
+            Dict[str, Union[bool, str]],
+            Dict[str, Union[datetime, str]],
+            Dict[str, Union[Model, int]],
+            Dict[str, Combinable],
+            Dict[str, UUID],
+        ],
     ) -> None: ...
-    def add_update_fields(self, values_seq: List) -> None: ...
+    def add_update_fields(
+        self,
+        values_seq: List[
+            Tuple[
+                Field,
+                Optional[
+                    Union[
+                        Type[Model],
+                        date,
+                        time,
+                        Decimal,
+                        Model,
+                        Combinable,
+                        files.FieldFile,
+                        float,
+                        int,
+                        memoryview,
+                        str,
+                        UUID,
+                    ]
+                ],
+                Optional[
+                    Union[
+                        bytes,
+                        date,
+                        time,
+                        Decimal,
+                        Model,
+                        Combinable,
+                        files.FieldFile,
+                        float,
+                        int,
+                        memoryview,
+                        str,
+                        UUID,
+                    ]
+                ],
+            ]
+        ],
+    ) -> None: ...
     def add_related_update(
-        self, model: Any, field: Any, value: Any
+        self, model: Type[Model], field: Field, value: Union[int, str]
     ) -> None: ...
-    def get_related_updates(self) -> List[Any]: ...
+    def get_related_updates(self) -> List[UpdateQuery]: ...
 
 class InsertQuery(Query):
     alias_map: collections.OrderedDict
-    alias_refcount: Dict[Any, Any]
+    alias_refcount: Dict[str, int]
     annotation_select_mask: None
     combinator: None
     combinator_all: bool
@@ -182,7 +249,7 @@ class InsertQuery(Query):
     select_related: bool
     standard_ordering: bool
     subquery: bool
-    table_map: Dict[Any, Any]
+    table_map: Dict[str, List[str]]
     used_aliases: Set[Any]
     values_select: Tuple
     where: django.db.models.sql.where.WhereNode

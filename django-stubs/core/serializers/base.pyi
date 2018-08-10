@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from io import BufferedReader, StringIO, TextIOWrapper
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 from uuid import UUID
@@ -18,10 +20,10 @@ class DeserializationError(Exception):
     @classmethod
     def WithData(
         cls,
-        original_exc: Union[ValidationError, ObjectDoesNotExist],
+        original_exc: Union[ObjectDoesNotExist, ValidationError],
         model: str,
-        fk: Union[str, int],
-        field_value: Optional[Union[str, List[str]]],
+        fk: Union[int, str],
+        field_value: Optional[Union[List[str], str]],
     ) -> DeserializationError: ...
 
 class M2MDeserializationError(Exception):
@@ -29,8 +31,8 @@ class M2MDeserializationError(Exception):
     pk: List[str] = ...
     def __init__(
         self,
-        original_exc: Union[ValidationError, ObjectDoesNotExist],
-        pk: Union[str, List[str]],
+        original_exc: Union[ObjectDoesNotExist, ValidationError],
+        pk: Union[List[str], str],
     ) -> None: ...
 
 class ProgressBar:
@@ -55,7 +57,7 @@ class Serializer:
     first: bool = ...
     def serialize(
         self,
-        queryset: Union[QuerySet, List[Model], Iterator[Any]],
+        queryset: Union[Iterator[Any], List[Model], QuerySet],
         *,
         stream: Optional[Any] = ...,
         fields: Optional[Any] = ...,
@@ -64,7 +66,7 @@ class Serializer:
         progress_output: Optional[Any] = ...,
         object_count: int = ...,
         **options: Any
-    ) -> Optional[Union[str, bytes, List[OrderedDict]]]: ...
+    ) -> Optional[Union[List[OrderedDict], bytes, str]]: ...
     def start_serialization(self) -> None: ...
     def end_serialization(self) -> None: ...
     def start_object(self, obj: Any) -> None: ...
@@ -72,14 +74,14 @@ class Serializer:
     def handle_field(self, obj: Any, field: Any) -> None: ...
     def handle_fk_field(self, obj: Any, field: Any) -> None: ...
     def handle_m2m_field(self, obj: Any, field: Any) -> None: ...
-    def getvalue(self) -> Optional[Union[str, bytes]]: ...
+    def getvalue(self) -> Optional[Union[bytes, str]]: ...
 
 class Deserializer:
     options: Any = ...
     stream: Any = ...
     def __init__(
         self,
-        stream_or_string: Union[str, TextIOWrapper, BufferedReader],
+        stream_or_string: Union[BufferedReader, TextIOWrapper, str],
         **options: Any
     ) -> None: ...
     def __iter__(self) -> Deserializer: ...
@@ -89,14 +91,29 @@ class DeserializedObject:
     object: django.db.models.base.Model = ...
     m2m_data: Dict[Any, Any] = ...
     def __init__(
-        self, obj: Model, m2m_data: Optional[Dict[str, List[int]]] = ...
+        self,
+        obj: Model,
+        m2m_data: Optional[Dict[str, Union[List[Any], List[int]]]] = ...,
     ) -> None: ...
     def save(
         self, save_m2m: bool = ..., using: Optional[str] = ..., **kwargs: Any
     ) -> None: ...
 
 def build_instance(
-    Model: Type[Model], data: Dict[str, Any], db: str
+    Model: Type[Model],
+    data: Union[
+        Dict[str, Optional[Union[int, str]]],
+        Dict[str, Optional[datetime]],
+        Dict[str, Optional[timedelta]],
+        Dict[str, Optional[UUID]],
+        Dict[str, Union[date, int, str]],
+        Dict[str, Union[time, int]],
+        Dict[str, Union[Decimal, int, str]],
+        Dict[str, Union[float, int, str]],
+        Dict[str, Union[int, memoryview]],
+        Dict[str, Union[int, UUID]],
+    ],
+    db: str,
 ) -> Model: ...
 def deserialize_m2m_values(
     field: ManyToManyField,
@@ -105,6 +122,6 @@ def deserialize_m2m_values(
 ) -> List[int]: ...
 def deserialize_fk_value(
     field: ForeignKey,
-    field_value: Optional[Union[int, Tuple[str], str, List[str]]],
+    field_value: Optional[Union[List[str], Tuple[str], int, str]],
     using: str,
-) -> Optional[Union[str, UUID, int]]: ...
+) -> Optional[Union[int, str, UUID]]: ...

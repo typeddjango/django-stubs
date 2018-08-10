@@ -1,5 +1,5 @@
 from contextlib import ContextDecorator
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 
@@ -31,7 +31,7 @@ def gettext(message: str) -> str: ...
 
 ugettext = gettext
 
-def ngettext(singular: str, plural: str, number: float) -> str: ...
+def ngettext(singular: str, plural: str, number: Union[float, int]) -> str: ...
 
 ungettext = ngettext
 

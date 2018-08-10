@@ -1,124 +1,405 @@
-from typing import Any, Optional
+from collections import OrderedDict
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from uuid import UUID
 
 from django import forms
+from django.contrib.admin.sites import AdminSite, DefaultAdminSite
+from django.contrib.auth.forms import (ReadOnlyPasswordHashField,
+                                       ReadOnlyPasswordHashWidget)
+from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.query_utils import Q
+from django.forms.fields import (BooleanField, CharField, Field, FileField,
+                                 IntegerField, SplitDateTimeField, URLField)
+from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
+from django.forms.widgets import (CheckboxInput, ChoiceWidget, DateInput,
+                                  Media, Select, TimeInput, Widget)
+from django.http.request import QueryDict
+from django.utils.datastructures import MultiValueDict
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     @property
-    def media(self): ...
+    def media(self) -> Media: ...
     verbose_name: Any = ...
     is_stacked: Any = ...
     def __init__(
         self,
-        verbose_name: Any,
-        is_stacked: Any,
-        attrs: Optional[Any] = ...,
-        choices: Any = ...,
+        verbose_name: str,
+        is_stacked: bool,
+        attrs: None = ...,
+        choices: Tuple = ...,
     ) -> None: ...
-    def get_context(self, name: Any, value: Any, attrs: Any): ...
+    def get_context(
+        self,
+        name: str,
+        value: Union[List[Any], str],
+        attrs: Optional[Dict[str, str]],
+    ) -> Dict[
+        str,
+        Dict[
+            str,
+            Union[
+                Dict[str, Union[int, str]],
+                List[
+                    Tuple[
+                        None,
+                        List[Dict[str, Union[Dict[Any, Any], int, str]]],
+                        int,
+                    ]
+                ],
+                List[str],
+                bool,
+                str,
+            ],
+        ],
+    ]: ...
 
 class AdminDateWidget(forms.DateInput):
+    attrs: Dict[str, str]
+    input_type: str
     @property
-    def media(self): ...
+    def media(self) -> Media: ...
     def __init__(
-        self, attrs: Optional[Any] = ..., format: Optional[Any] = ...
+        self,
+        attrs: Optional[Dict[str, Union[int, str]]] = ...,
+        format: None = ...,
     ) -> None: ...
 
 class AdminTimeWidget(forms.TimeInput):
+    attrs: Dict[str, str]
+    input_type: str
     @property
-    def media(self): ...
+    def media(self) -> Media: ...
     def __init__(
-        self, attrs: Optional[Any] = ..., format: Optional[Any] = ...
+        self,
+        attrs: Optional[Dict[str, Union[int, str]]] = ...,
+        format: None = ...,
     ) -> None: ...
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
+    attrs: Dict[Any, Any]
+    widgets: List[django.forms.widgets.DateTimeBaseInput]
     template_name: str = ...
-    def __init__(self, attrs: Optional[Any] = ...) -> None: ...
-    def get_context(self, name: Any, value: Any, attrs: Any): ...
+    def __init__(self, attrs: None = ...) -> None: ...
+    def get_context(
+        self,
+        name: str,
+        value: Optional[Union[List[str], datetime]],
+        attrs: Optional[Dict[str, Union[bool, str]]],
+    ) -> Union[
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str,
+                    Optional[
+                        Union[
+                            Dict[str, Union[bool, str]],
+                            List[
+                                Dict[
+                                    str,
+                                    Optional[
+                                        Union[
+                                            Dict[str, Union[bool, str]],
+                                            bool,
+                                            str,
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            bool,
+                            str,
+                        ]
+                    ],
+                ],
+                str,
+            ],
+        ],
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str,
+                    Optional[
+                        Union[
+                            Dict[str, str],
+                            List[
+                                Dict[
+                                    str,
+                                    Optional[Union[Dict[str, str], bool, str]],
+                                ]
+                            ],
+                            bool,
+                            str,
+                        ]
+                    ],
+                ],
+                str,
+            ],
+        ],
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[Any, Any],
+                        List[Dict[str, Union[Dict[str, str], bool, str]]],
+                        bool,
+                        str,
+                    ],
+                ],
+                str,
+            ],
+        ],
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[bool, str]],
+                        List[
+                            Dict[
+                                str,
+                                Union[Dict[str, Union[bool, str]], bool, str],
+                            ]
+                        ],
+                        bool,
+                        str,
+                    ],
+                ],
+                str,
+            ],
+        ],
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, str],
+                        List[Dict[str, Union[Dict[str, str], bool, str]]],
+                        bool,
+                        str,
+                    ],
+                ],
+                str,
+            ],
+        ],
+    ]: ...
 
 class AdminRadioSelect(forms.RadioSelect):
+    attrs: Dict[str, str]
     template_name: str = ...
 
 class AdminFileWidget(forms.ClearableFileInput):
+    attrs: Dict[Any, Any]
     template_name: str = ...
 
-def url_params_from_lookup_dict(lookups: Any): ...
+def url_params_from_lookup_dict(
+    lookups: Union[
+        Dict[str, Callable],
+        Dict[str, List[str]],
+        Dict[str, Tuple[str, str]],
+        Dict[str, Union[int, str]],
+        Q,
+    ]
+) -> Dict[str, str]: ...
 
 class ForeignKeyRawIdWidget(forms.TextInput):
+    attrs: Dict[Any, Any]
     template_name: str = ...
-    rel: Any = ...
-    admin_site: Any = ...
-    db: Any = ...
+    rel: django.db.models.fields.reverse_related.ManyToOneRel = ...
+    admin_site: django.contrib.admin.sites.AdminSite = ...
+    db: None = ...
     def __init__(
         self,
-        rel: Any,
-        admin_site: Any,
-        attrs: Optional[Any] = ...,
-        using: Optional[Any] = ...,
+        rel: ForeignObjectRel,
+        admin_site: Union[AdminSite, DefaultAdminSite],
+        attrs: None = ...,
+        using: None = ...,
     ) -> None: ...
-    def get_context(self, name: Any, value: Any, attrs: Any): ...
-    def base_url_parameters(self): ...
-    def url_parameters(self): ...
-    def label_and_url_for_value(self, value: Any): ...
+    def get_context(
+        self,
+        name: str,
+        value: Optional[Union[List[int], int, str, UUID]],
+        attrs: Optional[Dict[str, Union[bool, str]]],
+    ) -> Union[
+        Dict[
+            str,
+            Union[
+                Dict[
+                    str, Optional[Union[Dict[str, Union[bool, str]], bool, str]]
+                ],
+                str,
+            ],
+        ],
+        Dict[str, Union[Dict[str, Union[Dict[Any, Any], bool, str]], str]],
+        Dict[str, Union[Dict[str, Union[Dict[str, str], bool, str]], str]],
+    ]: ...
+    def base_url_parameters(self) -> Dict[str, str]: ...
+    def url_parameters(self) -> Dict[str, str]: ...
+    def label_and_url_for_value(
+        self, value: Union[int, str, UUID]
+    ) -> Tuple[str, str]: ...
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
+    admin_site: django.contrib.admin.sites.AdminSite
+    attrs: Dict[Any, Any]
+    db: None
+    rel: django.db.models.fields.reverse_related.ManyToManyRel
     template_name: str = ...
-    def get_context(self, name: Any, value: Any, attrs: Any): ...
-    def url_parameters(self): ...
-    def label_and_url_for_value(self, value: Any): ...
-    def value_from_datadict(self, data: Any, files: Any, name: Any): ...
-    def format_value(self, value: Any): ...
+    def get_context(
+        self,
+        name: str,
+        value: Optional[List[int]],
+        attrs: Optional[Dict[str, str]],
+    ) -> Union[
+        Dict[str, Union[Dict[str, Union[Dict[Any, Any], bool, str]], str]],
+        Dict[str, Union[Dict[str, Union[Dict[str, str], bool, str]], str]],
+    ]: ...
+    def url_parameters(self) -> Dict[Any, Any]: ...
+    def label_and_url_for_value(self, value: List[int]) -> Tuple[str, str]: ...
+    def value_from_datadict(
+        self, data: QueryDict, files: MultiValueDict, name: str
+    ) -> None: ...
+    def format_value(self, value: Optional[List[int]]) -> str: ...
 
 class RelatedFieldWidgetWrapper(forms.Widget):
     template_name: str = ...
-    needs_multipart_form: Any = ...
-    attrs: Any = ...
-    choices: Any = ...
-    widget: Any = ...
-    rel: Any = ...
-    can_add_related: Any = ...
-    can_change_related: Any = ...
-    can_delete_related: Any = ...
-    can_view_related: Any = ...
-    admin_site: Any = ...
+    needs_multipart_form: bool = ...
+    attrs: Dict[Any, Any] = ...
+    choices: django.forms.models.ModelChoiceIterator = ...
+    widget: django.contrib.admin.widgets.AutocompleteSelect = ...
+    rel: django.db.models.fields.reverse_related.ManyToOneRel = ...
+    can_add_related: bool = ...
+    can_change_related: bool = ...
+    can_delete_related: bool = ...
+    can_view_related: bool = ...
+    admin_site: django.contrib.admin.sites.AdminSite = ...
     def __init__(
         self,
-        widget: Any,
-        rel: Any,
-        admin_site: Any,
-        can_add_related: Optional[Any] = ...,
+        widget: ChoiceWidget,
+        rel: ForeignObjectRel,
+        admin_site: Union[AdminSite, DefaultAdminSite],
+        can_add_related: Optional[bool] = ...,
         can_change_related: bool = ...,
         can_delete_related: bool = ...,
         can_view_related: bool = ...,
     ) -> None: ...
-    def __deepcopy__(self, memo: Any): ...
+    def __deepcopy__(
+        self,
+        memo: Union[
+            Dict[
+                int,
+                Union[
+                    List[
+                        Union[
+                            AdminEmailInputWidget,
+                            AdminTextInputWidget,
+                            FilteredSelectMultiple,
+                            RelatedFieldWidgetWrapper,
+                            ReadOnlyPasswordHashField,
+                            ReadOnlyPasswordHashWidget,
+                            BooleanField,
+                            CharField,
+                            ModelMultipleChoiceField,
+                            CheckboxInput,
+                        ]
+                    ],
+                    List[
+                        Union[
+                            AdminFileWidget,
+                            AdminTextInputWidget,
+                            CharField,
+                            FileField,
+                        ]
+                    ],
+                    List[Union[AdminIntegerFieldWidget, IntegerField]],
+                    List[
+                        Union[
+                            AdminSplitDateTime,
+                            AdminTextInputWidget,
+                            AdminTextareaWidget,
+                            RelatedFieldWidgetWrapper,
+                            CharField,
+                            SplitDateTimeField,
+                            ModelChoiceField,
+                            DateInput,
+                            Select,
+                            TimeInput,
+                        ]
+                    ],
+                    OrderedDict,
+                    Field,
+                    Widget,
+                ],
+            ],
+            Dict[
+                int,
+                Union[
+                    List[Union[AdminURLFieldWidget, URLField]],
+                    OrderedDict,
+                    AdminURLFieldWidget,
+                    URLField,
+                    ModelChoiceField,
+                ],
+            ],
+        ],
+    ) -> RelatedFieldWidgetWrapper: ...
     @property
-    def is_hidden(self): ...
+    def is_hidden(self) -> bool: ...
     @property
-    def media(self): ...
-    def get_related_url(self, info: Any, action: Any, *args: Any): ...
-    def get_context(self, name: Any, value: Any, attrs: Any): ...
-    def value_from_datadict(self, data: Any, files: Any, name: Any): ...
-    def value_omitted_from_data(self, data: Any, files: Any, name: Any): ...
-    def id_for_label(self, id_: Any): ...
+    def media(self) -> Media: ...
+    def get_related_url(
+        self, info: Tuple[str, str], action: str, *args: Any
+    ) -> str: ...
+    def get_context(
+        self,
+        name: str,
+        value: Optional[Union[int, str]],
+        attrs: Optional[Dict[str, Union[bool, str]]],
+    ) -> Dict[str, Union[bool, str]]: ...
+    def value_from_datadict(
+        self, data: QueryDict, files: MultiValueDict, name: str
+    ) -> Optional[Union[List[str], str]]: ...
+    def value_omitted_from_data(
+        self, data: Dict[Any, Any], files: Dict[Any, Any], name: str
+    ) -> bool: ...
+    def id_for_label(self, id_: str) -> str: ...
 
 class AdminTextareaWidget(forms.Textarea):
-    def __init__(self, attrs: Optional[Any] = ...) -> None: ...
+    attrs: Dict[str, str]
+    def __init__(self, attrs: None = ...) -> None: ...
 
 class AdminTextInputWidget(forms.TextInput):
-    def __init__(self, attrs: Optional[Any] = ...) -> None: ...
+    attrs: Dict[str, str]
+    input_type: str
+    def __init__(self, attrs: None = ...) -> None: ...
 
 class AdminEmailInputWidget(forms.EmailInput):
-    def __init__(self, attrs: Optional[Any] = ...) -> None: ...
+    attrs: Dict[str, str]
+    input_type: str
+    def __init__(self, attrs: None = ...) -> None: ...
 
 class AdminURLFieldWidget(forms.URLInput):
+    attrs: Dict[str, str]
+    input_type: str
     template_name: str = ...
-    def __init__(self, attrs: Optional[Any] = ...) -> None: ...
-    def get_context(self, name: Any, value: Any, attrs: Any): ...
+    def __init__(self, attrs: None = ...) -> None: ...
+    def get_context(
+        self, name: str, value: Optional[str], attrs: Optional[Dict[str, str]]
+    ) -> Dict[
+        str, Union[Dict[str, Optional[Union[Dict[str, str], bool, str]]], str]
+    ]: ...
 
 class AdminIntegerFieldWidget(forms.NumberInput):
+    attrs: Dict[str, str]
+    input_type: str
     class_name: str = ...
-    def __init__(self, attrs: Optional[Any] = ...) -> None: ...
+    def __init__(self, attrs: None = ...) -> None: ...
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name: str = ...
@@ -134,19 +415,37 @@ class AutocompleteMixin:
     attrs: Any = ...
     def __init__(
         self,
-        rel: Any,
-        admin_site: Any,
-        attrs: Optional[Any] = ...,
-        choices: Any = ...,
-        using: Optional[Any] = ...,
+        rel: ForeignObjectRel,
+        admin_site: Union[AdminSite, DefaultAdminSite],
+        attrs: Optional[Dict[str, str]] = ...,
+        choices: Tuple = ...,
+        using: None = ...,
     ) -> None: ...
-    def get_url(self): ...
+    def get_url(self) -> str: ...
     def build_attrs(
-        self, base_attrs: Any, extra_attrs: Optional[Any] = ...
-    ): ...
-    def optgroups(self, name: Any, value: Any, attr: Optional[Any] = ...): ...
+        self,
+        base_attrs: Dict[str, str],
+        extra_attrs: Optional[Dict[str, Union[bool, str]]] = ...,
+    ) -> Dict[str, Union[bool, str]]: ...
+    def optgroups(
+        self,
+        name: str,
+        value: List[str],
+        attr: Dict[str, Union[bool, str]] = ...,
+    ) -> List[
+        Tuple[
+            None,
+            List[
+                Union[
+                    Dict[str, Union[Dict[Any, Any], bool, str]],
+                    Dict[str, Union[Dict[str, bool], Set[str], int, str]],
+                ]
+            ],
+            int,
+        ]
+    ]: ...
     @property
-    def media(self): ...
+    def media(self) -> Media: ...
 
 class AutocompleteSelect(AutocompleteMixin, forms.Select): ...
 class AutocompleteSelectMultiple(AutocompleteMixin, forms.SelectMultiple): ...

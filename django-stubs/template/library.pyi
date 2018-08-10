@@ -16,26 +16,26 @@ class Library:
     def __init__(self) -> None: ...
     def tag(
         self,
-        name: Optional[Union[str, Callable]] = ...,
+        name: Optional[Union[Callable, str]] = ...,
         compile_function: Optional[Union[Callable, str]] = ...,
     ) -> Callable: ...
     def tag_function(self, func: Callable) -> Callable: ...
     def filter(
         self,
-        name: Optional[Union[str, Callable]] = ...,
-        filter_func: Optional[Union[str, Callable]] = ...,
+        name: Optional[Union[Callable, str]] = ...,
+        filter_func: Optional[Union[Callable, str]] = ...,
         **flags: Any
     ) -> Callable: ...
     def filter_function(self, func: Callable, **flags: Any) -> Callable: ...
     def simple_tag(
         self,
-        func: Optional[Union[str, Callable]] = ...,
+        func: Optional[Union[Callable, str]] = ...,
         takes_context: Optional[bool] = ...,
         name: Optional[str] = ...,
     ) -> Callable: ...
     def inclusion_tag(
         self,
-        filename: Union[str, Template],
+        filename: Union[Template, str],
         func: None = ...,
         takes_context: Optional[bool] = ...,
         name: Optional[str] = ...,
@@ -56,14 +56,8 @@ class TagHelperNode(Node):
     def get_resolved_arguments(
         self, context: Context
     ) -> Union[
-        Tuple[
-            Union[Dict[str, int], Dict[str, Union[int, SafeText]]],
-            Union[Dict[str, int], Dict[str, Union[int, SafeText]]],
-        ],
-        Tuple[
-            Union[Dict[Any, Any], Dict[str, SafeText]],
-            Union[Dict[Any, Any], Dict[str, SafeText]],
-        ],
+        Tuple[Dict[Any, Any], Dict[Any, Any]],
+        Tuple[List[int], Dict[str, Union[SafeText, int]]],
     ]: ...
 
 class SimpleNode(TagHelperNode):
@@ -91,14 +85,14 @@ class InclusionNode(TagHelperNode):
     origin: django.template.base.Origin
     takes_context: Optional[bool]
     token: django.template.base.Token
-    filename: Union[str, django.template.base.Template] = ...
+    filename: Union[django.template.base.Template, str] = ...
     def __init__(
         self,
         func: Callable,
         takes_context: Optional[bool],
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],
-        filename: Optional[Union[str, Template]],
+        filename: Optional[Union[Template, str]],
     ) -> None: ...
     def render(self, context: Context) -> SafeText: ...
 

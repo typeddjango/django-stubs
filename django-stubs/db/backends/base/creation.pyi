@@ -17,7 +17,7 @@ class BaseDatabaseCreation:
     def set_as_test_mirror(
         self,
         primary_settings_dict: Dict[
-            str, Optional[Union[str, int, Dict[str, None]]]
+            str, Optional[Union[Dict[str, None], int, str]]
         ],
     ) -> None: ...
     def serialize_db_to_string(self) -> str: ...

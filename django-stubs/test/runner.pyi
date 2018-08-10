@@ -14,10 +14,20 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     buffer: bool
     descriptions: bool
     dots: bool
-    errors: List[Tuple[unittest.case.TestCase, str, str]]
+    errors: List[
+        Union[
+            Tuple[django.test.testcases.TestCase, str, str],
+            Tuple[unittest.case._SubTest, str, str],
+        ]
+    ]
     expectedFailures: List[Any]
     failfast: bool
-    failures: List[Tuple[unittest.case.TestCase, str, str]]
+    failures: List[
+        Union[
+            Tuple[django.test.testcases.TestCase, str, str],
+            Tuple[unittest.case._SubTest, str, str],
+        ]
+    ]
     shouldStop: bool
     showAll: bool
     skipped: List[Any]
@@ -127,7 +137,7 @@ class DiscoverRunner:
     def setup_test_environment(self, **kwargs: Any) -> None: ...
     def build_suite(
         self,
-        test_labels: Union[Tuple[str, str], List[str]] = ...,
+        test_labels: Union[List[str], Tuple[str, str]] = ...,
         extra_tests: Optional[List[Any]] = ...,
         **kwargs: Any
     ) -> TestSuite: ...

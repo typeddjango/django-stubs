@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional
+from typing import Any, Callable, Dict, Iterator, List, Optional, Union
 
 from django.db.backends.sqlite3.base import (DatabaseWrapper,
                                              SQLiteCursorWrapper)
@@ -48,7 +48,9 @@ class BaseDatabaseWrapper:
     validation: Any = ...
     def __init__(
         self,
-        settings_dict: Dict[str, Any],
+        settings_dict: Dict[
+            str, Optional[Union[Dict[str, Optional[str]], int, str]]
+        ],
         alias: str = ...,
         allow_thread_sharing: bool = ...,
     ) -> None: ...

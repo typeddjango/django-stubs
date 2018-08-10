@@ -8,5 +8,5 @@ from django.contrib.postgres.validators import KeysValidator
 def deconstructible(
     *args: Any, path: Optional[Any] = ...
 ) -> Type[
-    Union[UnicodeUsernameValidator, KeysValidator, ASCIIUsernameValidator]
+    Union[ASCIIUsernameValidator, UnicodeUsernameValidator, KeysValidator]
 ]: ...

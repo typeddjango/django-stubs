@@ -1,8 +1,11 @@
-from argparse import Action, ArgumentParser, HelpFormatter, Namespace
+from argparse import (ArgumentParser, HelpFormatter, Namespace, _AppendAction,
+                      _HelpAction, _StoreAction, _StoreFalseAction,
+                      _StoreTrueAction, _VersionAction)
 from io import StringIO, TextIOBase, TextIOWrapper
 from typing import Any, Callable, List, Optional, Tuple, Union
 
-from django.apps.config import AppConfig
+from django.contrib.admin.apps import SimpleAdminConfig
+from django.contrib.auth.apps import AuthConfig
 
 
 class CommandError(Exception): ...
@@ -34,9 +37,34 @@ def no_translations(handle_func: Callable) -> Callable: ...
 class DjangoHelpFormatter(HelpFormatter):
     show_last: Any = ...
     def add_usage(
-        self, usage: None, actions: List[Action], *args: Any, **kwargs: Any
+        self,
+        usage: None,
+        actions: List[
+            Union[
+                _AppendAction,
+                _HelpAction,
+                _StoreAction,
+                _StoreFalseAction,
+                _StoreTrueAction,
+                _VersionAction,
+            ]
+        ],
+        *args: Any,
+        **kwargs: Any
     ) -> None: ...
-    def add_arguments(self, actions: List[Action]) -> None: ...
+    def add_arguments(
+        self,
+        actions: List[
+            Union[
+                _AppendAction,
+                _HelpAction,
+                _StoreAction,
+                _StoreFalseAction,
+                _StoreTrueAction,
+                _VersionAction,
+            ]
+        ],
+    ) -> None: ...
 
 class OutputWrapper(TextIOBase):
     @property
@@ -85,10 +113,10 @@ class BaseCommand:
     def run_from_argv(self, argv: List[str]) -> None: ...
     def execute(
         self, *args: Any, **options: Any
-    ) -> Optional[Union[str, Tuple]]: ...
+    ) -> Optional[Union[Tuple, str]]: ...
     def check(
         self,
-        app_configs: Optional[List[AppConfig]] = ...,
+        app_configs: Optional[List[Union[SimpleAdminConfig, AuthConfig]]] = ...,
         tags: Optional[List[str]] = ...,
         display_num_errors: bool = ...,
         include_deployment_checks: bool = ...,

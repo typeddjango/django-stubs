@@ -1,8 +1,11 @@
 from collections import OrderedDict
+from gzip import GzipFile
+from io import BufferedReader, StringIO, TextIOWrapper
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
                     Union)
 
 from django.apps.config import AppConfig
+from django.core.management.commands.loaddata import SingleZipReader
 from django.core.serializers.python import Serializer
 from django.core.serializers.xml_serializer import Deserializer, Serializer
 from django.db.models.base import Model
@@ -30,14 +33,22 @@ def get_public_serializer_formats() -> List[str]: ...
 def get_deserializer(format: str) -> Union[Callable, Type[Deserializer]]: ...
 def serialize(
     format: str,
-    queryset: Union[QuerySet, List[Model], Iterator[Any]],
+    queryset: Union[Iterator[Any], List[Model], QuerySet],
     **options: Any
-) -> Optional[Union[str, bytes, List[OrderedDict]]]: ...
+) -> Optional[Union[List[OrderedDict], bytes, str]]: ...
 def deserialize(
-    format: str, stream_or_string: Any, **options: Any
-) -> Union[Deserializer, Iterator[Any]]: ...
+    format: str,
+    stream_or_string: Union[
+        List[OrderedDict],
+        BufferedReader,
+        StringIO,
+        TextIOWrapper,
+        SingleZipReader,
+        GzipFile,
+        str,
+    ],
+    **options: Any
+) -> Union[Iterator[Any], Deserializer]: ...
 def sort_dependencies(
-    app_list: Union[
-        List[Tuple[str, List[Type[Model]]]], List[Tuple[AppConfig, None]]
-    ]
+    app_list: List[Union[Tuple[AppConfig, None], Tuple[str, List[Type[Model]]]]]
 ) -> List[Type[Model]]: ...

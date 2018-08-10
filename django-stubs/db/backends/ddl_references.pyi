@@ -39,7 +39,7 @@ class Columns(TableColumns):
         table: str,
         columns: List[str],
         quote_name: Callable,
-        col_suffixes: Union[Tuple, List[str]] = ...,
+        col_suffixes: Union[List[str], Tuple] = ...,
     ) -> None: ...
 
 class IndexName(TableColumns):

@@ -1,9 +1,12 @@
 import json
 from datetime import date, time, timedelta
 from decimal import Decimal
+from gzip import GzipFile
+from io import BufferedReader, StringIO, TextIOWrapper
 from typing import Any, Optional, Union
 from uuid import UUID
 
+from django.core.management.commands.loaddata import SingleZipReader
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.db.models.base import Model
 
@@ -21,9 +24,14 @@ class Serializer(PythonSerializer):
     def start_serialization(self) -> None: ...
     def end_serialization(self) -> None: ...
     def end_object(self, obj: Model) -> None: ...
-    def getvalue(self) -> Optional[Union[str, bytes]]: ...
+    def getvalue(self) -> Optional[Union[bytes, str]]: ...
 
-def Deserializer(stream_or_string: Any, **options: Any) -> None: ...
+def Deserializer(
+    stream_or_string: Union[
+        BufferedReader, StringIO, TextIOWrapper, SingleZipReader, GzipFile, str
+    ],
+    **options: Any
+) -> None: ...
 
 class DjangoJSONEncoder(json.JSONEncoder):
     allow_nan: bool
@@ -33,5 +41,5 @@ class DjangoJSONEncoder(json.JSONEncoder):
     skipkeys: bool
     sort_keys: bool
     def default(
-        self, o: Union[time, UUID, Decimal, date, timedelta]
+        self, o: Union[date, time, timedelta, Decimal, UUID]
     ) -> str: ...
