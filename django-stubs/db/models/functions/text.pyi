@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union, Dict, Callable
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models import Func, Transform
