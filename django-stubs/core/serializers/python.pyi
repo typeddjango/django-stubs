@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from datetime import date
 from typing import Any, Dict, Iterator, List, Optional, Union
 
 from django.core.serializers import base
@@ -29,77 +28,9 @@ class Serializer(base.Serializer):
 
 def Deserializer(
     object_list: Union[
-        List[Dict[str, Optional[Union[Dict[str, None], str]]]],
-        List[Dict[str, Optional[Union[Dict[str, Union[float, str]], str]]]],
-        List[
-            Dict[
-                str,
-                Union[Dict[str, Union[List[List[str]], int, str]], int, str],
-            ]
-        ],
-        List[
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[List[Union[int, str]], int, str]], int, str
-                ],
-            ]
-        ],
-        List[
-            Dict[
-                str,
-                Union[Dict[str, Union[List[int], date, int, str]], int, str],
-            ]
-        ],
-        List[
-            Union[
-                Dict[str, Optional[Union[Dict[str, Optional[str]], str]]],
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[List[List[str]], List[str], str]],
-                        int,
-                        str,
-                    ],
-                ],
-            ]
-        ],
-        List[
-            Union[
-                Dict[str, Union[Dict[Any, Any], date, str]],
-                Dict[str, Union[Dict[Any, Any], float, str]],
-                Dict[str, Union[Dict[str, List[int]], int, str]],
-                Dict[str, Union[Dict[str, None], int, str]],
-                Dict[str, Union[Dict[str, Union[int, str]], int, str]],
-                Dict[str, Union[Dict[str, date], int, str]],
-                Dict[str, Union[Dict[str, float], int, str]],
-            ]
-        ],
-        List[
-            Union[
-                Dict[str, Union[Dict[str, List[str]], int, str]],
-                Dict[str, Union[Dict[str, Optional[str]], int, str]],
-            ]
-        ],
-        List[
-            Union[
-                Dict[str, Union[Dict[str, Union[List[Any], str]], int, str]],
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[List[List[str]], bool, str]], int, str
-                    ],
-                ],
-            ]
-        ],
-        List[
-            Union[
-                Dict[str, Union[Dict[str, Union[List[Any], str]], int, str]],
-                Dict[
-                    str, Union[Dict[str, Union[List[int], bool, str]], int, str]
-                ],
-            ]
-        ],
+        List[Dict[str, Optional[Union[Dict[str, Optional[str]], str]]]],
+        List[Dict[str, Union[Dict[str, Union[List[int], int, str]], int, str]]],
+        List[OrderedDict],
     ],
     *,
     using: Any = ...,

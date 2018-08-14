@@ -1,16 +1,11 @@
 from datetime import date
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 from uuid import UUID
 
-from django.contrib.auth.models import AbstractUser, PermissionsMixin
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.checks.messages import Warning
-from django.core.exceptions import (MultipleObjectsReturned,
-                                    ObjectDoesNotExist, ValidationError)
-from django.db.models.fields import CharField, Field
+from django.core.exceptions import ValidationError
 from django.db.models.fields.related import ForeignKey
-from django.db.models.manager import Manager
 
 
 class Deferred: ...
@@ -19,47 +14,17 @@ DEFERRED: Any
 
 def subclass_exception(
     name: str,
-    bases: Tuple[
-        Union[Type[MultipleObjectsReturned], Type[ObjectDoesNotExist]],
-        Type[Exception],
-    ],
+    bases: Tuple[Type[Exception]],
     module: str,
     attached_to: Type[Model],
-) -> Type[Union[MultipleObjectsReturned, ObjectDoesNotExist]]: ...
+) -> Type[Exception]: ...
 
 class ModelBase(type):
     def __new__(
         cls: Type[ModelBase],
         name: str,
         bases: Tuple[Type[Model]],
-        attrs: Union[
-            Dict[str, Any],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Tuple[Tuple[int, str], Tuple[int, str]],
-                    Field,
-                    str,
-                ],
-            ],
-            Dict[str, Union[Callable, Type[Any], Field, Manager, str]],
-            Dict[str, Union[Callable, Type[PermissionsMixin.Meta], Field, str]],
-            Dict[str, Union[Callable, GenericForeignKey, Field, str]],
-            Dict[str, Union[Callable, Field, property, str]],
-            Dict[
-                str,
-                Union[
-                    Tuple[
-                        Tuple[str, Tuple[Tuple[str, str], Tuple[str, str]]],
-                        Tuple[str, str],
-                    ],
-                    CharField,
-                    str,
-                ],
-            ],
-            Dict[str, Union[Type[AbstractUser.Meta], str]],
-        ],
+        attrs: Dict[str, Any],
         **kwargs: Any
     ) -> Type[Model]: ...
     def add_to_class(cls, name: str, value: Any) -> None: ...
@@ -86,7 +51,6 @@ class Model:
             List[Optional[UUID]],
             List[Union[Decimal, int]],
             List[Union[int, UUID]],
-            List[Union[str, UUID]],
             Tuple[Union[int, str]],
         ],
     ) -> Model: ...

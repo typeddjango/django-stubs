@@ -19,9 +19,7 @@ class MigrationExecutor:
     def __init__(
         self,
         connection: Optional[
-            Union[
-                DefaultConnectionProxy, backends.base.base.BaseDatabaseWrapper
-            ]
+            Union[DefaultConnectionProxy, BaseDatabaseWrapper]
         ],
         progress_callback: Optional[Callable] = ...,
     ) -> None: ...
@@ -29,7 +27,7 @@ class MigrationExecutor:
         self,
         targets: Union[List[Tuple[str, Optional[str]]], Set[Tuple[str, str]]],
         clean_start: bool = ...,
-    ) -> List[Tuple[bool, bool]]: ...
+    ) -> List[Tuple[Migration, bool]]: ...
     def migrate(
         self,
         targets: Optional[List[Tuple[str, Optional[str]]]],

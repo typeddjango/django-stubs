@@ -31,31 +31,18 @@ class MigrationAutodetector:
     def deep_deconstruct(self, obj: Any) -> Any: ...
     def only_relation_agnostic_fields(
         self, fields: List[Tuple[str, Field]]
-    ) -> List[
-        Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Callable],
-                Dict[str, Union[Callable, bool]],
-                Dict[str, Union[bool, str]],
-                Dict[str, Union[int, str]],
-                Dict[str, bool],
-                Dict[str, int],
-            ],
-        ]
-    ]: ...
+    ) -> List[Tuple[str, List[Any], Dict[str, Union[Callable, int, str]]]]: ...
     def check_dependency(
         self,
         operation: Operation,
-        dependency: Tuple[str, str, Union[bool, str], Union[bool, str]],
+        dependency: Tuple[str, str, Optional[str], Union[bool, str]],
     ) -> bool: ...
     def add_operation(
         self,
         app_label: str,
         operation: Operation,
         dependencies: Optional[
-            List[Tuple[str, str, Union[bool, str], Union[bool, str]]]
+            List[Tuple[str, str, Optional[str], Union[bool, str]]]
         ] = ...,
         beginning: bool = ...,
     ) -> None: ...

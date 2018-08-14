@@ -1,17 +1,17 @@
-from datetime import date, datetime, time, timedelta
+from collections import OrderedDict
+from datetime import date, datetime
 from decimal import Decimal
 from itertools import chain
-from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
-                    Union)
+from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
+                    Type, Union)
 from unittest.mock import MagicMock
 from uuid import UUID
 
-from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db.models.base import Model, ModelState
 from django.db.models.expressions import Expression
 from django.db.models.fields import Field
+from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.related_descriptors import (ForwardManyToOneDescriptor,
                                                          ReverseOneToOneDescriptor)
@@ -42,16 +42,7 @@ class ValuesIterable(BaseIterable):
     chunk_size: int
     chunked_fetch: bool
     queryset: django.db.models.query.QuerySet
-    def __iter__(
-        self
-    ) -> Iterator[
-        Union[
-            Dict[str, Optional[Union[int, str]]],
-            Dict[str, Union[date, Decimal, float, str]],
-            Dict[str, Union[date, int, str]],
-            Dict[str, Union[Decimal, int]],
-        ]
-    ]: ...
+    def __iter__(self) -> Iterator[Dict[str, Optional[Union[int, str]]]]: ...
 
 class ValuesListIterable(BaseIterable):
     chunk_size: int
@@ -106,20 +97,13 @@ class QuerySet:
     def iterator(self, chunk_size: int = ...) -> Iterator[Any]: ...
     def aggregate(
         self, *args: Any, **kwargs: Any
-    ) -> Union[
-        Dict[str, Optional[int]],
-        Dict[str, Union[date, time]],
-        Dict[str, Union[Decimal, float]],
-        Dict[str, timedelta],
-    ]: ...
+    ) -> Dict[str, Optional[Union[datetime, float]]]: ...
     def count(self) -> int: ...
     def get(
         self, *args: Any, **kwargs: Any
     ) -> Union[
         Dict[str, Union[date, Decimal, float, str]],
-        Dict[str, Union[int, str]],
-        Tuple[Decimal],
-        Tuple[str, int, int],
+        Tuple[Union[Decimal, str]],
         Model,
         str,
     ]: ...
@@ -131,13 +115,7 @@ class QuerySet:
     ) -> List[Model]: ...
     def get_or_create(
         self,
-        defaults: Optional[
-            Union[
-                Dict[str, Union[Callable, str]],
-                Dict[str, Union[date, str]],
-                Dict[str, Model],
-            ]
-        ] = ...,
+        defaults: Optional[Union[Dict[str, date], Dict[str, Model]]] = ...,
         **kwargs: Any
     ) -> Tuple[Model, bool]: ...
     def update_or_create(
@@ -145,8 +123,9 @@ class QuerySet:
         defaults: Optional[
             Union[
                 Dict[str, Callable],
-                Dict[str, Union[date, str]],
+                Dict[str, date],
                 Dict[str, Model],
+                Dict[str, str],
             ]
         ] = ...,
         **kwargs: Any
@@ -171,7 +150,16 @@ class QuerySet:
     def raw(
         self,
         raw_query: str,
-        params: Any = ...,
+        params: Optional[
+            Union[
+                Dict[str, str],
+                List[datetime],
+                List[Decimal],
+                List[str],
+                Set[str],
+                Tuple[int],
+            ]
+        ] = ...,
         translations: Optional[Dict[str, str]] = ...,
         using: None = ...,
     ) -> RawQuerySet: ...
@@ -192,11 +180,7 @@ class QuerySet:
     def complex_filter(
         self,
         filter_obj: Union[
-            Dict[str, Union[int, str]],
-            Dict[str, datetime],
-            Dict[str, QuerySet],
-            Q,
-            MagicMock,
+            Dict[str, datetime], Dict[str, QuerySet], Q, MagicMock
         ],
     ) -> QuerySet: ...
     def union(self, *other_qs: Any, all: bool = ...) -> QuerySet: ...
@@ -212,7 +196,9 @@ class QuerySet:
     def distinct(self, *field_names: Any) -> QuerySet: ...
     def extra(
         self,
-        select: Optional[Union[Dict[str, int], Dict[str, str]]] = ...,
+        select: Optional[
+            Union[Dict[str, int], Dict[str, str], OrderedDict]
+        ] = ...,
         where: Optional[List[str]] = ...,
         params: Optional[Union[List[int], List[str]]] = ...,
         tables: Optional[List[str]] = ...,
@@ -255,7 +241,16 @@ class RawQuerySet:
         raw_query: str,
         model: Optional[Type[Model]] = ...,
         query: Optional[RawQuery] = ...,
-        params: Any = ...,
+        params: Optional[
+            Union[
+                Dict[str, str],
+                List[datetime],
+                List[Decimal],
+                List[str],
+                Set[str],
+                Tuple,
+            ]
+        ] = ...,
         translations: Optional[Dict[str, str]] = ...,
         using: Optional[str] = ...,
         hints: Optional[Dict[Any, Any]] = ...,
@@ -303,11 +298,8 @@ def prefetch_related_objects(
 ) -> None: ...
 def get_prefetcher(
     instance: Model, through_attr: str, to_attr: str
-) -> Union[
-    Tuple[None, bool, bool, bool],
-    Tuple[GenericForeignKey, GenericForeignKey, bool, bool],
-    Tuple[ForwardManyToOneDescriptor, ForwardManyToOneDescriptor, bool, bool],
-    Tuple[ReverseOneToOneDescriptor, ReverseOneToOneDescriptor, bool, bool],
+) -> Tuple[
+    GenericForeignKey, Union[GenericForeignKey, property], bool, bool
 ]: ...
 def prefetch_one_level(
     instances: List[Model],
@@ -331,7 +323,64 @@ class RelatedPopulator:
     remote_setter: Callable = ...
     def __init__(
         self,
-        klass_info: Dict[str, Any],
+        klass_info: Dict[
+            str,
+            Union[
+                Callable,
+                List[
+                    Dict[
+                        str,
+                        Union[
+                            Callable,
+                            List[
+                                Dict[
+                                    str,
+                                    Union[
+                                        Callable,
+                                        List[
+                                            Dict[
+                                                str,
+                                                Union[
+                                                    Callable,
+                                                    List[
+                                                        Dict[
+                                                            str,
+                                                            Union[
+                                                                Callable,
+                                                                List[int],
+                                                                Type[Model],
+                                                                bool,
+                                                                ForeignKey,
+                                                            ],
+                                                        ]
+                                                    ],
+                                                    List[int],
+                                                    Type[Model],
+                                                    bool,
+                                                    ForeignKey,
+                                                ],
+                                            ]
+                                        ],
+                                        List[int],
+                                        Type[Model],
+                                        bool,
+                                        ForeignKey,
+                                    ],
+                                ]
+                            ],
+                            List[int],
+                            Type[Model],
+                            bool,
+                            ForeignKey,
+                        ],
+                    ]
+                ],
+                List[int],
+                Type[Model],
+                bool,
+                FieldCacheMixin,
+            ],
+        ],
         select: List[Tuple[Expression, Tuple[str, List[int]], Optional[str]]],
         db: str,
     ) -> None: ...
@@ -340,54 +389,118 @@ class RelatedPopulator:
         row: Union[
             List[Optional[Union[date, int, str]]],
             List[Union[date, Decimal, float, str]],
-            List[Union[datetime, time, Decimal, int, str]],
-            Tuple[int, Optional[str], Optional[str]],
-            Tuple[int, Union[int, str], Union[float, int, str]],
-            Tuple[int, int, None, None, int, str, str, None, None, None],
-            Tuple[str, int, int, int, str, int],
+            Tuple[Union[int, str], str, int],
         ],
         from_obj: Model,
     ) -> None: ...
 
 def get_related_populators(
-    klass_info: Union[
-        Dict[str, Any],
-        Dict[str, Union[List[Dict[str, Any]], List[int], Type[Model]]],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable, List[int], Type[User], bool, ForeignKey
+    klass_info: Dict[
+        str,
+        Union[
+            Callable,
+            List[
+                Dict[
+                    str,
+                    Union[
+                        Callable,
+                        List[
+                            Dict[
+                                str,
+                                Union[
+                                    Callable,
+                                    List[
+                                        Dict[
+                                            str,
+                                            Union[
+                                                Callable,
+                                                List[
+                                                    Dict[
+                                                        str,
+                                                        Union[
+                                                            Callable,
+                                                            List[
+                                                                Dict[
+                                                                    str,
+                                                                    Union[
+                                                                        Callable,
+                                                                        List[
+                                                                            Dict[
+                                                                                str,
+                                                                                Union[
+                                                                                    Callable,
+                                                                                    List[
+                                                                                        Dict[
+                                                                                            str,
+                                                                                            Union[
+                                                                                                Callable,
+                                                                                                List[
+                                                                                                    int
+                                                                                                ],
+                                                                                                Type[
+                                                                                                    Model
+                                                                                                ],
+                                                                                                bool,
+                                                                                                ForeignKey,
+                                                                                            ],
+                                                                                        ]
+                                                                                    ],
+                                                                                    List[
+                                                                                        int
+                                                                                    ],
+                                                                                    Type[
+                                                                                        Model
+                                                                                    ],
+                                                                                    bool,
+                                                                                    ForeignKey,
+                                                                                ],
+                                                                            ]
+                                                                        ],
+                                                                        List[
+                                                                            int
+                                                                        ],
+                                                                        Type[
+                                                                            Model
+                                                                        ],
+                                                                        bool,
+                                                                        ForeignKey,
+                                                                    ],
+                                                                ]
+                                                            ],
+                                                            List[int],
+                                                            Type[Model],
+                                                            bool,
+                                                            ForeignKey,
+                                                        ],
+                                                    ]
+                                                ],
+                                                List[int],
+                                                Type[Model],
+                                                bool,
+                                                ForeignKey,
+                                            ],
+                                        ]
+                                    ],
+                                    List[int],
+                                    Type[Model],
+                                    bool,
+                                    ForeignKey,
+                                ],
+                            ]
                         ],
-                    ]
-                ],
-                List[int],
-                Type[Model],
+                        List[int],
+                        Type[Model],
+                        bool,
+                        FieldCacheMixin,
+                    ],
+                ]
             ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[
-                        str,
-                        Union[
-                            Callable,
-                            List[int],
-                            Type[ContentType],
-                            bool,
-                            ForeignKey,
-                        ],
-                    ]
-                ],
-                List[int],
-                Type[Permission],
-            ],
+            List[int],
+            Type[Model],
+            bool,
+            FieldCacheMixin,
         ],
     ],
-    select: List[Tuple[Expression, Optional[str], Optional[str]]],
+    select: List[Tuple[Expression, Tuple[str, List[bool]], Optional[str]]],
     db: str,
 ) -> List[RelatedPopulator]: ...

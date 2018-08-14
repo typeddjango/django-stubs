@@ -3,8 +3,8 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
                     Union)
 
 from django.apps.config import AppConfig
-from django.core.serializers.python import Serializer
-from django.core.serializers.xml_serializer import Deserializer, Serializer
+from django.core.serializers.base import Serializer
+from django.core.serializers.xml_serializer import Deserializer
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
@@ -22,11 +22,7 @@ def register_serializer(
     serializers: Optional[Dict[str, Any]] = ...,
 ) -> None: ...
 def unregister_serializer(format: str) -> None: ...
-def get_serializer(
-    format: str
-) -> Union[
-    Type[Union[python.Serializer, xml_serializer.Serializer]], BadSerializer
-]: ...
+def get_serializer(format: str) -> Union[Type[Serializer], BadSerializer]: ...
 def get_serializer_formats() -> List[str]: ...
 def get_public_serializer_formats() -> List[str]: ...
 def get_deserializer(format: str) -> Union[Callable, Type[Deserializer]]: ...

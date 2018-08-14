@@ -65,143 +65,7 @@ class TestContextDecorator:
 class override_settings(TestContextDecorator):
     attr_name: None
     kwarg_name: None
-    options: Union[
-        Dict[str, Dict[str, Callable]],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Callable, Dict[str, Union[Dict[str, bool], bool]]
-                        ],
-                    ],
-                    Dict[
-                        str, Union[Dict[str, Union[Dict[str, bool], bool]], int]
-                    ],
-                    Dict[
-                        str, Union[Dict[str, Union[Dict[str, bool], bool]], str]
-                    ],
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[Callable, Dict[str, int], str]],
-                    Dict[str, Union[Dict[str, int], int, str]],
-                ],
-            ],
-        ],
-        Dict[str, List[Dict[str, Union[Dict[Any, Any], bool, str]]]],
-        Dict[
-            str,
-            List[
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[str, List[Tuple[str, Dict[str, str]]]],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    Dict[str, Union[Dict[str, List[str]], str]],
-                ]
-            ],
-        ],
-        Dict[
-            str,
-            List[
-                Union[
-                    Dict[str, Union[Dict[str, int], bool, str]],
-                    Dict[str, Union[Dict[str, str], str]],
-                ]
-            ],
-        ],
-        Dict[str, List[unittest.mock.Mock]],
-        Dict[str, Optional[Union[List[str], bool]]],
-        Dict[str, Optional[Union[bool, str]]],
-        Dict[str, Tuple[Tuple[str, str], Tuple[str, str]]],
-        Dict[str, Type[Any]],
-        Dict[str, Union[Callable, bool]],
-        Dict[str, Union[Dict[int, None], bool]],
-        Dict[
-            str,
-            Union[
-                Dict[str, Dict[str, Optional[str]]], List[Tuple[str, str]], str
-            ],
-        ],
-        Dict[str, Union[Dict[str, Optional[str]], List[str]]],
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Dict[str, Union[List[str], bool, str]]], int
-                    ],
-                ],
-                str,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[Callable, str]],
-                        Dict[str, Union[Dict[str, int], str]],
-                        Dict[str, Union[int, str]],
-                    ],
-                ],
-                bool,
-            ],
-        ],
-        Dict[
-            str,
-            Union[Dict[str, Union[Dict[str, str], str]], List[str], int, str],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[str, Union[Dict[str, List[Any]], List[Any], bool, str]]
-                ],
-                List[str],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[
-                    Dict[str, Union[Dict[str, List[str]], List[str], bool, str]]
-                ],
-                List[Union[Tuple[str, str], str]],
-                int,
-                str,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                List[Dict[str, Union[Dict[str, Tuple[str]], List[str], str]]],
-                List[str],
-                int,
-                str,
-            ],
-        ],
-        Dict[str, Union[List[Dict[str, Union[List[Any], bool, str]]], int]],
-        Dict[str, Union[List[int], List[str], str]],
-        Dict[str, Union[Tuple[str], str]],
-        Dict[str, Union[float, str]],
-        Dict[str, bytes],
-    ] = ...
+    options: Dict[str, Any] = ...
     def __init__(self, **kwargs: Any) -> None: ...
     wrapped: Union[django.conf.Settings, django.conf.UserSettingsHolder] = ...
     def enable(self) -> None: ...
@@ -217,9 +81,7 @@ class modify_settings(override_settings):
     attr_name: None
     kwarg_name: None
     wrapped: Union[django.conf.Settings, django.conf.UserSettingsHolder]
-    operations: List[
-        Tuple[str, Union[Dict[str, List[str]], Dict[str, str]]]
-    ] = ...
+    operations: List[Tuple[str, Dict[str, Union[List[str], str]]]] = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def save_options(self, test_func: Type[SimpleTestCase]) -> None: ...
     options: Dict[str, List[Union[Tuple[str, str], str]]] = ...
@@ -262,9 +124,8 @@ class CaptureQueriesContext:
 class ignore_warnings(TestContextDecorator):
     attr_name: None
     kwarg_name: None
-    ignore_kwargs: Union[
-        Dict[str, Type[django.utils.deprecation.RemovedInDjango30Warning]],
-        Dict[str, str],
+    ignore_kwargs: Dict[
+        str, Union[Type[django.utils.deprecation.RemovedInDjango30Warning], str]
     ] = ...
     filter_func: Callable = ...
     def __init__(self, **kwargs: Any) -> None: ...

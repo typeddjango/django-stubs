@@ -1,18 +1,16 @@
 from collections import OrderedDict
-from datetime import date, datetime, time
-from decimal import Decimal
+from datetime import date, datetime
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models.base import Model
-from django.db.models.fields.files import FieldFile
 from django.db.models.query import QuerySet
 from django.forms.boundfield import BoundField
 from django.forms.fields import Field
-from django.forms.models import ModelForm
 from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass
+from django.http.request import QueryDict
+from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeText
 
 
@@ -22,7 +20,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         name: str,
         bases: Tuple[Type[BaseForm]],
         attrs: OrderedDict,
-    ) -> Type[Union[Form, ModelForm]]: ...
+    ) -> Type[BaseForm]: ...
     @classmethod
     def __prepare__(
         metacls: Any, name: str, bases: Tuple[Type[BaseForm]], **kwds: Any
@@ -47,22 +45,18 @@ class BaseForm:
         self,
         data: Optional[
             Union[
-                Dict[str, Optional[Union[List[int], datetime, int, str]]],
+                Dict[str, Union[List[int], int, str]],
                 Dict[str, Union[List[str], str]],
-                Dict[str, Union[datetime, Decimal, int, str]],
+                QueryDict,
             ]
         ] = ...,
-        files: Optional[Dict[str, SimpleUploadedFile]] = ...,
+        files: Optional[
+            Union[Dict[str, SimpleUploadedFile], MultiValueDict]
+        ] = ...,
         auto_id: Optional[Union[bool, str]] = ...,
         prefix: Optional[str] = ...,
         initial: Optional[
-            Union[
-                Dict[str, List[int]],
-                Dict[str, Optional[Union[List[Model], date, int, str]]],
-                Dict[str, Union[List[Model], Model, QuerySet]],
-                Dict[str, Union[List[str], str]],
-                Dict[str, Union[FieldFile, int, str]],
-            ]
+            Union[Dict[str, List[int]], Dict[str, date], Dict[str, str]]
         ] = ...,
         error_class: Type[ErrorList] = ...,
         label_suffix: None = ...,
@@ -91,12 +85,8 @@ class BaseForm:
     def full_clean(self) -> None: ...
     def clean(
         self
-    ) -> Union[
-        Dict[str, Optional[Union[int, str]]],
-        Dict[str, Union[date, time, Decimal, float]],
-        Dict[str, Union[date, str]],
-        Dict[str, SimpleUploadedFile],
-        Dict[str, QuerySet],
+    ) -> Dict[
+        str, Optional[Union[datetime, SimpleUploadedFile, QuerySet, str]]
     ]: ...
     def has_changed(self) -> bool: ...
     def changed_data(self) -> List[str]: ...

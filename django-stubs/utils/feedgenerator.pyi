@@ -52,15 +52,7 @@ class SyndicationFeed:
     def num_items(self): ...
     def root_attributes(self) -> Dict[Any, Any]: ...
     def add_root_elements(self, handler: Any) -> None: ...
-    def item_attributes(
-        self,
-        item: Union[
-            Dict[str, Any],
-            Dict[
-                str, Optional[Union[List[Enclosure], List[str], datetime, str]]
-            ],
-        ],
-    ) -> Dict[Any, Any]: ...
+    def item_attributes(self, item: Dict[str, Any]) -> Dict[Any, Any]: ...
     def add_item_elements(self, handler: Any, item: Any) -> None: ...
     def write(self, outfile: Any, encoding: Any) -> None: ...
     def writeString(self, encoding: str) -> str: ...
@@ -96,10 +88,7 @@ class RssUserland091Feed(RssFeed):
     ) -> None: ...
 
 class Rss201rev2Feed(RssFeed):
-    feed: Union[
-        Dict[str, Optional[Union[List[str], str]]],
-        Dict[str, Optional[Union[Tuple, str]]],
-    ]
+    feed: Dict[str, Optional[Union[List[str], Tuple, str]]]
     items: Union[
         List[Dict[str, Any]],
         List[
@@ -117,20 +106,11 @@ class Rss201rev2Feed(RssFeed):
         ],
     ]
     def add_item_elements(
-        self,
-        handler: SimplerXMLGenerator,
-        item: Union[
-            Dict[str, Any],
-            Dict[
-                str, Optional[Union[List[Enclosure], List[str], datetime, str]]
-            ],
-        ],
+        self, handler: SimplerXMLGenerator, item: Dict[str, Any]
     ) -> None: ...
 
 class Atom1Feed(SyndicationFeed):
-    feed: Union[
-        Dict[str, Optional[Union[Tuple, str]]], Dict[str, Union[List[str], str]]
-    ]
+    feed: Dict[str, Optional[Union[List[str], Tuple, str]]]
     items: Union[
         List[
             Dict[
@@ -160,11 +140,9 @@ class Atom1Feed(SyndicationFeed):
     def add_item_elements(
         self,
         handler: SimplerXMLGenerator,
-        item: Union[
-            Dict[
-                str, Optional[Union[List[Enclosure], List[str], datetime, str]]
-            ],
-            Dict[str, Optional[Union[List[str], Tuple, datetime, str]]],
+        item: Dict[
+            str,
+            Optional[Union[List[Enclosure], List[str], Tuple, datetime, str]],
         ],
     ) -> None: ...
 

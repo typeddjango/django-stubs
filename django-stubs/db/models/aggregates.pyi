@@ -40,9 +40,7 @@ class Aggregate(Func):
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         **extra_context: Any
-    ) -> Tuple[
-        str, Union[List[Union[int, str]], List[Decimal], List[float]]
-    ]: ...
+    ) -> Tuple[str, Union[List[Decimal], List[int]]]: ...
 
 class Avg(Aggregate):
     filter: None

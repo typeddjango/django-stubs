@@ -1,5 +1,4 @@
-from datetime import date
-from decimal import Decimal
+from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.db import DefaultConnectionProxy
@@ -28,83 +27,24 @@ class WhereNode(tree.Node):
         self,
         compiler: SQLCompiler,
         connection: Union[DefaultConnectionProxy, DatabaseWrapper],
-    ) -> Tuple[
-        str,
-        Union[
-            List[Optional[int]],
-            List[Union[date, str]],
-            List[Union[Decimal, int]],
-            List[Union[int, str]],
-            List[float],
-            List[memoryview],
-        ],
-    ]: ...
+    ) -> Tuple[str, List[Union[int, str]]]: ...
     def get_group_by_cols(self) -> List[Expression]: ...
     def get_source_expressions(self) -> List[FieldGetDbPrepValueMixin]: ...
-    children: Union[
-        List[
-            Union[
-                django.db.models.lookups.BuiltinLookup,
-                django.db.models.sql.where.ExtraWhere,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.lookups.BuiltinLookup,
-                django.db.models.sql.where.WhereNode,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.lookups.FieldGetDbPrepValueMixin,
-                django.db.models.lookups.IsNull,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.lookups.FieldGetDbPrepValueMixin,
-                django.db.models.query_utils.QueryWrapper,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.lookups.FieldGetDbPrepValueMixin,
-                django.db.models.sql.where.NothingNode,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.lookups.FieldGetDbPrepValueMixin,
-                django.db.models.sql.where.WhereNode,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.lookups.Lookup,
-                django.db.models.sql.where.NothingNode,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.sql.where.NothingNode,
-                django.db.models.sql.where.WhereNode,
-            ]
-        ],
-        List[
-            Union[
-                django.db.models.sql.where.SubqueryConstraint,
-                django.db.models.sql.where.WhereNode,
-            ]
-        ],
-        List[django.db.models.fields.related_lookups.RelatedLookupMixin],
+    children: List[
+        Union[
+            django.db.models.lookups.BuiltinLookup,
+            django.db.models.sql.where.WhereNode,
+        ]
     ] = ...
     def set_source_expressions(
         self, children: List[FieldGetDbPrepValueMixin]
     ) -> None: ...
-    def relabel_aliases(self, change_map: Dict[Optional[str], str]) -> None: ...
+    def relabel_aliases(
+        self, change_map: Union[Dict[Optional[str], str], OrderedDict]
+    ) -> None: ...
     def clone(self) -> WhereNode: ...
     def relabeled_clone(
-        self, change_map: Dict[Optional[str], str]
+        self, change_map: Union[Dict[Optional[str], str], OrderedDict]
     ) -> WhereNode: ...
     def contains_aggregate(self) -> bool: ...
     def contains_over_clause(self) -> bool: ...

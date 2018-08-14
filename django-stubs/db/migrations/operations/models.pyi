@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.postgres.fields.citext import CIText
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
-from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
@@ -39,12 +39,11 @@ class CreateModel(ModelOperation):
         fields: List[Tuple[str, Union[CIText, Field]]],
         options: Optional[
             Union[
-                Dict[str, Union[List[Any], bool]],
                 Dict[str, Union[Set[Tuple[str, str]], Tuple[str], str]],
                 Dict[str, Union[bool, str]],
             ]
         ] = ...,
-        bases: Optional[Tuple[Union[Type[Model], str]]] = ...,
+        bases: Optional[Tuple[Type[AbstractBaseUser]]] = ...,
         managers: Optional[List[Tuple[str, Manager]]] = ...,
     ) -> None: ...
     def deconstruct(

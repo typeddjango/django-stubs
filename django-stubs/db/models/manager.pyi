@@ -1,6 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type
 
-from django.contrib.auth.models import Group, Permission
 from django.contrib.sites.managers import CurrentSiteManager
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
@@ -45,13 +44,6 @@ class ManagerDescriptor:
 class EmptyManager(Manager):
     creation_counter: int
     name: None
-    model: Optional[
-        Type[
-            Union[
-                django.contrib.auth.models.Group,
-                django.contrib.auth.models.Permission,
-            ]
-        ]
-    ] = ...
-    def __init__(self, model: Type[Union[Group, Permission]]) -> None: ...
+    model: Optional[Type[django.db.models.base.Model]] = ...
+    def __init__(self, model: Type[Model]) -> None: ...
     def get_queryset(self) -> QuerySet: ...

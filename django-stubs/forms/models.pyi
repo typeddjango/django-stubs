@@ -8,10 +8,8 @@ from uuid import UUID
 
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.flatpages.forms import FlatpageForm
-from django.core.files.base import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.base import Model
-from django.db.models.fields.files import FieldFile
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
@@ -19,7 +17,9 @@ from django.forms.fields import CharField, ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.utils import ErrorList
-from django.forms.widgets import Widget
+from django.forms.widgets import Input, Widget
+from django.http.request import QueryDict
+from django.utils.datastructures import MultiValueDict
 
 ALL_FIELDS: str
 
@@ -27,17 +27,12 @@ def model_to_dict(
     instance: Model,
     fields: Optional[Union[List[Union[Callable, str]], Tuple[str]]] = ...,
     exclude: Optional[Union[List[Union[Callable, str]], Tuple[str]]] = ...,
-) -> Union[
-    Dict[str, Optional[Union[List[Model], date, int, str]]],
-    Dict[str, Optional[FieldFile]],
-    Dict[str, Union[FieldFile, int, str]],
-    Dict[str, float],
-]: ...
+) -> Dict[str, Optional[Union[bool, date, float]]]: ...
 def fields_for_model(
     model: Type[Model],
     fields: Optional[Union[List[Union[Callable, str]], Tuple]] = ...,
     exclude: Optional[Union[List[Union[Callable, str]], Tuple]] = ...,
-    widgets: Optional[Dict[str, Union[Type[Widget], Widget]]] = ...,
+    widgets: Optional[Union[Dict[str, Type[Input]], Dict[str, Widget]]] = ...,
     formfield_callback: Optional[Union[Callable, str]] = ...,
     localized_fields: Optional[Union[Tuple[str], str]] = ...,
     labels: Optional[Dict[str, str]] = ...,
@@ -53,11 +48,9 @@ class ModelFormOptions:
     fields: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
     exclude: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
     widgets: Optional[
-        Dict[
-            str,
-            Union[
-                Type[django.forms.widgets.Widget], django.forms.widgets.Widget
-            ],
+        Union[
+            Dict[str, Type[django.forms.widgets.Input]],
+            Dict[str, django.forms.widgets.Widget],
         ]
     ] = ...
     localized_fields: Optional[Union[Tuple[str], str]] = ...
@@ -97,19 +90,15 @@ class BaseModelForm(BaseForm):
                 Dict[str, Optional[Union[List[int], datetime, int, str]]],
                 Dict[str, Union[List[str], str]],
                 Dict[str, Union[datetime, Decimal, int, str]],
+                QueryDict,
             ]
         ] = ...,
-        files: Optional[Dict[str, SimpleUploadedFile]] = ...,
+        files: Optional[
+            Union[Dict[str, SimpleUploadedFile], MultiValueDict]
+        ] = ...,
         auto_id: Union[bool, str] = ...,
         prefix: None = ...,
-        initial: Optional[
-            Union[
-                Dict[str, List[int]],
-                Dict[str, Union[List[Model], Model, QuerySet]],
-                Dict[str, Union[List[str], str]],
-                Dict[str, int],
-            ]
-        ] = ...,
+        initial: Optional[Union[Dict[str, List[int]], Dict[str, int]]] = ...,
         error_class: Type[ErrorList] = ...,
         label_suffix: None = ...,
         empty_permitted: bool = ...,
@@ -117,15 +106,7 @@ class BaseModelForm(BaseForm):
         use_required_attribute: None = ...,
         renderer: Any = ...,
     ) -> None: ...
-    def clean(
-        self
-    ) -> Union[
-        Dict[str, Optional[Union[bool, datetime, QuerySet, str]]],
-        Dict[str, Optional[Union[date, Model, QuerySet, str]]],
-        Dict[str, Optional[Union[Model, int, str]]],
-        Dict[str, Union[datetime, Decimal, int, str]],
-        Dict[str, Union[File, str]],
-    ]: ...
+    def clean(self) -> Dict[str, Any]: ...
     def validate_unique(self) -> None: ...
     save_m2m: Any = ...
     def save(self, commit: bool = ...) -> Model: ...
@@ -282,7 +263,7 @@ class ModelChoiceIterator:
     field: django.forms.models.ModelChoiceField = ...
     queryset: Optional[django.db.models.query.QuerySet] = ...
     def __init__(self, field: ModelChoiceField) -> None: ...
-    def __iter__(self) -> Iterator[Tuple[str, str]]: ...
+    def __iter__(self) -> Iterator[Tuple[Union[int, str], str]]: ...
     def __len__(self) -> int: ...
     def __bool__(self) -> bool: ...
     def choice(self, obj: Model) -> Tuple[int, str]: ...
@@ -321,9 +302,7 @@ class ModelChoiceField(ChoiceField):
     ) -> None: ...
     def get_limit_choices_to(
         self
-    ) -> Optional[
-        Union[Dict[str, Union[int, str]], Dict[str, datetime], Q, MagicMock]
-    ]: ...
+    ) -> Optional[Union[Dict[str, datetime], Q, MagicMock]]: ...
     def __deepcopy__(
         self,
         memo: Dict[
@@ -359,87 +338,19 @@ class ModelMultipleChoiceField(ModelChoiceField):
     default_error_messages: Any = ...
     def __init__(self, queryset: QuerySet, **kwargs: Any) -> None: ...
     def to_python(
-        self,
-        value: Union[
-            List[str],
-            Tuple[
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-                int,
-            ],
-        ],
+        self, value: Union[List[str], Tuple[int, ...]]
     ) -> List[Model]: ...
     def clean(
         self,
         value: Optional[
             Union[
-                List[Dict[str, str]],
-                List[List[str]],
-                List[Union[int, str]],
-                List[Model],
-                Tuple,
-                str,
+                List[Dict[str, str]], List[List[str]], List[Model], Tuple, str
             ]
         ],
     ) -> QuerySet: ...
     def prepare_value(
         self, value: Any
-    ) -> Optional[
-        Union[
-            List[Dict[str, str]],
-            List[List[str]],
-            List[Union[int, str]],
-            int,
-            str,
-        ]
-    ]: ...
+    ) -> Optional[Union[List[Dict[str, str]], List[List[str]], int, str]]: ...
     def has_changed(
         self,
         initial: Optional[Union[List[Model], QuerySet, str]],

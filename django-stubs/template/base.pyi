@@ -35,11 +35,9 @@ class TokenType(Enum):
 
 class VariableDoesNotExist(Exception):
     msg: str = ...
-    params: Union[Tuple[Dict[str, str]], Tuple[str, Any]] = ...
+    params: Tuple[Union[Dict[str, str], str]] = ...
     def __init__(
-        self,
-        msg: str,
-        params: Union[Tuple[Dict[str, str]], Tuple[str, Any]] = ...,
+        self, msg: str, params: Tuple[Union[Dict[str, str], str]] = ...
     ) -> None: ...
 
 class Origin:
@@ -158,10 +156,14 @@ class FilterExpression:
     filters: List[
         Tuple[
             Callable,
-            Union[
-                List[Any],
-                List[Tuple[bool, django.template.base.Variable]],
-                List[Tuple[bool, django.utils.safestring.SafeText]],
+            List[
+                Tuple[
+                    bool,
+                    Union[
+                        django.template.base.Variable,
+                        django.utils.safestring.SafeText,
+                    ],
+                ]
             ],
         ]
     ] = ...
@@ -191,11 +193,7 @@ class Variable:
     def resolve(
         self,
         context: Union[
-            Dict[str, Dict[str, Union[int, str]]],
-            Dict[str, Union[int, str]],
-            Context,
-            int,
-            str,
+            Dict[str, Dict[str, Union[int, str]]], Context, int, str
         ],
     ) -> Any: ...
 

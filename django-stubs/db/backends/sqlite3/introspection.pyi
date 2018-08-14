@@ -39,10 +39,4 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     ) -> Optional[str]: ...
     def get_constraints(
         self, cursor: CursorWrapper, table_name: str
-    ) -> Dict[
-        str,
-        Union[
-            Dict[str, Union[List[str], Tuple[str, str], bool]],
-            Dict[str, Union[List[str], bool, str]],
-        ],
-    ]: ...
+    ) -> Dict[str, Dict[str, Union[List[str], bool]]]: ...

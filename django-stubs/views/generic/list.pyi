@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Page, Paginator
 from django.db.models.query import QuerySet
@@ -22,7 +21,9 @@ class MultipleObjectMixin(ContextMixin):
     def get_ordering(self) -> Optional[Union[Tuple[str, str], str]]: ...
     def paginate_queryset(
         self, queryset: Union[List[Dict[str, str]], QuerySet], page_size: int
-    ) -> Tuple[Paginator, Page, bool, bool]: ...
+    ) -> Tuple[
+        Paginator, Page, Union[List[Dict[str, str]], QuerySet], bool
+    ]: ...
     def get_paginate_by(
         self, queryset: Optional[Union[List[Dict[str, str]], QuerySet]]
     ) -> Optional[int]: ...
@@ -41,15 +42,7 @@ class MultipleObjectMixin(ContextMixin):
     ) -> Optional[str]: ...
     def get_context_data(
         self, *, object_list: Optional[Any] = ..., **kwargs: Any
-    ) -> Union[
-        Dict[str, Any],
-        Dict[
-            str,
-            Optional[Union[List[Dict[str, str]], bool, MultipleObjectMixin]],
-        ],
-        Dict[str, Union[List[Dict[str, str]], bool, Page, Paginator, ListView]],
-        Dict[str, Union[bool, AutocompleteJsonView, Page, Paginator, QuerySet]],
-    ]: ...
+    ) -> Dict[str, Any]: ...
 
 class BaseListView(MultipleObjectMixin, View):
     object_list: Any = ...

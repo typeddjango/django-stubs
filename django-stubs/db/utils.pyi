@@ -33,22 +33,20 @@ def load_backend(backend_name: str) -> Any: ...
 class ConnectionDoesNotExist(Exception): ...
 
 class ConnectionHandler:
-    databases: Union[
-        Dict[
-            str, Dict[str, Optional[Union[Dict[str, Optional[bool]], int, str]]]
-        ],
-        Dict[
-            str, Dict[str, Optional[Union[Dict[str, Optional[str]], int, str]]]
-        ],
+    databases: Dict[
+        str, Dict[str, Optional[Union[Dict[str, Optional[bool]], int, str]]]
     ]
     def __init__(
         self, databases: Dict[str, Dict[str, Union[Dict[str, str], str]]] = ...
     ) -> None: ...
     def databases(
         self
-    ) -> Union[
-        Dict[str, Dict[str, Union[Dict[str, bool], str]]],
-        Dict[str, Dict[str, Union[Dict[str, str], str]]],
+    ) -> Dict[
+        str,
+        Union[
+            Dict[str, Union[Dict[str, bool], str]],
+            Dict[str, Union[Dict[str, str], str]],
+        ],
     ]: ...
     def ensure_defaults(self, alias: str) -> None: ...
     def prepare_test_settings(self, alias: str) -> None: ...

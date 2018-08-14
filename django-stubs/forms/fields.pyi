@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.fields.files import FieldFile
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
-from django.forms.widgets import Input, Select, Widget
+from django.forms.widgets import Input, Widget
 
 
 class Field:
@@ -44,37 +44,33 @@ class Field:
         label_suffix: Optional[Any] = ...
     ) -> None: ...
     def prepare_value(self, value: Any) -> Any: ...
-    def to_python(self, value: Any) -> Any: ...
+    def to_python(
+        self,
+        value: Optional[Union[List[None], List[str], datetime, float, str]],
+    ) -> Optional[Union[List[None], List[str], datetime, float, str]]: ...
     def validate(self, value: Any) -> None: ...
     def run_validators(self, value: Any) -> None: ...
     def clean(self, value: Any) -> Any: ...
     def bound_data(self, data: Any, initial: Any) -> Any: ...
     def widget_attrs(self, widget: Widget) -> Dict[Any, Any]: ...
-    def has_changed(self, initial: Any, data: Optional[str]) -> bool: ...
+    def has_changed(
+        self,
+        initial: Optional[Union[datetime, Decimal, float, str]],
+        data: Optional[str],
+    ) -> bool: ...
     def get_bound_field(
         self, form: BaseForm, field_name: str
     ) -> BoundField: ...
     def __deepcopy__(
         self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    List[Tuple[str, str]],
-                    List[Union[List[Tuple[str, str]], Field, Widget]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[Union[List[Any], ChoiceField, Select]],
-                    OrderedDict,
-                    ChoiceField,
-                    Select,
-                ],
+        memo: Dict[
+            int,
+            Union[
+                List[Tuple[Union[int, str], str]],
+                List[Widget],
+                OrderedDict,
+                Field,
+                Widget,
             ],
         ],
     ) -> Field: ...
@@ -142,7 +138,7 @@ class IntegerField(Field):
     ) -> Optional[int]: ...
     def widget_attrs(
         self, widget: Widget
-    ) -> Union[Dict[str, Decimal], Dict[str, float], Dict[str, int]]: ...
+    ) -> Dict[str, Union[Decimal, float]]: ...
 
 class FloatField(IntegerField):
     disabled: bool
@@ -163,9 +159,7 @@ class FloatField(IntegerField):
         self, value: Optional[Union[float, str]]
     ) -> Optional[float]: ...
     def validate(self, value: Optional[float]) -> None: ...
-    def widget_attrs(
-        self, widget: Input
-    ) -> Union[Dict[str, Union[float, str]], Dict[str, Union[int, str]]]: ...
+    def widget_attrs(self, widget: Input) -> Dict[str, Union[float, str]]: ...
 
 class DecimalField(IntegerField):
     decimal_places: Optional[int]
@@ -204,14 +198,14 @@ class DecimalField(IntegerField):
     def validate(self, value: Optional[Decimal]) -> None: ...
     def widget_attrs(
         self, widget: Widget
-    ) -> Union[Dict[str, Union[Decimal, str]], Dict[str, Union[int, str]]]: ...
+    ) -> Dict[str, Union[Decimal, int, str]]: ...
 
 class BaseTemporalField(Field):
     input_formats: Any = ...
     def __init__(
         self, *, input_formats: Optional[Any] = ..., **kwargs: Any
     ) -> None: ...
-    def to_python(self, value: str) -> Union[date, time]: ...
+    def to_python(self, value: str) -> datetime: ...
     def strptime(self, value: Any, format: Any) -> None: ...
 
 class DateField(BaseTemporalField):
@@ -479,8 +473,8 @@ class ChoiceField(Field):
         memo: Dict[
             int,
             Union[
-                List[Tuple[str, str]],
-                List[Union[List[Tuple[str, str]], Field, Widget]],
+                List[Tuple[Union[int, str], str]],
+                List[Widget],
                 OrderedDict,
                 Field,
                 Widget,
@@ -500,7 +494,7 @@ class TypedChoiceField(ChoiceField):
     localize: bool
     required: bool
     show_hidden_initial: bool
-    coerce: Union[Callable, Type[Union[float, int, str]]] = ...
+    coerce: Union[Callable, Type[Union[bool, float, str]]] = ...
     empty_value: Optional[str] = ...
     def __init__(
         self, *, coerce: Any = ..., empty_value: str = ..., **kwargs: Any
@@ -542,12 +536,12 @@ class TypedMultipleChoiceField(MultipleChoiceField):
     localize: bool
     required: bool
     show_hidden_initial: bool
-    coerce: Union[Callable, Type[Union[float, int]]] = ...
+    coerce: Union[Callable, Type[float]] = ...
     empty_value: Optional[List[Any]] = ...
     def __init__(self, *, coerce: Any = ..., **kwargs: Any) -> None: ...
     def clean(
         self, value: List[str]
-    ) -> Optional[Union[List[Decimal], List[float], List[int]]]: ...
+    ) -> Optional[Union[List[bool], List[Decimal], List[float]]]: ...
     def validate(self, value: List[str]) -> None: ...
 
 class ComboField(Field):
@@ -584,41 +578,22 @@ class MultiValueField(Field):
     ) -> None: ...
     def __deepcopy__(
         self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    List[Tuple[str, str]],
-                    List[Union[List[Tuple[str, str]], Widget]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[List[Union[Field, Widget]], OrderedDict, Field, Widget],
-            ],
+        memo: Dict[
+            int, Union[List[Tuple[str, str]], OrderedDict, Field, Widget]
         ],
     ) -> MultiValueField: ...
     def validate(self, value: Union[datetime, str]) -> None: ...
     def clean(
         self,
         value: Optional[
-            Union[
-                List[None],
-                List[Union[List[str], str]],
-                List[Union[date, time]],
-                datetime,
-                str,
-            ]
+            Union[List[None], List[datetime], List[str], datetime, str]
         ],
     ) -> Optional[Union[datetime, str]]: ...
     def compress(self, data_list: Any) -> None: ...
     def has_changed(
         self,
         initial: Optional[Union[List[None], List[str], datetime, str]],
-        data: Union[List[None], List[Union[List[str], str]]],
+        data: Union[List[None], List[str]],
     ) -> bool: ...
 
 class FilePathField(ChoiceField):
@@ -669,10 +644,7 @@ class SplitDateTimeField(MultiValueField):
         **kwargs: Any
     ) -> None: ...
     def compress(
-        self,
-        data_list: Union[
-            List[Optional[date]], List[Optional[time]], List[Union[date, time]]
-        ],
+        self, data_list: List[Optional[datetime]]
     ) -> Optional[datetime]: ...
 
 class GenericIPAddressField(CharField):

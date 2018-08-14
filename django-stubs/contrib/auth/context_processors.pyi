@@ -22,7 +22,4 @@ class PermWrapper:
 
 def auth(
     request: HttpRequest
-) -> Union[
-    Dict[str, Union[PermWrapper, AnonymousUser]],
-    Dict[str, Union[PermWrapper, User]],
-]: ...
+) -> Dict[str, Union[PermWrapper, AnonymousUser, User]]: ...

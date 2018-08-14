@@ -3,13 +3,14 @@ from uuid import UUID
 
 from django.core.checks.messages import Error, Warning
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.migrations.writer import SettingsReference
 from django.db.models.base import Model
 from django.db.models.expressions import Col
 from django.db.models.fields import Field
+from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.fields.reverse_related import (ForeignObjectRel,
                                                      ManyToManyRel,
                                                      ManyToOneRel, OneToOneRel)
+from django.db.models.lookups import FieldGetDbPrepValueMixin
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo, Q
 from django.db.models.sql.where import WhereNode
@@ -57,23 +58,10 @@ class RelatedField(FieldCacheMixin, Field):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[
-        str,
-        List[Any],
-        Union[
-            Dict[str, Union[Callable, bool, str]],
-            Dict[str, Union[Dict[str, Union[int, str]], bool]],
-            Dict[str, Union[Dict[str, bool], bool, str]],
-        ],
-        Union[
-            Dict[str, Union[Callable, bool, str]],
-            Dict[str, Union[Dict[str, Union[int, str]], bool]],
-            Dict[str, Union[Dict[str, bool], bool, str]],
-        ],
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, str]]: ...
     def get_forward_related_filter(
         self, obj: Model
-    ) -> Union[Dict[str, int], Dict[str, UUID]]: ...
+    ) -> Dict[str, Union[int, UUID]]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
     @property
     def swappable_setting(self) -> Optional[str]: ...
@@ -119,18 +107,19 @@ class ForeignObject(RelatedField):
     def check(self, **kwargs: Any) -> List[Any]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[None, str, List[Any], Dict[str, Any]],
-        Tuple[str, List[Any], Dict[str, Any], Dict[str, Any]],
-        Tuple[
+    ) -> Tuple[
+        Optional[str],
+        str,
+        List[Any],
+        Dict[
             str,
-            str,
-            List[Any],
-            Dict[
+            Union[
+                Callable,
+                Dict[str, Union[int, str]],
+                List[None],
+                List[str],
+                bool,
                 str,
-                Union[
-                    Callable, Dict[str, Union[int, str]], List[str], bool, str
-                ],
             ],
         ],
     ]: ...
@@ -145,14 +134,14 @@ class ForeignObject(RelatedField):
     def foreign_related_fields(self) -> Tuple[Field]: ...
     def get_local_related_value(
         self, instance: Model
-    ) -> Tuple[Optional[Union[int, str, UUID]]]: ...
+    ) -> Tuple[Optional[int]]: ...
     def get_foreign_related_value(
         self, instance: Model
-    ) -> Tuple[Optional[Union[int, str, UUID]]]: ...
+    ) -> Tuple[Optional[int]]: ...
     @staticmethod
     def get_instance_value_for_fields(
         instance: Model, fields: Tuple[Field]
-    ) -> Tuple[Optional[Union[int, str, UUID]]]: ...
+    ) -> Tuple[Optional[int]]: ...
     def get_attname_column(self) -> Tuple[str, None]: ...
     def get_joining_columns(
         self, reverse_join: bool = ...
@@ -169,7 +158,9 @@ class ForeignObject(RelatedField):
     ) -> List[PathInfo]: ...
     def get_reverse_path_info(self, filtered_relation: Optional[Any] = ...): ...
     @classmethod
-    def get_lookups(cls) -> Dict[str, Type[Any]]: ...
+    def get_lookups(
+        cls
+    ) -> Dict[str, Type[Union[RelatedIsNull, FieldGetDbPrepValueMixin]]]: ...
     def contribute_to_class(
         self,
         cls: Type[Model],
@@ -208,33 +199,11 @@ class ForeignKey(ForeignObject):
     def check(self, **kwargs: Any) -> List[Warning]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            None,
-            str,
-            List[Any],
-            Dict[str, Union[Callable, Dict[str, Union[int, str]], str]],
-        ],
-        Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Union[Callable, Dict[str, Union[int, str]], str]],
-                Dict[str, Union[Callable, Dict[str, bool], str]],
-                Dict[str, Union[Callable, bool, str]],
-            ],
-            Union[
-                Dict[str, Union[Callable, Dict[str, Union[int, str]], str]],
-                Dict[str, Union[Callable, Dict[str, bool], str]],
-                Dict[str, Union[Callable, bool, str]],
-            ],
-        ],
-        Tuple[
-            str,
-            str,
-            List[Any],
-            Dict[str, Union[Callable, bool, SettingsReference]],
-        ],
+    ) -> Tuple[
+        Optional[str],
+        str,
+        List[Any],
+        Dict[str, Union[Callable, Dict[str, Union[int, str]], str]],
     ]: ...
     def to_python(self, value: Union[int, str]) -> int: ...
     @property
@@ -277,7 +246,7 @@ class ForeignKey(ForeignObject):
     def get_col(
         self,
         alias: str,
-        output_field: Optional[Union[Field, OneToOneRel]] = ...,
+        output_field: Optional[Union[Field, reverse_related.OneToOneRel]] = ...,
     ) -> Col: ...
 
 class OneToOneField(ForeignKey):
@@ -299,10 +268,7 @@ class OneToOneField(ForeignKey):
     def deconstruct(
         self
     ) -> Tuple[
-        str,
-        List[Any],
-        Dict[str, Union[Callable, bool, str]],
-        Dict[str, Union[Callable, bool, str]],
+        Optional[str], str, List[Any], Dict[str, Union[Callable, bool, str]]
     ]: ...
     def formfield(self, **kwargs: Any) -> None: ...
     def save_form_data(
@@ -338,20 +304,7 @@ class ManyToManyField(RelatedField):
     def check(self, **kwargs: Any) -> List[Any]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[None, str, List[Any], Dict[str, Union[bool, str]]],
-        Tuple[
-            str,
-            List[Any],
-            Union[Dict[str, Union[Callable, str]], Dict[str, Union[bool, str]]],
-            Union[
-                Dict[str, Union[Callable, str]],
-                Dict[str, Union[bool, str]],
-                Dict[str, str],
-            ],
-        ],
-        Tuple[str, str, List[Any], Dict[str, Union[Callable, str]]],
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, str]]: ...
     def get_path_info(
         self, filtered_relation: None = ...
     ) -> List[PathInfo]: ...

@@ -1,6 +1,7 @@
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 from django.db.models.base import Model
+from django.forms.utils import ErrorDict, ErrorList
 
 
 class FieldDoesNotExist(Exception): ...
@@ -35,9 +36,10 @@ class ValidationError(Exception):
         self,
         message: Union[
             Dict[str, List[ValidationError]],
-            Dict[str, Union[List[str], str]],
+            Dict[str, ErrorList],
             List[Union[ValidationError, str]],
             ValidationError,
+            ErrorList,
             str,
         ],
         code: Optional[str] = ...,
@@ -53,8 +55,8 @@ class ValidationError(Exception):
     @property
     def messages(self) -> List[str]: ...
     def update_error_dict(
-        self, error_dict: Dict[str, List[ValidationError]]
-    ) -> Dict[str, List[ValidationError]]: ...
+        self, error_dict: Union[Dict[str, List[ValidationError]], ErrorDict]
+    ) -> Union[Dict[str, List[ValidationError]], ErrorDict]: ...
     def __iter__(self) -> Iterator[Union[Tuple[str, List[str]], str]]: ...
 
 class EmptyResultSet(Exception): ...

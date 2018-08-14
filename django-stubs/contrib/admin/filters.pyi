@@ -48,7 +48,7 @@ class FieldListFilter(ListFilter):
     title: Any = ...
     def __init__(
         self,
-        field: Union[Field, ForeignObjectRel],
+        field: Union[Field, reverse_related.ForeignObjectRel],
         request: WSGIRequest,
         params: Dict[str, str],
         model: Type[Model],
@@ -63,21 +63,13 @@ class FieldListFilter(ListFilter):
     def register(
         cls,
         test: Callable,
-        list_filter_class: Type[
-            Union[
-                AllValuesFieldListFilter,
-                BooleanFieldListFilter,
-                ChoicesFieldListFilter,
-                DateFieldListFilter,
-                RelatedFieldListFilter,
-            ]
-        ],
+        list_filter_class: Type[FieldListFilter],
         take_priority: bool = ...,
     ) -> None: ...
     @classmethod
     def create(
         cls,
-        field: Union[Field, ForeignObjectRel],
+        field: Union[Field, reverse_related.ForeignObjectRel],
         request: WSGIRequest,
         params: Dict[str, str],
         model: Type[Model],
@@ -115,7 +107,7 @@ class RelatedFieldListFilter(FieldListFilter):
         field: FieldCacheMixin,
         request: WSGIRequest,
         model_admin: ModelAdmin,
-    ) -> List[Tuple[str, str]]: ...
+    ) -> List[Tuple[Union[int, str], str]]: ...
     def choices(self, changelist: Any) -> None: ...
 
 class BooleanFieldListFilter(FieldListFilter):
@@ -209,4 +201,4 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     used_parameters: Dict[Any, Any]
     def field_choices(
         self, field: RelatedField, request: WSGIRequest, model_admin: ModelAdmin
-    ) -> List[Tuple[str, str]]: ...
+    ) -> List[Tuple[Union[int, str], str]]: ...

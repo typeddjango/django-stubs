@@ -16,7 +16,5 @@ def contains(
     source: Union[Group, NonCapture, str], inst: Type[Group]
 ) -> bool: ...
 def flatten_result(
-    source: Optional[
-        Union[List[Union[Choice, Group, str]], List[Union[NonCapture, str]]]
-    ]
+    source: Optional[Union[List[Union[Choice, Group, str]], Group, NonCapture]]
 ) -> Tuple[List[str], List[List[str]]]: ...

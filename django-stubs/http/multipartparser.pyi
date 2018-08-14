@@ -61,18 +61,6 @@ class Parser:
         self
     ) -> Iterator[
         Tuple[
-            str,
-            Dict[
-                str,
-                Tuple[
-                    str,
-                    Union[
-                        Dict[str, Union[bytes, str]],
-                        Dict[str, bytes],
-                        Dict[str, str],
-                    ],
-                ],
-            ],
-            LazyStream,
+            str, Dict[str, Tuple[str, Dict[str, Union[bytes, str]]]], LazyStream
         ]
     ]: ...

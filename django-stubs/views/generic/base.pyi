@@ -2,36 +2,20 @@ from typing import Any, Callable, Dict, List, Optional, Union
 from unittest.mock import MagicMock
 
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LoginView
-from django.contrib.sites.requests import RequestSite
+from django.contrib.sites.models import Site
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Page, Paginator
-from django.db.models.base import Model
-from django.forms.forms import BaseForm
 from django.http.request import HttpRequest
 from django.http.response import (HttpResponse, HttpResponseNotAllowed,
                                   HttpResponseRedirect)
 from django.template.response import TemplateResponse
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView, MultipleObjectMixin
+from django.views.generic.list import ListView
 
 logger: Any
 
 class ContextMixin:
     extra_context: Any = ...
-    def get_context_data(
-        self, **kwargs: Any
-    ) -> Union[
-        Dict[str, Any],
-        Dict[
-            str,
-            Optional[Union[List[Dict[str, str]], bool, MultipleObjectMixin]],
-        ],
-        Dict[str, Union[Dict[str, str], DetailView]],
-        Dict[str, Union[List[Dict[str, str]], bool, Page, Paginator, ListView]],
-        Dict[str, Union[Model, BaseForm, TemplateResponseMixin]],
-        Dict[str, Union[Model, ContextMixin, str]],
-    ]: ...
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]: ...
 
 class View:
     http_method_names: Any = ...
@@ -61,13 +45,13 @@ class TemplateResponseMixin:
         context: Union[
             Dict[str, Any],
             Dict[str, Optional[Union[List[Dict[str, str]], bool, ListView]]],
-            Dict[str, Union[Dict[str, str], DetailView]],
             Dict[
                 str,
                 Union[List[Dict[str, str]], bool, Page, Paginator, ListView],
             ],
-            Dict[str, Union[AuthenticationForm, LoginView, RequestSite, str]],
-            Dict[str, Union[Model, BaseForm, TemplateResponseMixin, str]],
+            Dict[
+                str, Union[AuthenticationForm, Site, TemplateResponseMixin, str]
+            ],
             MagicMock,
         ],
         **response_kwargs: Any
@@ -89,7 +73,7 @@ class TemplateView(TemplateResponseMixin, ContextMixin, View):
 
 class RedirectView(View):
     args: Tuple
-    kwargs: Union[Dict[str, int], Dict[str, str]]
+    kwargs: Dict[str, Union[int, str]]
     request: django.core.handlers.wsgi.WSGIRequest
     permanent: bool = ...
     url: str = ...

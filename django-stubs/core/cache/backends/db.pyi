@@ -25,12 +25,7 @@ class BaseDatabaseCache(BaseCache):
     def __init__(
         self,
         table: str,
-        params: Union[
-            Dict[str, Callable],
-            Dict[str, Dict[str, int]],
-            Dict[str, int],
-            Dict[str, str],
-        ],
+        params: Dict[str, Union[Callable, Dict[str, int], int, str]],
     ) -> None: ...
 
 class DatabaseCache(BaseDatabaseCache):

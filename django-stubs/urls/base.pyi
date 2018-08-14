@@ -12,13 +12,10 @@ def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
 def reverse(
     viewname: Optional[Union[Callable, str]],
     urlconf: Optional[str] = ...,
-    args: Optional[Union[List[Union[int, str]], List[UUID], Tuple]] = ...,
+    args: Optional[Union[List[UUID], Tuple]] = ...,
     kwargs: Optional[
         Union[
-            Dict[str, None],
-            Dict[str, Union[int, str]],
-            Dict[str, bytes],
-            Dict[str, UUID],
+            Dict[str, None], Dict[str, bytes], Dict[str, str], Dict[str, UUID]
         ]
     ] = ...,
     current_app: Optional[str] = ...,

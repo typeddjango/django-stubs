@@ -5,13 +5,13 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
 from unittest.case import TestCase
 from uuid import UUID
 
-from django.contrib.sitemaps import GenericSitemap, Sitemap
+from django.contrib.sitemaps import GenericSitemap
 from django.core.files.uploadedfile import InMemoryUploadedFile, UploadedFile
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.test.testcases import SerializeMixin
 from django.test.utils import LoggingCaptureMixin
-from django.urls.converters import IntConverter, StringConverter, UUIDConverter
+from django.urls.converters import IntConverter, StringConverter
 
 
 class OrderedSet:
@@ -20,10 +20,10 @@ class OrderedSet:
         self,
         iterable: Optional[
             Union[
-                List[Optional[int]],
                 List[Tuple[str, str]],
                 List[datetime],
                 List[Combinable],
+                List[int],
                 List[str],
                 List[UUID],
                 OrderedDict,
@@ -51,7 +51,7 @@ class MultiValueDict(dict):
         key_to_list_mapping: Union[
             Dict[str, List[List[Any]]],
             Dict[str, List[int]],
-            Dict[str, Optional[List[str]]],
+            Dict[str, List[str]],
             List[Tuple[str, Union[List[List[Any]], List[str]]]],
             Tuple,
         ] = ...,
@@ -77,26 +77,7 @@ class MultiValueDict(dict):
     ) -> Union[
         List[
             Tuple[
-                List[Tuple[str, List[str]]],
-                str,
-                Dict[str, Dict[str, GenericSitemap]],
-                Dict[str, Any],
-            ]
-        ],
-        List[
-            Tuple[
-                List[Tuple[str, List[str]]],
-                str,
-                Dict[str, Union[Dict[str, Type[Sitemap]], str]],
-                Union[Dict[str, StringConverter], Dict[str, UUIDConverter]],
-            ]
-        ],
-        List[
-            Tuple[
-                List[Tuple[str, List[str]]],
-                str,
-                Dict[str, int],
-                Union[Dict[str, IntConverter], Dict[str, StringConverter]],
+                List[Tuple[str, List[str]]], str, Dict[str, str], Dict[Any, Any]
             ]
         ],
         List[UploadedFile],
@@ -109,22 +90,14 @@ class MultiValueDict(dict):
             Tuple[
                 List[Tuple[str, List[str]]],
                 str,
-                Union[
-                    Dict[Any, Any],
-                    Dict[str, Any],
-                    Dict[str, Union[IntConverter, StringConverter]],
-                ],
-                Union[
-                    Dict[str, Any],
-                    Dict[str, Union[IntConverter, StringConverter]],
-                    Dict[str, UUIDConverter],
-                ],
+                Dict[str, Dict[str, GenericSitemap]],
+                Dict[str, Union[IntConverter, StringConverter]],
             ],
             UploadedFile,
             str,
         ],
     ) -> None: ...
-    def items(self) -> Iterator[Tuple[str, Union[UploadedFile, str]]]: ...
+    def items(self) -> Iterator[Tuple[str, InMemoryUploadedFile]]: ...
     def lists(self): ...
     def values(self) -> Iterator[str]: ...
     def copy(self) -> MultiValueDict: ...

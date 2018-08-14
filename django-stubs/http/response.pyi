@@ -289,7 +289,6 @@ class JsonResponse(HttpResponse):
         self,
         data: Union[
             Dict[str, Dict[str, str]],
-            Dict[str, Union[Dict[str, bool], List[Dict[str, str]]]],
             Dict[str, int],
             Dict[str, str],
             List[int],

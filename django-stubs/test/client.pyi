@@ -1,19 +1,17 @@
 from datetime import date
-from io import BufferedRandom, BufferedReader, BytesIO, StringIO
-from tempfile import _TemporaryFileWrapper
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from django.contrib.auth.models import User
 from django.contrib.sessions.backends.base import SessionBase
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.dispatch.dispatcher import Signal
-from django.http.request import HttpRequest
+from django.http.request import HttpRequest, QueryDict
 from django.http.response import (HttpResponse, HttpResponseBase,
                                   HttpResponseRedirect)
 from django.template.base import Template
 from django.template.context import Context
+from django.test.utils import ContextList
 
 
 class RedirectCycleError(Exception):
@@ -37,27 +35,7 @@ class ClientHandler(BaseHandler):
     ) -> None: ...
     def __call__(self, environ: Dict[str, Any]) -> HttpResponseBase: ...
 
-def encode_multipart(
-    boundary: str,
-    data: Union[
-        Dict[str, Union[List[int], List[str], int]],
-        Dict[str, Union[List[int], int, str]],
-        Dict[str, Union[List[str], int, str]],
-        Dict[str, Union[Tuple[str, str, str], int, str]],
-        Dict[
-            str,
-            Union[
-                Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
-                str,
-                _TemporaryFileWrapper,
-            ],
-        ],
-        Dict[str, Union[BufferedReader, str]],
-        Dict[str, Union[BytesIO, StringIO, _TemporaryFileWrapper]],
-        Dict[str, BufferedRandom],
-        Dict[str, SimpleUploadedFile],
-    ],
-) -> bytes: ...
+def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
 def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
 
 class RequestFactory:
@@ -70,42 +48,14 @@ class RequestFactory:
     def get(
         self,
         path: str,
-        data: Optional[
-            Union[
-                Dict[str, Union[Tuple[str, str, str], str]],
-                Dict[str, Union[int, str]],
-                Dict[str, date],
-                str,
-            ]
-        ] = ...,
+        data: Optional[Union[Dict[str, date], QueryDict, str]] = ...,
         secure: bool = ...,
         **extra: Any
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def post(
         self,
         path: str,
-        data: Optional[
-            Union[
-                Dict[str, Union[List[int], List[str], int]],
-                Dict[str, Union[List[int], int, str]],
-                Dict[str, Union[List[str], int, str]],
-                Dict[str, Union[Tuple[str, str, str], int, str]],
-                Dict[
-                    str,
-                    Union[
-                        Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
-                        str,
-                        _TemporaryFileWrapper,
-                    ],
-                ],
-                Dict[str, Union[BufferedReader, str]],
-                Dict[str, Union[BytesIO, StringIO, _TemporaryFileWrapper]],
-                Dict[str, BufferedRandom],
-                Dict[str, SimpleUploadedFile],
-                bytes,
-                str,
-            ]
-        ] = ...,
+        data: Any = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -181,13 +131,7 @@ class Client(RequestFactory):
     def get(
         self,
         path: str,
-        data: Optional[
-            Union[
-                Dict[str, Union[Tuple[str, str, str], str]],
-                Dict[str, Union[int, str]],
-                str,
-            ]
-        ] = ...,
+        data: Optional[Union[Dict[str, Union[int, str]], QueryDict, str]] = ...,
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
@@ -195,28 +139,7 @@ class Client(RequestFactory):
     def post(
         self,
         path: str,
-        data: Optional[
-            Union[
-                Dict[str, Union[List[int], List[str], int]],
-                Dict[str, Union[List[int], int, str]],
-                Dict[str, Union[List[str], int, str]],
-                Dict[str, Union[Tuple[str, str, str], int, str]],
-                Dict[
-                    str,
-                    Union[
-                        Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
-                        str,
-                        _TemporaryFileWrapper,
-                    ],
-                ],
-                Dict[str, Union[BufferedReader, str]],
-                Dict[str, Union[BytesIO, StringIO, _TemporaryFileWrapper]],
-                Dict[str, BufferedRandom],
-                Dict[str, SimpleUploadedFile],
-                bytes,
-                str,
-            ]
-        ] = ...,
+        data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,

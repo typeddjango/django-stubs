@@ -27,24 +27,15 @@ class ModelState:
         fields: List[Tuple[str, Union[CIText, Field]]],
         options: Optional[
             Union[
-                Dict[str, Optional[List[Index]]],
-                Dict[
-                    str,
-                    Union[
-                        List[Tuple[str, str]],
-                        Set[Tuple[str, str]],
-                        Tuple[str],
-                        str,
-                    ],
-                ],
-                Dict[str, Union[List[Index], bool]],
-                Dict[str, Union[List[str], Set[Tuple[str, str]]]],
-                Dict[str, Union[List[str], Tuple, bool]],
-                Dict[str, Union[List[str], bool, str]],
-                Dict[str, Union[Set[Tuple[str, str]], bool]],
+                Dict[str, List[Index]],
+                Dict[str, List[str]],
+                Dict[str, Set[Tuple[str, str]]],
+                Dict[str, Tuple[str]],
+                Dict[str, bool],
+                Dict[str, str],
             ]
         ] = ...,
-        bases: Optional[Tuple[Union[Type[Model], str]]] = ...,
+        bases: Optional[Tuple[Type[Model]]] = ...,
         managers: Optional[List[Tuple[str, Manager]]] = ...,
     ) -> None: ...
     def clone(self) -> ModelState: ...

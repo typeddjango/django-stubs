@@ -1,6 +1,5 @@
 from collections import OrderedDict
-from datetime import date, datetime, time, timedelta
-from decimal import Decimal
+from datetime import date
 from io import BufferedReader, StringIO, TextIOWrapper
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 from uuid import UUID
@@ -96,23 +95,12 @@ class DeserializedObject:
 
 def build_instance(
     Model: Type[Model],
-    data: Union[
-        Dict[str, Optional[Union[int, str]]],
-        Dict[str, Optional[datetime]],
-        Dict[str, Optional[timedelta]],
-        Dict[str, Optional[UUID]],
-        Dict[str, Union[date, int, str]],
-        Dict[str, Union[time, int]],
-        Dict[str, Union[Decimal, int, str]],
-        Dict[str, Union[float, str]],
-        Dict[str, Union[int, memoryview]],
-        Dict[str, Union[int, UUID]],
-    ],
+    data: Dict[str, Optional[Union[date, int, str, UUID]]],
     db: str,
 ) -> Model: ...
 def deserialize_m2m_values(
     field: ManyToManyField,
-    field_value: Union[List[List[str]], List[Union[int, str]]],
+    field_value: Union[List[List[str]], List[int]],
     using: str,
 ) -> List[int]: ...
 def deserialize_fk_value(

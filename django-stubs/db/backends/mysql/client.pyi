@@ -8,10 +8,11 @@ class DatabaseClient(BaseDatabaseClient):
     @classmethod
     def settings_to_cmd_args(
         cls,
-        settings_dict: Union[
-            Dict[str, Optional[Union[Dict[Any, Any], str]]],
-            Dict[str, Union[Dict[str, Dict[str, str]], int, str]],
-            Dict[str, Union[Dict[str, Union[int, str]], int, str]],
+        settings_dict: Dict[
+            str,
+            Optional[
+                Union[Dict[Any, Any], Dict[str, Dict[str, str]], int, str]
+            ],
         ],
     ) -> List[str]: ...
     def runshell(self) -> None: ...

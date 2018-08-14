@@ -144,7 +144,7 @@ class Ord(Transform):
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         **extra_context: Any
-    ) -> Tuple[str, Union[List[int], List[str]]]: ...
+    ) -> Tuple[str, List[Any]]: ...
 
 class Repeat(BytesToCharFieldConversionMixin, Func):
     contains_aggregate: bool

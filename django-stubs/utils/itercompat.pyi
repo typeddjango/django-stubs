@@ -8,28 +8,11 @@ def is_iterable(
     x: Optional[
         Union[
             List[List[Union[List[List[Union[List[List[str]], str]]], str]]],
-            List[
-                Tuple[
-                    Union[Tuple[Tuple[int, str], Tuple[int, str]], str],
-                    Union[Tuple[Tuple[int, str], Tuple[int, str]], str],
-                ]
-            ],
-            List[Tuple[int, int, int]],
+            List[Tuple[Optional[Union[int, str]], Union[int, str]]],
             List[CheckMessage],
             List[int],
             List[str],
-            Tuple[
-                Tuple[
-                    Union[Tuple[Tuple[int, str], Tuple[int, str]], str],
-                    Union[
-                        Tuple[Tuple[int, str], Tuple[int, str]],
-                        Tuple[Tuple[str, str], Tuple[str, str]],
-                        str,
-                    ],
-                ]
-            ],
-            Tuple[str, str, str],
-            Tuple[_TemporaryFileWrapper, _TemporaryFileWrapper],
+            Tuple[Union[Tuple[str, str], _TemporaryFileWrapper]],
             int,
         ]
     ]

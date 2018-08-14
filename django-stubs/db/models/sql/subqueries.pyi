@@ -1,9 +1,7 @@
-from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-from uuid import UUID
 
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
+from django.db.models.expressions import Case
 from django.db.models.fields import DateTimeCheckMixin, Field
 from django.db.models.query import QuerySet
 from django.db.models.sql.query import Query
@@ -51,7 +49,10 @@ class DeleteQuery(Query):
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
-    alias_map: Dict[str, django.db.models.sql.datastructures.BaseTable] = ...
+    alias_map: Union[
+        Dict[str, django.db.models.sql.datastructures.BaseTable],
+        collections.OrderedDict,
+    ] = ...
     where: django.db.models.sql.where.WhereNode = ...
     def do_query(self, table: str, where: WhereNode, using: str) -> int: ...
     def delete_batch(
@@ -87,15 +88,9 @@ class UpdateQuery(Query):
     model: Type[django.db.models.base.Model]
     order_by: Tuple
     related_ids: Optional[List[int]]
-    related_updates: Union[
-        Dict[
-            Type[django.db.models.base.Model],
-            List[Tuple[django.db.models.fields.CharField, None, str]],
-        ],
-        Dict[
-            Type[django.db.models.base.Model],
-            List[Tuple[django.db.models.fields.IntegerField, None, int]],
-        ],
+    related_updates: Dict[
+        Type[django.db.models.base.Model],
+        List[Tuple[django.db.models.fields.Field, None, Union[int, str]]],
     ]
     select: Tuple
     select_for_update: bool
@@ -108,7 +103,13 @@ class UpdateQuery(Query):
     subquery: bool
     table_map: Dict[str, List[str]]
     used_aliases: Set[str]
-    values: List[Tuple[django.db.models.fields.Field, Any, Any]]
+    values: List[
+        Tuple[
+            django.db.models.fields.Field,
+            Optional[Type[django.db.models.base.Model]],
+            Union[django.db.models.expressions.Case, uuid.UUID],
+        ]
+    ]
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
@@ -116,24 +117,11 @@ class UpdateQuery(Query):
     def clone(self) -> UpdateQuery: ...
     where: django.db.models.sql.where.WhereNode = ...
     def update_batch(
-        self,
-        pk_list: List[int],
-        values: Union[Dict[str, None], Dict[str, int]],
-        using: str,
+        self, pk_list: List[int], values: Dict[str, Optional[int]], using: str
     ) -> None: ...
-    def add_update_values(
-        self,
-        values: Union[
-            Dict[str, None],
-            Dict[str, Union[bool, str]],
-            Dict[str, Union[datetime, str]],
-            Dict[str, Union[Model, int]],
-            Dict[str, Combinable],
-            Dict[str, UUID],
-        ],
-    ) -> None: ...
+    def add_update_values(self, values: Dict[str, Any]) -> None: ...
     def add_update_fields(
-        self, values_seq: List[Tuple[Field, Any, Any]]
+        self, values_seq: List[Tuple[Field, Optional[Type[Model]], Case]]
     ) -> None: ...
     def add_related_update(
         self, model: Type[Model], field: Field, value: Union[int, str]

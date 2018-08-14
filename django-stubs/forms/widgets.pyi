@@ -5,20 +5,15 @@ from itertools import chain
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 
-from django.contrib.admin.filters import SimpleListFilter
-from django.contrib.admin.options import (InlineModelAdmin, StackedInline,
-                                          TabularInline)
-from django.contrib.contenttypes.admin import GenericInlineModelAdminChecks
-from django.contrib.contenttypes.forms import BaseGenericInlineFormSet
+from django.contrib.admin.options import BaseModelAdmin
 from django.core.files.base import File
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.paginator import Paginator
-from django.db.models.base import Model
-from django.db.models.fields import CharField, IntegerField
 from django.db.models.fields.files import FieldFile
 from django.forms.fields import Field
-from django.forms.models import ModelForm
+from django.forms.forms import BaseForm
 from django.forms.renderers import EngineMixin
+from django.http.request import QueryDict
+from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeText
 
 
@@ -45,108 +40,8 @@ class Media:
 
 class MediaDefiningClass(type):
     def __new__(
-        mcs: Type[MediaDefiningClass],
-        name: str,
-        bases: Tuple,
-        attrs: Union[
-            Dict[str, Any],
-            Dict[
-                str,
-                Optional[Union[List[str], Tuple[str, str, str, str], int, str]],
-            ],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Dict[str, Tuple[str]],
-                    List[Type[Union[StackedInline, TabularInline]]],
-                    List[str],
-                    str,
-                ],
-            ],
-            Dict[str, Union[Callable, Dict[str, Tuple[str]], Type[Model], str]],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    List[Type[InlineModelAdmin]],
-                    List[str],
-                    Tuple[str, str, str],
-                    str,
-                ],
-            ],
-            Dict[str, Union[Callable, List[Type[TabularInline]], bool, str]],
-            Dict[str, Union[Callable, List[str], Type[Model], str]],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Tuple[str],
-                    Type[Union[Model, ModelForm]],
-                    int,
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Callable,
-                    Type[
-                        Union[
-                            GenericInlineModelAdminChecks,
-                            BaseGenericInlineFormSet,
-                        ]
-                    ],
-                    str,
-                ],
-            ],
-            Dict[str, Union[Callable, property, str]],
-            Dict[
-                str,
-                Union[
-                    Dict[Type[CharField], Dict[str, bool]],
-                    Dict[str, List[str]],
-                    List[Type[Union[StackedInline, TabularInline]]],
-                    Tuple[
-                        Tuple[
-                            None,
-                            Dict[
-                                str,
-                                Tuple[
-                                    Tuple[str, str], Tuple[str, str, str, str]
-                                ],
-                            ],
-                        ]
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[Type[IntegerField], Dict[str, Type[NumberInput]]],
-                    Type[Model],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[str, Tuple[str]],
-                    Tuple[
-                        Tuple[str, Dict[str, Tuple[str]]],
-                        Tuple[str, Dict[str, Tuple[str]]],
-                    ],
-                    Type[Union[Model, ModelForm]],
-                    str,
-                ],
-            ],
-            Dict[str, Union[List[Callable], str]],
-            Dict[str, Union[List[Type[SimpleListFilter]], str]],
-            Dict[str, Union[List[str], Tuple[str], Type[ModelForm], str]],
-            Dict[str, Union[Type[Paginator], str]],
-        ],
-    ) -> Type[Any]: ...
+        mcs: Type[MediaDefiningClass], name: str, bases: Tuple, attrs: Any
+    ) -> Type[Union[BaseModelAdmin, BaseForm, Widget]]: ...
 
 class Widget:
     needs_multipart_form: bool = ...
@@ -157,32 +52,11 @@ class Widget:
     def __init__(
         self,
         attrs: Optional[
-            Union[Dict[str, None], Dict[str, Union[int, str]], Dict[str, float]]
+            Union[Dict[str, None], Dict[str, bool], Dict[str, float]]
         ] = ...,
     ) -> None: ...
     def __deepcopy__(
-        self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    Dict[Any, Any],
-                    List[Union[List[Any], Field, Widget]],
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[
-                    List[Tuple[str, str]],
-                    List[Union[List[Tuple[str, str]], Field, Widget]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-        ],
+        self, memo: Dict[int, Union[Dict[Any, Any], List[Any]]]
     ) -> Widget: ...
     @property
     def is_hidden(self) -> bool: ...
@@ -195,33 +69,15 @@ class Widget:
         name: str,
         value: Any,
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[
-                    Union[Dict[str, Union[bool, Decimal, str]], bool, str]
-                ],
-            ],
+    ) -> Dict[
+        str,
+        Union[
+            Dict[str, Optional[Union[Dict[str, None], bool, str]]],
+            Dict[str, Optional[Union[Dict[str, bool], bool, str]]],
+            Dict[str, Union[Dict[str, Union[int, str]], List[str], bool, str]],
+            Dict[str, Union[Dict[str, str], List[int], bool, str]],
+            Dict[str, Union[Dict[str, str], bool, FieldFile, str]],
         ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[Union[Dict[str, Union[float, int, str]], bool, str]],
-            ],
-        ],
-        Dict[str, Dict[str, Union[Dict[str, None], List[str], bool, str]]],
-        Dict[
-            str,
-            Dict[str, Union[Dict[str, Union[bool, str]], List[int], bool, str]],
-        ],
-        Dict[
-            str,
-            Dict[str, Union[Dict[str, Union[bool, str]], List[str], bool, str]],
-        ],
-        Dict[str, Dict[str, Union[Dict[str, str], bool, FieldFile, str]]],
     ]: ...
     def render(
         self,
@@ -232,25 +88,23 @@ class Widget:
     ) -> SafeText: ...
     def build_attrs(
         self,
-        base_attrs: Union[
-            Dict[str, Union[Decimal, str]],
-            Dict[str, Union[float, str]],
-            Dict[str, Union[int, str]],
-        ],
+        base_attrs: Dict[str, Union[float, str]],
         extra_attrs: Optional[Dict[str, Union[bool, str]]] = ...,
-    ) -> Union[
-        Dict[str, Union[bool, float, str]], Dict[str, Union[Decimal, int, str]]
-    ]: ...
+    ) -> Dict[str, Union[Decimal, float, str]]: ...
     def value_from_datadict(
-        self, data: dict, files: Dict[str, SimpleUploadedFile], name: str
+        self,
+        data: dict,
+        files: Union[Dict[str, SimpleUploadedFile], MultiValueDict],
+        name: str,
     ) -> Any: ...
     def value_omitted_from_data(
         self,
         data: Union[
             Dict[str, Optional[Union[List[int], date, int, str]]],
             Dict[str, Union[datetime, Decimal, int, str]],
+            QueryDict,
         ],
-        files: Dict[str, SimpleUploadedFile],
+        files: Union[Dict[str, SimpleUploadedFile], MultiValueDict],
         name: str,
     ) -> bool: ...
     def id_for_label(self, id_: str) -> str: ...
@@ -263,7 +117,12 @@ class Input(Widget):
     def __init__(
         self,
         attrs: Optional[
-            Union[Dict[str, None], Dict[str, Union[int, str]], Dict[str, float]]
+            Union[
+                Dict[str, None],
+                Dict[str, bool],
+                Dict[str, float],
+                Dict[str, str],
+            ]
         ] = ...,
     ) -> None: ...
     def get_context(
@@ -271,41 +130,25 @@ class Input(Widget):
         name: str,
         value: Any,
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[
-                    Union[Dict[str, Union[bool, Decimal, str]], bool, str]
-                ],
-            ],
+    ) -> Dict[
+        str,
+        Union[
+            Dict[str, Optional[Union[Dict[str, Union[int, str]], bool, str]]],
+            Dict[str, Union[Dict[str, str], List[int], bool, str]],
+            Dict[str, Union[Dict[str, str], List[str], bool, str]],
+            Dict[str, Union[Dict[str, str], bool, FieldFile, str]],
         ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[Union[Dict[str, Union[float, int, str]], bool, str]],
-            ],
-        ],
-        Dict[str, Dict[str, Union[Dict[str, str], List[int], bool, str]]],
-        Dict[str, Dict[str, Union[Dict[str, str], List[str], bool, str]]],
-        Dict[str, Dict[str, Union[Dict[str, str], bool, FieldFile, str]]],
     ]: ...
 
 class TextInput(Input):
-    attrs: Union[Dict[str, None], Dict[str, Union[int, str]]]
+    attrs: Dict[str, Optional[bool]]
     is_localized: bool
     is_required: bool
     input_type: str = ...
     template_name: str = ...
 
 class NumberInput(Input):
-    attrs: Union[
-        Dict[str, Union[decimal.Decimal, str]],
-        Dict[str, Union[float, str]],
-        Dict[str, int],
-    ]
+    attrs: Dict[str, Union[float, str]]
     is_required: bool
     input_type: str = ...
     template_name: str = ...
@@ -323,7 +166,7 @@ class URLInput(Input):
     template_name: str = ...
 
 class PasswordInput(Input):
-    attrs: Union[Dict[str, bool], Dict[str, str]]
+    attrs: Dict[str, Union[bool, str]]
     is_required: bool
     input_type: str = ...
     template_name: str = ...
@@ -359,22 +202,9 @@ class MultipleHiddenInput(HiddenInput):
         name: str,
         value: Optional[Union[List[int], List[str]]],
         attrs: Optional[Dict[str, str]],
-    ) -> Union[
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[Any, Any],
-                    List[Dict[str, Union[Dict[Any, Any], bool, str]]],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
+    ) -> Dict[
+        str,
+        Union[
             Dict[
                 str,
                 Union[
@@ -385,9 +215,6 @@ class MultipleHiddenInput(HiddenInput):
                     str,
                 ],
             ],
-        ],
-        Dict[
-            str,
             Dict[
                 str,
                 Union[
@@ -403,126 +230,17 @@ class MultipleHiddenInput(HiddenInput):
     def value_from_datadict(
         self,
         data: Union[
-            Dict[str, List[str]],
-            Dict[
-                str,
-                Tuple[
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                ],
-            ],
+            Dict[str, List[str]], Dict[str, Tuple[int, ...]], MultiValueDict
         ],
         files: Dict[Any, Any],
         name: str,
-    ) -> Union[
-        List[str],
-        Tuple[
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-        ],
-    ]: ...
+    ) -> Union[List[str], Tuple[int, ...]]: ...
     def format_value(
         self, value: Optional[Union[List[int], List[str]]]
     ) -> Union[List[int], List[str]]: ...
 
 class FileInput(Input):
-    attrs: Union[Dict[str, bool], Dict[str, str]]
+    attrs: Dict[str, Union[bool, str]]
     is_required: bool
     input_type: str = ...
     needs_multipart_form: bool = ...
@@ -530,14 +248,16 @@ class FileInput(Input):
     def format_value(self, value: Optional[str]) -> None: ...
     def value_from_datadict(
         self,
-        data: Union[Dict[str, None], Dict[str, bool], Dict[str, str]],
-        files: Union[Dict[str, SimpleUploadedFile], Dict[str, str]],
+        data: Union[
+            Dict[str, None], Dict[str, bool], Dict[str, str], QueryDict
+        ],
+        files: Dict[str, Union[SimpleUploadedFile, str]],
         name: str,
     ) -> Optional[Union[SimpleUploadedFile, str]]: ...
     def value_omitted_from_data(
         self,
         data: Dict[str, str],
-        files: Union[Dict[str, SimpleUploadedFile], Dict[str, str]],
+        files: Dict[str, Union[SimpleUploadedFile, str]],
         name: str,
     ) -> bool: ...
 
@@ -557,8 +277,10 @@ class ClearableFileInput(FileInput):
     def get_context(self, name: Any, value: Any, attrs: Any): ...
     def value_from_datadict(
         self,
-        data: Union[Dict[str, None], Dict[str, bool], Dict[str, str]],
-        files: Union[Dict[str, SimpleUploadedFile], Dict[str, str]],
+        data: Union[
+            Dict[str, None], Dict[str, bool], Dict[str, str], QueryDict
+        ],
+        files: Dict[str, Union[SimpleUploadedFile, str]],
         name: str,
     ) -> Any: ...
     def use_required_attribute(
@@ -567,12 +289,12 @@ class ClearableFileInput(FileInput):
     def value_omitted_from_data(
         self,
         data: Dict[str, str],
-        files: Union[Dict[str, SimpleUploadedFile], Dict[str, str]],
+        files: Dict[str, Union[SimpleUploadedFile, str]],
         name: str,
     ) -> bool: ...
 
 class Textarea(Widget):
-    attrs: Union[Dict[str, int], Dict[str, str]]
+    attrs: Dict[str, Union[int, str]]
     is_required: bool
     template_name: str = ...
     def __init__(
@@ -589,7 +311,7 @@ class DateTimeBaseInput(TextInput):
         format: Optional[str] = ...,
     ) -> None: ...
     def format_value(
-        self, value: Optional[Union[date, time, str]]
+        self, value: Optional[Union[datetime, str]]
     ) -> Optional[str]: ...
 
 class DateInput(DateTimeBaseInput):
@@ -643,14 +365,18 @@ class CheckboxInput(Input):
     ]: ...
     def value_from_datadict(
         self,
-        data: Dict[str, Optional[Union[List[int], datetime, int, str]]],
-        files: Dict[str, SimpleUploadedFile],
+        data: Union[
+            Dict[str, Optional[Union[List[int], datetime, int, str]]], QueryDict
+        ],
+        files: Union[Dict[str, SimpleUploadedFile], MultiValueDict],
         name: str,
     ) -> bool: ...
     def value_omitted_from_data(
         self,
-        data: Dict[str, Optional[Union[List[int], datetime, int, str]]],
-        files: Dict[Any, Any],
+        data: Union[
+            Dict[str, Optional[Union[List[int], datetime, int, str]]], QueryDict
+        ],
+        files: Union[Dict[Any, Any], MultiValueDict],
         name: str,
     ) -> bool: ...
 
@@ -669,32 +395,12 @@ class ChoiceWidget(Widget):
         choices: Union[
             Iterator[Any],
             List[List[Union[int, str]]],
-            List[
-                Union[
-                    Tuple[
-                        Union[List[Tuple[str, str]], str],
-                        Union[List[Tuple[str, str]], str],
-                    ],
-                    Tuple[int, int],
-                ]
-            ],
+            List[Tuple[Union[time, int], int]],
             List[int],
             Tuple,
         ] = ...,
     ) -> None: ...
-    def __deepcopy__(
-        self,
-        memo: Dict[
-            int,
-            Union[
-                List[Tuple[str, str]],
-                List[Union[List[Tuple[str, str]], Field, Widget]],
-                OrderedDict,
-                Field,
-                Widget,
-            ],
-        ],
-    ) -> ChoiceWidget: ...
+    def __deepcopy__(self, memo: Dict[int, List[Any]]) -> ChoiceWidget: ...
     def subwidgets(
         self,
         name: str,
@@ -712,15 +418,12 @@ class ChoiceWidget(Widget):
         name: str,
         value: List[str],
         attrs: Optional[Dict[str, Union[bool, str]]] = ...,
-    ) -> Union[
-        List[
-            Tuple[
-                None,
-                List[Dict[str, Union[Dict[str, Union[bool, str]], int, str]]],
-                int,
-            ]
-        ],
-        List[Tuple[int, int, int]],
+    ) -> List[
+        Tuple[
+            Optional[str],
+            List[Dict[str, Union[Dict[str, Union[bool, str]], time, int, str]]],
+            int,
+        ]
     ]: ...
     def create_option(
         self,
@@ -731,305 +434,61 @@ class ChoiceWidget(Widget):
         index: int,
         subindex: Optional[int] = ...,
         attrs: Optional[Dict[str, Union[bool, str]]] = ...,
-    ) -> Union[
-        Dict[str, Union[Dict[Any, Any], bool, time, str]],
-        Dict[str, Union[Dict[str, Union[bool, str]], Set[str], int, str]],
+    ) -> Dict[
+        str,
+        Union[
+            Dict[str, Union[bool, str]],
+            Dict[str, bool],
+            Set[str],
+            time,
+            int,
+            str,
+        ],
     ]: ...
     def get_context(
         self,
         name: str,
-        value: Any,
+        value: Optional[Union[List[int], List[str], Tuple[str, str], int, str]],
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
+    ) -> Dict[
+        str,
         Dict[
             str,
-            Dict[
-                str,
-                Union[
-                    Dict[Any, Any],
-                    List[
-                        Tuple[
-                            List[Dict[str, Union[Dict[Any, Any], bool, str]]],
-                            int,
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[Any, Any],
-                    List[
-                        Tuple[
+            Union[
+                Dict[str, Union[bool, str]],
+                List[
+                    Tuple[
+                        Optional[str],
+                        Union[
                             List[Dict[str, Union[Dict[str, bool], bool, str]]],
-                            int,
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
+                            List[Dict[str, Union[Dict[str, str], bool, str]]],
+                        ],
+                        int,
+                    ]
                 ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
+                List[str],
+                bool,
                 str,
-                Union[
-                    Dict[Any, Any],
-                    List[
-                        Union[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[str, Union[Dict[Any, Any], bool, str]]
-                                ],
-                                int,
-                            ],
-                            Tuple[
-                                str,
-                                List[
-                                    Dict[str, Union[Dict[str, bool], bool, str]]
-                                ],
-                                int,
-                            ],
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Tuple[
-                            None,
-                            List[
-                                Dict[str, Union[Dict[Any, Any], time, int, str]]
-                            ],
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Tuple[
-                            None,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[str, Union[bool, str]], int, str
-                                    ],
-                                ]
-                            ],
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Tuple[
-                            None,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[Dict[str, bool], Set[str], int, str],
-                                ]
-                            ],
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Union[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[str, Union[Dict[str, bool], bool, str]]
-                                ],
-                                int,
-                            ],
-                            Tuple[
-                                str,
-                                List[
-                                    Dict[str, Union[Dict[Any, Any], bool, str]]
-                                ],
-                                int,
-                            ],
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, str],
-                    List[
-                        Tuple[
-                            None,
-                            List[Dict[str, Union[Dict[str, str], int, str]]],
-                            int,
-                        ]
-                    ],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, str],
-                    List[
-                        Union[
-                            Tuple[
-                                List[
-                                    Dict[str, Union[Dict[str, str], bool, str]]
-                                ],
-                                int,
-                                int,
-                            ],
-                            Tuple[
-                                str,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Dict[str, Union[bool, str]],
-                                            bool,
-                                            str,
-                                        ],
-                                    ]
-                                ],
-                                int,
-                            ],
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, str],
-                    List[
-                        Union[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[str, Union[Dict[str, str], bool, str]]
-                                ],
-                                int,
-                            ],
-                            Tuple[
-                                str,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Dict[str, Union[bool, str]],
-                                            bool,
-                                            str,
-                                        ],
-                                    ]
-                                ],
-                                int,
-                            ],
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
             ],
         ],
     ]: ...
     def id_for_label(self, id_: str, index: str = ...) -> str: ...
     def value_from_datadict(
-        self, data: dict, files: Dict[Any, Any], name: str
+        self,
+        data: dict,
+        files: Union[Dict[Any, Any], MultiValueDict],
+        name: str,
     ) -> Optional[Union[List[str], int, str]]: ...
-    def format_value(self, value: Any) -> List[str]: ...
+    def format_value(
+        self,
+        value: Optional[Union[List[int], List[str], Tuple[str, str], int, str]],
+    ) -> List[str]: ...
 
 class Select(ChoiceWidget):
     attrs: Dict[str, Union[bool, str]]
     choices: Union[
         List[List[Union[int, str]]],
-        List[
-            Union[
-                Tuple[
-                    Union[
-                        List[Tuple[str, str]],
-                        Tuple[Tuple[str, str], Tuple[str, str]],
-                        str,
-                    ],
-                    Union[
-                        List[Tuple[str, str]],
-                        Tuple[Tuple[str, str], Tuple[str, str]],
-                        str,
-                    ],
-                ],
-                Tuple[int, Union[int, str]],
-            ]
-        ],
+        List[Tuple[datetime.time, Union[int, str]]],
         django.forms.fields.CallableChoiceIterator,
         django.forms.models.ModelChoiceIterator,
     ]
@@ -1045,148 +504,26 @@ class Select(ChoiceWidget):
         name: str,
         value: Optional[Union[List[int], List[str], int, str]],
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
+    ) -> Dict[
+        str,
         Dict[
             str,
-            Dict[
-                str,
-                Union[
-                    Dict[Any, Any],
-                    List[
-                        Tuple[
-                            List[Dict[str, Union[Dict[Any, Any], bool, str]]],
-                            int,
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
+            Union[
+                Dict[str, Union[bool, str]],
+                List[
+                    Tuple[
+                        Optional[str],
+                        List[
+                            Dict[
+                                str, Union[Dict[str, bool], Set[str], int, str]
+                            ]
+                        ],
+                        int,
+                    ]
                 ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
+                List[str],
+                bool,
                 str,
-                Union[
-                    Dict[Any, Any],
-                    List[
-                        Union[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[str, Union[Dict[Any, Any], bool, str]]
-                                ],
-                                int,
-                            ],
-                            Tuple[
-                                str,
-                                List[
-                                    Dict[str, Union[Dict[str, bool], bool, str]]
-                                ],
-                                int,
-                            ],
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Tuple[
-                            None,
-                            List[
-                                Dict[str, Union[Dict[Any, Any], time, int, str]]
-                            ],
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Tuple[
-                            None,
-                            List[
-                                Dict[
-                                    str,
-                                    Union[Dict[str, bool], Set[str], int, str],
-                                ]
-                            ],
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Union[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[str, Union[Dict[str, bool], bool, str]]
-                                ],
-                                int,
-                            ],
-                            Tuple[
-                                str,
-                                List[
-                                    Dict[str, Union[Dict[Any, Any], bool, str]]
-                                ],
-                                int,
-                            ],
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, bool],
-                    List[
-                        Tuple[
-                            List[Dict[str, Union[Dict[str, bool], bool, str]]],
-                            int,
-                            int,
-                        ]
-                    ],
-                    List[str],
-                    bool,
-                    str,
-                ],
             ],
         ],
     ]: ...
@@ -1198,8 +535,8 @@ class NullBooleanSelect(Select):
     def format_value(self, value: Optional[Union[bool, str]]) -> str: ...
     def value_from_datadict(
         self,
-        data: Dict[str, Union[bool, str]],
-        files: Dict[Any, Any],
+        data: Union[Dict[str, Union[bool, str]], QueryDict],
+        files: Union[Dict[Any, Any], MultiValueDict],
         name: str,
     ) -> Optional[bool]: ...
 
@@ -1214,65 +551,12 @@ class SelectMultiple(Select):
     def value_from_datadict(
         self,
         data: Union[
-            Dict[str, Optional[Union[List[int], datetime, int, str]]],
-            Dict[
-                str,
-                Tuple[
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                    int,
-                ],
-            ],
-            Dict[str, Union[List[str], str]],
+            Dict[str, List[int]],
+            Dict[str, Tuple[int, ...]],
+            Dict[str, str],
+            QueryDict,
         ],
-        files: Dict[Any, Any],
+        files: Union[Dict[Any, Any], MultiValueDict],
         name: str,
     ) -> Optional[Union[List[int], List[str], str]]: ...
     def value_omitted_from_data(
@@ -1282,7 +566,12 @@ class SelectMultiple(Select):
 class RadioSelect(ChoiceWidget):
     attrs: Dict[str, str]
     choices: Union[
-        List[Tuple[str, Union[Tuple[Tuple[str, str], Tuple[str, str]], str]]],
+        List[
+            Tuple[
+                datetime.time,
+                Union[Tuple[Tuple[str, str], Tuple[str, str]], str],
+            ]
+        ],
         List[int],
         django.forms.models.ModelChoiceIterator,
     ]
@@ -1296,7 +585,7 @@ class CheckboxSelectMultiple(ChoiceWidget):
     choices: Union[
         List[
             Tuple[
-                Union[Tuple[Tuple[str, str], Tuple[str, str]], str],
+                datetime.time,
                 Union[Tuple[Tuple[str, str], Tuple[str, str]], str],
             ]
         ],
@@ -1319,7 +608,9 @@ class MultiWidget(Widget):
     widgets: List[django.forms.widgets.Widget] = ...
     def __init__(
         self,
-        widgets: Union[List[Union[Type[TextInput], RadioSelect]], Tuple[Input]],
+        widgets: Union[
+            List[Type[DateTimeBaseInput]], Tuple[Union[Type[TextInput], Input]]
+        ],
         attrs: Optional[Dict[str, str]] = ...,
     ) -> None: ...
     @property
@@ -1327,36 +618,11 @@ class MultiWidget(Widget):
     def get_context(
         self,
         name: str,
-        value: Optional[
-            Union[
-                List[Union[List[str], str]],
-                List[Union[date, time]],
-                datetime,
-                str,
-            ]
-        ],
+        value: Optional[Union[List[datetime], datetime, str]],
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        Dict[Any, Any],
-                        List[
-                            Dict[
-                                str, Optional[Union[Dict[Any, Any], bool, str]]
-                            ]
-                        ],
-                        bool,
-                        str,
-                    ]
-                ],
-            ],
-        ],
-        Dict[
-            str,
+    ) -> Dict[
+        str,
+        Union[
             Dict[
                 str,
                 Optional[
@@ -1377,95 +643,6 @@ class MultiWidget(Widget):
                     ]
                 ],
             ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        Dict[str, Union[bool, str]],
-                        List[
-                            Union[
-                                Dict[
-                                    str,
-                                    Optional[
-                                        Union[
-                                            Dict[str, Union[bool, str]],
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Optional[
-                                                        Union[
-                                                            Dict[
-                                                                str,
-                                                                Union[
-                                                                    bool, str
-                                                                ],
-                                                            ],
-                                                            bool,
-                                                            str,
-                                                        ]
-                                                    ],
-                                                ]
-                                            ],
-                                            bool,
-                                            str,
-                                        ]
-                                    ],
-                                ],
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[str, Union[bool, str]],
-                                        List[
-                                            Tuple[
-                                                None,
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Union[
-                                                            Dict[Any, Any],
-                                                            bool,
-                                                            str,
-                                                        ],
-                                                    ]
-                                                ],
-                                                int,
-                                            ]
-                                        ],
-                                        bool,
-                                        str,
-                                    ],
-                                ],
-                            ]
-                        ],
-                        bool,
-                        str,
-                    ]
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        Dict[str, str],
-                        List[
-                            Dict[
-                                str, Optional[Union[Dict[str, str], bool, str]]
-                            ]
-                        ],
-                        bool,
-                        str,
-                    ]
-                ],
-            ],
-        ],
-        Dict[
-            str,
             Dict[
                 str,
                 Union[
@@ -1500,147 +677,28 @@ class MultiWidget(Widget):
                 ],
             ],
         ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[Any, Any],
-                    List[
-                        Union[
-                            Dict[
-                                str,
-                                Union[
-                                    Dict[Any, Any],
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[Any, Any], bool, str],
-                                        ]
-                                    ],
-                                    bool,
-                                    str,
-                                ],
-                            ],
-                            Dict[
-                                str,
-                                Union[
-                                    Dict[str, bool],
-                                    List[
-                                        Tuple[
-                                            None,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Dict[str, bool],
-                                                        bool,
-                                                        str,
-                                                    ],
-                                                ]
-                                            ],
-                                            int,
-                                        ]
-                                    ],
-                                    List[str],
-                                    bool,
-                                    str,
-                                ],
-                            ],
-                        ]
-                    ],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
-        Dict[
-            str,
-            Dict[
-                str,
-                Union[
-                    Dict[str, Union[bool, str]],
-                    List[
-                        Union[
-                            Dict[
-                                str,
-                                Union[
-                                    Dict[str, Union[bool, str]],
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[
-                                                Dict[str, Union[bool, str]],
-                                                bool,
-                                                str,
-                                            ],
-                                        ]
-                                    ],
-                                    bool,
-                                    str,
-                                ],
-                            ],
-                            Dict[
-                                str,
-                                Union[
-                                    Dict[str, Union[bool, str]],
-                                    List[
-                                        Tuple[
-                                            None,
-                                            List[
-                                                Dict[
-                                                    str,
-                                                    Union[
-                                                        Dict[str, bool],
-                                                        bool,
-                                                        str,
-                                                    ],
-                                                ]
-                                            ],
-                                            int,
-                                        ]
-                                    ],
-                                    List[str],
-                                    bool,
-                                    str,
-                                ],
-                            ],
-                        ]
-                    ],
-                    bool,
-                    str,
-                ],
-            ],
-        ],
     ]: ...
     def id_for_label(self, id_: str) -> str: ...
     def value_from_datadict(
         self,
-        data: Dict[str, Union[List[str], str]],
-        files: Dict[Any, Any],
+        data: Union[Dict[str, Union[List[str], str]], QueryDict],
+        files: Union[Dict[Any, Any], MultiValueDict],
         name: str,
-    ) -> Union[List[None], List[Union[List[str], str]]]: ...
+    ) -> Union[List[None], List[str]]: ...
     def value_omitted_from_data(
-        self, data: Dict[str, str], files: Dict[Any, Any], name: str
+        self,
+        data: Union[Dict[str, str], QueryDict],
+        files: Union[Dict[Any, Any], MultiValueDict],
+        name: str,
     ) -> bool: ...
     def decompress(self, value: Any) -> None: ...
     media: Any = ...
     def __deepcopy__(
         self,
-        memo: Union[
-            Dict[
-                int,
-                Union[
-                    List[Tuple[str, str]],
-                    List[Union[List[Tuple[str, str]], Widget]],
-                    OrderedDict,
-                    Field,
-                    Widget,
-                ],
-            ],
-            Dict[
-                int,
-                Union[List[Union[Field, Widget]], OrderedDict, Field, Widget],
+        memo: Dict[
+            int,
+            Union[
+                List[Tuple[str, str]], List[Widget], OrderedDict, Field, Widget
             ],
         ],
     ) -> MultiWidget: ...
@@ -1663,7 +721,7 @@ class SplitDateTimeWidget(MultiWidget):
     ) -> None: ...
     def decompress(
         self, value: Optional[Union[datetime, str]]
-    ) -> Union[List[None], List[Union[date, time]]]: ...
+    ) -> Union[List[None], List[datetime]]: ...
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     attrs: Dict[Any, Any]
@@ -1704,7 +762,7 @@ class SelectDateWidget(Widget):
     def get_context(self, name: Any, value: Any, attrs: Any): ...
     def format_value(
         self, value: Optional[Union[date, str]]
-    ) -> Union[Dict[str, None], Dict[str, Union[int, str]]]: ...
+    ) -> Dict[str, None]: ...
     def id_for_label(self, id_: str) -> str: ...
     def value_from_datadict(
         self, data: Dict[str, str], files: Dict[Any, Any], name: str

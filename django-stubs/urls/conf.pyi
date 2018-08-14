@@ -11,12 +11,13 @@ def include(
         List[Tuple[str, Callable]],
         List[URLPattern],
         List[URLResolver],
-        Tuple[List[URLPattern], str, str],
-        Tuple[str, str],
+        Tuple[List[URLResolver], str],
         str,
     ],
     namespace: Optional[str] = ...,
-) -> Union[Tuple[None, None, None], Tuple[str, str, str]]: ...
+) -> Union[
+    Tuple[List[Any], str, str], Tuple[List[URLResolver], None, None]
+]: ...
 
 path: Any
 re_path: Any

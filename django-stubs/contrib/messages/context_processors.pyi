@@ -6,7 +6,4 @@ from django.http.request import HttpRequest
 
 def messages(
     request: HttpRequest
-) -> Union[
-    Dict[str, Union[Dict[str, int], List[Any]]],
-    Dict[str, Union[Dict[str, int], BaseStorage]],
-]: ...
+) -> Dict[str, Union[Dict[str, int], List[Any], BaseStorage]]: ...

@@ -14,20 +14,11 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name: str = ...
     def get_context(
         self, name: str, value: Optional[str], attrs: Dict[str, str]
-    ) -> Union[
-        Dict[
-            str,
-            Union[
-                Dict[str, Optional[Union[Dict[Any, Any], bool, str]]],
-                List[Dict[str, str]],
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[str, Optional[Union[Dict[str, str], bool, str]]],
-                List[Dict[str, str]],
-            ],
+    ) -> Dict[
+        str,
+        Union[
+            Dict[str, Optional[Union[Dict[str, str], bool, str]]],
+            List[Dict[str, str]],
         ],
     ]: ...
 

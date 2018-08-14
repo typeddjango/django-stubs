@@ -1,5 +1,5 @@
-from datetime import date, datetime
-from decimal import Decimal
+from collections import OrderedDict
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
@@ -13,6 +13,7 @@ from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 from django.utils.datastructures import OrderedSet
+from django.utils.safestring import SafeText
 
 
 class Lookup:
@@ -22,7 +23,9 @@ class Lookup:
     rhs: Any = ...
     bilateral_transforms: Any = ...
     def __init__(
-        self, lhs: Union[Expression, TextField, MultiColSource], rhs: Any
+        self,
+        lhs: Union[Expression, TextField, related_lookups.MultiColSource],
+        rhs: Any,
     ) -> None: ...
     def apply_bilateral_transforms(self, value: Expression) -> Transform: ...
     def batch_process_rhs(
@@ -30,40 +33,26 @@ class Lookup:
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         rhs: Optional[OrderedSet] = ...,
-    ) -> Tuple[
-        List[str],
-        Union[List[Optional[int]], List[Union[Combinable, int]], List[str]],
-    ]: ...
+    ) -> Tuple[List[str], List[str]]: ...
     def get_source_expressions(self) -> List[Expression]: ...
     lhs: Any = ...
     def set_source_expressions(self, new_exprs: List[Ref]) -> None: ...
     def get_prep_lookup(self) -> Any: ...
     def get_db_prep_lookup(
         self, value: Union[int, str], connection: DatabaseWrapper
-    ) -> Tuple[str, Union[List[int], List[str]]]: ...
+    ) -> Tuple[str, List[SafeText]]: ...
     def process_lhs(
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         lhs: Optional[Col] = ...,
-    ) -> Tuple[str, Union[List[Union[int, str]], Tuple]]: ...
+    ) -> Tuple[str, List[Union[int, str]]]: ...
     def process_rhs(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[
-        str,
-        Union[
-            List[None],
-            List[Union[date, str]],
-            List[Union[int, str]],
-            List[Decimal],
-            List[float],
-            List[memoryview],
-            Tuple,
-        ],
-    ]: ...
+    ) -> Tuple[str, Union[List[Union[int, str]], Tuple[int, int]]]: ...
     def rhs_is_direct_value(self) -> bool: ...
     def relabeled_clone(
-        self, relabels: Dict[Optional[str], str]
+        self, relabels: Union[Dict[Optional[str], str], OrderedDict]
     ) -> Union[BuiltinLookup, FieldGetDbPrepValueMixin]: ...
     def get_group_by_cols(self) -> List[Expression]: ...
     def as_sql(self, compiler: Any, connection: Any) -> None: ...
@@ -88,44 +77,24 @@ class BuiltinLookup(Lookup):
     ) -> Tuple[str, List[Union[int, str]]]: ...
     def as_sql(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[
-        str,
-        Union[
-            List[Optional[int]],
-            List[Union[date, str]],
-            List[Union[Decimal, int]],
-            List[Union[int, str]],
-            List[float],
-            List[memoryview],
-        ],
-    ]: ...
+    ) -> Tuple[str, List[float]]: ...
     def get_rhs_op(self, connection: DatabaseWrapper, rhs: str) -> str: ...
 
 class FieldGetDbPrepValueMixin:
     get_db_prep_lookup_value_is_iterable: bool = ...
     def get_db_prep_lookup(
         self, value: Any, connection: DatabaseWrapper
-    ) -> Tuple[
-        str,
-        Union[
-            List[Optional[int]],
-            List[Union[Combinable, int]],
-            List[Decimal],
-            List[float],
-            List[memoryview],
-            List[str],
-        ],
-    ]: ...
+    ) -> Tuple[str, List[float]]: ...
 
 class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     get_db_prep_lookup_value_is_iterable: bool = ...
     def get_prep_lookup(
         self
     ) -> Union[
-        List[Optional[int]],
-        List[Union[Combinable, int]],
         List[datetime],
         List[Model],
+        List[Combinable],
+        List[int],
         List[str],
         List[UUID],
         Subquery,
@@ -133,14 +102,14 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     ]: ...
     def process_rhs(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[Tuple, Tuple]: ...
+    ) -> Tuple[Union[Tuple[str, str], str], Tuple]: ...
     def resolve_expression_parameter(
         self,
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         sql: str,
         param: Optional[Union[Combinable, int, str]],
-    ) -> Tuple[str, Union[List[None], List[int], List[str]]]: ...
+    ) -> Tuple[str, List[None]]: ...
     def batch_process_rhs(
         self,
         compiler: SQLCompiler,
@@ -157,17 +126,7 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name: str = ...
     def process_rhs(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[
-        str,
-        Union[
-            List[None],
-            List[Union[int, str]],
-            List[Decimal],
-            List[float],
-            List[memoryview],
-            Tuple,
-        ],
-    ]: ...
+    ) -> Tuple[str, Union[List[str], Tuple[int, int]]]: ...
 
 class IExact(BuiltinLookup):
     bilateral_transforms: List[Any]
@@ -183,10 +142,7 @@ class IExact(BuiltinLookup):
 class GreaterThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: Union[
-        django.db.models.expressions.Expression,
-        django.db.models.expressions.SQLiteNumericMixin,
-    ]
+    lhs: django.db.models.expressions.Expression
     rhs: Any
     lookup_name: str = ...
 
@@ -194,24 +150,33 @@ class GreaterThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
     lhs: django.db.models.expressions.Expression
-    rhs: Any
+    rhs: Union[
+        datetime.datetime,
+        decimal.Decimal,
+        django.db.models.expressions.Combinable,
+        int,
+        str,
+    ]
     lookup_name: str = ...
 
 class LessThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
     lhs: django.db.models.expressions.Expression
-    rhs: Any
+    rhs: Union[
+        datetime.datetime,
+        decimal.Decimal,
+        django.db.models.expressions.CombinedExpression,
+        float,
+        str,
+    ]
     lookup_name: str = ...
 
 class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
     contains_aggregate: bool
     contains_over_clause: bool
-    lhs: Union[
-        django.db.models.expressions.Expression,
-        django.db.models.expressions.SQLiteNumericMixin,
-    ]
+    lhs: django.db.models.expressions.Expression
     rhs: Union[
         datetime.date,
         decimal.Decimal,
@@ -241,7 +206,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     def get_rhs_op(self, connection: DatabaseWrapper, rhs: str) -> str: ...
     def as_sql(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[str, Union[List[Optional[int]], List[Union[int, str]]]]: ...
+    ) -> Tuple[str, List[Union[int, str]]]: ...
     def split_parameter_list_as_sql(self, compiler: Any, connection: Any): ...
 
 class PatternLookup(BuiltinLookup):
@@ -250,7 +215,7 @@ class PatternLookup(BuiltinLookup):
     def get_rhs_op(self, connection: DatabaseWrapper, rhs: str) -> str: ...
     def process_rhs(
         self, qn: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[str, Union[List[int], List[str]]]: ...
+    ) -> Tuple[str, List[Any]]: ...
 
 class Contains(PatternLookup):
     bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
@@ -301,13 +266,11 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     contains_aggregate: bool
     lhs: django.db.models.expressions.Expression
     rhs: Union[
-        List[Union[django.db.models.expressions.Combinable, int]],
         List[datetime.datetime],
         Tuple[
-            Union[django.db.models.expressions.Combinable, int],
-            Union[django.db.models.expressions.CombinedExpression, int],
+            Union[django.db.models.expressions.F, int],
+            Union[datetime.datetime, int],
         ],
-        Tuple[datetime.datetime, datetime.datetime],
     ]
     lookup_name: str = ...
     def get_rhs_op(

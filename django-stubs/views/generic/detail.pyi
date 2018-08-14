@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional, Union
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
-from django.forms.models import ModelForm
 from django.template.response import TemplateResponse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
@@ -22,13 +21,7 @@ class SingleObjectMixin(ContextMixin):
     def get_context_object_name(
         self, obj: Union[Dict[str, str], Model]
     ) -> Optional[str]: ...
-    def get_context_data(
-        self, **kwargs: Any
-    ) -> Union[
-        Dict[str, Union[Dict[str, str], DetailView]],
-        Dict[str, Union[Model, ModelForm, SingleObjectTemplateResponseMixin]],
-        Dict[str, Union[Model, SingleObjectMixin, str]],
-    ]: ...
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]: ...
 
 class BaseDetailView(SingleObjectMixin, View):
     object: Any = ...

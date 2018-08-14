@@ -20,9 +20,7 @@ class MigrationRecorder:
     def __init__(
         self,
         connection: Optional[
-            Union[
-                DefaultConnectionProxy, backends.base.base.BaseDatabaseWrapper
-            ]
+            Union[DefaultConnectionProxy, BaseDatabaseWrapper]
         ],
     ) -> None: ...
     @property

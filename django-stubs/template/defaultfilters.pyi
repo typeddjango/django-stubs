@@ -1,8 +1,7 @@
-from datetime import date, time, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
-from django.db.models.query import QuerySet
 from django.utils.safestring import SafeText
 
 from .base import Variable, VariableDoesNotExist
@@ -52,7 +51,7 @@ def dictsort(
     value: Union[
         Dict[str, int],
         List[Dict[str, Dict[str, Union[int, str]]]],
-        List[Dict[str, Union[int, str]]],
+        List[Dict[str, str]],
         List[Tuple[str, str]],
         List[int],
         int,
@@ -61,7 +60,7 @@ def dictsort(
     arg: Union[int, str],
 ) -> Union[
     List[Dict[str, Dict[str, Union[int, str]]]],
-    List[Dict[str, Union[int, str]]],
+    List[Dict[str, str]],
     List[Tuple[str, str]],
     str,
 ]: ...
@@ -79,21 +78,17 @@ def dictsortreversed(
 def first(value: Union[List[int], List[str], str]) -> Union[int, str]: ...
 def join(value: Any, arg: str, autoescape: bool = ...) -> Any: ...
 def last(value: List[str]) -> str: ...
-def length(
-    value: Optional[
-        Union[
-            List[Optional[Union[Dict[Any, Any], int, str]]], QuerySet, int, str
-        ]
-    ]
-) -> int: ...
-def length_is(value: Any, arg: Union[SafeText, int]) -> Union[bool, str]: ...
+def length(value: Any) -> int: ...
+def length_is(
+    value: Optional[Union[List[Callable], Tuple[str, str], int, str]],
+    arg: Union[SafeText, int],
+) -> Union[bool, str]: ...
 def random(value: List[str]) -> str: ...
 def slice_filter(value: Any, arg: str) -> Any: ...
 def unordered_list(
     value: Union[
         Iterator[Any],
         List[Union[List[Union[List[Union[List[str], str]], str]], str]],
-        List[Union[List[Union[List[str], str]], str]],
     ],
     autoescape: bool = ...,
 ) -> SafeText: ...
@@ -103,10 +98,10 @@ def add(
 ) -> Union[List[int], Tuple[int, int, int, int], date, int, str]: ...
 def get_digit(value: Union[int, str], arg: int) -> Union[int, str]: ...
 def date(
-    value: Optional[Union[date, time, str]], arg: Optional[str] = ...
+    value: Optional[Union[datetime, str]], arg: Optional[str] = ...
 ) -> str: ...
 def time(
-    value: Optional[Union[date, time, str]], arg: Optional[str] = ...
+    value: Optional[Union[datetime, str]], arg: Optional[str] = ...
 ) -> str: ...
 def timesince_filter(
     value: Optional[date], arg: Optional[date] = ...

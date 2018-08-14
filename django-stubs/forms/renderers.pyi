@@ -1,6 +1,5 @@
 from datetime import time
-from decimal import Decimal
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.template.backends.base import BaseEngine
 from django.template.backends.django import Template
@@ -15,68 +14,18 @@ class BaseRenderer:
     def render(
         self,
         template_name: str,
-        context: Union[
-            Dict[
-                str,
+        context: Dict[
+            str,
+            Union[
                 Dict[
                     str,
                     Optional[
                         Union[
-                            Dict[str, Union[bool, float, str]],
+                            Dict[str, bool],
                             List[
-                                Union[
-                                    Dict[
-                                        str,
-                                        Optional[
-                                            Union[
-                                                Dict[str, Union[bool, str]],
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Optional[
-                                                            Union[
-                                                                Dict[
-                                                                    str,
-                                                                    Union[
-                                                                        bool,
-                                                                        str,
-                                                                    ],
-                                                                ],
-                                                                bool,
-                                                                str,
-                                                            ]
-                                                        ],
-                                                    ]
-                                                ],
-                                                bool,
-                                                str,
-                                            ]
-                                        ],
-                                    ],
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Dict[str, Union[bool, str]],
-                                            List[
-                                                Tuple[
-                                                    None,
-                                                    List[
-                                                        Dict[
-                                                            str,
-                                                            Union[
-                                                                Dict[Any, Any],
-                                                                bool,
-                                                                str,
-                                                            ],
-                                                        ]
-                                                    ],
-                                                    int,
-                                                ]
-                                            ],
-                                            bool,
-                                            str,
-                                        ],
-                                    ],
+                                Dict[
+                                    str,
+                                    Optional[Union[Dict[str, str], bool, str]],
                                 ]
                             ],
                             bool,
@@ -84,153 +33,55 @@ class BaseRenderer:
                         ]
                     ],
                 ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Optional[
-                        Union[
-                            Dict[str, Union[Decimal, int, str]],
-                            List[
-                                Dict[
-                                    str,
-                                    Optional[Union[Dict[str, str], bool, str]],
-                                ]
-                            ],
-                            int,
-                            str,
-                        ]
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[Any, Any],
-                        List[
-                            Tuple[
-                                List[
-                                    Dict[str, Union[Dict[Any, Any], bool, str]]
-                                ],
-                                int,
-                                int,
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[Any, Any],
-                        List[
-                            Union[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[Any, Any],
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Dict[Any, Any], bool, str
-                                                ],
-                                            ]
-                                        ],
-                                        bool,
-                                        str,
-                                    ],
-                                ],
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[str, bool],
-                                        List[
-                                            Tuple[
-                                                None,
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Union[
-                                                            Dict[str, bool],
-                                                            bool,
-                                                            str,
-                                                        ],
-                                                    ]
-                                                ],
-                                                int,
-                                            ]
-                                        ],
-                                        List[str],
-                                        bool,
-                                        str,
-                                    ],
-                                ],
-                            ]
-                        ],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[Any, Any],
-                        List[
-                            Union[
-                                Tuple[
-                                    None,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[Any, Any], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ],
-                                Tuple[
-                                    str,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[str, bool], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ],
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
                 Dict[
                     str,
                     Union[
                         Dict[str, Union[bool, str]],
                         List[
+                            Dict[
+                                str,
+                                Union[
+                                    Dict[str, Union[bool, str]],
+                                    List[
+                                        Tuple[
+                                            None,
+                                            List[
+                                                Dict[
+                                                    str,
+                                                    Union[
+                                                        Dict[str, bool],
+                                                        bool,
+                                                        str,
+                                                    ],
+                                                ]
+                                            ],
+                                            int,
+                                        ]
+                                    ],
+                                    List[str],
+                                    bool,
+                                    str,
+                                ],
+                            ]
+                        ],
+                        List[str],
+                        bool,
+                        str,
+                    ],
+                ],
+                Dict[
+                    str,
+                    Union[
+                        Dict[str, Union[int, str]],
+                        List[
                             Tuple[
-                                None,
+                                Optional[str],
                                 List[
                                     Dict[
                                         str,
                                         Union[
                                             Dict[str, Union[bool, str]],
+                                            time,
                                             int,
                                             str,
                                         ],
@@ -240,178 +91,10 @@ class BaseRenderer:
                             ]
                         ],
                         List[str],
-                        bool,
+                        int,
                         str,
                     ],
                 ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[bool, str]],
-                        List[
-                            Union[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[str, Union[bool, str]],
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Dict[str, Union[bool, str]],
-                                                    bool,
-                                                    str,
-                                                ],
-                                            ]
-                                        ],
-                                        bool,
-                                        str,
-                                    ],
-                                ],
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[str, Union[bool, str]],
-                                        List[
-                                            Tuple[
-                                                None,
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Union[
-                                                            Dict[str, bool],
-                                                            bool,
-                                                            str,
-                                                        ],
-                                                    ]
-                                                ],
-                                                int,
-                                            ]
-                                        ],
-                                        List[str],
-                                        bool,
-                                        str,
-                                    ],
-                                ],
-                            ]
-                        ],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[bool, str]],
-                        List[
-                            Union[
-                                Tuple[
-                                    None,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[str, bool], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ],
-                                Tuple[
-                                    str,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[Any, Any], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ],
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[int, str]],
-                        List[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[Dict[Any, Any], time, int, str],
-                                    ]
-                                ],
-                                int,
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, Union[int, str]],
-                        List[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[
-                                        str,
-                                        Union[
-                                            Dict[str, bool], Set[str], int, str
-                                        ],
-                                    ]
-                                ],
-                                int,
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, bool],
-                        List[
-                            Tuple[
-                                List[
-                                    Dict[str, Union[Dict[str, bool], bool, str]]
-                                ],
-                                int,
-                                int,
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
                 Dict[
                     str,
                     Union[
@@ -423,316 +106,6 @@ class BaseRenderer:
                     ],
                 ],
             ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, str],
-                        List[
-                            Tuple[
-                                None,
-                                List[
-                                    Dict[str, Union[Dict[str, str], int, str]]
-                                ],
-                                int,
-                            ]
-                        ],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, str],
-                        List[
-                            Union[
-                                Tuple[
-                                    None,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[str, str], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ],
-                                Tuple[
-                                    str,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[
-                                                Dict[str, Union[bool, str]],
-                                                bool,
-                                                str,
-                                            ],
-                                        ]
-                                    ],
-                                    int,
-                                ],
-                            ]
-                        ],
-                        List[str],
-                        bool,
-                        str,
-                    ],
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Optional[
-                            Union[
-                                Dict[Any, Any],
-                                List[
-                                    Dict[
-                                        str,
-                                        Optional[
-                                            Union[Dict[Any, Any], bool, str]
-                                        ],
-                                    ]
-                                ],
-                                bool,
-                                str,
-                            ]
-                        ],
-                    ],
-                    List[Dict[str, str]],
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Optional[
-                            Union[
-                                Dict[str, Union[bool, str]],
-                                List[
-                                    Dict[
-                                        str,
-                                        Optional[
-                                            Union[
-                                                Dict[str, Union[bool, str]],
-                                                bool,
-                                                str,
-                                            ]
-                                        ],
-                                    ]
-                                ],
-                                bool,
-                                str,
-                            ]
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Optional[
-                            Union[
-                                Dict[str, str],
-                                List[
-                                    Dict[
-                                        str,
-                                        Optional[
-                                            Union[Dict[str, str], bool, str]
-                                        ],
-                                    ]
-                                ],
-                                bool,
-                                str,
-                            ]
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[str, Optional[Union[Dict[str, str], bool, str]]],
-                    List[Dict[str, str]],
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[Any, Any],
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[Any, Any],
-                                        List[
-                                            Tuple[
-                                                None,
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Union[
-                                                            Dict[str, bool],
-                                                            bool,
-                                                            str,
-                                                        ],
-                                                    ]
-                                                ],
-                                                int,
-                                            ]
-                                        ],
-                                        List[str],
-                                        bool,
-                                        str,
-                                    ],
-                                ]
-                            ],
-                            List[str],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[Any, Any],
-                            List[Dict[str, Union[Dict[str, str], bool, str]]],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[str, Union[bool, str]],
-                            List[
-                                Dict[
-                                    str,
-                                    Union[
-                                        Dict[str, Union[bool, str]], bool, str
-                                    ],
-                                ]
-                            ],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[str, str],
-                            List[Dict[str, Union[Dict[str, str], bool, str]]],
-                            List[str],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[str, str],
-                            List[
-                                Tuple[
-                                    None,
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[str, str], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ]
-                            ],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    str,
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            Dict[str, str],
-                            List[
-                                Union[
-                                    Tuple[
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Dict[str, str], bool, str
-                                                ],
-                                            ]
-                                        ],
-                                        int,
-                                        int,
-                                    ],
-                                    Tuple[
-                                        str,
-                                        List[
-                                            Dict[
-                                                str,
-                                                Union[
-                                                    Dict[str, Union[bool, str]],
-                                                    bool,
-                                                    str,
-                                                ],
-                                            ]
-                                        ],
-                                        int,
-                                    ],
-                                ]
-                            ],
-                            List[str],
-                            bool,
-                            str,
-                        ],
-                    ],
-                    List[Dict[str, str]],
-                ],
-            ],
-            Dict[str, Union[bool, str]],
         ],
         request: None = ...,
     ) -> str: ...

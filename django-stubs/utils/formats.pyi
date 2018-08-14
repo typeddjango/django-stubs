@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, Iterator, List, Optional, Union
 
@@ -19,12 +19,12 @@ def get_format(
 get_format_lazy: Any
 
 def date_format(
-    value: Union[date, time, str],
+    value: Union[datetime, str],
     format: Optional[str] = ...,
     use_l10n: Optional[bool] = ...,
 ) -> str: ...
 def time_format(
-    value: Union[date, time, str],
+    value: Union[datetime, str],
     format: Optional[str] = ...,
     use_l10n: None = ...,
 ) -> str: ...
@@ -36,7 +36,8 @@ def number_format(
 ) -> str: ...
 def localize(value: Any, use_l10n: Optional[bool] = ...) -> Any: ...
 def localize_input(
-    value: Any, default: Optional[str] = ...
+    value: Optional[Union[datetime, Decimal, float, str]],
+    default: Optional[str] = ...,
 ) -> Optional[str]: ...
 def sanitize_separators(
     value: Union[Decimal, int, str]

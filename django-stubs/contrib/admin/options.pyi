@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
 
 from django.contrib.admin.filters import SimpleListFilter
 from django.contrib.admin.models import LogEntry
-from django.contrib.admin.sites import AdminSite, DefaultAdminSite
+from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.contenttypes.models import ContentType
@@ -87,20 +87,9 @@ class BaseModelAdmin:
     def get_fieldsets(
         self, request: WSGIRequest, obj: Optional[Model] = ...
     ) -> Union[
-        List[
-            Tuple[
-                None,
-                Union[
-                    Dict[str, List[Any]],
-                    Dict[str, List[Union[Callable, str]]],
-                    Dict[str, List[str]],
-                    Dict[str, Tuple[str, str]],
-                ],
-            ]
-        ],
-        Tuple[Tuple[None, Dict[str, Tuple[Tuple[str, str]]]]],
+        List[Tuple[None, Dict[str, List[Union[Callable, str]]]]],
         Tuple[
-            Tuple[str, Dict[str, Tuple[str]]], Tuple[str, Dict[str, Tuple[str]]]
+            Tuple[Optional[str], Dict[str, Tuple[Union[Tuple[str, str], str]]]]
         ],
     ]: ...
     def get_ordering(self, request: WSGIRequest) -> Union[List[str], Tuple]: ...
@@ -130,7 +119,12 @@ class BaseModelAdmin:
 
 class ModelAdmin(BaseModelAdmin):
     formfield_overrides: Dict[
-        Type[Any],
+        Type[
+            Union[
+                django.db.models.fields.DateTimeCheckMixin,
+                django.db.models.fields.Field,
+            ]
+        ],
         Dict[
             str,
             Type[
@@ -173,9 +167,7 @@ class ModelAdmin(BaseModelAdmin):
     opts: django.db.models.options.Options = ...
     admin_site: django.contrib.admin.sites.AdminSite = ...
     def __init__(
-        self,
-        model: Type[Model],
-        admin_site: Optional[Union[AdminSite, DefaultAdminSite]],
+        self, model: Type[Model], admin_site: Optional[AdminSite]
     ) -> None: ...
     def get_inline_instances(
         self, request: WSGIRequest, obj: Optional[Model] = ...

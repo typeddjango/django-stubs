@@ -1,14 +1,14 @@
 from collections import OrderedDict
 from typing import Any, Iterator, List, Optional, Tuple, Union
 
-from django.core.files.storage import DefaultStorage, FileSystemStorage
+from django.core.files.storage import FileSystemStorage
 
 
 def matches_patterns(
     path: str, patterns: Union[List[str], Tuple[str], OrderedDict] = ...
 ) -> bool: ...
 def get_files(
-    storage: Union[DefaultStorage, FileSystemStorage],
+    storage: FileSystemStorage,
     ignore_patterns: List[str] = ...,
     location: str = ...,
 ) -> Iterator[str]: ...

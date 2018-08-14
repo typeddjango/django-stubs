@@ -14,7 +14,12 @@ sensitive_post_parameters_m: Any
 class GroupAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[Any],
+        Type[
+            Union[
+                django.db.models.fields.DateTimeCheckMixin,
+                django.db.models.fields.Field,
+            ]
+        ],
         Dict[
             str,
             Type[
@@ -40,7 +45,12 @@ class GroupAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[Any],
+        Type[
+            Union[
+                django.db.models.fields.DateTimeCheckMixin,
+                django.db.models.fields.Field,
+            ]
+        ],
         Dict[
             str,
             Type[

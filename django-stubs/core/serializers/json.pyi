@@ -1,5 +1,5 @@
 import json
-from datetime import date, time, timedelta
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, Optional, Union
 from uuid import UUID
@@ -32,6 +32,4 @@ class DjangoJSONEncoder(json.JSONEncoder):
     indent: None
     skipkeys: bool
     sort_keys: bool
-    def default(
-        self, o: Union[date, time, timedelta, Decimal, UUID]
-    ) -> str: ...
+    def default(self, o: Union[datetime, Decimal, UUID]) -> str: ...

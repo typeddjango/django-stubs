@@ -1,5 +1,5 @@
 from collections import OrderedDict, namedtuple
-from datetime import date, time, timedelta
+from datetime import datetime
 from decimal import Decimal
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
@@ -14,9 +14,10 @@ from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.fields.reverse_related import (ForeignObjectRel,
                                                      ManyToOneRel)
-from django.db.models.lookups import (FieldGetDbPrepValueMixin, Lookup,
-                                      Transform)
+from django.db.models.lookups import (FieldGetDbPrepValueMixin,
+                                      IntegerLessThan, Lookup, Transform)
 from django.db.models.options import Options
+from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.datastructures import BaseTable, Join
@@ -43,7 +44,21 @@ class RawQuery:
     cursor: Optional[django.db.backends.utils.CursorWrapper] = ...
     extra_select: Dict[Any, Any] = ...
     annotation_select: Dict[Any, Any] = ...
-    def __init__(self, sql: str, using: str, params: Any = ...) -> None: ...
+    def __init__(
+        self,
+        sql: str,
+        using: str,
+        params: Optional[
+            Union[
+                Dict[str, str],
+                List[datetime],
+                List[Decimal],
+                List[str],
+                Set[str],
+                Tuple[int],
+            ]
+        ] = ...,
+    ) -> None: ...
     def chain(self, using: str) -> RawQuery: ...
     def clone(self, using: str) -> RawQuery: ...
     def get_columns(self) -> List[str]: ...
@@ -54,21 +69,15 @@ class RawQuery:
 class Query:
     base_table: str
     related_ids: None
-    related_updates: Union[
-        Dict[
-            Type[django.db.models.base.Model],
-            List[Tuple[django.db.models.fields.CharField, None, str]],
-        ],
-        Dict[
-            Type[django.db.models.base.Model],
-            List[Tuple[django.db.models.fields.IntegerField, None, int]],
-        ],
+    related_updates: Dict[
+        Type[django.db.models.base.Model],
+        List[Tuple[django.db.models.fields.Field, None, Union[int, str]]],
     ]
     values: List[
         Tuple[
             django.db.models.fields.Field,
-            Union[django.db.models.aggregates.Max, int, str],
-            Union[django.db.models.aggregates.Max, int, str],
+            Optional[Type[django.db.models.base.Model]],
+            django.db.models.aggregates.Max,
         ]
     ]
     alias_prefix: str = ...
@@ -118,7 +127,7 @@ class Query:
     extra_select_mask: Optional[Set[str]] = ...
     extra_tables: Tuple = ...
     extra_order_by: Union[List[str], Tuple] = ...
-    deferred_loading: Tuple[bool, bool] = ...
+    deferred_loading: Tuple[Union[Set[str], frozenset], bool] = ...
     explain_query: bool = ...
     explain_format: Optional[str] = ...
     explain_options: Dict[str, int] = ...
@@ -153,22 +162,19 @@ class Query:
     def get_meta(self) -> Options: ...
     def clone(self) -> Query: ...
     def chain(self, klass: Optional[Type[Query]] = ...) -> Query: ...
-    def relabeled_clone(self, change_map: Dict[Any, Any]) -> Query: ...
+    def relabeled_clone(
+        self, change_map: Union[Dict[Any, Any], OrderedDict]
+    ) -> Query: ...
     def rewrite_cols(
         self,
         annotation: Union[Expression, FieldGetDbPrepValueMixin, WhereNode],
         col_cnt: int,
-    ) -> Tuple[int, int]: ...
+    ) -> Tuple[Union[Expression, IntegerLessThan], int]: ...
     def get_aggregation(
         self,
         using: str,
         added_aggregate_names: Union[Dict[str, SQLiteNumericMixin], List[str]],
-    ) -> Union[
-        Dict[str, Optional[int]],
-        Dict[str, Union[date, time]],
-        Dict[str, Union[Decimal, float]],
-        Dict[str, timedelta],
-    ]: ...
+    ) -> Dict[str, Optional[Union[datetime, Decimal, float]]]: ...
     def get_count(self, using: str) -> int: ...
     def has_filters(self) -> WhereNode: ...
     def has_results(self, using: str) -> bool: ...
@@ -190,7 +196,9 @@ class Query:
     def promote_joins(self, aliases: Set[str]) -> None: ...
     def demote_joins(self, aliases: Set[str]) -> None: ...
     def reset_refcounts(self, to_counts: Dict[str, int]) -> None: ...
-    def change_aliases(self, change_map: Dict[Any, Any]) -> None: ...
+    def change_aliases(
+        self, change_map: Union[Dict[Any, Any], OrderedDict]
+    ) -> None: ...
     def bump_prefix(self, outer_query: Query) -> None: ...
     def get_initial_alias(self) -> str: ...
     def count_active_tables(self) -> int: ...
@@ -222,8 +230,7 @@ class Query:
     def solve_lookup_type(
         self, lookup: str
     ) -> Union[
-        Tuple[List[str], List[str], bool],
-        Tuple[List[str], Tuple, Union[Expression, SQLiteNumericMixin]],
+        Tuple[List[str], List[str], bool], Tuple[List[str], Tuple, Expression]
     ]: ...
     def check_query_object_type(
         self,
@@ -232,26 +239,31 @@ class Query:
         field: FieldCacheMixin,
     ) -> None: ...
     def check_related_objects(
-        self, field: Union[Field, ForeignObjectRel], value: Any, opts: Options
+        self,
+        field: Union[Field, reverse_related.ForeignObjectRel],
+        value: Any,
+        opts: Options,
     ) -> None: ...
     def build_lookup(
         self,
         lookups: List[str],
-        lhs: Union[Expression, TextField, related_lookups.MultiColSource],
+        lhs: Union[Expression, TextField, MultiColSource],
         rhs: Any,
     ) -> Lookup: ...
     def try_transform(self, lhs: Expression, name: str) -> Transform: ...
     def build_filter(
         self,
-        filter_expr: Union[Dict[str, str], Tuple[str, Any]],
+        filter_expr: Union[Dict[str, str], Tuple[str, Tuple[int, int]]],
         branch_negated: bool = ...,
         current_negated: bool = ...,
         can_reuse: Optional[Set[str]] = ...,
         allow_joins: bool = ...,
         split_subq: bool = ...,
         reuse_with_filtered_relation: bool = ...,
-    ) -> Tuple[WhereNode, Union[List[Any], Set[str], Tuple]]: ...
-    def add_filter(self, filter_clause: Tuple[str, Any]) -> None: ...
+    ) -> Tuple[WhereNode, List[Any]]: ...
+    def add_filter(
+        self, filter_clause: Tuple[str, Union[List[int], List[str]]]
+    ) -> None: ...
     def add_q(self, q_object: Q) -> None: ...
     def build_filtered_relation_q(
         self,
@@ -269,11 +281,11 @@ class Query:
         opts: Options,
         allow_many: bool = ...,
         fail_on_missing: bool = ...,
-    ) -> Union[
-        Tuple[
-            List[PathInfo], Tuple[Field], List[str], Union[List[Any], List[str]]
-        ],
-        Tuple[List[PathInfo], Field, Tuple[Field], List[str]],
+    ) -> Tuple[
+        List[PathInfo],
+        Union[Field, reverse_related.ForeignObjectRel],
+        Tuple[Field],
+        List[str],
     ]: ...
     def setup_joins(
         self,
@@ -296,7 +308,7 @@ class Query:
     ) -> Expression: ...
     def split_exclude(
         self,
-        filter_expr: Tuple[str, Any],
+        filter_expr: Tuple[str, Union[QuerySet, int]],
         can_reuse: Set[str],
         names_with_path: List[Tuple[str, List[PathInfo]]],
     ) -> Tuple[WhereNode, Tuple]: ...
@@ -325,7 +337,7 @@ class Query:
     def add_select_related(self, fields: Tuple[str]) -> None: ...
     def add_extra(
         self,
-        select: Optional[Union[Dict[str, int], Dict[str, str]]],
+        select: Optional[Union[Dict[str, int], Dict[str, str], OrderedDict]],
         select_params: Optional[Union[List[int], List[str], Tuple[int]]],
         where: Optional[List[str]],
         params: Optional[List[str]],
@@ -340,7 +352,7 @@ class Query:
         self,
         target: Dict[Type[Model], Set[str]],
         model: Type[Model],
-        fields: Union[Set[Field], Set[ManyToOneRel]],
+        fields: Union[Set[Field], Set[reverse_related.ManyToOneRel]],
     ) -> None: ...
     def set_annotation_mask(
         self, names: Optional[Union[List[str], Set[str], Tuple]]
@@ -349,9 +361,9 @@ class Query:
     def set_extra_mask(self, names: Union[List[str], Tuple]) -> None: ...
     def set_values(self, fields: Union[List[str], Tuple]) -> None: ...
     @property
-    def annotation_select(self) -> Dict[Any, Any]: ...
+    def annotation_select(self) -> Union[Dict[Any, Any], OrderedDict]: ...
     @property
-    def extra_select(self) -> Dict[Any, Any]: ...
+    def extra_select(self) -> Union[Dict[Any, Any], OrderedDict]: ...
     def trim_start(
         self, names_with_path: List[Tuple[str, List[PathInfo]]]
     ) -> Tuple[str, bool]: ...

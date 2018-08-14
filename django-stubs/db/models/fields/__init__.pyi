@@ -3,7 +3,6 @@ from decimal import Context, Decimal
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 from uuid import UUID
 
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.core.validators import DecimalValidator
 from django.db.backends.sqlite3.base import DatabaseWrapper
@@ -79,30 +78,9 @@ class Field(RegisterLookupMixin):
         choices: Optional[
             Union[
                 List[List[Union[List[List[str]], str]]],
-                List[
-                    Tuple[
-                        Union[int, str],
-                        Union[
-                            Tuple[
-                                Tuple[str, str],
-                                Tuple[str, str],
-                                Tuple[str, str],
-                            ],
-                            Tuple[Tuple[str, str], Tuple[str, str]],
-                            int,
-                            str,
-                        ],
-                    ]
-                ],
-                Tuple[
-                    Union[
-                        Tuple[int, Union[int, str]],
-                        Tuple[
-                            str,
-                            Union[Tuple[Tuple[int, str], Tuple[int, str]], str],
-                        ],
-                    ]
-                ],
+                List[Tuple[Optional[int], str]],
+                List[Tuple[Union[int, str], int]],
+                Tuple[Tuple[Union[int, str], Union[int, str]]],
             ]
         ] = ...,
         help_text: str = ...,
@@ -116,7 +94,9 @@ class Field(RegisterLookupMixin):
     def get_col(
         self,
         alias: str,
-        output_field: Optional[Union[Field, ForeignObjectRel]] = ...,
+        output_field: Optional[
+            Union[Field, reverse_related.ForeignObjectRel]
+        ] = ...,
     ) -> Col: ...
     def cached_col(self) -> Col: ...
     def select_format(
@@ -124,81 +104,14 @@ class Field(RegisterLookupMixin):
     ) -> Tuple[str, List[Union[int, str]]]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[None, str, List[Any], Dict[str, Union[List[Callable], int, str]]],
-        Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Optional[bool]],
-                Dict[str, Union[Callable, int, str]],
-                Dict[str, Union[List[Tuple[int, str]], int]],
-                Dict[
-                    str,
-                    Union[
-                        List[
-                            Tuple[
-                                str,
-                                Union[
-                                    Tuple[Tuple[str, str], Tuple[str, str]], str
-                                ],
-                            ]
-                        ],
-                        int,
-                    ],
-                ],
-                Dict[str, Union[List[Tuple[str, str]], int]],
-                Dict[str, Union[List[UnicodeUsernameValidator], int, str]],
-                Dict[str, float],
-            ],
-            Union[
-                Dict[str, Optional[bool]],
-                Dict[str, Union[Callable, int, str]],
-                Dict[str, Union[List[Tuple[int, str]], int]],
-                Dict[
-                    str,
-                    Union[
-                        List[
-                            Tuple[
-                                str,
-                                Union[
-                                    Tuple[Tuple[str, str], Tuple[str, str]], str
-                                ],
-                            ]
-                        ],
-                        int,
-                    ],
-                ],
-                Dict[str, Union[List[Tuple[str, str]], int]],
-                Dict[str, Union[List[UnicodeUsernameValidator], int, str]],
-                Dict[str, float],
-            ],
-        ],
-        Tuple[
-            str,
-            List[Any],
-            Union[
-                Dict[str, Optional[bool]],
-                Dict[str, Union[List[Tuple[int, str]], str]],
-            ],
-            Union[
-                Dict[str, List[Tuple[int, str]]],
-                Dict[str, Optional[bool]],
-                Dict[str, Union[List[Tuple[int, str]], str]],
-            ],
-        ],
+    ) -> Tuple[
+        Optional[str], str, List[Any], Dict[str, List[Tuple[int, str]]]
     ]: ...
     def clone(self) -> Field: ...
     def __eq__(self, other: Field) -> bool: ...
     def __lt__(self, other: Field) -> bool: ...
     def __hash__(self) -> int: ...
-    def __deepcopy__(
-        self,
-        memodict: Union[
-            Dict[int, Any],
-            Dict[int, Union[Dict[str, Field], List[Field], Field]],
-        ],
-    ) -> Field: ...
+    def __deepcopy__(self, memodict: Dict[int, Dict[Any, Any]]) -> Field: ...
     def __copy__(self) -> Field: ...
     def __reduce__(self): ...
     def get_pk_value_on_save(self, instance: Model) -> Optional[UUID]: ...
@@ -242,7 +155,7 @@ class Field(RegisterLookupMixin):
     ) -> Optional[Union[bytes, float, str]]: ...
     def get_db_prep_save(
         self, value: Any, connection: DatabaseWrapper
-    ) -> Optional[Union[float, memoryview, str]]: ...
+    ) -> Optional[Union[float, str]]: ...
     def has_default(self) -> bool: ...
     def get_default(self) -> Any: ...
     def get_choices(
@@ -251,20 +164,8 @@ class Field(RegisterLookupMixin):
         blank_choice: List[Tuple[str, str]] = ...,
         limit_choices_to: Optional[Dict[str, QuerySet]] = ...,
     ) -> List[
-        Union[
-            Tuple[
-                Union[
-                    Tuple[Tuple[str, str], Tuple[str, str], Tuple[str, str]],
-                    Tuple[Tuple[str, str], Tuple[str, str]],
-                    str,
-                ],
-                Union[
-                    Tuple[Tuple[str, str], Tuple[str, str], Tuple[str, str]],
-                    Tuple[Tuple[str, str], Tuple[str, str]],
-                    str,
-                ],
-            ],
-            Tuple[int, int],
+        Tuple[
+            Union[int, str], Union[Tuple[Tuple[str, str], Tuple[str, str]], str]
         ]
     ]: ...
     def value_to_string(self, obj: Model) -> str: ...
@@ -274,7 +175,7 @@ class Field(RegisterLookupMixin):
     ) -> None: ...
     def formfield(
         self,
-        form_class: Optional[Type[Any]] = ...,
+        form_class: Optional[Type[Field]] = ...,
         choices_form_class: Optional[Type[TypedMultipleChoiceField]] = ...,
         **kwargs: Any
     ) -> Field: ...
@@ -288,15 +189,7 @@ class AutoField(Field):
     def check(self, **kwargs: Any) -> List[Any]: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            str,
-            List[Any],
-            Dict[str, Union[bool, str]],
-            Dict[str, Union[bool, str]],
-        ],
-        Tuple[str, str, List[Any], Dict[str, bool]],
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, Union[bool, str]]]: ...
     def get_internal_type(self) -> str: ...
     def to_python(self, value: Union[int, str]) -> int: ...
     def rel_db_type(self, connection: DatabaseWrapper) -> str: ...
@@ -367,14 +260,8 @@ class DateField(DateTimeCheckMixin, Field):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            str,
-            List[Any],
-            Dict[str, Union[Callable, int, str]],
-            Dict[str, Union[Callable, int, str]],
-        ],
-        Tuple[str, str, List[Any], Dict[str, int]],
+    ) -> Tuple[
+        Optional[str], str, List[Any], Dict[str, Union[Callable, int, str]]
     ]: ...
     def get_internal_type(self) -> str: ...
     def to_python(
@@ -438,7 +325,7 @@ class DecimalField(Field):
     def context(self) -> Context: ...
     def deconstruct(
         self
-    ) -> Tuple[str, List[Any], Dict[str, int], Dict[str, int]]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, int]]: ...
     def get_internal_type(self) -> str: ...
     def to_python(self, value: Optional[str]) -> Optional[Decimal]: ...
     def get_db_prep_save(
@@ -466,7 +353,7 @@ class EmailField(CharField):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[str, List[Any], Dict[str, int], Dict[str, int]]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, int]]: ...
     def formfield(self, **kwargs: Any) -> EmailField: ...
 
 class FilePathField(Field):
@@ -588,15 +475,7 @@ class SlugField(CharField):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            str,
-            List[Any],
-            Dict[str, int],
-            Union[Dict[Any, Any], Dict[str, int]],
-        ],
-        Tuple[str, str, List[Any], Dict[str, int]],
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, int]]: ...
     def get_internal_type(self) -> str: ...
     def formfield(self, **kwargs: Any) -> SlugField: ...
 
@@ -629,20 +508,18 @@ class TimeField(DateTimeCheckMixin, Field):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[str, List[Any], Dict[Any, Any], Dict[Any, Any]]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[Any, Any]]: ...
     def get_internal_type(self) -> str: ...
     def to_python(
-        self, value: Optional[Union[datetime, time, str]]
+        self, value: Optional[Union[datetime, str]]
     ) -> Optional[time]: ...
     def pre_save(
         self, model_instance: Model, add: bool
     ) -> Optional[datetime]: ...
-    def get_prep_value(
-        self, value: Optional[Union[datetime, time]]
-    ) -> Optional[time]: ...
+    def get_prep_value(self, value: Optional[datetime]) -> Optional[time]: ...
     def get_db_prep_value(
         self,
-        value: Optional[Union[datetime, time]],
+        value: Optional[datetime],
         connection: DatabaseWrapper,
         prepared: bool = ...,
     ) -> Optional[str]: ...
@@ -657,9 +534,7 @@ class URLField(CharField):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[
-        str, List[Any], Dict[str, int], Union[Dict[Any, Any], Dict[str, int]]
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, int]]: ...
     def formfield(self, **kwargs: Any) -> URLField: ...
 
 class BinaryField(Field):
@@ -668,19 +543,11 @@ class BinaryField(Field):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def deconstruct(
         self
-    ) -> Union[
-        Tuple[
-            str,
-            List[Any],
-            Dict[str, bool],
-            Union[Dict[Any, Any], Dict[str, bool]],
-        ],
-        Tuple[str, str, List[Any], Dict[Any, Any]],
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, bool]]: ...
     def get_internal_type(self) -> str: ...
     def get_placeholder(
         self,
-        value: Optional[memoryview],
+        value: None,
         compiler: SQLInsertCompiler,
         connection: DatabaseWrapper,
     ) -> str: ...
@@ -690,7 +557,7 @@ class BinaryField(Field):
         value: Optional[bytes],
         connection: DatabaseWrapper,
         prepared: bool = ...,
-    ) -> Optional[memoryview]: ...
+    ) -> None: ...
     def value_to_string(self, obj: Any): ...
     def to_python(self, value: Any): ...
 
@@ -702,10 +569,7 @@ class UUIDField(Field):
     def deconstruct(
         self
     ) -> Tuple[
-        str,
-        List[Any],
-        Dict[str, Union[Callable, bool]],
-        Dict[str, Union[Callable, bool]],
+        Optional[str], str, List[Any], Dict[str, Union[Callable, bool]]
     ]: ...
     def get_internal_type(self) -> str: ...
     def get_db_prep_value(

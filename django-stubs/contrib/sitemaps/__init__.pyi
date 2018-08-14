@@ -35,10 +35,7 @@ class GenericSitemap(Sitemap):
     protocol: None = ...
     def __init__(
         self,
-        info_dict: Union[
-            Dict[str, Union[datetime, QuerySet]],
-            Dict[str, Union[QuerySet, str]],
-        ],
+        info_dict: Dict[str, Union[datetime, QuerySet, str]],
         priority: Optional[float] = ...,
         changefreq: Optional[str] = ...,
         protocol: Optional[str] = ...,

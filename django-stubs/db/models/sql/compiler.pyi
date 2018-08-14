@@ -1,16 +1,19 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime
 from decimal import Decimal
 from itertools import chain
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 from uuid import UUID
 
+from django.contrib.contenttypes.models import ContentType
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import (BaseExpression, Col, Expression,
-                                          OrderBy, SQLiteNumericMixin)
+                                          OrderBy, RawSQL, SQLiteNumericMixin)
 from django.db.models.fields import DateTimeCheckMixin, Field
+from django.db.models.fields.mixins import FieldCacheMixin
+from django.db.models.fields.related import ForeignKey
 from django.db.models.functions.text import Lower
 from django.db.models.options import Options
 from django.db.models.sql.query import Query, RawQuery
@@ -39,42 +42,23 @@ class SQLCompiler:
     def pre_sql_setup(
         self
     ) -> Tuple[
-        Union[
-            List[Tuple[OrderBy, Tuple[str, Tuple[str, str], bool]]],
-            List[Tuple[str, List[int]]],
-            List[Tuple[str, Union[List[float], List[str]]]],
+        List[
+            Tuple[OrderBy, Tuple[str, Union[List[Any], Tuple[str, str]]], None]
         ],
-        Union[
-            List[Tuple[OrderBy, Tuple[str, List[Any], bool]]],
-            List[Tuple[str, List[int]]],
-            List[Tuple[str, Union[List[float], List[str]]]],
-        ],
-        Union[
-            List[Any],
-            List[Tuple[str, List[int]]],
-            List[Tuple[str, Union[List[float], List[str]]]],
-        ],
+        List[Tuple[OrderBy, Tuple[str, List[Union[int, str]], bool]]],
+        List[Tuple[str, List[float]]],
     ]: ...
     def get_group_by(
         self,
-        select: Union[
-            List[Tuple[BaseExpression, Optional[str], Optional[str]]],
-            List[Tuple[SQLiteNumericMixin, Tuple[str, List[int]], str]],
-        ],
-        order_by: List[
+        select: List[
             Tuple[
-                OrderBy,
-                Union[
-                    Tuple[str, List[Any], bool],
-                    Tuple[str, List[Union[int, str]], bool],
-                    Tuple[str, List[int], bool],
-                    Tuple[str, List[str], bool],
-                    Tuple[str, Tuple, bool],
-                    Tuple[str, Tuple[str, str], bool],
-                ],
+                Union[BaseExpression, SQLiteNumericMixin],
+                Tuple[str, List[float]],
+                Optional[str],
             ]
         ],
-    ) -> List[Tuple[str, Union[List[float], List[int], List[str]]]]: ...
+        order_by: List[Tuple[OrderBy, Tuple[str, List[Union[int, str]], bool]]],
+    ) -> List[Tuple[str, List[float]]]: ...
     def collapse_group_by(
         self,
         expressions: List[Expression],
@@ -83,59 +67,54 @@ class SQLCompiler:
     def get_select(
         self
     ) -> Tuple[
-        Optional[Dict[str, int]],
-        Union[Dict[Any, Any], Dict[str, int]],
-        Union[Dict[Any, Any], Dict[str, int]],
-    ]: ...
-    def get_order_by(
-        self
-    ) -> List[
-        Tuple[
-            OrderBy,
-            Union[
-                Tuple[str, List[Any], bool],
-                Tuple[str, List[Union[int, str]], bool],
-                Tuple[str, List[int], bool],
-                Tuple[str, List[str], bool],
-                Tuple[str, Tuple, bool],
-            ],
-        ]
-    ]: ...
-    def get_extra_select(
-        self,
-        order_by: List[
+        List[
             Tuple[
-                OrderBy,
+                Union[Expression, SQLiteNumericMixin],
+                Tuple[str, List[Union[int, str]]],
+                Optional[str],
+            ]
+        ],
+        Optional[
+            Dict[
+                str,
                 Union[
-                    Tuple[str, List[Any], bool],
-                    Tuple[str, List[Union[int, str]], bool],
-                    Tuple[str, List[int], bool],
-                    Tuple[str, List[str], bool],
-                    Tuple[str, Tuple, bool],
+                    List[
+                        Dict[
+                            str,
+                            Union[
+                                Callable,
+                                List[int],
+                                Type[ContentType],
+                                bool,
+                                ForeignKey,
+                            ],
+                        ]
+                    ],
+                    List[int],
+                    Type[Model],
                 ],
             ]
         ],
-        select: Union[
-            List[Tuple[Expression, Optional[str], Optional[str]]],
-            List[Tuple[SQLiteNumericMixin, Tuple[str, List[int]], str]],
+        Dict[str, int],
+    ]: ...
+    def get_order_by(
+        self
+    ) -> List[Tuple[OrderBy, Tuple[str, List[Any], bool]]]: ...
+    def get_extra_select(
+        self,
+        order_by: List[Tuple[OrderBy, Tuple[str, List[Any], bool]]],
+        select: List[
+            Tuple[
+                Union[Expression, SQLiteNumericMixin],
+                Tuple[str, List[float]],
+                Optional[str],
+            ]
         ],
     ) -> List[Tuple[OrderBy, Tuple[str, List[Any]], None]]: ...
     def quote_name_unless_alias(self, name: str) -> str: ...
     def compile(
         self, node: Any, select_format: Any = ...
-    ) -> Tuple[
-        str,
-        Union[
-            List[Optional[int]],
-            List[Union[date, int]],
-            List[Union[date, str]],
-            List[Union[Decimal, int]],
-            List[Union[int, memoryview]],
-            List[Union[int, str]],
-            List[float],
-            Tuple,
-        ],
-    ]: ...
+    ) -> Tuple[str, Union[List[Optional[int]], Tuple[int, int]]]: ...
     def get_combinator_sql(
         self, combinator: str, all: bool
     ) -> Tuple[List[str], Union[List[int], List[str]]]: ...
@@ -156,12 +135,7 @@ class SQLCompiler:
         alias: Optional[str] = ...,
         default_order: str = ...,
         already_seen: Optional[
-            Union[
-                Set[
-                    Tuple[None, Tuple[Tuple[str, str]], Tuple[Tuple[str, str]]]
-                ],
-                Set[Tuple[Tuple[Tuple[str, str]], Tuple[Tuple[str, str]]]],
-            ]
+            Set[Tuple[Optional[Tuple[Tuple[str, str]]], Tuple[Tuple[str, str]]]]
         ] = ...,
     ) -> List[Tuple[OrderBy, bool]]: ...
     def get_from_clause(self) -> Tuple[List[str], List[Union[int, str]]]: ...
@@ -175,14 +149,70 @@ class SQLCompiler:
             Union[Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]], bool]
         ] = ...,
         restricted: Optional[bool] = ...,
-    ) -> List[Dict[str, Any]]: ...
+    ) -> List[
+        Dict[
+            str,
+            Union[
+                Callable,
+                List[
+                    Dict[
+                        str,
+                        Union[
+                            Callable,
+                            List[
+                                Dict[
+                                    str,
+                                    Union[
+                                        Callable,
+                                        List[
+                                            Dict[
+                                                str,
+                                                Union[
+                                                    Callable,
+                                                    List[
+                                                        Dict[
+                                                            str,
+                                                            Union[
+                                                                Callable,
+                                                                List[int],
+                                                                Type[Model],
+                                                                bool,
+                                                                ForeignKey,
+                                                            ],
+                                                        ]
+                                                    ],
+                                                    List[int],
+                                                    Type[Model],
+                                                    bool,
+                                                    ForeignKey,
+                                                ],
+                                            ]
+                                        ],
+                                        List[int],
+                                        Type[Model],
+                                        bool,
+                                        ForeignKey,
+                                    ],
+                                ]
+                            ],
+                            List[int],
+                            Type[Model],
+                            bool,
+                            ForeignKey,
+                        ],
+                    ]
+                ],
+                List[int],
+                Type[Model],
+                bool,
+                FieldCacheMixin,
+            ],
+        ]
+    ]: ...
     def get_select_for_update_of_arguments(self): ...
     def deferred_to_columns(self) -> Dict[Type[Model], Set[str]]: ...
     def get_converters(
-        self,
-        expressions: Union[
-            List[Optional[Expression]], List[SQLiteNumericMixin]
-        ],
+        self, expressions: Union[List[RawSQL], List[SQLiteNumericMixin]]
     ) -> Dict[
         int, Tuple[List[Callable], Union[Expression, SQLiteNumericMixin]]
     ]: ...
@@ -194,27 +224,15 @@ class SQLCompiler:
         ],
     ) -> Iterator[
         Union[
-            List[Optional[Union[bool, datetime, str, UUID]]],
-            List[Optional[Union[bytes, date, int, str]]],
-            List[Optional[Union[bytes, time, int, str]]],
-            List[Optional[Union[bytes, timedelta, int, str]]],
-            List[Optional[Union[bytes, Decimal, int, str]]],
-            List[Optional[Union[bytes, float, str]]],
-            List[Optional[Union[bytes, int, str, UUID]]],
-            List[Optional[Union[date, time, int, str]]],
+            List[Optional[Union[bytes, datetime, int, str]]],
             List[Optional[Union[date, Decimal, float, str]]],
-            List[Union[date, time, timedelta, int, str]],
-            List[Union[datetime, time, Decimal, int, str]],
-            List[Union[timedelta, Decimal, int, str]],
-            List[Union[float, str, UUID]],
+            List[Optional[Union[datetime, float, str, UUID]]],
         ]
     ]: ...
     def results_iter(
         self,
         results: Optional[
-            Union[
-                Iterator[Any], List[List[Tuple[Union[date, float, int, str]]]]
-            ]
+            Union[Iterator[Any], List[List[Tuple[Union[int, str]]]]]
         ] = ...,
         tuple_expected: bool = ...,
         chunked_fetch: bool = ...,
@@ -235,16 +253,11 @@ class SQLCompiler:
 class SQLInsertCompiler(SQLCompiler):
     return_id: bool = ...
     def field_as_sql(
-        self,
-        field: Optional[Field],
-        val: Optional[Union[Lower, float, memoryview, str]],
-    ) -> Tuple[
-        str,
-        Union[List[None], List[float], List[int], List[memoryview], List[str]],
-    ]: ...
+        self, field: Optional[Field], val: Optional[Union[Lower, float, str]]
+    ) -> Tuple[str, Union[List[int], List[str]]]: ...
     def prepare_value(
         self, field: Field, value: Any
-    ) -> Optional[Union[Lower, float, memoryview, str]]: ...
+    ) -> Optional[Union[Lower, float, str]]: ...
     def pre_save_val(self, field: Field, obj: Model) -> Any: ...
     def assemble_as_sql(
         self,
@@ -252,64 +265,10 @@ class SQLInsertCompiler(SQLCompiler):
             List[None], List[DateTimeCheckMixin], List[Field], ImmutableList
         ],
         value_rows: Union[
-            List[
-                Union[
-                    List[Optional[Union[Lower, int]]],
-                    List[Optional[Union[int, memoryview, str]]],
-                ]
-            ],
-            List[
-                Union[
-                    List[Optional[Union[float, memoryview, str]]],
-                    List[Optional[Union[int, memoryview, str]]],
-                ]
-            ],
+            List[List[Optional[Union[Lower, int]]]], List[List[Union[int, str]]]
         ],
-    ) -> Tuple[
-        Union[
-            List[List[Optional[Union[float, str]]]],
-            List[List[Optional[Union[int, str]]]],
-            List[List[Union[int, memoryview]]],
-            Tuple[Tuple[str]],
-        ],
-        Union[
-            List[List[Optional[Union[float, str]]]],
-            List[List[Optional[Union[int, str]]]],
-            List[
-                Union[
-                    List[Optional[Union[float, memoryview, str]]],
-                    List[Optional[Union[int, memoryview, str]]],
-                ]
-            ],
-        ],
-    ]: ...
-    def as_sql(
-        self
-    ) -> List[
-        Tuple[
-            str,
-            Union[
-                List[Any],
-                List[None],
-                List[Optional[Union[bool, str]]],
-                List[Optional[Union[float, str]]],
-                List[Optional[Union[int, memoryview, str]]],
-                List[Optional[Union[int, str]]],
-                List[Optional[bool]],
-                List[Optional[int]],
-                List[Optional[str]],
-                List[Union[bool, str]],
-                List[Union[float, str]],
-                List[Union[int, str]],
-                List[bool],
-                List[float],
-                List[int],
-                List[memoryview],
-                List[str],
-                Tuple,
-            ],
-        ]
-    ]: ...
+    ) -> Tuple[Tuple[Tuple[str]], List[List[Optional[Union[int, str]]]]]: ...
+    def as_sql(self) -> List[Tuple[str, Tuple[Union[float, str]]]]: ...
     def execute_sql(self, return_id: Optional[bool] = ...) -> Any: ...
 
 class SQLDeleteCompiler(SQLCompiler):
@@ -329,4 +288,4 @@ def cursor_iter(
     sentinel: List[Any],
     col_count: Optional[int],
     itersize: int,
-) -> Iterator[List[Tuple[Any]]]: ...
+) -> Iterator[List[Tuple[Union[date, int]]]]: ...

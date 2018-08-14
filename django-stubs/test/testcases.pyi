@@ -6,9 +6,7 @@ from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 from unittest.runner import TextTestResult
 
-from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core.handlers.wsgi import WSGIHandler
-from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.servers.basehttp import WSGIRequestHandler
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
@@ -17,9 +15,8 @@ from django.forms.fields import EmailField
 from django.http.response import HttpResponse, HttpResponseBase
 from django.template.context import Context
 from django.test.html import Element
-from django.test.utils import (CaptureQueriesContext, modify_settings,
-                               override_settings)
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.test.utils import (CaptureQueriesContext, ContextList,
+                               modify_settings, override_settings)
 from django.utils.safestring import SafeText
 
 
@@ -146,15 +143,7 @@ class SimpleTestCase(unittest.TestCase):
     ) -> Optional[_GeneratorContextManager]: ...
     def assertWarnsMessage(
         self,
-        expected_warning: Type[
-            Union[
-                DeprecationWarning,
-                RuntimeWarning,
-                UserWarning,
-                ProxyModelWarning,
-                RemovedInDjango30Warning,
-            ]
-        ],
+        expected_warning: Type[Exception],
         expected_message: str,
         *args: Any,
         **kwargs: Any
@@ -206,13 +195,11 @@ class TransactionTestCase(SimpleTestCase):
         self,
         qs: Union[Iterator[Any], List[Model], QuerySet, RawQuerySet],
         values: Union[
-            List[Optional[str]],
-            List[Tuple[Any, Any]],
-            List[Tuple[Model, Model]],
-            List[Tuple[Model, int, int]],
-            List[Tuple[str, Type[Model], int]],
+            List[None],
+            List[Tuple[str, str]],
             List[date],
             List[int],
+            List[str],
             Set[str],
             QuerySet,
         ],
@@ -275,19 +262,14 @@ class LiveServerThread(threading.Thread):
     port: int = ...
     is_ready: threading.Event = ...
     error: Optional[django.core.exceptions.ImproperlyConfigured] = ...
-    static_handler: Type[
-        Union[
-            django.contrib.staticfiles.handlers.StaticFilesHandler,
-            django.test.testcases._StaticFilesHandler,
-        ]
-    ] = ...
+    static_handler: Type[django.core.handlers.wsgi.WSGIHandler] = ...
     connections_override: Dict[
         str, django.db.backends.sqlite3.base.DatabaseWrapper
     ] = ...
     def __init__(
         self,
         host: str,
-        static_handler: Type[Union[StaticFilesHandler, _StaticFilesHandler]],
+        static_handler: Type[WSGIHandler],
         connections_override: Dict[str, DatabaseWrapper] = ...,
         port: int = ...,
     ) -> None: ...

@@ -55,10 +55,7 @@ class TagHelperNode(Node):
     ) -> None: ...
     def get_resolved_arguments(
         self, context: Context
-    ) -> Tuple[
-        Union[Dict[str, Union[SafeText, int]], List[Union[Context, int]]],
-        Union[Dict[Any, Any], Dict[str, Union[SafeText, int]], Dict[str, int]],
-    ]: ...
+    ) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
 
 class SimpleNode(TagHelperNode):
     args: List[django.template.base.FilterExpression]
@@ -102,7 +99,7 @@ def parse_bits(
     params: List[str],
     varargs: Optional[str],
     varkw: Optional[str],
-    defaults: Optional[Union[Tuple[bool, None], Tuple[str]]],
+    defaults: Optional[Tuple[Union[bool, str]]],
     kwonly: List[str],
     kwonly_defaults: Optional[Dict[str, int]],
     takes_context: Optional[bool],

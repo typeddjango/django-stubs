@@ -21,15 +21,15 @@ class MigrationLoader:
     def __init__(
         self,
         connection: Optional[
-            Union[
-                DefaultConnectionProxy, backends.base.base.BaseDatabaseWrapper
-            ]
+            Union[DefaultConnectionProxy, BaseDatabaseWrapper]
         ],
         load: bool = ...,
         ignore_no_migrations: bool = ...,
     ) -> None: ...
     @classmethod
-    def migrations_module(cls, app_label: str) -> Tuple[bool, bool]: ...
+    def migrations_module(
+        cls, app_label: str
+    ) -> Tuple[Optional[str], bool]: ...
     unmigrated_apps: Set[str] = ...
     migrated_apps: Set[str] = ...
     def load_disk(self) -> None: ...

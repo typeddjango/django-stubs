@@ -6,16 +6,12 @@ from django.contrib.auth.models import User
 
 
 def get_default_password_validators() -> Union[
-    List[Union[CommonPasswordValidator, MinimumLengthValidator]],
-    List[Union[MinimumLengthValidator, UserAttributeSimilarityValidator]],
-    List[NumericPasswordValidator],
+    List[NumericPasswordValidator], List[UserAttributeSimilarityValidator]
 ]: ...
 def get_password_validators(
     validator_config: List[Dict[str, Union[Dict[str, int], str]]]
 ) -> Union[
-    List[Union[CommonPasswordValidator, MinimumLengthValidator]],
-    List[Union[MinimumLengthValidator, UserAttributeSimilarityValidator]],
-    List[NumericPasswordValidator],
+    List[NumericPasswordValidator], List[UserAttributeSimilarityValidator]
 ]: ...
 def validate_password(
     password: str,

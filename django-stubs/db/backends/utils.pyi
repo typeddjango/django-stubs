@@ -32,12 +32,7 @@ class CursorWrapper:
         self,
         sql: str,
         params: Optional[
-            Union[
-                List[Optional[Union[float, str]]],
-                List[Optional[Union[int, memoryview, str]]],
-                List[datetime],
-                Tuple,
-            ]
+            Union[List[bool], List[datetime], List[float], Tuple]
         ] = ...,
     ) -> Optional[SQLiteCursorWrapper]: ...
     def executemany(

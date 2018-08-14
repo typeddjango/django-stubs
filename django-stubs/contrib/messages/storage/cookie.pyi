@@ -32,25 +32,7 @@ class MessageDecoder(json.JSONDecoder):
                     List[Union[int, str]],
                 ],
             ],
-            List[
-                Union[
-                    Dict[
-                        str,
-                        Union[
-                            List[
-                                Union[
-                                    Dict[str, List[Union[int, str]]],
-                                    List[Union[int, str]],
-                                ]
-                            ],
-                            List[Union[int, str]],
-                        ],
-                    ],
-                    List[Union[int, str]],
-                ]
-            ],
             List[Union[List[Union[int, str]], str]],
-            List[Union[int, str]],
             str,
         ],
     ) -> Union[

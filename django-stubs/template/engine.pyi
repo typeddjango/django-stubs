@@ -1,4 +1,3 @@
-from datetime import date, time, timedelta
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from django.template.base import Origin, Template
@@ -23,19 +22,8 @@ class Engine:
     debug: bool = ...
     loaders: Union[
         List[List[Union[Dict[str, str], str]]],
-        List[
-            Union[
-                Tuple[
-                    str,
-                    Union[
-                        Dict[str, str],
-                        List[Tuple[str, Dict[str, str]]],
-                        List[str],
-                    ],
-                ],
-                str,
-            ]
-        ],
+        List[Tuple[str, List[str]]],
+        List[str],
     ] = ...
     string_if_invalid: str = ...
     file_charset: str = ...
@@ -52,19 +40,8 @@ class Engine:
         loaders: Optional[
             Union[
                 List[List[Union[Dict[str, str], str]]],
-                List[
-                    Union[
-                        Tuple[
-                            str,
-                            Union[
-                                Dict[str, str],
-                                List[Tuple[str, Dict[str, str]]],
-                                List[str],
-                            ],
-                        ],
-                        str,
-                    ]
-                ],
+                List[Tuple[str, List[str]]],
+                List[str],
             ]
         ] = ...,
         string_if_invalid: str = ...,
@@ -85,32 +62,14 @@ class Engine:
         self,
         template_loaders: Union[
             List[List[Union[Dict[str, str], str]]],
-            List[
-                Union[
-                    Tuple[
-                        str,
-                        Union[
-                            Dict[str, str],
-                            List[Tuple[str, Dict[str, str]]],
-                            List[str],
-                        ],
-                    ],
-                    str,
-                ]
-            ],
+            List[Tuple[str, List[str]]],
+            List[str],
         ],
     ) -> List[Loader]: ...
     def find_template_loader(
         self,
         loader: Union[
-            List[Union[Dict[str, str], str]],
-            Tuple[
-                str,
-                Union[
-                    Dict[str, str], List[Tuple[str, Dict[str, str]]], List[str]
-                ],
-            ],
-            str,
+            List[Union[Dict[str, str], str]], Tuple[str, List[str]], str
         ],
     ) -> Loader: ...
     def find_template(
@@ -119,62 +78,6 @@ class Engine:
     def from_string(self, template_code: str) -> Template: ...
     def get_template(self, template_name: str) -> Template: ...
     def render_to_string(
-        self,
-        template_name: str,
-        context: Optional[
-            Union[
-                Dict[str, Callable],
-                Dict[str, Dict[Union[int, str], str]],
-                Dict[str, Dict[str, Callable]],
-                Dict[str, Dict[str, Dict[str, str]]],
-                Dict[str, Dict[str, List[Tuple[str, int]]]],
-                Dict[str, Dict[str, Tuple[str, str, str, str]]],
-                Dict[str, List[Dict[str, Union[List[int], int]]]],
-                Dict[str, List[Dict[str, Union[int, str]]]],
-                Dict[str, List[List[Tuple[int, str]]]],
-                Dict[str, List[Union[List[SafeText], str]]],
-                Dict[str, List[Template]],
-                Dict[str, Optional[int]],
-                Dict[str, Optional[str]],
-                Dict[
-                    str, Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]
-                ],
-                Dict[
-                    str,
-                    Tuple[
-                        Tuple[str, Union[int, str]], Tuple[str, Union[int, str]]
-                    ],
-                ],
-                Dict[str, Tuple[int, int]],
-                Dict[str, Tuple[str, str]],
-                Dict[str, Union[Dict[str, int], List[Union[List[str], str]]]],
-                Dict[str, Union[Dict[str, int], str]],
-                Dict[
-                    str,
-                    Union[
-                        List[
-                            Optional[
-                                Union[
-                                    Dict[str, Union[List[str], str]], int, str
-                                ]
-                            ]
-                        ],
-                        str,
-                    ],
-                ],
-                Dict[
-                    str,
-                    Union[
-                        List[Optional[Union[Dict[str, date], int, str]]], int
-                    ],
-                ],
-                Dict[str, Union[date, timedelta]],
-                Dict[str, Union[int, str]],
-                Dict[str, time],
-                Dict[str, Template],
-                Dict[str, float],
-                Dict[str, range],
-            ]
-        ] = ...,
+        self, template_name: str, context: Any = ...
     ) -> SafeText: ...
     def select_template(self, template_name_list: List[str]) -> Template: ...

@@ -1,5 +1,7 @@
-from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
+from collections import OrderedDict
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
+from django.contrib.flatpages.sitemaps import FlatPageSitemap
 from django.contrib.sitemaps import Sitemap
 from django.urls import include as include
 from django.urls.resolvers import URLPattern, URLResolver
@@ -12,13 +14,18 @@ handler500: Any
 def url(
     regex: str,
     view: Optional[
-        Union[Callable, Tuple[None, None, None], Tuple[str, str, str]]
+        Union[
+            Callable,
+            Tuple[List[Union[URLPattern, URLResolver]], str, str],
+            Tuple[Union[List[URLPattern], List[URLResolver]], None, None],
+        ]
     ],
     kwargs: Optional[
         Union[
+            Dict[str, Dict[str, Type[FlatPageSitemap]]],
             Dict[str, Dict[str, Sitemap]],
-            Dict[str, Union[Dict[str, Type[Sitemap]], str]],
-            Dict[str, Union[int, str]],
+            Dict[str, OrderedDict],
+            Dict[str, str],
         ]
     ] = ...,
     name: Optional[str] = ...,

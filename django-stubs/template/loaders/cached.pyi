@@ -9,21 +9,8 @@ from .base import Loader as BaseLoader
 class Loader(BaseLoader):
     engine: django.template.engine.Engine
     template_cache: Dict[Any, Any] = ...
-    get_template_cache: Union[
-        Dict[
-            str,
-            Union[
-                Type[django.template.exceptions.TemplateDoesNotExist],
-                django.template.base.Template,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                django.template.base.Template,
-                django.template.exceptions.TemplateDoesNotExist,
-            ],
-        ],
+    get_template_cache: Dict[
+        str, django.template.exceptions.TemplateDoesNotExist
     ] = ...
     loaders: List[django.template.loaders.base.Loader] = ...
     def __init__(

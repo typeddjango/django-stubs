@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Union
 
 from django.core.cache.backends.base import BaseCache
@@ -12,20 +11,12 @@ class LocMemCache(BaseCache):
     def __init__(
         self,
         name: str,
-        params: Union[
-            Dict[str, Callable],
-            Dict[str, Dict[str, int]],
-            Dict[str, None],
-            Dict[str, int],
-            Dict[str, str],
-        ],
+        params: Dict[str, Optional[Union[Callable, Dict[str, int], int, str]]],
     ) -> None: ...
     def add(
         self,
         key: str,
-        value: Union[
-            Dict[str, Union[datetime, str]], Dict[str, int], bytes, int, str
-        ],
+        value: Union[Dict[str, int], Dict[str, str], bytes, int, str],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> Any: ...

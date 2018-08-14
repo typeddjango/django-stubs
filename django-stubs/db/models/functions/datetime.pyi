@@ -1,10 +1,10 @@
-from datetime import date, time
+from datetime import datetime
 from typing import Any, List, Optional, Set, Tuple, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models import Func, Transform
 from django.db.models.expressions import Col, Expression
-from django.db.models.fields import DateTimeCheckMixin, IntegerField
+from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 
@@ -138,7 +138,7 @@ class TruncBase(TimezoneMixin, Transform):
     def __init__(
         self,
         expression: Union[Col, str],
-        output_field: Optional[Union[DateTimeCheckMixin, IntegerField]] = ...,
+        output_field: Optional[Field] = ...,
         tzinfo: None = ...,
         **extra: Any
     ) -> None: ...
@@ -155,16 +155,19 @@ class TruncBase(TimezoneMixin, Transform):
     ) -> TruncBase: ...
     def convert_value(
         self,
-        value: Union[date, time],
+        value: datetime,
         expression: django.db.models.functions.TruncBase,
         connection: DatabaseWrapper,
-    ) -> Union[date, time]: ...
+    ) -> datetime: ...
 
 class Trunc(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Union[
+        django.db.models.fields.DateTimeCheckMixin,
+        django.db.models.fields.IntegerField,
+    ]
     source_expressions: List[django.db.models.expressions.Combinable]
     tzinfo: None
     kind: str = ...
@@ -172,7 +175,7 @@ class Trunc(TruncBase):
         self,
         expression: str,
         kind: str,
-        output_field: Optional[Union[DateTimeCheckMixin, IntegerField]] = ...,
+        output_field: Optional[Field] = ...,
         tzinfo: None = ...,
         **extra: Any
     ) -> None: ...

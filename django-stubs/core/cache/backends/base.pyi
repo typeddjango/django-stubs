@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from django.core.exceptions import ImproperlyConfigured
@@ -21,13 +22,7 @@ class BaseCache:
     key_func: Callable = ...
     def __init__(
         self,
-        params: Union[
-            Dict[str, Callable],
-            Dict[str, Dict[str, int]],
-            Dict[str, None],
-            Dict[str, int],
-            Dict[str, str],
-        ],
+        params: Dict[str, Optional[Union[Callable, Dict[str, int], int, str]]],
     ) -> None: ...
     def get_backend_timeout(self, timeout: Any = ...) -> Optional[float]: ...
     def make_key(
@@ -59,7 +54,7 @@ class BaseCache:
     def delete(self, key: Any, version: Optional[Any] = ...) -> None: ...
     def get_many(
         self, keys: List[str], version: Optional[int] = ...
-    ) -> Union[Dict[str, int], Dict[str, str]]: ...
+    ) -> Dict[str, Union[int, str]]: ...
     def get_or_set(
         self,
         key: str,
@@ -78,9 +73,7 @@ class BaseCache:
     def set_many(
         self,
         data: Union[
-            Dict[str, Union[Dict[str, int], str]],
-            Dict[str, bytes],
-            Dict[str, int],
+            Dict[str, bytes], Dict[str, int], Dict[str, str], OrderedDict
         ],
         timeout: Any = ...,
         version: Optional[Union[int, str]] = ...,

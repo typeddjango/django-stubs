@@ -84,15 +84,15 @@ class ForNode(Node):
     token: django.template.base.Token
     child_nodelists: Any = ...
     is_reversed: bool = ...
-    nodelist_loop: List[str] = ...
-    nodelist_empty: List[str] = ...
+    nodelist_loop: Union[List[str], django.template.base.NodeList] = ...
+    nodelist_empty: Union[List[str], django.template.base.NodeList] = ...
     def __init__(
         self,
         loopvars: Union[List[str], str],
         sequence: Union[FilterExpression, str],
         is_reversed: bool,
-        nodelist_loop: List[str],
-        nodelist_empty: Optional[List[str]] = ...,
+        nodelist_loop: Union[List[str], NodeList],
+        nodelist_empty: Optional[Union[List[str], NodeList]] = ...,
     ) -> None: ...
     def render(self, context: Context) -> SafeText: ...
 
@@ -108,8 +108,8 @@ class IfChangedNode(Node):
     def render(self, context: Context) -> str: ...
 
 class IfEqualNode(Node):
-    nodelist_false: List[Any]
-    nodelist_true: List[Any]
+    nodelist_false: Union[List[Any], django.template.base.NodeList]
+    nodelist_true: Union[List[Any], django.template.base.NodeList]
     origin: django.template.base.Origin
     token: django.template.base.Token
     var1: Union[django.template.base.FilterExpression, str]
@@ -120,8 +120,8 @@ class IfEqualNode(Node):
         self,
         var1: Union[FilterExpression, str],
         var2: Union[FilterExpression, str],
-        nodelist_true: List[Any],
-        nodelist_false: List[Any],
+        nodelist_true: Union[List[Any], NodeList],
+        nodelist_false: Union[List[Any], NodeList],
         negate: bool,
     ) -> None: ...
     def render(self, context: Context) -> SafeText: ...
@@ -130,10 +130,14 @@ class IfNode(Node):
     origin: django.template.base.Origin
     token: django.template.base.Token
     conditions_nodelists: List[
-        Tuple[django.template.base.NodeList, django.template.base.NodeList]
+        Tuple[
+            Optional[django.template.defaulttags.TemplateLiteral],
+            django.template.base.NodeList,
+        ]
     ] = ...
     def __init__(
-        self, conditions_nodelists: List[Tuple[NodeList, NodeList]]
+        self,
+        conditions_nodelists: List[Tuple[Optional[TemplateLiteral], NodeList]],
     ) -> None: ...
     def __iter__(self) -> None: ...
     @property
@@ -166,13 +170,7 @@ class RegroupNode(Node):
         var_name: str,
     ) -> None: ...
     def resolve_expression(
-        self,
-        obj: Union[
-            Dict[str, Union[List[str], str]],
-            Dict[str, Union[int, str]],
-            Dict[str, date],
-        ],
-        context: Context,
+        self, obj: Dict[str, date], context: Context
     ) -> Union[int, str]: ...
     def render(self, context: Context) -> str: ...
 
@@ -255,15 +253,15 @@ class WidthRatioNode(Node):
 class WithNode(Node):
     origin: django.template.base.Origin
     token: django.template.base.Token
-    nodelist: List[Any] = ...
-    extra_context: Union[
-        Dict[str, django.template.base.FilterExpression], Dict[str, str]
+    nodelist: Union[List[Any], django.template.base.NodeList] = ...
+    extra_context: Dict[
+        str, Union[django.template.base.FilterExpression, str]
     ] = ...
     def __init__(
         self,
         var: Optional[str],
         name: Optional[str],
-        nodelist: List[Any],
+        nodelist: Union[List[Any], NodeList],
         extra_context: Optional[Dict[str, FilterExpression]] = ...,
     ) -> None: ...
     def render(self, context: Context) -> Any: ...

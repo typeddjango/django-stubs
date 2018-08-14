@@ -12,10 +12,7 @@ from django.forms.fields import FileField, ImageField
 class FieldFile(File):
     instance: django.db.models.base.Model = ...
     field: django.db.models.fields.files.FileField = ...
-    storage: Union[
-        django.core.files.storage.DefaultStorage,
-        django.core.files.storage.FileSystemStorage,
-    ] = ...
+    storage: django.core.files.storage.FileSystemStorage = ...
     def __init__(
         self, instance: Model, field: FileField, name: Optional[str]
     ) -> None: ...
@@ -63,18 +60,7 @@ class FileField(Field):
     def check(self, **kwargs: Any) -> List[Error]: ...
     def deconstruct(
         self
-    ) -> Tuple[
-        str,
-        List[Any],
-        Union[
-            Dict[str, Union[Callable, FileSystemStorage, int]],
-            Dict[str, Union[FileSystemStorage, int, str]],
-        ],
-        Union[
-            Dict[str, Union[Callable, FileSystemStorage, int]],
-            Dict[str, Union[FileSystemStorage, int, str]],
-        ],
-    ]: ...
+    ) -> Tuple[Optional[str], str, List[Any], Dict[str, Union[bool, str]]]: ...
     def get_internal_type(self) -> str: ...
     def get_prep_value(self, value: Union[FieldFile, str]) -> str: ...
     def pre_save(self, model_instance: Model, add: bool) -> FieldFile: ...
@@ -116,9 +102,9 @@ class ImageField(FileField):
     def deconstruct(
         self
     ) -> Tuple[
+        Optional[str],
         str,
         List[Any],
-        Dict[str, Union[Callable, bool, FileSystemStorage, str]],
         Dict[str, Union[Callable, bool, FileSystemStorage, str]],
     ]: ...
     def contribute_to_class(

@@ -1,5 +1,4 @@
-from datetime import date
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 ETAG_MATCH: Any
 MONTHS: Any
@@ -14,22 +13,7 @@ def urlquote(url: str, safe: str = ...) -> str: ...
 def urlquote_plus(url: str, safe: str = ...) -> str: ...
 def urlunquote(quoted_url: str) -> str: ...
 def urlunquote_plus(quoted_url: str) -> str: ...
-def urlencode(
-    query: Union[
-        Dict[str, Iterator[Any]],
-        Dict[str, List[bytes]],
-        Dict[str, List[int]],
-        Dict[str, Union[Tuple[str, str, str], str]],
-        Dict[str, Union[int, str]],
-        Dict[str, bytearray],
-        Dict[str, bytes],
-        Dict[str, date],
-        List[Tuple[str, Union[int, str]]],
-        Tuple[Tuple[str, int], Tuple[str, int], Tuple[str, int]],
-        str,
-    ],
-    doseq: bool = ...,
-) -> str: ...
+def urlencode(query: Any, doseq: bool = ...) -> str: ...
 def cookie_date(epoch_seconds: float = ...) -> str: ...
 def http_date(epoch_seconds: float = ...) -> str: ...
 def parse_http_date(date: str) -> int: ...

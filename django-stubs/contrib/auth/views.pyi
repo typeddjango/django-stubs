@@ -10,6 +10,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.utils.datastructures import MultiValueDict
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -34,13 +35,14 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     def get_form_class(self) -> Type[AuthenticationForm]: ...
     def get_form_kwargs(
         self
-    ) -> Dict[str, Optional[Union[Dict[str, str], HttpRequest]]]: ...
+    ) -> Dict[
+        str, Optional[Union[Dict[str, str], HttpRequest, MultiValueDict]]
+    ]: ...
     def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect: ...
     def get_context_data(
         self, **kwargs: Any
-    ) -> Union[
-        Dict[str, Union[AuthenticationForm, LoginView, Site, str]],
-        Dict[str, Union[AuthenticationForm, LoginView, RequestSite, str]],
+    ) -> Dict[
+        str, Union[AuthenticationForm, LoginView, Site, RequestSite, str]
     ]: ...
 
 class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
@@ -105,7 +107,9 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     def get_user(self, uidb64: str) -> Optional[AbstractBaseUser]: ...
     def get_form_kwargs(
         self
-    ) -> Dict[str, Optional[Union[Dict[Any, Any], AbstractBaseUser]]]: ...
+    ) -> Dict[
+        str, Optional[Union[Dict[Any, Any], AbstractBaseUser, MultiValueDict]]
+    ]: ...
     def form_valid(self, form: SetPasswordForm) -> HttpResponseRedirect: ...
     def get_context_data(self, **kwargs: Any): ...
 
@@ -122,7 +126,7 @@ class PasswordChangeView(PasswordContextMixin, FormView):
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def get_form_kwargs(
         self
-    ) -> Dict[str, Optional[Union[Dict[Any, Any], User]]]: ...
+    ) -> Dict[str, Optional[Union[Dict[Any, Any], User, MultiValueDict]]]: ...
     def form_valid(self, form: PasswordChangeForm) -> HttpResponseRedirect: ...
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):

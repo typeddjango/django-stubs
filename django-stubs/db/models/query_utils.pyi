@@ -3,11 +3,13 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import Expression, F
+from django.db.models.expressions import Expression
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.functions.datetime import TimezoneMixin
-from django.db.models.lookups import BuiltinLookup, Lookup, Transform
+from django.db.models.lookups import (FieldGetDbPrepValueMixin,
+                                      IntegerFieldFloatRounding, Lookup,
+                                      Transform)
 from django.db.models.options import Options
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
@@ -22,8 +24,8 @@ PathInfo = namedtuple(
 class InvalidQuery(Exception): ...
 
 def subclasses(
-    cls: Type[Union[Field, Transform]]
-) -> Iterator[Type[Union[Field, Transform]]]: ...
+    cls: Type[RegisterLookupMixin]
+) -> Iterator[Type[RegisterLookupMixin]]: ...
 
 class QueryWrapper:
     contains_aggregate: bool = ...
@@ -36,7 +38,8 @@ class QueryWrapper:
 class Q(tree.Node):
     children: Union[
         List[Dict[str, str]],
-        List[Union[Tuple[str, Any], django.db.models.query_utils.Q]],
+        List[Tuple[str, Any]],
+        List[django.db.models.query_utils.Q],
     ]
     connector: str
     negated: bool
@@ -56,11 +59,7 @@ class Q(tree.Node):
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> WhereNode: ...
-    def deconstruct(
-        self
-    ) -> Tuple[
-        str, Tuple, Union[Dict[str, Union[bool, F]], Dict[str, str]]
-    ]: ...
+    def deconstruct(self) -> Tuple[str, Tuple, Dict[str, str]]: ...
 
 class DeferredAttribute:
     field_name: str = ...
@@ -71,16 +70,33 @@ class DeferredAttribute:
 
 class RegisterLookupMixin:
     @classmethod
-    def get_lookups(cls) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
-    def get_lookup(self, lookup_name: str) -> Optional[Type[Lookup]]: ...
+    def get_lookups(
+        cls
+    ) -> Dict[str, Type[Union[TimezoneMixin, Lookup, Transform]]]: ...
+    def get_lookup(
+        self, lookup_name: str
+    ) -> Optional[Type[Union[FieldGetDbPrepValueMixin, Lookup]]]: ...
     def get_transform(self, lookup_name: str) -> Optional[Type[Transform]]: ...
     @staticmethod
     def merge_dicts(
-        dicts: Union[
-            List[Dict[str, Type[Union[TimezoneMixin, BuiltinLookup]]]],
-            List[Dict[str, Type[Union[Lookup, Transform]]]],
+        dicts: List[
+            Dict[
+                str,
+                Type[
+                    Union[
+                        TimezoneMixin,
+                        FieldGetDbPrepValueMixin,
+                        IntegerFieldFloatRounding,
+                        Lookup,
+                        Transform,
+                    ]
+                ],
+            ]
         ]
-    ) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
+    ) -> Dict[
+        str,
+        Type[Union[TimezoneMixin, FieldGetDbPrepValueMixin, Lookup, Transform]],
+    ]: ...
     @classmethod
     def register_lookup(
         cls,
@@ -113,9 +129,7 @@ def select_related_descend(
 ) -> bool: ...
 def refs_expression(
     lookup_parts: List[str], annotations: OrderedDict
-) -> Tuple[
-    Union[List[str], Tuple, Expression], Union[List[Any], List[str], Tuple]
-]: ...
+) -> Union[Tuple[bool, Tuple], Tuple[Expression, List[str]]]: ...
 def check_rel_lookup_compatibility(
     model: Type[Model], target_opts: Options, field: FieldCacheMixin
 ) -> bool: ...

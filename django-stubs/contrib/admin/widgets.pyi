@@ -1,10 +1,10 @@
 from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from uuid import UUID
 
 from django import forms
-from django.contrib.admin.sites import AdminSite, DefaultAdminSite
+from django.contrib.admin.sites import AdminSite
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q
 from django.forms.fields import Field
@@ -30,9 +30,9 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         name: str,
         value: Union[List[Any], str],
         attrs: Optional[Dict[str, str]],
-    ) -> Union[
-        Dict[
-            str,
+    ) -> Dict[
+        str,
+        Union[
             Dict[
                 str,
                 Union[
@@ -48,9 +48,6 @@ class FilteredSelectMultiple(forms.SelectMultiple):
                     str,
                 ],
             ],
-        ],
-        Dict[
-            str,
             Dict[str, Union[Dict[str, Union[int, str]], List[str], bool, str]],
         ],
     ]: ...
@@ -87,106 +84,30 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         name: str,
         value: Optional[Union[List[str], datetime]],
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Optional[
-                        Union[
-                            Dict[str, Union[bool, str]],
-                            List[
-                                Dict[
-                                    str,
-                                    Optional[
-                                        Union[
-                                            Dict[str, Union[bool, str]],
-                                            bool,
-                                            str,
-                                        ]
-                                    ],
-                                ]
-                            ],
-                            bool,
-                            str,
-                        ]
-                    ],
-                ],
+    ) -> Dict[
+        str,
+        Union[
+            Dict[
                 str,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Optional[
-                        Union[
-                            Dict[str, str],
-                            List[
-                                Dict[
-                                    str,
-                                    Optional[Union[Dict[str, str], bool, str]],
-                                ]
-                            ],
-                            bool,
-                            str,
-                        ]
-                    ],
-                ],
-                str,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Dict[Any, Any],
-                        List[Dict[str, Union[Dict[str, str], bool, str]]],
-                        bool,
-                        str,
-                    ],
-                ],
-                str,
-            ],
-        ],
-        Dict[
-            str,
-            Union[
-                Dict[
-                    str,
+                Optional[
                     Union[
                         Dict[str, Union[bool, str]],
                         List[
                             Dict[
                                 str,
-                                Union[Dict[str, Union[bool, str]], bool, str],
+                                Optional[
+                                    Union[
+                                        Dict[str, Union[bool, str]], bool, str
+                                    ]
+                                ],
                             ]
                         ],
                         bool,
                         str,
-                    ],
+                    ]
                 ],
-                str,
             ],
-        ],
-        Dict[
             str,
-            Union[
-                Dict[
-                    str,
-                    Union[
-                        Dict[str, str],
-                        List[Dict[str, Union[Dict[str, str], bool, str]]],
-                        bool,
-                        str,
-                    ],
-                ],
-                str,
-            ],
         ],
     ]: ...
 
@@ -203,7 +124,8 @@ def url_params_from_lookup_dict(
         Dict[str, Callable],
         Dict[str, List[str]],
         Dict[str, Tuple[str, str]],
-        Dict[str, Union[int, str]],
+        Dict[str, bool],
+        Dict[str, str],
         Q,
     ]
 ) -> Dict[str, str]: ...
@@ -217,7 +139,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def __init__(
         self,
         rel: ForeignObjectRel,
-        admin_site: Union[AdminSite, DefaultAdminSite],
+        admin_site: AdminSite,
         attrs: None = ...,
         using: None = ...,
     ) -> None: ...
@@ -226,18 +148,12 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         name: str,
         value: Optional[Union[List[int], int, str, UUID]],
         attrs: Optional[Dict[str, Union[bool, str]]],
-    ) -> Union[
-        Dict[
+    ) -> Dict[
+        str,
+        Union[
+            Dict[str, Optional[Union[Dict[str, Union[bool, str]], bool, str]]],
             str,
-            Union[
-                Dict[
-                    str, Optional[Union[Dict[str, Union[bool, str]], bool, str]]
-                ],
-                str,
-            ],
         ],
-        Dict[str, Union[Dict[str, Union[Dict[Any, Any], bool, str]], str]],
-        Dict[str, Union[Dict[str, Union[Dict[str, str], bool, str]], str]],
     ]: ...
     def base_url_parameters(self) -> Dict[str, str]: ...
     def url_parameters(self) -> Dict[str, str]: ...
@@ -256,10 +172,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         name: str,
         value: Optional[List[int]],
         attrs: Optional[Dict[str, str]],
-    ) -> Union[
-        Dict[str, Union[Dict[str, Union[Dict[Any, Any], bool, str]], str]],
-        Dict[str, Union[Dict[str, Union[Dict[str, str], bool, str]], str]],
-    ]: ...
+    ) -> Dict[str, Union[Dict[str, Union[Dict[str, str], bool, str]], str]]: ...
     def url_parameters(self) -> Dict[Any, Any]: ...
     def label_and_url_for_value(self, value: List[int]) -> Tuple[str, str]: ...
     def value_from_datadict(
@@ -283,7 +196,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self,
         widget: ChoiceWidget,
         rel: ForeignObjectRel,
-        admin_site: Union[AdminSite, DefaultAdminSite],
+        admin_site: AdminSite,
         can_add_related: Optional[bool] = ...,
         can_change_related: bool = ...,
         can_delete_related: bool = ...,
@@ -362,7 +275,7 @@ class AutocompleteMixin:
     def __init__(
         self,
         rel: ForeignObjectRel,
-        admin_site: Union[AdminSite, DefaultAdminSite],
+        admin_site: AdminSite,
         attrs: Optional[Dict[str, str]] = ...,
         choices: Tuple = ...,
         using: None = ...,
@@ -378,7 +291,13 @@ class AutocompleteMixin:
         name: str,
         value: List[str],
         attr: Dict[str, Union[bool, str]] = ...,
-    ) -> List[Tuple[None, int, int]]: ...
+    ) -> List[
+        Tuple[
+            None,
+            List[Dict[str, Union[Dict[str, bool], Set[str], int, str]]],
+            int,
+        ]
+    ]: ...
     @property
     def media(self) -> Media: ...
 

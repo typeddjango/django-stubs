@@ -6,7 +6,9 @@ from django.forms import Form
 class ManagementForm(Form):
     auto_id: Union[bool, str]
     cleaned_data: Dict[str, Optional[int]]
-    data: Dict[str, Union[List[int], int, str]]
+    data: Union[
+        Dict[str, Union[List[int], int, str]], django.http.request.QueryDict
+    ]
     empty_permitted: bool
     error_class: Type[django.forms.utils.ErrorList]
     fields: collections.OrderedDict

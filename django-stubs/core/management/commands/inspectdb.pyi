@@ -26,13 +26,7 @@ class Command(BaseCommand):
     def get_meta(
         self,
         table_name: str,
-        constraints: Dict[
-            str,
-            Union[
-                Dict[str, Union[List[str], Tuple[str, str], bool]],
-                Dict[str, Union[List[str], bool, str]],
-            ],
-        ],
+        constraints: Dict[str, Dict[str, Union[List[str], bool]]],
         column_to_field_name: Dict[str, str],
         is_view: bool,
     ) -> List[str]: ...
