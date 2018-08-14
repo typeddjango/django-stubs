@@ -8,6 +8,7 @@ from django.core.validators import DecimalValidator
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import Col, CombinedExpression
+from django.db.models.fields import reverse_related
 from django.db.models.fields.files import FieldFile
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
