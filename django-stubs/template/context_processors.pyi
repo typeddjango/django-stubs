@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest

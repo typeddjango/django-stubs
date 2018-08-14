@@ -4,8 +4,8 @@ from django.template.base import FilterExpression, Parser, Template
 from django.template.context import Context
 from django.utils.safestring import SafeText
 
-from .base import Node, Template, token_kwargs
-from .exceptions import TemplateSyntaxError
+from .base import Node, Template
+from .exceptions import TemplateSyntaxError as TemplateSyntaxError
 
 
 class InvalidTemplateLibrary(Exception): ...
@@ -58,9 +58,9 @@ class TagHelperNode(Node):
     ) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
 
 class SimpleNode(TagHelperNode):
-    args: List[django.template.base.FilterExpression]
+    args: List[FilterExpression]
     func: Callable
-    kwargs: Dict[str, django.template.base.FilterExpression]
+    kwargs: Dict[str, FilterExpression]
     origin: django.template.base.Origin
     takes_context: Optional[bool]
     token: django.template.base.Token
@@ -76,9 +76,9 @@ class SimpleNode(TagHelperNode):
     def render(self, context: Context) -> str: ...
 
 class InclusionNode(TagHelperNode):
-    args: List[django.template.base.FilterExpression]
+    args: List[FilterExpression]
     func: Callable
-    kwargs: Dict[str, django.template.base.FilterExpression]
+    kwargs: Dict[str, FilterExpression]
     origin: django.template.base.Origin
     takes_context: Optional[bool]
     token: django.template.base.Token

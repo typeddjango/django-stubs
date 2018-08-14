@@ -4,8 +4,8 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.utils.safestring import SafeText
 
-from .base import Variable, VariableDoesNotExist
-from .library import Library
+from .base import Variable as Variable, VariableDoesNotExist as VariableDoesNotExist
+from .library import Library as Library
 
 register: Any
 

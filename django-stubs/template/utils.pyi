@@ -1,5 +1,6 @@
+import collections
 from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.backends.base import BaseEngine

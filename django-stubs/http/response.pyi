@@ -2,7 +2,6 @@ from datetime import datetime
 from io import BufferedReader, BytesIO
 from tempfile import _TemporaryFileWrapper
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-from uuid import UUID
 
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder

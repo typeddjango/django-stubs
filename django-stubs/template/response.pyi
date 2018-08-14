@@ -10,36 +10,25 @@ from django.template.backends.django import Template
 from django.template.backends.jinja2 import Template
 from django.views.generic.base import TemplateResponseMixin
 
-from .loader import get_template, select_template
+from .loader import get_template as get_template, select_template as select_template
 
 
 class ContentNotRenderedError(Exception): ...
 
 class SimpleTemplateResponse(HttpResponse):
     closed: bool
-    cookies: http.cookies.SimpleCookie
+    cookies: SimpleCookie
     status_code: int
     rendering_attrs: Any = ...
     template_name: Union[
-        List[str], django.template.backends.django.Template, str
+        List[str], Template, str
     ] = ...
     context_data: Optional[Dict[str, str]] = ...
     using: Optional[str] = ...
     def __init__(
         self,
         template: Union[List[str], Template, str],
-        context: Optional[
-            Union[
-                Dict[
-                    str, List[Dict[str, Optional[Union[datetime, Model, str]]]]
-                ],
-                Dict[str, List[str]],
-                Dict[str, Model],
-                Dict[str, TemplateResponseMixin],
-                Dict[str, str],
-                MagicMock,
-            ]
-        ] = ...,
+        context: Optional[Dict[str, Any]] = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
         charset: Optional[str] = ...,
@@ -50,28 +39,8 @@ class SimpleTemplateResponse(HttpResponse):
     ) -> Union[Template, Template]: ...
     def resolve_context(
         self,
-        context: Optional[
-            Union[
-                Dict[
-                    str, List[Dict[str, Optional[Union[datetime, Model, str]]]]
-                ],
-                Dict[str, List[str]],
-                Dict[str, Model],
-                Dict[str, TemplateResponseMixin],
-                Dict[str, str],
-                MagicMock,
-            ]
-        ],
-    ) -> Optional[
-        Union[
-            Dict[str, List[Dict[str, Optional[Union[datetime, Model, str]]]]],
-            Dict[str, List[str]],
-            Dict[str, Model],
-            Dict[str, TemplateResponseMixin],
-            Dict[str, str],
-            MagicMock,
-        ]
-    ]: ...
+        context: Optional[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
@@ -89,31 +58,8 @@ class TemplateResponse(SimpleTemplateResponse):
     client: django.test.client.Client
     closed: bool
     context: django.template.context.RequestContext
-    context_data: Optional[
-        Union[
-            Dict[
-                str,
-                List[
-                    Dict[
-                        str,
-                        Optional[
-                            Union[
-                                datetime.datetime,
-                                django.db.models.base.Model,
-                                str,
-                            ]
-                        ],
-                    ]
-                ],
-            ],
-            Dict[str, List[str]],
-            Dict[str, django.db.models.base.Model],
-            Dict[str, django.views.generic.base.TemplateResponseMixin],
-            Dict[str, str],
-            unittest.mock.MagicMock,
-        ]
-    ]
-    cookies: http.cookies.SimpleCookie
+    context_data: Optional[Dict[str, Any]]
+    cookies: SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]

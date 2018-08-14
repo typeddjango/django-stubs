@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Optional
+from typing import Dict, Iterator
 
 from django.template.base import Origin
 from django.template.engine import Engine
@@ -7,7 +7,7 @@ from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    engine: django.template.engine.Engine
+    engine: Engine
     templates_dict: Dict[str, str] = ...
     def __init__(
         self, engine: Engine, templates_dict: Dict[str, str]
