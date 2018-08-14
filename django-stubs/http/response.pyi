@@ -287,15 +287,7 @@ class JsonResponse(HttpResponse):
     wsgi_request: django.core.handlers.wsgi.WSGIRequest
     def __init__(
         self,
-        data: Union[
-            Dict[str, Dict[str, str]],
-            Dict[str, int],
-            Dict[str, str],
-            List[int],
-            List[str],
-            str,
-            UUID,
-        ],
+        data: Any,
         encoder: Type[DjangoJSONEncoder] = ...,
         safe: bool = ...,
         json_dumps_params: Optional[Dict[str, int]] = ...,
