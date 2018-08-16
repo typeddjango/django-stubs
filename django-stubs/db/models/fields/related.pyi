@@ -111,17 +111,7 @@ class ForeignObject(RelatedField):
         Optional[str],
         str,
         List[Any],
-        Dict[
-            str,
-            Union[
-                Callable,
-                Dict[str, Union[int, str]],
-                List[None],
-                List[str],
-                bool,
-                str,
-            ],
-        ],
+        Dict[str, Any],
     ]: ...
     def resolve_related_fields(self) -> List[Tuple[Field, Field]]: ...
     @property

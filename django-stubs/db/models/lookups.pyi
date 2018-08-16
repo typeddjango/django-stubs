@@ -1,14 +1,12 @@
 from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
-from uuid import UUID
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, Iterable
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.models.base import Model
+from django.db.models import expressions, lookups
 from django.db.models.expressions import (Col, Combinable, Expression, Func,
-                                          Ref, Subquery)
-from django.db.models.fields import TextField
-from django.db.models.fields.related_lookups import MultiColSource
+                                          Ref)
+from django.db.models.fields import TextField, related_lookups
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
@@ -90,16 +88,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     get_db_prep_lookup_value_is_iterable: bool = ...
     def get_prep_lookup(
         self
-    ) -> Union[
-        List[datetime],
-        List[Model],
-        List[Combinable],
-        List[int],
-        List[str],
-        List[UUID],
-        Subquery,
-        Query,
-    ]: ...
+    ) -> Iterable[Any]: ...
     def process_rhs(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
     ) -> Tuple[Union[Tuple[str, str], str], Tuple]: ...
@@ -118,10 +107,10 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     ) -> Tuple[Tuple[str], Tuple]: ...
 
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
-    bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
+    bilateral_transforms: List[Type[lookups.Transform]]
     contains_aggregate: bool
     contains_over_clause: bool
-    lhs: django.db.models.expressions.Expression
+    lhs: Expression
     rhs: Any
     lookup_name: str = ...
     def process_rhs(
@@ -131,8 +120,8 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
 class IExact(BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
-    rhs: Optional[Union[django.db.models.expressions.Col, str]]
+    lhs: expressions.Col
+    rhs: Optional[Union[expressions.Col, str]]
     lookup_name: str = ...
     prepare_rhs: bool = ...
     def process_rhs(
@@ -142,47 +131,30 @@ class IExact(BuiltinLookup):
 class GreaterThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
+    lhs: Expression
     rhs: Any
     lookup_name: str = ...
 
 class GreaterThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
-    rhs: Union[
-        datetime.datetime,
-        decimal.Decimal,
-        django.db.models.expressions.Combinable,
-        int,
-        str,
-    ]
+    lhs: Expression
+    rhs: Any
     lookup_name: str = ...
 
 class LessThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
-    rhs: Union[
-        datetime.datetime,
-        decimal.Decimal,
-        django.db.models.expressions.CombinedExpression,
-        float,
-        str,
-    ]
+    lhs: Expression
+    rhs: Any
     lookup_name: str = ...
 
 class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
-    bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
+    bilateral_transforms: List[Type[lookups.Transform]]
     contains_aggregate: bool
     contains_over_clause: bool
-    lhs: django.db.models.expressions.Expression
-    rhs: Union[
-        datetime.date,
-        decimal.Decimal,
-        django.db.models.expressions.Expression,
-        float,
-    ]
+    lhs: Expression
+    rhs: Any
     lookup_name: str = ...
 
 class IntegerFieldFloatRounding:
@@ -195,9 +167,9 @@ class IntegerGreaterThanOrEqual(
 class IntegerLessThan(IntegerFieldFloatRounding, LessThan): ...
 
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
-    bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
+    bilateral_transforms: List[Type[lookups.Transform]]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
+    lhs: Expression
     rhs: Any
     lookup_name: str = ...
     def process_rhs(
@@ -218,57 +190,57 @@ class PatternLookup(BuiltinLookup):
     ) -> Tuple[str, List[Any]]: ...
 
 class Contains(PatternLookup):
-    bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
+    bilateral_transforms: List[Type[lookups.Transform]]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
-    rhs: Union[django.db.models.expressions.Expression, str]
+    lhs: Expression
+    rhs: Union[Expression, str]
     lookup_name: str = ...
 
 class IContains(Contains):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
-    rhs: Union[django.db.models.expressions.Expression, str]
+    lhs: expressions.Col
+    rhs: Union[Expression, str]
     lookup_name: str = ...
 
 class StartsWith(PatternLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
-    rhs: Union[django.db.models.expressions.Expression, str]
+    lhs: expressions.Col
+    rhs: Union[Expression, str]
     lookup_name: str = ...
     param_pattern: str = ...
 
 class IStartsWith(StartsWith):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
-    rhs: Union[django.db.models.expressions.Expression, str]
+    lhs: expressions.Col
+    rhs: Union[Expression, str]
     lookup_name: str = ...
 
 class EndsWith(PatternLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
-    rhs: Union[django.db.models.expressions.Expression, str]
+    lhs: expressions.Col
+    rhs: Union[Expression, str]
     lookup_name: str = ...
     param_pattern: str = ...
 
 class IEndsWith(EndsWith):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
-    rhs: Union[django.db.models.expressions.Expression, str]
+    lhs: expressions.Col
+    rhs: Union[Expression, str]
     lookup_name: str = ...
 
 class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
-    bilateral_transforms: List[Type[django.db.models.lookups.Transform]]
+    bilateral_transforms: List[Type[lookups.Transform]]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
+    lhs: Expression
     rhs: Union[
         List[datetime.datetime],
         Tuple[
-            Union[django.db.models.expressions.F, int],
+            Union[expressions.F, int],
             Union[datetime.datetime, int],
         ],
     ]
@@ -280,7 +252,7 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 class IsNull(BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Expression
+    lhs: Expression
     rhs: bool
     lookup_name: str = ...
     prepare_rhs: bool = ...
@@ -291,7 +263,7 @@ class IsNull(BuiltinLookup):
 class Regex(BuiltinLookup):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
+    lhs: expressions.Col
     rhs: str
     lookup_name: str = ...
     prepare_rhs: bool = ...
@@ -302,7 +274,7 @@ class Regex(BuiltinLookup):
 class IRegex(Regex):
     bilateral_transforms: List[Any]
     contains_aggregate: bool
-    lhs: django.db.models.expressions.Col
+    lhs: expressions.Col
     rhs: str
     lookup_name: str = ...
 
@@ -313,8 +285,8 @@ class YearLookup(Lookup):
 
 class YearComparisonLookup(YearLookup):
     bilateral_transforms: List[Any]
-    lhs: django.db.models.expressions.Value
-    rhs: django.db.models.expressions.Value
+    lhs: expressions.Value
+    rhs: expressions.Value
     def as_sql(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
     ) -> Tuple[str, List[str]]: ...

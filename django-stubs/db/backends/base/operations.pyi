@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import Any, List, Optional, Set, Tuple, Type, Union
+from typing import Any, List, Optional, Set, Tuple, Type, Union, Sequence
 
 from django.core.management.color import Style
 from django.db import DefaultConnectionProxy
@@ -97,7 +97,7 @@ class BaseDatabaseOperations:
     def sequence_reset_sql(
         self,
         style: Style,
-        model_list: Union[List[Type[Model]], Set[Type[Model]]],
+        model_list: Sequence[Type[Model]],
     ) -> List[Any]: ...
     def start_transaction_sql(self) -> str: ...
     def end_transaction_sql(self, success: bool = ...) -> str: ...

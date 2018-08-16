@@ -11,7 +11,7 @@ class DatabaseClient(BaseDatabaseClient):
         settings_dict: Dict[
             str,
             Optional[
-                Union[Dict[Any, Any], Dict[str, Dict[str, str]], int, str]
+                Union[Dict[str, Dict[str, str]], int, str]
             ],
         ],
     ) -> List[str]: ...
