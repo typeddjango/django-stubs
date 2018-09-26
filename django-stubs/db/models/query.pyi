@@ -96,8 +96,6 @@ class QuerySet(Generic[_T]):
 
     def as_manager(cls): ...
 
-    as_manager: Any = ...
-
     def __deepcopy__(
             self,
             memo: Dict[

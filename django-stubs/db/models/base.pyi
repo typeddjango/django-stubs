@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 from uuid import UUID
 
 from django.core.checks.messages import Warning
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models.fields.related import ForeignKey
 
 
@@ -40,6 +40,9 @@ class ModelState:
     fields_cache: Any = ...
 
 class Model:
+    class DoesNotExist(ObjectDoesNotExist):
+        pass
+
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     @classmethod
     def from_db(
