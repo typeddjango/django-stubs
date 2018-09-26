@@ -48,7 +48,7 @@ class BaseDatabaseWrapper:
     validation: Any = ...
     def __init__(
         self,
-        settings_dict: Dict[str, Any],
+        settings_dict: Dict[str, Dict[str, str]],
         alias: str = ...,
         allow_thread_sharing: bool = ...,
     ) -> None: ...

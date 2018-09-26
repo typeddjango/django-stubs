@@ -1,5 +1,5 @@
 from contextlib import ContextDecorator
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Union, ContextManager
 
 from django.db import ProgrammingError
 from django.db.backends.sqlite3.base import DatabaseWrapper
@@ -31,5 +31,5 @@ class Atomic(ContextDecorator):
 
 def atomic(
     using: Optional[Union[Callable, str]] = ..., savepoint: bool = ...
-) -> Callable: ...
+) -> ContextManager[Atomic]: ...
 def non_atomic_requests(using: Callable = ...) -> Callable: ...

@@ -7,7 +7,6 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.options import Options
 from django.http.request import HttpRequest
-from django.utils.functional import SimpleLazyObject
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -24,7 +23,7 @@ def authenticate(
 def login(
     request: HttpRequest,
     user: AbstractBaseUser,
-    backend: Optional[Union[str, Type[ModelBackend]]] = ...,
+    backend: Optional[Union[Type[ModelBackend], str]] = ...,
 ) -> None: ...
 def logout(request: HttpRequest) -> None: ...
 def get_user_model() -> Type[Model]: ...
@@ -33,7 +32,7 @@ def get_user(
 ) -> Union[AbstractBaseUser, AnonymousUser]: ...
 def get_permission_codename(action: str, opts: Options) -> str: ...
 def update_session_auth_hash(
-    request: WSGIRequest, user: Union[SimpleLazyObject, AbstractUser]
+    request: WSGIRequest, user: AbstractUser
 ) -> None: ...
 
 default_app_config: str

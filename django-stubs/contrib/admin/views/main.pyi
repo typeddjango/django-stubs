@@ -47,29 +47,27 @@ class ChangeList:
         self,
         request: WSGIRequest,
         model: Type[Model],
-        list_display: Union[List[Union[str, Callable]], Tuple[str]],
+        list_display: Union[List[Union[Callable, str]], Tuple[str]],
         list_display_links: Optional[
-            Union[List[str], Tuple[str], List[Callable]]
+            Union[List[Callable], List[str], Tuple[str]]
         ],
-        list_filter: Union[Tuple, List[Type[SimpleListFilter]], List[str]],
+        list_filter: Union[List[Type[SimpleListFilter]], List[str], Tuple],
         date_hierarchy: Optional[str],
-        search_fields: Union[Tuple, List[str]],
-        list_select_related: Union[bool, Tuple],
+        search_fields: Union[List[str], Tuple],
+        list_select_related: Union[Tuple, bool],
         list_per_page: int,
         list_max_show_all: int,
         list_editable: Union[List[str], Tuple],
         model_admin: ModelAdmin,
-        sortable_by: Union[Tuple, List[Callable], List[str]],
+        sortable_by: Union[List[Callable], List[str], Tuple],
     ) -> None: ...
     def get_filters_params(self, params: None = ...) -> Dict[str, str]: ...
     def get_filters(
         self, request: WSGIRequest
-    ) -> Tuple[List[ListFilter], bool, bool, bool]: ...
+    ) -> Tuple[List[ListFilter], bool, Dict[str, Union[bool, str]], bool]: ...
     def get_query_string(
         self,
-        new_params: Optional[
-            Union[Dict[str, Union[str, int]], Dict[str, None]]
-        ] = ...,
+        new_params: Optional[Dict[str, None]] = ...,
         remove: Optional[List[str]] = ...,
     ) -> str: ...
     result_count: Any = ...
@@ -82,7 +80,7 @@ class ChangeList:
     paginator: Any = ...
     def get_results(self, request: WSGIRequest) -> None: ...
     def get_ordering_field(
-        self, field_name: Union[str, Callable]
+        self, field_name: Union[Callable, str]
     ) -> Optional[Union[CombinedExpression, str]]: ...
     def get_ordering(
         self, request: WSGIRequest, queryset: QuerySet

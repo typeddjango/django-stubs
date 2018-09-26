@@ -17,7 +17,7 @@ class CursorWrapper:
     def __getattr__(
         self, attr: str
     ) -> Union[
-        Callable, int, Tuple[Tuple[str, None, None, None, None, None, None]]
+        Callable, Tuple[Tuple[str, None, None, None, None, None, None]], int
     ]: ...
     def __iter__(self) -> None: ...
     def __enter__(self) -> CursorWrapper: ...
@@ -32,25 +32,20 @@ class CursorWrapper:
         self,
         sql: str,
         params: Optional[
-            Union[
-                List[Union[int, str, None, memoryview]],
-                List[Union[str, float, None]],
-                List[datetime],
-                Tuple,
-            ]
+            Union[List[bool], List[datetime], List[float], Tuple]
         ] = ...,
     ) -> Optional[SQLiteCursorWrapper]: ...
     def executemany(
         self,
         sql: str,
-        param_list: Union[List[Tuple[str]], List[Tuple[int]], Iterator[Any]],
+        param_list: Union[Iterator[Any], List[Tuple[Union[int, str]]]],
     ) -> Optional[SQLiteCursorWrapper]: ...
 
 class CursorDebugWrapper(CursorWrapper):
     cursor: django.db.backends.sqlite3.base.SQLiteCursorWrapper
     db: django.db.backends.sqlite3.base.DatabaseWrapper
     def execute(
-        self, sql: str, params: Optional[Union[Tuple, List[str]]] = ...
+        self, sql: str, params: Optional[Union[List[str], Tuple]] = ...
     ) -> Any: ...
     def executemany(self, sql: str, param_list: Iterator[Any]) -> Any: ...
 

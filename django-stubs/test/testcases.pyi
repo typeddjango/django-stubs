@@ -1,17 +1,23 @@
 import threading
 import unittest
 from contextlib import _GeneratorContextManager
-from typing import Any, Callable, List, Optional, Tuple, Type, Union
+from datetime import date
+from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
+                    Type, Union)
 from unittest.runner import TextTestResult
 
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import WSGIRequestHandler
+from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.query import QuerySet
-from django.http.response import HttpResponse
-from django.template.response import TemplateResponse
+from django.db.models.query import QuerySet, RawQuerySet
+from django.forms.fields import EmailField
+from django.http.response import HttpResponse, HttpResponseBase
+from django.template.context import Context
 from django.test.html import Element
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import (CaptureQueriesContext, ContextList,
+                               modify_settings, override_settings)
+from django.utils.safestring import SafeText
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
@@ -20,8 +26,8 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
     force_debug_cursor: bool
     initial_queries: int
     test_case: Union[
-        django.test.testcases.TransactionTestCase,
         django.test.testcases.SerializeMixin,
+        django.test.testcases.TransactionTestCase,
     ] = ...
     num: int = ...
     def __init__(self, test_case: Any, num: Any, connection: Any) -> None: ...
@@ -71,7 +77,7 @@ class SimpleTestCase(unittest.TestCase):
     def tearDownClass(cls) -> None: ...
     def __call__(self, result: TextTestResult = ...) -> None: ...
     def settings(self, **kwargs: Any) -> override_settings: ...
-    def modify_settings(self, **kwargs: Any): ...
+    def modify_settings(self, **kwargs: Any) -> modify_settings: ...
     def assertRedirects(
         self,
         response: HttpResponse,
@@ -83,98 +89,99 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertContains(
         self,
-        response: HttpResponse,
-        text: Union[str, bytes],
-        count: None = ...,
+        response: HttpResponseBase,
+        text: Union[bytes, int, str],
+        count: Optional[int] = ...,
         status_code: int = ...,
         msg_prefix: str = ...,
         html: bool = ...,
     ) -> None: ...
     def assertNotContains(
         self,
-        response: TemplateResponse,
-        text: str,
+        response: HttpResponse,
+        text: Union[bytes, str],
         status_code: int = ...,
         msg_prefix: str = ...,
         html: bool = ...,
     ) -> None: ...
     def assertFormError(
         self,
-        response: Any,
-        form: Any,
-        field: Any,
-        errors: Any,
+        response: HttpResponse,
+        form: str,
+        field: Optional[str],
+        errors: Union[List[str], str],
         msg_prefix: str = ...,
     ) -> None: ...
     def assertFormsetError(
         self,
-        response: Any,
-        formset: Any,
-        form_index: Any,
-        field: Any,
-        errors: Any,
+        response: HttpResponse,
+        formset: str,
+        form_index: Optional[int],
+        field: Optional[str],
+        errors: Union[List[str], str],
         msg_prefix: str = ...,
     ) -> None: ...
     def assertTemplateUsed(
         self,
-        response: TemplateResponse = ...,
-        template_name: str = ...,
+        response: Optional[Union[HttpResponse, str]] = ...,
+        template_name: Optional[str] = ...,
         msg_prefix: str = ...,
-        count: None = ...,
-    ) -> None: ...
+        count: Optional[int] = ...,
+    ) -> Optional[_AssertTemplateUsedContext]: ...
     def assertTemplateNotUsed(
         self,
-        response: Optional[Any] = ...,
-        template_name: Optional[Any] = ...,
+        response: Union[HttpResponse, str] = ...,
+        template_name: Optional[str] = ...,
         msg_prefix: str = ...,
-    ): ...
+    ) -> Optional[_AssertTemplateNotUsedContext]: ...
     def assertRaisesMessage(
         self,
         expected_exception: Type[Exception],
         expected_message: str,
         *args: Any,
         **kwargs: Any
-    ) -> _GeneratorContextManager: ...
+    ) -> Optional[_GeneratorContextManager]: ...
     def assertWarnsMessage(
         self,
-        expected_warning: Type[RuntimeWarning],
+        expected_warning: Type[Exception],
         expected_message: str,
         *args: Any,
         **kwargs: Any
     ) -> _GeneratorContextManager: ...
     def assertFieldOutput(
         self,
-        fieldclass: Any,
-        valid: Any,
-        invalid: Any,
-        field_args: Optional[Any] = ...,
-        field_kwargs: Optional[Any] = ...,
+        fieldclass: Type[EmailField],
+        valid: Dict[str, str],
+        invalid: Dict[str, List[str]],
+        field_args: None = ...,
+        field_kwargs: None = ...,
         empty_value: str = ...,
-    ) -> None: ...
+    ) -> Any: ...
     def assertHTMLEqual(
-        self, html1: Any, html2: Any, msg: Optional[Any] = ...
+        self, html1: str, html2: str, msg: None = ...
     ) -> None: ...
     def assertHTMLNotEqual(
-        self, html1: Any, html2: Any, msg: Optional[Any] = ...
+        self, html1: str, html2: str, msg: None = ...
     ) -> None: ...
     def assertInHTML(
         self,
-        needle: Any,
-        haystack: Any,
-        count: Optional[Any] = ...,
+        needle: str,
+        haystack: SafeText,
+        count: Optional[int] = ...,
         msg_prefix: str = ...,
     ) -> None: ...
     def assertJSONEqual(
-        self, raw: str, expected_data: str, msg: None = ...
+        self,
+        raw: str,
+        expected_data: Union[Dict[str, str], bool, str],
+        msg: None = ...,
     ) -> None: ...
     def assertJSONNotEqual(
-        self, raw: Any, expected_data: Any, msg: Optional[Any] = ...
+        self, raw: str, expected_data: str, msg: None = ...
     ) -> None: ...
-    def assertXMLEqual(
-        self, xml1: Any, xml2: Any, msg: Optional[Any] = ...
-    ) -> None: ...
+    def assertXMLEqual(self, xml1: str, xml2: str, msg: None = ...) -> None: ...
     def assertXMLNotEqual(
-        self, xml1: Any, xml2: Any, msg: Optional[Any] = ...
+        self, xml1: str, xml2: str, msg: None = ...
     ) -> None: ...
 
 class TransactionTestCase(SimpleTestCase):
@@ -186,13 +193,17 @@ class TransactionTestCase(SimpleTestCase):
     allow_database_queries: bool = ...
     def assertQuerysetEqual(
         self,
-        qs: QuerySet,
+        qs: Union[Iterator[Any], List[Model], QuerySet, RawQuerySet],
         values: Union[
+            List[None],
+            List[Tuple[str, str]],
+            List[date],
             List[int],
-            List[Union[str, None]],
-            List[Tuple[str, Type[Model], int]],
+            List[str],
+            Set[str],
+            QuerySet,
         ],
-        transform: Callable = ...,
+        transform: Union[Callable, Type[str]] = ...,
         ordered: bool = ...,
         msg: None = ...,
     ) -> None: ...
@@ -216,11 +227,15 @@ class TestCase(TransactionTestCase):
 class CheckCondition:
     conditions: Tuple[Tuple[Callable, str]] = ...
     def __init__(self, *conditions: Any) -> None: ...
-    def add_condition(self, condition: Any, reason: Any): ...
-    def __get__(self, instance: None, cls: Type[TestCase] = ...) -> bool: ...
+    def add_condition(
+        self, condition: Callable, reason: str
+    ) -> CheckCondition: ...
+    def __get__(
+        self, instance: None, cls: Type[TransactionTestCase] = ...
+    ) -> bool: ...
 
-def skipIfDBFeature(*features: Any): ...
-def skipUnlessDBFeature(*features: Any): ...
+def skipIfDBFeature(*features: Any) -> Callable: ...
+def skipUnlessDBFeature(*features: Any) -> Callable: ...
 
 class QuietWSGIRequestHandler(WSGIRequestHandler):
     def log_message(*args: Any) -> None: ...
@@ -247,20 +262,15 @@ class LiveServerThread(threading.Thread):
     port: int = ...
     is_ready: threading.Event = ...
     error: Optional[django.core.exceptions.ImproperlyConfigured] = ...
-    static_handler: Type[
-        Union[
-            django.contrib.staticfiles.handlers.StaticFilesHandler,
-            django.test.testcases._StaticFilesHandler,
-        ]
-    ] = ...
+    static_handler: Type[django.core.handlers.wsgi.WSGIHandler] = ...
     connections_override: Dict[
         str, django.db.backends.sqlite3.base.DatabaseWrapper
     ] = ...
     def __init__(
         self,
-        host: Any,
-        static_handler: Any,
-        connections_override: Optional[Any] = ...,
+        host: str,
+        static_handler: Type[WSGIHandler],
+        connections_override: Dict[str, DatabaseWrapper] = ...,
         port: int = ...,
     ) -> None: ...
     httpd: django.core.servers.basehttp.ThreadedWSGIServer = ...

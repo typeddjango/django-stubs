@@ -127,7 +127,7 @@ class DiscoverRunner:
     def setup_test_environment(self, **kwargs: Any) -> None: ...
     def build_suite(
         self,
-        test_labels: Union[Tuple[str, str], List[str]] = ...,
+        test_labels: Union[List[str], Tuple[str, str]] = ...,
         extra_tests: Optional[List[Any]] = ...,
         **kwargs: Any
     ) -> TestSuite: ...

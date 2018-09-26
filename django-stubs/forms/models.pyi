@@ -1,19 +1,23 @@
 from collections import OrderedDict
-from datetime import date
-from functools import partial
+from datetime import date, datetime
+from decimal import Decimal
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
                     Union)
+from unittest.mock import MagicMock
+from uuid import UUID
 
-from django.contrib.admin.widgets import AdminTextInputWidget
-from django.contrib.auth.forms import UsernameField
-from django.contrib.auth.models import Permission
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.flatpages.forms import FlatpageForm
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.base import Model
+from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
-from django.forms.fields import CharField, ChoiceField, Field, URLField
+from django.db.models.query_utils import Q
+from django.forms.fields import CharField, ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.utils import ErrorList
-from django.forms.widgets import Textarea, TextInput, Widget
+from django.forms.widgets import Input, Widget
 from django.http.request import QueryDict
 from django.utils.datastructures import MultiValueDict
 
@@ -21,67 +25,53 @@ ALL_FIELDS: str
 
 def model_to_dict(
     instance: Model,
-    fields: Optional[Union[List[Union[str, Callable]], Tuple[str]]] = ...,
-    exclude: Optional[List[Union[str, Callable]]] = ...,
-) -> Dict[str, Optional[Union[int, date, str, List[Any]]]]: ...
+    fields: Optional[Union[List[Union[Callable, str]], Tuple[str]]] = ...,
+    exclude: Optional[Union[List[Union[Callable, str]], Tuple[str]]] = ...,
+) -> Dict[str, Optional[Union[bool, date, float]]]: ...
 def fields_for_model(
     model: Type[Model],
-    fields: Optional[Union[List[Union[str, Callable]], Tuple]] = ...,
-    exclude: Optional[List[Union[str, Callable]]] = ...,
-    widgets: Optional[Dict[str, Union[Type[Textarea], TextInput]]] = ...,
-    formfield_callback: Optional[partial] = ...,
-    localized_fields: None = ...,
+    fields: Optional[Union[List[Union[Callable, str]], Tuple]] = ...,
+    exclude: Optional[Union[List[Union[Callable, str]], Tuple]] = ...,
+    widgets: Optional[Union[Dict[str, Type[Input]], Dict[str, Widget]]] = ...,
+    formfield_callback: Optional[Union[Callable, str]] = ...,
+    localized_fields: Optional[Union[Tuple[str], str]] = ...,
     labels: Optional[Dict[str, str]] = ...,
     help_texts: Optional[Dict[str, str]] = ...,
     error_messages: Optional[Dict[str, Dict[str, str]]] = ...,
-    field_classes: Optional[
-        Dict[str, Type[Union[URLField, UsernameField]]]
-    ] = ...,
+    field_classes: Optional[Dict[str, Type[CharField]]] = ...,
     *,
     apply_limit_choices_to: bool = ...
 ) -> OrderedDict: ...
 
 class ModelFormOptions:
     model: Optional[Type[django.db.models.base.Model]] = ...
-    fields: Optional[Union[List[Union[str, Callable]], Tuple, str]] = ...
-    exclude: Optional[Union[List[Union[str, Callable]], Tuple, str]] = ...
+    fields: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
+    exclude: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
     widgets: Optional[
         Union[
-            Dict[
-                str,
-                Type[
-                    Union[
-                        django.forms.widgets.TextInput,
-                        django.forms.widgets.HiddenInput,
-                    ]
-                ],
-            ],
-            Dict[
-                str,
-                Union[
-                    Type[django.forms.widgets.Textarea],
-                    django.forms.widgets.Widget,
-                ],
-            ],
+            Dict[str, Type[django.forms.widgets.Input]],
+            Dict[str, django.forms.widgets.Widget],
         ]
     ] = ...
-    localized_fields: Optional[Union[str, Tuple[str]]] = ...
+    localized_fields: Optional[Union[Tuple[str], str]] = ...
     labels: Optional[Dict[str, str]] = ...
     help_texts: Optional[Dict[str, str]] = ...
     error_messages: Optional[Dict[str, Dict[str, str]]] = ...
     field_classes: Optional[
-        Dict[
-            str,
+        Dict[str, Type[django.forms.fields.CharField]]
+    ] = ...
+    def __init__(
+        self,
+        options: Optional[
             Type[
                 Union[
-                    django.forms.fields.URLField,
-                    django.contrib.auth.forms.UsernameField,
-                    django.forms.fields.SlugField,
+                    UserChangeForm.Meta,
+                    UserCreationForm.Meta,
+                    FlatpageForm.Meta,
                 ]
-            ],
-        ]
-    ] = ...
-    def __init__(self, options: Type[Any] = ...) -> None: ...
+            ]
+        ] = ...,
+    ) -> None: ...
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass):
     def __new__(
@@ -95,19 +85,28 @@ class BaseModelForm(BaseForm):
     instance: Any = ...
     def __init__(
         self,
-        data: Optional[Union[Dict[str, str], QueryDict]] = ...,
-        files: Optional[MultiValueDict] = ...,
-        auto_id: str = ...,
+        data: Optional[
+            Union[
+                Dict[str, Optional[Union[List[int], datetime, int, str]]],
+                Dict[str, Union[List[str], str]],
+                Dict[str, Union[datetime, Decimal, int, str]],
+                QueryDict,
+            ]
+        ] = ...,
+        files: Optional[
+            Union[Dict[str, SimpleUploadedFile], MultiValueDict]
+        ] = ...,
+        auto_id: Union[bool, str] = ...,
         prefix: None = ...,
-        initial: Optional[Dict[Any, Any]] = ...,
+        initial: Optional[Union[Dict[str, List[int]], Dict[str, int]]] = ...,
         error_class: Type[ErrorList] = ...,
         label_suffix: None = ...,
         empty_permitted: bool = ...,
         instance: Optional[Model] = ...,
         use_required_attribute: None = ...,
-        renderer: None = ...,
+        renderer: Any = ...,
     ) -> None: ...
-    def clean(self) -> Dict[str, Union[int, date]]: ...
+    def clean(self) -> Dict[str, Any]: ...
     def validate_unique(self) -> None: ...
     save_m2m: Any = ...
     def save(self, commit: bool = ...) -> Model: ...
@@ -115,18 +114,18 @@ class BaseModelForm(BaseForm):
 class ModelForm(BaseModelForm): ...
 
 def modelform_factory(
-    model: Any,
-    form: Any = ...,
-    fields: Optional[Any] = ...,
-    exclude: Optional[Any] = ...,
-    formfield_callback: Optional[Any] = ...,
-    widgets: Optional[Any] = ...,
-    localized_fields: Optional[Any] = ...,
-    labels: Optional[Any] = ...,
-    help_texts: Optional[Any] = ...,
-    error_messages: Optional[Any] = ...,
-    field_classes: Optional[Any] = ...,
-): ...
+    model: Type[Model],
+    form: Type[ModelForm] = ...,
+    fields: Optional[Union[List[str], str]] = ...,
+    exclude: None = ...,
+    formfield_callback: Optional[str] = ...,
+    widgets: None = ...,
+    localized_fields: None = ...,
+    labels: None = ...,
+    help_texts: None = ...,
+    error_messages: None = ...,
+    field_classes: None = ...,
+) -> Any: ...
 
 class BaseModelFormSet(BaseFormSet):
     model: Any = ...
@@ -165,26 +164,26 @@ class BaseModelFormSet(BaseFormSet):
     def add_fields(self, form: Any, index: Any): ...
 
 def modelformset_factory(
-    model: Any,
-    form: Any = ...,
-    formfield_callback: Optional[Any] = ...,
-    formset: Any = ...,
+    model: Type[Model],
+    form: Type[ModelForm] = ...,
+    formfield_callback: None = ...,
+    formset: Type[BaseModelFormSet] = ...,
     extra: int = ...,
     can_delete: bool = ...,
     can_order: bool = ...,
-    max_num: Optional[Any] = ...,
-    fields: Optional[Any] = ...,
-    exclude: Optional[Any] = ...,
-    widgets: Optional[Any] = ...,
+    max_num: None = ...,
+    fields: None = ...,
+    exclude: None = ...,
+    widgets: None = ...,
     validate_max: bool = ...,
-    localized_fields: Optional[Any] = ...,
-    labels: Optional[Any] = ...,
-    help_texts: Optional[Any] = ...,
-    error_messages: Optional[Any] = ...,
-    min_num: Optional[Any] = ...,
+    localized_fields: None = ...,
+    labels: None = ...,
+    help_texts: None = ...,
+    error_messages: None = ...,
+    min_num: None = ...,
     validate_min: bool = ...,
-    field_classes: Optional[Any] = ...,
-): ...
+    field_classes: None = ...,
+) -> Any: ...
 
 class BaseInlineFormSet(BaseModelFormSet):
     instance: Any = ...
@@ -208,33 +207,33 @@ class BaseInlineFormSet(BaseModelFormSet):
     def get_unique_error_message(self, unique_check: Any): ...
 
 def inlineformset_factory(
-    parent_model: Any,
-    model: Any,
-    form: Any = ...,
-    formset: Any = ...,
-    fk_name: Optional[Any] = ...,
-    fields: Optional[Any] = ...,
-    exclude: Optional[Any] = ...,
+    parent_model: Type[Model],
+    model: Type[Model],
+    form: Type[ModelForm] = ...,
+    formset: Type[BaseInlineFormSet] = ...,
+    fk_name: Optional[str] = ...,
+    fields: Optional[str] = ...,
+    exclude: None = ...,
     extra: int = ...,
     can_order: bool = ...,
     can_delete: bool = ...,
-    max_num: Optional[Any] = ...,
-    formfield_callback: Optional[Any] = ...,
-    widgets: Optional[Any] = ...,
+    max_num: None = ...,
+    formfield_callback: None = ...,
+    widgets: None = ...,
     validate_max: bool = ...,
-    localized_fields: Optional[Any] = ...,
-    labels: Optional[Any] = ...,
-    help_texts: Optional[Any] = ...,
-    error_messages: Optional[Any] = ...,
-    min_num: Optional[Any] = ...,
+    localized_fields: None = ...,
+    labels: None = ...,
+    help_texts: None = ...,
+    error_messages: None = ...,
+    min_num: None = ...,
     validate_min: bool = ...,
-    field_classes: Optional[Any] = ...,
-): ...
+    field_classes: None = ...,
+) -> Any: ...
 
 class InlineForeignKeyField(Field):
     disabled: bool
     help_text: str
-    initial: Optional[Union[str, django.db.models.base.Model, int]]
+    initial: Optional[Union[django.db.models.base.Model, int, str]]
     label: Optional[str]
     label_suffix: None
     localize: bool
@@ -253,23 +252,27 @@ class InlineForeignKeyField(Field):
         to_field: Optional[Any] = ...,
         **kwargs: Any
     ) -> None: ...
-    def clean(self, value: Optional[str]) -> Model: ...
-    def has_changed(self, initial: int, data: str) -> bool: ...
+    def clean(self, value: Optional[Union[int, str]]) -> Optional[Model]: ...
+    def has_changed(
+        self,
+        initial: Optional[Union[int, str]],
+        data: Optional[Union[int, str]],
+    ) -> bool: ...
 
 class ModelChoiceIterator:
     field: django.forms.models.ModelChoiceField = ...
     queryset: Optional[django.db.models.query.QuerySet] = ...
-    def __init__(self, field: Any) -> None: ...
-    def __iter__(self) -> Iterator[Tuple[str, str]]: ...
-    def __len__(self): ...
-    def __bool__(self): ...
+    def __init__(self, field: ModelChoiceField) -> None: ...
+    def __iter__(self) -> Iterator[Tuple[Union[int, str], str]]: ...
+    def __len__(self) -> int: ...
+    def __bool__(self) -> bool: ...
     def choice(self, obj: Model) -> Tuple[int, str]: ...
 
 class ModelChoiceField(ChoiceField):
     disabled: bool
     error_messages: Dict[str, str]
     help_text: str
-    initial: Optional[Union[Callable, uuid.UUID, int, str]]
+    initial: Optional[Union[Callable, int, str, uuid.UUID]]
     label: Optional[str]
     label_suffix: None
     localize: bool
@@ -285,7 +288,7 @@ class ModelChoiceField(ChoiceField):
     to_field_name: None = ...
     def __init__(
         self,
-        queryset: Any,
+        queryset: Optional[Union[Manager, QuerySet]],
         *,
         empty_label: str = ...,
         required: bool = ...,
@@ -297,28 +300,28 @@ class ModelChoiceField(ChoiceField):
         limit_choices_to: Optional[Any] = ...,
         **kwargs: Any
     ) -> None: ...
-    def get_limit_choices_to(self) -> Dict[Any, Any]: ...
+    def get_limit_choices_to(
+        self
+    ) -> Optional[Union[Dict[str, datetime], Q, MagicMock]]: ...
     def __deepcopy__(
         self,
         memo: Dict[
-            int,
-            Union[
-                OrderedDict,
-                Widget,
-                List[Union[Widget, Field]],
-                Field,
-                List[Union[AdminTextInputWidget, CharField]],
-            ],
+            int, Union[List[Union[Field, Widget]], OrderedDict, Field, Widget]
         ],
     ) -> ModelChoiceField: ...
     def label_from_instance(self, obj: Model) -> str: ...
     choices: Any = ...
-    def prepare_value(
-        self, value: Optional[Union[int, str, Model]]
-    ) -> Optional[Union[str, int]]: ...
-    def to_python(self, value: str) -> Optional[Model]: ...
-    def validate(self, value: Model) -> None: ...
-    def has_changed(self, initial: None, data: str) -> bool: ...
+    def prepare_value(self, value: Any) -> Any: ...
+    def to_python(
+        self,
+        value: Optional[Union[List[Dict[str, str]], List[List[str]], int, str]],
+    ) -> Optional[Model]: ...
+    def validate(self, value: Optional[Model]) -> None: ...
+    def has_changed(
+        self,
+        initial: Optional[Union[Model, int, str, UUID]],
+        data: Optional[Union[int, str]],
+    ) -> bool: ...
 
 class ModelMultipleChoiceField(ModelChoiceField):
     disabled: bool
@@ -333,10 +336,23 @@ class ModelMultipleChoiceField(ModelChoiceField):
     widget: Any = ...
     hidden_widget: Any = ...
     default_error_messages: Any = ...
-    def __init__(self, queryset: Any, **kwargs: Any) -> None: ...
-    def to_python(self, value: Any): ...
-    def clean(self, value: List[str]) -> QuerySet: ...
+    def __init__(self, queryset: QuerySet, **kwargs: Any) -> None: ...
+    def to_python(
+        self, value: Union[List[str], Tuple[int, ...]]
+    ) -> List[Model]: ...
+    def clean(
+        self,
+        value: Optional[
+            Union[
+                List[Dict[str, str]], List[List[str]], List[Model], Tuple, str
+            ]
+        ],
+    ) -> QuerySet: ...
     def prepare_value(
-        self, value: Union[Permission, List[str]]
-    ) -> Union[List[str], int]: ...
-    def has_changed(self, initial: List[Any], data: List[str]) -> bool: ...
+        self, value: Any
+    ) -> Optional[Union[List[Dict[str, str]], List[List[str]], int, str]]: ...
+    def has_changed(
+        self,
+        initial: Optional[Union[List[Model], QuerySet, str]],
+        data: Optional[Union[List[int], List[str], str]],
+    ) -> bool: ...

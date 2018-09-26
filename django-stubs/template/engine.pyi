@@ -18,13 +18,12 @@ class Engine:
     dirs: List[str] = ...
     app_dirs: bool = ...
     autoescape: bool = ...
-    context_processors: Union[Tuple[str], List[str]] = ...
+    context_processors: Union[List[str], Tuple[str]] = ...
     debug: bool = ...
     loaders: Union[
-        List[List[Union[str, Dict[str, str]]]],
-        List[Union[Tuple[str, Dict[str, str]], str]],
+        List[List[Union[Dict[str, str], str]]],
         List[Tuple[str, List[str]]],
-        List[Tuple[str, List[Tuple[str, Dict[str, str]]]]],
+        List[str],
     ] = ...
     string_if_invalid: str = ...
     file_charset: str = ...
@@ -36,14 +35,13 @@ class Engine:
         self,
         dirs: Optional[List[str]] = ...,
         app_dirs: bool = ...,
-        context_processors: Optional[Union[Tuple[str], List[str]]] = ...,
+        context_processors: Optional[Union[List[str], Tuple[str]]] = ...,
         debug: bool = ...,
         loaders: Optional[
             Union[
-                List[List[Union[str, Dict[str, str]]]],
-                List[Union[Tuple[str, Dict[str, str]], str]],
+                List[List[Union[Dict[str, str], str]]],
                 List[Tuple[str, List[str]]],
-                List[Tuple[str, List[Tuple[str, Dict[str, str]]]]],
+                List[str],
             ]
         ] = ...,
         string_if_invalid: str = ...,
@@ -63,26 +61,15 @@ class Engine:
     def get_template_loaders(
         self,
         template_loaders: Union[
-            List[Union[Tuple[str, Dict[str, str]], str]],
-            List[List[Union[str, Dict[str, str]]]],
+            List[List[Union[Dict[str, str], str]]],
             List[Tuple[str, List[str]]],
-            List[Tuple[str, List[Tuple[str, Dict[str, str]]]]],
+            List[str],
         ],
     ) -> List[Loader]: ...
     def find_template_loader(
         self,
         loader: Union[
-            Tuple[
-                str,
-                Union[
-                    List[Tuple[str, Dict[str, str]]],
-                    Dict[str, str],
-                    List[Any],
-                    List[str],
-                ],
-            ],
-            str,
-            List[Union[str, Dict[str, str]]],
+            List[Union[Dict[str, str], str]], Tuple[str, List[str]], str
         ],
     ) -> Loader: ...
     def find_template(

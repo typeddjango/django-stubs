@@ -31,7 +31,7 @@ class AdminSite:
     def register(
         self,
         model_or_iterable: Union[
-            Tuple[Type[Model]], Type[Model], List[Type[Model]]
+            List[Type[Model]], Tuple[Type[Model]], Type[Model]
         ],
         admin_class: Optional[Type[ModelAdmin]] = ...,
         **options: Any

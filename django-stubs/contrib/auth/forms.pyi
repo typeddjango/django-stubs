@@ -6,7 +6,6 @@ from django.contrib.auth.models import AbstractUser, User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
-from django.utils.functional import SimpleLazyObject
 
 UserModel: Any
 
@@ -18,10 +17,8 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
     ) -> Dict[
         str,
         Union[
-            Dict[str, Union[str, bool, None, Dict[Any, Any]]],
+            Dict[str, Optional[Union[Dict[str, str], bool, str]]],
             List[Dict[str, str]],
-            Dict[str, Union[str, bool, None, Dict[str, str]]],
-            Dict[str, Union[str, bool, Dict[str, str]]],
         ],
     ]: ...
 
@@ -63,7 +60,7 @@ class UserChangeForm(forms.ModelForm):
     error_class: Type[django.forms.utils.ErrorList]
     fields: collections.OrderedDict
     files: Dict[Any, Any]
-    initial: Dict[str, Optional[Union[int, str, datetime.datetime, List[Any]]]]
+    initial: Dict[str, Optional[Union[List[Any], datetime.datetime, int, str]]]
     instance: django.contrib.auth.models.User
     is_bound: bool
     label_suffix: str
@@ -114,7 +111,7 @@ class PasswordResetForm(forms.Form):
         self,
         subject_template_name: str,
         email_template_name: str,
-        context: Dict[str, Union[str, AbstractBaseUser]],
+        context: Dict[str, Union[AbstractBaseUser, str]],
         from_email: Optional[str],
         to_email: str,
         html_email_template_name: Optional[str] = ...,
@@ -148,15 +145,10 @@ class SetPasswordForm(forms.Form):
     new_password2: Any = ...
     user: django.contrib.auth.models.User = ...
     def __init__(
-        self,
-        user: Optional[Union[SimpleLazyObject, AbstractBaseUser]],
-        *args: Any,
-        **kwargs: Any
+        self, user: Optional[AbstractBaseUser], *args: Any, **kwargs: Any
     ) -> None: ...
     def clean_new_password2(self) -> str: ...
-    def save(
-        self, commit: bool = ...
-    ) -> Union[AbstractBaseUser, SimpleLazyObject]: ...
+    def save(self, commit: bool = ...) -> AbstractBaseUser: ...
 
 class PasswordChangeForm(SetPasswordForm):
     auto_id: str

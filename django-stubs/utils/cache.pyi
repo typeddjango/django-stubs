@@ -1,6 +1,5 @@
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple
 
-from django.core.cache import DefaultCacheProxy
 from django.core.cache.backends.base import BaseCache
 from django.core.cache.backends.locmem import LocMemCache
 from django.core.handlers.wsgi import WSGIRequest
@@ -29,12 +28,12 @@ def get_cache_key(
     request: WSGIRequest,
     key_prefix: Optional[str] = ...,
     method: str = ...,
-    cache: Optional[Union[BaseCache, DefaultCacheProxy]] = ...,
+    cache: Optional[BaseCache] = ...,
 ) -> Optional[str]: ...
 def learn_cache_key(
     request: WSGIRequest,
     response: HttpResponse,
     cache_timeout: Optional[float] = ...,
     key_prefix: Optional[str] = ...,
-    cache: Optional[Union[LocMemCache, DefaultCacheProxy]] = ...,
+    cache: Optional[LocMemCache] = ...,
 ) -> str: ...

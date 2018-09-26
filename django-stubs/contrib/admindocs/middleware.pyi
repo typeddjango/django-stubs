@@ -4,8 +4,6 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from .utils import get_view_name
-
 
 class XViewMiddleware(MiddlewareMixin):
     get_response: None

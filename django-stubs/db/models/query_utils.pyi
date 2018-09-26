@@ -1,15 +1,19 @@
 from collections import OrderedDict, namedtuple
-from decimal import Decimal
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import Expression, F
-from django.db.models.fields import CharField, Field, TextField
+from django.db.models.expressions import Expression
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.lookups import Lookup, Transform
+from django.db.models.functions.datetime import TimezoneMixin
+from django.db.models.lookups import (FieldGetDbPrepValueMixin,
+                                      IntegerFieldFloatRounding, Lookup,
+                                      Transform)
 from django.db.models.options import Options
 from django.db.models.sql.compiler import SQLCompiler
+from django.db.models.sql.query import Query
+from django.db.models.sql.where import WhereNode
 from django.utils import tree
 
 PathInfo = namedtuple(
@@ -20,8 +24,8 @@ PathInfo = namedtuple(
 class InvalidQuery(Exception): ...
 
 def subclasses(
-    cls: Type[Union[TextField, Transform, CharField]]
-) -> Iterator[Type[Union[TextField, Transform, CharField]]]: ...
+    cls: Type[RegisterLookupMixin]
+) -> Iterator[Type[RegisterLookupMixin]]: ...
 
 class QueryWrapper:
     contains_aggregate: bool = ...
@@ -32,7 +36,11 @@ class QueryWrapper:
     ) -> Tuple[str, List[Any]]: ...
 
 class Q(tree.Node):
-    children: List
+    children: Union[
+        List[Dict[str, str]],
+        List[Tuple[str, Any]],
+        List[django.db.models.query_utils.Q],
+    ]
     connector: str
     negated: bool
     AND: str = ...
@@ -45,41 +53,50 @@ class Q(tree.Node):
     def __invert__(self) -> Q: ...
     def resolve_expression(
         self,
-        query: Optional[Any] = ...,
+        query: Query = ...,
         allow_joins: bool = ...,
-        reuse: Optional[Any] = ...,
+        reuse: Optional[Set[str]] = ...,
         summarize: bool = ...,
         for_save: bool = ...,
-    ): ...
-    def deconstruct(
-        self
-    ) -> Tuple[
-        str,
-        Tuple,
-        Union[
-            Dict[str, str],
-            Dict[str, Union[F, bool]],
-            Dict[str, F],
-            Dict[Any, Any],
-        ],
-    ]: ...
+    ) -> WhereNode: ...
+    def deconstruct(self) -> Tuple[str, Tuple, Dict[str, str]]: ...
 
 class DeferredAttribute:
     field_name: str = ...
     def __init__(self, field_name: str) -> None: ...
     def __get__(
         self, instance: Optional[Model], cls: Type[Model] = ...
-    ) -> Optional[Union[str, Decimal, DeferredAttribute]]: ...
+    ) -> Any: ...
 
 class RegisterLookupMixin:
     @classmethod
-    def get_lookups(cls) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
-    def get_lookup(self, lookup_name: str) -> Optional[Type[Lookup]]: ...
+    def get_lookups(
+        cls
+    ) -> Dict[str, Type[Union[TimezoneMixin, Lookup, Transform]]]: ...
+    def get_lookup(
+        self, lookup_name: str
+    ) -> Optional[Type[Union[FieldGetDbPrepValueMixin, Lookup]]]: ...
     def get_transform(self, lookup_name: str) -> Optional[Type[Transform]]: ...
     @staticmethod
     def merge_dicts(
-        dicts: List[Dict[str, Type[Union[Transform, Lookup]]]]
-    ) -> Dict[str, Type[Union[Lookup, Transform]]]: ...
+        dicts: List[
+            Dict[
+                str,
+                Type[
+                    Union[
+                        TimezoneMixin,
+                        FieldGetDbPrepValueMixin,
+                        IntegerFieldFloatRounding,
+                        Lookup,
+                        Transform,
+                    ]
+                ],
+            ]
+        ]
+    ) -> Dict[
+        str,
+        Type[Union[TimezoneMixin, FieldGetDbPrepValueMixin, Lookup, Transform]],
+    ]: ...
     @classmethod
     def register_lookup(
         cls,
@@ -92,7 +109,6 @@ def select_related_descend(
     restricted: bool,
     requested: Optional[
         Union[
-            bool,
             Dict[
                 str,
                 Dict[
@@ -105,6 +121,7 @@ def select_related_descend(
                     ],
                 ],
             ],
+            bool,
         ]
     ],
     load_fields: Optional[Set[str]],
@@ -112,7 +129,7 @@ def select_related_descend(
 ) -> bool: ...
 def refs_expression(
     lookup_parts: List[str], annotations: OrderedDict
-) -> Tuple[Expression, List[str]]: ...
+) -> Union[Tuple[bool, Tuple], Tuple[Expression, List[str]]]: ...
 def check_rel_lookup_compatibility(
     model: Type[Model], target_opts: Options, field: FieldCacheMixin
 ) -> bool: ...
@@ -122,8 +139,10 @@ class FilteredRelation:
     alias: Optional[str] = ...
     condition: django.db.models.query_utils.Q = ...
     path: List[str] = ...
-    def __init__(self, relation_name: Any, *, condition: Any = ...) -> None: ...
-    def __eq__(self, other: Any): ...
-    def clone(self): ...
+    def __init__(self, relation_name: str, *, condition: Any = ...) -> None: ...
+    def __eq__(self, other: FilteredRelation) -> bool: ...
+    def clone(self) -> FilteredRelation: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> None: ...
-    def as_sql(self, compiler: Any, connection: Any): ...
+    def as_sql(
+        self, compiler: SQLCompiler, connection: DatabaseWrapper
+    ) -> Tuple[str, List[Union[int, str]]]: ...

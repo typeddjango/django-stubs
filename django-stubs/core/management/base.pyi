@@ -1,4 +1,4 @@
-from argparse import Action, ArgumentParser, HelpFormatter, Namespace
+from argparse import ArgumentParser, HelpFormatter, Namespace
 from io import StringIO, TextIOBase, TextIOWrapper
 from typing import Any, Callable, List, Optional, Tuple, Union
 
@@ -34,9 +34,9 @@ def no_translations(handle_func: Callable) -> Callable: ...
 class DjangoHelpFormatter(HelpFormatter):
     show_last: Any = ...
     def add_usage(
-        self, usage: None, actions: List[Action], *args: Any, **kwargs: Any
+        self, usage: None, actions: List[Any], *args: Any, **kwargs: Any
     ) -> None: ...
-    def add_arguments(self, actions: List[Action]) -> None: ...
+    def add_arguments(self, actions: List[Any]) -> None: ...
 
 class OutputWrapper(TextIOBase):
     @property
@@ -85,7 +85,7 @@ class BaseCommand:
     def run_from_argv(self, argv: List[str]) -> None: ...
     def execute(
         self, *args: Any, **options: Any
-    ) -> Optional[Union[str, Tuple]]: ...
+    ) -> Optional[Union[Tuple, str]]: ...
     def check(
         self,
         app_configs: Optional[List[AppConfig]] = ...,

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from django.middleware.csrf import CsrfViewMiddleware
 
@@ -9,6 +9,7 @@ class _EnsureCsrfToken(CsrfViewMiddleware): ...
 requires_csrf_token: Any
 
 class _EnsureCsrfCookie(CsrfViewMiddleware):
+    get_response: None
     def process_view(
         self,
         request: Any,
@@ -19,4 +20,4 @@ class _EnsureCsrfCookie(CsrfViewMiddleware):
 
 ensure_csrf_cookie: Any
 
-def csrf_exempt(view_func: Any): ...
+def csrf_exempt(view_func: Callable) -> Callable: ...

@@ -7,6 +7,7 @@ from django.db import migrations
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import StateApps
+from django.db.models.base import Model
 
 
 class RenameContentType(migrations.RunPython):
@@ -31,7 +32,7 @@ def inject_rename_contenttypes_operations(
 ) -> None: ...
 def get_contenttypes_and_models(
     app_config: AppConfig, using: str, ContentType: Type[ContentType]
-) -> Tuple[Dict[str, ContentType], Dict]: ...
+) -> Tuple[Dict[str, ContentType], Dict[str, Type[Model]]]: ...
 def create_contenttypes(
     app_config: AppConfig,
     verbosity: int = ...,

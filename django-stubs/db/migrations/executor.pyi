@@ -19,22 +19,18 @@ class MigrationExecutor:
     def __init__(
         self,
         connection: Optional[
-            Union[
-                DefaultConnectionProxy, backends.base.base.BaseDatabaseWrapper
-            ]
+            Union[DefaultConnectionProxy, BaseDatabaseWrapper]
         ],
         progress_callback: Optional[Callable] = ...,
     ) -> None: ...
     def migration_plan(
         self,
-        targets: Union[
-            Set[Tuple[str, str]], List[Tuple[str, str]], List[Tuple[str, None]]
-        ],
+        targets: Union[List[Tuple[str, Optional[str]]], Set[Tuple[str, str]]],
         clean_start: bool = ...,
-    ) -> Union[List[Tuple[Migration, bool]], List[Tuple[Any, bool]]]: ...
+    ) -> List[Tuple[Migration, bool]]: ...
     def migrate(
         self,
-        targets: Optional[Union[List[Tuple[str, str]], List[Tuple[str, None]]]],
+        targets: Optional[List[Tuple[str, Optional[str]]]],
         plan: Optional[List[Tuple[Migration, bool]]] = ...,
         state: Optional[ProjectState] = ...,
         fake: bool = ...,

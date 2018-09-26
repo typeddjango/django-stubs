@@ -3,8 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
-from django.db.models.fields import (BooleanField, DateTimeField, Field,
-                                     SlugField)
+from django.db.models.fields import Field, SlugField
 
 from .base import Operation
 from .utils import is_referenced_by_foreign_key
@@ -43,9 +42,7 @@ class AddField(FieldOperation):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[
-        str, List[Any], Dict[str, Union[str, DateTimeField, bool, BooleanField]]
-    ]: ...
+    ) -> Tuple[str, List[Any], Dict[str, Union[bool, Field, str]]]: ...
     def state_forwards(self, app_label: str, state: ProjectState) -> None: ...
     def database_forwards(
         self,
@@ -103,7 +100,7 @@ class AlterField(FieldOperation):
     ) -> None: ...
     def deconstruct(
         self
-    ) -> Tuple[str, List[Any], Dict[str, Union[str, SlugField]]]: ...
+    ) -> Tuple[str, List[Any], Dict[str, Union[SlugField, str]]]: ...
     def state_forwards(self, app_label: str, state: ProjectState) -> None: ...
     def database_forwards(
         self,

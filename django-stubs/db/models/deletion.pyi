@@ -1,7 +1,6 @@
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
                     Union)
 
-from django.contrib.admin.utils import NestedObjects
 from django.db import IntegrityError
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey
@@ -13,19 +12,21 @@ from django.db.models.query import QuerySet
 class ProtectedError(IntegrityError):
     protected_objects: django.db.models.query.QuerySet = ...
     def __init__(
-        self, msg: str, protected_objects: Union[QuerySet, List[Model]]
+        self, msg: str, protected_objects: Union[List[Model], QuerySet]
     ) -> None: ...
 
 def CASCADE(
     collector: Collector, field: ForeignKey, sub_objs: QuerySet, using: str
 ) -> None: ...
 def PROTECT(
-    collector: NestedObjects, field: ForeignKey, sub_objs: QuerySet, using: str
+    collector: Collector, field: ForeignKey, sub_objs: QuerySet, using: str
 ) -> Any: ...
 def SET(value: Callable) -> Callable: ...
-def SET_NULL(collector: Any, field: Any, sub_objs: Any, using: Any) -> None: ...
+def SET_NULL(
+    collector: Collector, field: ForeignKey, sub_objs: QuerySet, using: str
+) -> None: ...
 def SET_DEFAULT(
-    collector: Any, field: Any, sub_objs: Any, using: Any
+    collector: Collector, field: ForeignKey, sub_objs: QuerySet, using: str
 ) -> None: ...
 def DO_NOTHING(
     collector: Any, field: Any, sub_objs: Any, using: Any
@@ -47,7 +48,7 @@ class Collector:
         reverse_dependency: bool = ...,
     ) -> List[Model]: ...
     def add_field_update(
-        self, field: ForeignKey, value: None, objs: QuerySet
+        self, field: ForeignKey, value: Optional[int], objs: QuerySet
     ) -> None: ...
     def can_fast_delete(
         self,

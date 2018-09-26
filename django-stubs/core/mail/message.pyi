@@ -19,7 +19,7 @@ def forbid_multi_line_headers(
 ) -> Tuple[str, str]: ...
 def split_addr(addr: str, encoding: str) -> Tuple[str, str]: ...
 def sanitize_address(
-    addr: Union[str, Tuple[str, str]], encoding: str
+    addr: Union[Tuple[str, str], str], encoding: str
 ) -> str: ...
 
 class MIMEMixin:
@@ -80,15 +80,15 @@ class EmailMessage:
         subject: str = ...,
         body: Optional[str] = ...,
         from_email: Optional[str] = ...,
-        to: Optional[Union[List[str], str, Tuple[str, str]]] = ...,
-        bcc: Optional[Union[str, List[str], Tuple[str]]] = ...,
+        to: Optional[Union[List[str], Tuple[str, str], str]] = ...,
+        bcc: Optional[Union[List[str], Tuple[str], str]] = ...,
         connection: Optional[BaseEmailBackend] = ...,
         attachments: Optional[
-            Union[List[MIMEText], List[Tuple[str, str]]]
+            Union[List[Tuple[str, str]], List[MIMEText]]
         ] = ...,
         headers: Optional[Dict[str, str]] = ...,
-        cc: Optional[Union[str, List[str], Tuple[str, str]]] = ...,
-        reply_to: Optional[Union[str, List[Union[str, None]]]] = ...,
+        cc: Optional[Union[List[str], Tuple[str, str], str]] = ...,
+        reply_to: Optional[Union[List[Optional[str]], str]] = ...,
     ) -> None: ...
     def get_connection(self, fail_silently: bool = ...) -> BaseEmailBackend: ...
     def message(self) -> MIMEMixin: ...
@@ -96,8 +96,8 @@ class EmailMessage:
     def send(self, fail_silently: bool = ...) -> int: ...
     def attach(
         self,
-        filename: Optional[Union[str, MIMEText]] = ...,
-        content: Optional[Union[bytes, str, SafeMIMEText, EmailMessage]] = ...,
+        filename: Optional[Union[MIMEText, str]] = ...,
+        content: Optional[Union[bytes, EmailMessage, SafeMIMEText, str]] = ...,
         mimetype: Optional[str] = ...,
     ) -> None: ...
     def attach_file(self, path: str, mimetype: Optional[str] = ...) -> None: ...

@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from datetime import date
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from django.contrib.auth.models import User
 from django.contrib.sessions.backends.base import SessionBase
@@ -22,10 +23,10 @@ class RedirectCycleError(Exception):
 
 class FakePayload:
     read_started: bool = ...
-    def __init__(self, content: Optional[Union[str, bytes]] = ...) -> None: ...
+    def __init__(self, content: Optional[Union[bytes, str]] = ...) -> None: ...
     def __len__(self) -> int: ...
     def read(self, num_bytes: int = ...) -> bytes: ...
-    def write(self, content: Union[str, bytes]) -> None: ...
+    def write(self, content: Union[bytes, str]) -> None: ...
 
 class ClientHandler(BaseHandler):
     enforce_csrf_checks: bool = ...
@@ -45,7 +46,11 @@ class RequestFactory:
     def __init__(self, *, json_encoder: Any = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> WSGIRequest: ...
     def get(
-        self, path: str, data: Any = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Optional[Union[Dict[str, date], QueryDict, str]] = ...,
+        secure: bool = ...,
+        **extra: Any
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def post(
         self,
@@ -58,7 +63,7 @@ class RequestFactory:
     def head(
         self,
         path: str,
-        data: Optional[Union[str, Dict[str, str]]] = ...,
+        data: Optional[Union[Dict[str, str], str]] = ...,
         secure: bool = ...,
         **extra: Any
     ) -> Union[WSGIRequest, HttpResponse]: ...
@@ -68,7 +73,7 @@ class RequestFactory:
     def options(
         self,
         path: str,
-        data: Union[str, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -76,7 +81,7 @@ class RequestFactory:
     def put(
         self,
         path: str,
-        data: Union[str, bytes, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], bytes, str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -84,7 +89,7 @@ class RequestFactory:
     def patch(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -92,7 +97,7 @@ class RequestFactory:
     def delete(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
@@ -101,7 +106,7 @@ class RequestFactory:
         self,
         method: str,
         path: str,
-        data: Union[str, bytes, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], bytes, str] = ...,
         content_type: Optional[str] = ...,
         secure: bool = ...,
         **extra: Any
@@ -111,8 +116,8 @@ class Client(RequestFactory):
     defaults: Dict[str, str]
     errors: _io.BytesIO
     json_encoder: Union[
-        unittest.mock.MagicMock,
         Type[django.core.serializers.json.DjangoJSONEncoder],
+        unittest.mock.MagicMock,
     ]
     handler: django.test.client.ClientHandler = ...
     exc_info: None = ...
@@ -126,14 +131,7 @@ class Client(RequestFactory):
     def get(
         self,
         path: str,
-        data: Optional[
-            Union[
-                Dict[str, Union[str, int]],
-                QueryDict,
-                str,
-                Dict[str, Union[str, Tuple[str, str, str]]],
-            ]
-        ] = ...,
+        data: Optional[Union[Dict[str, Union[int, str]], QueryDict, str]] = ...,
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
@@ -150,7 +148,7 @@ class Client(RequestFactory):
     def head(
         self,
         path: str,
-        data: Optional[Union[str, Dict[str, str]]] = ...,
+        data: Optional[Union[Dict[str, str], str]] = ...,
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
@@ -158,7 +156,7 @@ class Client(RequestFactory):
     def options(
         self,
         path: str,
-        data: Union[str, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -167,7 +165,7 @@ class Client(RequestFactory):
     def put(
         self,
         path: str,
-        data: Union[str, bytes, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], bytes, str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -176,7 +174,7 @@ class Client(RequestFactory):
     def patch(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -185,7 +183,7 @@ class Client(RequestFactory):
     def delete(
         self,
         path: str,
-        data: Union[str, Dict[str, str], Dict[str, int]] = ...,
+        data: Union[Dict[str, int], Dict[str, str], str] = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -194,7 +192,7 @@ class Client(RequestFactory):
     def trace(
         self,
         path: str,
-        data: Union[str, Dict[str, str]] = ...,
+        data: Union[Dict[str, str], str] = ...,
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any

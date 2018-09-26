@@ -78,21 +78,21 @@ class FirstOfNode(Node):
     def render(self, context: Context) -> str: ...
 
 class ForNode(Node):
-    loopvars: Union[str, List[str]]
+    loopvars: Union[List[str], str]
     origin: django.template.base.Origin
-    sequence: Union[str, django.template.base.FilterExpression]
+    sequence: Union[django.template.base.FilterExpression, str]
     token: django.template.base.Token
     child_nodelists: Any = ...
     is_reversed: bool = ...
-    nodelist_loop: Union[django.template.base.NodeList, List[str]] = ...
-    nodelist_empty: Union[django.template.base.NodeList, List[str]] = ...
+    nodelist_loop: Union[List[str], django.template.base.NodeList] = ...
+    nodelist_empty: Union[List[str], django.template.base.NodeList] = ...
     def __init__(
         self,
-        loopvars: Union[str, List[str]],
-        sequence: Union[str, FilterExpression],
+        loopvars: Union[List[str], str],
+        sequence: Union[FilterExpression, str],
         is_reversed: bool,
-        nodelist_loop: Union[NodeList, List[str]],
-        nodelist_empty: Optional[Union[NodeList, List[str]]] = ...,
+        nodelist_loop: Union[List[str], NodeList],
+        nodelist_empty: Optional[Union[List[str], NodeList]] = ...,
     ) -> None: ...
     def render(self, context: Context) -> SafeText: ...
 
@@ -108,20 +108,20 @@ class IfChangedNode(Node):
     def render(self, context: Context) -> str: ...
 
 class IfEqualNode(Node):
-    nodelist_false: Union[django.template.base.NodeList, List[Any]]
-    nodelist_true: Union[django.template.base.NodeList, List[Any]]
+    nodelist_false: Union[List[Any], django.template.base.NodeList]
+    nodelist_true: Union[List[Any], django.template.base.NodeList]
     origin: django.template.base.Origin
     token: django.template.base.Token
-    var1: Union[str, django.template.base.FilterExpression]
-    var2: Union[str, django.template.base.FilterExpression]
+    var1: Union[django.template.base.FilterExpression, str]
+    var2: Union[django.template.base.FilterExpression, str]
     child_nodelists: Any = ...
     negate: bool = ...
     def __init__(
         self,
-        var1: Union[str, FilterExpression],
-        var2: Union[str, FilterExpression],
-        nodelist_true: Union[NodeList, List[Any]],
-        nodelist_false: Union[NodeList, List[Any]],
+        var1: Union[FilterExpression, str],
+        var2: Union[FilterExpression, str],
+        nodelist_true: Union[List[Any], NodeList],
+        nodelist_false: Union[List[Any], NodeList],
         negate: bool,
     ) -> None: ...
     def render(self, context: Context) -> SafeText: ...
@@ -129,23 +129,15 @@ class IfEqualNode(Node):
 class IfNode(Node):
     origin: django.template.base.Origin
     token: django.template.base.Token
-    conditions_nodelists: Union[
-        List[
-            Tuple[
-                django.template.defaulttags.TemplateLiteral,
-                django.template.base.NodeList,
-            ]
-        ],
-        List[
-            Tuple[django.template.base.NodeList, django.template.base.NodeList]
-        ],
+    conditions_nodelists: List[
+        Tuple[
+            Optional[django.template.defaulttags.TemplateLiteral],
+            django.template.base.NodeList,
+        ]
     ] = ...
     def __init__(
         self,
-        conditions_nodelists: Union[
-            List[Tuple[TemplateLiteral, NodeList]],
-            List[Tuple[NodeList, NodeList]],
-        ],
+        conditions_nodelists: List[Tuple[Optional[TemplateLiteral], NodeList]],
     ) -> None: ...
     def __iter__(self) -> None: ...
     @property
@@ -178,8 +170,8 @@ class RegroupNode(Node):
         var_name: str,
     ) -> None: ...
     def resolve_expression(
-        self, obj: Dict[str, Union[str, int, List[str], date]], context: Context
-    ) -> Union[str, int]: ...
+        self, obj: Dict[str, date], context: Context
+    ) -> Union[int, str]: ...
     def render(self, context: Context) -> str: ...
 
 class LoadNode(Node):
@@ -261,7 +253,7 @@ class WidthRatioNode(Node):
 class WithNode(Node):
     origin: django.template.base.Origin
     token: django.template.base.Token
-    nodelist: Union[django.template.base.NodeList, List[Any]] = ...
+    nodelist: Union[List[Any], django.template.base.NodeList] = ...
     extra_context: Dict[
         str, Union[django.template.base.FilterExpression, str]
     ] = ...
@@ -269,7 +261,7 @@ class WithNode(Node):
         self,
         var: Optional[str],
         name: Optional[str],
-        nodelist: Union[NodeList, List[Any]],
+        nodelist: Union[List[Any], NodeList],
         extra_context: Optional[Dict[str, FilterExpression]] = ...,
     ) -> None: ...
     def render(self, context: Context) -> Any: ...

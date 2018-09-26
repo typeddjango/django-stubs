@@ -34,7 +34,7 @@ class Deserializer(base.Deserializer):
     ignore: Any = ...
     def __init__(
         self,
-        stream_or_string: Union[str, TextIOWrapper, BufferedReader],
+        stream_or_string: Union[BufferedReader, TextIOWrapper, str],
         *,
         using: Any = ...,
         ignorenonexistent: bool = ...,

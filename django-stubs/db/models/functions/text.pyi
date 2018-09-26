@@ -1,9 +1,8 @@
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union, Dict, Callable
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import (Combinable, Expression,
-                                          SQLiteNumericMixin, Value)
+from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler
 
 
@@ -145,7 +144,7 @@ class Ord(Transform):
         compiler: SQLCompiler,
         connection: DatabaseWrapper,
         **extra_context: Any
-    ) -> Tuple[str, Union[List[str], List[int]]]: ...
+    ) -> Tuple[str, List[Any]]: ...
 
 class Repeat(BytesToCharFieldConversionMixin, Func):
     contains_aggregate: bool
@@ -157,7 +156,7 @@ class Repeat(BytesToCharFieldConversionMixin, Func):
     function: str = ...
     def __init__(
         self,
-        expression: Union[str, Value],
+        expression: Union[Value, str],
         number: Union[Length, int],
         **extra: Any
     ) -> None: ...
@@ -234,9 +233,9 @@ class Substr(Func):
     function: str = ...
     def __init__(
         self,
-        expression: Union[str, Expression],
-        pos: Union[SQLiteNumericMixin, Value, int],
-        length: Optional[Union[int, Value]] = ...,
+        expression: Union[Expression, str],
+        pos: Union[Expression, int],
+        length: Optional[Union[Value, int]] = ...,
         **extra: Any
     ) -> None: ...
     def as_sqlite(

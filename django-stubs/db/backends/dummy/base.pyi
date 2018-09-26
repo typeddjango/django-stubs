@@ -54,7 +54,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     run_on_commit: List[Any]
     savepoint_ids: List[Any]
     savepoint_state: int
-    settings_dict: Dict[str, Optional[Union[str, int, Dict[str, None]]]]
+    settings_dict: Dict[str, Optional[Union[Dict[str, None], int, str]]]
     validation: django.db.backends.base.validation.BaseDatabaseValidation
     operators: Any = ...
     ensure_connection: Any = ...

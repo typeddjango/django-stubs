@@ -12,19 +12,19 @@ class FileBasedCache(BaseCache):
     def __init__(
         self,
         dir: str,
-        params: Dict[str, Union[Dict[str, int], Callable, str, int]],
+        params: Dict[str, Union[Callable, Dict[str, int], int, str]],
     ) -> None: ...
     def add(
         self,
         key: str,
-        value: Union[int, bytes, str, Dict[str, int]],
+        value: Union[Dict[str, int], bytes, int, str],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> bool: ...
     def get(
         self,
         key: str,
-        default: Optional[Union[str, int]] = ...,
+        default: Optional[Union[int, str]] = ...,
         version: Optional[int] = ...,
     ) -> Optional[str]: ...
     def set(

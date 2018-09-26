@@ -1,9 +1,10 @@
-from datetime import date, time
-from typing import Any, List, Optional, Set, Tuple, Union
+from datetime import datetime
+from typing import Any, List, Optional, Set, Tuple, Union, Callable, Dict
 
+from django.db import models
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import Col, Expression
+from django.db.models.expressions import Col, Expression, Combinable
 from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
@@ -18,7 +19,7 @@ class Extract(TimezoneMixin, Transform):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     lookup_name: Optional[str] = ...
     output_field: Any = ...
     tzinfo: None = ...
@@ -46,7 +47,7 @@ class ExtractYear(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -55,7 +56,7 @@ class ExtractMonth(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -64,7 +65,7 @@ class ExtractDay(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -73,7 +74,7 @@ class ExtractWeek(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -82,7 +83,7 @@ class ExtractWeekDay(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -91,7 +92,7 @@ class ExtractQuarter(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -100,7 +101,7 @@ class ExtractHour(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -109,7 +110,7 @@ class ExtractMinute(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -118,7 +119,7 @@ class ExtractSecond(Extract):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     lookup_name: str = ...
 
@@ -137,7 +138,7 @@ class TruncBase(TimezoneMixin, Transform):
     tzinfo: Any = ...
     def __init__(
         self,
-        expression: Union[str, Col],
+        expression: Union[Col, str],
         output_field: Optional[Field] = ...,
         tzinfo: None = ...,
         **extra: Any
@@ -155,20 +156,20 @@ class TruncBase(TimezoneMixin, Transform):
     ) -> TruncBase: ...
     def convert_value(
         self,
-        value: Union[date, time],
-        expression: django.db.models.functions.TruncBase,
+        value: datetime,
+        expression: models.functions.TruncBase,
         connection: DatabaseWrapper,
-    ) -> Union[date, time]: ...
+    ) -> datetime: ...
 
 class Trunc(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
     output_field: Union[
-        django.db.models.fields.DateTimeCheckMixin,
-        django.db.models.fields.IntegerField,
+        models.fields.DateTimeCheckMixin,
+        models.fields.IntegerField,
     ]
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
     def __init__(
@@ -184,8 +185,8 @@ class TruncYear(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -193,8 +194,8 @@ class TruncQuarter(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -202,8 +203,8 @@ class TruncMonth(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -211,8 +212,8 @@ class TruncWeek(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -220,8 +221,8 @@ class TruncDay(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -229,11 +230,11 @@ class TruncDate(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
     lookup_name: str = ...
-    output_field: django.db.models.fields.TimeField = ...
+    output_field: models.fields.TimeField = ...
     def as_sql(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
     ) -> Tuple[str, List[Any]]: ...
@@ -242,11 +243,11 @@ class TruncTime(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    source_expressions: List[django.db.models.expressions.Combinable]
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
     lookup_name: str = ...
-    output_field: django.db.models.fields.DateField = ...
+    output_field: models.fields.DateField = ...
     def as_sql(
         self, compiler: SQLCompiler, connection: DatabaseWrapper
     ) -> Tuple[str, List[Any]]: ...
@@ -255,8 +256,8 @@ class TruncHour(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -264,8 +265,8 @@ class TruncMinute(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
 
@@ -273,7 +274,7 @@ class TruncSecond(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.DateTimeCheckMixin
-    source_expressions: List[django.db.models.expressions.Combinable]
+    output_field: models.fields.DateTimeCheckMixin
+    source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...

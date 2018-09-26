@@ -1,18 +1,4 @@
-from typing import Any, List, Optional, Type, Union
-
-from django.contrib.postgres.operations import CreateExtension
-from django.db.migrations.operations.fields import (AddField, AlterField,
-                                                    RemoveField, RenameField)
-from django.db.migrations.operations.models import (AddIndex,
-                                                    AlterIndexTogether,
-                                                    AlterModelOptions,
-                                                    AlterModelTable,
-                                                    AlterOrderWithRespectTo,
-                                                    AlterUniqueTogether,
-                                                    CreateModel, DeleteModel,
-                                                    RenameModel)
-from django.db.migrations.operations.special import (RunPython,
-                                                     SeparateDatabaseAndState)
+from typing import Any, List, Optional, Type
 
 
 class Operation:
@@ -22,28 +8,7 @@ class Operation:
     elidable: bool = ...
     serialization_expand_args: Any = ...
     def __new__(
-        cls: Type[
-            Union[
-                RenameModel,
-                AlterIndexTogether,
-                RenameField,
-                AlterUniqueTogether,
-                RunPython,
-                CreateExtension,
-                AddIndex,
-                CreateModel,
-                AlterField,
-                AlterModelOptions,
-                AddField,
-                AlterModelTable,
-                DeleteModel,
-                RemoveField,
-                AlterOrderWithRespectTo,
-                SeparateDatabaseAndState,
-            ]
-        ],
-        *args: Any,
-        **kwargs: Any
+        cls: Type[Operation], *args: Any, **kwargs: Any
     ) -> Operation: ...
     def deconstruct(self): ...
     def state_forwards(self, app_label: Any, state: Any) -> None: ...

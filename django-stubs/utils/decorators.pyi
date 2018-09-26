@@ -1,15 +1,11 @@
 from typing import Any, Callable, Optional, Set, Tuple, Type, Union
 
-from django.contrib.admindocs.middleware import XViewMiddleware
-from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        PermissionRequiredMixin,
-                                        UserPassesTestMixin)
+from django.contrib.auth.mixins import AccessMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.middleware.cache import CacheMiddleware
-from django.middleware.csrf import CsrfViewMiddleware
-from django.middleware.http import ConditionalGetMiddleware
 from django.test.testcases import LiveServerTestCase
-from django.views.generic.base import View
+from django.utils.deprecation import MiddlewareMixin
+from django.views.generic.base import TemplateResponseMixin, View
 
 
 class classonlymethod(classmethod):
@@ -17,41 +13,23 @@ class classonlymethod(classmethod):
         self,
         instance: Optional[View],
         cls: Type[
-            Union[
-                View,
-                UserPassesTestMixin,
-                PermissionRequiredMixin,
-                SuccessMessageMixin,
-                LoginRequiredMixin,
-            ]
+            Union[AccessMixin, SuccessMessageMixin, TemplateResponseMixin, View]
         ] = ...,
     ) -> Callable: ...
 
 def method_decorator(
-    decorator: Union[Callable, Tuple[Callable, Callable], Set[Callable]],
+    decorator: Union[Callable, Set[Callable], Tuple[Callable, Callable]],
     name: str = ...,
 ) -> Callable: ...
 def decorator_from_middleware_with_args(
     middleware_class: Type[CacheMiddleware]
 ) -> Callable: ...
 def decorator_from_middleware(
-    middleware_class: Type[
-        Union[
-            CsrfViewMiddleware, Any, XViewMiddleware, ConditionalGetMiddleware
-        ]
-    ]
+    middleware_class: Type[MiddlewareMixin]
 ) -> Callable: ...
 def available_attrs(fn: Any): ...
 def make_middleware_decorator(
-    middleware_class: Type[
-        Union[
-            CsrfViewMiddleware,
-            Any,
-            XViewMiddleware,
-            CacheMiddleware,
-            ConditionalGetMiddleware,
-        ]
-    ]
+    middleware_class: Type[MiddlewareMixin]
 ) -> Callable: ...
 
 class classproperty:

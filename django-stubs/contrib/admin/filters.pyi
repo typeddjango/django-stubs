@@ -63,15 +63,7 @@ class FieldListFilter(ListFilter):
     def register(
         cls,
         test: Callable,
-        list_filter_class: Type[
-            Union[
-                BooleanFieldListFilter,
-                AllValuesFieldListFilter,
-                DateFieldListFilter,
-                RelatedFieldListFilter,
-                ChoicesFieldListFilter,
-            ]
-        ],
+        list_filter_class: Type[FieldListFilter],
         take_priority: bool = ...,
     ) -> None: ...
     @classmethod
@@ -115,7 +107,7 @@ class RelatedFieldListFilter(FieldListFilter):
         field: FieldCacheMixin,
         request: WSGIRequest,
         model_admin: ModelAdmin,
-    ) -> Union[List[Tuple[str, str]], List[Tuple[int, str]]]: ...
+    ) -> List[Tuple[Union[int, str], str]]: ...
     def choices(self, changelist: Any) -> None: ...
 
 class BooleanFieldListFilter(FieldListFilter):
@@ -209,4 +201,4 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     used_parameters: Dict[Any, Any]
     def field_choices(
         self, field: RelatedField, request: WSGIRequest, model_admin: ModelAdmin
-    ) -> Union[List[Tuple[str, str]], List[Tuple[int, str]]]: ...
+    ) -> List[Tuple[Union[int, str], str]]: ...

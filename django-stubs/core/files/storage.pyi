@@ -11,7 +11,7 @@ class Storage:
     def save(
         self,
         name: Optional[str],
-        content: Union[TextIOWrapper, StringIO, File],
+        content: Union[StringIO, TextIOWrapper, File],
         max_length: Optional[int] = ...,
     ) -> str: ...
     def get_valid_name(self, name: str) -> str: ...

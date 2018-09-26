@@ -1,6 +1,6 @@
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
-from django.core.files.storage import DefaultStorage, FileSystemStorage
+from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandParser
 
 
@@ -26,26 +26,17 @@ class Command(BaseCommand):
     ignore_patterns: Any = ...
     post_process: Any = ...
     def set_options(self, **options: Any) -> None: ...
-    def collect(self) -> Union[str, List[str]]: ...
+    def collect(self) -> Dict[str, List[str]]: ...
     def handle(self, **options: Any) -> Optional[str]: ...
     def log(self, msg: str, level: int = ...) -> None: ...
     def is_local_storage(self) -> bool: ...
     def clear_dir(self, path: str) -> None: ...
     def delete_file(
-        self,
-        path: str,
-        prefixed_path: str,
-        source_storage: Union[DefaultStorage, FileSystemStorage],
+        self, path: str, prefixed_path: str, source_storage: FileSystemStorage
     ) -> bool: ...
     def link_file(
-        self,
-        path: str,
-        prefixed_path: str,
-        source_storage: Union[DefaultStorage, FileSystemStorage],
+        self, path: str, prefixed_path: str, source_storage: FileSystemStorage
     ) -> None: ...
     def copy_file(
-        self,
-        path: str,
-        prefixed_path: str,
-        source_storage: Union[DefaultStorage, FileSystemStorage],
+        self, path: str, prefixed_path: str, source_storage: FileSystemStorage
     ) -> None: ...

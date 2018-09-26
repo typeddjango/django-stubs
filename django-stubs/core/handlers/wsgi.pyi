@@ -16,7 +16,7 @@ class LimitedStream:
     buf_size: int = ...
     def __init__(
         self,
-        stream: Union[str, FakePayload, BytesIO],
+        stream: Union[BytesIO, FakePayload, str],
         limit: int,
         buf_size: int = ...,
     ) -> None: ...
@@ -29,11 +29,11 @@ class WSGIRequest(HttpRequest):
     environ: Dict[
         str,
         Union[
-            str,
             Tuple[int, int],
-            django.test.client.FakePayload,
             _io.BytesIO,
+            django.test.client.FakePayload,
             int,
+            str,
         ],
     ] = ...
     path_info: str = ...
@@ -41,11 +41,11 @@ class WSGIRequest(HttpRequest):
     META: Dict[
         str,
         Union[
-            str,
             Tuple[int, int],
-            django.test.client.FakePayload,
             _io.BytesIO,
+            django.test.client.FakePayload,
             int,
+            str,
         ],
     ] = ...
     method: str = ...
@@ -64,7 +64,7 @@ class WSGIHandler(base.BaseHandler):
     def __call__(
         self,
         environ: Dict[
-            str, Union[str, Tuple[int, int], FakePayload, BytesIO, int]
+            str, Union[Tuple[int, int], BytesIO, FakePayload, int, str]
         ],
         start_response: Callable,
     ) -> HttpResponse: ...

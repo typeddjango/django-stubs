@@ -12,7 +12,7 @@ def login_required(
     login_url: Optional[str] = ...,
 ) -> Callable: ...
 def permission_required(
-    perm: Union[str, List[str], Set[str]],
+    perm: Union[List[str], Set[str], str],
     login_url: None = ...,
     raise_exception: bool = ...,
 ) -> Callable: ...

@@ -38,7 +38,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     run_on_commit: List[Any]
     savepoint_ids: List[Any]
     savepoint_state: int
-    settings_dict: Dict[str, Optional[Union[str, int, Dict[str, None]]]]
+    settings_dict: Dict[str, Optional[Union[Dict[str, None], int, str]]]
     validation: django.db.backends.base.validation.BaseDatabaseValidation
     vendor: str = ...
     display_name: str = ...
@@ -76,15 +76,10 @@ class SQLiteCursorWrapper(Database.Cursor):
         self,
         query: str,
         params: Optional[
-            Union[
-                List[Union[int, str, None, memoryview]],
-                List[Union[str, float, None]],
-                List[datetime],
-                Tuple,
-            ]
+            Union[List[bool], List[datetime], List[float], Tuple]
         ] = ...,
     ) -> SQLiteCursorWrapper: ...
     def executemany(
-        self, query: str, param_list: Union[List[Tuple[int]], Iterator[Any]]
+        self, query: str, param_list: Union[Iterator[Any], List[Tuple[int]]]
     ) -> SQLiteCursorWrapper: ...
     def convert_query(self, query: str) -> str: ...

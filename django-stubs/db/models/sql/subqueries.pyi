@@ -1,10 +1,8 @@
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
-from uuid import UUID
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from django.db.models.base import Model
-from django.db.models.expressions import Func
-from django.db.models.fields import Field
+from django.db.models.expressions import Case
+from django.db.models.fields import DateTimeCheckMixin, Field
 from django.db.models.query import QuerySet
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
@@ -52,8 +50,8 @@ class DeleteQuery(Query):
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
     alias_map: Union[
-        collections.OrderedDict,
         Dict[str, django.db.models.sql.datastructures.BaseTable],
+        collections.OrderedDict,
     ] = ...
     where: django.db.models.sql.where.WhereNode = ...
     def do_query(self, table: str, where: WhereNode, using: str) -> int: ...
@@ -65,7 +63,7 @@ class DeleteQuery(Query):
 class UpdateQuery(Query):
     alias_map: collections.OrderedDict
     alias_refcount: Dict[str, int]
-    annotation_select_mask: None
+    annotation_select_mask: Optional[Set[Any]]
     base_table: str
     combinator: None
     combinator_all: bool
@@ -80,7 +78,7 @@ class UpdateQuery(Query):
     explain_query: bool
     external_aliases: Set[Any]
     extra_order_by: Tuple
-    extra_select_mask: None
+    extra_select_mask: Optional[Set[Any]]
     extra_tables: Tuple
     filter_is_sticky: bool
     group_by: Optional[bool]
@@ -89,8 +87,11 @@ class UpdateQuery(Query):
     max_depth: int
     model: Type[django.db.models.base.Model]
     order_by: Tuple
-    related_ids: None
-    related_updates: Dict[Any, Any]
+    related_ids: Optional[List[int]]
+    related_updates: Dict[
+        Type[django.db.models.base.Model],
+        List[Tuple[django.db.models.fields.Field, None, Union[int, str]]],
+    ]
     select: Tuple
     select_for_update: bool
     select_for_update_nowait: bool
@@ -102,55 +103,34 @@ class UpdateQuery(Query):
     subquery: bool
     table_map: Dict[str, List[str]]
     used_aliases: Set[str]
-    values: Union[
-        List[
-            Tuple[
-                django.db.models.fields.Field,
-                None,
-                Union[str, datetime.date, int, None],
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.related.ForeignKey,
-                Type[django.db.models.base.Model],
-                django.db.models.base.Model,
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.related.ForeignKey,
-                Type[django.db.models.base.Model],
-                None,
-            ]
-        ],
-        List[
-            Tuple[
-                django.db.models.fields.CharField,
-                Type[django.db.models.base.Model],
-                str,
-            ]
-        ],
+    values: List[
+        Tuple[
+            django.db.models.fields.Field,
+            Optional[Type[django.db.models.base.Model]],
+            Union[django.db.models.expressions.Case, uuid.UUID],
+        ]
     ]
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def clone(self): ...
+    def clone(self) -> UpdateQuery: ...
     where: django.db.models.sql.where.WhereNode = ...
-    def update_batch(self, pk_list: Any, values: Any, using: Any) -> None: ...
-    def add_update_values(
-        self, values: Dict[str, Union[Model, Func, UUID, datetime]]
+    def update_batch(
+        self, pk_list: List[int], values: Dict[str, Optional[int]], using: str
     ) -> None: ...
-    def add_update_fields(self, values_seq: List) -> None: ...
+    def add_update_values(self, values: Dict[str, Any]) -> None: ...
+    def add_update_fields(
+        self, values_seq: List[Tuple[Field, Optional[Type[Model]], Case]]
+    ) -> None: ...
     def add_related_update(
-        self, model: Any, field: Any, value: Any
+        self, model: Type[Model], field: Field, value: Union[int, str]
     ) -> None: ...
-    def get_related_updates(self) -> List[Any]: ...
+    def get_related_updates(self) -> List[UpdateQuery]: ...
 
 class InsertQuery(Query):
     alias_map: collections.OrderedDict
-    alias_refcount: Dict[Any, Any]
+    alias_refcount: Dict[str, int]
     annotation_select_mask: None
     combinator: None
     combinator_all: bool
@@ -182,13 +162,14 @@ class InsertQuery(Query):
     select_related: bool
     standard_ordering: bool
     subquery: bool
-    table_map: Dict[Any, Any]
+    table_map: Dict[str, List[str]]
     used_aliases: Set[Any]
     values_select: Tuple
     where: django.db.models.sql.where.WhereNode
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
     fields: Union[
+        List[django.db.models.fields.DateTimeCheckMixin],
         List[django.db.models.fields.Field],
         django.utils.datastructures.ImmutableList,
     ] = ...
@@ -197,7 +178,7 @@ class InsertQuery(Query):
     raw: bool = ...
     def insert_values(
         self,
-        fields: Union[List[Field], ImmutableList],
+        fields: Union[List[DateTimeCheckMixin], List[Field], ImmutableList],
         objs: List[Model],
         raw: bool = ...,
     ) -> None: ...

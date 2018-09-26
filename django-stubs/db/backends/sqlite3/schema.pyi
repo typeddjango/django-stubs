@@ -18,9 +18,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def __exit__(
         self, exc_type: None, exc_value: None, traceback: None
     ) -> None: ...
-    def quote_value(
-        self, value: Optional[Union[int, memoryview, str]]
-    ) -> str: ...
+    def quote_value(self, value: Optional[Union[int, str]]) -> str: ...
     def alter_db_table(
         self,
         model: Type[Model],

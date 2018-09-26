@@ -8,9 +8,9 @@ from django.utils.safestring import SafeText
 register: Any
 
 def admin_urlname(value: Options, arg: SafeText) -> str: ...
-def admin_urlquote(value: Union[str, UUID, int]) -> Union[str, UUID, int]: ...
+def admin_urlquote(value: Union[int, str, UUID]) -> Union[int, str, UUID]: ...
 def add_preserved_filters(
-    context: Union[Dict[str, Union[str, Options]], RequestContext],
+    context: Union[Dict[str, Union[Options, str]], RequestContext],
     url: str,
     popup: bool = ...,
     to_field: Optional[str] = ...,

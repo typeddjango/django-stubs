@@ -26,7 +26,7 @@ class FileUploadHandler:
     def __init__(self, request: Optional[WSGIRequest] = ...) -> None: ...
     def handle_raw_input(
         self,
-        input_data: Union[WSGIRequest, BytesIO],
+        input_data: Union[BytesIO, WSGIRequest],
         META: Dict[str, Any],
         content_length: int,
         boundary: bytes,
@@ -68,7 +68,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
     activated: Any = ...
     def handle_raw_input(
         self,
-        input_data: Union[WSGIRequest, BytesIO],
+        input_data: Union[BytesIO, WSGIRequest],
         META: Dict[str, Any],
         content_length: int,
         boundary: bytes,

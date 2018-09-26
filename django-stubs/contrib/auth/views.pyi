@@ -11,7 +11,6 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.datastructures import MultiValueDict
-from django.utils.functional import SimpleLazyObject
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -37,16 +36,13 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     def get_form_kwargs(
         self
     ) -> Dict[
-        str,
-        Optional[
-            Union[Dict[Any, Any], Dict[str, str], MultiValueDict, HttpRequest]
-        ],
+        str, Optional[Union[Dict[str, str], HttpRequest, MultiValueDict]]
     ]: ...
     def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect: ...
     def get_context_data(
         self, **kwargs: Any
     ) -> Dict[
-        str, Union[AuthenticationForm, LoginView, str, Site, RequestSite]
+        str, Union[AuthenticationForm, LoginView, Site, RequestSite, str]
     ]: ...
 
 class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
@@ -112,7 +108,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     def get_form_kwargs(
         self
     ) -> Dict[
-        str, Optional[Union[Dict[Any, Any], MultiValueDict, AbstractBaseUser]]
+        str, Optional[Union[Dict[Any, Any], AbstractBaseUser, MultiValueDict]]
     ]: ...
     def form_valid(self, form: SetPasswordForm) -> HttpResponseRedirect: ...
     def get_context_data(self, **kwargs: Any): ...
@@ -130,10 +126,7 @@ class PasswordChangeView(PasswordContextMixin, FormView):
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def get_form_kwargs(
         self
-    ) -> Dict[
-        str,
-        Optional[Union[Dict[Any, Any], User, MultiValueDict, SimpleLazyObject]],
-    ]: ...
+    ) -> Dict[str, Optional[Union[Dict[Any, Any], User, MultiValueDict]]]: ...
     def form_valid(self, form: PasswordChangeForm) -> HttpResponseRedirect: ...
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):

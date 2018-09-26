@@ -16,7 +16,7 @@ class BaseConverter:
     def decode(self, s: str) -> int: ...
     def convert(
         self,
-        number: Union[str, int],
+        number: Union[int, str],
         from_digits: str,
         to_digits: str,
         sign: str,

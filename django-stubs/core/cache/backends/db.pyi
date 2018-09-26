@@ -25,7 +25,7 @@ class BaseDatabaseCache(BaseCache):
     def __init__(
         self,
         table: str,
-        params: Dict[str, Union[Dict[str, int], Callable, str, int]],
+        params: Dict[str, Union[Callable, Dict[str, int], int, str]],
     ) -> None: ...
 
 class DatabaseCache(BaseDatabaseCache):
@@ -36,7 +36,7 @@ class DatabaseCache(BaseDatabaseCache):
     def get(
         self,
         key: str,
-        default: Optional[Union[str, int]] = ...,
+        default: Optional[Union[int, str]] = ...,
         version: Optional[int] = ...,
     ) -> Any: ...
     def set(
@@ -49,7 +49,7 @@ class DatabaseCache(BaseDatabaseCache):
     def add(
         self,
         key: str,
-        value: Union[int, bytes, str, Dict[str, int]],
+        value: Union[Dict[str, int], bytes, int, str],
         timeout: Any = ...,
         version: Optional[int] = ...,
     ) -> bool: ...

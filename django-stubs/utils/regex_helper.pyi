@@ -13,15 +13,8 @@ def get_quantifier(
     ch: str, input_iter: Iterator[Any]
 ) -> Tuple[int, Optional[str]]: ...
 def contains(
-    source: Union[str, NonCapture, Group], inst: Type[Group]
+    source: Union[Group, NonCapture, str], inst: Type[Group]
 ) -> bool: ...
 def flatten_result(
-    source: Optional[
-        Union[
-            List[Union[str, NonCapture]],
-            List[Union[str, Group, Choice]],
-            NonCapture,
-            Group,
-        ]
-    ]
+    source: Optional[Union[List[Union[Choice, Group, str]], Group, NonCapture]]
 ) -> Tuple[List[str], List[List[str]]]: ...

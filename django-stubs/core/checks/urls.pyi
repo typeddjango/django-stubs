@@ -8,7 +8,7 @@ def check_url_config(
     app_configs: None, **kwargs: Any
 ) -> List[CheckMessage]: ...
 def check_resolver(
-    resolver: Union[URLResolver, Tuple[str, Callable], URLPattern]
+    resolver: Union[Tuple[str, Callable], URLPattern, URLResolver]
 ) -> List[CheckMessage]: ...
 def check_url_namespaces_unique(
     app_configs: None, **kwargs: Any

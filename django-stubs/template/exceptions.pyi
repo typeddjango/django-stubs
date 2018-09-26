@@ -10,7 +10,7 @@ class TemplateDoesNotExist(Exception):
     chain: List[django.template.exceptions.TemplateDoesNotExist] = ...
     def __init__(
         self,
-        msg: Union[str, Origin],
+        msg: Union[Origin, str],
         tried: Optional[List[Tuple[Origin, str]]] = ...,
         backend: Optional[BaseEngine] = ...,
         chain: Optional[List[TemplateDoesNotExist]] = ...,

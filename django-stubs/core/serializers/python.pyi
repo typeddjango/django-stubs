@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 from django.core.serializers import base
 from django.core.serializers.base import DeserializedObject
@@ -24,10 +24,14 @@ class Serializer(base.Serializer):
     def handle_field(self, obj: Model, field: Field) -> None: ...
     def handle_fk_field(self, obj: Model, field: ForeignKey) -> None: ...
     def handle_m2m_field(self, obj: Model, field: ManyToManyField) -> None: ...
-    def getvalue(self): ...
+    def getvalue(self) -> List[OrderedDict]: ...
 
 def Deserializer(
-    object_list: List,
+    object_list: Union[
+        List[Dict[str, Optional[Union[Dict[str, Optional[str]], str]]]],
+        List[Dict[str, Union[Dict[str, Union[List[int], int, str]], int, str]]],
+        List[OrderedDict],
+    ],
     *,
     using: Any = ...,
     ignorenonexistent: bool = ...,

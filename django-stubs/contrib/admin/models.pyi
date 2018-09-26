@@ -18,18 +18,13 @@ class LogEntryManager(models.Manager):
         self,
         user_id: int,
         content_type_id: int,
-        object_id: Union[str, UUID, int],
+        object_id: Union[int, str, UUID],
         object_repr: str,
         action_flag: int,
         change_message: Union[
-            List[Dict[str, Dict[str, Union[str, List[str]]]]],
             Dict[str, Dict[str, List[str]]],
+            List[Dict[str, Dict[str, Union[List[str], str]]]],
             str,
-            List[
-                Union[
-                    Dict[str, Dict[str, List[str]]], Dict[str, Dict[str, str]]
-                ]
-            ],
         ] = ...,
     ) -> LogEntry: ...
 

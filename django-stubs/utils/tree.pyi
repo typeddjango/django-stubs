@@ -1,22 +1,31 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+from django.contrib.auth.models import User
+from django.db.models.fields.related_lookups import RelatedLookupMixin
+from django.db.models.lookups import BuiltinLookup, FieldGetDbPrepValueMixin
+from django.db.models.sql.where import ExtraWhere, NothingNode
 
 
 class Node:
     default: str = ...
     children: Union[
-        List[
-            Union[
-                django.db.models.lookups.BuiltinLookup,
-                django.db.models.sql.where.WhereNode,
-            ]
-        ],
-        List[Tuple[str, int]],
+        List[Tuple[str, int]], List[django.db.models.lookups.Contains]
     ] = ...
     connector: str = ...
     negated: bool = ...
     def __init__(
         self,
-        children: Any = ...,
+        children: Optional[
+            Union[
+                List[Dict[str, str]],
+                List[Tuple[str, List[User]]],
+                List[RelatedLookupMixin],
+                List[BuiltinLookup],
+                List[FieldGetDbPrepValueMixin],
+                List[NothingNode],
+                List[Node],
+            ]
+        ] = ...,
         connector: Optional[str] = ...,
         negated: bool = ...,
     ) -> None: ...
@@ -24,7 +33,12 @@ class Node:
     def __len__(self) -> int: ...
     def __bool__(self) -> bool: ...
     def __contains__(self, other: Tuple[str, int]) -> bool: ...
-    def __eq__(self, other: Any) -> bool: ...
-    def __hash__(self): ...
+    def __eq__(
+        self,
+        other: Union[
+            Tuple[str, List[Any]], BuiltinLookup, ExtraWhere, NothingNode, Node
+        ],
+    ) -> bool: ...
+    def __hash__(self) -> int: ...
     def add(self, data: Any, conn_type: str, squash: bool = ...) -> Any: ...
     def negate(self) -> None: ...
