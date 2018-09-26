@@ -1,17 +1,27 @@
+import functools
+import io
+import tempfile
 from datetime import datetime
 from io import BufferedReader, BytesIO
 from tempfile import _TemporaryFileWrapper
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from http import cookies
 
 from django.core.files.base import ContentFile
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.serializers.json import DjangoJSONEncoder
+from django.template import Template
+from django.template.context import Context
+from django.test import Client
+from django.test.client import FakePayload
+from django.urls import ResolverMatch
 
 
 class BadHeaderError(ValueError): ...
 
 class HttpResponseBase:
     status_code: int = ...
-    cookies: http.cookies.SimpleCookie = ...
+    cookies: cookies.SimpleCookie = ...
     closed: bool = ...
     def __init__(
         self,
@@ -71,23 +81,21 @@ class HttpResponseBase:
     def writelines(self, lines: List[str]) -> Any: ...
 
 class HttpResponse(HttpResponseBase):
-    client: django.test.client.Client
+    client: Client
     closed: bool
-    context: Optional[
-        Union[django.template.context.Context, django.test.utils.ContextList]
-    ]
-    cookies: http.cookies.SimpleCookie
+    context: Optional[Context]
+    cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
-    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
-    resolver_match: django.urls.resolvers.ResolverMatch
+    request: Dict[str, Union[FakePayload, int, str]]
+    resolver_match: ResolverMatch
     sameorigin: bool
     status_code: int
-    templates: List[django.template.base.Template]
+    templates: List[Template]
     test_server_port: str
     test_was_secure_request: bool
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    wsgi_request: WSGIRequest
     xframe_options_exempt: bool
     streaming: bool = ...
     content: Any = ...
@@ -108,16 +116,16 @@ class HttpResponse(HttpResponseBase):
     def writelines(self, lines: List[str]) -> None: ...
 
 class StreamingHttpResponse(HttpResponseBase):
-    client: django.test.client.Client
+    client: Client
     closed: bool
     context: None
-    cookies: http.cookies.SimpleCookie
+    cookies: cookies.SimpleCookie
     json: functools.partial
-    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
-    resolver_match: django.utils.functional.SimpleLazyObject
+    request: Dict[str, Union[FakePayload, int, str]]
+    resolver_match: ResolverMatch
     status_code: int
     templates: List[Any]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    wsgi_request: WSGIRequest
     streaming: bool = ...
     streaming_content: Any = ...
     def __init__(
@@ -133,23 +141,23 @@ class StreamingHttpResponse(HttpResponseBase):
     def getvalue(self) -> bytes: ...
 
 class FileResponse(StreamingHttpResponse):
-    client: django.test.client.Client
+    client: Client
     closed: bool
     context: None
-    cookies: http.cookies.SimpleCookie
+    cookies: cookies.SimpleCookie
     file_to_stream: Optional[
         Union[
-            _io.BufferedReader,
-            _io.BytesIO,
-            django.core.files.base.ContentFile,
+            io.BufferedReader,
+            io.BytesIO,
+            ContentFile,
             tempfile._TemporaryFileWrapper,
         ]
     ]
     json: functools.partial
     request: Dict[str, str]
-    resolver_match: django.utils.functional.SimpleLazyObject
+    resolver_match: ResolverMatch
     templates: List[Any]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    wsgi_request: WSGIRequest
     block_size: int = ...
     as_attachment: bool = ...
     filename: str = ...
@@ -173,77 +181,77 @@ class HttpResponseRedirectBase(HttpResponse):
     url: Any = ...
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
-    client: django.test.client.Client
+    client: Client
     closed: bool
-    context: Optional[django.test.utils.ContextList]
-    cookies: http.cookies.SimpleCookie
+    context: Optional[Context]
+    cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
     request: Dict[
-        str, Union[Dict[str, str], django.test.client.FakePayload, int, str]
+        str, Union[Dict[str, str], FakePayload, int, str]
     ]
-    resolver_match: django.utils.functional.SimpleLazyObject
-    templates: List[django.template.base.Template]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    resolver_match: ResolverMatch
+    templates: List[Template]
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
-    client: django.test.client.Client
+    client: Client
     closed: bool
     context: None
-    cookies: http.cookies.SimpleCookie
+    cookies: cookies.SimpleCookie
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
     request: Dict[str, str]
-    resolver_match: django.utils.functional.SimpleLazyObject
+    resolver_match: ResolverMatch
     templates: List[Any]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class HttpResponseNotModified(HttpResponse):
     closed: bool
-    cookies: http.cookies.SimpleCookie
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    cookies: cookies.SimpleCookie
+    wsgi_request: WSGIRequest
     status_code: int = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def content(self, value: Any) -> None: ...
 
 class HttpResponseBadRequest(HttpResponse):
     closed: bool
-    cookies: http.cookies.SimpleCookie
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    cookies: cookies.SimpleCookie
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class HttpResponseNotFound(HttpResponse):
-    client: django.test.client.Client
+    client: Client
     closed: bool
-    context: Optional[django.template.context.Context]
-    cookies: http.cookies.SimpleCookie
+    context: Optional[Context]
+    cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     request: Dict[str, str]
-    resolver_match: django.utils.functional.SimpleLazyObject
-    templates: List[django.template.base.Template]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    resolver_match: ResolverMatch
+    templates: List[Template]
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class HttpResponseForbidden(HttpResponse):
-    client: django.test.client.Client
+    client: Client
     closed: bool
-    context: Optional[django.template.context.Context]
-    cookies: http.cookies.SimpleCookie
+    context: Optional[Context]
+    cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
-    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
-    resolver_match: django.utils.functional.SimpleLazyObject
-    templates: List[django.template.base.Template]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    request: Dict[str, Union[FakePayload, int, str]]
+    resolver_match: ResolverMatch
+    templates: List[Template]
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class HttpResponseNotAllowed(HttpResponse):
     closed: bool
-    cookies: http.cookies.SimpleCookie
+    cookies: cookies.SimpleCookie
     status_code: int = ...
     def __init__(
         self,
@@ -254,36 +262,36 @@ class HttpResponseNotAllowed(HttpResponse):
 
 class HttpResponseGone(HttpResponse):
     closed: bool
-    cookies: http.cookies.SimpleCookie
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    cookies: cookies.SimpleCookie
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class HttpResponseServerError(HttpResponse):
-    client: django.test.client.Client
+    client: Client
     closed: bool
-    context: django.test.utils.ContextList
-    cookies: http.cookies.SimpleCookie
+    context: Context
+    cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     request: Dict[str, str]
-    resolver_match: django.utils.functional.SimpleLazyObject
-    templates: List[django.template.base.Template]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    resolver_match: ResolverMatch
+    templates: List[Template]
+    wsgi_request: WSGIRequest
     status_code: int = ...
 
 class Http404(Exception): ...
 
 class JsonResponse(HttpResponse):
-    client: django.test.client.Client
+    client: Client
     closed: bool
     context: None
-    cookies: http.cookies.SimpleCookie
+    cookies: cookies.SimpleCookie
     json: functools.partial
-    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
-    resolver_match: django.utils.functional.SimpleLazyObject
+    request: Dict[str, Union[FakePayload, int, str]]
+    resolver_match: ResolverMatch
     status_code: int
     templates: List[Any]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    wsgi_request: WSGIRequest
     def __init__(
         self,
         data: Any,
