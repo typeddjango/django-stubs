@@ -1,22 +1,18 @@
-import json
-from typing import Dict
+from typing import Set
 
 import dataclasses
 
 
-@dataclasses.dataclass
-class ModelInfo(object):
-    # class_name: str
-    related_managers: Dict[str, 'ModelInfo'] = dataclasses.field(default_factory=dict)
-
-
 def get_default_base_models():
-    return {'django.db.models.base.Model': ModelInfo()}
+    return {'django.db.models.base.Model'}
 
 
 @dataclasses.dataclass
 class DjangoModelsRegistry(object):
-    base_models: Dict[str, ModelInfo] = dataclasses.field(default_factory=get_default_base_models)
+    base_models: Set[str] = dataclasses.field(default_factory=get_default_base_models)
 
     def __contains__(self, item: str) -> bool:
         return item in self.base_models
+
+    def __iter__(self):
+        return iter(self.base_models)

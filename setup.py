@@ -19,6 +19,6 @@ setup(
     version="0.1.0",
     license='BSD',
     install_requires='Django>=2.1.1',
-    packages=['django-stubs'],
-    package_data=find_stubs('django-stubs')
+    packages=['mypy_django_plugin']
+    # package_data=find_stubs('django-stubs')
 )

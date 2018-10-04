@@ -17,3 +17,21 @@ def lookup_django_model(mypy_api: TypeChecker, fullname: str) -> SymbolTableNode
         return mypy_api.modules[module].names[model_name]
     except KeyError:
         return mypy_api.modules['django.db.models'].names['Model']
+
+
+def get_app_model(model_name: str) -> str:
+    import os
+    os.environ.setdefault('SITE_URL', 'https://localhost')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server._config.settings.local')
+
+    import django
+    django.setup()
+
+    from django.apps import apps
+
+    try:
+        app_name, model_name = model_name.rsplit('.', maxsplit=1)
+        model = apps.get_model(app_name, model_name)
+        return model.__module__ + '.' + model_name
+    except ValueError:
+        return model_name
