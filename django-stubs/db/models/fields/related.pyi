@@ -19,11 +19,11 @@ from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 
 from . import Field
 from .mixins import FieldCacheMixin
-from .related_descriptors import (ForwardManyToOneDescriptor,
-                                  ForwardOneToOneDescriptor,
-                                  ManyToManyDescriptor,
-                                  ReverseManyToOneDescriptor,
-                                  ReverseOneToOneDescriptor)
+from .related_descriptors import (ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
+                                  ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
+                                  ManyToManyDescriptor as ManyToManyDescriptor,
+                                  ReverseManyToOneDescriptor as ReverseManyToOneDescriptor,
+                                  ReverseOneToOneDescriptor as ReverseOneToOneDescriptor)
 from .related_lookups import (RelatedExact, RelatedGreaterThan,
                               RelatedGreaterThanOrEqual, RelatedIn,
                               RelatedIsNull, RelatedLessThan,
@@ -236,7 +236,7 @@ class ForeignKey(ForeignObject):
     def get_col(
         self,
         alias: str,
-        output_field: Optional[Union[Field, reverse_related.OneToOneRel]] = ...,
+        output_field: Optional[Union[Field, OneToOneRel]] = ...,
     ) -> Col: ...
 
 class OneToOneField(ForeignKey):
