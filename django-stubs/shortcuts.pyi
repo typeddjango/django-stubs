@@ -1,9 +1,9 @@
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 
 
@@ -15,7 +15,7 @@ def render_to_response(
     using: Optional[str] = ...,
 ) -> HttpResponse: ...
 def render(
-    request: WSGIRequest,
+    request: HttpRequest,
     template_name: Union[List[str], str],
     context: Optional[Dict[str, bool]] = ...,
     content_type: Optional[str] = ...,
