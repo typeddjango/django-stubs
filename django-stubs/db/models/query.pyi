@@ -138,12 +138,7 @@ class QuerySet(Generic[_T]):
 
     def get(
             self, *args: Any, **kwargs: Any
-    ) -> Union[
-        Dict[str, Union[date, Decimal, float, str]],
-        Tuple[Union[Decimal, str]],
-        Model,
-        str,
-    ]: ...
+    ) -> _T: ...
 
     def create(self, **kwargs: Any) -> _T: ...
 

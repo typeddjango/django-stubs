@@ -1,5 +1,6 @@
 from typing import Callable, Optional, Type
 
+from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
@@ -8,7 +9,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 class SessionMiddleware(MiddlewareMixin):
     get_response: Callable[[WSGIRequest], HttpResponseBase] = ...
-    SessionStore: Type[SessionStore] = ...
+    SessionStore: Type[SessionBase] = ...
 
     def __init__(self, get_response: Optional[Callable] = ...) -> None: ...
 

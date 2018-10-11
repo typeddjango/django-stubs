@@ -16,7 +16,8 @@ def lookup_django_model(mypy_api: TypeChecker, fullname: str) -> SymbolTableNode
     try:
         return mypy_api.modules[module].names[model_name]
     except KeyError:
-        return mypy_api.modules['django.db.models'].names['Model']
+        return mypy_api.lookup_qualified('typing.Any')
+        # return mypy_api.modules['typing'].names['Any']
 
 
 def get_app_model(model_name: str) -> str:
