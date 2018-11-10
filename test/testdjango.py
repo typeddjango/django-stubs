@@ -13,14 +13,17 @@ TEST_DATA_DIR = ROOT_DIR / 'test' / 'test-data'
 
 class DjangoTestSuite(DataSuite):
     files = [
-        'basic-check.test'
+        'check-postgres-fields.test'
     ]
     data_prefix = str(TEST_DATA_DIR)
 
     def run_case(self, testcase: DataDrivenTestCase) -> None:
         assert testcase.old_cwd is not None, "test was not properly set up"
 
-        mypy_cmdline = []
+        mypy_cmdline = [
+            '--show-traceback',
+            '--no-silence-site-packages'
+        ]
         mypy_cmdline.append('--python-version={}'.format('.'.join(map(str,
                                                                       sys.version_info[:2]))))
 
