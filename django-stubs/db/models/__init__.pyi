@@ -7,3 +7,5 @@ from .fields import (AutoField as AutoField,
                      Field as Field,
                      SlugField as SlugField,
                      TextField as TextField)
+from .fields.related import (ForeignKey as ForeignKey)
+from .deletion import CASCADE as CASCADE

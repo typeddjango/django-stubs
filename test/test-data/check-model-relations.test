@@ -1,0 +1,14 @@
+[case testForeignKeyWithClass]
+from django.db import models
+
+class User(models.Model):
+    pass
+
+class Profile(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+profile = Profile()
+reveal_type(profile.user)  # E: Revealed type is 'main.User*'
+[out]
+
+
