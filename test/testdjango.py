@@ -13,6 +13,7 @@ TEST_DATA_DIR = ROOT_DIR / 'test' / 'test-data'
 
 class DjangoTestSuite(DataSuite):
     files = [
+        'check-model-fields.test',
         'check-postgres-fields.test'
     ]
     data_prefix = str(TEST_DATA_DIR)

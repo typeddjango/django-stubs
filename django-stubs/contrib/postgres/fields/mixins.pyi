@@ -1,0 +1,2 @@
+class CheckFieldDefaultMixin:
+    pass

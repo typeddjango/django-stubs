@@ -1,9 +1,0 @@
-[case testBasicCheck]
-from typing import Any
-
-class A:
-    pass
-
-class B(A):
-    pass
-[out]

@@ -1,0 +1,13 @@
+[case testArrayField]
+import typing
+
+from django.db import models
+from django.contrib.postgres.fields import ArrayField
+
+
+class User(models.Model):
+    members = ArrayField(base_field=models.IntegerField())
+
+user = User()
+reveal_type(user.members)  # E: Revealed type is 'typing.List[int]'
+[out]
