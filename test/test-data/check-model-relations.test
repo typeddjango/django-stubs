@@ -1,14 +1,27 @@
 [case testForeignKeyWithClass]
 from django.db import models
 
-class User(models.Model):
+class Publisher(models.Model):
     pass
 
-class Profile(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
 
-profile = Profile()
-reveal_type(profile.user)  # E: Revealed type is 'main.User*'
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
 [out]
 
 
+[case testForeignKeyRelatedName]
+from django.db import models
+
+class Publisher(models.Model):
+    pass
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
+                                    related_name='books')
+
+publisher = Publisher()
+reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+[out]
