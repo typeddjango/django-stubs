@@ -1,6 +1,17 @@
-[case testArrayField]
-import typing
+[case testArrayFieldJsonField]
+from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
+
+class User(models.Model):
+    array = ArrayField(base_field=models.Field())
+
+user = User()
+reveal_type(user.array)  # E: Revealed type is 'builtins.list[Any]'
+[out]
+
+
+[case testArrayFieldBaseFieldParsedIntoGenericAttribute]
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
@@ -13,3 +24,5 @@ user = User()
 reveal_type(user.members)  # E: Revealed type is 'builtins.list[builtins.int*]'
 reveal_type(user.members_as_text)  # E: Revealed type is 'builtins.list[builtins.str*]'
 [out]
+
+

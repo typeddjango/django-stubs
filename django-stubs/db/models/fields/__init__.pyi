@@ -14,6 +14,10 @@ class IntegerField(Field):
     def __get__(self, instance, owner) -> int: ...
 
 
+class SmallIntegerField(IntegerField):
+    pass
+
+
 class AutoField(Field):
     def __get__(self, instance, owner) -> int: ...
 
@@ -24,3 +28,10 @@ class CharField(Field):
                  **kwargs): ...
     def __get__(self, instance, owner) -> str: ...
 
+
+class SlugField(CharField):
+    pass
+
+
+class TextField(Field):
+    def __get__(self, instance, owner) -> str: ...
