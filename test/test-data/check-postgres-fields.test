@@ -7,7 +7,9 @@ from django.contrib.postgres.fields import ArrayField
 
 class User(models.Model):
     members = ArrayField(base_field=models.IntegerField())
+    members_as_text = ArrayField(base_field=models.CharField(max_length=255))
 
 user = User()
-reveal_type(user.members)  # E: Revealed type is 'typing.List[int]'
+reveal_type(user.members)  # E: Revealed type is 'builtins.list[builtins.int*]'
+reveal_type(user.members_as_text)  # E: Revealed type is 'builtins.list[builtins.str*]'
 [out]
