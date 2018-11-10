@@ -1,9 +1,7 @@
-from typing import Any, Optional, Tuple, Type
+from typing import Any, Tuple, Type, List
 
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.migrations.state import ProjectState
-
-from .exceptions import IrreversibleError
 
 
 class Migration:

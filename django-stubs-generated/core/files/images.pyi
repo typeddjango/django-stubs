@@ -1,11 +1,11 @@
 from io import BufferedReader, BytesIO
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from django.core.files import File
 
 
 class ImageFile(File):
-    file: _io.BufferedReader
+    file: BufferedReader
     mode: str
     name: str
     @property

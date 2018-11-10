@@ -1,6 +1,9 @@
 import socketserver
-from typing import Any, Dict, Optional
+from io import BytesIO
+from typing import Any, Dict
 from wsgiref import simple_server
+
+from django.core.handlers.wsgi import WSGIRequest
 
 
 class WSGIServer(simple_server.WSGIServer):
@@ -25,9 +28,9 @@ class ServerHandler(simple_server.ServerHandler):
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     client_address: str
     close_connection: bool
-    connection: django.core.handlers.wsgi.WSGIRequest
-    request: django.core.handlers.wsgi.WSGIRequest
-    rfile: _io.BytesIO
+    connection: WSGIRequest
+    request: WSGIRequest
+    rfile: BytesIO
     server: None
     wfile: socketserver._SocketWriter
     protocol_version: str = ...

@@ -35,7 +35,7 @@ class Warning(CheckMessage):
     id: str
     level: int
     msg: str
-    obj: django.db.models.fields.related.ForeignKey
+    obj: Any
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class Error(CheckMessage):
@@ -43,7 +43,7 @@ class Error(CheckMessage):
     id: str
     level: int
     msg: str
-    obj: Type[django.contrib.admin.options.ModelAdmin]
+    obj: Any
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class Critical(CheckMessage):

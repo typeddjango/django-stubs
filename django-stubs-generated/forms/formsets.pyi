@@ -1,23 +1,24 @@
-from typing import Any, List, Optional
+import collections
+from typing import Any, List, Optional, Union, Dict, Type
 
 from django.forms import Form
+from django.forms.renderers import BaseRenderer
+from django.forms.utils import ErrorList
 
 
 class ManagementForm(Form):
     auto_id: Union[bool, str]
     cleaned_data: Dict[str, Optional[int]]
-    data: Union[
-        Dict[str, Union[List[int], int, str]], django.http.request.QueryDict
-    ]
+    data: Dict[str, Union[List[int], int, str]]
     empty_permitted: bool
-    error_class: Type[django.forms.utils.ErrorList]
+    error_class: Type[ErrorList]
     fields: collections.OrderedDict
     files: Dict[Any, Any]
     initial: Dict[str, int]
     is_bound: bool
     label_suffix: str
     prefix: str
-    renderer: django.forms.renderers.DjangoTemplates
+    renderer: BaseRenderer
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class BaseFormSet:
