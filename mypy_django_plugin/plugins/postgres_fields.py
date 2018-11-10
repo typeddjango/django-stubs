@@ -9,3 +9,7 @@ class PostgresFieldsPlugin(Plugin):
     def get_base_class_hook(self, fullname: str
                             ):
         return determine_type_of_array_field
+
+
+def plugin(version):
+    return PostgresFieldsPlugin

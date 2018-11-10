@@ -9,6 +9,7 @@ from mypy.test.helpers import assert_string_arrays_equal
 
 ROOT_DIR = Path(__file__).parent.parent
 TEST_DATA_DIR = ROOT_DIR / 'test' / 'test-data'
+MYPY_INI_PATH = ROOT_DIR / 'test' / 'plugins.ini'
 
 
 class DjangoTestSuite(DataSuite):
@@ -23,7 +24,8 @@ class DjangoTestSuite(DataSuite):
 
         mypy_cmdline = [
             '--show-traceback',
-            '--no-silence-site-packages'
+            '--no-silence-site-packages',
+            '--config-file={}'.format(MYPY_INI_PATH)
         ]
         mypy_cmdline.append('--python-version={}'.format('.'.join(map(str,
                                                                       sys.version_info[:2]))))
