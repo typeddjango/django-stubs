@@ -1,0 +1,21 @@
+language: python
+# cache package wheels (1 cache per python version)
+cache: pip
+# newer python versions are available only on xenial (while some older only on trusty) Ubuntu distribution
+dist: xenial
+sudo: required
+
+jobs:
+  include:
+  - name: "run test suite with python 3.7"
+    python: 3.7
+    script: |
+      set -e
+      pytest
+
+before_install: |
+  # Upgrade pip, setuptools, and wheel
+  pip install -U pip setuptools wheel
+
+install: |
+  pip install -r ./dev-requirements.txt
