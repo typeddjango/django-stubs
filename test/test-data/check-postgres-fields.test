@@ -24,5 +24,3 @@ user = User()
 reveal_type(user.members)  # E: Revealed type is 'builtins.list[builtins.int*]'
 reveal_type(user.members_as_text)  # E: Revealed type is 'builtins.list[builtins.str*]'
 [out]
-
-

@@ -16,7 +16,7 @@ class DjangoTestSuite(DataSuite):
     files = [
         'check-model-fields.test',
         'check-postgres-fields.test',
-        'check-model-relations.test'
+        'check-model-relations.test',
     ]
     data_prefix = str(TEST_DATA_DIR)
 

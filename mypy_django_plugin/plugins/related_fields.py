@@ -1,11 +1,11 @@
 from typing import Optional, Callable
 
-from mypy.nodes import SymbolTableNode, MDEF, Var
+from mypy.nodes import Var, MDEF, SymbolTableNode
 from mypy.plugin import Plugin, FunctionContext
-from mypy.types import Type, CallableType, TypeOfAny, AnyType, Instance
+from mypy.types import Type, CallableType, Instance
 
 
-def set_related_fields(ctx: FunctionContext) -> Type:
+def set_related_name_manager_for_foreign_key(ctx: FunctionContext) -> Type:
     if 'related_name' not in ctx.context.arg_names:
         return ctx.default_return_type
 
@@ -23,8 +23,8 @@ def set_related_fields(ctx: FunctionContext) -> Type:
     related_var = Var(related_name,
                       queryset_type)
     related_var.info = queryset_type.type
-
-    referred_to.type.names[related_name] = SymbolTableNode(MDEF, related_var)
+    referred_to.type.names[related_name] = SymbolTableNode(MDEF, related_var,
+                                                           plugin_generated=True)
     return ctx.default_return_type
 
 
@@ -32,7 +32,7 @@ class RelatedFieldsPlugin(Plugin):
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
         if fullname == 'django.db.models.fields.related.ForeignKey':
-            return set_related_fields
+            return set_related_name_manager_for_foreign_key
         return None
 
 
