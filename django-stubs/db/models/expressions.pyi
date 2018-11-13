@@ -177,3 +177,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
             summarize: bool = ...,
             for_save: bool = ...,
     ) -> CombinedExpression: ...
+
+
+class F(Combinable):
+    def __init__(self, name: str): ...

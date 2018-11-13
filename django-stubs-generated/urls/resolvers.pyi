@@ -4,11 +4,8 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 from django.contrib.flatpages.sitemaps import FlatPageSitemap
 from django.contrib.sitemaps import Sitemap
 from django.core.checks.messages import CheckMessage, Warning
+from django.urls.converters import UUIDConverter
 from django.utils.datastructures import MultiValueDict
-
-from .converters import get_converter
-from .exceptions import NoReverseMatch, Resolver404
-from .utils import get_callable
 
 
 class ResolverMatch:
@@ -30,17 +27,7 @@ class ResolverMatch:
         app_names: Optional[List[Optional[str]]] = ...,
         namespaces: Optional[List[Optional[str]]] = ...,
     ) -> None: ...
-    def __getitem__(
-        self, index: int
-    ) -> Union[
-        Callable,
-        Dict[str, Dict[str, Type[FlatPageSitemap]]],
-        Dict[str, Dict[str, Sitemap]],
-        Dict[str, OrderedDict],
-        Dict[str, int],
-        Dict[str, str],
-        Tuple,
-    ]: ...
+    def __getitem__(self, index: int) -> Any: ...
 
 def get_resolver(
     urlconf: Optional[Union[Type[Any], str]] = ...
@@ -74,7 +61,7 @@ class RegexPattern(CheckURLMixin):
 class RoutePattern(CheckURLMixin):
     regex: Any = ...
     name: Optional[str] = ...
-    converters: Dict[str, django.urls.converters.UUIDConverter] = ...
+    converters: Dict[str, UUIDConverter] = ...
     def __init__(
         self, route: str, name: Optional[str] = ..., is_endpoint: bool = ...
     ) -> None: ...

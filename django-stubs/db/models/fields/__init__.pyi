@@ -35,3 +35,7 @@ class SlugField(CharField):
 
 class TextField(Field):
     def __get__(self, instance, owner) -> str: ...
+
+
+class BooleanField(Field):
+    def __get__(self, instance, owner) -> bool: ...

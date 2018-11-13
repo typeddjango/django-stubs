@@ -21,4 +21,6 @@ from .query import (QuerySet as QuerySet,
 
 from .query_utils import Q as Q
 
-from .lookups import (Lookup as Lookup)
+from .lookups import Lookup as Lookup
+
+from .expressions import F as F
