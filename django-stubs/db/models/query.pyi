@@ -175,3 +175,11 @@ class QuerySet(Generic[_T]):
 
 class RawQuerySet:
     pass
+
+
+class RawQuery(object):
+    pass
+
+
+class Query(object):
+    pass

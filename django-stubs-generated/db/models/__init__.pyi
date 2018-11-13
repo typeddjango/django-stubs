@@ -59,7 +59,6 @@ from django.db.models.fields.proxy import OrderWrt
 # noinspection PyUnresolvedReferences
 from django.db.models.indexes import *  # NOQA
 
-# noinspection PyUnresolvedReferences
 from django.db.models.lookups import (
     Lookup as Lookup,
     Transform as Transform

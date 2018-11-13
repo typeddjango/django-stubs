@@ -16,6 +16,9 @@ from .deletion import (CASCADE as CASCADE,
                        SET_NULL as SET_NULL,
                        DO_NOTHING as DO_NOTHING)
 
-from .query import QuerySet as QuerySet
+from .query import (QuerySet as QuerySet,
+                    RawQuerySet as RawQuerySet)
 
 from .query_utils import Q as Q
+
+from .lookups import (Lookup as Lookup)

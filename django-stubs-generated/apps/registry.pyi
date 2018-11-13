@@ -1,3 +1,4 @@
+import collections
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 from django.apps.config import AppConfig

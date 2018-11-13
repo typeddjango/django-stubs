@@ -1,4 +1,4 @@
-from typing import Any, Iterator, Optional, Type
+from typing import Any, Iterator, Type
 
 from django.db.models.base import Model
 

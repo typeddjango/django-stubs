@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Union, Dict
 
 from django.utils.functional import LazyObject
 
