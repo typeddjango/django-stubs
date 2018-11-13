@@ -1,18 +1,4 @@
-[case testForeignKeyWithClass]
-from django.db import models
-
-class Publisher(models.Model):
-    pass
-
-class Book(models.Model):
-    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
-
-book = Book()
-reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
-[out]
-
-
-[case testForeignKeyRelatedName]
+[case testForeignKeyField]
 from django.db import models
 
 class Publisher(models.Model):
@@ -22,6 +8,25 @@ class Book(models.Model):
     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
                                     related_name='books')
 
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+
 publisher = Publisher()
 reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
 [out]
+
+[case testOneToOneField]
+from django.db import models
+
+class User(models.Model):
+    pass
+
+class Profile(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='profile')
+
+profile = Profile()
+reveal_type(profile.user)  # E: Revealed type is 'main.User*'
+
+user = User()
+reveal_type(user.profile)  # E: Revealed type is 'main.Profile'
+
