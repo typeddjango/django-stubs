@@ -56,3 +56,16 @@ class Profile(models.Model):
 profile = Profile()
 reveal_type(profile.user_id)  # E: Revealed type is 'builtins.int'
 [out]
+
+[case testToParameterKeywordMaybeAbsent]
+from django.db import models
+
+class User(models.Model):
+    pass
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+
+reveal_type(User().profile)  # E: Revealed type is 'main.Profile'
+[out]
+

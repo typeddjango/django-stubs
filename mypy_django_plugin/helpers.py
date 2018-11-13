@@ -1,38 +1,55 @@
-from mypy.checker import TypeChecker
-from mypy.nodes import SymbolTableNode, Var
+from typing import Dict, Optional, Type, Tuple, NamedTuple
+
+from mypy.nodes import SymbolTableNode, Var, Expression, MemberExpr
+from mypy.plugin import FunctionContext
+from mypy.types import Instance
+
+MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
+QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
+FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
+ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
 
 
-def is_class_variable(symbol_table_node: SymbolTableNode) -> bool:
-    # MDEF: class member definition
-    is_class_variable = symbol_table_node.kind == 2 and type(symbol_table_node.node) == Var
-    if not is_class_variable:
-        return False
+def create_new_symtable_node(name: str, kind: int, instance: Instance) -> SymbolTableNode:
+    new_var = Var(name, instance)
+    new_var.info = instance.type
 
-    return True
-
-
-def lookup_django_model(mypy_api: TypeChecker, fullname: str) -> SymbolTableNode:
-    module, _, model_name = fullname.rpartition('.')
-    try:
-        return mypy_api.modules[module].names[model_name]
-    except KeyError:
-        return mypy_api.lookup_qualified('typing.Any')
-        # return mypy_api.modules['typing'].names['Any']
+    return SymbolTableNode(kind, new_var,
+                           plugin_generated=True)
 
 
-def get_app_model(model_name: str) -> str:
-    import os
-    os.environ.setdefault('SITE_URL', 'https://localhost')
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server._config.settings.local')
+Argument = NamedTuple('Argument', fields=[
+    ('arg', Expression),
+    ('arg_type', Type)
+])
 
-    import django
-    django.setup()
 
-    from django.apps import apps
+def get_call_signature_or_none(ctx: FunctionContext) -> Optional[Dict[str, Argument]]:
+    arg_names = ctx.context.arg_names
 
-    try:
-        app_name, model_name = model_name.rsplit('.', maxsplit=1)
-        model = apps.get_model(app_name, model_name)
-        return model.__module__ + '.' + model_name
-    except ValueError:
-        return model_name
+    result: Dict[str, Argument] = {}
+    positional_args_only = []
+    positional_arg_types_only = []
+    for arg, arg_name, arg_type in zip(ctx.args, arg_names, ctx.arg_types):
+        if arg_name is None:
+            positional_args_only.append(arg)
+            positional_arg_types_only.append(arg_type)
+            continue
+
+        if len(arg) == 0 or len(arg_type) == 0:
+            continue
+
+        result[arg_name] = (arg[0], arg_type[0])
+
+    callee = ctx.context.callee
+    if '__init__' not in callee.node.names:
+        return None
+
+    init_type = callee.node.names['__init__'].type
+    arg_names = init_type.arg_names[1:]
+    for arg, arg_name, arg_type in zip(positional_args_only,
+                                       arg_names[:len(positional_args_only)],
+                                       positional_arg_types_only):
+        result[arg_name] = (arg[0], arg_type[0])
+
+    return result

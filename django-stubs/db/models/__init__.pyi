@@ -6,7 +6,8 @@ from .fields import (AutoField as AutoField,
                      CharField as CharField,
                      Field as Field,
                      SlugField as SlugField,
-                     TextField as TextField)
+                     TextField as TextField,
+                     BooleanField as BooleanField)
 
 from .fields.related import (ForeignKey as ForeignKey,
                              OneToOneField as OneToOneField)

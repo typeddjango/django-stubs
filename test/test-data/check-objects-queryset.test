@@ -1,0 +1,24 @@
+[case testEveryModelClassHasDefaultObjectsQuerySetAvailableAsAttribute]
+from django.db import models
+
+class User(models.Model):
+    pass
+
+reveal_type(User.objects)  # E: Revealed type is 'django.db.models.query.QuerySet[main.User]'
+[out]
+
+[case testGetReturnsModelInstanceIfInheritedFromAbstractMixin]
+from django.db import models
+
+class ModelMixin(models.Model):
+    class Meta:
+        abstract = True
+
+class User(ModelMixin):
+    pass
+
+reveal_type(ModelMixin.objects)
+reveal_type(User.objects.get())  # E: Revealed type is 'main.User*'
+[out]
+main:10: error: Revealed type is 'Any'
+main:10: error: "Type[ModelMixin]" has no attribute "objects"

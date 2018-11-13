@@ -14,9 +14,10 @@ MYPY_INI_PATH = ROOT_DIR / 'test' / 'plugins.ini'
 
 class DjangoTestSuite(DataSuite):
     files = [
+        'check-objects-queryset.test',
         'check-model-fields.test',
         'check-postgres-fields.test',
-        'check-model-relations.test',
+        'check-model-relations.test'
     ]
     data_prefix = str(TEST_DATA_DIR)
 
