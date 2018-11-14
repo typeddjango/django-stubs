@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Set
+from typing import Any, List, Optional, Set, Tuple, Dict
 
 
 class ModelBase(type):
@@ -15,7 +15,7 @@ class Model(metaclass=ModelBase):
 
     def delete(self,
                using: Any = ...,
-               keep_parents: bool = ...) -> None: ...
+               keep_parents: bool = ...) -> Tuple[int, Dict[str, int]]: ...
 
     def full_clean(
         self, exclude: Optional[List[str]] = ..., validate_unique: bool = ...

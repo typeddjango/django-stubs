@@ -1,9 +1,6 @@
 from typing import Any, Callable, List, Optional, Tuple, Union
 
-from django.urls.resolvers import URLPattern, URLResolver
-
-from .resolvers import (LocalePrefixPattern, RegexPattern, RoutePattern,
-                        URLPattern, URLResolver)
+from .resolvers import URLPattern, URLResolver
 
 
 def include(

@@ -1,4 +1,5 @@
-from .request import (HttpRequest as HttpRequest)
+from .request import (HttpRequest as HttpRequest,
+                      QueryDict as QueryDict)
 
 from .response import (BadHeaderError as BadHeaderError,
                        FileResponse as FileResponse,

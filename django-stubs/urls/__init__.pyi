@@ -1,19 +1,9 @@
-from .conf import (
-    include as include,
-    path as path,
-    re_path as re_path
-)
-from .resolvers import (
-    LocaleRegexProvider, LocaleRegexURLResolver, RegexURLPattern,
-    RegexURLResolver, ResolverMatch, get_ns_resolver, get_resolver,
-)
-from .utils import get_callable, get_mod_func
+from .base import reverse as reverse
 
-__all__ = [
-    'LocaleRegexProvider', 'LocaleRegexURLResolver', 'NoReverseMatch',
-    'RegexURLPattern', 'RegexURLResolver', 'Resolver404', 'ResolverMatch',
-    'clear_script_prefix', 'clear_url_caches', 'get_callable', 'get_mod_func',
-    'get_ns_resolver', 'get_resolver', 'get_script_prefix', 'get_urlconf',
-    'is_valid_path', 'resolve', 'reverse', 'reverse_lazy', 'set_script_prefix',
-    'set_urlconf', 'translate_url',
-]
+from .conf import (include as include,
+                   path as path,
+                   re_path as re_path)
+
+from .resolvers import (ResolverMatch as ResolverMatch,
+                        get_ns_resolver as get_ns_resolver,
+                        get_resolver as get_resolver)

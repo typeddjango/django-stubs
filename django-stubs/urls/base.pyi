@@ -3,10 +3,6 @@ from uuid import UUID
 
 from django.urls.resolvers import ResolverMatch
 
-from .exceptions import NoReverseMatch, Resolver404
-from .resolvers import get_ns_resolver, get_resolver
-from .utils import get_callable
-
 
 def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
 def reverse(
