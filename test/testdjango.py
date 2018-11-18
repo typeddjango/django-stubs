@@ -17,7 +17,8 @@ class DjangoTestSuite(DataSuite):
         'check-objects-queryset.test',
         'check-model-fields.test',
         'check-postgres-fields.test',
-        'check-model-relations.test'
+        'check-model-relations.test',
+        'check-parse-settings.test'
     ]
     data_prefix = str(TEST_DATA_DIR)
 

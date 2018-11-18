@@ -1,8 +1,10 @@
-from typing import Dict, Optional, Type, Tuple, NamedTuple
+from typing import Dict, Optional, NamedTuple
 
-from mypy.nodes import SymbolTableNode, Var, Expression, MemberExpr
+from mypy.semanal import SemanticAnalyzerPass2
+from mypy.types import Type
+from mypy.nodes import SymbolTableNode, Var, Expression
 from mypy.plugin import FunctionContext
-from mypy.types import Instance
+from mypy.types import Instance, UnionType, NoneTyp
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
@@ -13,7 +15,6 @@ ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
 def create_new_symtable_node(name: str, kind: int, instance: Instance) -> SymbolTableNode:
     new_var = Var(name, instance)
     new_var.info = instance.type
-
     return SymbolTableNode(kind, new_var,
                            plugin_generated=True)
 
@@ -53,3 +54,14 @@ def get_call_signature_or_none(ctx: FunctionContext) -> Optional[Dict[str, Argum
         result[arg_name] = (arg[0], arg_type[0])
 
     return result
+
+
+def make_optional(typ: Type) -> Type:
+    return UnionType.make_simplified_union([typ, NoneTyp()])
+
+
+def make_required(typ: Type) -> Type:
+    if not isinstance(typ, UnionType):
+        return typ
+    items = [item for item in typ.items if not isinstance(item, NoneTyp)]
+    return UnionType.make_union(items)
