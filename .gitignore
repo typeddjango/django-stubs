@@ -4,3 +4,4 @@ out/
 /test_sqlite.py
 /django
 .idea/
+.mypy_cache/

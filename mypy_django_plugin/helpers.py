@@ -1,15 +1,15 @@
-from typing import Dict, Optional, NamedTuple
+import typing
+from typing import Dict, Optional, NamedTuple, Any
 
-from mypy.semanal import SemanticAnalyzerPass2
-from mypy.types import Type
 from mypy.nodes import SymbolTableNode, Var, Expression
 from mypy.plugin import FunctionContext
-from mypy.types import Instance, UnionType, NoneTyp
+from mypy.types import Type, Instance, UnionType, NoneTyp
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
 FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
 ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
+DUMMY_SETTINGS_BASE_CLASS = 'django.conf._DjangoConfLazyObject'
 
 
 def create_new_symtable_node(name: str, kind: int, instance: Instance) -> SymbolTableNode:
@@ -26,12 +26,10 @@ Argument = NamedTuple('Argument', fields=[
 
 
 def get_call_signature_or_none(ctx: FunctionContext) -> Optional[Dict[str, Argument]]:
-    arg_names = ctx.context.arg_names
-
     result: Dict[str, Argument] = {}
     positional_args_only = []
     positional_arg_types_only = []
-    for arg, arg_name, arg_type in zip(ctx.args, arg_names, ctx.arg_types):
+    for arg, arg_name, arg_type in zip(ctx.args, ctx.arg_names, ctx.arg_types):
         if arg_name is None:
             positional_args_only.append(arg)
             positional_arg_types_only.append(arg_type)
@@ -65,3 +63,7 @@ def make_required(typ: Type) -> Type:
         return typ
     items = [item for item in typ.items if not isinstance(item, NoneTyp)]
     return UnionType.make_union(items)
+
+
+def get_obj_type_name(typ: typing.Type) -> str:
+    return typ.__module__ + '.' + typ.__qualname__

@@ -147,6 +147,12 @@ class DjangoDataDrivenTestCase(DataDrivenTestCase):
         self.old_cwd = os.getcwd()
 
         self.tmpdir = tempfile.TemporaryDirectory(prefix='mypy-test-')
+        tmpdir_root = os.path.join(self.tmpdir.name, 'tmp')
+
+        new_files = []
+        for path, contents in self.files:
+            new_files.append((path, contents.replace('<TMP>', tmpdir_root)))
+        self.files = new_files
 
         os.chdir(self.tmpdir.name)
         os.mkdir(test_temp_dir)
@@ -179,7 +185,7 @@ class DjangoDataDrivenTestCase(DataDrivenTestCase):
                 self.clean_up.append((True, d))
             self.clean_up.append((False, path))
 
-        sys.path.insert(0, os.path.join(self.tmpdir.name, 'tmp'))
+        sys.path.insert(0, tmpdir_root)
 
     def teardown(self):
         if hasattr(self, 'old_environ'):

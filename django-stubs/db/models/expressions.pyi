@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import (Any, Callable, Dict, Iterator, List, Optional, Set, Tuple,
                     Type, Union)
 
+from django.db.models import QuerySet
 from django.db.models.fields import Field
 from django.db.models.lookups import Lookup
 from django.db.models.sql.compiler import SQLCompiler
@@ -180,4 +181,50 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
 
 
 class F(Combinable):
+    name: str
     def __init__(self, name: str): ...
+    def resolve_expression(
+        self,
+        query: Any = ...,
+        allow_joins: bool = ...,
+        reuse: Optional[Set[str]] = ...,
+        summarize: bool = ...,
+        for_save: bool = ...,
+    ) -> Expression: ...
+
+
+class OuterRef(F): ...
+
+class Subquery(Expression):
+    template: str = ...
+    queryset: QuerySet = ...
+    extra: Dict[Any, Any] = ...
+    def __init__(
+        self,
+        queryset: QuerySet,
+        output_field: Optional[Field] = ...,
+        **extra: Any
+    ) -> None: ...
+
+class Exists(Subquery):
+    extra: Dict[Any, Any]
+    template: str = ...
+    negated: bool = ...
+    def __init__(
+        self, *args: Any, negated: bool = ..., **kwargs: Any
+    ) -> None: ...
+    def __invert__(self) -> Exists: ...
+
+class OrderBy(BaseExpression):
+    template: str = ...
+    nulls_first: bool = ...
+    nulls_last: bool = ...
+    descending: bool = ...
+    expression: Expression = ...
+    def __init__(
+        self,
+        expression: Combinable,
+        descending: bool = ...,
+        nulls_first: bool = ...,
+        nulls_last: bool = ...,
+    ) -> None: ...

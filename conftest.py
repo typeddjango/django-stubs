@@ -1,3 +1,3 @@
 pytest_plugins = [
-    'test.data'
+    'test.pytest_plugin'
 ]

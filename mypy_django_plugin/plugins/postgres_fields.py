@@ -1,14 +1,11 @@
 from mypy.plugin import FunctionContext
 from mypy.types import Type
 
-from mypy_django_plugin import helpers
-
 
 def determine_type_of_array_field(ctx: FunctionContext) -> Type:
-    signature = helpers.get_call_signature_or_none(ctx)
-    if signature is None:
+    if 'base_field' not in ctx.arg_names:
         return ctx.default_return_type
 
-    _, base_field_arg_type = signature['base_field']
+    base_field_arg_type = ctx.arg_types[ctx.arg_names.index('base_field')][0]
     return ctx.api.named_generic_type(ctx.context.callee.fullname,
                                       args=[base_field_arg_type.type.names['__get__'].type.ret_type])

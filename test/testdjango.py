@@ -14,11 +14,14 @@ MYPY_INI_PATH = ROOT_DIR / 'test' / 'plugins.ini'
 
 class DjangoTestSuite(DataSuite):
     files = [
-        'check-objects-queryset.test',
-        'check-model-fields.test',
-        'check-postgres-fields.test',
-        'check-model-relations.test',
-        'check-parse-settings.test'
+        # 'check-objects-queryset.test',
+        # 'check-model-fields.test',
+        # 'check-postgres-fields.test',
+        # 'check-model-relations.test',
+        # 'check-parse-settings.test',
+        # 'check-to-attr-as-string-one-to-one-field.test',
+        'check-to-attr-as-string-foreign-key.test',
+        # 'check-foreign-key-as-string-creates-underscore-id-attr.test'
     ]
     data_prefix = str(TEST_DATA_DIR)
 
