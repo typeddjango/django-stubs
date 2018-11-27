@@ -127,7 +127,7 @@ def assert_string_arrays_equal(expected: List[str], actual: List[str]) -> None:
     actual = _clean_up(actual)
     error_message = ''
 
-    if actual != expected:
+    if set(actual) != set(expected):
         num_skip_start = _num_skipped_prefix_lines(expected, actual)
         num_skip_end = _num_skipped_suffix_lines(expected, actual)
 

@@ -1,4 +1,4 @@
-from test.pytest_plugin import reveal_type
+from test.pytest_plugin import reveal_type, output
 from test.pytest_tests.base import BaseDjangoPluginTestCase
 
 
@@ -47,6 +47,20 @@ class TestForeignKey(BaseDjangoPluginTestCase):
 
         publisher = Publisher()
         reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+
+    @output(
+        """
+        main:4: warning: to= parameter type Instance is not supported
+"""
+    )
+    def test_to_parameter_as_string_fallbacks_to_any(self):
+        from django.db import models
+
+        class Book(models.Model):
+            publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
+
+        book = Book()
+        reveal_type(book.publisher)  # E: Revealed type is 'Any'
 
 
 class TestOneToOneField(BaseDjangoPluginTestCase):

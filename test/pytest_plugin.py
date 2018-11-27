@@ -24,7 +24,7 @@ def reveal_type(obj: Any) -> None:
 
 def output(output_lines: str):
     def decor(func: Callable[..., None]):
-        func.out = output_lines
+        func.out = output_lines.strip()
 
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
@@ -123,7 +123,7 @@ def fname_to_module(fpath: Path, root_path: Path) -> Optional[str]:
 
 
 class MypyTypecheckItem(pytest.Item):
-    root_directory = '/run/testdata'
+    root_directory = '/tmp'
 
     def __init__(self,
                  name: str,
@@ -255,9 +255,10 @@ def extract_test_output(attr: Callable[..., None]) -> List[str]:
     out_data: str = getattr(attr, 'out', None)
     out_lines = []
     if out_data:
-        for line in out_data.split('\n'):
-            line = line.strip()
-            out_lines.append(line)
+        for line in out_data.strip().split('\n'):
+            if line:
+                line = line.strip()
+                out_lines.append(line)
     return out_lines
 
 
