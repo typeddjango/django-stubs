@@ -132,13 +132,11 @@ def assert_string_arrays_equal(expected: List[str], actual: List[str]) -> None:
         num_skip_end = _num_skipped_suffix_lines(expected, actual)
 
         error_message += 'Expected:\n'
-        # sys.stderr.write('Expected:\n')
 
         # If omit some lines at the beginning, indicate it by displaying a line
         # with '...'.
         if num_skip_start > 0:
             error_message += '  ...\n'
-            # sys.stderr.write('  ...\n')
 
         # Keep track of the first different line.
         first_diff = -1
@@ -151,51 +149,37 @@ def assert_string_arrays_equal(expected: List[str], actual: List[str]) -> None:
                 if first_diff < 0:
                     first_diff = i
                 error_message += '  {:<45} (diff)'.format(expected[i])
-                # sys.stderr.write('  {:<45} (diff)'.format(expected[i]))
             else:
                 e = expected[i]
                 error_message += '  ' + e[:width]
-                # sys.stderr.write('  ' + e[:width])
                 if len(e) > width:
                     error_message += '...'
-                    # sys.stderr.write('...')
             error_message += '\n'
-            # sys.stderr.write('\n')
         if num_skip_end > 0:
             error_message += '  ...\n'
-            # sys.stderr.write('  ...\n')
 
         error_message += 'Actual:\n'
-        # sys.stderr.write('Actual:\n')
 
         if num_skip_start > 0:
             error_message += '  ...\n'
-            # sys.stderr.write('  ...\n')
 
         for j in range(num_skip_start, len(actual) - num_skip_end):
             if j >= len(expected) or expected[j] != actual[j]:
                 error_message += '  {:<45} (diff)'.format(actual[j])
-                # sys.stderr.write('  {:<45} (diff)'.format(actual[j]))
             else:
                 a = actual[j]
                 error_message += '  ' + a[:width]
-                # sys.stderr.write('  ' + a[:width])
                 if len(a) > width:
                     error_message += '...'
-                    # sys.stderr.write('...')
             error_message += '\n'
-            # sys.stderr.write('\n')
         if actual == []:
             error_message += '  (empty)\n'
-            # sys.stderr.write('  (empty)\n')
         if num_skip_end > 0:
             error_message += '  ...\n'
-            # sys.stderr.write('  ...\n')
 
         error_message += '\n'
-        # sys.stderr.write('\n')
 
-        if first_diff >= 0 and first_diff < len(actual) and (
+        if 0 <= first_diff < len(actual) and (
                 len(expected[first_diff]) >= MIN_LINE_LENGTH_FOR_ALIGNMENT
                 or len(actual[first_diff]) >= MIN_LINE_LENGTH_FOR_ALIGNMENT):
             # Display message that helps visualize the differences between two

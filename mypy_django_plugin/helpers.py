@@ -1,5 +1,5 @@
 import typing
-from typing import Dict, Optional, NamedTuple, Any
+from typing import Dict, Optional, NamedTuple
 
 from mypy.nodes import SymbolTableNode, Var, Expression
 from mypy.plugin import FunctionContext

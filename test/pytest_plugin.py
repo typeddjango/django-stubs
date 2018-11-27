@@ -189,9 +189,9 @@ class MypyTypecheckItem(pytest.Item):
                 main_fpath.write_text(self.source_code)
                 mypy_cmd_options.append(str(main_fpath))
 
-                stdout, _, _ = mypy_api.run(mypy_cmd_options)
+                stdout, stderr, returncode = mypy_api.run(mypy_cmd_options)
                 output_lines = []
-                for line in stdout.splitlines():
+                for line in (stdout + stderr).splitlines():
                     if ':' not in line:
                         continue
                     out_fpath, res_line = line.split(':', 1)
@@ -199,15 +199,18 @@ class MypyTypecheckItem(pytest.Item):
                     output_lines.append(line.strip().replace('.py', ''))
 
                 for module in test_specific_modules:
-                    if module in sys.modules:
-                        del sys.modules[module]
-                raise ValueError
+                    parts = module.split('.')
+                    for i in range(len(parts)):
+                        parent_module = '.'.join(parts[:i + 1])
+                        if parent_module in sys.modules:
+                            del sys.modules[parent_module]
+
                 assert_string_arrays_equal(expected=self.expected_output_lines,
                                            actual=output_lines)
 
     def prepare_mypy_cmd_options(self, config_file_path: Path) -> List[str]:
         mypy_cmd_options = [
-            '--show-traceback',
+            '--raise-exceptions',
             '--no-silence-site-packages'
         ]
         python_version = '.'.join([str(part) for part in sys.version_info[:2]])
@@ -238,7 +241,7 @@ class MypyTypecheckItem(pytest.Item):
             exception_repr.reprtraceback.reprentries = [repr_tb_entry]
             return exception_repr
         else:
-            return super().repr_failure(excinfo, style='short')
+            return super().repr_failure(excinfo, style='native')
 
     def reportinfo(self):
         return self.fspath, None, get_class_qualname(self.klass) + '::' + self.name
@@ -266,7 +269,7 @@ class MypyTestsCollector(pytest.Class):
         current_testcase = cast(MypyTypecheckTestCase, self.obj())
         ini_file_contents = self.get_ini_file_contents(current_testcase.ini_file())
         for attr_name in dir(current_testcase):
-            if attr_name.startswith('_test_'):
+            if attr_name.startswith('test_'):
                 attr = getattr(self.obj, attr_name)
                 if inspect.isfunction(attr):
                     first_line_lnum, source_lines = get_func_first_lnum(attr)

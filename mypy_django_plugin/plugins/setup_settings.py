@@ -1,32 +1,42 @@
-from typing import cast
+from typing import Optional, Any, cast
 
-from django.conf import Settings
-from mypy.nodes import MDEF
+from mypy.nodes import Var, Context, GDEF
+from mypy.options import Options
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
-from mypy.types import Instance, AnyType, TypeOfAny
+from mypy.types import Instance
 
-from mypy_django_plugin import helpers
+
+def add_settings_to_django_conf_object(ctx: ClassDefContext,
+                                       settings_module: str) -> Optional[Any]:
+    api = cast(SemanticAnalyzerPass2, ctx.api)
+    if settings_module not in api.modules:
+        return None
+
+    settings_file = api.modules[settings_module]
+    for name, sym in settings_file.names.items():
+        if name.isupper():
+            if not isinstance(sym.node, Var) or not isinstance(sym.type, Instance):
+                error_context = Context()
+                error_context.set_line(sym.node)
+                api.msg.fail("Need type annotation for '{}'".format(sym.node.name()),
+                             context=error_context,
+                             file=settings_file.path,
+                             origin=Context())
+                continue
+
+            sym_copy = sym.copy()
+            sym_copy.node.info = sym_copy.type.type
+            sym_copy.kind = GDEF
+            ctx.cls.info.names[name] = sym_copy
 
 
 class DjangoConfSettingsInitializerHook(object):
-    def __init__(self, settings: Settings):
-        self.settings = settings
+    def __init__(self, settings_module: str):
+        self.settings_module = settings_module
 
     def __call__(self, ctx: ClassDefContext) -> None:
-        api = cast(SemanticAnalyzerPass2, ctx.api)
-        if self.settings:
-            for name, value in self.settings.__dict__.items():
-                if name.isupper():
-                    if value is None:
-                        # TODO: change to Optional[Any] later
-                        ctx.cls.info.names[name] = helpers.create_new_symtable_node(name, MDEF,
-                                                                                    instance=api.builtin_type('builtins.object'))
-                        continue
+        if not self.settings_module:
+            return
 
-                    type_fullname = helpers.get_obj_type_name(type(value))
-                    sym = api.lookup_fully_qualified_or_none(type_fullname)
-                    if sym is not None:
-                        args = len(sym.node.type_vars) * [AnyType(TypeOfAny.from_omitted_generics)]
-                        ctx.cls.info.names[name] = helpers.create_new_symtable_node(name, MDEF,
-                                                                                    instance=Instance(sym.node, args))
+        add_settings_to_django_conf_object(ctx, self.settings_module)
