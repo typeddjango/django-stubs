@@ -16,6 +16,7 @@ jobs:
 before_install: |
   # Upgrade pip, setuptools, and wheel
   pip install -U pip setuptools wheel
+  mkdir -p /run/testdata
 
 install: |
   pip install -r ./dev-requirements.txt
