@@ -1,0 +1,53 @@
+[CASE test_foreign_key_field_with_related_name]
+from django.db import models
+
+class Publisher(models.Model):
+    pass
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
+                                  related_name='books')
+
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+
+publisher = Publisher()
+reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+
+[CASE test_foreign_key_field_creates_attribute_with_underscore_id]
+from django.db import models
+
+class Publisher(models.Model):
+    pass
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
+                                  related_name='books')
+
+book = Book()
+reveal_type(book.publisher_id)  # E: Revealed type is 'builtins.int'
+
+[CASE test_foreign_key_field_different_order_of_params]
+from django.db import models
+
+class Publisher(models.Model):
+    pass
+
+class Book(models.Model):
+    publisher = models.ForeignKey(on_delete=models.CASCADE, to=Publisher,
+                                  related_name='books')
+
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+
+publisher = Publisher()
+reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+
+[CASE test_to_parameter_as_string_fallbacks_to_any]
+from django.db import models
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
+
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'Any'

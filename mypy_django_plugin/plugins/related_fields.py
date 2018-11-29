@@ -31,8 +31,7 @@ def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
 
     arg_type = ctx.arg_types[ctx.arg_names.index('to')][0]
     if not isinstance(arg_type, CallableType):
-        ctx.api.msg.warn(f'to= parameter type {arg_type.__class__.__name__} is not supported',
-                         context=ctx.context)
+        # to= defined as string is not supported
         return None
 
     referred_to_type = arg_type.ret_type

@@ -1,0 +1,29 @@
+[CASE test_settings_are_parsed_into_django_conf_settings]
+from django.conf import settings
+
+reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'builtins.str'
+reveal_type(settings.OBJ)  # E: Revealed type is 'django.utils.functional.LazyObject'
+reveal_type(settings.NUMBERS)  # E: Revealed type is 'builtins.list[builtins.str]'
+reveal_type(settings.DICT)  # E: Revealed type is 'builtins.dict[Any, Any]'
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[file mysettings.py]
+SECRET_KEY = 112233
+ROOT_DIR = '/etc'
+NUMBERS = ['one', 'two']
+DICT = {}  # type: ignore
+
+from django.utils.functional import LazyObject
+
+OBJ = LazyObject()
+
+[CASE test_settings_could_be_defined_in_different_module_and_imported_with_star]
+from django.conf import settings
+
+reveal_type(settings.BASE)  # E: Revealed type is 'builtins.int'
+reveal_type(settings.NESTED)  # E: Revealed type is 'builtins.str'
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[file mysettings.py]
+from base import *
+NESTED = '1122'
+[file base.py]
+BASE = 1
