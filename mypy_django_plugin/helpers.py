@@ -1,7 +1,7 @@
 import typing
 from typing import Dict, Optional, NamedTuple
 
-from mypy.nodes import SymbolTableNode, Var, Expression
+from mypy.nodes import SymbolTableNode, Var, Expression, StrExpr, MypyFile, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import Type, Instance, UnionType, NoneTyp
 
@@ -67,3 +67,23 @@ def make_required(typ: Type) -> Type:
 
 def get_obj_type_name(typ: typing.Type) -> str:
     return typ.__module__ + '.' + typ.__qualname__
+
+
+def get_models_file(app_name: str, all_modules: typing.Dict[str, MypyFile]) -> Optional[MypyFile]:
+    models_module = '.'.join([app_name, 'models'])
+    return all_modules.get(models_module)
+
+
+def get_model_type_from_string(expr: StrExpr,
+                               all_modules: Dict[str, MypyFile]) -> Optional[TypeInfo]:
+    app_name, model_name = expr.value.split('.')
+
+    models_file = get_models_file(app_name, all_modules)
+    if models_file is None:
+        # not imported so far, not supported
+        return None
+    sym = models_file.names.get(model_name)
+    if not sym or not isinstance(sym.node, TypeInfo):
+        # no such model found in the app / node is not a class definition
+        return None
+    return sym.node

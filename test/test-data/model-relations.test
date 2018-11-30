@@ -21,11 +21,14 @@ class Publisher(models.Model):
     pass
 
 class Book(models.Model):
-    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
-                                  related_name='books')
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
+    class StylesheetError(Exception):
+        pass
+    owner = models.ForeignKey(db_column='model_id', to='db.Unknown', on_delete=models.CASCADE)
 
 book = Book()
 reveal_type(book.publisher_id)  # E: Revealed type is 'builtins.int'
+reveal_type(book.owner_id)  # E: Revealed type is 'builtins.int'
 
 [CASE test_foreign_key_field_different_order_of_params]
 from django.db import models
@@ -36,18 +39,77 @@ class Publisher(models.Model):
 class Book(models.Model):
     publisher = models.ForeignKey(on_delete=models.CASCADE, to=Publisher,
                                   related_name='books')
+    publisher2 = models.ForeignKey(to=Publisher, related_name='books2', on_delete=models.CASCADE)
 
 book = Book()
 reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+reveal_type(book.publisher2)  # E: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
 reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
 
-[CASE test_to_parameter_as_string_fallbacks_to_any]
+[CASE test_to_parameter_as_string_with_application_name__model_imported]
+from django.db import models
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from myapp.models import Publisher
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to='myapp.Publisher', on_delete=models.CASCADE)
+
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'myapp.models.Publisher*'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class Publisher(models.Model):
+    pass
+
+[CASE test_to_parameter_as_string_with_application_name__fallbacks_to_any_if_model_not_present_in_dependency_graph]
 from django.db import models
 
 class Book(models.Model):
-    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
+    publisher = models.ForeignKey(to='myapp.Publisher', on_delete=models.CASCADE)
 
 book = Book()
 reveal_type(book.publisher)  # E: Revealed type is 'Any'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class Publisher(models.Model):
+    pass
+
+[CASE test_circular_dependency_in_imports_with_foreign_key]
+from django.db import models
+
+class App(models.Model):
+    def method(self) -> None:
+        reveal_type(self.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+        reveal_type(self.members)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Member]'
+        reveal_type(self.sheets)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Sheet]'
+        reveal_type(self.profile)  # E: Revealed type is 'main.Profile'
+class View(models.Model):
+    app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
+class Member(models.Model):
+    app = models.ForeignKey(related_name='members', on_delete=models.CASCADE, to=App)
+class Sheet(models.Model):
+    app = models.ForeignKey(App, related_name='sheets', on_delete=models.CASCADE)
+class Profile(models.Model):
+    app = models.OneToOneField(App, related_name='profile', on_delete=models.CASCADE)
+
+[CASE test_circular_dependency_in_imports_with_string_based]
+from django.db import models
+from myapp.models import App
+class View(models.Model):
+    app = models.ForeignKey(to='myapp.App', related_name='views', on_delete=models.CASCADE)
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class App(models.Model):
+    def method(self) -> None:
+        reveal_type(self.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'

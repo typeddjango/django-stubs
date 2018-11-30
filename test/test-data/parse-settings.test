@@ -19,11 +19,36 @@ OBJ = LazyObject()
 [CASE test_settings_could_be_defined_in_different_module_and_imported_with_star]
 from django.conf import settings
 
-reveal_type(settings.BASE)  # E: Revealed type is 'builtins.int'
-reveal_type(settings.NESTED)  # E: Revealed type is 'builtins.str'
+reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'pathlib.Path'
+reveal_type(settings.SETUP)  # E: Revealed type is 'builtins.int'
+reveal_type(settings.DATABASES)  # E: Revealed type is 'builtins.dict[builtins.str, builtins.str]'
 [env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]
+from local import *
+DATABASES = {'default': 'mydb'}
+[file local.py]
 from base import *
-NESTED = '1122'
+SETUP = 3
 [file base.py]
-BASE = 1
+from pathlib import Path
+
+ROOT_DIR = Path(__file__)
+
+[CASE test_circular_dependency_in_settings]
+from django.conf import settings
+
+class Class:
+    pass
+
+reveal_type(settings.MYSETTING)  # E: Revealed type is 'builtins.int'
+reveal_type(settings.REGISTRY)  # E: Revealed type is 'Any'
+
+[file mysettings.py]
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .main import Class
+
+MYSETTING = 1122
+REGISTRY: Optional['Class'] = None
+

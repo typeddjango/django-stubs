@@ -14,3 +14,47 @@ reveal_type(user.small_int)  # E: Revealed type is 'builtins.int'
 reveal_type(user.name)  # E: Revealed type is 'builtins.str'
 reveal_type(user.slug)  # E: Revealed type is 'builtins.str'
 reveal_type(user.text)  # E: Revealed type is 'builtins.str'
+
+[CASE test_add_id_field_if_no_primary_key_defined]
+from django.db import models
+
+class User(models.Model):
+    pass
+
+reveal_type(User().id)  # E: Revealed type is 'builtins.int'
+
+[CASE test_do_not_add_id_if_field_with_primary_key_True_defined]
+from django.db import models
+
+class User(models.Model):
+    my_pk = models.IntegerField(primary_key=True)
+
+reveal_type(User().my_pk)  # E: Revealed type is 'builtins.int'
+reveal_type(User().id)  # E: Revealed type is 'Any'
+[out]
+main:7: error: "User" has no attribute "id"
+
+[CASE test_meta_nested_class_allows_subclassing_in_multiple_inheritance]
+from typing import Any
+from django.db import models
+
+class Mixin1(models.Model):
+    class Meta:
+        abstract = True
+
+class Mixin2(models.Model):
+    class Meta:
+        abstract = True
+
+class User(Mixin1, Mixin2):
+    pass
+[out]
+
+[CASE test_inheritance_from_abstract_model_does_not_fail_if_field_with_id_exists]
+from django.db import models
+class Abstract(models.Model):
+    class Meta:
+        abstract = True
+class User(Abstract):
+    id = models.AutoField(primary_key=True)
+[out]
