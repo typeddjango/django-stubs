@@ -1,23 +1,15 @@
 import typing
 from typing import Dict, Optional, NamedTuple
 
-from mypy.nodes import SymbolTableNode, Var, Expression, StrExpr, MypyFile, TypeInfo
+from mypy.nodes import Expression, StrExpr, MypyFile, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import Type, Instance, UnionType, NoneTyp
+from mypy.types import Type, UnionType, NoneTyp
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
 FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
 ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
 DUMMY_SETTINGS_BASE_CLASS = 'django.conf._DjangoConfLazyObject'
-
-
-def create_new_symtable_node(name: str, kind: int, instance: Instance) -> SymbolTableNode:
-    new_var = Var(name, instance)
-    new_var.info = instance.type
-    return SymbolTableNode(kind, new_var,
-                           plugin_generated=True)
-
 
 Argument = NamedTuple('Argument', fields=[
     ('arg', Expression),

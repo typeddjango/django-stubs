@@ -11,9 +11,7 @@ SECRET_KEY = 112233
 ROOT_DIR = '/etc'
 NUMBERS = ['one', 'two']
 DICT = {}  # type: ignore
-
 from django.utils.functional import LazyObject
-
 OBJ = LazyObject()
 
 [CASE test_settings_could_be_defined_in_different_module_and_imported_with_star]
@@ -36,18 +34,18 @@ ROOT_DIR = Path(__file__)
 
 [CASE test_circular_dependency_in_settings]
 from django.conf import settings
-
 class Class:
     pass
-
 reveal_type(settings.MYSETTING)  # E: Revealed type is 'builtins.int'
-reveal_type(settings.REGISTRY)  # E: Revealed type is 'Any'
+reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
 
+[env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]
 from typing import TYPE_CHECKING
+from typing import Optional
 
 if TYPE_CHECKING:
-    from .main import Class
+    from main import Class
 
 MYSETTING = 1122
 REGISTRY: Optional['Class'] = None

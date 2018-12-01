@@ -18,7 +18,9 @@ setup(
     author_email="maxim.kurnikov@gmail.com",
     version="0.1.0",
     license='BSD',
-    install_requires=['Django>=2.1.1'],
-    packages=['mypy_django_plugin']
-    # package_data=find_stubs('django-stubs')
+    install_requires=[
+        'Django>=2.1.1',
+        'mypy'
+    ],
+    packages=['mypy_django_plugin'],
 )

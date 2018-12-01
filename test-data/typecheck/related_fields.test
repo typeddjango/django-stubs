@@ -105,7 +105,12 @@ class Profile(models.Model):
 from django.db import models
 from myapp.models import App
 class View(models.Model):
-    app = models.ForeignKey(to='myapp.App', related_name='views', on_delete=models.CASCADE)
+    app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
+
+reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+reveal_type(View().app.unknown)  # E: Revealed type is 'Any'
+[out]
+main:7: error: "App" has no attribute "unknown"
 
 [file myapp/__init__.py]
 [file myapp/models.py]
@@ -113,3 +118,20 @@ from django.db import models
 class App(models.Model):
     def method(self) -> None:
         reveal_type(self.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+
+[case models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model]
+from django.db.models import Model
+from django.db import models
+
+class App(Model):
+    pass
+
+class View(Model):
+    app = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views')
+
+class View2(View):
+    app = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views2')
+
+reveal_type(App().views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+reveal_type(App().views2)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View2]'
+[out]

@@ -1,7 +1,7 @@
 from typing import Optional, List, Sequence, NamedTuple, Tuple
 
 from mypy import checkexpr
-from mypy.argmap import map_actuals_to_formals
+from mypy.checkexpr import map_actuals_to_formals
 from mypy.checkmember import analyze_member_access
 from mypy.expandtype import freshen_function_type_vars
 from mypy.messages import MessageBuilder
@@ -68,7 +68,6 @@ class PatchedExpressionChecker(checkexpr.ExpressionChecker):
                 on which the method is being called
         """
         arg_messages = arg_messages or self.msg
-
         if isinstance(callee, CallableType):
             if callable_name is None and callee.name:
                 callable_name = callee.name
