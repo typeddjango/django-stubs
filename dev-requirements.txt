@@ -1,3 +1,2 @@
-decorator
 -e git+https://github.com/mkurnikov/pytest-mypy-plugins.git#egg=pytest-mypy-plugins
 -e .
