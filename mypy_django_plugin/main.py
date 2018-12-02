@@ -42,9 +42,6 @@ class DjangoPlugin(Plugin):
                         helpers.ONETOONE_FIELD_FULLNAME}:
             return extract_to_parameter_as_get_ret_type_for_related_field
 
-        # if fullname == helpers.ONETOONE_FIELD_FULLNAME:
-        #     return OneToOneFieldHook(settings=self.django_settings)
-
         if fullname == 'django.contrib.postgres.fields.array.ArrayField':
             return determine_type_of_array_field
         return None

@@ -2,7 +2,7 @@ import typing
 from typing import Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import StrExpr
+from mypy.nodes import StrExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import Type, CallableType, Instance, AnyType, TypeOfAny
 
@@ -18,10 +18,11 @@ def fill_typevars_with_any(instance: Instance) -> Type:
 
 
 def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
+    api = cast(TypeChecker, ctx.api)
     if 'to' not in ctx.arg_names:
         # shouldn't happen, invalid code
-        ctx.api.msg.fail(f'to= parameter must be set for {ctx.context.callee.fullname}',
-                         context=ctx.context)
+        api.msg.fail(f'to= parameter must be set for {ctx.context.callee.fullname}',
+                     context=ctx.context)
         return None
 
     arg_type = ctx.arg_types[ctx.arg_names.index('to')][0]
@@ -30,13 +31,19 @@ def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
         if not isinstance(to_arg_expr, StrExpr):
             # not string, not supported
             return None
-        model_info = helpers.get_model_type_from_string(to_arg_expr,
-                                                        all_modules=cast(TypeChecker, ctx.api).modules)
-        if model_info is None:
+        model_fullname = helpers.get_model_fullname_from_string(to_arg_expr,
+                                                                all_modules=api.modules)
+        if model_fullname is None:
+            return None
+        model_info = helpers.lookup_fully_qualified_generic(model_fullname,
+                                                            all_modules=api.modules)
+        if model_info is None or not isinstance(model_info, TypeInfo):
             return None
         return Instance(model_info, [])
 
     referred_to_type = arg_type.ret_type
+    if not isinstance(referred_to_type, Instance):
+        return None
     for base in referred_to_type.type.bases:
         if base.type.fullname() == helpers.MODEL_CLASS_FULLNAME:
             break

@@ -36,17 +36,47 @@ ROOT_DIR = Path(__file__)
 from django.conf import settings
 class Class:
     pass
-reveal_type(settings.MYSETTING)  # E: Revealed type is 'builtins.int'
 reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
+reveal_type(settings.LIST)  # E: Revealed type is 'Any'
+reveal_type(settings.BASE_LIST)  # E: Revealed type is 'Any'
+[out]
+main:5: error: "LazySettings" has no attribute "LIST"
+main:6: error: "LazySettings" has no attribute "BASE_LIST"
+mysettings:4: error: Need type annotation for 'LIST'
+base:6: error: Need type annotation for 'BASE_LIST'
 
 [env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]
-from typing import TYPE_CHECKING
 from typing import Optional
+from base import *
+
+LIST = ['1', '2']
+
+[file base.py]
+from typing import TYPE_CHECKING, Optional
+if TYPE_CHECKING:
+    from main import Class
+
+REGISTRY: Optional['Class'] = None
+BASE_LIST = ['3', '4']
+
+[CASE test_circular_dependency_in_settings_works_if_settings_have_annotations]
+from django.conf import settings
+class Class:
+    pass
+reveal_type(settings.MYSETTING)  # E: Revealed type is 'builtins.int'
+reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
+reveal_type(settings.LIST)  # E: Revealed type is 'builtins.list[builtins.str]'
+[out]
+
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[file mysettings.py]
+from typing import TYPE_CHECKING, Optional, List
 
 if TYPE_CHECKING:
     from main import Class
 
 MYSETTING = 1122
 REGISTRY: Optional['Class'] = None
+LIST: List[str] = ['1', '2']
 

@@ -119,7 +119,7 @@ class App(models.Model):
     def method(self) -> None:
         reveal_type(self.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
 
-[case models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model]
+[CASE models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model]
 from django.db.models import Model
 from django.db import models
 
@@ -135,3 +135,61 @@ class View2(View):
 reveal_type(App().views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
 reveal_type(App().views2)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View2]'
 [out]
+
+[CASE models_imported_inside_init_file]
+from django.db import models
+from myapp.models import App
+class View(models.Model):
+    app = models.ForeignKey(to='myapp.App', related_name='views', on_delete=models.CASCADE)
+reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+
+[file myapp/__init__.py]
+[file myapp/models/__init__.py]
+from .app import App
+[file myapp/models/app.py]
+from django.db import models
+class App(models.Model):
+    pass
+
+[CASE models_imported_inside_init_file_one_to_one_field]
+from django.db import models
+from myapp.models import User
+class Profile(models.Model):
+    user = models.OneToOneField(to='myapp.User', related_name='profile', on_delete=models.CASCADE)
+reveal_type(Profile().user.profile)  # E: Revealed type is 'main.Profile'
+
+[file myapp/__init__.py]
+[file myapp/models/__init__.py]
+from .user import User
+[file myapp/models/user.py]
+from django.db import models
+class User(models.Model):
+    pass
+
+[CASE models_triple_circular_reference]
+from myapp.models import App
+reveal_type(App().owner.profile)  # E: Revealed type is 'myapp.models.profile.Profile'
+
+[file myapp/__init__.py]
+[file myapp/models/__init__.py]
+from .user import User
+from .profile import Profile
+from .app import App
+
+[file myapp/models/user.py]
+from django.db import models
+class User(models.Model):
+    pass
+
+[file myapp/models/profile.py]
+from django.db import models
+from myapp.models import User
+class Profile(models.Model):
+    user = models.OneToOneField(to='myapp.User', related_name='profile', on_delete=models.CASCADE)
+
+[file myapp/models/app.py]
+from django.db import models
+class App(models.Model):
+    owner = models.ForeignKey(to='myapp.User', on_delete=models.CASCADE, related_name='apps')
+
+

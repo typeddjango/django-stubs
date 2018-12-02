@@ -1,7 +1,7 @@
-from typing import cast, Iterator, Tuple, Optional
+from typing import cast, Iterator, Tuple, Optional, Dict
 
 from mypy.nodes import ClassDef, AssignmentStmt, CallExpr, MemberExpr, StrExpr, NameExpr, MDEF, TypeInfo, Var, SymbolTableNode, \
-    Lvalue, Expression, Statement
+    Lvalue, Expression, MypyFile
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import Instance
@@ -30,12 +30,11 @@ def iter_over_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, Expression]
 
 def iter_call_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, CallExpr]]:
     for lvalue, rvalue in iter_over_assignments(klass):
-        if not isinstance(rvalue, CallExpr):
-            continue
-        yield lvalue, rvalue
+        if isinstance(rvalue, CallExpr):
+            yield lvalue, rvalue
 
 
-def iter_over_one_to_n_related_fields(klass: ClassDef, api: SemanticAnalyzerPass2) -> Iterator[Tuple[NameExpr, CallExpr]]:
+def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExpr, CallExpr]]:
     for lvalue, rvalue in iter_call_assignments(klass):
         if (isinstance(lvalue, NameExpr)
                 and isinstance(rvalue.callee, MemberExpr)):
@@ -67,7 +66,7 @@ def is_abstract_model(ctx: ClassDefContext) -> bool:
 
 def set_fieldname_attrs_for_related_fields(ctx: ClassDefContext) -> None:
     api = ctx.api
-    for lvalue, rvalue in iter_over_one_to_n_related_fields(ctx.cls, api):
+    for lvalue, rvalue in iter_over_one_to_n_related_fields(ctx.cls):
         property_name = lvalue.name + '_id'
         add_new_var_node_to_class(ctx.cls.info, property_name,
                                   typ=api.named_type('__builtins__.int'))
@@ -112,68 +111,67 @@ def inject_any_as_base_for_nested_class_meta(ctx: ClassDefContext) -> None:
     meta_node.fallback_to_any = True
 
 
-def is_model_defn(defn: Statement, api: SemanticAnalyzerPass2) -> bool:
-    if not isinstance(defn, ClassDef):
-        return False
-
-    for base_type_expr in defn.base_type_exprs:
-        # api.accept(base_type_expr)
-        fullname = getattr(base_type_expr, 'fullname', None)
-        if fullname == helpers.MODEL_CLASS_FULLNAME:
-            return True
-    return False
-
-
-def iter_over_models(ctx: ClassDefContext) -> Iterator[ClassDef]:
-    for module_name, module_file in ctx.api.modules.items():
-        for defn in module_file.defs:
-            if is_model_defn(defn, api=cast(SemanticAnalyzerPass2, ctx.api)):
-                yield defn
-
-
-def extract_to_value_or_none(field_expr: CallExpr, ctx: ClassDefContext) -> Optional[TypeInfo]:
-    if 'to' in field_expr.arg_names:
-        ref_expr = field_expr.args[field_expr.arg_names.index('to')]
-    else:
-        # first positional argument
-        ref_expr = field_expr.args[0]
-
-    if isinstance(ref_expr, StrExpr):
-        model_typeinfo = helpers.get_model_type_from_string(ref_expr,
-                                                            all_modules=ctx.api.modules)
-        return model_typeinfo
-    elif isinstance(ref_expr, NameExpr):
-        return ref_expr.node
+def iter_over_classdefs(module_file: MypyFile) -> Iterator[ClassDef]:
+    for defn in module_file.defs:
+        if isinstance(defn, ClassDef):
+            yield defn
 
 
 def get_related_field_type(rvalue: CallExpr, api: SemanticAnalyzerPass2,
                            related_model_typ: TypeInfo) -> Optional[Instance]:
-    if rvalue.callee.fullname == helpers.FOREIGN_KEY_FULLNAME:
+    if rvalue.callee.name == 'ForeignKey':
         return api.named_type_or_none(helpers.QUERYSET_CLASS_FULLNAME,
                                       args=[Instance(related_model_typ, [])])
     else:
         return Instance(related_model_typ, [])
 
 
-def add_related_managers(ctx: ClassDefContext) -> None:
-    for model_defn in iter_over_models(ctx):
-        for _, rvalue in iter_over_one_to_n_related_fields(model_defn, ctx.api):
-            if 'related_name' not in rvalue.arg_names:
-                # positional related_name is not supported yet
-                return
-            related_name = rvalue.args[rvalue.arg_names.index('related_name')].value
-            ref_to_typ = extract_to_value_or_none(rvalue, ctx)
-            if ref_to_typ is not None:
-                if ref_to_typ.fullname() == ctx.cls.info.fullname():
-                    typ = get_related_field_type(rvalue, ctx.api,
-                                                 related_model_typ=model_defn.info)
-                    if typ is None:
-                        return
-                    add_new_var_node_to_class(ctx.cls.info, related_name, typ)
+def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:
+    if isinstance(expr.callee, MemberExpr) and isinstance(expr.callee.expr, NameExpr):
+        module = module_file.names[expr.callee.expr.name]
+        if module.fullname == 'django.db.models' and expr.callee.name in {'ForeignKey', 'OneToOneField'}:
+            return True
+    return False
+
+
+def extract_ref_to_fullname(rvalue_expr: CallExpr,
+                            module_file: MypyFile, all_modules: Dict[str, MypyFile]) -> Optional[str]:
+    if 'to' in rvalue_expr.arg_names:
+        to_expr = rvalue_expr.args[rvalue_expr.arg_names.index('to')]
+    else:
+        to_expr = rvalue_expr.args[0]
+    if isinstance(to_expr, NameExpr):
+        return module_file.names[to_expr.name].fullname
+    elif isinstance(to_expr, StrExpr):
+        typ_fullname = helpers.get_model_fullname_from_string(to_expr, all_modules)
+        if typ_fullname is None:
+            return None
+        return typ_fullname
+    return None
+
+
+def add_related_managers(ctx: ClassDefContext):
+    api = cast(SemanticAnalyzerPass2, ctx.api)
+    for module_name, module_file in ctx.api.modules.items():
+        for defn in iter_over_classdefs(module_file):
+            for lvalue, rvalue in iter_call_assignments(defn):
+                if is_related_field(rvalue, module_file):
+                    ref_to_fullname = extract_ref_to_fullname(rvalue, module_file=module_file,
+                                                              all_modules=api.modules)
+                    if ctx.cls.fullname == ref_to_fullname:
+                        if 'related_name' in rvalue.arg_names:
+                            related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]
+                            if not isinstance(related_name_expr, StrExpr):
+                                return None
+                            related_name = related_name_expr.value
+                            typ = get_related_field_type(rvalue, api, defn.info)
+                            if typ is None:
+                                return None
+                            add_new_var_node_to_class(ctx.cls.info, related_name, typ)
 
 
 def process_model_class(ctx: ClassDefContext) -> None:
-    # add_related_managers(ctx)
+    add_related_managers(ctx)
     inject_any_as_base_for_nested_class_meta(ctx)
     set_fieldname_attrs_for_related_fields(ctx)
     add_int_id_attribute_if_primary_key_true_is_not_present(ctx)
