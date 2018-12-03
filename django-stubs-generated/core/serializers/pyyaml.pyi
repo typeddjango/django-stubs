@@ -9,7 +9,6 @@ from django.core.serializers.python import Serializer as PythonSerializer
 from django.db.models.base import Model
 from django.db.models.fields import Field
 
-
 class DjangoSafeDumper(SafeDumper):
     alias_key: int
     allow_unicode: None
@@ -33,24 +32,11 @@ class DjangoSafeDumper(SafeDumper):
     last_anchor_id: int
     line: int
     mapping_context: bool
-    object_keeper: List[
-        Union[
-            List[collections.OrderedDict],
-            collections.OrderedDict,
-            datetime.datetime,
-        ]
-    ]
+    object_keeper: List[Union[List[collections.OrderedDict], collections.OrderedDict, datetime.datetime]]
     open_ended: bool
     prepared_anchor: None
     prepared_tag: None
-    represented_objects: Dict[
-        int,
-        Union[
-            yaml.nodes.MappingNode,
-            yaml.nodes.ScalarNode,
-            yaml.nodes.SequenceNode,
-        ],
-    ]
+    represented_objects: Dict[int, Union[yaml.nodes.MappingNode, yaml.nodes.ScalarNode, yaml.nodes.SequenceNode]]
     resolver_exact_paths: List[Any]
     resolver_prefix_paths: List[Any]
     root_context: bool

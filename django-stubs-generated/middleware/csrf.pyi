@@ -23,12 +23,6 @@ class CsrfViewMiddleware(MiddlewareMixin):
     get_response: Optional[Callable]
     def process_request(self, request: HttpRequest) -> None: ...
     def process_view(
-        self,
-        request: HttpRequest,
-        callback: Callable,
-        callback_args: Tuple,
-        callback_kwargs: Dict[str, Any],
+        self, request: HttpRequest, callback: Callable, callback_args: Tuple, callback_kwargs: Dict[str, Any]
     ) -> Optional[HttpResponseForbidden]: ...
-    def process_response(
-        self, request: HttpRequest, response: HttpResponseBase
-    ) -> HttpResponseBase: ...
+    def process_response(self, request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...

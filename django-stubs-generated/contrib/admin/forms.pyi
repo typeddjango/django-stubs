@@ -3,7 +3,6 @@ from typing import Any, Optional
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 
-
 class AdminAuthenticationForm(AuthenticationForm):
     auto_id: str
     data: Dict[str, str]

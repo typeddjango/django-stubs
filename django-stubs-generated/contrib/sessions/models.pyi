@@ -1,9 +1,7 @@
 from typing import Any, Optional, Type
 
 from django.contrib.sessions.backends.db import SessionStore
-from django.contrib.sessions.base_session import (AbstractBaseSession,
-                                                  BaseSessionManager)
-
+from django.contrib.sessions.base_session import AbstractBaseSession, BaseSessionManager
 
 class SessionManager(BaseSessionManager):
     creation_counter: int

@@ -1,7 +1,6 @@
 from decimal import Decimal
 from typing import Any, Optional, Tuple, Union
 
-
 def format(
     number: Union[Decimal, float, str],
     decimal_sep: str,

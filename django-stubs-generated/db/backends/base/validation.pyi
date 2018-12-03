@@ -3,7 +3,6 @@ from typing import Any, List, Optional
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.fields import Field
 
-
 class BaseDatabaseValidation:
     connection: django.db.backends.sqlite3.base.DatabaseWrapper = ...
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...

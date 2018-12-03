@@ -2,7 +2,6 @@ from typing import Any
 
 from django.db import models
 
-
 class RangeField(models.Field):
     empty_strings_allowed: bool = ...
     base_field: Any = ...

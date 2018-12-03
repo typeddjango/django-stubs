@@ -1,8 +1,7 @@
 from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
-from typing import (Any, Callable, Dict, Iterator, List, Optional, Tuple, Type,
-                    Union)
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
 from unittest.mock import MagicMock
 from uuid import UUID
 
@@ -47,38 +46,19 @@ class ModelFormOptions:
     model: Optional[Type[django.db.models.base.Model]] = ...
     fields: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
     exclude: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
-    widgets: Optional[
-        Union[
-            Dict[str, Type[django.forms.widgets.Input]],
-            Dict[str, django.forms.widgets.Widget],
-        ]
-    ] = ...
+    widgets: Optional[Union[Dict[str, Type[django.forms.widgets.Input]], Dict[str, django.forms.widgets.Widget]]] = ...
     localized_fields: Optional[Union[Tuple[str], str]] = ...
     labels: Optional[Dict[str, str]] = ...
     help_texts: Optional[Dict[str, str]] = ...
     error_messages: Optional[Dict[str, Dict[str, str]]] = ...
-    field_classes: Optional[
-        Dict[str, Type[django.forms.fields.CharField]]
-    ] = ...
+    field_classes: Optional[Dict[str, Type[django.forms.fields.CharField]]] = ...
     def __init__(
-        self,
-        options: Optional[
-            Type[
-                Union[
-                    UserChangeForm.Meta,
-                    UserCreationForm.Meta,
-                    FlatpageForm.Meta,
-                ]
-            ]
-        ] = ...,
+        self, options: Optional[Type[Union[UserChangeForm.Meta, UserCreationForm.Meta, FlatpageForm.Meta]]] = ...
     ) -> None: ...
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass):
     def __new__(
-        mcs: Type[ModelFormMetaclass],
-        name: str,
-        bases: Tuple[Type[ModelForm]],
-        attrs: OrderedDict,
+        mcs: Type[ModelFormMetaclass], name: str, bases: Tuple[Type[ModelForm]], attrs: OrderedDict
     ) -> Type[ModelForm]: ...
 
 class BaseModelForm(BaseForm):
@@ -93,9 +73,7 @@ class BaseModelForm(BaseForm):
                 QueryDict,
             ]
         ] = ...,
-        files: Optional[
-            Union[Dict[str, SimpleUploadedFile], MultiValueDict]
-        ] = ...,
+        files: Optional[Union[Dict[str, SimpleUploadedFile], MultiValueDict]] = ...,
         auto_id: Union[bool, str] = ...,
         prefix: None = ...,
         initial: Optional[Union[Dict[str, List[int]], Dict[str, int]]] = ...,
@@ -245,19 +223,10 @@ class InlineForeignKeyField(Field):
     pk_field: bool = ...
     to_field: Optional[str] = ...
     def __init__(
-        self,
-        parent_instance: Model,
-        *args: Any,
-        pk_field: bool = ...,
-        to_field: Optional[Any] = ...,
-        **kwargs: Any
+        self, parent_instance: Model, *args: Any, pk_field: bool = ..., to_field: Optional[Any] = ..., **kwargs: Any
     ) -> None: ...
     def clean(self, value: Optional[Union[int, str]]) -> Optional[Model]: ...
-    def has_changed(
-        self,
-        initial: Optional[Union[int, str]],
-        data: Optional[Union[int, str]],
-    ) -> bool: ...
+    def has_changed(self, initial: Optional[Union[int, str]], data: Optional[Union[int, str]]) -> bool: ...
 
 class ModelChoiceIterator:
     field: django.forms.models.ModelChoiceField = ...
@@ -300,28 +269,16 @@ class ModelChoiceField(ChoiceField):
         limit_choices_to: Optional[Any] = ...,
         **kwargs: Any
     ) -> None: ...
-    def get_limit_choices_to(
-        self
-    ) -> Optional[Union[Dict[str, datetime], Q, MagicMock]]: ...
+    def get_limit_choices_to(self) -> Optional[Union[Dict[str, datetime], Q, MagicMock]]: ...
     def __deepcopy__(
-        self,
-        memo: Dict[
-            int, Union[List[Union[Field, Widget]], OrderedDict, Field, Widget]
-        ],
+        self, memo: Dict[int, Union[List[Union[Field, Widget]], OrderedDict, Field, Widget]]
     ) -> ModelChoiceField: ...
     def label_from_instance(self, obj: Model) -> str: ...
     choices: Any = ...
     def prepare_value(self, value: Any) -> Any: ...
-    def to_python(
-        self,
-        value: Optional[Union[List[Dict[str, str]], List[List[str]], int, str]],
-    ) -> Optional[Model]: ...
+    def to_python(self, value: Optional[Union[List[Dict[str, str]], List[List[str]], int, str]]) -> Optional[Model]: ...
     def validate(self, value: Optional[Model]) -> None: ...
-    def has_changed(
-        self,
-        initial: Optional[Union[Model, int, str, UUID]],
-        data: Optional[Union[int, str]],
-    ) -> bool: ...
+    def has_changed(self, initial: Optional[Union[Model, int, str, UUID]], data: Optional[Union[int, str]]) -> bool: ...
 
 class ModelMultipleChoiceField(ModelChoiceField):
     disabled: bool
@@ -337,22 +294,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
     hidden_widget: Any = ...
     default_error_messages: Any = ...
     def __init__(self, queryset: QuerySet, **kwargs: Any) -> None: ...
-    def to_python(
-        self, value: Union[List[str], Tuple[int, ...]]
-    ) -> List[Model]: ...
-    def clean(
-        self,
-        value: Optional[
-            Union[
-                List[Dict[str, str]], List[List[str]], List[Model], Tuple, str
-            ]
-        ],
-    ) -> QuerySet: ...
-    def prepare_value(
-        self, value: Any
-    ) -> Optional[Union[List[Dict[str, str]], List[List[str]], int, str]]: ...
+    def to_python(self, value: Union[List[str], Tuple[int, ...]]) -> List[Model]: ...
+    def clean(self, value: Optional[Union[List[Dict[str, str]], List[List[str]], List[Model], Tuple, str]]) -> QuerySet: ...
+    def prepare_value(self, value: Any) -> Optional[Union[List[Dict[str, str]], List[List[str]], int, str]]: ...
     def has_changed(
-        self,
-        initial: Optional[Union[List[Model], QuerySet, str]],
-        data: Optional[Union[List[int], List[str], str]],
+        self, initial: Optional[Union[List[Model], QuerySet, str]], data: Optional[Union[List[int], List[str], str]]
     ) -> bool: ...

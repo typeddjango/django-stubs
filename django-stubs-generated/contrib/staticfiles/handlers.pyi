@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 
-
 class StaticFilesHandler(WSGIHandler):
     handles_files: bool = ...
     application: django.core.handlers.wsgi.WSGIHandler = ...

@@ -3,17 +3,12 @@ from uuid import UUID
 
 from django.urls.resolvers import ResolverMatch
 
-
 def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
 def reverse(
     viewname: Optional[Union[Callable, str]],
     urlconf: Optional[str] = ...,
     args: Optional[Union[List[UUID], Tuple]] = ...,
-    kwargs: Optional[
-        Union[
-            Dict[str, None], Dict[str, bytes], Dict[str, str], Dict[str, UUID]
-        ]
-    ] = ...,
+    kwargs: Optional[Union[Dict[str, None], Dict[str, bytes], Dict[str, str], Dict[str, UUID]]] = ...,
     current_app: Optional[str] = ...,
 ) -> str: ...
 

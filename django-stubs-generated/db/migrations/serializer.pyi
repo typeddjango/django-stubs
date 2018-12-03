@@ -1,6 +1,5 @@
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
-
 class BaseSerializer:
     value: Any = ...
     def __init__(self, value: Any) -> None: ...

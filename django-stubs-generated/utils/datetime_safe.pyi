@@ -3,7 +3,6 @@ from datetime import datetime as real_datetime
 from datetime import time as real_time
 from typing import Any, Optional, Union
 
-
 class date(real_date):
     def strftime(self, fmt: str) -> str: ...
 

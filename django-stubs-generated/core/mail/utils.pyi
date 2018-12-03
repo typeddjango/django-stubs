@@ -1,6 +1,5 @@
 from typing import Any, Optional
 
-
 class CachedDnsName:
     def get_fqdn(self) -> str: ...
 

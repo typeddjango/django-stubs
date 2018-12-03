@@ -3,7 +3,6 @@ from typing import Any, Optional
 from django.contrib.postgres import lookups
 from django.db import models
 
-
 class RangeField(models.Field):
     empty_strings_allowed: bool = ...
     base_field: Any = ...

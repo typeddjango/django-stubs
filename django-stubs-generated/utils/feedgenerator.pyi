@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from django.http.response import HttpResponse
 from django.utils.xmlutils import SimplerXMLGenerator
 
-
 def rfc2822_date(date: date) -> str: ...
 def rfc3339_date(date: date) -> str: ...
 def get_tag_uri(url: str, date: Optional[date]) -> str: ...
@@ -62,15 +61,11 @@ class Enclosure:
     length: Union[int, str]
     mime_type: str
     url: str = ...
-    def __init__(
-        self, url: str, length: Union[int, str], mime_type: str
-    ) -> None: ...
+    def __init__(self, url: str, length: Union[int, str], mime_type: str) -> None: ...
 
 class RssFeed(SyndicationFeed):
     content_type: str = ...
-    def write(
-        self, outfile: Union[StringIO, HttpResponse], encoding: str
-    ) -> None: ...
+    def write(self, outfile: Union[StringIO, HttpResponse], encoding: str) -> None: ...
     def rss_attributes(self) -> Dict[str, str]: ...
     def write_items(self, handler: SimplerXMLGenerator) -> None: ...
     def add_root_elements(self, handler: SimplerXMLGenerator) -> None: ...
@@ -78,72 +73,33 @@ class RssFeed(SyndicationFeed):
 
 class RssUserland091Feed(RssFeed):
     feed: Dict[str, Optional[Union[List[str], str]]]
-    items: List[
-        Dict[str, Optional[Union[List[str], Tuple, datetime.datetime, str]]]
-    ]
+    items: List[Dict[str, Optional[Union[List[str], Tuple, datetime.datetime, str]]]]
     def add_item_elements(
-        self,
-        handler: SimplerXMLGenerator,
-        item: Dict[str, Optional[Union[List[str], Tuple, datetime, str]]],
+        self, handler: SimplerXMLGenerator, item: Dict[str, Optional[Union[List[str], Tuple, datetime, str]]]
     ) -> None: ...
 
 class Rss201rev2Feed(RssFeed):
     feed: Dict[str, Optional[Union[List[str], Tuple, str]]]
     items: Union[
         List[Dict[str, Any]],
-        List[
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        List[django.utils.feedgenerator.Enclosure],
-                        List[str],
-                        datetime.datetime,
-                        str,
-                    ]
-                ],
-            ]
-        ],
+        List[Dict[str, Optional[Union[List[django.utils.feedgenerator.Enclosure], List[str], datetime.datetime, str]]]],
     ]
-    def add_item_elements(
-        self, handler: SimplerXMLGenerator, item: Dict[str, Any]
-    ) -> None: ...
+    def add_item_elements(self, handler: SimplerXMLGenerator, item: Dict[str, Any]) -> None: ...
 
 class Atom1Feed(SyndicationFeed):
     feed: Dict[str, Optional[Union[List[str], Tuple, str]]]
     items: Union[
-        List[
-            Dict[
-                str,
-                Optional[
-                    Union[
-                        List[django.utils.feedgenerator.Enclosure],
-                        List[str],
-                        datetime.datetime,
-                        str,
-                    ]
-                ],
-            ]
-        ],
-        List[
-            Dict[str, Optional[Union[List[str], Tuple, datetime.datetime, str]]]
-        ],
+        List[Dict[str, Optional[Union[List[django.utils.feedgenerator.Enclosure], List[str], datetime.datetime, str]]]],
+        List[Dict[str, Optional[Union[List[str], Tuple, datetime.datetime, str]]]],
     ]
     content_type: str = ...
     ns: str = ...
-    def write(
-        self, outfile: Union[StringIO, HttpResponse], encoding: str
-    ) -> None: ...
+    def write(self, outfile: Union[StringIO, HttpResponse], encoding: str) -> None: ...
     def root_attributes(self) -> Dict[str, str]: ...
     def add_root_elements(self, handler: SimplerXMLGenerator) -> None: ...
     def write_items(self, handler: SimplerXMLGenerator) -> None: ...
     def add_item_elements(
-        self,
-        handler: SimplerXMLGenerator,
-        item: Dict[
-            str,
-            Optional[Union[List[Enclosure], List[str], Tuple, datetime, str]],
-        ],
+        self, handler: SimplerXMLGenerator, item: Dict[str, Optional[Union[List[Enclosure], List[str], Tuple, datetime, str]]]
     ) -> None: ...
 
 DefaultFeed = Rss201rev2Feed

@@ -1,7 +1,3 @@
-from .config import (
-    AppConfig as AppConfig
-)
+from .config import AppConfig as AppConfig
 
-from .registry import (
-    apps as apps
-)
+from .registry import apps as apps

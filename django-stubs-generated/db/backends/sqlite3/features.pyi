@@ -2,7 +2,6 @@ from typing import Optional
 
 from django.db.backends.base.features import BaseDatabaseFeatures
 
-
 class DatabaseFeatures(BaseDatabaseFeatures):
     connection: django.db.backends.sqlite3.base.DatabaseWrapper
     can_use_chunked_reads: bool = ...

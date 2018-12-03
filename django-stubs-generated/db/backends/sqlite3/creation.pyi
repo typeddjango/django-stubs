@@ -2,7 +2,6 @@ from typing import Any, Optional, Tuple
 
 from django.db.backends.base.creation import BaseDatabaseCreation
 
-
 class DatabaseCreation(BaseDatabaseCreation):
     connection: django.db.backends.sqlite3.base.DatabaseWrapper
     @staticmethod

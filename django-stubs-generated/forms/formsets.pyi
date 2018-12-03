@@ -5,7 +5,6 @@ from django.forms import Form
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 
-
 class ManagementForm(Form):
     auto_id: Union[bool, str]
     cleaned_data: Dict[str, Optional[int]]

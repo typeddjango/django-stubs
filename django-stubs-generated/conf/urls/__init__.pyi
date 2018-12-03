@@ -21,12 +21,7 @@ def url(
         ]
     ],
     kwargs: Optional[
-        Union[
-            Dict[str, Dict[str, Type[FlatPageSitemap]]],
-            Dict[str, Dict[str, Sitemap]],
-            Dict[str, OrderedDict],
-            Dict[str, str],
-        ]
+        Union[Dict[str, Dict[str, Type[FlatPageSitemap]]], Dict[str, Dict[str, Sitemap]], Dict[str, OrderedDict], Dict[str, str]]
     ] = ...,
     name: Optional[str] = ...,
 ) -> Union[URLPattern, URLResolver]: ...

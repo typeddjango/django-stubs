@@ -9,7 +9,6 @@ from django.views.generic.base import TemplateView
 
 from .base import BaseEngine
 
-
 class Jinja2(BaseEngine):
     app_dirs: bool
     dirs: List[str]
@@ -19,12 +18,7 @@ class Jinja2(BaseEngine):
     app_dirname: str = ...
     context_processors: List[str] = ...
     env: jinja2.environment.Environment = ...
-    def __init__(
-        self,
-        params: Dict[
-            str, Union[Dict[str, Union[List[str], bool]], List[str], bool, str]
-        ],
-    ) -> None: ...
+    def __init__(self, params: Dict[str, Union[Dict[str, Union[List[str], bool]], List[str], bool, str]]) -> None: ...
     def from_string(self, template_code: str) -> Template: ...
     def get_template(self, template_name: str) -> Template: ...
     def template_context_processors(self) -> List[Callable]: ...
@@ -38,28 +32,12 @@ class Template:
         self,
         context: Optional[
             Union[
-                Dict[
-                    str, Dict[str, Optional[Union[Dict[str, bool], bool, str]]]
-                ],
+                Dict[str, Dict[str, Optional[Union[Dict[str, bool], bool, str]]]],
                 Dict[
                     str,
                     Dict[
                         str,
-                        Optional[
-                            Union[
-                                Dict[str, str],
-                                List[
-                                    Dict[
-                                        str,
-                                        Optional[
-                                            Union[Dict[str, str], bool, str]
-                                        ],
-                                    ]
-                                ],
-                                bool,
-                                str,
-                            ]
-                        ],
+                        Optional[Union[Dict[str, str], List[Dict[str, Optional[Union[Dict[str, str], bool, str]]]], bool, str]],
                     ],
                 ],
                 Dict[
@@ -68,18 +46,7 @@ class Template:
                         str,
                         Union[
                             Dict[str, int],
-                            List[
-                                Tuple[
-                                    Optional[str],
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[Dict[str, bool], bool, str],
-                                        ]
-                                    ],
-                                    int,
-                                ]
-                            ],
+                            List[Tuple[Optional[str], List[Dict[str, Union[Dict[str, bool], bool, str]]], int]],
                             List[str],
                             bool,
                             str,
@@ -97,22 +64,7 @@ class Template:
                                     str,
                                     Union[
                                         Dict[str, str],
-                                        List[
-                                            Tuple[
-                                                None,
-                                                List[
-                                                    Dict[
-                                                        str,
-                                                        Union[
-                                                            Dict[str, bool],
-                                                            bool,
-                                                            str,
-                                                        ],
-                                                    ]
-                                                ],
-                                                int,
-                                            ]
-                                        ],
+                                        List[Tuple[None, List[Dict[str, Union[Dict[str, bool], bool, str]]], int]],
                                         List[str],
                                         bool,
                                         str,
@@ -131,23 +83,7 @@ class Template:
                         str,
                         Union[
                             Dict[str, str],
-                            List[
-                                Tuple[
-                                    Optional[str],
-                                    List[
-                                        Dict[
-                                            str,
-                                            Union[
-                                                Dict[str, Union[bool, str]],
-                                                time,
-                                                int,
-                                                str,
-                                            ],
-                                        ]
-                                    ],
-                                    int,
-                                ]
-                            ],
+                            List[Tuple[Optional[str], List[Dict[str, Union[Dict[str, Union[bool, str]], time, int, str]]], int]],
                             List[str],
                             bool,
                             str,
@@ -166,6 +102,4 @@ class Origin:
     template_name: Optional[str] = ...
     def __init__(self, name: str, template_name: Optional[str]) -> None: ...
 
-def get_exception_info(
-    exception: TemplateSyntaxError
-) -> Dict[str, Union[List[Tuple[int, str]], int, str]]: ...
+def get_exception_info(exception: TemplateSyntaxError) -> Dict[str, Union[List[Tuple[int, str]], int, str]]: ...

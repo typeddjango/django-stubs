@@ -7,11 +7,8 @@ from uuid import UUID
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.db.models.base import Model
 
-
 class Serializer(PythonSerializer):
-    json_kwargs: Dict[
-        str, Optional[Type[django.core.serializers.json.DjangoJSONEncoder]]
-    ]
+    json_kwargs: Dict[str, Optional[Type[django.core.serializers.json.DjangoJSONEncoder]]]
     options: Dict[str, None]
     selected_fields: None
     stream: _io.StringIO

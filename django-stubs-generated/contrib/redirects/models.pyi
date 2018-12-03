@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.db import models
 
-
 class Redirect(models.Model):
     id: None
     site_id: int

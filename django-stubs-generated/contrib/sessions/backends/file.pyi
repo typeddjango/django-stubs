@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional, Union
 
 from django.contrib.sessions.backends.base import SessionBase
 
-
 class SessionStore(SessionBase):
     accessed: bool
     serializer: Type[django.core.signing.JSONSerializer]

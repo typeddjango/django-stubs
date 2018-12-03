@@ -2,9 +2,7 @@ from typing import Any, Optional
 
 from django.apps import AppConfig
 
-from .management import (create_contenttypes,
-                         inject_rename_contenttypes_operations)
-
+from .management import create_contenttypes, inject_rename_contenttypes_operations
 
 class ContentTypesConfig(AppConfig):
     apps: None

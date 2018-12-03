@@ -1,6 +1,5 @@
 from typing import Optional
 
-
 def supports_color() -> bool: ...
 
 class Style: ...

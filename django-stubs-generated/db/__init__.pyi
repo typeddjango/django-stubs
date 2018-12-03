@@ -3,8 +3,7 @@ from unittest.mock import MagicMock
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
-from django.db.utils import \
-    DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
+from django.db.utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
 from django.db.utils import DatabaseError as DatabaseError
 from django.db.utils import DataError as DataError
 from django.db.utils import Error as Error

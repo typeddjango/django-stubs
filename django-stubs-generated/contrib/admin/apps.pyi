@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.apps import AppConfig
 
-
 class SimpleAdminConfig(AppConfig):
     apps: None
     label: str

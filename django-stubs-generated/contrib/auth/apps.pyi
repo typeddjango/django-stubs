@@ -6,7 +6,6 @@ from .checks import check_models_permissions, check_user_model
 from .management import create_permissions
 from .signals import user_logged_in
 
-
 class AuthConfig(AppConfig):
     apps: None
     label: str

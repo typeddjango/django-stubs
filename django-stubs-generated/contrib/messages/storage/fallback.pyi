@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.contrib.messages.storage.base import BaseStorage
 
-
 class FallbackStorage(BaseStorage):
     added_new: bool
     request: django.core.handlers.wsgi.WSGIRequest

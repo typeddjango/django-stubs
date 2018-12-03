@@ -4,7 +4,6 @@ from typing import Any, Dict, Iterator, Optional, Union
 
 from django.core.files.base import File
 
-
 class UploadedFile(File):
     file: None
     size: Any = ...
@@ -26,12 +25,7 @@ class TemporaryUploadedFile(UploadedFile):
     file: tempfile._TemporaryFileWrapper
     mode: str
     def __init__(
-        self,
-        name: str,
-        content_type: str,
-        size: int,
-        charset: Optional[str],
-        content_type_extra: Optional[Dict[Any, Any]] = ...,
+        self, name: str, content_type: str, size: int, charset: Optional[str], content_type_extra: Optional[Dict[Any, Any]] = ...
     ) -> None: ...
     def temporary_file_path(self) -> str: ...
     def close(self) -> None: ...
@@ -55,11 +49,6 @@ class InMemoryUploadedFile(UploadedFile):
 
 class SimpleUploadedFile(InMemoryUploadedFile):
     file: _io.BytesIO
-    def __init__(
-        self,
-        name: str,
-        content: Optional[Union[bytes, str]],
-        content_type: str = ...,
-    ) -> None: ...
+    def __init__(self, name: str, content: Optional[Union[bytes, str]], content_type: str = ...) -> None: ...
     @classmethod
     def from_dict(cls, file_dict: Any): ...

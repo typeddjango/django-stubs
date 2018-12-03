@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.db import models
 
-
 class FlatPage(models.Model):
     id: None
     url: str = ...

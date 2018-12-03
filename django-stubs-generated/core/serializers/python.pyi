@@ -7,7 +7,6 @@ from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 
-
 class Serializer(base.Serializer):
     options: Dict[Any, Any]
     selected_fields: None

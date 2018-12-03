@@ -4,7 +4,6 @@ from django.apps import AppConfig
 
 from .management import create_default_site
 
-
 class SitesConfig(AppConfig):
     apps: None
     label: str

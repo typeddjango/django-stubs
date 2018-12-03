@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional, Union
 from django import forms
 from django.db.models.query import QuerySet
 
-
 class FlatpageForm(forms.ModelForm):
     auto_id: str
     data: Dict[str, Union[List[int], str]]

@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.forms.models import BaseModelFormSet
 
-
 class BaseGenericInlineFormSet(BaseModelFormSet):
     instance: Any = ...
     rel_name: Any = ...

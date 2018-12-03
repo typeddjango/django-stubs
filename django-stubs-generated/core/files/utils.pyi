@@ -1,6 +1,5 @@
 from typing import Any, Optional
 
-
 class FileProxyMixin:
     encoding: Any = ...
     fileno: Any = ...

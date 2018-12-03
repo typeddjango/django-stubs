@@ -4,7 +4,6 @@ from django.core.checks.messages import Error
 from django.db import models
 from django.db.models.query import QuerySet
 
-
 class CurrentSiteManager(models.Manager):
     creation_counter: int
     model: None

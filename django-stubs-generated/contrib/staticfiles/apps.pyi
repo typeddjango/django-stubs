@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.apps import AppConfig
 
-
 class StaticFilesConfig(AppConfig):
     apps: None
     label: str

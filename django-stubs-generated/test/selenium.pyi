@@ -2,7 +2,6 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.test import LiveServerTestCase
 
-
 class SeleniumTestCaseBase:
     browsers: Any = ...
     browser: Any = ...

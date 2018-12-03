@@ -3,7 +3,6 @@ from typing import Any, List, Optional, Tuple, Union
 
 from django.core.checks.messages import CheckMessage
 
-
 def is_iterable(
     x: Optional[
         Union[

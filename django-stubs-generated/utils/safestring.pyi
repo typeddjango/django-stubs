@@ -2,7 +2,6 @@ from typing import Any, Callable, Optional, Union
 
 from django.forms.boundfield import BoundField
 
-
 class SafeData:
     def __html__(self) -> SafeText: ...
 
@@ -14,6 +13,4 @@ class SafeText(str, SafeData):
 
 SafeString = SafeText
 
-def mark_safe(
-    s: Union[Callable, BoundField, str]
-) -> Union[Callable, BoundField, str]: ...
+def mark_safe(s: Union[Callable, BoundField, str]) -> Union[Callable, BoundField, str]: ...

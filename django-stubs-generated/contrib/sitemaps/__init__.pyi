@@ -21,10 +21,7 @@ class Sitemap:
     @property
     def paginator(self) -> Paginator: ...
     def get_urls(
-        self,
-        page: Union[int, str] = ...,
-        site: Optional[Union[Site, RequestSite]] = ...,
-        protocol: Optional[str] = ...,
+        self, page: Union[int, str] = ..., site: Optional[Union[Site, RequestSite]] = ..., protocol: Optional[str] = ...
     ) -> List[Dict[str, Optional[Union[datetime, Model, str]]]]: ...
 
 class GenericSitemap(Sitemap):

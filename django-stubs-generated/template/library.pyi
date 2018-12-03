@@ -7,7 +7,6 @@ from django.utils.safestring import SafeText
 from .base import Node, Template
 from .exceptions import TemplateSyntaxError as TemplateSyntaxError
 
-
 class InvalidTemplateLibrary(Exception): ...
 
 class Library:
@@ -15,30 +14,18 @@ class Library:
     tags: Dict[str, Callable] = ...
     def __init__(self) -> None: ...
     def tag(
-        self,
-        name: Optional[Union[Callable, str]] = ...,
-        compile_function: Optional[Union[Callable, str]] = ...,
+        self, name: Optional[Union[Callable, str]] = ..., compile_function: Optional[Union[Callable, str]] = ...
     ) -> Callable: ...
     def tag_function(self, func: Callable) -> Callable: ...
     def filter(
-        self,
-        name: Optional[Union[Callable, str]] = ...,
-        filter_func: Optional[Union[Callable, str]] = ...,
-        **flags: Any
+        self, name: Optional[Union[Callable, str]] = ..., filter_func: Optional[Union[Callable, str]] = ..., **flags: Any
     ) -> Callable: ...
     def filter_function(self, func: Callable, **flags: Any) -> Callable: ...
     def simple_tag(
-        self,
-        func: Optional[Union[Callable, str]] = ...,
-        takes_context: Optional[bool] = ...,
-        name: Optional[str] = ...,
+        self, func: Optional[Union[Callable, str]] = ..., takes_context: Optional[bool] = ..., name: Optional[str] = ...
     ) -> Callable: ...
     def inclusion_tag(
-        self,
-        filename: Union[Template, str],
-        func: None = ...,
-        takes_context: Optional[bool] = ...,
-        name: Optional[str] = ...,
+        self, filename: Union[Template, str], func: None = ..., takes_context: Optional[bool] = ..., name: Optional[str] = ...
     ) -> Callable: ...
 
 class TagHelperNode(Node):
@@ -47,15 +34,9 @@ class TagHelperNode(Node):
     args: Any = ...
     kwargs: Any = ...
     def __init__(
-        self,
-        func: Callable,
-        takes_context: Optional[bool],
-        args: List[FilterExpression],
-        kwargs: Dict[str, FilterExpression],
+        self, func: Callable, takes_context: Optional[bool], args: List[FilterExpression], kwargs: Dict[str, FilterExpression]
     ) -> None: ...
-    def get_resolved_arguments(
-        self, context: Context
-    ) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
+    def get_resolved_arguments(self, context: Context) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
 
 class SimpleNode(TagHelperNode):
     args: List[FilterExpression]

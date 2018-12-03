@@ -1,12 +1,8 @@
 # noinspection PyUnresolvedReferences
-from django.core.exceptions import (
-    ObjectDoesNotExist as ObjectDoesNotExist
-)
+from django.core.exceptions import ObjectDoesNotExist as ObjectDoesNotExist
 
 # noinspection PyUnresolvedReferences
-from django.db.models import (
-    signals as signals
-)
+from django.db.models import signals as signals
 
 # noinspection PyUnresolvedReferences
 from django.db.models.aggregates import *  # NOQA
@@ -48,10 +44,7 @@ from django.db.models.expressions import (
 from django.db.models.fields import *  # NOQA
 
 # noinspection PyUnresolvedReferences
-from django.db.models.fields.files import (
-    FileField as FileField,
-    ImageField as ImageField
-)
+from django.db.models.fields.files import FileField as FileField, ImageField as ImageField
 
 # noinspection PyUnresolvedReferences
 from django.db.models.fields.proxy import OrderWrt
@@ -59,10 +52,7 @@ from django.db.models.fields.proxy import OrderWrt
 # noinspection PyUnresolvedReferences
 from django.db.models.indexes import *  # NOQA
 
-from django.db.models.lookups import (
-    Lookup as Lookup,
-    Transform as Transform
-)
+from django.db.models.lookups import Lookup as Lookup, Transform as Transform
 
 # noinspection PyUnresolvedReferences
 from django.db.models.manager import Manager as Manager
@@ -90,6 +80,5 @@ from django.db.models.fields.related import (  # isort:skip
     ManyToManyField as ManyToManyField,
     ManyToOneRel as ManyToOneRel,
     ManyToManyRel as ManyToManyRel,
-    OneToOneRel as OneToOneRel
+    OneToOneRel as OneToOneRel,
 )
-

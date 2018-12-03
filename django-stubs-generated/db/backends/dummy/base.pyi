@@ -6,7 +6,6 @@ from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.operations import BaseDatabaseOperations
 
-
 def complain(*args: Any, **kwargs: Any) -> Any: ...
 def ignore(*args: Any, **kwargs: Any) -> None: ...
 

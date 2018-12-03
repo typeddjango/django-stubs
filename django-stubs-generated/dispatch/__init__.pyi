@@ -1,1 +1,1 @@
-from django.dispatch.dispatcher import (Signal as Signal, receiver as receiver)  # NOQA
+from django.dispatch.dispatcher import Signal as Signal, receiver as receiver  # NOQA

@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Union
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
-
 class UnorderedObjectListWarning(RuntimeWarning): ...
 class InvalidPage(Exception): ...
 class PageNotAnInteger(InvalidPage): ...
@@ -17,9 +16,7 @@ class Paginator:
     allow_empty_first_page: bool = ...
     def __init__(
         self,
-        object_list: Union[
-            List[Dict[str, str]], List[Model], List[int], QuerySet, str
-        ],
+        object_list: Union[List[Dict[str, str]], List[Model], List[int], QuerySet, str],
         per_page: Union[int, str],
         orphans: int = ...,
         allow_empty_first_page: bool = ...,
@@ -39,12 +36,7 @@ class Page(collections.abc.Sequence):
     number: int = ...
     paginator: django.core.paginator.Paginator = ...
     def __init__(
-        self,
-        object_list: Union[
-            List[Dict[str, str]], List[Model], List[int], QuerySet, str
-        ],
-        number: int,
-        paginator: Paginator,
+        self, object_list: Union[List[Dict[str, str]], List[Model], List[int], QuerySet, str], number: int, paginator: Paginator
     ) -> None: ...
     def __len__(self) -> int: ...
     def __getitem__(self, index: Union[int, str]) -> Union[Model, str]: ...

@@ -3,7 +3,6 @@ from typing import Any, Callable, Optional, Type
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 
-
 class RemovedInDjango30Warning(PendingDeprecationWarning): ...
 class RemovedInNextVersionWarning(DeprecationWarning): ...
 
@@ -13,11 +12,7 @@ class warn_about_renamed_method:
     new_method_name: str = ...
     deprecation_warning: Type[DeprecationWarning] = ...
     def __init__(
-        self,
-        class_name: str,
-        old_method_name: str,
-        new_method_name: str,
-        deprecation_warning: Type[DeprecationWarning],
+        self, class_name: str, old_method_name: str, new_method_name: str, deprecation_warning: Type[DeprecationWarning]
     ) -> None: ...
     def __call__(self, f: Callable) -> Callable: ...
 
@@ -27,9 +22,7 @@ class RenameMethodsBase(type):
 
 class DeprecationInstanceCheck(type):
     alternative: str
-    deprecation_warning: Type[
-        django.utils.deprecation.RemovedInNextVersionWarning
-    ]
+    deprecation_warning: Type[django.utils.deprecation.RemovedInNextVersionWarning]
     def __instancecheck__(self, instance: Any): ...
 
 class MiddlewareMixin:

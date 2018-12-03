@@ -9,7 +9,6 @@ from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 
-
 class TimezoneMixin:
     tzinfo: Any = ...
     def get_tzname(self) -> Optional[str]: ...
@@ -24,15 +23,9 @@ class Extract(TimezoneMixin, Transform):
     output_field: Any = ...
     tzinfo: None = ...
     def __init__(
-        self,
-        expression: Union[Expression, str],
-        lookup_name: Optional[str] = ...,
-        tzinfo: None = ...,
-        **extra: Any
+        self, expression: Union[Expression, str], lookup_name: Optional[str] = ..., tzinfo: None = ..., **extra: Any
     ) -> None: ...
-    def as_sql(
-        self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[str, List[Any]]: ...
+    def as_sql(self, compiler: SQLCompiler, connection: DatabaseWrapper) -> Tuple[str, List[Any]]: ...
     def resolve_expression(
         self,
         query: Query = ...,
@@ -137,15 +130,9 @@ class TruncBase(TimezoneMixin, Transform):
     kind: Any = ...
     tzinfo: Any = ...
     def __init__(
-        self,
-        expression: Union[Col, str],
-        output_field: Optional[Field] = ...,
-        tzinfo: None = ...,
-        **extra: Any
+        self, expression: Union[Col, str], output_field: Optional[Field] = ..., tzinfo: None = ..., **extra: Any
     ) -> None: ...
-    def as_sql(
-        self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[str, List[Any]]: ...
+    def as_sql(self, compiler: SQLCompiler, connection: DatabaseWrapper) -> Tuple[str, List[Any]]: ...
     def resolve_expression(
         self,
         query: Query = ...,
@@ -154,31 +141,18 @@ class TruncBase(TimezoneMixin, Transform):
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> TruncBase: ...
-    def convert_value(
-        self,
-        value: datetime,
-        expression: models.functions.TruncBase,
-        connection: DatabaseWrapper,
-    ) -> datetime: ...
+    def convert_value(self, value: datetime, expression: models.functions.TruncBase, connection: DatabaseWrapper) -> datetime: ...
 
 class Trunc(TruncBase):
     contains_aggregate: bool
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: Union[
-        models.fields.DateTimeCheckMixin,
-        models.fields.IntegerField,
-    ]
+    output_field: Union[models.fields.DateTimeCheckMixin, models.fields.IntegerField]
     source_expressions: List[Combinable]
     tzinfo: None
     kind: str = ...
     def __init__(
-        self,
-        expression: str,
-        kind: str,
-        output_field: Optional[Field] = ...,
-        tzinfo: None = ...,
-        **extra: Any
+        self, expression: str, kind: str, output_field: Optional[Field] = ..., tzinfo: None = ..., **extra: Any
     ) -> None: ...
 
 class TruncYear(TruncBase):
@@ -235,9 +209,7 @@ class TruncDate(TruncBase):
     kind: str = ...
     lookup_name: str = ...
     output_field: models.fields.TimeField = ...
-    def as_sql(
-        self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[str, List[Any]]: ...
+    def as_sql(self, compiler: SQLCompiler, connection: DatabaseWrapper) -> Tuple[str, List[Any]]: ...
 
 class TruncTime(TruncBase):
     contains_aggregate: bool
@@ -248,9 +220,7 @@ class TruncTime(TruncBase):
     kind: str = ...
     lookup_name: str = ...
     output_field: models.fields.DateField = ...
-    def as_sql(
-        self, compiler: SQLCompiler, connection: DatabaseWrapper
-    ) -> Tuple[str, List[Any]]: ...
+    def as_sql(self, compiler: SQLCompiler, connection: DatabaseWrapper) -> Tuple[str, List[Any]]: ...
 
 class TruncHour(TruncBase):
     contains_aggregate: bool

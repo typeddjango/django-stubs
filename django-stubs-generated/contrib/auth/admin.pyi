@@ -14,21 +14,8 @@ sensitive_post_parameters_m: Any
 class GroupAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[
-            Union[
-                django.db.models.fields.DateTimeCheckMixin,
-                django.db.models.fields.Field,
-            ]
-        ],
-        Dict[
-            str,
-            Type[
-                Union[
-                    django.forms.fields.SplitDateTimeField,
-                    django.forms.widgets.Widget,
-                ]
-            ],
-        ],
+        Type[Union[django.db.models.fields.DateTimeCheckMixin, django.db.models.fields.Field]],
+        Dict[str, Type[Union[django.forms.fields.SplitDateTimeField, django.forms.widgets.Widget]]],
     ]
     model: Type[django.contrib.auth.models.Group]
     opts: django.db.models.options.Options
@@ -36,30 +23,14 @@ class GroupAdmin(admin.ModelAdmin):
     ordering: Any = ...
     filter_horizontal: Any = ...
     def formfield_for_manytomany(
-        self,
-        db_field: ManyToManyField,
-        request: WSGIRequest = ...,
-        **kwargs: Any
+        self, db_field: ManyToManyField, request: WSGIRequest = ..., **kwargs: Any
     ) -> ModelMultipleChoiceField: ...
 
 class UserAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[
-            Union[
-                django.db.models.fields.DateTimeCheckMixin,
-                django.db.models.fields.Field,
-            ]
-        ],
-        Dict[
-            str,
-            Type[
-                Union[
-                    django.forms.fields.SplitDateTimeField,
-                    django.forms.widgets.Widget,
-                ]
-            ],
-        ],
+        Type[Union[django.db.models.fields.DateTimeCheckMixin, django.db.models.fields.Field]],
+        Dict[str, Type[Union[django.forms.fields.SplitDateTimeField, django.forms.widgets.Widget]]],
     ]
     model: Type[django.contrib.auth.models.User]
     opts: django.db.models.options.Options
@@ -75,23 +46,10 @@ class UserAdmin(admin.ModelAdmin):
     search_fields: Any = ...
     ordering: Any = ...
     filter_horizontal: Any = ...
-    def get_fieldsets(
-        self, request: WSGIRequest, obj: None = ...
-    ) -> Tuple[Tuple[None, Dict[str, Tuple[str]]]]: ...
-    def get_form(
-        self, request: Any, obj: Optional[Any] = ..., **kwargs: Any
-    ): ...
+    def get_fieldsets(self, request: WSGIRequest, obj: None = ...) -> Tuple[Tuple[None, Dict[str, Tuple[str]]]]: ...
+    def get_form(self, request: Any, obj: Optional[Any] = ..., **kwargs: Any): ...
     def get_urls(self) -> List[URLPattern]: ...
     def lookup_allowed(self, lookup: str, value: str) -> bool: ...
-    def add_view(
-        self,
-        request: WSGIRequest,
-        form_url: str = ...,
-        extra_context: None = ...,
-    ) -> Any: ...
-    def user_change_password(
-        self, request: WSGIRequest, id: str, form_url: str = ...
-    ) -> HttpResponse: ...
-    def response_add(
-        self, request: WSGIRequest, obj: User, post_url_continue: None = ...
-    ) -> HttpResponse: ...
+    def add_view(self, request: WSGIRequest, form_url: str = ..., extra_context: None = ...) -> Any: ...
+    def user_change_password(self, request: WSGIRequest, id: str, form_url: str = ...) -> HttpResponse: ...
+    def response_add(self, request: WSGIRequest, obj: User, post_url_continue: None = ...) -> HttpResponse: ...

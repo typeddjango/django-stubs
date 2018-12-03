@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandParser
 from django.db.backends.base.introspection import FieldInfo
 from django.db.backends.sqlite3.base import DatabaseWrapper
 
-
 class Command(BaseCommand):
     stderr: django.core.management.base.OutputWrapper
     stdout: django.core.management.base.OutputWrapper

@@ -1,7 +1,4 @@
-from django.http.cookie import (
-    SimpleCookie as SimpleCookie,
-    parse_cookie as parse_cookie
-)
+from django.http.cookie import SimpleCookie as SimpleCookie, parse_cookie as parse_cookie
 from django.http.request import (
     HttpRequest as HttpRequest,
     QueryDict as QueryDict,
@@ -22,5 +19,6 @@ from django.http.response import (
     HttpResponsePermanentRedirect as HttpResponsePermanentRedirect,
     HttpResponseRedirect as HttpResponseRedirect,
     HttpResponseServerError as HttpResponseServerError,
-    JsonResponse as JsonResponse, StreamingHttpResponse as StreamingHttpResponse
+    JsonResponse as JsonResponse,
+    StreamingHttpResponse as StreamingHttpResponse,
 )

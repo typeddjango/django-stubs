@@ -7,19 +7,15 @@ from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.dispatch.dispatcher import Signal
 from django.http.request import HttpRequest, QueryDict
-from django.http.response import (HttpResponse, HttpResponseBase,
-                                  HttpResponseRedirect)
+from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.template.base import Template
 from django.template.context import Context
 from django.test.utils import ContextList
 
-
 class RedirectCycleError(Exception):
     last_response: django.http.response.HttpResponseRedirect = ...
     redirect_chain: List[Tuple[str, int]] = ...
-    def __init__(
-        self, message: str, last_response: HttpResponseRedirect
-    ) -> None: ...
+    def __init__(self, message: str, last_response: HttpResponseRedirect) -> None: ...
 
 class FakePayload:
     read_started: bool = ...
@@ -30,9 +26,7 @@ class FakePayload:
 
 class ClientHandler(BaseHandler):
     enforce_csrf_checks: bool = ...
-    def __init__(
-        self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any
-    ) -> None: ...
+    def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
     def __call__(self, environ: Dict[str, Any]) -> HttpResponseBase: ...
 
 def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
@@ -46,37 +40,17 @@ class RequestFactory:
     def __init__(self, *, json_encoder: Any = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> WSGIRequest: ...
     def get(
-        self,
-        path: str,
-        data: Optional[Union[Dict[str, date], QueryDict, str]] = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Optional[Union[Dict[str, date], QueryDict, str]] = ..., secure: bool = ..., **extra: Any
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def post(
-        self,
-        path: str,
-        data: Any = ...,
-        content_type: str = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any
     ) -> Union[WSGIRequest, HttpResponseBase]: ...
     def head(
-        self,
-        path: str,
-        data: Optional[Union[Dict[str, str], str]] = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Optional[Union[Dict[str, str], str]] = ..., secure: bool = ..., **extra: Any
     ) -> Union[WSGIRequest, HttpResponse]: ...
-    def trace(
-        self, path: str, secure: bool = ..., **extra: Any
-    ) -> Union[WSGIRequest, HttpResponse]: ...
+    def trace(self, path: str, secure: bool = ..., **extra: Any) -> Union[WSGIRequest, HttpResponse]: ...
     def options(
-        self,
-        path: str,
-        data: Union[Dict[str, str], str] = ...,
-        content_type: str = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Union[Dict[str, str], str] = ..., content_type: str = ..., secure: bool = ..., **extra: Any
     ) -> Union[WSGIRequest, HttpResponse]: ...
     def put(
         self,
@@ -115,15 +89,10 @@ class RequestFactory:
 class Client(RequestFactory):
     defaults: Dict[str, str]
     errors: _io.BytesIO
-    json_encoder: Union[
-        Type[django.core.serializers.json.DjangoJSONEncoder],
-        unittest.mock.MagicMock,
-    ]
+    json_encoder: Union[Type[django.core.serializers.json.DjangoJSONEncoder], unittest.mock.MagicMock]
     handler: django.test.client.ClientHandler = ...
     exc_info: None = ...
-    def __init__(
-        self, enforce_csrf_checks: bool = ..., **defaults: Any
-    ) -> None: ...
+    def __init__(self, enforce_csrf_checks: bool = ..., **defaults: Any) -> None: ...
     def store_exc_info(self, **kwargs: Any) -> None: ...
     @property
     def session(self) -> SessionBase: ...
@@ -137,21 +106,10 @@ class Client(RequestFactory):
         **extra: Any
     ) -> HttpResponseBase: ...
     def post(
-        self,
-        path: str,
-        data: Any = ...,
-        content_type: str = ...,
-        follow: bool = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> HttpResponseBase: ...
     def head(
-        self,
-        path: str,
-        data: Optional[Union[Dict[str, str], str]] = ...,
-        follow: bool = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Optional[Union[Dict[str, str], str]] = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> HttpResponse: ...
     def options(
         self,
@@ -190,12 +148,7 @@ class Client(RequestFactory):
         **extra: Any
     ) -> HttpResponse: ...
     def trace(
-        self,
-        path: str,
-        data: Union[Dict[str, str], str] = ...,
-        follow: bool = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Union[Dict[str, str], str] = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> HttpResponse: ...
     def login(self, **credentials: Any) -> bool: ...
     def force_login(self, user: User, backend: Optional[str] = ...) -> None: ...

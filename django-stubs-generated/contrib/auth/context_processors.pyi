@@ -4,7 +4,6 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.http.request import HttpRequest
 from django.utils.functional import SimpleLazyObject
 
-
 class PermLookupDict:
     app_label: django.utils.safestring.SafeText
     user: django.utils.functional.SimpleLazyObject
@@ -20,6 +19,4 @@ class PermWrapper:
     def __iter__(self) -> Any: ...
     def __contains__(self, perm_name: Union[bool, str]) -> bool: ...
 
-def auth(
-    request: HttpRequest
-) -> Dict[str, Union[PermWrapper, AnonymousUser, User]]: ...
+def auth(request: HttpRequest) -> Dict[str, Union[PermWrapper, AnonymousUser, User]]: ...

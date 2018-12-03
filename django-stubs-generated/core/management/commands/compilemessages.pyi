@@ -2,7 +2,6 @@ from typing import Any, List, Optional, Tuple
 
 from django.core.management.base import BaseCommand, CommandParser
 
-
 def has_bom(fn: str) -> bool: ...
 def is_writable(path: str) -> bool: ...
 

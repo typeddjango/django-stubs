@@ -12,7 +12,6 @@ from django.views.generic.base import TemplateResponseMixin
 
 from .loader import get_template as get_template, select_template as select_template
 
-
 class ContentNotRenderedError(Exception): ...
 
 class SimpleTemplateResponse(HttpResponse):
@@ -20,9 +19,7 @@ class SimpleTemplateResponse(HttpResponse):
     cookies: SimpleCookie
     status_code: int
     rendering_attrs: Any = ...
-    template_name: Union[
-        List[str], Template, str
-    ] = ...
+    template_name: Union[List[str], Template, str] = ...
     context_data: Optional[Dict[str, str]] = ...
     using: Optional[str] = ...
     def __init__(
@@ -34,13 +31,8 @@ class SimpleTemplateResponse(HttpResponse):
         charset: Optional[str] = ...,
         using: Optional[str] = ...,
     ) -> None: ...
-    def resolve_template(
-        self, template: Union[List[str], Template, str]
-    ) -> Union[Template, Template]: ...
-    def resolve_context(
-        self,
-        context: Optional[Dict[str, Any]],
-    ) -> Optional[Dict[str, Any]]: ...
+    def resolve_template(self, template: Union[List[str], Template, str]) -> Union[Template, Template]: ...
+    def resolve_context(self, context: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
@@ -66,9 +58,7 @@ class TemplateResponse(SimpleTemplateResponse):
     request: Dict[str, Union[django.test.client.FakePayload, int, str]]
     resolver_match: django.utils.functional.SimpleLazyObject
     status_code: int
-    template_name: Union[
-        List[str], django.template.backends.django.Template, str
-    ]
+    template_name: Union[List[str], django.template.backends.django.Template, str]
     templates: List[django.template.base.Template]
     using: Optional[str]
     wsgi_request: django.core.handlers.wsgi.WSGIRequest
@@ -79,9 +69,7 @@ class TemplateResponse(SimpleTemplateResponse):
         template: Union[List[str], Template, str],
         context: Optional[
             Union[
-                Dict[
-                    str, List[Dict[str, Optional[Union[datetime, Model, str]]]]
-                ],
+                Dict[str, List[Dict[str, Optional[Union[datetime, Model, str]]]]],
                 Dict[str, List[str]],
                 Dict[str, Model],
                 Dict[str, TemplateResponseMixin],

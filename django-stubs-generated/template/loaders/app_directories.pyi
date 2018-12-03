@@ -4,7 +4,6 @@ from django.template import Engine
 
 from .filesystem import Loader as FilesystemLoader
 
-
 class Loader(FilesystemLoader):
     dirs: None
     engine: Engine

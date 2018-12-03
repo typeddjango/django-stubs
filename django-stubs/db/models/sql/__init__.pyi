@@ -1,2 +1,1 @@
-from ..query import (Query as Query,
-                     RawQuery as RawQuery)
+from ..query import Query as Query, RawQuery as RawQuery

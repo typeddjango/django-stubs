@@ -13,18 +13,12 @@ from django.http.request import QueryDict
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeText
 
-
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
     def __new__(
-        mcs: Type[DeclarativeFieldsMetaclass],
-        name: str,
-        bases: Tuple[Type[BaseForm]],
-        attrs: OrderedDict,
+        mcs: Type[DeclarativeFieldsMetaclass], name: str, bases: Tuple[Type[BaseForm]], attrs: OrderedDict
     ) -> Type[BaseForm]: ...
     @classmethod
-    def __prepare__(
-        metacls: Any, name: str, bases: Tuple[Type[BaseForm]], **kwds: Any
-    ) -> OrderedDict: ...
+    def __prepare__(metacls: Any, name: str, bases: Tuple[Type[BaseForm]], **kwds: Any) -> OrderedDict: ...
 
 class BaseForm:
     default_renderer: Any = ...
@@ -43,21 +37,11 @@ class BaseForm:
     renderer: Any = ...
     def __init__(
         self,
-        data: Optional[
-            Union[
-                Dict[str, Union[List[int], int, str]],
-                Dict[str, Union[List[str], str]],
-                QueryDict,
-            ]
-        ] = ...,
-        files: Optional[
-            Union[Dict[str, SimpleUploadedFile], MultiValueDict]
-        ] = ...,
+        data: Optional[Union[Dict[str, Union[List[int], int, str]], Dict[str, Union[List[str], str]], QueryDict]] = ...,
+        files: Optional[Union[Dict[str, SimpleUploadedFile], MultiValueDict]] = ...,
         auto_id: Optional[Union[bool, str]] = ...,
         prefix: Optional[str] = ...,
-        initial: Optional[
-            Union[Dict[str, List[int]], Dict[str, date], Dict[str, str]]
-        ] = ...,
+        initial: Optional[Union[Dict[str, List[int]], Dict[str, date], Dict[str, str]]] = ...,
         error_class: Type[ErrorList] = ...,
         label_suffix: None = ...,
         empty_permitted: bool = ...,
@@ -77,17 +61,11 @@ class BaseForm:
     def as_ul(self) -> SafeText: ...
     def as_p(self) -> SafeText: ...
     def non_field_errors(self) -> ErrorList: ...
-    def add_error(
-        self, field: Optional[str], error: Union[ValidationError, str]
-    ) -> None: ...
+    def add_error(self, field: Optional[str], error: Union[ValidationError, str]) -> None: ...
     def has_error(self, field: Any, code: Optional[Any] = ...): ...
     cleaned_data: Any = ...
     def full_clean(self) -> None: ...
-    def clean(
-        self
-    ) -> Dict[
-        str, Optional[Union[datetime, SimpleUploadedFile, QuerySet, str]]
-    ]: ...
+    def clean(self) -> Dict[str, Optional[Union[datetime, SimpleUploadedFile, QuerySet, str]]]: ...
     def has_changed(self) -> bool: ...
     def changed_data(self) -> List[str]: ...
     @property

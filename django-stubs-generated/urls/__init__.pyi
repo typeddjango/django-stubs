@@ -10,23 +10,18 @@ from .base import (
     reverse_lazy as reverse_lazy,
     set_script_prefix as set_script_prefix,
     set_urlconf as set_urlconf,
-    translate_url as translate_url
+    translate_url as translate_url,
 )
+
 # noinspection PyUnresolvedReferences
-from .conf import (
-    include as include,
-    path as path,
-    re_path as re_path
-)
+from .conf import include as include, path as path, re_path as re_path
+
 # noinspection PyUnresolvedReferences
-from .converters import (
-    register_converter as register_converter
-)
+from .converters import register_converter as register_converter
+
 # noinspection PyUnresolvedReferences
-from .exceptions import (
-    NoReverseMatch as NoReverseMatch,
-    Resolver404 as Resolver404
-)
+from .exceptions import NoReverseMatch as NoReverseMatch, Resolver404 as Resolver404
+
 # noinspection PyUnresolvedReferences
 from .resolvers import (
     LocalePrefixPattern as LocalePrefixPattern,
@@ -34,10 +29,8 @@ from .resolvers import (
     URLPattern as URLPattern,
     URLResolver as URLResolver,
     get_ns_resolver as get_ns_resolver,
-    get_resolver as get_resolver
+    get_resolver as get_resolver,
 )
+
 # noinspection PyUnresolvedReferences
-from .utils import (
-    get_callable as get_callable,
-    get_mod_func as get_mod_func
-)
+from .utils import get_callable as get_callable, get_mod_func as get_mod_func

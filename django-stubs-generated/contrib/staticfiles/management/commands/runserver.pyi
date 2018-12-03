@@ -2,9 +2,7 @@ from typing import Any, Optional
 
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core.management.base import CommandParser
-from django.core.management.commands.runserver import \
-    Command as RunserverCommand
-
+from django.core.management.commands.runserver import Command as RunserverCommand
 
 class Command(RunserverCommand):
     stderr: django.core.management.base.OutputWrapper
