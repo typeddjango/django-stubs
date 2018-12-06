@@ -67,16 +67,24 @@ class Widget:
         ],
     ]: ...
     def render(
-        self, name: str, value: Any, attrs: Optional[Dict[str, Union[bool, str]]] = ..., renderer: Optional[EngineMixin] = ...
+        self,
+        name: str,
+        value: Any,
+        attrs: Optional[Dict[str, Union[bool, str]]] = ...,
+        renderer: Optional[EngineMixin] = ...,
     ) -> SafeText: ...
     def build_attrs(
         self, base_attrs: Dict[str, Union[float, str]], extra_attrs: Optional[Dict[str, Union[bool, str]]] = ...
     ) -> Dict[str, Union[Decimal, float, str]]: ...
-    def value_from_datadict(self, data: dict, files: Union[Dict[str, SimpleUploadedFile], MultiValueDict], name: str) -> Any: ...
+    def value_from_datadict(
+        self, data: dict, files: Union[Dict[str, SimpleUploadedFile], MultiValueDict], name: str
+    ) -> Any: ...
     def value_omitted_from_data(
         self,
         data: Union[
-            Dict[str, Optional[Union[List[int], date, int, str]]], Dict[str, Union[datetime, Decimal, int, str]], QueryDict
+            Dict[str, Optional[Union[List[int], date, int, str]]],
+            Dict[str, Union[datetime, Decimal, int, str]],
+            QueryDict,
         ],
         files: Union[Dict[str, SimpleUploadedFile], MultiValueDict],
         name: str,
@@ -163,7 +171,10 @@ class MultipleHiddenInput(HiddenInput):
         ],
     ]: ...
     def value_from_datadict(
-        self, data: Union[Dict[str, List[str]], Dict[str, Tuple[int, ...]], MultiValueDict], files: Dict[Any, Any], name: str
+        self,
+        data: Union[Dict[str, List[str]], Dict[str, Tuple[int, ...]], MultiValueDict],
+        files: Dict[Any, Any],
+        name: str,
     ) -> Union[List[str], Tuple[int, ...]]: ...
     def format_value(self, value: Optional[Union[List[int], List[str]]]) -> Union[List[int], List[str]]: ...
 
@@ -283,7 +294,9 @@ class ChoiceWidget(Widget):
     def __init__(
         self,
         attrs: Optional[Dict[str, Union[bool, str]]] = ...,
-        choices: Union[Iterator[Any], List[List[Union[int, str]]], List[Tuple[Union[time, int], int]], List[int], Tuple] = ...,
+        choices: Union[
+            Iterator[Any], List[List[Union[int, str]]], List[Tuple[Union[time, int], int]], List[int], Tuple
+        ] = ...,
     ) -> None: ...
     def __deepcopy__(self, memo: Dict[int, List[Any]]) -> ChoiceWidget: ...
     def subwidgets(self, name: str, value: Optional[List[str]], attrs: Dict[str, Union[bool, str]] = ...) -> None: ...
@@ -316,7 +329,8 @@ class ChoiceWidget(Widget):
                     Tuple[
                         Optional[str],
                         Union[
-                            List[Dict[str, Union[Dict[str, bool], bool, str]]], List[Dict[str, Union[Dict[str, str], bool, str]]]
+                            List[Dict[str, Union[Dict[str, bool], bool, str]]],
+                            List[Dict[str, Union[Dict[str, str], bool, str]]],
                         ],
                         int,
                     ]
@@ -349,7 +363,10 @@ class Select(ChoiceWidget):
     checked_attribute: Any = ...
     option_inherits_attrs: bool = ...
     def get_context(
-        self, name: str, value: Optional[Union[List[int], List[str], int, str]], attrs: Optional[Dict[str, Union[bool, str]]]
+        self,
+        name: str,
+        value: Optional[Union[List[int], List[str], int, str]],
+        attrs: Optional[Dict[str, Union[bool, str]]],
     ) -> Dict[
         str,
         Dict[
@@ -370,12 +387,17 @@ class NullBooleanSelect(Select):
     def __init__(self, attrs: None = ...) -> None: ...
     def format_value(self, value: Optional[Union[bool, str]]) -> str: ...
     def value_from_datadict(
-        self, data: Union[Dict[str, Union[bool, str]], QueryDict], files: Union[Dict[Any, Any], MultiValueDict], name: str
+        self,
+        data: Union[Dict[str, Union[bool, str]], QueryDict],
+        files: Union[Dict[Any, Any], MultiValueDict],
+        name: str,
     ) -> Optional[bool]: ...
 
 class SelectMultiple(Select):
     attrs: Dict[Any, Any]
-    choices: Union[List[Tuple[str, Union[Tuple[Tuple[str, str], Tuple[str, str]], str]]], django.forms.models.ModelChoiceIterator]
+    choices: Union[
+        List[Tuple[str, Union[Tuple[Tuple[str, str], Tuple[str, str]], str]]], django.forms.models.ModelChoiceIterator
+    ]
     is_required: bool
     allow_multiple_selected: bool = ...
     def value_from_datadict(
@@ -401,7 +423,8 @@ class RadioSelect(ChoiceWidget):
 class CheckboxSelectMultiple(ChoiceWidget):
     attrs: Dict[str, str]
     choices: Union[
-        List[Tuple[datetime.time, Union[Tuple[Tuple[str, str], Tuple[str, str]], str]]], django.forms.models.ModelChoiceIterator
+        List[Tuple[datetime.time, Union[Tuple[Tuple[str, str], Tuple[str, str]], str]]],
+        django.forms.models.ModelChoiceIterator,
     ]
     is_required: bool
     allow_multiple_selected: bool = ...
@@ -424,7 +447,10 @@ class MultiWidget(Widget):
     @property
     def is_hidden(self) -> bool: ...
     def get_context(
-        self, name: str, value: Optional[Union[List[datetime], datetime, str]], attrs: Optional[Dict[str, Union[bool, str]]]
+        self,
+        name: str,
+        value: Optional[Union[List[datetime], datetime, str]],
+        attrs: Optional[Dict[str, Union[bool, str]]],
     ) -> Dict[
         str,
         Union[
@@ -463,7 +489,10 @@ class MultiWidget(Widget):
     ]: ...
     def id_for_label(self, id_: str) -> str: ...
     def value_from_datadict(
-        self, data: Union[Dict[str, Union[List[str], str]], QueryDict], files: Union[Dict[Any, Any], MultiValueDict], name: str
+        self,
+        data: Union[Dict[str, Union[List[str], str]], QueryDict],
+        files: Union[Dict[Any, Any], MultiValueDict],
+        name: str,
     ) -> Union[List[None], List[str]]: ...
     def value_omitted_from_data(
         self, data: Union[Dict[str, str], QueryDict], files: Union[Dict[Any, Any], MultiValueDict], name: str

@@ -82,7 +82,9 @@ class UpdateQuery(Query):
     model: Type[django.db.models.base.Model]
     order_by: Tuple
     related_ids: Optional[List[int]]
-    related_updates: Dict[Type[django.db.models.base.Model], List[Tuple[django.db.models.fields.Field, None, Union[int, str]]]]
+    related_updates: Dict[
+        Type[django.db.models.base.Model], List[Tuple[django.db.models.fields.Field, None, Union[int, str]]]
+    ]
     select: Tuple
     select_for_update: bool
     select_for_update_nowait: bool

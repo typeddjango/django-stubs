@@ -25,7 +25,12 @@ class TemporaryUploadedFile(UploadedFile):
     file: tempfile._TemporaryFileWrapper
     mode: str
     def __init__(
-        self, name: str, content_type: str, size: int, charset: Optional[str], content_type_extra: Optional[Dict[Any, Any]] = ...
+        self,
+        name: str,
+        content_type: str,
+        size: int,
+        charset: Optional[str],
+        content_type_extra: Optional[Dict[Any, Any]] = ...,
     ) -> None: ...
     def temporary_file_path(self) -> str: ...
     def close(self) -> None: ...

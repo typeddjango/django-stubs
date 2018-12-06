@@ -37,7 +37,11 @@ class Template:
                     str,
                     Dict[
                         str,
-                        Optional[Union[Dict[str, str], List[Dict[str, Optional[Union[Dict[str, str], bool, str]]]], bool, str]],
+                        Optional[
+                            Union[
+                                Dict[str, str], List[Dict[str, Optional[Union[Dict[str, str], bool, str]]]], bool, str
+                            ]
+                        ],
                     ],
                 ],
                 Dict[
@@ -83,7 +87,13 @@ class Template:
                         str,
                         Union[
                             Dict[str, str],
-                            List[Tuple[Optional[str], List[Dict[str, Union[Dict[str, Union[bool, str]], time, int, str]]], int]],
+                            List[
+                                Tuple[
+                                    Optional[str],
+                                    List[Dict[str, Union[Dict[str, Union[bool, str]], time, int, str]]],
+                                    int,
+                                ]
+                            ],
                             List[str],
                             bool,
                             str,

@@ -21,7 +21,9 @@ class LogEntryManager(models.Manager):
         object_id: Union[int, str, UUID],
         object_repr: str,
         action_flag: int,
-        change_message: Union[Dict[str, Dict[str, List[str]]], List[Dict[str, Dict[str, Union[List[str], str]]]], str] = ...,
+        change_message: Union[
+            Dict[str, Dict[str, List[str]]], List[Dict[str, Dict[str, Union[List[str], str]]]], str
+        ] = ...,
     ) -> LogEntry: ...
 
 class LogEntry(models.Model):

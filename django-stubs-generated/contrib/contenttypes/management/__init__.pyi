@@ -24,5 +24,10 @@ def get_contenttypes_and_models(
     app_config: AppConfig, using: str, ContentType: Type[ContentType]
 ) -> Tuple[Dict[str, ContentType], Dict[str, Type[Model]]]: ...
 def create_contenttypes(
-    app_config: AppConfig, verbosity: int = ..., interactive: bool = ..., using: str = ..., apps: Apps = ..., **kwargs: Any
+    app_config: AppConfig,
+    verbosity: int = ...,
+    interactive: bool = ...,
+    using: str = ...,
+    apps: Apps = ...,
+    **kwargs: Any
 ) -> None: ...

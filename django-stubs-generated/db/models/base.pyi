@@ -11,7 +11,9 @@ class Deferred: ...
 
 DEFERRED: Any
 
-def subclass_exception(name: str, bases: Tuple[Type[Exception]], module: str, attached_to: Type[Model]) -> Type[Exception]: ...
+def subclass_exception(
+    name: str, bases: Tuple[Type[Exception]], module: str, attached_to: Type[Model]
+) -> Type[Exception]: ...
 
 class ModelBase(type):
     def __new__(

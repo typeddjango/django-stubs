@@ -42,7 +42,9 @@ class ValidationError(Exception):
             str,
         ],
         code: Optional[str] = ...,
-        params: Optional[Union[Dict[str, Union[Tuple[str], Type[Model], Model, str]], Dict[str, Union[int, str]]]] = ...,
+        params: Optional[
+            Union[Dict[str, Union[Tuple[str], Type[Model], Model, str]], Dict[str, Union[int, str]]]
+        ] = ...,
     ) -> None: ...
     @property
     def message_dict(self) -> Dict[str, List[str]]: ...

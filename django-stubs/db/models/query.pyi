@@ -1,7 +1,6 @@
 from collections import OrderedDict
 from datetime import date, datetime
 from typing import (
-    Generic,
     TypeVar,
     Optional,
     Any,
@@ -13,14 +12,16 @@ from typing import (
     Iterator,
     Tuple,
     Callable,
-    Sequence,
+    Iterable,
+    Sized,
+    Reversible,
 )
 
 from django.db import models
 
 _T = TypeVar("_T", bound=models.Model)
 
-class QuerySet(Sequence[_T]):
+class QuerySet(Iterable[_T], Sized[_T]):
     def __init__(
         self,
         model: Optional[Type[models.Model]] = ...,
@@ -33,6 +34,8 @@ class QuerySet(Sequence[_T]):
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_T]: ...
     def __bool__(self) -> bool: ...
+    def __class_getitem__(cls, item: Type[_T]):
+        pass
     @overload
     def __getitem__(self, k: int) -> _T: ...
     @overload
@@ -79,6 +82,7 @@ class QuerySet(Sequence[_T]):
     def filter(self, *args: Any, **kwargs: Any) -> QuerySet[_T]: ...
     def exclude(self, *args: Any, **kwargs: Any) -> QuerySet[_T]: ...
     def complex_filter(self, filter_obj: Any) -> QuerySet[_T]: ...
+    def count(self) -> int: ...
     def union(self, *other_qs: Any, all: bool = ...) -> QuerySet[_T]: ...
     def intersection(self, *other_qs: Any) -> QuerySet[_T]: ...
     def difference(self, *other_qs: Any) -> QuerySet[_T]: ...

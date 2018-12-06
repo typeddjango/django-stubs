@@ -28,7 +28,9 @@ class MigrationAutodetector:
     def only_relation_agnostic_fields(
         self, fields: List[Tuple[str, Field]]
     ) -> List[Tuple[str, List[Any], Dict[str, Union[Callable, int, str]]]]: ...
-    def check_dependency(self, operation: Operation, dependency: Tuple[str, str, Optional[str], Union[bool, str]]) -> bool: ...
+    def check_dependency(
+        self, operation: Operation, dependency: Tuple[str, str, Optional[str], Union[bool, str]]
+    ) -> bool: ...
     def add_operation(
         self,
         app_label: str,

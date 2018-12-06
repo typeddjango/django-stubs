@@ -60,7 +60,11 @@ class RegisterLookupMixin:
     def get_transform(self, lookup_name: str) -> Optional[Type[Transform]]: ...
     @staticmethod
     def merge_dicts(
-        dicts: List[Dict[str, Type[Union[TimezoneMixin, FieldGetDbPrepValueMixin, IntegerFieldFloatRounding, Lookup, Transform]]]]
+        dicts: List[
+            Dict[
+                str, Type[Union[TimezoneMixin, FieldGetDbPrepValueMixin, IntegerFieldFloatRounding, Lookup, Transform]]
+            ]
+        ]
     ) -> Dict[str, Type[Union[TimezoneMixin, FieldGetDbPrepValueMixin, Lookup, Transform]]]: ...
     @classmethod
     def register_lookup(
@@ -70,7 +74,9 @@ class RegisterLookupMixin:
 def select_related_descend(
     field: Field,
     restricted: bool,
-    requested: Optional[Union[Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]]]]]], bool]],
+    requested: Optional[
+        Union[Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]]]]]], bool]
+    ],
     load_fields: Optional[Set[str]],
     reverse: bool = ...,
 ) -> bool: ...

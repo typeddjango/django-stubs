@@ -76,7 +76,10 @@ class QuerySet(Generic[_T]):
         memo: Dict[
             int,
             Union[
-                Dict[str, Union[ModelState, int, str]], List[Union[Dict[str, Union[bool, str]], ModelState]], Model, ModelState
+                Dict[str, Union[ModelState, int, str]],
+                List[Union[Dict[str, Union[bool, str]], ModelState]],
+                Model,
+                ModelState,
             ],
         ],
     ) -> QuerySet[_T]: ...
@@ -129,7 +132,9 @@ class QuerySet(Generic[_T]):
     def all(self) -> QuerySet[_T]: ...
     def filter(self, *args: Any, **kwargs: Any) -> QuerySet[_T]: ...
     def exclude(self, *args: Any, **kwargs: Any) -> QuerySet[_T]: ...
-    def complex_filter(self, filter_obj: Union[Dict[str, datetime], Dict[str, QuerySet], Q, MagicMock]) -> QuerySet[_T]: ...
+    def complex_filter(
+        self, filter_obj: Union[Dict[str, datetime], Dict[str, QuerySet], Q, MagicMock]
+    ) -> QuerySet[_T]: ...
     def union(self, *other_qs: Any, all: bool = ...) -> QuerySet[_T]: ...
     def intersection(self, *other_qs: Any) -> QuerySet[_T]: ...
     def difference(self, *other_qs: Any) -> QuerySet[_T]: ...
@@ -237,7 +242,9 @@ class RelatedPopulator:
     def populate(
         self,
         row: Union[
-            List[Optional[Union[date, int, str]]], List[Union[date, Decimal, float, str]], Tuple[Union[int, str], str, int]
+            List[Optional[Union[date, int, str]]],
+            List[Union[date, Decimal, float, str]],
+            Tuple[Union[int, str], str, int],
         ],
         from_obj: Model,
     ) -> None: ...

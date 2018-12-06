@@ -50,7 +50,12 @@ class RequestFactory:
     ) -> Union[WSGIRequest, HttpResponse]: ...
     def trace(self, path: str, secure: bool = ..., **extra: Any) -> Union[WSGIRequest, HttpResponse]: ...
     def options(
-        self, path: str, data: Union[Dict[str, str], str] = ..., content_type: str = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Union[Dict[str, str], str] = ...,
+        content_type: str = ...,
+        secure: bool = ...,
+        **extra: Any
     ) -> Union[WSGIRequest, HttpResponse]: ...
     def put(
         self,
@@ -109,7 +114,12 @@ class Client(RequestFactory):
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> HttpResponseBase: ...
     def head(
-        self, path: str, data: Optional[Union[Dict[str, str], str]] = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Optional[Union[Dict[str, str], str]] = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        **extra: Any
     ) -> HttpResponse: ...
     def options(
         self,

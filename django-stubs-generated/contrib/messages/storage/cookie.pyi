@@ -19,7 +19,9 @@ class MessageDecoder(json.JSONDecoder):
     def process_messages(
         self,
         obj: Union[
-            Dict[str, Union[List[Union[Dict[str, List[Union[int, str]]], List[Union[int, str]]]], List[Union[int, str]]]],
+            Dict[
+                str, Union[List[Union[Dict[str, List[Union[int, str]]], List[Union[int, str]]]], List[Union[int, str]]]
+            ],
             List[Union[List[Union[int, str]], str]],
             str,
         ],

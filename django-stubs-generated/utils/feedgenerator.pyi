@@ -99,7 +99,9 @@ class Atom1Feed(SyndicationFeed):
     def add_root_elements(self, handler: SimplerXMLGenerator) -> None: ...
     def write_items(self, handler: SimplerXMLGenerator) -> None: ...
     def add_item_elements(
-        self, handler: SimplerXMLGenerator, item: Dict[str, Optional[Union[List[Enclosure], List[str], Tuple, datetime, str]]]
+        self,
+        handler: SimplerXMLGenerator,
+        item: Dict[str, Optional[Union[List[Enclosure], List[str], Tuple, datetime, str]]],
     ) -> None: ...
 
 DefaultFeed = Rss201rev2Feed

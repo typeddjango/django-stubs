@@ -90,7 +90,9 @@ class Options:
     default_related_name: None = ...
     def __init__(
         self,
-        meta: Optional[Type[Union[AbstractBaseUser.Meta, AbstractUser.Meta, PermissionsMixin.Meta, AbstractBaseSession.Meta]]],
+        meta: Optional[
+            Type[Union[AbstractBaseUser.Meta, AbstractUser.Meta, PermissionsMixin.Meta, AbstractBaseSession.Meta]]
+        ],
         app_label: Optional[str] = ...,
     ) -> None: ...
     @property

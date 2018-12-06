@@ -11,7 +11,13 @@ ROLES: Any
 
 def create_reference_role(rolename: Any, urlbase: Any): ...
 def default_reference_role(
-    name: Any, rawtext: Any, text: Any, lineno: Any, inliner: Any, options: Optional[Any] = ..., content: Optional[Any] = ...
+    name: Any,
+    rawtext: Any,
+    text: Any,
+    lineno: Any,
+    inliner: Any,
+    options: Optional[Any] = ...,
+    content: Optional[Any] = ...,
 ): ...
 
 named_group_matcher: Any

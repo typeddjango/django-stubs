@@ -141,7 +141,9 @@ class TruncBase(TimezoneMixin, Transform):
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> TruncBase: ...
-    def convert_value(self, value: datetime, expression: models.functions.TruncBase, connection: DatabaseWrapper) -> datetime: ...
+    def convert_value(
+        self, value: datetime, expression: models.functions.TruncBase, connection: DatabaseWrapper
+    ) -> datetime: ...
 
 class Trunc(TruncBase):
     contains_aggregate: bool

@@ -18,7 +18,10 @@ class BaseRenderer:
             str,
             Union[
                 Dict[
-                    str, Optional[Union[Dict[str, bool], List[Dict[str, Optional[Union[Dict[str, str], bool, str]]]], bool, str]]
+                    str,
+                    Optional[
+                        Union[Dict[str, bool], List[Dict[str, Optional[Union[Dict[str, str], bool, str]]]], bool, str]
+                    ],
                 ],
                 Dict[
                     str,
@@ -45,13 +48,19 @@ class BaseRenderer:
                     str,
                     Union[
                         Dict[str, Union[int, str]],
-                        List[Tuple[Optional[str], List[Dict[str, Union[Dict[str, Union[bool, str]], time, int, str]]], int]],
+                        List[
+                            Tuple[
+                                Optional[str], List[Dict[str, Union[Dict[str, Union[bool, str]], time, int, str]]], int
+                            ]
+                        ],
                         List[str],
                         int,
                         str,
                     ],
                 ],
-                Dict[str, Union[Dict[str, str], List[Dict[str, Union[Dict[str, str], bool, str]]], List[int], bool, str]],
+                Dict[
+                    str, Union[Dict[str, str], List[Dict[str, Union[Dict[str, str], bool, str]]], List[int], bool, str]
+                ],
             ],
         ],
         request: None = ...,
