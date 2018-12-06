@@ -176,3 +176,5 @@ def process_model_class(ctx: ClassDefContext) -> None:
     set_fieldname_attrs_for_related_fields(ctx)
     add_int_id_attribute_if_primary_key_true_is_not_present(ctx)
     set_objects_queryset_to_model_class(ctx)
+
+    ctx.cls.info.fallback_to_any = True

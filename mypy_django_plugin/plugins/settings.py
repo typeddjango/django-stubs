@@ -59,6 +59,7 @@ def add_settings_to_django_conf_object(ctx: ClassDefContext,
                 context.set_line(sym.node)
                 api.msg.report(f"Need type annotation for '{sym.node.name()}'", context,
                                severity='error', file=module_file.path)
+    ctx.cls.info.fallback_to_any = True
 
 
 class DjangoConfSettingsInitializerHook(object):

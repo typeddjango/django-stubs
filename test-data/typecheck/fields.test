@@ -54,7 +54,6 @@ class User(models.Model):
 reveal_type(User().my_pk)  # E: Revealed type is 'builtins.int'
 reveal_type(User().id)  # E: Revealed type is 'Any'
 [out]
-main:7: error: "User" has no attribute "id"
 
 [CASE test_meta_nested_class_allows_subclassing_in_multiple_inheritance]
 from typing import Any

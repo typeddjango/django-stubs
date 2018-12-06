@@ -110,7 +110,6 @@ class View(models.Model):
 reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
 reveal_type(View().app.unknown)  # E: Revealed type is 'Any'
 [out]
-main:7: error: "App" has no attribute "unknown"
 
 [file myapp/__init__.py]
 [file myapp/models.py]
