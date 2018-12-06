@@ -21,7 +21,7 @@ from django.db import models
 
 _T = TypeVar("_T", bound=models.Model)
 
-class QuerySet(Iterable[_T], Sized[_T]):
+class QuerySet(Iterable[_T], Sized):
     def __init__(
         self,
         model: Optional[Type[models.Model]] = ...,
