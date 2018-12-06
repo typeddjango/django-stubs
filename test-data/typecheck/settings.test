@@ -40,8 +40,6 @@ reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
 reveal_type(settings.LIST)  # E: Revealed type is 'Any'
 reveal_type(settings.BASE_LIST)  # E: Revealed type is 'Any'
 [out]
-mysettings:4: error: Need type annotation for 'LIST'
-base:6: error: Need type annotation for 'BASE_LIST'
 
 [env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]

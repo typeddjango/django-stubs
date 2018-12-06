@@ -50,15 +50,16 @@ def add_settings_to_django_conf_object(ctx: ClassDefContext,
                 if copied is None:
                     continue
                 ctx.cls.info.names[name] = copied
-            else:
-                context = Context()
-                module, node_name = sym.node.fullname().rsplit('.', 1)
-                module_file = api.modules.get(module)
-                if module_file is None:
-                    return None
-                context.set_line(sym.node)
-                api.msg.report(f"Need type annotation for '{sym.node.name()}'", context,
-                               severity='error', file=module_file.path)
+            # else:
+                # TODO: figure out suggestion to add type annotation
+                # context = Context()
+                # module, node_name = sym.node.fullname().rsplit('.', 1)
+                # module_file = api.modules.get(module)
+                # if module_file is None:
+                #     return None
+                # context.set_line(sym.node)
+                # api.msg.report(f"Need type annotation for '{sym.node.name()}'", context,
+                #                severity='error', file=module_file.path)
     ctx.cls.info.fallback_to_any = True
 
 
