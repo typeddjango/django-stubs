@@ -15,7 +15,7 @@ jobs:
   - name: "Lint with black"
     python: 3.7
     script: |
-      black --check --line-length=130 django-stubs/ django-stubs-generated/
+      black --check --line-length=120 django-stubs/ django-stubs-generated/
 
 before_install: |
   # Upgrade pip, setuptools, and wheel

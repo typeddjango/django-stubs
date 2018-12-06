@@ -23,10 +23,23 @@ from .deletion import CASCADE as CASCADE, SET_DEFAULT as SET_DEFAULT, SET_NULL a
 
 from .query import QuerySet as QuerySet, RawQuerySet as RawQuerySet
 
-from .query_utils import Q as Q
+from .query_utils import Q as Q, FilteredRelation as FilteredRelation
 
 from .lookups import Lookup as Lookup
 
-from .expressions import F as F, Subquery as Subquery, Exists as Exists, OrderBy as OrderBy, OuterRef as OuterRef
+from .expressions import (
+    F as F,
+    Expression as Expression,
+    Subquery as Subquery,
+    Exists as Exists,
+    OrderBy as OrderBy,
+    OuterRef as OuterRef,
+    Case as Case,
+    When as When,
+    RawSQL as RawSQL,
+    Value as Value,
+)
 
 from .manager import BaseManager as BaseManager, Manager as Manager
+
+from .aggregates import Count as Count, Aggregate as Aggregate
