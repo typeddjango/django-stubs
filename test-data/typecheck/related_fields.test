@@ -12,7 +12,7 @@ book = Book()
 reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
-reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
 
 [CASE test_foreign_key_field_creates_attribute_with_underscore_id]
 from django.db import models
@@ -46,8 +46,8 @@ reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
 reveal_type(book.publisher2)  # E: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
-reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
-reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Book]'
+reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
 
 [CASE test_to_parameter_as_string_with_application_name__model_imported]
 from django.db import models
@@ -88,9 +88,9 @@ from django.db import models
 
 class App(models.Model):
     def method(self) -> None:
-        reveal_type(self.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
-        reveal_type(self.members)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Member]'
-        reveal_type(self.sheets)  # E: Revealed type is 'django.db.models.query.QuerySet[main.Sheet]'
+        reveal_type(self.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+        reveal_type(self.members)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
+        reveal_type(self.sheets)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Sheet]'
         reveal_type(self.profile)  # E: Revealed type is 'main.Profile'
 class View(models.Model):
     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
@@ -107,7 +107,7 @@ from myapp.models import App
 class View(models.Model):
     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
 
-reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
 reveal_type(View().app.unknown)  # E: Revealed type is 'Any'
 [out]
 
@@ -116,7 +116,7 @@ reveal_type(View().app.unknown)  # E: Revealed type is 'Any'
 from django.db import models
 class App(models.Model):
     def method(self) -> None:
-        reveal_type(self.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+        reveal_type(self.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
 
 [CASE models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model]
 from django.db.models import Model
@@ -131,8 +131,8 @@ class View(Model):
 class View2(View):
     app = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views2')
 
-reveal_type(App().views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
-reveal_type(App().views2)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View2]'
+reveal_type(App().views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+reveal_type(App().views2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View2]'
 [out]
 
 [CASE models_imported_inside_init_file]
@@ -140,7 +140,7 @@ from django.db import models
 from myapp.models import App
 class View(models.Model):
     app = models.ForeignKey(to='myapp.App', related_name='views', on_delete=models.CASCADE)
-reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.query.QuerySet[main.View]'
+reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
 
 [file myapp/__init__.py]
 [file myapp/models/__init__.py]
@@ -191,4 +191,26 @@ from django.db import models
 class App(models.Model):
     owner = models.ForeignKey(to='myapp.User', on_delete=models.CASCADE, related_name='apps')
 
+[CASE many_to_many_field_converts_to_queryset_of_model_type]
+from django.db import models
+class App(models.Model):
+    pass
+class Member(models.Model):
+    apps = models.ManyToManyField(to=App, related_name='members')
+reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.App*]'
+reveal_type(App().members)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
+[out]
 
+[CASE many_to_many_works_with_string_if_imported]
+from django.db import models
+from myapp.models import App
+class Member(models.Model):
+    apps = models.ManyToManyField(to='myapp.App', related_name='members')
+reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.App*]'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class App(models.Model):
+    pass
+[out]

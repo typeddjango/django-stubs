@@ -4,10 +4,22 @@ from typing import Dict, Optional
 from mypy.nodes import StrExpr, MypyFile, TypeInfo, ImportedName, SymbolNode
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
-QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
 FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
 ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
+MANYTOMANY_FIELD_FULLNAME = 'django.db.models.fields.related.ManyToManyField'
 DUMMY_SETTINGS_BASE_CLASS = 'django.conf._DjangoConfLazyObject'
+
+QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
+BASE_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.BaseManager'
+MANAGER_CLASS_FULLNAME = 'django.db.models.manager.Manager'
+RELATED_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.RelatedManager'
+
+MANAGER_CLASSES = {
+    MANAGER_CLASS_FULLNAME,
+    RELATED_MANAGER_CLASS_FULLNAME,
+    BASE_MANAGER_CLASS_FULLNAME,
+    QUERYSET_CLASS_FULLNAME
+}
 
 
 def get_models_file(app_name: str, all_modules: typing.Dict[str, MypyFile]) -> Optional[MypyFile]:

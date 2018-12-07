@@ -1,8 +1,21 @@
 [CASE test_every_model_has_objects_queryset_available]
 from django.db import models
-
 class User(models.Model):
     pass
-
-reveal_type(User.objects)  # E: Revealed type is 'django.db.models.query.QuerySet[main.User]'
+reveal_type(User.objects)  # E: Revealed type is 'django.db.models.manager.Manager[main.User]'
 reveal_type(User.objects.get())  # E: Revealed type is 'main.User*'
+
+[CASE test_leave_as_is_if_objects_is_set_and_fill_typevars_with_outer_class]
+from django.db import models
+
+class UserManager(models.Manager):
+    def get_or_404(self) -> User:
+        pass
+
+class User(models.Model):
+    objects = UserManager()
+
+reveal_type(User.objects)  # E: Revealed type is 'main.UserManager'
+reveal_type(User.objects.get())  # E: Revealed type is 'main.User*'
+reveal_type(User.objects.get_or_404())  # E: Revealed type is 'main.User'
+

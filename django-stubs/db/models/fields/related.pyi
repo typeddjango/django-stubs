@@ -1,10 +1,13 @@
-from typing import Type, Union, TypeVar, Any, Generic, List, Optional, Dict, Callable, Tuple, Sequence
+from typing import Type, Union, TypeVar, Any, Generic, List, Optional, Dict, Callable, Tuple, Sequence, TYPE_CHECKING
 from uuid import UUID
 
 from django.db import models
 from django.db.models import Field, Model, QuerySet
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.query_utils import PathInfo, Q
+
+if TYPE_CHECKING:
+    from django.db.models.manager import RelatedManager
 
 _T = TypeVar("_T", bound=models.Model)
 
@@ -64,7 +67,7 @@ class ManyToManyField(RelatedField, Generic[_T]):
         **kwargs: Any
     ) -> None: ...
     def __set__(self, instance, value: Sequence[_T]) -> None: ...
-    def __get__(self, instance, owner) -> QuerySet[_T]: ...
+    def __get__(self, instance, owner) -> RelatedManager[_T]: ...
     def check(self, **kwargs: Any) -> List[Any]: ...
     def deconstruct(self) -> Tuple[Optional[str], str, List[Any], Dict[str, str]]: ...
     def get_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...

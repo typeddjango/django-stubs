@@ -1,23 +1,9 @@
 from collections import OrderedDict
 from datetime import date, datetime
-from typing import (
-    TypeVar,
-    Optional,
-    Any,
-    Type,
-    Dict,
-    Union,
-    overload,
-    List,
-    Iterator,
-    Tuple,
-    Callable,
-    Iterable,
-    Sized,
-    Reversible,
-)
+from typing import TypeVar, Optional, Any, Type, Dict, Union, overload, List, Iterator, Tuple, Callable, Iterable, Sized
 
 from django.db import models
+from django.db.models import Manager
 
 _T = TypeVar("_T", bound=models.Model)
 
@@ -30,7 +16,7 @@ class QuerySet(Iterable[_T], Sized):
         hints: Optional[Dict[str, models.Model]] = ...,
     ) -> None: ...
     @classmethod
-    def as_manager(cls): ...
+    def as_manager(cls) -> Manager[Any]: ...
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_T]: ...
     def __bool__(self) -> bool: ...
@@ -110,6 +96,8 @@ class QuerySet(Iterable[_T], Sized):
     @property
     def db(self) -> str: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
+    # TODO: remove when django adds __class_getitem__ methods
+    def __getattr__(self, item: str) -> Any: ...
 
 class RawQuerySet:
     pass
