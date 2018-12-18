@@ -1,11 +1,11 @@
 import os
-from typing import Callable, Optional, cast
+from typing import Callable, Optional, cast, Dict
 
 from mypy.checker import TypeChecker
+from mypy.nodes import TypeInfo
 from mypy.options import Options
-from mypy.plugin import Plugin, FunctionContext, ClassDefContext, AnalyzeTypeContext
+from mypy.plugin import Plugin, FunctionContext, ClassDefContext
 from mypy.types import Type, Instance
-from mypy.typevars import fill_typevars
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field
@@ -14,17 +14,17 @@ from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_ge
 from mypy_django_plugin.plugins.settings import DjangoConfSettingsInitializerHook
 
 
-base_model_classes = {helpers.MODEL_CLASS_FULLNAME}
-manager_subclasses = set()
-
-
 def transform_model_class(ctx: ClassDefContext) -> None:
-    base_model_classes.add(ctx.cls.fullname)
+    sym = ctx.api.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
+    if sym is not None and isinstance(sym.node, TypeInfo):
+        sym.node.metadata['django']['model_bases'][ctx.cls.fullname] = 1
     process_model_class(ctx)
 
 
-def add_new_manager_subclass(ctx: ClassDefContext) -> None:
-    manager_subclasses.add(ctx.cls.fullname)
+def transform_manager_class(ctx: ClassDefContext) -> None:
+    sym = ctx.api.lookup_fully_qualified_or_none(helpers.MANAGER_CLASS_FULLNAME)
+    if sym is not None and isinstance(sym.node, TypeInfo):
+        sym.node.metadata['django']['manager_bases'][ctx.cls.fullname] = 1
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> Type:
@@ -52,7 +52,6 @@ class DjangoPlugin(Plugin):
     def __init__(self,
                  options: Options) -> None:
         super().__init__(options)
-        monkeypatch.replace_apply_function_plugin_method()
         monkeypatch.make_inner_classes_with_inherit_from_any_compatible_with_each_other()
 
         self.django_settings = os.environ.get('DJANGO_SETTINGS_MODULE')
@@ -62,6 +61,28 @@ class DjangoPlugin(Plugin):
         else:
             monkeypatch.restore_original_load_graph()
             monkeypatch.restore_original_dependencies_handling()
+
+    def get_current_model_bases(self) -> Dict[str, int]:
+        model_sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
+        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
+            if 'django' not in model_sym.node.metadata:
+                model_sym.node.metadata['django'] = {
+                    'model_bases': {helpers.MODEL_CLASS_FULLNAME: 1}
+                }
+            return model_sym.node.metadata['django']['model_bases']
+        else:
+            return {}
+
+    def get_current_manager_bases(self) -> Dict[str, int]:
+        manager_sym = self.lookup_fully_qualified(helpers.MANAGER_CLASS_FULLNAME)
+        if manager_sym is not None and isinstance(manager_sym.node, TypeInfo):
+            if 'django' not in manager_sym.node.metadata:
+                manager_sym.node.metadata['django'] = {
+                    'manager_bases': {helpers.MANAGER_CLASS_FULLNAME: 1}
+                }
+            return manager_sym.node.metadata['django']['manager_bases']
+        else:
+            return {}
 
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
@@ -73,20 +94,22 @@ class DjangoPlugin(Plugin):
         if fullname == 'django.contrib.postgres.fields.array.ArrayField':
             return determine_type_of_array_field
 
-        if fullname in manager_subclasses:
+        manager_bases = self.get_current_manager_bases()
+        if fullname in manager_bases:
             return determine_proper_manager_type
         return None
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
-        if fullname in base_model_classes:
+        if fullname in self.get_current_model_bases():
             return transform_model_class
 
         if fullname == helpers.DUMMY_SETTINGS_BASE_CLASS:
             return DjangoConfSettingsInitializerHook(settings_module=self.django_settings)
 
-        if fullname in helpers.MANAGER_CLASSES:
-            return add_new_manager_subclass
+        if fullname in self.get_current_manager_bases():
+            return transform_manager_class
+
         return None
 
 

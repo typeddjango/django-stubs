@@ -52,15 +52,6 @@ class ModelClassInitializer(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-def add_new_var_node_to_class(class_type: TypeInfo, name: str, typ: Instance) -> None:
-    var = Var(name=name, type=typ)
-    var.info = typ.type
-    var._fullname = class_type.fullname() + '.' + name
-    var.is_inferred = True
-    var.is_initialized_in_class = True
-    class_type.names[name] = SymbolTableNode(MDEF, var)
-
-
 def iter_over_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, Expression]]:
     for stmt in klass.defs.body:
         if not isinstance(stmt, AssignmentStmt):

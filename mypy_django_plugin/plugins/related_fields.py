@@ -19,15 +19,15 @@ def fill_typevars_with_any(instance: Instance) -> Type:
 
 def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
     api = cast(TypeChecker, ctx.api)
-    if 'to' not in ctx.arg_names:
+    if 'to' not in ctx.callee_arg_names:
         # shouldn't happen, invalid code
         api.msg.fail(f'to= parameter must be set for {ctx.context.callee.fullname}',
                      context=ctx.context)
         return None
 
-    arg_type = ctx.arg_types[ctx.arg_names.index('to')][0]
+    arg_type = ctx.arg_types[ctx.callee_arg_names.index('to')][0]
     if not isinstance(arg_type, CallableType):
-        to_arg_expr = ctx.args[ctx.arg_names.index('to')][0]
+        to_arg_expr = ctx.args[ctx.callee_arg_names.index('to')][0]
         if not isinstance(to_arg_expr, StrExpr):
             # not string, not supported
             return None
