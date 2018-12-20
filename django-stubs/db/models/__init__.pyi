@@ -1,5 +1,7 @@
 from .base import Model as Model
 
+from .aggregates import Aggregate as Aggregate, Sum as Sum, Variance as Variance, Count as Count
+
 from .fields import (
     AutoField as AutoField,
     IntegerField as IntegerField,
@@ -44,5 +46,3 @@ from .expressions import (
 )
 
 from .manager import BaseManager as BaseManager, Manager as Manager
-
-from .aggregates import Count as Count, Aggregate as Aggregate
