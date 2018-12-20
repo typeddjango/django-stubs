@@ -4,7 +4,22 @@ from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
 from itertools import chain
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, Generic, TypeVar, overload
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+    Generic,
+    TypeVar,
+    overload,
+    Sequence,
+)
 from unittest.mock import MagicMock
 from uuid import UUID
 
@@ -99,15 +114,9 @@ class QuerySet(Generic[_T]):
     def count(self) -> int: ...
     def get(self, *args: Any, **kwargs: Any) -> _T: ...
     def create(self, **kwargs: Any) -> _T: ...
-    def bulk_create(self, objs: Union[Iterator[Any], List[Model]], batch_size: Optional[int] = ...) -> List[_T]: ...
-    def get_or_create(
-        self, defaults: Optional[Union[Dict[str, date], Dict[str, Model]]] = ..., **kwargs: Any
-    ) -> Tuple[_T, bool]: ...
-    def update_or_create(
-        self,
-        defaults: Optional[Union[Dict[str, Callable], Dict[str, date], Dict[str, Model], Dict[str, str]]] = ...,
-        **kwargs: Any
-    ) -> Tuple[_T, bool]: ...
+    def bulk_create(self, objs: Sequence[Model], batch_size: Optional[int] = ...) -> List[_T]: ...
+    def get_or_create(self, defaults: Optional[Dict[str, Any]] = ..., **kwargs: Any) -> Tuple[_T, bool]: ...
+    def update_or_create(self, defaults: Optional[Dict[str, Any]] = ..., **kwargs: Any) -> Tuple[_T, bool]: ...
     def earliest(self, *fields: Any, field_name: Optional[Any] = ...) -> _T: ...
     def latest(self, *fields: Any, field_name: Optional[Any] = ...) -> _T: ...
     def first(self) -> Optional[Union[Dict[str, int], _T]]: ...

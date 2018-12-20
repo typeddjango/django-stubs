@@ -11,6 +11,7 @@ from .fields import (
     BigIntegerField as BigIntegerField,
     CharField as CharField,
     EmailField as EmailField,
+    URLField as URLField,
     Field as Field,
     SlugField as SlugField,
     TextField as TextField,

@@ -66,7 +66,6 @@ class HttpResponse(HttpResponseBase):
     context: Optional[Context]
     cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
-    json: Callable[[], Dict]
     redirect_chain: List[Tuple[str, int]]
     request: Dict[str, Any]
     resolver_match: ResolverMatch
@@ -92,11 +91,14 @@ class HttpResponse(HttpResponseBase):
     def writelines(self, lines: List[str]) -> None: ...
     @property
     def url(self) -> str: ...
+    def json(self) -> Dict[str, Any]: ...
 
 class StreamingHttpResponse(HttpResponseBase):
     def __init__(self, streaming_content: Iterable[bytes] = ..., *args: Any, **kwargs: Any) -> None: ...
     @property
     def content(self) -> bytes: ...
+    @content.setter
+    def content(self, value: Any) -> None: ...
     @property
     def streaming_content(self) -> Iterator[bytes]: ...
     @streaming_content.setter
@@ -110,7 +112,6 @@ class FileResponse(StreamingHttpResponse):
     context: None
     cookies: cookies.SimpleCookie
     file_to_stream: Optional[BytesIO]
-    json: Callable[[], Dict]
     request: Dict[str, str]
     resolver_match: ResolverMatch
     templates: List[Any]
@@ -120,6 +121,7 @@ class FileResponse(StreamingHttpResponse):
     filename: str = ...
     def __init__(self, *args: Any, as_attachment: bool = ..., filename: str = ..., **kwargs: Any) -> None: ...
     def set_headers(self, filelike: BytesIO) -> None: ...
+    def json(self) -> Dict[str, Any]: ...
 
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ...  # type: List[str]
