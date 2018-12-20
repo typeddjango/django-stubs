@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, DefaultDict
 
 from django.apps.registry import Apps
 from django.contrib.postgres.fields.citext import CIText
@@ -6,6 +6,8 @@ from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
+
+from django.utils.functional import cached_property
 
 class AppConfigStub:
     apps: None
@@ -66,9 +68,9 @@ class ProjectState:
     def reload_models(self, models: List[Any], delay: bool = ...) -> None: ...
     def remove_model(self, app_label: str, model_name: str) -> None: ...
 
-class StateApps:
-    all_models: collections.defaultdict
-    app_configs: collections.OrderedDict
+class StateApps(Apps):
+    all_models: DefaultDict
+    app_configs: Dict
     apps_ready: bool
     loading: bool
     models_ready: bool

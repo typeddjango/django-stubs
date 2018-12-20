@@ -3,9 +3,12 @@ from .base import Model as Model
 from .fields import (
     AutoField as AutoField,
     IntegerField as IntegerField,
+    PositiveIntegerField as PositiveIntegerField,
+    PositiveSmallIntegerField as PositiveSmallIntegerField,
     SmallIntegerField as SmallIntegerField,
     BigIntegerField as BigIntegerField,
     CharField as CharField,
+    EmailField as EmailField,
     Field as Field,
     SlugField as SlugField,
     TextField as TextField,

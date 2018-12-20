@@ -1,11 +1,17 @@
 # Stubs for django.http.response (Python 3.5)
 
 import datetime
+from io import BytesIO
 from json import JSONEncoder
-from typing import Any, Dict, Iterable, Iterator, List, Optional, overload, Tuple, Type, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, overload, Tuple, Type, Union, Callable
 
+from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
 import six
+from django.template import Context, Template
+from django.test import Client
+
+from django.urls import ResolverMatch
 
 class BadHeaderError(ValueError): ...
 
@@ -55,15 +61,37 @@ class HttpResponseBase(six.Iterator):
     def writelines(self, lines: Iterable[object]) -> None: ...
 
 class HttpResponse(HttpResponseBase):
-    streaming = ...  # type: bool
-    def __init__(self, content: object = b"", *args: Any, **kwargs: Any) -> None: ...
+    client: Client
+    closed: bool
+    context: Optional[Context]
+    cookies: cookies.SimpleCookie
+    csrf_cookie_set: bool
+    json: Callable[[], Dict]
+    redirect_chain: List[Tuple[str, int]]
+    request: Dict[str, Any]
+    resolver_match: ResolverMatch
+    sameorigin: bool
+    status_code: int
+    templates: List[Template]
+    test_server_port: str
+    test_was_secure_request: bool
+    wsgi_request: WSGIRequest
+    xframe_options_exempt: bool
+    streaming: bool = ...
+    def __init__(self, content: object = ..., *args: Any, **kwargs: Any) -> None: ...
     def serialize(self) -> bytes: ...
     @property
     def content(self) -> bytes: ...
     @content.setter
     def content(self, value: Any) -> None: ...
     def __iter__(self) -> Iterator[bytes]: ...
+    def write(self, content: Union[bytes, str]) -> None: ...
+    def tell(self) -> int: ...
     def getvalue(self) -> bytes: ...
+    def writable(self) -> bool: ...
+    def writelines(self, lines: List[str]) -> None: ...
+    @property
+    def url(self) -> str: ...
 
 class StreamingHttpResponse(HttpResponseBase):
     def __init__(self, streaming_content: Iterable[bytes] = ..., *args: Any, **kwargs: Any) -> None: ...
@@ -76,7 +104,22 @@ class StreamingHttpResponse(HttpResponseBase):
     def __iter__(self) -> Iterator[bytes]: ...
     def getvalue(self) -> bytes: ...
 
-class FileResponse(StreamingHttpResponse): ...
+class FileResponse(StreamingHttpResponse):
+    client: Client
+    closed: bool
+    context: None
+    cookies: cookies.SimpleCookie
+    file_to_stream: Optional[BytesIO]
+    json: Callable[[], Dict]
+    request: Dict[str, str]
+    resolver_match: ResolverMatch
+    templates: List[Any]
+    wsgi_request: WSGIRequest
+    block_size: int = ...
+    as_attachment: bool = ...
+    filename: str = ...
+    def __init__(self, *args: Any, as_attachment: bool = ..., filename: str = ..., **kwargs: Any) -> None: ...
+    def set_headers(self, filelike: BytesIO) -> None: ...
 
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ...  # type: List[str]

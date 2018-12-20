@@ -7,8 +7,6 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import Field
 
-from .topological_sort import stable_topological_sort
-
 class MigrationAutodetector:
     from_state: ProjectState = ...
     to_state: ProjectState = ...

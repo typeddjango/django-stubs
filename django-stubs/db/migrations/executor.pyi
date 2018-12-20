@@ -3,15 +3,13 @@ from typing import Any, Callable, List, Optional, Set, Tuple, Union
 from django.db import DefaultConnectionProxy
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
-from django.db.migrations.state import ProjectState
 
-from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
 
 class MigrationExecutor:
-    connection: django.db.backends.sqlite3.base.DatabaseWrapper = ...
+    connection: Any = ...
     loader: MigrationLoader = ...
     recorder: MigrationRecorder = ...
     progress_callback: Callable = ...
