@@ -14,6 +14,23 @@ from django.db import models
 class User(models.Model):
     pass
 
+[CASE registry_apps_get_model_passed_as_variables_not_supported]
+from django.apps.registry import Apps
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from myapp.models import User
+app_name = 'myapp'
+model_name = 'User'
+apps = Apps()
+model_cls = apps.get_model(app_name, model_name)
+reveal_type(model_cls)  # E: Revealed type is 'Type[django.db.models.base.Model]'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class User(models.Model):
+    pass
+
 [CASE state_apps_get_model]
 from django.db.migrations.state import StateApps
 from typing import TYPE_CHECKING
