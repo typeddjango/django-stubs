@@ -1,0 +1,31 @@
+[CASE registry_apps_get_model]
+from django.apps.registry import Apps
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from myapp.models import User
+apps = Apps()
+model_cls = apps.get_model('myapp', 'User')
+reveal_type(model_cls)  # E: Revealed type is 'Type[myapp.models.User]'
+reveal_type(model_cls.objects)  # E: Revealed type is 'django.db.models.manager.Manager[myapp.models.User]'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class User(models.Model):
+    pass
+
+[CASE state_apps_get_model]
+from django.db.migrations.state import StateApps
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from myapp.models import User
+apps = StateApps([], {})
+model_cls = apps.get_model('myapp', 'User')
+reveal_type(model_cls)  # E: Revealed type is 'Type[myapp.models.User]'
+reveal_type(model_cls.objects)  # E: Revealed type is 'django.db.models.manager.Manager[myapp.models.User]'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class User(models.Model):
+    pass

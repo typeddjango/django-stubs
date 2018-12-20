@@ -27,10 +27,8 @@ def get_models_file(app_name: str, all_modules: typing.Dict[str, MypyFile]) -> O
     return all_modules.get(models_module)
 
 
-def get_model_fullname_from_string(expr: StrExpr,
-                                   all_modules: Dict[str, MypyFile]) -> Optional[str]:
-    app_name, model_name = expr.value.split('.')
-
+def get_model_fullname(app_name: str, model_name: str,
+                       all_modules: Dict[str, MypyFile]) -> Optional[str]:
     models_file = get_models_file(app_name, all_modules)
     if models_file is None:
         # not imported so far, not supported
@@ -45,6 +43,21 @@ def get_model_fullname_from_string(expr: StrExpr,
         return sym.node.target_fullname
     else:
         return None
+
+
+class InvalidModelString(ValueError):
+    def __init__(self, model_string: str):
+        self.model_string = model_string
+
+
+def get_model_fullname_from_string(expr: StrExpr,
+                                   all_modules: Dict[str, MypyFile]) -> Optional[str]:
+    model_string = expr.value
+    if '.' not in model_string:
+        raise InvalidModelString(model_string)
+
+    app_name, model_name = model_string.split('.')
+    return get_model_fullname(app_name, model_name, all_modules)
 
 
 def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolNode]:

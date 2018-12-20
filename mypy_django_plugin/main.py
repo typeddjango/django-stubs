@@ -4,11 +4,12 @@ from typing import Callable, Optional, cast, Dict
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.options import Options
-from mypy.plugin import Plugin, FunctionContext, ClassDefContext
+from mypy.plugin import Plugin, FunctionContext, ClassDefContext, MethodContext
 from mypy.types import Type, Instance
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field
+from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations
 from mypy_django_plugin.plugins.models import process_model_class
 from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
 from mypy_django_plugin.plugins.settings import DjangoConfSettingsInitializerHook
@@ -97,6 +98,12 @@ class DjangoPlugin(Plugin):
         manager_bases = self.get_current_manager_bases()
         if fullname in manager_bases:
             return determine_proper_manager_type
+
+    def get_method_hook(self, fullname: str
+                        ) -> Optional[Callable[[MethodContext], Type]]:
+        if fullname in {'django.apps.registry.Apps.get_model',
+                        'django.db.migrations.state.StateApps.get_model'}:
+            return determine_model_cls_from_string_for_migrations
         return None
 
     def get_base_class_hook(self, fullname: str

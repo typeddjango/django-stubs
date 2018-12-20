@@ -3,7 +3,7 @@ from abc import abstractmethod, ABCMeta
 from typing import cast, Iterator, Tuple, Optional, Dict
 
 from mypy.nodes import ClassDef, AssignmentStmt, CallExpr, MemberExpr, StrExpr, NameExpr, MDEF, TypeInfo, Var, SymbolTableNode, \
-    Lvalue, Expression, MypyFile
+    Lvalue, Expression, MypyFile, Context
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import Instance
@@ -128,9 +128,15 @@ class AddRelatedManagers(ModelClassInitializer):
             for defn in iter_over_classdefs(module_file):
                 for lvalue, rvalue in iter_call_assignments(defn):
                     if is_related_field(rvalue, module_file):
-                        ref_to_fullname = extract_ref_to_fullname(rvalue,
-                                                                  module_file=module_file,
-                                                                  all_modules=self.api.modules)
+                        try:
+                            ref_to_fullname = extract_ref_to_fullname(rvalue,
+                                                                      module_file=module_file,
+                                                                      all_modules=self.api.modules)
+                        except helpers.InvalidModelString as exc:
+                            self.api.fail(f'Invalid value for a to= parameter: {exc.model_string!r}',
+                                          Context(line=rvalue.line))
+                            return None
+
                         if self.model_classdef.fullname == ref_to_fullname:
                             if 'related_name' in rvalue.arg_names:
                                 related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]

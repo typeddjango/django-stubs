@@ -2,7 +2,7 @@ import typing
 from typing import Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import StrExpr, TypeInfo
+from mypy.nodes import StrExpr, TypeInfo, Context
 from mypy.plugin import FunctionContext
 from mypy.types import Type, CallableType, Instance, AnyType, TypeOfAny
 
@@ -57,7 +57,12 @@ def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
 
 
 def extract_to_parameter_as_get_ret_type_for_related_field(ctx: FunctionContext) -> Type:
-    referred_to_type = get_valid_to_value_or_none(ctx)
+    try:
+        referred_to_type = get_valid_to_value_or_none(ctx)
+    except helpers.InvalidModelString as exc:
+        ctx.api.fail(f'Invalid value for a to= parameter: {exc.model_string!r}', ctx.context)
+        return fill_typevars_with_any(ctx.default_return_type)
+
     if referred_to_type is None:
         # couldn't extract to= value
         return fill_typevars_with_any(ctx.default_return_type)
