@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand as BaseCommand
 
 def find_commands(management_dir: str) -> List[str]: ...
 def load_command_class(app_name: str, name: str) -> BaseCommand: ...

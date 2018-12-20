@@ -1,13 +1,15 @@
 from datetime import datetime
 from decimal import Decimal
 from re import RegexFlag
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Pattern
 from uuid import UUID
 
 from django.core.files.base import File
 from django.utils.functional import SimpleLazyObject
 
 EMPTY_VALUES: Any
+
+def _lazy_re_compile(regex: Union[str, Pattern], flags: int = ...): ...
 
 class RegexValidator:
     regex: SimpleLazyObject = ...
