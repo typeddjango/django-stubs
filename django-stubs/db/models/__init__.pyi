@@ -1,6 +1,6 @@
 from .base import Model as Model
 
-from .aggregates import Aggregate as Aggregate, Sum as Sum, Variance as Variance, Count as Count
+from .aggregates import Aggregate as Aggregate, Sum as Sum, Variance as Variance, Count as Count, Max as Max
 
 from .fields import (
     AutoField as AutoField,
