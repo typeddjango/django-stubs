@@ -1,13 +1,11 @@
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, DefaultDict
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, DefaultDict
 
 from django.apps.registry import Apps
-from django.contrib.postgres.fields.citext import CIText
 from django.db.models.base import Model
-from django.db.models.fields import Field
-from django.db.models.indexes import Index
 from django.db.models.manager import Manager
-
 from django.utils.functional import cached_property
+
+from django.db.models.fields import Field
 
 class AppConfigStub:
     apps: None
@@ -25,17 +23,8 @@ class ModelState:
         self,
         app_label: str,
         name: str,
-        fields: List[Tuple[str, Union[CIText, Field]]],
-        options: Optional[
-            Union[
-                Dict[str, List[Index]],
-                Dict[str, List[str]],
-                Dict[str, Set[Tuple[str, str]]],
-                Dict[str, Tuple[str]],
-                Dict[str, bool],
-                Dict[str, str],
-            ]
-        ] = ...,
+        fields: List[Tuple[str, Field]],
+        options: Optional[Dict[str, Any]] = ...,
         bases: Optional[Tuple[Type[Model]]] = ...,
         managers: Optional[List[Tuple[str, Manager]]] = ...,
     ) -> None: ...
@@ -70,7 +59,6 @@ class ProjectState:
 
 class StateApps(Apps):
     all_models: DefaultDict
-    app_configs: Dict
     apps_ready: bool
     loading: bool
     models_ready: bool
