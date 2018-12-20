@@ -15,6 +15,7 @@ from .fields import (
     SlugField as SlugField,
     TextField as TextField,
     BooleanField as BooleanField,
+    NullBooleanField as NullBooleanField,
     FileField as FileField,
     DateField as DateField,
     DateTimeField as DateTimeField,
