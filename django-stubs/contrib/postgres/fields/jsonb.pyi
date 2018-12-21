@@ -2,7 +2,6 @@ from json import JSONEncoder
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from django.db.models import Field
-
 from .mixins import CheckFieldDefaultMixin
 
 class JsonAdapter(object):

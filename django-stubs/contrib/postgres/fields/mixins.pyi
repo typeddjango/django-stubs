@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, List
 
 class CheckFieldDefaultMixin:
     def check(self, **kwargs: Any) -> List[Any]: ...

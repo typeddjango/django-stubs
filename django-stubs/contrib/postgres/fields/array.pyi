@@ -1,7 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Union, TypeVar, Generic, Sequence
 
 from django.db.models.fields import Field
-
 from .mixins import CheckFieldDefaultMixin
 
 _T = TypeVar("_T", bound=Field)
