@@ -8,7 +8,6 @@ from django.core.mail.message import EmailMultiAlternatives as EmailMultiAlterna
 from django.core.mail.message import SafeMIMEMultipart as SafeMIMEMultipart
 from django.core.mail.message import SafeMIMEText as SafeMIMEText
 from django.core.mail.message import forbid_multi_line_headers as forbid_multi_line_headers
-from django.core.mail.message import make_msgid as make_msgid
 from django.core.mail.utils import DNS_NAME as DNS_NAME
 from django.core.mail.utils import CachedDnsName as CachedDnsName
 
@@ -45,3 +44,5 @@ def mail_managers(
     connection: Optional[BaseEmailBackend] = ...,
     html_message: Optional[str] = ...,
 ) -> None: ...
+
+outbox = [EmailMessage()]

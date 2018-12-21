@@ -1,5 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
-from uuid import UUID
+from typing import Any, Callable, Dict, Optional, Type, Union, Sequence
 
 from django.urls.resolvers import ResolverMatch
 
@@ -7,8 +6,8 @@ def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
 def reverse(
     viewname: Optional[Union[Callable, str]],
     urlconf: Optional[str] = ...,
-    args: Optional[Union[List[UUID], Tuple]] = ...,
-    kwargs: Optional[Union[Dict[str, None], Dict[str, bytes], Dict[str, str], Dict[str, UUID]]] = ...,
+    args: Optional[Sequence[Any]] = ...,
+    kwargs: Optional[Dict[str, Any]] = ...,
     current_app: Optional[str] = ...,
 ) -> str: ...
 
