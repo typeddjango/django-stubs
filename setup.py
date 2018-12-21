@@ -9,7 +9,7 @@ setup(
     license='BSD',
     install_requires=[
         'Django',
-        'mypy @ git+https://github.com/python/mypy.git#egg=mypy-0.660+dev.01c268644d1d22506442df4e21b39c04710b7e8b'
+        'mypy @ git+https://github.com/python/mypy.git#egg=mypy-0.660+dev.a7296c4595350768ec8ecf145c23a76b6c98e8e6'
     ],
     packages=['mypy_django_plugin']
 )
