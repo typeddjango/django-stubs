@@ -2,7 +2,7 @@ import typing
 from typing import Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import StrExpr, TypeInfo, Context
+from mypy.nodes import StrExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import Type, CallableType, Instance, AnyType, TypeOfAny
 
@@ -31,8 +31,12 @@ def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
         if not isinstance(to_arg_expr, StrExpr):
             # not string, not supported
             return None
-        model_fullname = helpers.get_model_fullname_from_string(to_arg_expr,
-                                                                all_modules=api.modules)
+        try:
+            model_fullname = helpers.get_model_fullname_from_string(to_arg_expr.value,
+                                                                    all_modules=api.modules)
+        except helpers.SelfReference:
+            model_fullname = api.tscope.classes[-1].fullname()
+
         if model_fullname is None:
             return None
         model_info = helpers.lookup_fully_qualified_generic(model_fullname,

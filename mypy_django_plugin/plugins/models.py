@@ -132,6 +132,8 @@ class AddRelatedManagers(ModelClassInitializer):
                             ref_to_fullname = extract_ref_to_fullname(rvalue,
                                                                       module_file=module_file,
                                                                       all_modules=self.api.modules)
+                        except helpers.SelfReference:
+                            ref_to_fullname = defn.fullname
                         except helpers.InvalidModelString as exc:
                             self.api.fail(f'Invalid value for a to= parameter: {exc.model_string!r}',
                                           Context(line=rvalue.line))
@@ -183,7 +185,7 @@ def extract_ref_to_fullname(rvalue_expr: CallExpr,
     if isinstance(to_expr, NameExpr):
         return module_file.names[to_expr.name].fullname
     elif isinstance(to_expr, StrExpr):
-        typ_fullname = helpers.get_model_fullname_from_string(to_expr, all_modules)
+        typ_fullname = helpers.get_model_fullname_from_string(to_expr.value, all_modules)
         if typ_fullname is None:
             return None
         return typ_fullname

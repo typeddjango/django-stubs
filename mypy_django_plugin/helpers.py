@@ -50,9 +50,15 @@ class InvalidModelString(ValueError):
         self.model_string = model_string
 
 
-def get_model_fullname_from_string(expr: StrExpr,
+class SelfReference(ValueError):
+    pass
+
+
+def get_model_fullname_from_string(model_string: str,
                                    all_modules: Dict[str, MypyFile]) -> Optional[str]:
-    model_string = expr.value
+    if model_string == 'self':
+        raise SelfReference()
+
     if '.' not in model_string:
         raise InvalidModelString(model_string)
 
