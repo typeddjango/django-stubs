@@ -6,16 +6,16 @@ from django.http.response import HttpResponse, HttpResponseRedirect
 from django.http import HttpRequest
 
 def render_to_response(
-    template_name: Union[List[str], str],
-    context: Optional[Dict[str, str]] = ...,
+    template_name: str,
+    context: Optional[Dict[str, Any]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,
 ) -> HttpResponse: ...
 def render(
     request: HttpRequest,
-    template_name: Union[List[str], str],
-    context: Optional[Dict[str, bool]] = ...,
+    template_name: str,
+    context: Optional[Dict[str, Any]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,

@@ -2,11 +2,13 @@ from typing import Any, Dict, Optional
 
 from django.contrib.sessions.backends.base import SessionBase
 
+from django.contrib.sessions.serializers import JSONSerializer
+
 KEY_PREFIX: str
 
 class SessionStore(SessionBase):
     accessed: bool
-    serializer: Type[django.core.signing.JSONSerializer]
+    serializer: JSONSerializer
     cache_key_prefix: Any = ...
     def __init__(self, session_key: Optional[str] = ...) -> None: ...
     @property
