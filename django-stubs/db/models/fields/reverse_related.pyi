@@ -16,14 +16,14 @@ class ForeignObjectRel(FieldCacheMixin):
     name: str
     one_to_many: bool
     one_to_one: bool
-    related_model: Type[django.db.models.base.Model]
+    related_model: Type[Model]
     auto_created: bool = ...
     concrete: bool = ...
     editable: bool = ...
     is_relation: bool = ...
     null: bool = ...
-    field: django.db.models.fields.related.ForeignObject = ...
-    model: Union[Type[django.db.models.base.Model], str] = ...
+    field: Field = ...
+    model: Union[Type[Model], str] = ...
     related_name: Optional[str] = ...
     related_query_name: None = ...
     limit_choices_to: Dict[Any, Any] = ...
@@ -37,7 +37,7 @@ class ForeignObjectRel(FieldCacheMixin):
         to: Union[Type[Model], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Callable, Dict[str, Union[int, str]], Q]] = ...,
+        limit_choices_to: Any = ...,
         parent_link: bool = ...,
         on_delete: Optional[Callable] = ...,
     ) -> None: ...
@@ -71,19 +71,19 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_cache_name(self) -> str: ...
 
 class ManyToOneRel(ForeignObjectRel):
-    field: django.db.models.fields.related.ForeignKey
+    field: ForeignKey
     hidden: bool
-    limit_choices_to: Union[Callable, Dict[str, Union[int, str]], django.db.models.query_utils.Q]
+    limit_choices_to: Any
     many_to_many: bool
     many_to_one: bool
-    model: Union[Type[django.db.models.base.Model], str]
+    model: Union[Type[Model], str]
     multiple: bool
     name: str
     on_delete: Callable
     one_to_many: bool
     one_to_one: bool
     parent_link: bool
-    related_model: Type[django.db.models.base.Model]
+    related_model: Type[Model]
     related_name: Optional[str]
     related_query_name: Optional[str]
     symmetrical: bool
@@ -103,19 +103,19 @@ class ManyToOneRel(ForeignObjectRel):
     def set_field_name(self) -> None: ...
 
 class OneToOneRel(ManyToOneRel):
-    field: django.db.models.fields.related.OneToOneField
+    field: OneToOneField
     field_name: Optional[str]
     hidden: bool
     limit_choices_to: Dict[str, str]
     many_to_many: bool
     many_to_one: bool
-    model: Union[Type[django.db.models.base.Model], str]
+    model: Union[Type[Model], str]
     name: str
     on_delete: Callable
     one_to_many: bool
     one_to_one: bool
     parent_link: bool
-    related_model: Type[django.db.models.base.Model]
+    related_model: Type[Model]
     related_name: Optional[str]
     related_query_name: Optional[str]
     symmetrical: bool
@@ -133,21 +133,21 @@ class OneToOneRel(ManyToOneRel):
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
-    field: django.db.models.fields.related.RelatedField
+    field: RelatedField
     field_name: None
     hidden: bool
     limit_choices_to: Union[Callable, Dict[str, str]]
-    model: Union[Type[django.db.models.base.Model], str]
+    model: Union[Type[Model], str]
     multiple: bool
     name: str
     on_delete: None
     one_to_many: bool
     one_to_one: bool
     parent_link: bool
-    related_model: Type[django.db.models.base.Model]
+    related_model: Type[Model]
     related_name: Optional[str]
     related_query_name: Optional[str]
-    through: Optional[Union[Type[django.db.models.base.Model], str]] = ...
+    through: Optional[Union[Type[Model], str]] = ...
     through_fields: Optional[Tuple[str, str]] = ...
     symmetrical: bool = ...
     db_constraint: bool = ...
@@ -157,7 +157,7 @@ class ManyToManyRel(ForeignObjectRel):
         to: Union[Type[Model], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Callable, Dict[str, str]]] = ...,
+        limit_choices_to: Any = ...,
         symmetrical: bool = ...,
         through: Optional[Union[Type[Model], str]] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,

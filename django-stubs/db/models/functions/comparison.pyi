@@ -13,7 +13,7 @@ class Cast(Func):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     template: str = ...
@@ -29,7 +29,7 @@ class Coalesce(Func):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     def __init__(self, *expressions: Any, **extra: Any) -> None: ...
@@ -41,7 +41,7 @@ class Greatest(Func):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     def __init__(self, *expressions: Any, **extra: Any) -> None: ...
@@ -53,7 +53,7 @@ class Least(Func):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     def __init__(self, *expressions: Any, **extra: Any) -> None: ...

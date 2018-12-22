@@ -49,7 +49,7 @@ class GenericForeignKey(FieldCacheMixin):
 class GenericRel(ForeignObjectRel):
     field: django.contrib.contenttypes.fields.GenericRelation
     limit_choices_to: Dict[Any, Any]
-    model: Type[django.db.models.base.Model]
+    model: Type[Model]
     multiple: bool
     on_delete: Callable
     parent_link: bool

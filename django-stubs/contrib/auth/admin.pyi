@@ -28,7 +28,7 @@ class GroupAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     admin_site: django.contrib.admin.sites.AdminSite
     formfield_overrides: Dict[
-        Type[Union[django.db.models.fields.DateTimeCheckMixin, django.db.models.fields.Field]],
+        Type[Union[django.db.models.fields.DateTimeCheckMixin, Field]],
         Dict[str, Type[Union[django.forms.fields.SplitDateTimeField, django.forms.widgets.Widget]]],
     ]
     model: Type[django.contrib.auth.models.User]

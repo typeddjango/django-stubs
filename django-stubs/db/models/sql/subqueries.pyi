@@ -32,7 +32,7 @@ class DeleteQuery(Query):
     high_mark: None
     low_mark: int
     max_depth: int
-    model: Type[django.db.models.base.Model]
+    model: Type[Model]
     order_by: Tuple
     select: Tuple
     select_for_update: bool
@@ -79,12 +79,10 @@ class UpdateQuery(Query):
     high_mark: None
     low_mark: int
     max_depth: int
-    model: Type[django.db.models.base.Model]
+    model: Type[Model]
     order_by: Tuple
     related_ids: Optional[List[int]]
-    related_updates: Dict[
-        Type[django.db.models.base.Model], List[Tuple[django.db.models.fields.Field, None, Union[int, str]]]
-    ]
+    related_updates: Dict[Type[Model], List[Tuple[Field, None, Union[int, str]]]]
     select: Tuple
     select_for_update: bool
     select_for_update_nowait: bool
@@ -96,13 +94,7 @@ class UpdateQuery(Query):
     subquery: bool
     table_map: Dict[str, List[str]]
     used_aliases: Set[str]
-    values: List[
-        Tuple[
-            django.db.models.fields.Field,
-            Optional[Type[django.db.models.base.Model]],
-            Union[django.db.models.expressions.Case, uuid.UUID],
-        ]
-    ]
+    values: List[Tuple[Field, Optional[Type[Model]], Union[django.db.models.expressions.Case, uuid.UUID]]]
     values_select: Tuple
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
@@ -139,7 +131,7 @@ class InsertQuery(Query):
     high_mark: None
     low_mark: int
     max_depth: int
-    model: Type[django.db.models.base.Model]
+    model: Type[Model]
     order_by: Tuple
     select: Tuple
     select_for_update: bool
@@ -156,11 +148,9 @@ class InsertQuery(Query):
     where_class: Type[django.db.models.sql.where.WhereNode]
     compiler: str = ...
     fields: Union[
-        List[django.db.models.fields.DateTimeCheckMixin],
-        List[django.db.models.fields.Field],
-        django.utils.datastructures.ImmutableList,
+        List[django.db.models.fields.DateTimeCheckMixin], List[Field], django.utils.datastructures.ImmutableList
     ] = ...
-    objs: List[django.db.models.base.Model] = ...
+    objs: List[Model] = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     raw: bool = ...
     def insert_values(
@@ -191,7 +181,7 @@ class AggregateQuery(Query):
     high_mark: None
     low_mark: int
     max_depth: int
-    model: Type[django.db.models.base.Model]
+    model: Type[Model]
     order_by: Tuple
     select: Tuple
     select_for_update: bool

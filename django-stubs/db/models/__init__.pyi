@@ -32,7 +32,7 @@ from .query import QuerySet as QuerySet, RawQuerySet as RawQuerySet
 
 from .query_utils import Q as Q, FilteredRelation as FilteredRelation
 
-from .lookups import Lookup as Lookup
+from .lookups import Lookup as Lookup, Transform as Transform
 
 from .expressions import (
     F as F,
@@ -45,6 +45,9 @@ from .expressions import (
     When as When,
     RawSQL as RawSQL,
     Value as Value,
+    Func as Func,
 )
 
 from .manager import BaseManager as BaseManager, Manager as Manager
+
+from . import lookups as lookups

@@ -3,8 +3,9 @@ from typing import Any, Callable, List, Optional, Tuple, Type, Union, Generic, T
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
 from django.db.models.expressions import F
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import ForeignObject, RelatedField, OneToOneField
+from django.db.models.fields.related import RelatedField, OneToOneField
 from django.db.models.fields.reverse_related import ManyToManyRel, OneToOneRel
 from django.db.models.query import QuerySet
 
@@ -12,8 +13,8 @@ _T = TypeVar("_T")
 
 class ForwardManyToOneDescriptor:
     RelatedObjectDoesNotExist: Type[ObjectDoesNotExist]
-    field: ForeignObject = ...
-    def __init__(self, field_with_rel: ForeignObject) -> None: ...
+    field: Field = ...
+    def __init__(self, field_with_rel: Field) -> None: ...
     def is_cached(self, instance: Model) -> bool: ...
     def get_queryset(self, **hints: Any) -> QuerySet: ...
     def get_prefetch_queryset(

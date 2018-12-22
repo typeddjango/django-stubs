@@ -1,3 +1,3 @@
 #!/usr/local/bin/xonsh
 
-black --line-length=120 django-stubs/ django-stubs-generated/
+black --line-length=120 django-stubs/

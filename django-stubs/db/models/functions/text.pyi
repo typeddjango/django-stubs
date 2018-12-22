@@ -40,7 +40,7 @@ class Concat(Func):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.functions.text.ConcatPair]
     function: Any = ...
     template: str = ...
@@ -82,7 +82,7 @@ class Lower(Transform):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     lookup_name: str = ...
@@ -219,7 +219,7 @@ class Upper(Transform):
     convert_value: Callable
     extra: Dict[Any, Any]
     is_summary: bool
-    output_field: django.db.models.fields.Field
+    output_field: Field
     source_expressions: List[django.db.models.expressions.Combinable]
     function: str = ...
     lookup_name: str = ...
