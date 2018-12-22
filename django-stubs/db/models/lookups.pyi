@@ -4,15 +4,14 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union, Iterable
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.expressions import Combinable, Expression, Func
-from django.db.models.functions.datetime import ExtractYear
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 from django.utils.datastructures import OrderedSet
 from django.utils.safestring import SafeText
 
-from django.db.models import expressions, lookups
-from django.db.models.fields import TextField, related_lookups
+from django.db.models import lookups
+from django.db.models.fields import TextField, related_lookups, Field
 
 class Lookup:
     lookup_name: Any = ...
@@ -50,6 +49,7 @@ class Lookup:
 class Transform(RegisterLookupMixin, Func):
     bilateral: bool = ...
     arity: int = ...
+    output_field: Field
     @property
     def lhs(self) -> Expression: ...
     def get_bilateral_transforms(self) -> List[Type[Transform]]: ...
