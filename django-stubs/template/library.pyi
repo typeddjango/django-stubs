@@ -74,7 +74,7 @@ class InclusionNode(TagHelperNode):
     origin: django.template.base.Origin
     takes_context: Optional[bool]
     token: django.template.base.Token
-    filename: Union[django.template.base.Template, str] = ...
+    filename: Union[Template, str] = ...
     def __init__(
         self,
         func: Callable,

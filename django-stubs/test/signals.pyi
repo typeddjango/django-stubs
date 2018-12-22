@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 template_rendered: Any
 COMPLEX_OVERRIDE_SETTINGS: Any

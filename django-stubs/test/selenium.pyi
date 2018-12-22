@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Tuple, Type, Union
 
 from django.test import LiveServerTestCase
 

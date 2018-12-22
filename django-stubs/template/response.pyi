@@ -59,7 +59,7 @@ class TemplateResponse(SimpleTemplateResponse):
     resolver_match: django.utils.functional.SimpleLazyObject
     status_code: int
     template_name: Union[List[str], django.template.backends.django.Template, str]
-    templates: List[django.template.base.Template]
+    templates: List[Template]
     using: Optional[str]
     wsgi_request: django.core.handlers.wsgi.WSGIRequest
     rendering_attrs: Any = ...

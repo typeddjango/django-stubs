@@ -1,7 +1,6 @@
 import collections
 from typing import Any, Callable, List, Optional, Tuple, Type, Union, Iterable
 
-from django.apps.config import AppConfig
 from django.db.migrations.state import AppConfigStub
 from django.db.models.base import Model
 
