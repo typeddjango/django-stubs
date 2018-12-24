@@ -4,6 +4,7 @@ from django.db.models.base import Model
 
 from django.db import models
 from django.db.models import Manager
+from django.db.models.sql.query import Query, RawQuery
 
 _T = TypeVar("_T", bound=models.Model)
 
@@ -11,7 +12,7 @@ class QuerySet(Iterable[_T], Sized):
     def __init__(
         self,
         model: Optional[Type[models.Model]] = ...,
-        query: Optional[Any] = ...,
+        query: Optional[Query] = ...,
         using: Optional[str] = ...,
         hints: Optional[Dict[str, models.Model]] = ...,
     ) -> None: ...
@@ -91,11 +92,33 @@ class QuerySet(Iterable[_T], Sized):
     # TODO: remove when django adds __class_getitem__ methods
     def __getattr__(self, item: str) -> Any: ...
 
-class RawQuerySet:
-    pass
-
-class RawQuery(object):
-    pass
-
-class Query(object):
-    pass
+class RawQuerySet(Iterable[_T], Sized):
+    def __init__(
+        self,
+        raw_query: RawQuery,
+        model: Optional[Type[models.Model]] = ...,
+        query: Optional[Query] = ...,
+        params: Tuple[Any] = ...,
+        translations: Optional[Dict[str, str]] = ...,
+        using: str = ...,
+        hints: Optional[Dict[str, models.Model]] = ...,
+    ) -> None: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[_T]: ...
+    def __bool__(self) -> bool: ...
+    @overload
+    def __getitem__(self, k: int) -> _T: ...
+    @overload
+    def __getitem__(self, k: str) -> Any: ...
+    @overload
+    def __getitem__(self, k: slice) -> QuerySet[_T]: ...
+    @property
+    def columns(self) -> List[str]: ...
+    @property
+    def db(self) -> str: ...
+    def iterator(self) -> Iterator[_T]: ...
+    @property
+    def model_fields(self) -> Dict[str, str]: ...
+    def prefetch_related(self, *lookups: Any) -> RawQuerySet[_T]: ...
+    def resolve_model_init_order(self) -> Tuple[List[str], List[int], List[Tuple[str, int]]]: ...
+    def using(self, alias: Optional[str]) -> RawQuerySet[_T]: ...
