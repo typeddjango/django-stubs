@@ -1,3 +1,0 @@
-[submodule "external/mypy"]
-	path = external/mypy
-	url = https://github.com/python/mypy.git
