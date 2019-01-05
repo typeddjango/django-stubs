@@ -21,8 +21,7 @@ jobs:
   - name: "Typecheck Django test suite"
     python: 3.7
     script: |
-      cd scripts
-      ./typecheck_django_tests.xsh
+      ./scripts/typecheck_django_tests.xsh
 
 before_install: |
   # Upgrade pip, setuptools, and wheel
