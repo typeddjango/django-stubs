@@ -1,5 +1,3 @@
-#!/usr/local/bin/xonsh
-
 import os
 if not os.path.exists('./django-sources'):
     git clone -b stable/2.1.x https://github.com/django/django.git django-sources
