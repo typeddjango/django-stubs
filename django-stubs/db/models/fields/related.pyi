@@ -59,7 +59,7 @@ class ManyToManyField(RelatedField, Generic[_T]):
         related_query_name: Optional[str] = ...,
         limit_choices_to: Optional[Callable] = ...,
         symmetrical: Optional[bool] = ...,
-        through: Optional[str] = ...,
+        through: Optional[Union[str, Type[Model]]] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,
         db_constraint: bool = ...,
         db_table: None = ...,

@@ -33,14 +33,7 @@ class ValidationError(Exception):
     params: Any = ...
     def __init__(
         self,
-        message: Union[
-            Dict[str, List[ValidationError]],
-            Dict[str, ErrorList],
-            List[Union[ValidationError, str]],
-            ValidationError,
-            ErrorList,
-            str,
-        ],
+        message: Any,
         code: Optional[str] = ...,
         params: Optional[
             Union[Dict[str, Union[Tuple[str], Type[Model], Model, str]], Dict[str, Union[int, str]]]

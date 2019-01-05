@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.models import User
@@ -7,8 +7,8 @@ class AdminAuthenticationForm(AuthenticationForm):
     auto_id: str
     data: Dict[str, str]
     empty_permitted: bool
-    error_class: Type[django.forms.utils.ErrorList]
-    fields: collections.OrderedDict
+    error_class: type
+    fields: Dict[Any, Any]
     files: Dict[Any, Any]
     initial: Dict[Any, Any]
     is_bound: bool
@@ -23,11 +23,11 @@ class AdminPasswordChangeForm(PasswordChangeForm):
     auto_id: str
     data: Dict[Any, Any]
     empty_permitted: bool
-    error_class: Type[django.forms.utils.ErrorList]
-    fields: collections.OrderedDict
+    error_class: type
+    fields: Dict[Any, Any]
     files: Dict[Any, Any]
     initial: Dict[Any, Any]
     is_bound: bool
     label_suffix: str
-    user: django.utils.functional.SimpleLazyObject
+    user: Any
     required_css_class: str = ...

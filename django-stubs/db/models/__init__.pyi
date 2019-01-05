@@ -9,6 +9,7 @@ from .fields import (
     PositiveSmallIntegerField as PositiveSmallIntegerField,
     SmallIntegerField as SmallIntegerField,
     BigIntegerField as BigIntegerField,
+    FloatField as FloatField,
     CharField as CharField,
     EmailField as EmailField,
     URLField as URLField,
@@ -19,14 +20,27 @@ from .fields import (
     NullBooleanField as NullBooleanField,
     FileField as FileField,
     DateField as DateField,
+    TimeField as TimeField,
     DateTimeField as DateTimeField,
     IPAddressField as IPAddressField,
     GenericIPAddressField as GenericIPAddressField,
+    UUIDField as UUIDField,
+    DecimalField as DecimalField,
+    FilePathField as FilePathField,
+    BinaryField as BinaryField,
+    DurationField as DurationField,
 )
 
 from .fields.related import ForeignKey as ForeignKey, OneToOneField as OneToOneField, ManyToManyField as ManyToManyField
+from .fields.files import ImageField as ImageField, FileField as FileField
 
-from .deletion import CASCADE as CASCADE, SET_DEFAULT as SET_DEFAULT, SET_NULL as SET_NULL, DO_NOTHING as DO_NOTHING
+from .deletion import (
+    CASCADE as CASCADE,
+    SET_DEFAULT as SET_DEFAULT,
+    SET_NULL as SET_NULL,
+    DO_NOTHING as DO_NOTHING,
+    PROTECT as PROTECT,
+)
 
 from .query import QuerySet as QuerySet, RawQuerySet as RawQuerySet
 
