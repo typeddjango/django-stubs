@@ -18,10 +18,10 @@ jobs:
     script: |
       black --check --line-length=120 django-stubs/
 
-  - name: "Typecheck Django test suite"
-    python: 3.7
-    script: |
-      xonsh ./scripts/typecheck_django_tests.xsh
+#  - name: "Typecheck Django test suite"
+#    python: 3.7
+#    script: |
+#      xonsh ./scripts/typecheck_django_tests.xsh
 
 before_install: |
   # Upgrade pip, setuptools, and wheel
