@@ -1,11 +1,14 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
+import collections
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, Type
 
 from django import forms
 from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.db.models.fields import AutoField
-from django.forms.utils import ErrorDict
+from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeText
+
+from django.forms.boundfield import BoundField
 
 ACTION_CHECKBOX_NAME: str
 
@@ -13,7 +16,7 @@ class ActionForm(forms.Form):
     auto_id: None
     data: Dict[Any, Any]
     empty_permitted: bool
-    error_class: Type[django.forms.utils.ErrorList]
+    error_class: Type[ErrorList]
     fields: collections.OrderedDict
     files: Dict[Any, Any]
     initial: Dict[Any, Any]
@@ -77,7 +80,7 @@ class Fieldline:
     def errors(self) -> SafeText: ...
 
 class AdminField:
-    field: django.forms.boundfield.BoundField = ...
+    field: BoundField = ...
     is_first: bool = ...
     is_checkbox: bool = ...
     is_readonly: bool = ...

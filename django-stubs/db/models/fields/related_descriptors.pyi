@@ -2,12 +2,12 @@ from typing import Any, Callable, List, Optional, Tuple, Type, Union, Generic, T
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
-from django.db.models.expressions import F
-from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import RelatedField, OneToOneField
 from django.db.models.fields.reverse_related import ManyToManyRel, OneToOneRel
 from django.db.models.query import QuerySet
+
+from django.db.models.fields import Field
 
 _T = TypeVar("_T")
 
@@ -24,14 +24,13 @@ class ForwardManyToOneDescriptor:
     def __get__(
         self, instance: Optional[Model], cls: Type[Model] = ...
     ) -> Optional[Union[Model, ForwardManyToOneDescriptor]]: ...
-    def __set__(self, instance: Model, value: Optional[Union[Model, F]]) -> None: ...
+    def __set__(self, instance: Model, value: Optional[Model]) -> None: ...
     def __reduce__(self) -> Tuple[Callable, Tuple[Type[Model], str]]: ...
 
 class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
     RelatedObjectDoesNotExist: Type[ObjectDoesNotExist]
     field: OneToOneField
     def get_object(self, instance: Model) -> Model: ...
-    def __set__(self, instance: Model, value: Optional[Model]) -> None: ...
 
 class ReverseOneToOneDescriptor:
     RelatedObjectDoesNotExist: Type[ObjectDoesNotExist]

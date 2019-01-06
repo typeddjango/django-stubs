@@ -26,13 +26,13 @@ class GroupAdmin(admin.ModelAdmin):
     ) -> ModelMultipleChoiceField: ...
 
 class UserAdmin(admin.ModelAdmin):
-    admin_site: django.contrib.admin.sites.AdminSite
+    admin_site: AdminSite
     formfield_overrides: Dict[
         Type[Union[django.db.models.fields.DateTimeCheckMixin, Field]],
-        Dict[str, Type[Union[django.forms.fields.SplitDateTimeField, django.forms.widgets.Widget]]],
+        Dict[str, Type[Union[django.forms.fields.SplitDateTimeField, Widget]]],
     ]
-    model: Type[django.contrib.auth.models.User]
-    opts: django.db.models.options.Options
+    model: Type[User]
+    opts: Options
     add_form_template: str = ...
     change_user_password_template: Any = ...
     fieldsets: Any = ...

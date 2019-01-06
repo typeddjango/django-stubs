@@ -5,7 +5,7 @@ from django.http.request import HttpRequest
 
 class SessionStorage(BaseStorage):
     added_new: bool
-    request: django.core.handlers.wsgi.WSGIRequest
+    request: WSGIRequest
     used: bool
     session_key: str = ...
     def __init__(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None: ...

@@ -1,16 +1,15 @@
-from datetime import datetime
+import functools
 from http.cookies import SimpleCookie
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from unittest.mock import MagicMock
 
-from django.db.models.base import Model
-from django.http import HttpResponse
+from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
-from django.template.backends.django import Template
-from django.template.backends.jinja2 import Template
-from django.views.generic.base import TemplateResponseMixin
+from django.template.base import Template
+from django.template.context import RequestContext
+from django.test.client import Client
+from django.utils.functional import SimpleLazyObject
 
-from .loader import get_template as get_template, select_template as select_template
+from django.http import HttpResponse
 
 class ContentNotRenderedError(Exception): ...
 
@@ -47,36 +46,26 @@ class SimpleTemplateResponse(HttpResponse):
     def content(self, value: Any) -> None: ...
 
 class TemplateResponse(SimpleTemplateResponse):
-    client: django.test.client.Client
+    client: Client
     closed: bool
-    context: django.template.context.RequestContext
+    context: RequestContext
     context_data: Optional[Dict[str, Any]]
     cookies: SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
-    request: Dict[str, Union[django.test.client.FakePayload, int, str]]
-    resolver_match: django.utils.functional.SimpleLazyObject
+    request: Dict[str, Union[int, str]]
     status_code: int
-    template_name: Union[List[str], django.template.backends.django.Template, str]
+    template_name: Union[List[str], Template, str]
     templates: List[Template]
     using: Optional[str]
-    wsgi_request: django.core.handlers.wsgi.WSGIRequest
+    wsgi_request: WSGIRequest
     rendering_attrs: Any = ...
     def __init__(
         self,
         request: HttpRequest,
         template: Union[List[str], Template, str],
-        context: Optional[
-            Union[
-                Dict[str, List[Dict[str, Optional[Union[datetime, Model, str]]]]],
-                Dict[str, List[str]],
-                Dict[str, Model],
-                Dict[str, TemplateResponseMixin],
-                Dict[str, str],
-                MagicMock,
-            ]
-        ] = ...,
+        context: Optional[Dict[str, Any]] = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
         charset: None = ...,

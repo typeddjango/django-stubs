@@ -1,7 +1,7 @@
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 from django.db.models.base import Model
-from django.forms.utils import ErrorDict, ErrorList
+from django.forms.utils import ErrorDict
 
 class FieldDoesNotExist(Exception): ...
 class AppRegistryNotReady(Exception): ...

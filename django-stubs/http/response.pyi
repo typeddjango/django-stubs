@@ -3,14 +3,14 @@
 import datetime
 from io import BytesIO
 from json import JSONEncoder
-from typing import Any, Dict, Iterable, Iterator, List, Optional, overload, Tuple, Type, Union, Callable
+from typing import Any, Dict, Iterable, Iterator, List, Optional, overload, Tuple, Type, Union
 
+import six
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
-import six
-from django.template import Context, Template
-from django.test import Client
+from django.test.client import Client
 
+from django.template import Context, Template
 from django.urls import ResolverMatch
 
 class BadHeaderError(ValueError): ...
@@ -64,7 +64,6 @@ class HttpResponse(HttpResponseBase):
     client: Client
     closed: bool
     context: Optional[Context]
-    cookies: cookies.SimpleCookie
     csrf_cookie_set: bool
     redirect_chain: List[Tuple[str, int]]
     request: Dict[str, Any]
@@ -84,11 +83,9 @@ class HttpResponse(HttpResponseBase):
     @content.setter
     def content(self, value: Any) -> None: ...
     def __iter__(self) -> Iterator[bytes]: ...
-    def write(self, content: Union[bytes, str]) -> None: ...
     def tell(self) -> int: ...
     def getvalue(self) -> bytes: ...
     def writable(self) -> bool: ...
-    def writelines(self, lines: List[str]) -> None: ...
     @property
     def url(self) -> str: ...
     def json(self) -> Dict[str, Any]: ...
@@ -110,7 +107,6 @@ class FileResponse(StreamingHttpResponse):
     client: Client
     closed: bool
     context: None
-    cookies: cookies.SimpleCookie
     file_to_stream: Optional[BytesIO]
     request: Dict[str, str]
     resolver_match: ResolverMatch

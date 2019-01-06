@@ -18,7 +18,6 @@ from .fields import (
     TextField as TextField,
     BooleanField as BooleanField,
     NullBooleanField as NullBooleanField,
-    FileField as FileField,
     DateField as DateField,
     TimeField as TimeField,
     DateTimeField as DateTimeField,
@@ -31,7 +30,12 @@ from .fields import (
     DurationField as DurationField,
 )
 
-from .fields.related import ForeignKey as ForeignKey, OneToOneField as OneToOneField, ManyToManyField as ManyToManyField
+from .fields.related import (
+    ForeignKey as ForeignKey,
+    OneToOneField as OneToOneField,
+    ManyToManyField as ManyToManyField,
+    ForeignObject as ForeignObject,
+)
 from .fields.files import ImageField as ImageField, FileField as FileField
 
 from .deletion import (

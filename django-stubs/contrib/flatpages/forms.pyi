@@ -7,7 +7,7 @@ class FlatpageForm(forms.ModelForm):
     auto_id: str
     data: Dict[str, Union[List[int], str]]
     empty_permitted: bool
-    error_class: Type[django.forms.utils.ErrorList]
+    error_class: Type[ErrorList]
     fields: collections.OrderedDict
     files: Dict[Any, Any]
     initial: Dict[str, Union[List[django.contrib.sites.models.Site], int, str]]

@@ -1,11 +1,10 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-from django.template.base import FilterExpression, Parser, Template
+from django.template.base import FilterExpression, Parser, Origin, Token
 from django.template.context import Context
 from django.utils.safestring import SafeText
 
 from .base import Node, Template
-from .exceptions import TemplateSyntaxError as TemplateSyntaxError
 
 class InvalidTemplateLibrary(Exception): ...
 
@@ -53,9 +52,9 @@ class SimpleNode(TagHelperNode):
     args: List[FilterExpression]
     func: Callable
     kwargs: Dict[str, FilterExpression]
-    origin: django.template.base.Origin
+    origin: Origin
     takes_context: Optional[bool]
-    token: django.template.base.Token
+    token: Token
     target_var: Optional[str] = ...
     def __init__(
         self,
@@ -65,15 +64,14 @@ class SimpleNode(TagHelperNode):
         kwargs: Dict[str, FilterExpression],
         target_var: Optional[str],
     ) -> None: ...
-    def render(self, context: Context) -> str: ...
 
 class InclusionNode(TagHelperNode):
     args: List[FilterExpression]
     func: Callable
     kwargs: Dict[str, FilterExpression]
-    origin: django.template.base.Origin
+    origin: Origin
     takes_context: Optional[bool]
-    token: django.template.base.Token
+    token: Token
     filename: Union[Template, str] = ...
     def __init__(
         self,
@@ -83,7 +81,6 @@ class InclusionNode(TagHelperNode):
         kwargs: Dict[str, FilterExpression],
         filename: Optional[Union[Template, str]],
     ) -> None: ...
-    def render(self, context: Context) -> SafeText: ...
 
 def parse_bits(
     parser: Parser,

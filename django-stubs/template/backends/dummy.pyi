@@ -1,10 +1,9 @@
 import string
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 from django.http.request import HttpRequest
 
 from .base import BaseEngine
-from .utils import csrf_input_lazy, csrf_token_lazy
 
 class TemplateStrings(BaseEngine):
     app_dirs: bool

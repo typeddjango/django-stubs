@@ -6,3 +6,5 @@ from .testcases import (
 )
 
 from .utils import override_settings as override_settings
+
+from .client import Client as Client

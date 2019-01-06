@@ -3,9 +3,12 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import Error
 from django.db.models.base import Model
+from django.db.models.fields.related import ForeignObject
+from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
+from django.db.models.fields.reverse_related import ForeignObjectRel
+
 from django.db.models.fields import Field, PositiveIntegerField
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
@@ -47,7 +50,7 @@ class GenericForeignKey(FieldCacheMixin):
     def __set__(self, instance: Model, value: Optional[Model]) -> None: ...
 
 class GenericRel(ForeignObjectRel):
-    field: django.contrib.contenttypes.fields.GenericRelation
+    field: GenericRelation
     limit_choices_to: Dict[Any, Any]
     model: Type[Model]
     multiple: bool
@@ -103,8 +106,8 @@ class GenericRelation(ForeignObject):
     def bulk_related_objects(self, objs: List[Model], using: str = ...) -> QuerySet: ...
 
 class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
-    field: django.contrib.contenttypes.fields.GenericRelation
-    rel: django.contrib.contenttypes.fields.GenericRel
+    field: GenericRelation
+    rel: GenericRel
     def related_manager_cls(self): ...
 
 def create_generic_related_manager(superclass: Any, rel: Any): ...

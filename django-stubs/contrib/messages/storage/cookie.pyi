@@ -42,7 +42,7 @@ class MessageDecoder(json.JSONDecoder):
 
 class CookieStorage(BaseStorage):
     added_new: bool
-    request: django.core.handlers.wsgi.WSGIRequest
+    request: WSGIRequest
     used: bool
     cookie_name: str = ...
     max_cookie_size: int = ...

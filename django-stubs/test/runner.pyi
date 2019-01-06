@@ -1,38 +1,33 @@
-import unittest
+import logging
 from argparse import ArgumentParser
+from io import StringIO
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
-from unittest.case import TestCase, _SubTest
-from unittest.runner import TextTestResult, _WritelnDecorator
-from unittest.suite import TestSuite
+from unittest import TestCase, TextTestResult, TestSuite
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test.testcases import SimpleTestCase, TestCase
 from django.utils.datastructures import OrderedSet
 
-class DebugSQLTextTestResult(unittest.TextTestResult):
+class DebugSQLTextTestResult(TextTestResult):
     buffer: bool
     descriptions: bool
     dots: bool
-    errors: List[Tuple[unittest.case.TestCase, str, str]]
     expectedFailures: List[Any]
     failfast: bool
-    failures: List[Tuple[unittest.case.TestCase, str, str]]
     shouldStop: bool
     showAll: bool
     skipped: List[Any]
-    stream: unittest.runner._WritelnDecorator
     tb_locals: bool
     testsRun: int
     unexpectedSuccesses: List[Any]
     logger: logging.Logger = ...
-    def __init__(self, stream: _WritelnDecorator, descriptions: bool, verbosity: int) -> None: ...
-    debug_sql_stream: _io.StringIO = ...
+    def __init__(self, stream: Any, descriptions: bool, verbosity: int) -> None: ...
+    debug_sql_stream: StringIO = ...
     handler: logging.StreamHandler = ...
     def startTest(self, test: TestCase) -> None: ...
     def stopTest(self, test: TestCase) -> None: ...
     def addError(self, test: Any, err: Any) -> None: ...
     def addFailure(self, test: Any, err: Any) -> None: ...
-    def addSubTest(self, test: TestCase, subtest: _SubTest, err: None) -> None: ...
     def printErrorList(self, flavour: str, errors: List[Tuple[TestCase, str, str]]) -> None: ...
 
 class RemoteTestResult:
@@ -67,7 +62,7 @@ class RemoteTestRunner:
 
 def default_test_processes() -> int: ...
 
-class ParallelTestSuite(unittest.TestSuite):
+class ParallelTestSuite(TestSuite):
     init_worker: Any = ...
     run_subsuite: Any = ...
     runner_class: Any = ...

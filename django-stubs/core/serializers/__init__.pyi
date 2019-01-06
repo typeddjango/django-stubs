@@ -2,8 +2,7 @@ from collections import OrderedDict
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 from django.apps.config import AppConfig
-from django.core.serializers.base import Serializer
-from django.core.serializers.xml_serializer import Deserializer
+from django.core.serializers.base import Serializer, Deserializer
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
