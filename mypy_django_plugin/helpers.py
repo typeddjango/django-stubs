@@ -1,7 +1,7 @@
 import typing
 from typing import Dict, Optional
 
-from mypy.nodes import StrExpr, MypyFile, TypeInfo, ImportedName, SymbolNode
+from mypy.nodes import MypyFile, TypeInfo, ImportedName, SymbolNode
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
