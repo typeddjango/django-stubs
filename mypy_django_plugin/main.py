@@ -16,9 +16,14 @@ from mypy_django_plugin.plugins.settings import DjangoConfSettingsInitializerHoo
 
 
 def transform_model_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        sym.node.metadata['django']['model_bases'][ctx.cls.fullname] = 1
+    try:
+        sym = ctx.api.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
+    except KeyError:
+        # models.Model is not loaded, skip metadata model write
+        pass
+    else:
+        if sym is not None and isinstance(sym.node, TypeInfo):
+            sym.node.metadata['django']['model_bases'][ctx.cls.fullname] = 1
     process_model_class(ctx)
 
 
