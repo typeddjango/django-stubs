@@ -6,3 +6,5 @@ out/
 .idea/
 .mypy_cache/
 django-sources
+build/
+dist/
