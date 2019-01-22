@@ -58,7 +58,6 @@ class DjangoPlugin(Plugin):
     def __init__(self,
                  options: Options) -> None:
         super().__init__(options)
-        monkeypatch.make_inner_classes_with_inherit_from_any_compatible_with_each_other()
 
         self.django_settings = os.environ.get('DJANGO_SETTINGS_MODULE')
         if self.django_settings:
