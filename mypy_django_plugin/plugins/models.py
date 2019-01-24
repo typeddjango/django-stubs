@@ -93,8 +93,13 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
 
 class AddDefaultObjectsManager(ModelClassInitializer):
+    def is_default_objects_attr(self, sym: SymbolTableNode) -> bool:
+        return sym.fullname == helpers.MODEL_CLASS_FULLNAME + '.' + 'objects'
+
     def run(self) -> None:
-        if 'objects' in self.model_classdef.info.names:
+        existing_objects_sym = self.model_classdef.info.get('objects')
+        if (existing_objects_sym is not None
+            and not self.is_default_objects_attr(existing_objects_sym)):
             return None
 
         if self.is_abstract_model():

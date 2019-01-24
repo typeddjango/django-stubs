@@ -1,12 +1,14 @@
 from typing import Any, List, Optional, Set, Tuple, Dict
 
-class ModelBase(type):
-    pass
+from django.db.models.manager import Manager
+
+class ModelBase(type): ...
 
 class Model(metaclass=ModelBase):
     class DoesNotExist(Exception):
         pass
     pk: Any = ...
+    objects: Manager[Model]
     def __init__(self, **kwargs) -> None: ...
     def delete(self, using: Any = ..., keep_parents: bool = ...) -> Tuple[int, Dict[str, int]]: ...
     def full_clean(self, exclude: Optional[List[str]] = ..., validate_unique: bool = ...) -> None: ...

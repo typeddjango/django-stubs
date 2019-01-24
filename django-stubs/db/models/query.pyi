@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Manager
 from django.db.models.sql.query import Query, RawQuery
 
-_T = TypeVar("_T", bound=models.Model)
+_T = TypeVar("_T", bound=models.Model, covariant=True)
 
 class QuerySet(Iterable[_T], Sized):
     def __init__(

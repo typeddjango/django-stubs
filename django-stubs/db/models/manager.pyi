@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
-_T = TypeVar("_T", bound=Model)
+_T = TypeVar("_T", bound=Model, covariant=True)
 
 class BaseManager(QuerySet[_T]):
     creation_counter: int = ...
@@ -24,7 +24,7 @@ class BaseManager(QuerySet[_T]):
 class Manager(BaseManager[_T]): ...
 
 class RelatedManager(Manager[_T]):
-    def add(self, *objs: _T, bulk: bool = ...) -> None: ...
+    def add(self, *objs: Model, bulk: bool = ...) -> None: ...
     def clear(self) -> None: ...
 
 class ManagerDescriptor:
