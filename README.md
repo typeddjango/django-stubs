@@ -10,9 +10,7 @@ This package contains type stubs and mypy plugin to provide more precise static 
 ## Installation
 
 ```
-git clone https://github.com/mkurnikov/django-stubs.git
-cd django-stubs
-pip install -U .
+pip install django-stubs
 ```
 
 To make mypy aware of the plugin, you need to add
