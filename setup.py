@@ -16,10 +16,15 @@ def find_stub_files(name):
     return result
 
 
+with open('README.md', 'r') as f:
+    readme = f.read()
+
 setup(
     name="django-stubs",
-    description='Django mypy stubs',
     version="0.2.0",
+    description='Django mypy stubs',
+    long_description=readme,
+    long_description_content_type='text/markdown',
     license='BSD',
     url="https://github.com/mkurnikov/django-stubs.git",
     author="Maksim Kurnikov",
