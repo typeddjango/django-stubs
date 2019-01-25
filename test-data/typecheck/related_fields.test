@@ -228,3 +228,14 @@ class User(models.Model):
     friends = models.ManyToManyField('self', on_delete=models.CASCADE)
 reveal_type(User().friends)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.User*]'
 [out]
+
+[CASE recursively_checking_for_base_model_in_to_parameter]
+from django.db import models
+
+class BaseModel(models.Model):
+    pass
+class ParkingSpot(BaseModel):
+    pass
+class Booking(BaseModel):
+    parking_spot = models.ForeignKey(to=ParkingSpot, null=True, on_delete=models.SET_NULL)
+[out]

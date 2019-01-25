@@ -48,10 +48,7 @@ def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
     referred_to_type = arg_type.ret_type
     if not isinstance(referred_to_type, Instance):
         return None
-    for base in referred_to_type.type.bases:
-        if base.type.fullname() == helpers.MODEL_CLASS_FULLNAME:
-            break
-    else:
+    if not referred_to_type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
         ctx.api.msg.fail(f'to= parameter value must be '
                          f'a subclass of {helpers.MODEL_CLASS_FULLNAME}',
                          context=ctx.context)
