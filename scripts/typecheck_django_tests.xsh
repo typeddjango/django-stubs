@@ -17,8 +17,12 @@ IGNORED_ERROR_PATTERNS = [
 TESTS_DIRS = [
     'absolute_url_overrides',
     'admin_*',
-    'aggregation*',
-    'annotations'
+    'aggregation',
+    'aggregation_regress',
+    'annotations',
+    'app_loading',
+    'apps',
+    'auth_tests'
 ]
 
 def check_file_in_the_current_directory(directory, fname):
