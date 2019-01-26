@@ -10,7 +10,7 @@ jobs:
     - name: "Typecheck Django test suite"
       python: 3.7
       script: |
-        xonsh ./scripts/typecheck_django_tests.xsh
+        python ./scripts/typecheck_tests.py
 
     - name: "Run plugin test suite with python 3.7"
       python: 3.7
@@ -25,7 +25,8 @@ jobs:
 
 before_install: |
   # Upgrade pip, setuptools, and wheel
-  pip install -U pip setuptools wheel xonsh
+  pip install -U pip setuptools wheel
 
 install: |
   pip install -r ./dev-requirements.txt
+  pip install -r ./scripts/typecheck-tests-requirements.txt
