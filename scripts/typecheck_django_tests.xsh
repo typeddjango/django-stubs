@@ -50,7 +50,7 @@ for tests_dir in all_tests_dirs:
     abs_dir = os.path.join(os.getcwd(), tests_dir)
 
     with ${...}.swap(ABS_DIR=abs_dir):
-        ls_output = $(ls $ABS_DIR)
+        ls_output = $(ls -lhv --color=auto -F --group-directories-first $ABS_DIR)
         for fname in parse_ls_output_into_fnames(ls_output):
             path_to_check = os.path.join(abs_dir, fname)
             check_file_in_the_current_directory(abs_dir, fname)
