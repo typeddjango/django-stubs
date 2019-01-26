@@ -17,11 +17,12 @@ IGNORED_ERROR_PATTERNS = [
     'Invalid value for a to= parameter'
 ]
 TESTS_DIRS = [
-    # 'absolute_url_overrides',
-    'admin_custom_urls',
-    #'aggregation_regress',
-    #'annotations',
-    #'app_loading',
+    'absolute_url_overrides',
+    'admin_*',
+    'aggregation',
+    'aggregation_regress',
+    'annotations',
+    'app_loading',
 ]
 
 def check_file_in_the_current_directory(directory, fname):
