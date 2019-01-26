@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Optional, Tuple, Any
 
-from django.template.base import Template
+from django.template.base import Template as Template
 from django.template.exceptions import TemplateSyntaxError
 
 from .base import BaseEngine

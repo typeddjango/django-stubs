@@ -1,7 +1,7 @@
 # Stubs for django.conf.urls (Python 3.5)
 from typing import Any, Callable, Dict, List, Optional, overload, Tuple, Union
 
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseBase
 
 from django.urls import URLResolver, URLPattern
 
@@ -14,7 +14,9 @@ IncludedURLConf = Tuple[List[URLResolver], Optional[str], Optional[str]]
 
 def include(arg: Any, namespace: str = ..., app_name: str = ...) -> IncludedURLConf: ...
 @overload
-def url(regex: str, view: Callable[..., HttpResponse], kwargs: Dict[str, Any] = ..., name: str = ...) -> URLPattern: ...
+def url(
+    regex: str, view: Callable[..., HttpResponseBase], kwargs: Dict[str, Any] = ..., name: str = ...
+) -> URLPattern: ...
 @overload
 def url(regex: str, view: IncludedURLConf, kwargs: Dict[str, Any] = ..., name: str = ...) -> URLResolver: ...
 @overload

@@ -11,6 +11,7 @@ from .utils import (
     NotSupportedError as NotSupportedError,
     InternalError as InternalError,
     InterfaceError as InterfaceError,
+    ConnectionHandler as ConnectionHandler,
 )
 
 from . import migrations

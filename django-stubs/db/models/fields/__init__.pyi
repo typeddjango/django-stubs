@@ -1,9 +1,35 @@
-from typing import Any, Optional
+from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union
 
 from django.db.models.query_utils import RegisterLookupMixin
 
+_Choice = Tuple[Any, str]
+_ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
+_FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
+
+_ValidatorCallable = Callable[[...], None]
+_ErrorMessagesToOverride = Dict[str, Any]
+
 class Field(RegisterLookupMixin):
-    def __init__(self, **kwargs: Any): ...
+    def __init__(
+        self,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
     def __get__(self, instance, owner) -> Any: ...
 
 class IntegerField(Field):
@@ -19,24 +45,83 @@ class BigIntegerField(IntegerField): ...
 class FloatField(Field): ...
 
 class DecimalField(IntegerField):
-    def __init__(self, *, max_digits: Optional[int] = ..., decimal_places: Optional[int] = ..., **kwargs): ...
+    def __init__(
+        self,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        max_digits: Optional[int] = ...,
+        decimal_places: Optional[int] = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
 
 class AutoField(Field):
     def __get__(self, instance, owner) -> int: ...
 
 class CharField(Field):
-    def __init__(self, max_length: int = ..., **kwargs: Any): ...
+    def __init__(
+        self,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
     def __set__(self, instance, value: str) -> None: ...
     def __get__(self, instance, owner) -> str: ...
 
 class SlugField(CharField):
-    def __init__(self, max_length: int = ..., **kwargs: Any): ...
+    def __init__(
+        self,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        allow_unicode: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
 
-class EmailField(CharField):
-    def __init__(self, max_length: int = ..., **kwargs: Any): ...
-
-class URLField(CharField):
-    def __init__(self, max_length: int = ..., **kwargs: Any): ...
+class EmailField(CharField): ...
+class URLField(CharField): ...
 
 class TextField(Field):
     def __set__(self, instance, value: str) -> None: ...
@@ -63,7 +148,21 @@ class GenericIPAddressField(Field):
         name: Optional[Any] = ...,
         protocol: str = ...,
         unpack_ipv4: bool = ...,
-        **kwargs: Any
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
 
 class DateTimeCheckMixin: ...
@@ -75,7 +174,21 @@ class DateField(DateTimeCheckMixin, Field):
         name: Optional[str] = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
-        **kwargs
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
 class TimeField(DateTimeCheckMixin, Field): ...
@@ -92,10 +205,22 @@ class FilePathField(Field):
         recursive: bool = ...,
         allow_files: bool = ...,
         allow_folders: bool = ...,
-        **kwargs
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class BinaryField(Field):
-    def __init__(self, editable: bool = ..., **kwargs: Any): ...
-
+class BinaryField(Field): ...
 class DurationField(Field): ...

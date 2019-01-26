@@ -1,6 +1,6 @@
 from typing import Any, Dict, Iterator, Optional, List
 
-from django.template.base import Template
+from django.template.base import Template as Template
 from django.template.exceptions import TemplateDoesNotExist
 
 from django.template.engine import Engine

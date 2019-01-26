@@ -7,21 +7,21 @@ sudo: required
 
 jobs:
   include:
-  - name: "Run plugin test suite with python 3.7"
-    python: 3.7
-    script: |
-      set -e
-      pytest
+    - name: "Typecheck Django test suite"
+      python: 3.7
+      script: |
+        xonsh ./scripts/typecheck_django_tests.xsh
 
-  - name: "Lint with black"
-    python: 3.7
-    script: |
-      black --check --line-length=120 django-stubs/
+    - name: "Run plugin test suite with python 3.7"
+      python: 3.7
+      script: |
+        set -e
+        pytest
 
-#  - name: "Typecheck Django test suite"
-#    python: 3.7
-#    script: |
-#      xonsh ./scripts/typecheck_django_tests.xsh
+    - name: "Lint with black"
+      python: 3.7
+      script: |
+        black --check --line-length=120 django-stubs/
 
 before_install: |
   # Upgrade pip, setuptools, and wheel
