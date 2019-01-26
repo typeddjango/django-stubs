@@ -1,4 +1,6 @@
 import os
+import sys
+
 if not os.path.exists('./django-sources'):
     git clone -b stable/2.1.x https://github.com/django/django.git django-sources
 
@@ -34,7 +36,7 @@ def check_file_in_the_current_directory(directory, fname):
                     break
             else:
                 if line:
-                    print(line)
+                    print(line, file=sys.stderr)
     cd -
 
 def parse_ls_output_into_fnames(output):
@@ -58,3 +60,4 @@ for tests_dir in all_tests_dirs:
         for fname in parse_ls_output_into_fnames(ls_output):
             path_to_check = os.path.join(abs_dir, fname)
             check_file_in_the_current_directory(abs_dir, fname)
+
