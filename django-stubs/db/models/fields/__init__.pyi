@@ -6,7 +6,7 @@ _Choice = Tuple[Any, str]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 
-_ValidatorCallable = Callable[[...], None]
+_ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
 class Field(RegisterLookupMixin):
