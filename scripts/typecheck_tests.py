@@ -26,7 +26,6 @@ IGNORED_ERROR_PATTERNS = [
 ]
 TESTS_DIRS = [
     'absolute_url_overrides',
-    # 'admin_*'
 ]
 
 
@@ -76,13 +75,9 @@ if __name__ == '__main__':
         repo = Repo.clone_from('https://github.com/django/django.git', repo_directory)
     else:
         repo = Repo(repo_directory)
-        repo.remote().pull(DJANGO_COMMIT_SHA)
+        repo.remotes['origin'].pull(DJANGO_BRANCH)
 
-    branch = repo.heads[DJANGO_BRANCH]
-    branch.checkout()
-    assert repo.active_branch.name == DJANGO_BRANCH
-    assert repo.active_branch.commit.hexsha == DJANGO_COMMIT_SHA
-
+    repo.git.checkout(DJANGO_COMMIT_SHA)
     for dirname in TESTS_DIRS:
         paths = glob.glob(str(tests_root / dirname))
         for path in paths:
