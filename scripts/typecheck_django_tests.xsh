@@ -17,17 +17,15 @@ IGNORED_ERROR_PATTERNS = [
     'Invalid value for a to= parameter'
 ]
 TESTS_DIRS = [
-    'absolute_url_overrides',
-    'admin_*',
-    'aggregation',
-    'aggregation_regress',
-    'annotations',
-    'app_loading',
-    'apps',
-    'auth_tests'
+    # 'absolute_url_overrides',
+    'admin_custom_urls',
+    #'aggregation_regress',
+    #'annotations',
+    #'app_loading',
 ]
 
 def check_file_in_the_current_directory(directory, fname):
+    rc = 0
     cd @(directory)
     with ${...}.swap(FNAME=fname):
         for line in $(mypy --config-file ../../../scripts/mypy.ini $FNAME).split('\n'):
@@ -36,8 +34,10 @@ def check_file_in_the_current_directory(directory, fname):
                     break
             else:
                 if line:
-                    print(line, file=sys.stderr)
+                    rc = 1
+                    print(line)
     cd -
+    return rc
 
 def parse_ls_output_into_fnames(output):
     fnames = []
@@ -51,6 +51,7 @@ for test_dir in TESTS_DIRS:
         dirs = g`django-sources/tests/$TEST_DIR`
         all_tests_dirs.extend(dirs)
 
+rc = 0
 for tests_dir in all_tests_dirs:
     print('Checking ' + tests_dir)
     abs_dir = os.path.join(os.getcwd(), tests_dir)
@@ -59,5 +60,8 @@ for tests_dir in all_tests_dirs:
         ls_output = $(ls -lhv --color=auto -F --group-directories-first $ABS_DIR)
         for fname in parse_ls_output_into_fnames(ls_output):
             path_to_check = os.path.join(abs_dir, fname)
-            check_file_in_the_current_directory(abs_dir, fname)
+            current_step_rc = check_file_in_the_current_directory(abs_dir, fname)
+            if current_step_rc != 0:
+                rc = current_step_rc
 
+sys.exit(rc)
