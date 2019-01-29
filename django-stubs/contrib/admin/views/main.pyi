@@ -9,6 +9,7 @@ from django.db.models.expressions import Combinable, CombinedExpression, OrderBy
 from django.db.models.query import QuerySet
 
 from django.db.models.options import Options
+from django.forms.formsets import BaseFormSet
 
 ALL_VAR: str
 ORDER_VAR: str
@@ -44,6 +45,7 @@ class ChangeList:
     queryset: Any = ...
     title: Any = ...
     pk_attname: Any = ...
+    formset: Optional[BaseFormSet]
     def __init__(
         self,
         request: WSGIRequest,

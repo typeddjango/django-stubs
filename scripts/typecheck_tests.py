@@ -21,12 +21,16 @@ IGNORED_ERROR_PATTERNS = [
     'Cannot infer type of lambda',
     'Incompatible types in assignment (expression has type "Callable[',
     'Invalid value for a to= parameter',
+    'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")',
     re.compile(r'"Callable\[\[(Any(, )?)+\], Any\]" has no attribute'),
     re.compile(r'"HttpResponseBase" has no attribute "[A-Za-z_]+"'),
+    re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
+               r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
 ]
 TESTS_DIRS = [
     'absolute_url_overrides',
-    'admin_autodiscover'
+    'admin_autodiscover',
+    'admin_changelist',
 ]
 
 
