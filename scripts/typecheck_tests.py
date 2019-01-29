@@ -1,8 +1,9 @@
-import glob
 import os
+import re
 import sys
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Pattern
 
 from git import Repo
 from mypy import build
@@ -19,13 +20,13 @@ IGNORED_ERROR_PATTERNS = [
     'LazySettings',
     'Cannot infer type of lambda',
     'Incompatible types in assignment (expression has type "Callable[',
-    '"Callable[[Any], Any]" has no attribute',
-    '"Callable[[Any, Any], Any]" has no attribute',
     'Invalid value for a to= parameter',
-    '"HttpResponseBase" has no attribute "user"'
+    re.compile(r'"Callable\[\[(Any(, )?)+\], Any\]" has no attribute'),
+    re.compile(r'"HttpResponseBase" has no attribute "[A-Za-z_]+"'),
 ]
 TESTS_DIRS = [
     'absolute_url_overrides',
+    'admin_autodiscover'
 ]
 
 
@@ -46,8 +47,12 @@ def cd(path):
 
 def is_ignored(line: str) -> bool:
     for pattern in IGNORED_ERROR_PATTERNS:
-        if pattern in line:
-            return True
+        if isinstance(pattern, Pattern):
+            if pattern.search(line):
+                return True
+        else:
+            if pattern in line:
+                return True
     return False
 
 
@@ -79,13 +84,11 @@ if __name__ == '__main__':
 
     repo.git.checkout(DJANGO_COMMIT_SHA)
     for dirname in TESTS_DIRS:
-        paths = glob.glob(str(tests_root / dirname))
-        for path in paths:
-            abs_path = (project_directory / path).absolute()
+        abs_path = (project_directory / tests_root / dirname).absolute()
+        print(f'Checking {abs_path.as_uri()}')
 
-            print(f'Checking {abs_path.as_uri()}')
-            rc = check_with_mypy(abs_path, mypy_config_file)
-            if rc != 0:
-                global_rc = 1
+        rc = check_with_mypy(abs_path, mypy_config_file)
+        if rc != 0:
+            global_rc = 1
 
     sys.exit(rc)
