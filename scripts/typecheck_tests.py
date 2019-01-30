@@ -42,6 +42,8 @@ IGNORED_ERROR_PATTERNS = [
     '"NullTranslations" has no attribute "_catalog"',
     'Definition of "as_sql" in base class',
     'expression has type "property"',
+    '"object" has no attribute "__iter__"',
+    'Too few arguments for "dates" of "QuerySet"',
     re.compile(r'"Callable\[\[(Any(, )?)+\], Any\]" has no attribute'),
     re.compile(r'"HttpResponseBase" has no attribute "[A-Za-z_]+"'),
     re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
@@ -52,7 +54,7 @@ IGNORED_ERROR_PATTERNS = [
     # TODO: remove when reassignment will be possible (in 0.670? )
     re.compile(r'Incompatible types in assignment \(expression has type "(QuerySet|List){1}\[[A-Za-z, ]+\]", '
                r'variable has type "(QuerySet|List){1}\[[A-Za-z, ]+\]"\)'),
-    re.compile(r'"MockRequest" has no attribute "[a-zA-Z_]+"'),
+    re.compile(r'"(MockRequest|DummyRequest|DummyUser)" has no attribute "[a-zA-Z_]+"'),
 ]
 
 # Test folders to typecheck
@@ -64,20 +66,20 @@ TESTS_DIRS = [
     'admin_custom_urls',
     'admin_default_site',
     'admin_docs',
-    # # TODO: 'admin_filters',
+    # TODO: 'admin_filters',
     'admin_inlines',
     'admin_ordering',
     'admin_registration',
     'admin_scripts',
-    # # TODO: 'admin_utils',
-    # # TODO: 'admin_views',
+    # TODO: 'admin_utils',
+    # TODO: 'admin_views',
     'admin_widgets',
     'aggregation',
     'aggregation_regress',
     'annotations',
     'app_loading',
     'apps',
-    # # TODO: auth_tests
+    # TODO: auth_tests
     'base',
     'bash_completion',
     'basic',
@@ -92,6 +94,29 @@ TESTS_DIRS = [
     'csrf_tests',
     'custom_columns',
     # TODO: 'custom_lookups',
+    # TODO: 'custom_managers',
+    'custom_methods',
+    'custom_migration_operations',
+    'custom_pk',
+    'datatypes',
+    'dates',
+    'datetimes',
+    'db_functions',
+    'db_typecasts',
+    'db_utils',
+    'dbshell',
+    # TODO: 'decorators',
+    'defer',
+    # TODO: 'defer_regress',
+    'delete',
+    'delete_regress',
+    # TODO: 'deprecation',
+    # TODO: 'dispatch',
+    'distinct_on_fields',
+    'empty',
+    # TODO: 'expressions',
+    'expressions_case',
+    # TODO: 'expressions_window'
 ]
 
 

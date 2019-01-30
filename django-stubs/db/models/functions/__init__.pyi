@@ -18,3 +18,44 @@ from .text import (
     Replace as Replace,
     Substr as Substr,
 )
+
+from .window import (
+    CumeDist as CumeDist,
+    DenseRank as DenseRank,
+    FirstValue as FirstValue,
+    Lag as Lag,
+    LastValue as LastValue,
+    Lead as Lead,
+    NthValue as NthValue,
+    Ntile as Ntile,
+    PercentRank as PercentRank,
+    Rank as Rank,
+    RowNumber as RowNumber,
+)
+
+from .datetime import (
+    Extract as Extract,
+    ExtractDay as ExtractDay,
+    ExtractHour as ExtractHour,
+    ExtractMinute as ExtractMinute,
+    ExtractSecond as ExtractSecond,
+    ExtractMonth as ExtractMonth,
+    ExtractQuarter as ExtractQuarter,
+    ExtractWeek as ExtractWeek,
+    ExtractWeekDay as ExtractWeekDay,
+    ExtractYear as ExtractYear,
+    Trunc as Trunc,
+    TruncDate as TruncDate,
+    TruncDay as TruncDay,
+    TruncHour as TruncHour,
+    TruncMinute as TruncMinute,
+    TruncQuarter as TruncQuarter,
+    TruncMonth as TruncMonth,
+    TruncSecond as TruncSecond,
+    TruncTime as TruncTime,
+    TruncWeek as TruncWeek,
+    TruncYear as TruncYear,
+    Now as Now,
+)
+
+from .comparison import Coalesce as Coalesce, Greatest as Greatest, Least as Least, Cast as Cast
