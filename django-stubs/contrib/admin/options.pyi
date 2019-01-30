@@ -1,7 +1,6 @@
 from collections import OrderedDict
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 
-from django.contrib.admin.filters import SimpleListFilter
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.views.main import ChangeList
@@ -11,18 +10,17 @@ from django.core.checks.messages import Error
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Paginator
 from django.db.models.base import Model
-from django.forms.fields import TypedChoiceField
-
-from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
+from django.db.models.options import Options
 from django.db.models.query import QuerySet
+from django.forms.fields import TypedChoiceField
 from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect, JsonResponse
 from django.urls.resolvers import URLPattern
 from django.utils.safestring import SafeText
 
-from django.db.models.options import Options
+from django.db.models.fields import Field
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
@@ -55,7 +53,7 @@ class BaseModelAdmin:
     view_on_site: bool = ...
     show_full_result_count: bool = ...
     checks_class: Any = ...
-    def check(self, **kwargs: Any) -> List[Error]: ...
+    def check(self, **kwargs: Any) -> List[Union[str, Error]]: ...
     def __init__(self) -> None: ...
     def formfield_for_dbfield(self, db_field: Field, request: WSGIRequest, **kwargs: Any) -> Optional[Field]: ...
     def formfield_for_choice_field(self, db_field: Field, request: WSGIRequest, **kwargs: Any) -> TypedChoiceField: ...

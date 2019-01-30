@@ -15,6 +15,7 @@ from django.utils.safestring import SafeText
 class MediaOrderConflictWarning(RuntimeWarning): ...
 
 class Media:
+    _js: str
     def __init__(
         self,
         media: Optional[type] = ...,

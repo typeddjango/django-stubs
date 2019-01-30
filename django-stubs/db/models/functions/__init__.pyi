@@ -1,1 +1,20 @@
-from .text import Lower as Lower, Upper as Upper
+from .text import (
+    Lower as Lower,
+    Upper as Upper,
+    Length as Length,
+    Chr as Chr,
+    Concat as Concat,
+    ConcatPair as ConcatPair,
+    Left as Left,
+    Right as Right,
+    LPad as LPad,
+    RPad as RPad,
+    LTrim as LTrim,
+    RTrim as RTrim,
+    Trim as Trim,
+    Ord as Ord,
+    Repeat as Repeat,
+    StrIndex as StrIndex,
+    Replace as Replace,
+    Substr as Substr,
+)

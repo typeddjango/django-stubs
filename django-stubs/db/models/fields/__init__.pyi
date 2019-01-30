@@ -2,6 +2,8 @@ from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union
 
 from django.db.models.query_utils import RegisterLookupMixin
 
+from django.forms.widgets import Widget
+
 _Choice = Tuple[Any, str]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
@@ -10,6 +12,8 @@ _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
 class Field(RegisterLookupMixin):
+    widget: Widget
+    help_text: str
     def __init__(
         self,
         verbose_name: Optional[str] = ...,

@@ -64,8 +64,19 @@ from .expressions import (
     RawSQL as RawSQL,
     Value as Value,
     Func as Func,
+    ExpressionWrapper as ExpressionWrapper,
 )
 
 from .manager import BaseManager as BaseManager, Manager as Manager
 
 from . import lookups as lookups
+
+from .aggregates import (
+    Avg as Avg,
+    Min as Min,
+    Max as Max,
+    Variance as Variance,
+    StdDev as StdDev,
+    Sum as Sum,
+    Aggregate as Aggregate,
+)
