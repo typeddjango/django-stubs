@@ -1,10 +1,11 @@
 from collections import OrderedDict
 from datetime import date, datetime
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union, Sequence
 from unittest.mock import MagicMock
 from uuid import UUID
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models import ForeignKey
 from django.db.models.base import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
@@ -136,23 +137,23 @@ class BaseModelFormSet(BaseFormSet):
 def modelformset_factory(
     model: Type[Model],
     form: Type[ModelForm] = ...,
-    formfield_callback: None = ...,
+    formfield_callback: Optional[Callable] = ...,
     formset: Type[BaseModelFormSet] = ...,
     extra: int = ...,
     can_delete: bool = ...,
     can_order: bool = ...,
-    max_num: None = ...,
-    fields: None = ...,
-    exclude: None = ...,
-    widgets: None = ...,
+    min_num: Optional[int] = ...,
+    max_num: Optional[int] = ...,
+    fields: Optional[Union[str, Sequence[str]]] = ...,
+    exclude: Optional[Sequence[str]] = ...,
+    widgets: Optional[Dict[str, Any]] = ...,
     validate_max: bool = ...,
     localized_fields: None = ...,
-    labels: None = ...,
-    help_texts: None = ...,
-    error_messages: None = ...,
-    min_num: None = ...,
+    labels: Optional[Dict[str, str]] = ...,
+    help_texts: Optional[Dict[str, str]] = ...,
+    error_messages: Optional[Dict[str, Dict[str, str]]] = ...,
     validate_min: bool = ...,
-    field_classes: None = ...,
+    field_classes: Optional[Dict[str, Any]] = ...,
 ) -> Any: ...
 
 class BaseInlineFormSet(BaseModelFormSet):
@@ -182,22 +183,22 @@ def inlineformset_factory(
     form: Type[ModelForm] = ...,
     formset: Type[BaseInlineFormSet] = ...,
     fk_name: Optional[str] = ...,
-    fields: Optional[str] = ...,
-    exclude: None = ...,
+    fields: Optional[Union[str, Sequence[str]]] = ...,
+    exclude: Optional[Sequence[str]] = ...,
     extra: int = ...,
     can_order: bool = ...,
     can_delete: bool = ...,
-    max_num: None = ...,
-    formfield_callback: None = ...,
-    widgets: None = ...,
+    max_num: Optional[int] = ...,
+    formfield_callback: Optional[Callable] = ...,
+    widgets: Optional[Dict[str, Any]] = ...,
     validate_max: bool = ...,
     localized_fields: None = ...,
-    labels: None = ...,
-    help_texts: None = ...,
-    error_messages: None = ...,
-    min_num: None = ...,
+    labels: Optional[Dict[str, str]] = ...,
+    help_texts: Optional[Dict[str, str]] = ...,
+    error_messages: Optional[Dict[str, Dict[str, str]]] = ...,
+    min_num: Optional[int] = ...,
     validate_min: bool = ...,
-    field_classes: None = ...,
+    field_classes: Optional[Dict[str, Any]] = ...,
 ) -> Any: ...
 
 class InlineForeignKeyField(Field):
@@ -266,3 +267,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
     hidden_widget: Any = ...
     default_error_messages: Any = ...
     def __init__(self, queryset: QuerySet, **kwargs: Any) -> None: ...
+
+def _get_foreign_key(
+    parent_model: Type[Model], model: Type[Model], fk_name: Optional[str] = ..., can_fail: bool = ...
+) -> ForeignKey: ...

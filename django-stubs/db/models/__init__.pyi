@@ -80,3 +80,5 @@ from .aggregates import (
     Sum as Sum,
     Aggregate as Aggregate,
 )
+
+from .indexes import Index as Index

@@ -60,6 +60,7 @@ class HttpRequest(BytesIO):
 
 class QueryDict(MultiValueDict[str, str]):
     encoding = str  # type: Any
+    _mutable: bool = ...
     def __init__(
         self, query_string: Union[str, bytes, None] = None, mutable: bool = False, encoding: Optional[str] = None
     ) -> None: ...

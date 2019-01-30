@@ -1,12 +1,26 @@
-from typing import TypeVar, Optional, Any, Type, Dict, Union, overload, List, Iterator, Tuple, Iterable, Sized, Sequence
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Sized,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
+from django.db.models.sql.query import Query, RawQuery
 
 from django.db import models
 from django.db.models import Manager
-from django.db.models.sql.query import Query, RawQuery
-
-from django.db.models.expressions import F, Combinable
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 
@@ -38,8 +52,10 @@ class QuerySet(Iterable[_T], Sized):
     def get(self, *args: Any, **kwargs: Any) -> _T: ...
     def create(self, **kwargs: Any) -> _T: ...
     def bulk_create(self, objs: Iterable[Model], batch_size: Optional[int] = ...) -> List[_T]: ...
-    def get_or_create(self, defaults: Optional[Dict[str, Any]] = ..., **kwargs: Any) -> Tuple[_T, bool]: ...
-    def update_or_create(self, defaults: Optional[Dict[str, Any]] = ..., **kwargs: Any) -> Tuple[_T, bool]: ...
+    def get_or_create(self, defaults: Optional[MutableMapping[str, Any]] = ..., **kwargs: Any) -> Tuple[_T, bool]: ...
+    def update_or_create(
+        self, defaults: Optional[MutableMapping[str, Any]] = ..., **kwargs: Any
+    ) -> Tuple[_T, bool]: ...
     def earliest(self, *fields: Any, field_name: Optional[Any] = ...) -> _T: ...
     def latest(self, *fields: Any, field_name: Optional[Any] = ...) -> _T: ...
     def first(self) -> Optional[_T]: ...
