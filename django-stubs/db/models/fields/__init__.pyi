@@ -14,6 +14,7 @@ _ErrorMessagesToOverride = Dict[str, Any]
 class Field(RegisterLookupMixin):
     widget: Widget
     help_text: str
+    db_table: str
     def __init__(
         self,
         verbose_name: Optional[str] = ...,
