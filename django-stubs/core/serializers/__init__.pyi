@@ -2,9 +2,17 @@ from collections import OrderedDict
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
 
 from django.apps.config import AppConfig
-from django.core.serializers.base import Serializer, Deserializer
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
+
+from .base import (
+    Serializer as Serializer,
+    Deserializer as Deserializer,
+    SerializerDoesNotExist as SerializerDoesNotExist,
+    SerializationError as SerializationError,
+    DeserializationError as DeserializationError,
+    M2MDeserializationError as M2MDeserializationError,
+)
 
 BUILTIN_SERIALIZERS: Any
 

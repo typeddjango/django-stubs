@@ -14,6 +14,7 @@ from .utils import (
     override_script_prefix as override_script_prefix,
     override_system_checks as override_system_checks,
     ignore_warnings as ignore_warnings,
+    tag as tag,
 )
 
 from .client import Client as Client, RequestFactory as RequestFactory

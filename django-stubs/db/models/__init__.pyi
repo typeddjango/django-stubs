@@ -28,6 +28,7 @@ from .fields import (
     FilePathField as FilePathField,
     BinaryField as BinaryField,
     DurationField as DurationField,
+    BigAutoField as BigAutoField,
 )
 
 from .fields.related import (

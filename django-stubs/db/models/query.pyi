@@ -25,6 +25,7 @@ from django.db.models import Manager
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 
 class QuerySet(Iterable[_T], Sized):
+    query: Query
     def __init__(
         self,
         model: Optional[Type[models.Model]] = ...,
@@ -39,6 +40,7 @@ class QuerySet(Iterable[_T], Sized):
     def __bool__(self) -> bool: ...
     def __class_getitem__(cls, item: Type[_T]):
         pass
+    def __getstate__(self) -> Dict[str, Any]: ...
     @overload
     def __getitem__(self, k: int) -> _T: ...
     @overload
@@ -110,9 +112,10 @@ class QuerySet(Iterable[_T], Sized):
     def __getattr__(self, item: str) -> Any: ...
 
 class RawQuerySet(Iterable[_T], Sized):
+    query: RawQuery
     def __init__(
         self,
-        raw_query: RawQuery,
+        raw_query: Union[RawQuery, str],
         model: Optional[Type[models.Model]] = ...,
         query: Optional[Query] = ...,
         params: Tuple[Any] = ...,

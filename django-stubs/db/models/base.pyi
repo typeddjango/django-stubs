@@ -1,12 +1,15 @@
-from typing import Any, List, Optional, Set, Tuple, Dict
+from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union
 
 from django.db.models.manager import Manager
 
 class ModelBase(type): ...
 
+_Self = TypeVar("_Self", bound="Model")
+
 class Model(metaclass=ModelBase):
     class DoesNotExist(Exception):
         pass
+    _meta: Any
     pk: Any = ...
     objects: Manager[Model]
     def __init__(self, *args, **kwargs) -> None: ...
@@ -19,9 +22,9 @@ class Model(metaclass=ModelBase):
         force_insert: bool = ...,
         force_update: bool = ...,
         using: Optional[str] = ...,
-        update_fields: Optional[List[str]] = ...,
+        update_fields: Optional[Union[List[str], str]] = ...,
     ) -> None: ...
-    def refresh_from_db(self, using: None = ..., fields: Optional[List[str]] = ...) -> None: ...
+    def refresh_from_db(self: _Self, using: Optional[str] = ..., fields: Optional[List[str]] = ...) -> _Self: ...
     def get_deferred_fields(self) -> Set[str]: ...
 
 class ModelStateFieldsCacheDescriptor: ...

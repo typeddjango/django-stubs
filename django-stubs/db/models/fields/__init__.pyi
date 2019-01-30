@@ -16,6 +16,8 @@ class Field(RegisterLookupMixin):
     help_text: str
     db_table: str
     remote_field: Field
+    model: Type[Model]
+    name: str
     def __init__(
         self,
         verbose_name: Optional[str] = ...,
@@ -30,6 +32,9 @@ class Field(RegisterLookupMixin):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
@@ -194,6 +199,7 @@ class DateField(DateTimeCheckMixin, Field):
         auto_now: bool = ...,
         auto_now_add: bool = ...,
         primary_key: bool = ...,
+        max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -267,3 +273,4 @@ class FilePathField(Field):
 
 class BinaryField(Field): ...
 class DurationField(Field): ...
+class BigAutoField(AutoField): ...

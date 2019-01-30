@@ -23,8 +23,13 @@ from django.db.models.fields.related_descriptors import (
     ReverseOneToOneDescriptor as ReverseOneToOneDescriptor,
     ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
     ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
+    ManyToManyDescriptor as ManyToManyDescriptor,
 )
-from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignObjectRel
+from django.db.models.fields.reverse_related import (
+    ForeignObjectRel as ForeignObjectRel,
+    ManyToManyRel as ManyToManyRel,
+    ManyToOneRel as ManyToOneRel,
+)
 from django.db.models.query_utils import PathInfo, Q
 
 if TYPE_CHECKING:
@@ -38,6 +43,8 @@ _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 
 _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
+
+RECURSIVE_RELATIONSHIP_CONSTANT: str = ...
 
 class RelatedField(FieldCacheMixin, Field):
     one_to_many: bool = ...
@@ -141,3 +148,5 @@ class ManyToManyField(RelatedField, Generic[_T]):
     def set_attributes_from_rel(self) -> None: ...
     def value_from_object(self, obj: Model) -> List[Model]: ...
     def save_form_data(self, instance: Model, data: QuerySet) -> None: ...
+
+def create_many_to_many_intermediary_model(field: Type[Field], klass: Type[Model]) -> Type[Model]: ...
