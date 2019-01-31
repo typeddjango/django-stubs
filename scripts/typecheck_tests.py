@@ -240,7 +240,7 @@ TESTS_DIRS = [
     # TODO: 'serializers',
     # TODO: 'servers',
     'sessions_tests',
-    'settings_tests'
+    'settings_tests',
     'shell',
     # TODO: 'shortcuts',
     # TODO: 'signals',
