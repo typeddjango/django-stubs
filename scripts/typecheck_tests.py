@@ -94,8 +94,8 @@ TESTS_DIRS = [
     'aggregation_regress',
     'annotations',
     'app_loading',
-    'apps',
-    # TODO: auth_tests
+    # TODO: 'apps',
+    # TODO: 'auth_tests'
     'base',
     'bash_completion',
     'basic',
@@ -144,7 +144,7 @@ TESTS_DIRS = [
     # TODO: 'fixtures',
     'fixtures_model_package',
     # TODO: 'fixtures_regress',
-    'flatpages_tests',
+    # TODO: 'flatpages_tests',
     'force_insert_update',
     'foreign_object',
     # TODO: 'forms_tests',
