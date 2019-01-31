@@ -1,9 +1,7 @@
-# Stubs for django.http.response (Python 3.5)
-
 import datetime
 from io import BytesIO
 from json import JSONEncoder
-from typing import Any, Dict, Iterable, Iterator, List, Optional, overload, Tuple, Type, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, Union, overload
 
 import six
 from django.core.handlers.wsgi import WSGIRequest
@@ -16,21 +14,23 @@ from django.urls import ResolverMatch
 class BadHeaderError(ValueError): ...
 
 class HttpResponseBase(six.Iterator):
-    status_code = ...  # type: int
-    cookies = ...  # type: SimpleCookie
-    closed = ...  # type: bool
-    reason_phrase = ...  # type: str
-    charset = ...  # type: str
+    status_code: int = ...
+    cookies: SimpleCookie = ...
+    closed: bool = ...
+    reason_phrase: str = ...
+    charset: str = ...
     def __init__(
-        self, content_type: str = None, status: int = None, reason: str = None, charset: str = None
+        self,
+        content_type: Optional[str] = ...,
+        status: Optional[int] = ...,
+        reason: Optional[str] = ...,
+        charset: Optional[str] = ...,
     ) -> None: ...
     def serialize_headers(self) -> bytes: ...
-    def __bytes__(self) -> bytes: ...
     def __setitem__(self, header: str, value: Union[str, bytes]) -> None: ...
     def __delitem__(self, header: str) -> None: ...
     def __getitem__(self, header: str) -> str: ...
     def has_header(self, header: str) -> bool: ...
-    def __contains__(self, item: object) -> bool: ...
     def items(self) -> Iterable[Tuple[str, str]]: ...
     @overload
     def get(self, header: str, alternate: str) -> str: ...
@@ -39,13 +39,14 @@ class HttpResponseBase(six.Iterator):
     def set_cookie(
         self,
         key: str,
-        value: str = "",
-        max_age: int = None,
-        expires: Union[str, datetime.datetime] = None,
-        path: str = "",
-        domain: str = None,
-        secure: bool = False,
-        httponly: bool = False,
+        value: str = ...,
+        max_age: Optional[int] = ...,
+        expires: Optional[Union[str, datetime.datetime]] = ...,
+        path: str = ...,
+        domain: Optional[str] = ...,
+        secure: bool = ...,
+        httponly: bool = ...,
+        samesite: str = ...,
     ) -> None: ...
     def setdefault(self, key: str, value: str) -> None: ...
     def set_signed_cookie(self, key: str, value: str, salt: str = "", **kwargs: Any) -> None: ...
@@ -145,9 +146,9 @@ class Http404(Exception): ...
 class JsonResponse(HttpResponse):
     def __init__(
         self,
-        data: object,
+        data: Any,
         encoder: Type[JSONEncoder] = ...,
-        safe: bool = True,
-        json_dumps_params: Dict[str, Any] = None,
+        safe: bool = ...,
+        json_dumps_params: Optional[Dict[str, Any]] = ...,
         **kwargs: Any
     ) -> None: ...

@@ -21,6 +21,9 @@ def determine_model_cls_from_string_for_migrations(ctx: MethodContext) -> Type:
     if app_label is None:
         return ctx.default_return_type
 
+    if 'model_name' not in ctx.callee_arg_names:
+        return ctx.default_return_type
+
     model_name_expr = ctx.args[ctx.callee_arg_names.index('model_name')][0]
     model_name = get_string_value_from_expr(model_name_expr)
     if model_name is None:

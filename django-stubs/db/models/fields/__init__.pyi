@@ -1,6 +1,8 @@
-from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union
+from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type
 
+from django.db.models import Model
 from django.db.models.query_utils import RegisterLookupMixin
+from django.forms import Widget, Field as FormField
 
 _Choice = Tuple[Any, str]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
@@ -10,11 +12,18 @@ _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
 class Field(RegisterLookupMixin):
+    widget: Widget
+    help_text: str
+    db_table: str
+    remote_field: Field
+    model: Type[Model]
+    name: str
     def __init__(
         self,
         verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
+        max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -23,6 +32,9 @@ class Field(RegisterLookupMixin):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
@@ -31,6 +43,13 @@ class Field(RegisterLookupMixin):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
     def __get__(self, instance, owner) -> Any: ...
+    def deconstruct(self) -> Any: ...
+    def set_attributes_from_name(self, name: str) -> None: ...
+    def db_type(self, connection: Any) -> str: ...
+    def db_parameters(self, connection: Any) -> Dict[str, str]: ...
+    def get_prep_value(self, value: Any) -> Any: ...
+    def formfield(self, **kwargs) -> FormField: ...
+    def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
 
 class IntegerField(Field):
     def __get__(self, instance, owner) -> int: ...
@@ -86,6 +105,9 @@ class CharField(Field):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
@@ -112,6 +134,9 @@ class SlugField(CharField):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
@@ -175,6 +200,7 @@ class DateField(DateTimeCheckMixin, Field):
         auto_now: bool = ...,
         auto_now_add: bool = ...,
         primary_key: bool = ...,
+        max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -191,7 +217,30 @@ class DateField(DateTimeCheckMixin, Field):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class TimeField(DateTimeCheckMixin, Field): ...
+class TimeField(DateTimeCheckMixin, Field):
+    def __init__(
+        self,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+
 class DateTimeField(DateField): ...
 class UUIDField(Field): ...
 
@@ -206,6 +255,7 @@ class FilePathField(Field):
         allow_files: bool = ...,
         allow_folders: bool = ...,
         primary_key: bool = ...,
+        max_length: int = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -224,3 +274,4 @@ class FilePathField(Field):
 
 class BinaryField(Field): ...
 class DurationField(Field): ...
+class BigAutoField(AutoField): ...

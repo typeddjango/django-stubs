@@ -24,3 +24,9 @@ plugins =
 in your `mypy.ini` file.
 
 Also, it uses value of `DJANGO_SETTINGS_MODULE` from the environment, so set it before execution, otherwise some features will not work.
+
+## To get help
+
+We have Gitter here https://gitter.im/mypy-django/Lobby.
+
+If you think you have more generic typing issue, please refer to https://github.com/python/mypy and their Gitter.

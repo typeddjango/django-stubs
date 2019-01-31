@@ -6,7 +6,8 @@ from uuid import UUID
 
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression
-from django.db.models.sql import Query, RawQuery
+
+from django.db.models.sql.query import Query, RawQuery
 
 FORCE: Any
 

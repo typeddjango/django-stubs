@@ -1,15 +1,50 @@
-from typing import Type, Union, TypeVar, Any, Generic, List, Optional, Dict, Callable, Tuple, Sequence, TYPE_CHECKING
+from typing import (
+    Type,
+    Union,
+    TypeVar,
+    Any,
+    Generic,
+    List,
+    Optional,
+    Dict,
+    Callable,
+    Tuple,
+    Sequence,
+    TYPE_CHECKING,
+    Iterable,
+)
 from uuid import UUID
 
 from django.db import models
 from django.db.models import Field, Model, QuerySet
 from django.db.models.fields.mixins import FieldCacheMixin
+from django.db.models.fields.related_descriptors import (
+    ReverseManyToOneDescriptor as ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor as ReverseOneToOneDescriptor,
+    ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
+    ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
+    ManyToManyDescriptor as ManyToManyDescriptor,
+)
+from django.db.models.fields.reverse_related import (
+    ForeignObjectRel as ForeignObjectRel,
+    ManyToManyRel as ManyToManyRel,
+    ManyToOneRel as ManyToOneRel,
+)
 from django.db.models.query_utils import PathInfo, Q
 
 if TYPE_CHECKING:
     from django.db.models.manager import RelatedManager
 
 _T = TypeVar("_T", bound=models.Model)
+
+_Choice = Tuple[Any, str]
+_ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
+_FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
+
+_ValidatorCallable = Callable[..., None]
+_ErrorMessagesToOverride = Dict[str, Any]
+
+RECURSIVE_RELATIONSHIP_CONSTANT: str = ...
 
 class RelatedField(FieldCacheMixin, Field):
     one_to_many: bool = ...
@@ -29,12 +64,41 @@ class RelatedField(FieldCacheMixin, Field):
     def set_attributes_from_rel(self) -> None: ...
     def do_related_class(self, other: Type[Model], cls: Type[Model]) -> None: ...
     def get_limit_choices_to(self) -> Dict[str, int]: ...
-    def formfield(self, **kwargs: Any) -> Field: ...
     def related_query_name(self) -> str: ...
     @property
     def target_field(self) -> Field: ...
 
-class ForeignObject(RelatedField): ...
+class ForeignObject(RelatedField):
+    def __init__(
+        self,
+        to: Union[Type[Model], str],
+        on_delete: Callable[..., None],
+        from_fields: Sequence[str],
+        to_fields: Sequence[str],
+        rel: None = ...,
+        related_name: Optional[str] = ...,
+        related_query_name: None = ...,
+        limit_choices_to: None = ...,
+        parent_link: bool = ...,
+        swappable: bool = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
 
 class ForeignKey(RelatedField, Generic[_T]):
     def __init__(self, to: Union[Type[_T], str], on_delete: Any, related_name: str = ..., **kwargs): ...
@@ -52,7 +116,6 @@ class ManyToManyField(RelatedField, Generic[_T]):
     rel_class: Any = ...
     description: Any = ...
     has_null_arg: Any = ...
-    db_table: Any = ...
     swappable: Any = ...
     def __init__(
         self,
@@ -64,7 +127,7 @@ class ManyToManyField(RelatedField, Generic[_T]):
         through: Optional[Union[str, Type[Model]]] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,
         db_constraint: bool = ...,
-        db_table: None = ...,
+        db_table: Optional[str] = ...,
         swappable: bool = ...,
         **kwargs: Any
     ) -> None: ...
@@ -85,3 +148,5 @@ class ManyToManyField(RelatedField, Generic[_T]):
     def set_attributes_from_rel(self) -> None: ...
     def value_from_object(self, obj: Model) -> List[Model]: ...
     def save_form_data(self, instance: Model, data: QuerySet) -> None: ...
+
+def create_many_to_many_intermediary_model(field: Type[Field], klass: Type[Model]) -> Type[Model]: ...
