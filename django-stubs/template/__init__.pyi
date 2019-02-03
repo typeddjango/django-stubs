@@ -12,3 +12,5 @@ from .base import Node as Node, NodeList as NodeList, Origin as Origin, Template
 from .context import Context as Context, RequestContext as RequestContext
 
 from .library import Library as Library
+
+from . import defaultfilters as defaultfilters

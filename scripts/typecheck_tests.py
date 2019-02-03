@@ -9,6 +9,8 @@ from git import Repo
 from mypy import build
 from mypy.main import process_options
 
+PROJECT_DIRECTORY = Path(__file__).parent.parent
+
 # Django branch to typecheck against
 DJANGO_BRANCH = 'stable/2.1.x'
 
@@ -17,64 +19,114 @@ DJANGO_COMMIT_SHA = '03219b5f709dcd5b0bfacd963508625557ec1ef0'
 
 # Some errors occur for the test suite itself, and cannot be addressed via django-stubs. They should be ignored
 # using this constant.
-IGNORED_ERROR_PATTERNS = [
-    'Need type annotation for',
-    'already defined on',
-    'Cannot assign to a',
-    'cannot perform relative import',
-    'broken_app',
-    'cache_clear',
-    'call_count',
-    'call_args_list',
-    'call_args',
-    '"password_changed" does not return a value',
-    '"validate_password" does not return a value',
-    'LazySettings',
-    'Cannot infer type of lambda',
-    '"refresh_from_db" of "Model"',
-    '"as_sql" undefined in superclass',
-    'Incompatible types in assignment (expression has type "str", target has type "type")',
-    'Incompatible types in assignment (expression has type "Callable[',
-    'Invalid value for a to= parameter',
-    'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")',
-    'Incompatible types in assignment (expression has type "RelatedFieldWidgetWrapper", variable has type "AdminRadioSelect")',
-    'has incompatible type "MockRequest"; expected "WSGIRequest"',
-    '"NullTranslations" has no attribute "_catalog"',
-    'Definition of "as_sql" in base class',
-    'expression has type "property"',
-    '"object" has no attribute "__iter__"',
-    'Too few arguments for "dates" of "QuerySet"',
-    'has no attribute "vendor"',
-    'Argument 1 to "get_list_or_404" has incompatible type "List',
-    'error: "AdminRadioSelect" has no attribute "can_add_related"',
-    'MockCompiler',
-    'SessionTestsMixin',
-    'Argument 1 to "Paginator" has incompatible type "ObjectList"',
-    '"Type[Morsel[Any]]" has no attribute "_reserved"',
-    'Argument 1 to "append" of "list"',
-    'Argument 1 to "bytes"',
-    '"full_clean" of "Model" does not return a value',
-    '"object" not callable',
-    'Item "GenericForeignKey" of "Union[GenericForeignKey, Model, None]" has no attribute "read_by"',
-    'Item "Model" of "Union[GenericForeignKey, Model, None]" has no attribute "read_by"',
-    re.compile('Cannot determine type of \'(objects|stuff|specimens|normal_manager)\''),
-    re.compile(r'"Callable\[\[(Any(, )?)+\], Any\]" has no attribute'),
-    re.compile(r'"HttpResponseBase" has no attribute "[A-Za-z_]+"'),
-    re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
-               r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
-    re.compile(r'"validate" of "[A-Za-z]+" does not return a value'),
-    re.compile(r'Module has no attribute "[A-Za-z_]+"'),
-    re.compile(r'"[A-Za-z\[\]]+" has no attribute "getvalue"'),
-    # TODO: remove when reassignment will be possible (in 0.670? )
-    re.compile(r'Incompatible types in assignment \(expression has type "(QuerySet|List)\[[A-Za-z, ]+\]", '
-               r'variable has type "(QuerySet|List)\[[A-Za-z, ]+\]"\)'),
-    re.compile(r'"(MockRequest|DummyRequest|DummyUser)" has no attribute "[a-zA-Z_]+"'),
-    # TODO: remove when form <-> model plugin support is added
-    re.compile(r'"Model" has no attribute "[A-Za-z_]+"'),
-    re.compile(r'Argument 1 to "get_object_or_404" has incompatible type "(str|Type\[CustomClass\])"'),
-    re.compile(r'"None" has no attribute "[a-zA-Z_0-9]+"'),
-]
-
+MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz']
+IGNORED_ERRORS = {
+    '__common__': [
+        *MOCK_OBJECTS,
+        'LazySettings',
+        'NullTranslations',
+        'Need type annotation for',
+        'Invalid value for a to= parameter',
+        'already defined (possibly by an import)',
+        'Cannot assign to a type',
+        # forms <-> models plugin support
+        '"Model" has no attribute',
+        re.compile(r'Cannot determine type of \'(objects|stuff)\''),
+        # settings
+        re.compile(r'Module has no attribute "[A-Z_]+"'),
+        # attributes assigned to test functions
+        re.compile(r'"Callable\[\[(Any(, )?)+\], Any\]" has no attribute'),
+        # assign empty tuple
+        re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
+                   r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
+        # assign method to a method
+        'Cannot assign to a method',
+        'Cannot infer type of lambda',
+        re.compile(r'Incompatible types in assignment \(expression has type "Callable\[\[(Any(, )?)+\], Any\]", '
+                   r'variable has type "Callable\['),
+    ],
+    'admin_changelist': [
+        'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
+    ],
+    'admin_scripts': [
+        'Incompatible types in assignment (expression has type "Callable['
+    ],
+    'admin_widgets': [
+        'Incompatible types in assignment (expression has type "RelatedFieldWidgetWrapper", '
+        'variable has type "AdminRadioSelect")',
+        'Incompatible types in assignment (expression has type "Widget", variable has type "AutocompleteSelect")'
+    ],
+    'aggregation': [
+        'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
+        '"as_sql" undefined in superclass'
+    ],
+    'aggregation_regress': [
+        'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")'
+    ],
+    'basic': [
+        'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
+        '"refresh_from_db" of "Model" defined here'
+    ],
+    'builtin_server': [
+        'has no attribute "getvalue"'
+    ],
+    'csrf_tests': [
+        'Incompatible types in assignment (expression has type "property", ' +
+        'base class "HttpRequest" defined the type as "QueryDict")'
+    ],
+    'dates': [
+        'Too few arguments for "dates" of "QuerySet"',
+    ],
+    'defer': [
+        'Too many arguments for "refresh_from_db" of "Model"'
+    ],
+    'db_typecasts': [
+        '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)'
+    ],
+    'from_db_value': [
+        'has no attribute "vendor"'
+    ],
+    'get_object_or_404': [
+        'Argument 1 to "get_object_or_404" has incompatible type "str"; '
+        + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"',
+        'Argument 1 to "get_object_or_404" has incompatible type "Type[CustomClass]"; '
+        + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"',
+        'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
+        + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"'
+    ],
+    'model_inheritance_regress': [
+        'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
+    ],
+    'model_meta': [
+        '"object" has no attribute "items"',
+        '"Field" has no attribute "many_to_many"'
+    ],
+    'migrate_signals': [
+        'Value of type "None" is not indexable',
+    ],
+    'queryset_pickle': [
+        '"None" has no attribute "somefield"'
+    ],
+    'prefetch_related': [
+        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room]")',
+        '"None" has no attribute "__iter__"',
+        'has no attribute "read_by"'
+    ],
+    'urlpatterns': [
+        '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
+        '"object" not callable'
+    ],
+    'user_commands': [
+        'Incompatible types in assignment (expression has type "Callable[[Any, KwArg(Any)], Any]", variable has type'
+    ],
+    'sessions_tests': [
+        'base class "SessionTestsMixin" defined the type as "None")',
+        'has no attribute "_reserved"'
+    ],
+    'select_related_onetoone': [
+        '"None" has no attribute'
+    ]
+}
 # Test folders to typecheck
 TESTS_DIRS = [
     'absolute_url_overrides',
@@ -190,7 +242,7 @@ TESTS_DIRS = [
     # TODO: 'messages_tests',
     # TODO: 'middleware',
     # TODO: 'middleware_exceptions',
-    # SKIPPED (all errors are false positives) 'migrate_signals',
+    'migrate_signals',
     'migration_test_data_persistence',
     # TODO: 'migrations',
     'migrations2',
@@ -201,7 +253,7 @@ TESTS_DIRS = [
     'model_indexes',
     # TODO: 'model_inheritance',
     'model_inheritance_regress',
-    # SKIPPED (all errors are false positives) 'model_meta',
+    'model_meta',
     'model_options',
     'model_package',
     'model_regress',
@@ -298,8 +350,8 @@ def cd(path):
         os.chdir(prev_cwd)
 
 
-def is_ignored(line: str) -> bool:
-    for pattern in IGNORED_ERROR_PATTERNS:
+def is_ignored(line: str, test_folder_name: str) -> bool:
+    for pattern in IGNORED_ERRORS['__common__'] + IGNORED_ERRORS.get(test_folder_name, []):
         if isinstance(pattern, Pattern):
             if pattern.search(line):
                 return True
@@ -309,22 +361,29 @@ def is_ignored(line: str) -> bool:
     return False
 
 
+def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
+    raw_path, _, error_line = error.partition(': ')
+    fname, line_number = raw_path.split(':')
+    path = abs_test_folder.joinpath(fname).relative_to(PROJECT_DIRECTORY)
+    clickable_location = f'./{path}:{line_number}'
+    return error.replace(raw_path, clickable_location)
+
+
 def check_with_mypy(abs_path: Path, config_file_path: Path) -> int:
     error_happened = False
     with cd(abs_path):
         sources, options = process_options(['--config-file', str(config_file_path), str(abs_path)])
         res = build.build(sources, options)
         for error_line in res.errors:
-            if not is_ignored(error_line):
+            if not is_ignored(error_line, abs_path.name):
                 error_happened = True
-                print(error_line)
+                print(replace_with_clickable_location(error_line, abs_test_folder=abs_path))
     return int(error_happened)
 
 
 if __name__ == '__main__':
-    project_directory = Path(__file__).parent.parent
-    mypy_config_file = (project_directory / 'scripts' / 'mypy.ini').absolute()
-    repo_directory = project_directory / 'django-sources'
+    mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()
+    repo_directory = PROJECT_DIRECTORY / 'django-sources'
     tests_root = repo_directory / 'tests'
     global_rc = 0
 
@@ -337,8 +396,8 @@ if __name__ == '__main__':
 
     repo.git.checkout(DJANGO_COMMIT_SHA)
     for dirname in TESTS_DIRS:
-        abs_path = (project_directory / tests_root / dirname).absolute()
-        print(f'Checking {abs_path.as_uri()}')
+        abs_path = (PROJECT_DIRECTORY / tests_root / dirname).absolute()
+        print(f'Checking {abs_path}')
 
         rc = check_with_mypy(abs_path, mypy_config_file)
         if rc != 0:

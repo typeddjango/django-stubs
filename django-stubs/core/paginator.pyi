@@ -14,6 +14,9 @@ class SupportsLen(Protocol):
 class SupportsCount(Protocol):
     def count(self) -> int: ...
 
+class SupportsOrdered(Protocol):
+    ordered: bool = ...
+
 class Paginator:
     object_list: QuerySet = ...
     per_page: int = ...
@@ -21,7 +24,7 @@ class Paginator:
     allow_empty_first_page: bool = ...
     def __init__(
         self,
-        object_list: Union[SupportsLen, SupportsCount],
+        object_list: Union[SupportsLen, SupportsCount, SupportsOrdered],
         per_page: Union[int, str],
         orphans: int = ...,
         allow_empty_first_page: bool = ...,

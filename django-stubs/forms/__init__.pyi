@@ -34,6 +34,9 @@ from .widgets import (
     SelectMultiple as SelectMultiple,
     TimeInput as TimeInput,
     URLInput as URLInput,
+    SelectDateWidget as SelectDateWidget,
+    SplitHiddenDateTimeWidget as SplitHiddenDateTimeWidget,
+    SplitDateTimeWidget as SplitDateTimeWidget,
 )
 
 from .fields import (

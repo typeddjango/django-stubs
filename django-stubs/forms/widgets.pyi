@@ -159,6 +159,7 @@ class SelectMultiple(Select):
     allow_multiple_selected: bool = ...
 
 class RadioSelect(ChoiceWidget):
+    can_add_related: bool
     option_template_name: str = ...
 
 class CheckboxSelectMultiple(ChoiceWidget):

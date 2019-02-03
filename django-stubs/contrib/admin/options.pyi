@@ -21,6 +21,7 @@ from django.urls.resolvers import URLPattern
 from django.utils.safestring import SafeText
 
 from django.db.models.fields import Field
+from django.template.response import TemplateResponse
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
@@ -229,7 +230,7 @@ class ModelAdmin(BaseModelAdmin):
     ) -> HttpResponse: ...
     def changelist_view(
         self, request: WSGIRequest, extra_context: Optional[Dict[str, str]] = ...
-    ) -> HttpResponseBase: ...
+    ) -> TemplateResponse: ...
     def get_deleted_objects(
         self, objs: QuerySet, request: WSGIRequest
     ) -> Tuple[List[Any], Dict[Any, Any], Set[Any], List[Any]]: ...

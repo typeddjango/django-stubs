@@ -15,15 +15,15 @@ class Signal:
     def __init__(self, providing_args: List[str] = ..., use_caching: bool = ...) -> None: ...
     def connect(
         self,
-        receiver: Any,
-        sender: Optional[Union[Type[Model], AppConfig]] = ...,
+        receiver: Callable,
+        sender: Optional[Union[Type[Model], AppConfig, str]] = ...,
         weak: bool = ...,
         dispatch_uid: Optional[str] = ...,
     ) -> None: ...
     def disconnect(
         self,
         receiver: Optional[Callable] = ...,
-        sender: Optional[Union[Type[Model], AppConfig]] = ...,
+        sender: Optional[Union[Type[Model], AppConfig, str]] = ...,
         dispatch_uid: Optional[str] = ...,
     ) -> bool: ...
     def has_listeners(self, sender: Any = ...) -> bool: ...
