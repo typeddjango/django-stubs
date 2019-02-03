@@ -21,7 +21,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name="django-stubs",
-    version="0.2.0",
+    version="0.3.0",
     description='Django mypy stubs',
     long_description=readme,
     long_description_content_type='text/markdown',
