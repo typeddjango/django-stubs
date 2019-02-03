@@ -1,6 +1,15 @@
 from .base import Model as Model
 
-from .aggregates import Aggregate as Aggregate, Sum as Sum, Variance as Variance, Count as Count, Max as Max
+from .aggregates import (
+    Aggregate as Aggregate,
+    Avg as Avg,
+    Count as Count,
+    Max as Max,
+    Min as Min,
+    StdDev as StdDev,
+    Sum as Sum,
+    Variance as Variance,
+)
 
 from .fields import (
     AutoField as AutoField,
@@ -47,7 +56,12 @@ from .deletion import (
     PROTECT as PROTECT,
 )
 
-from .query import QuerySet as QuerySet, RawQuerySet as RawQuerySet
+from .query import (
+    Prefetch as Prefetch,
+    QuerySet as QuerySet,
+    RawQuerySet as RawQuerySet,
+    prefetch_related_objects as prefetch_related_objects,
+)
 
 from .query_utils import Q as Q, FilteredRelation as FilteredRelation
 
