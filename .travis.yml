@@ -1,32 +1,34 @@
 language: python
-# cache package wheels (1 cache per python version)
 cache: pip
-# newer python versions are available only on xenial (while some older only on trusty) Ubuntu distribution
 dist: xenial
 sudo: required
-
 jobs:
   include:
-    - name: "Typecheck Django test suite"
+    - name: Typecheck Django test suite
       python: 3.7
-      script: |
-        python ./scripts/typecheck_tests.py
+      script: 'python ./scripts/typecheck_tests.py'
 
-    - name: "Run plugin test suite with python 3.7"
+    - name: Run plugin test suite with python 3.7
       python: 3.7
       script: |
         set -e
         pytest
 
-    - name: "Lint with black"
+    - name: Lint with black
       python: 3.7
-      script: |
-        black --check --line-length=120 django-stubs/
+      script: 'black --check --line-length=120 django-stubs/'
 
 before_install: |
   # Upgrade pip, setuptools, and wheel
   pip install -U pip setuptools wheel
-
 install: |
   pip install -r ./dev-requirements.txt
   pip install -r ./scripts/typecheck-tests-requirements.txt
+
+deploy:
+  provider: pypi
+  user: "mkurnikov"
+  password:
+    secure: 0E+hkaIdtpEtyL1KZeglunZ5/PKjouFfa8ljakAwoig7VNUL+2sO/bTyg38wRQl0NvzDzEHSMEt1bzg4Tq7b7Zp6nLuewG/w7mGLzqaOlTySiPEfRsg8s6uO2KrTn7g9VhlXH6UtyTXoQdMt6aE8+bt/GmEesanS57NB2mhwmylFgQwlJFu4LfIv/+aGmc4eLeGI2Qhvs9QYf7qvYlLQldgFh8mAckQEEvaBg35sf+puypZgf4nkx1k/dfG9wnFWZU8PJ41LbMw/Wj+k/9NpF8ePwiAr0fvRMErZd8nvoiWjQQjhzgrLVHhXEP5pTHh3zjDuGFMWyKuBhC6WLsG4qOQz/HvxeYvNI+jaTp15BgxtefG/pCNDUl/8GlCde7xVt7xzEcYNJSRaZPY2oofEFSd9qDnr4kqmyCXpNsaHRHvkL61bFjXUcfOsMMYvQCC6N2Jjb7S97RbnDdkOZO/lnFhVANT2rigsaXlSlWyN6f7ApxDNvu6Ehu5yrx6IjlPZJ0sI9vvY3IoS6Fik7w9E6zjNVjbmUn1D4MKFP4v5ppNASOqYcZeLd42j8rjEp0gIc3ccz9aUIT9q8VqSXSdUbqA6SVwvHXIVPxJMXj0bqWBG1iKs0cPBuzRVpRrwkENWCSWElDAewM1qFEnK0LppyoYFbqoQ8F5FG0+re7QttKQ=
+  on:
+    tags: true
