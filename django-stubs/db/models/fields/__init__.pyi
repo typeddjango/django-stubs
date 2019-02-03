@@ -2,6 +2,8 @@ from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type
 
 from django.db.models import Model
 from django.db.models.query_utils import RegisterLookupMixin
+
+from django.db.models.expressions import F, Combinable
 from django.forms import Widget, Field as FormField
 
 _Choice = Tuple[Any, str]
@@ -52,6 +54,7 @@ class Field(RegisterLookupMixin):
     def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
 
 class IntegerField(Field):
+    def __set__(self, instance, value: Union[int, F]) -> None: ...
     def __get__(self, instance, owner) -> int: ...
 
 class PositiveIntegerRelDbTypeMixin:
@@ -115,7 +118,7 @@ class CharField(Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-    def __set__(self, instance, value: str) -> None: ...
+    def __set__(self, instance, value: Union[str, Combinable]) -> None: ...
     def __get__(self, instance, owner) -> str: ...
 
 class SlugField(CharField):

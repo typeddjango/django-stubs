@@ -201,7 +201,7 @@ TESTS_DIRS = [
     # TODO: 'dispatch',
     'distinct_on_fields',
     'empty',
-    # TODO: 'expressions',
+    'expressions',
     'expressions_case',
     # TODO: 'expressions_window',
     # TODO: 'extra_regress',

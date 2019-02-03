@@ -82,6 +82,12 @@ from .expressions import (
     Value as Value,
     Func as Func,
     ExpressionWrapper as ExpressionWrapper,
+    Combinable as Combinable,
+    Col as Col,
+    CombinedExpression as CombinedExpression,
+    ExpressionList as ExpressionList,
+    Random as Random,
+    Ref as Ref,
 )
 
 from .manager import BaseManager as BaseManager, Manager as Manager
