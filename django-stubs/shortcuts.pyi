@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union, Sequence
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
@@ -15,7 +15,7 @@ def render_to_response(
 ) -> HttpResponse: ...
 def render(
     request: HttpRequest,
-    template_name: str,
+    template_name: Union[str, Sequence[str]],
     context: Optional[Dict[str, Any]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,

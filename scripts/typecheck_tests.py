@@ -125,6 +125,10 @@ IGNORED_ERRORS = {
     ],
     'select_related_onetoone': [
         '"None" has no attribute'
+    ],
+    'view_tests': [
+        '"Handler" has no attribute "include_html"',
+        '"EmailMessage" has no attribute "alternatives"'
     ]
 }
 # Test folders to typecheck
@@ -330,7 +334,7 @@ TESTS_DIRS = [
     # TODO: 'validation',
     'validators',
     'version',
-    # TODO: 'view_tests',
+    'view_tests',
     # TODO: 'wsgi',
 ]
 
