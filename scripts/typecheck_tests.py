@@ -35,7 +35,7 @@ IGNORED_ERRORS = {
         # settings
         re.compile(r'Module has no attribute "[A-Z_]+"'),
         # attributes assigned to test functions
-        re.compile(r'"Callable\[\[(Any(, )?)+\], Any\]" has no attribute'),
+        re.compile(r'"Callable\[\[(Any(, )?)+(, VarArg\(Any\))?(, KwArg\(Any\))?\], Any\]" has no attribute'),
         # assign empty tuple
         re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
                    r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
@@ -69,6 +69,19 @@ IGNORED_ERRORS = {
     ],
     'builtin_server': [
         'has no attribute "getvalue"'
+    ],
+    'custom_lookups': [
+        'in base class "SQLFuncMixin"'
+    ],
+    'custom_managers': [
+        '_filter_CustomQuerySet',
+        '_filter_CustomManager',
+        re.compile(r'Cannot determine type of \'(abstract_persons|cars|plain_manager)\''),
+        # TODO: remove after 'objects' and '_default_manager' are handled in the plugin
+        'Incompatible types in assignment (expression has type "CharField", '
+        + 'base class "Model" defined the type as "Manager[Model]")',
+        # TODO: remove after from_queryset() handled in the plugin
+        'Invalid base class'
     ],
     'csrf_tests': [
         'Incompatible types in assignment (expression has type "property", ' +
@@ -167,8 +180,8 @@ TESTS_DIRS = [
     'context_processors',
     'csrf_tests',
     'custom_columns',
-    # TODO: 'custom_lookups',
-    # TODO: 'custom_managers',
+    'custom_lookups',
+    'custom_managers',
     'custom_methods',
     'custom_migration_operations',
     'custom_pk',
