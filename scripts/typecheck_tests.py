@@ -121,6 +121,9 @@ IGNORED_ERRORS = {
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
         + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"'
     ],
+    'handlers': [
+        '"HttpRequest" has no attribute "environ"'
+    ],
     'model_inheritance_regress': [
         'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
     ],
