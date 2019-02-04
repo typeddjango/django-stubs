@@ -33,7 +33,8 @@ setup(
     python_requires='>=3',
     install_requires=[
         'Django',
-        'mypy'
+        'mypy>=0.660',
+        'typing-extensions'
     ],
     packages=['django-stubs', *find_packages()],
     package_data={'django-stubs': find_stub_files('django-stubs')},
