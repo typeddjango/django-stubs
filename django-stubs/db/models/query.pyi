@@ -21,6 +21,7 @@ from django.db.models.sql.query import Query, RawQuery
 
 from django.db import models
 from django.db.models import Manager
+from django.db.models.query_utils import Q as Q
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 

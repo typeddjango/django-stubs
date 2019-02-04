@@ -19,7 +19,7 @@ DJANGO_COMMIT_SHA = '03219b5f709dcd5b0bfacd963508625557ec1ef0'
 
 # Some errors occur for the test suite itself, and cannot be addressed via django-stubs. They should be ignored
 # using this constant.
-MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz']
+MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_args_list', 'call_args']
 IGNORED_ERRORS = {
     '__common__': [
         *MOCK_OBJECTS,
@@ -35,7 +35,7 @@ IGNORED_ERRORS = {
         # settings
         re.compile(r'Module has no attribute "[A-Z_]+"'),
         # attributes assigned to test functions
-        re.compile(r'"Callable\[\[(Any(, )?)+(, VarArg\(Any\))?(, KwArg\(Any\))?\], Any\]" has no attribute'),
+        re.compile(r'"Callable\[\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\], Any\]" has no attribute'),
         # assign empty tuple
         re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
                    r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
@@ -44,6 +44,9 @@ IGNORED_ERRORS = {
         'Cannot infer type of lambda',
         re.compile(r'Incompatible types in assignment \(expression has type "Callable\[\[(Any(, )?)+\], Any\]", '
                    r'variable has type "Callable\['),
+        # cookies private attribute
+        'has no attribute "_reserved"',
+        'full_clean" of "Model" does not return a value'
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -62,6 +65,17 @@ IGNORED_ERRORS = {
     ],
     'aggregation_regress': [
         'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")'
+    ],
+    'apps': [
+        'Incompatible types in assignment (expression has type "str", target has type "type")',
+        '"Callable[[bool, bool], List[Type[Model]]]" has no attribute "cache_clear"'
+    ],
+    'auth_tests': [
+        '"PasswordValidator" has no attribute "min_length"',
+        '"validate_password" does not return a value',
+        '"password_changed" does not return a value',
+        re.compile(r'"validate" of "([A-Za-z]+)" does not return a value'),
+        'Module has no attribute "SessionStore"'
     ],
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
@@ -120,10 +134,31 @@ IGNORED_ERRORS = {
     'queryset_pickle': [
         '"None" has no attribute "somefield"'
     ],
+    'requests': [
+        'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
+    ],
     'prefetch_related': [
         'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room]")',
         '"None" has no attribute "__iter__"',
         'has no attribute "read_by"'
+    ],
+    'signals': [
+        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Any, Any]"; expected "Tuple[Any, Any, Any]"'
+    ],
+    'transactions': [
+        'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
+    ],
+    'test_client': [
+        'Incompatible types in assignment (expression has type "StreamingHttpResponse", variable has type "HttpResponse")',
+    ],
+    'test_client_regress': [
+        'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")'
+    ],
+    'timezones': [
+        'Too few arguments for "render" of "Template"'
+    ],
+    'test_runner': [
+        'Value of type "TestSuite" is not indexable'
     ],
     'urlpatterns': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
@@ -132,9 +167,16 @@ IGNORED_ERRORS = {
     'user_commands': [
         'Incompatible types in assignment (expression has type "Callable[[Any, KwArg(Any)], Any]", variable has type'
     ],
+    'utils_tests': [
+        re.compile(r'Argument ([1-9]) to "__get__" of "classproperty" has incompatible type')
+    ],
+    'urlpatterns_reverse': [
+        'to "reverse" has incompatible type "object"',
+        'Module has no attribute "_translations"',
+        "'django.urls.resolvers.ResolverMatch' object is not iterable"
+    ],
     'sessions_tests': [
-        'base class "SessionTestsMixin" defined the type as "None")',
-        'has no attribute "_reserved"'
+        'base class "SessionTestsMixin" defined the type as "None")'
     ],
     'select_related_onetoone': [
         '"None" has no attribute'
@@ -165,8 +207,8 @@ TESTS_DIRS = [
     'aggregation_regress',
     'annotations',
     'app_loading',
-    # TODO: 'apps',
-    # TODO: 'auth_tests'
+    'apps',
+    # TODO: 'auth_tests',
     'base',
     'bash_completion',
     'basic',
@@ -297,10 +339,10 @@ TESTS_DIRS = [
     'queryset_pickle',
     'raw_query',
     'redirects_tests',
-    # TODO: 'requests',
+    'requests',
     'reserved_names',
     'resolve_url',
-    # TODO: 'responses',
+    'responses',
     'reverse_lookup',
     'save_delete_hooks',
     'schema',
@@ -313,8 +355,8 @@ TESTS_DIRS = [
     'sessions_tests',
     'settings_tests',
     'shell',
-    # TODO: 'shortcuts',
-    # TODO: 'signals',
+    'shortcuts',
+    'signals',
     'signed_cookies_tests',
     # TODO: 'signing',
     # TODO: 'sitemaps_tests',
@@ -328,23 +370,32 @@ TESTS_DIRS = [
     # TODO: 'template_backends',
     'template_loader',
     # TODO: 'template_tests',
-    # TODO: 'test_client',
-    # TODO: 'test_client_regress',
+    'test_client',
+    'test_client_regress',
     'test_exceptions',
     # TODO: 'test_runner',
     'test_runner_apps',
-    # TODO: 'test_utils',
-    # TODO: 'timezones',
+    'test_utils',
+    'timezones',
     'transaction_hooks',
-    # TODO: 'transactions',
+    'transactions',
     'unmanaged_models',
+
+    # wait for "allow redefinitions" here
     # TODO: 'update',
+
     'update_only_fields',
     'urlpatterns',
+
+    # not annotatable without annotation in test
     # TODO: 'urlpatterns_reverse',
+
     'user_commands',
     # TODO: 'utils_tests',
+
+    # not annotatable without annotation in test
     # TODO: 'validation',
+
     'validators',
     'version',
     'view_tests',
@@ -380,9 +431,9 @@ def is_ignored(line: str, test_folder_name: str) -> bool:
 
 def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     raw_path, _, error_line = error.partition(': ')
-    fname, line_number = raw_path.split(':')
+    fname, _,line_number = raw_path.partition(':')
     path = abs_test_folder.joinpath(fname).relative_to(PROJECT_DIRECTORY)
-    clickable_location = f'./{path}:{line_number}'
+    clickable_location = f'./{path}:{line_number or 1}'
     return error.replace(raw_path, clickable_location)
 
 

@@ -5,15 +5,17 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Ty
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import WSGIRequestHandler, ThreadedWSGIServer
+from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
 from django.forms.fields import EmailField
 from django.http.response import HttpResponse, HttpResponseBase
 from django.template.base import Template
-from django.test.utils import CaptureQueriesContext, modify_settings, override_settings, ContextList
+from django.test.client import Client
+from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.safestring import SafeText
+from django.db import connections as connections
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
     connection: Any
@@ -55,6 +57,7 @@ class _CursorFailure:
 
 class SimpleTestCase(unittest.TestCase):
     client_class: Any = ...
+    client: Client
     allow_database_queries: bool = ...
     @classmethod
     def setUpClass(cls) -> None: ...
@@ -233,3 +236,5 @@ class SerializeMixin:
     def setUpClass(cls) -> None: ...
     @classmethod
     def tearDownClass(cls) -> None: ...
+
+def connections_support_transactions() -> bool: ...

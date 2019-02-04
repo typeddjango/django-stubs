@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from io import StringIO, TextIOBase, TextIOWrapper
-from typing import Any, Callable, List, Optional, Tuple, Union, Type
+from typing import Any, Callable, List, Optional, Union
 
 from django.apps.config import AppConfig
 from django.core.management.color import Style
@@ -9,17 +9,6 @@ class CommandError(Exception): ...
 class SystemCheckError(CommandError): ...
 
 class CommandParser(ArgumentParser):
-    add_help: bool
-    allow_abbrev: bool
-    argument_default: None
-    conflict_handler: str
-    description: str
-    epilog: None
-    formatter_class: Type[DjangoHelpFormatter]
-    fromfile_prefix_chars: None
-    prefix_chars: str
-    prog: str
-    usage: None
     missing_args_message: None = ...
     called_from_command_line: bool = ...
     def __init__(self, **kwargs: Any) -> None: ...

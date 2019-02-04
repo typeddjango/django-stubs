@@ -12,6 +12,8 @@ from .utils import (
     InternalError as InternalError,
     InterfaceError as InterfaceError,
     ConnectionHandler as ConnectionHandler,
+    Error as Error,
+    ConnectionDoesNotExist as ConnectionDoesNotExist,
 )
 
 from . import migrations

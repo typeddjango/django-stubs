@@ -1,16 +1,15 @@
 from collections import OrderedDict
-from datetime import date, datetime
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, Union
+from datetime import datetime
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple, Type, Union
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError as ValidationError
+from django.core.files.base import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.query import QuerySet
 from django.forms.boundfield import BoundField
 from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass
-from django.http.request import QueryDict
-from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeText
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
@@ -35,11 +34,11 @@ class BaseForm:
     renderer: Any = ...
     def __init__(
         self,
-        data: Optional[Union[Dict[str, Union[List[int], int, str]], Dict[str, Union[List[str], str]], QueryDict]] = ...,
-        files: Optional[Union[Dict[str, SimpleUploadedFile], MultiValueDict]] = ...,
+        data: Optional[Mapping[str, Any]] = ...,
+        files: Optional[Mapping[str, File]] = ...,
         auto_id: Optional[Union[bool, str]] = ...,
         prefix: Optional[str] = ...,
-        initial: Optional[Union[Dict[str, List[int]], Dict[str, date], Dict[str, str]]] = ...,
+        initial: Optional[Mapping[str, Any]] = ...,
         error_class: Type[ErrorList] = ...,
         label_suffix: None = ...,
         empty_permitted: bool = ...,

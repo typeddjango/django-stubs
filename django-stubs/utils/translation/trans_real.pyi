@@ -1,7 +1,7 @@
 import gettext as gettext_module
 from collections import OrderedDict
 from gettext import NullTranslations
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Callable
 
 from django.core.handlers.wsgi import WSGIRequest
 

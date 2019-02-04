@@ -1,4 +1,9 @@
-from .request import HttpRequest as HttpRequest, QueryDict as QueryDict
+from .request import (
+    HttpRequest as HttpRequest,
+    QueryDict as QueryDict,
+    RawPostDataException as RawPostDataException,
+    UnreadablePostError as UnreadablePostError,
+)
 
 from .response import (
     BadHeaderError as BadHeaderError,
