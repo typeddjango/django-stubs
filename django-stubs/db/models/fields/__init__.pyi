@@ -1,4 +1,5 @@
 from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type
+import decimal
 
 from django.db.models import Model
 from django.db.models.query_utils import RegisterLookupMixin
@@ -66,7 +67,7 @@ class SmallIntegerField(IntegerField): ...
 class BigIntegerField(IntegerField): ...
 class FloatField(Field): ...
 
-class DecimalField(IntegerField):
+class DecimalField(Field):
     def __init__(
         self,
         verbose_name: Optional[str] = ...,
@@ -89,6 +90,7 @@ class DecimalField(IntegerField):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    def __get__(self, instance, owner) -> decimal.Decimal: ...
 
 class AutoField(Field):
     def __get__(self, instance, owner) -> int: ...
