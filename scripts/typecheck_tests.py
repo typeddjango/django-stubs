@@ -121,9 +121,6 @@ IGNORED_ERRORS = {
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
         + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"'
     ],
-    'handlers': [
-        '"HttpRequest" has no attribute "environ"'
-    ],
     'model_inheritance_regress': [
         'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
     ],
@@ -443,7 +440,9 @@ def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
 def check_with_mypy(abs_path: Path, config_file_path: Path) -> int:
     error_happened = False
     with cd(abs_path):
-        sources, options = process_options(['--config-file', str(config_file_path), str(abs_path)])
+        sources, options = process_options(['--cache-dir', str(config_file_path.parent / '.mypy_cache'),
+                                            '--config-file', str(config_file_path),
+                                            str(abs_path)])
         res = build.build(sources, options)
         for error_line in res.errors:
             if not is_ignored(error_line, abs_path.name):
