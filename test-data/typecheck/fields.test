@@ -50,7 +50,7 @@ class Booking(models.Model):
 booking = Booking()
 reveal_type(booking.id)  # E: Revealed type is 'builtins.int'
 reveal_type(booking.time_range)  # E: Revealed type is 'Any'
-reveal_type(booking.some_decimal)  # E: Revealed type is 'Decimal'
+reveal_type(booking.some_decimal)  # E: Revealed type is 'decimal.Decimal'
 
 [CASE test_add_id_field_if_no_primary_key_defined]
 from django.db import models
