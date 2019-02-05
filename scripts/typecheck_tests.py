@@ -137,6 +137,9 @@ IGNORED_ERRORS = {
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
     ],
+    'responses': [
+        'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"'
+    ],
     'prefetch_related': [
         'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room]")',
         '"None" has no attribute "__iter__"',
