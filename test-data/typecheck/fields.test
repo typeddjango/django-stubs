@@ -40,7 +40,6 @@ reveal_type(user.text)  # E: Revealed type is 'builtins.str'
 [CASE test_model_field_classes_from_exciting_locations]
 from django.db import models
 from django.contrib.postgres import fields as pg_fields
-from psycopg2.extras import DateTimeTZRange
 from decimal import Decimal
 
 class Booking(models.Model):
@@ -50,7 +49,7 @@ class Booking(models.Model):
 
 booking = Booking()
 reveal_type(booking.id)  # E: Revealed type is 'builtins.int'
-reveal_type(booking.time_range)  # E: Revealed type is 'DateTimeTZRange'
+reveal_type(booking.time_range)  # E: Revealed type is 'Any'
 reveal_type(booking.some_decimal)  # E: Revealed type is 'Decimal'
 
 [CASE test_add_id_field_if_no_primary_key_defined]
