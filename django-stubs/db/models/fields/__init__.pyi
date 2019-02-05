@@ -5,6 +5,7 @@ from django.db.models.query_utils import RegisterLookupMixin
 
 from django.db.models.expressions import F, Combinable
 from django.forms import Widget, Field as FormField
+from .mixins import NOT_PROVIDED as NOT_PROVIDED
 
 _Choice = Tuple[Any, str]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]

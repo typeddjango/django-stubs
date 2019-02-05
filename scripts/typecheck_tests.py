@@ -161,7 +161,13 @@ IGNORED_ERRORS = {
         'Too few arguments for "render" of "Template"'
     ],
     'test_runner': [
-        'Value of type "TestSuite" is not indexable'
+        'Value of type "TestSuite" is not indexable',
+        '"TestSuite" has no attribute "_tests"',
+        'Argument "result" to "run" of "TestCase" has incompatible type "RemoteTestResult"; expected "Optional[TestResult]"',
+        'Item "TestSuite" of "Union[TestCase, TestSuite]" has no attribute "id"',
+        'MockTestRunner',
+        'Incompatible types in assignment (expression has type "Tuple[Union[TestCase, TestSuite], ...]", '
+        + 'variable has type "TestSuite")'
     ],
     'urlpatterns': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
@@ -285,7 +291,7 @@ TESTS_DIRS = [
     # TODO: 'invalid_models_tests',
     'known_related_objects',
     # TODO: 'logging_tests',
-    # TODO: 'lookup',
+    'lookup',
     'm2m_and_m2o',
     'm2m_intermediary',
     'm2m_multiple',
@@ -376,7 +382,7 @@ TESTS_DIRS = [
     'test_client',
     'test_client_regress',
     'test_exceptions',
-    # TODO: 'test_runner',
+    'test_runner',
     'test_runner_apps',
     'test_utils',
     'timezones',
