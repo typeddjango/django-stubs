@@ -13,7 +13,6 @@ class Session(AbstractBaseSession):
     expire_date: datetime.datetime
     session_data: str
     session_key: str
-    objects: Any = ...
     @classmethod
     def get_session_store_class(cls) -> Type[SessionStore]: ...
     class Meta(AbstractBaseSession.Meta):

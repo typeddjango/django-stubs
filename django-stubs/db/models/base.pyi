@@ -1,8 +1,12 @@
-from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union
+from typing import Any, List, Optional, Set, Tuple, Dict, TypeVar, Union, Type
 
 from django.db.models.manager import Manager
 
-class ModelBase(type): ...
+_T = TypeVar('_T', bound='Model')
+
+class ModelBase(type):
+    @property
+    def _default_manager(cls: Type[_T]) -> Manager[_T]: ... # type: ignore
 
 _Self = TypeVar("_Self", bound="Model")
 
@@ -11,7 +15,6 @@ class Model(metaclass=ModelBase):
         pass
     _meta: Any
     pk: Any = ...
-    objects: Manager[Model]
     def __init__(self, *args, **kwargs) -> None: ...
     def delete(self, using: Any = ..., keep_parents: bool = ...) -> Tuple[int, Dict[str, int]]: ...
     def full_clean(self, exclude: Optional[List[str]] = ..., validate_unique: bool = ...) -> None: ...

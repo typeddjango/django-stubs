@@ -37,6 +37,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
     api = cast(TypeChecker, ctx.api)
     ret = ctx.default_return_type
     if not api.tscope.classes:
+        api.fail('Managers should not be instantiated outside of Model definitions', ctx.context)
         # not in class
         return ret
     outer_model_info = api.tscope.classes[0]
@@ -45,12 +46,8 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
     if not isinstance(ret, Instance):
         return ret
 
-    for i, base in enumerate(ret.type.bases):
-        if base.type.fullname() in {helpers.MANAGER_CLASS_FULLNAME,
-                                    helpers.RELATED_MANAGER_CLASS_FULLNAME,
-                                    helpers.BASE_MANAGER_CLASS_FULLNAME}:
-            ret.type.bases[i] = reparametrize_with(base, [Instance(outer_model_info, [])])
-            return ret
+    if len(ret.args) > 0:
+        ret.args[0] = Instance(outer_model_info, [])
     return ret
 
 

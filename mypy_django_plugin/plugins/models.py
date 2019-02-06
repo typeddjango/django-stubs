@@ -1,8 +1,9 @@
-import dataclasses
 from abc import abstractmethod, ABCMeta
 from typing import cast, Iterator, Tuple, Optional, Dict
 
-from mypy.nodes import ClassDef, AssignmentStmt, CallExpr, MemberExpr, StrExpr, NameExpr, MDEF, TypeInfo, Var, SymbolTableNode, \
+import dataclasses
+from mypy.nodes import ClassDef, AssignmentStmt, CallExpr, MemberExpr, StrExpr, NameExpr, MDEF, TypeInfo, Var, \
+    SymbolTableNode, \
     Lvalue, Expression, MypyFile, Context
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
@@ -27,24 +28,26 @@ class ModelClassInitializer(metaclass=ABCMeta):
         return None
 
     def is_abstract_model(self) -> bool:
+        meta_abstract = self.get_meta_attr_expr('abstract')
+        if meta_abstract is None:
+            return False
+        return self.api.parse_bool(meta_abstract)
+
+    def get_meta_attr_expr(self, key: str) -> Optional[Expression]:
         meta_node = self.get_nested_meta_node()
         if meta_node is None:
-            return False
-
+            return None
         for lvalue, rvalue in iter_over_assignments(meta_node.defn):
-            if isinstance(lvalue, NameExpr) and lvalue.name == 'abstract':
-                is_abstract = self.api.parse_bool(rvalue)
-                if is_abstract:
-                    # abstract model do not need 'objects' queryset
-                    return True
-        return False
+            if isinstance(lvalue, NameExpr) and lvalue.name == key:
+                return rvalue
 
-    def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+    def add_new_node_to_model_class(self, name: str, typ: Instance, is_classvar: bool = False) -> None:
         var = Var(name=name, type=typ)
         var.info = typ.type
         var._fullname = self.model_classdef.info.fullname() + '.' + name
         var.is_inferred = True
         var.is_initialized_in_class = True
+        var.is_classvar = is_classvar
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var)
 
     @abstractmethod
@@ -71,7 +74,7 @@ def iter_call_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, CallExpr]]:
 def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExpr, CallExpr]]:
     for lvalue, rvalue in iter_call_assignments(klass):
         if (isinstance(lvalue, NameExpr)
-            and isinstance(rvalue.callee, MemberExpr)):
+                and isinstance(rvalue.callee, MemberExpr)):
             if rvalue.callee.fullname in {helpers.FOREIGN_KEY_FULLNAME,
                                           helpers.ONETOONE_FIELD_FULLNAME}:
                 yield lvalue, rvalue
@@ -92,27 +95,6 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         meta_node.fallback_to_any = True
 
 
-class AddDefaultObjectsManager(ModelClassInitializer):
-    def is_default_objects_attr(self, sym: SymbolTableNode) -> bool:
-        return sym.fullname == helpers.MODEL_CLASS_FULLNAME + '.' + 'objects'
-
-    def run(self) -> None:
-        existing_objects_sym = self.model_classdef.info.get('objects')
-        if (existing_objects_sym is not None
-            and not self.is_default_objects_attr(existing_objects_sym)):
-            return None
-
-        if self.is_abstract_model():
-            # abstract models do not need 'objects' queryset
-            return None
-
-        typ = self.api.named_type_or_none(helpers.MANAGER_CLASS_FULLNAME,
-                                          args=[Instance(self.model_classdef.info, [])])
-        if not typ:
-            return None
-        self.add_new_node_to_model_class('objects', typ)
-
-
 class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
     def run(self) -> None:
         if self.is_abstract_model():
@@ -121,7 +103,7 @@ class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
 
         for _, rvalue in iter_call_assignments(self.model_classdef):
             if ('primary_key' in rvalue.arg_names
-                and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
+                    and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
                 break
         else:
             self.add_new_node_to_model_class('id', self.api.builtin_type('builtins.int'))
@@ -154,6 +136,60 @@ class AddRelatedManagers(ModelClassInitializer):
                                 if typ is None:
                                     return None
                                 self.add_new_node_to_model_class(related_name, typ)
+
+
+class AddManagerTypes(ModelClassInitializer):
+    def run(self) -> None:
+        class_type = self.api.named_type_or_none(self.model_classdef.fullname)
+        for lvalue, rvalue in iter_call_assignments(self.model_classdef):
+            if isinstance(lvalue, NameExpr) and isinstance(rvalue.callee, NameExpr):
+                rvalue_type = self.api.named_type_or_none(rvalue.callee.fullname)
+                if rvalue_type.type.has_base(helpers.MANAGER_CLASS_FULLNAME):
+                    args = rvalue_type.args
+                    if len(args) > 0:
+                        args[0] = class_type
+                    self.add_new_node_to_model_class(lvalue.name, Instance(rvalue_type.type, args), True)
+
+
+class AddDefaultManager(ModelClassInitializer):
+    def run(self) -> None:
+        default_manager_attr = self.get_meta_attr_expr('default_manager_name')
+        if default_manager_attr is not None and isinstance(default_manager_attr, StrExpr):
+            default_manager_attr_name = default_manager_attr.value
+            if default_manager_attr_name in self.model_classdef.info.names:
+                requested_default_manager = self.model_classdef.info.names[default_manager_attr_name].node.type
+                if requested_default_manager.type.has_base(helpers.MANAGER_CLASS_FULLNAME):
+                    default_manager = requested_default_manager
+                else:
+                    self.api.fail(f'Attribute \'{default_manager_attr_name}\' does not refer to a Manager',
+                                  ctx=default_manager_attr)
+                    return
+            else:
+                self.api.fail(
+                    f'Attribute specified for default manager \'{default_manager_attr_name}\' does not exist',
+                    ctx=default_manager_attr)
+                return
+        else:
+            for lvalue, rvalue in iter_call_assignments(self.model_classdef):
+                if isinstance(rvalue.callee, NameExpr):
+                    rvalue_type = self.api.named_type_or_none(rvalue.callee.fullname,
+                                                              args=[Instance(self.model_classdef.info, [])])
+                    if rvalue_type.type.has_base(helpers.MANAGER_CLASS_FULLNAME):
+                        default_manager = rvalue_type
+                        break
+            else:
+                model = Instance(self.model_classdef.info, [])
+                if self.is_abstract_model():
+                    args = [self.api.named_type_or_none('django.db.models._T')]
+                else:
+                    args = [model]
+                objects_manager = self.api.named_type_or_none(helpers.MANAGER_CLASS_FULLNAME, args=args)
+                # Meta.default_manager_name not set and no manager attributes in class, create an objects attribute
+                if not self.is_abstract_model():
+                    self.add_new_node_to_model_class('objects', objects_manager, True)
+                return
+
+        self.add_new_node_to_model_class('_default_manager', default_manager, True)
 
 
 def iter_over_classdefs(module_file: MypyFile) -> Iterator[ClassDef]:
@@ -200,13 +236,11 @@ def extract_ref_to_fullname(rvalue_expr: CallExpr,
 def process_model_class(ctx: ClassDefContext) -> None:
     initializers = [
         InjectAnyAsBaseForNestedMeta,
-        AddDefaultObjectsManager,
+        AddManagerTypes,
+        AddDefaultManager,
         AddIdAttributeIfPrimaryKeyTrueIsNotSet,
         SetIdAttrsForRelatedFields,
         AddRelatedManagers
     ]
     for initializer_cls in initializers:
         initializer_cls.from_ctx(ctx).run()
-
-    # allow unspecified attributes for now
-    ctx.cls.info.fallback_to_any = True

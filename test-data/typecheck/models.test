@@ -19,7 +19,7 @@ reveal_type(User.objects)  # E: Revealed type is 'main.UserManager'
 reveal_type(User.objects.get())  # E: Revealed type is 'main.User*'
 reveal_type(User.objects.get_or_404())  # E: Revealed type is 'main.User'
 
-[CASE test_model_objects_attribute_present_in_case_of_model_cls_passed_as_parameter]
+[CASE test_model_objects_attribute_not_present_in_case_of_model_cls_passed_as_parameter]
 from typing import Type
 from django.db import models
 
@@ -28,7 +28,7 @@ class Base:
         self.model_cls = model_cls
 class MyModel(models.Model):
     pass
-reveal_type(Base(MyModel).model_cls.objects)  # E: Revealed type is 'django.db.models.manager.Manager[django.db.models.base.Model]'
+Base(MyModel).model_cls.objects  # E: "Type[Model]" has no attribute "objects"
 
 [CASE test_model_objects_attribute_present_in_case_of_model_cls_passed_as_generic_parameter]
 from typing import TypeVar, Generic, Type
@@ -38,7 +38,7 @@ _T = TypeVar('_T', bound=models.Model)
 class Base(Generic[_T]):
     def __init__(self, model_cls: Type[_T]):
         self.model_cls = model_cls
-        reveal_type(self.model_cls.objects)  # E: Revealed type is 'django.db.models.manager.Manager[django.db.models.base.Model]'
+        self.model_cls.objects  # E: "Type[_T]" has no attribute "objects"
 class MyModel(models.Model):
     pass
 base_instance = Base(MyModel)
@@ -47,3 +47,67 @@ reveal_type(base_instance.model_cls.objects)  # E: Revealed type is 'django.db.m
 class Child(Base[MyModel]):
     def method(self) -> None:
         reveal_type(self.model_cls.objects)  # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
+
+[CASE test_model_managers_no_manager_defined]
+from django.db import models
+
+class ModelWithNoManagerDefined(models.Model):
+    pass
+
+reveal_type(ModelWithNoManagerDefined.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.ModelWithNoManagerDefined]'
+reveal_type(ModelWithNoManagerDefined._default_manager) # E: Revealed type is 'django.db.models.manager.Manager[main.ModelWithNoManagerDefined*]'
+
+[CASE test_model_managers_model_with_managers]
+from typing import TypeVar
+from django.db import models
+
+_T = TypeVar('_T', bound=models.Model)
+
+class ManagerOne(models.Manager[_T]):
+    pass
+
+class ManagerTwo(models.Manager[_T]):
+    pass
+
+class ModelWithManagers(models.Model):
+    first_manager = ManagerOne()
+    second_manager = ManagerTwo()
+
+ModelWithManagers.objects  # E: "Type[ModelWithManagers]" has no attribute "objects"
+reveal_type(ModelWithManagers.first_manager) # E: Revealed type is 'main.ManagerOne[main.ModelWithManagers]'
+reveal_type(ModelWithManagers.second_manager) # E: Revealed type is 'main.ManagerTwo[main.ModelWithManagers]'
+reveal_type(ModelWithManagers._default_manager) # E: Revealed type is 'main.ManagerOne[main.ModelWithManagers]'
+
+[CASE test_model_managers_model_with_default_manager]
+from typing import TypeVar
+from django.db import models
+
+_T = TypeVar('_T', bound=models.Model)
+
+class ManagerOne(models.Manager[_T]):
+    pass
+
+class ManagerTwo(models.Manager[_T]):
+    pass
+
+class ModelWithDefaultManagerSet(models.Model):
+    first_manager = ManagerOne()
+    second_manager = ManagerTwo()
+
+    class Meta:
+        default_manager_name = 'second_manager'
+
+reveal_type(ModelWithDefaultManagerSet.first_manager) # E: Revealed type is 'main.ManagerOne[main.ModelWithDefaultManagerSet]'
+reveal_type(ModelWithDefaultManagerSet.second_manager) # E: Revealed type is 'main.ManagerTwo[main.ModelWithDefaultManagerSet]'
+reveal_type(ModelWithDefaultManagerSet._default_manager) # E: Revealed type is 'main.ManagerTwo[main.ModelWithDefaultManagerSet]'
+ModelWithDefaultManagerSet.objects  # E: "Type[ModelWithDefaultManagerSet]" has no attribute "objects"
+
+[CASE test_model_managers_instantiate_outside_model]
+from typing import TypeVar
+from django.db import models
+
+_T = TypeVar('_T', bound=models.Model)
+
+class ManagerOne(models.Manager[_T]):
+    pass
+ManagerOne() # E: Managers should not be instantiated outside of Model definitions
