@@ -16,7 +16,7 @@ from typing import (
 )
 
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
+from django.db.models.expressions import Combinable as Combinable, F as F
 from django.db.models.sql.query import Query, RawQuery
 
 from django.db import models
