@@ -133,6 +133,9 @@ IGNORED_ERRORS = {
     'db_typecasts': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)'
     ],
+    'expressions': [
+        'Argument 1 to "Subquery" has incompatible type "Sequence[Dict[str, Any]]"; expected "QuerySet[Any]"'
+    ],
     'from_db_value': [
         'has no attribute "vendor"'
     ],
