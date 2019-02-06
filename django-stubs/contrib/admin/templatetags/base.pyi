@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, List
 
 from django.template.base import Parser, Token
 from django.template.context import Context

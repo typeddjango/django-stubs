@@ -5,7 +5,7 @@ from django import http
 logger = ...  # type: Any
 
 class ContextMixin:
-    def get_context_data(self, **kwargs: object) -> Dict[str, object]: ...
+    def get_context_data(self, **kwargs: object) -> Dict[str, Any]: ...
 
 class View:
     http_method_names = ...  # type: List[str]

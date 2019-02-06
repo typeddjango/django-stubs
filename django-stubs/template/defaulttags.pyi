@@ -1,9 +1,9 @@
 from collections import namedtuple
 from datetime import date
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from django.template.base import FilterExpression, Parser, Token
-from django.template.context import RequestContext, Context
+from django.template.context import Context
 from django.utils.safestring import SafeText
 
 from .base import Node, NodeList
@@ -153,9 +153,13 @@ class WidthRatioNode(Node):
 
 class WithNode(Node):
     nodelist: NodeList = ...
-    extra_context: Dict[str, Union[FilterExpression, str]] = ...
+    extra_context: Dict[str, Any] = ...
     def __init__(
-        self, var: Optional[str], name: Optional[str], nodelist: NodeList, extra_context: Optional[Dict[str, Any]] = ...
+        self,
+        var: Optional[str],
+        name: Optional[str],
+        nodelist: Union[NodeList, Sequence[Node]],
+        extra_context: Optional[Dict[str, Any]] = ...,
     ) -> None: ...
 
 def autoescape(parser: Parser, token: Token) -> AutoEscapeControlNode: ...

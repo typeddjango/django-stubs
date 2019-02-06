@@ -1,6 +1,7 @@
 from typing import Any, Callable, Optional, Type
 
 from django.core.handlers.wsgi import WSGIRequest
+from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
 class RemovedInDjango30Warning(PendingDeprecationWarning): ...
@@ -25,9 +26,9 @@ class DeprecationInstanceCheck(type):
     deprecation_warning: Type[Warning]
     def __instancecheck__(self, instance: Any): ...
 
-GetResponseCallable = Callable[[WSGIRequest], HttpResponse]
+GetResponseCallable = Callable[[HttpRequest], HttpResponse]
 
 class MiddlewareMixin:
     get_response: Optional[GetResponseCallable] = ...
     def __init__(self, get_response: Optional[GetResponseCallable] = ...) -> None: ...
-    def __call__(self, request: WSGIRequest) -> HttpResponse: ...
+    def __call__(self, request: HttpRequest) -> HttpResponse: ...

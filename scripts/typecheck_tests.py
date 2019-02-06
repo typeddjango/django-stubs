@@ -35,7 +35,7 @@ IGNORED_ERRORS = {
         # settings
         re.compile(r'Module has no attribute "[A-Z_]+"'),
         # attributes assigned to test functions
-        re.compile(r'"Callable\[\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\], Any\]" has no attribute'),
+        re.compile(r'"Callable\[(\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\]|\.\.\.), Any\]" has no attribute'),
         # assign empty tuple
         re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
                    r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
@@ -45,8 +45,9 @@ IGNORED_ERRORS = {
         re.compile(r'Incompatible types in assignment \(expression has type "Callable\[\[(Any(, )?)+\], Any\]", '
                    r'variable has type "Callable\['),
         # cookies private attribute
-        'has no attribute "_reserved"',
-        'full_clean" of "Model" does not return a value'
+        'full_clean" of "Model" does not return a value',
+        # private members
+        re.compile(r'has no attribute "|\'_[a-z][a-z_]+"|\'')
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -148,6 +149,15 @@ IGNORED_ERRORS = {
     'signals': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Any, Any]"; expected "Tuple[Any, Any, Any]"'
     ],
+    'syndication_tests': [
+        'List or tuple expected as variable arguments'
+    ],
+    'staticfiles_tests': [
+        'Value of type "stat_result" is not indexable',
+        '"setUp" undefined in superclass',
+        'Argument 1 to "write" of "IO" has incompatible type "bytes"; expected "str"',
+        'Value of type "object" is not indexable'
+    ],
     'transactions': [
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
     ],
@@ -168,6 +178,20 @@ IGNORED_ERRORS = {
         'MockTestRunner',
         'Incompatible types in assignment (expression has type "Tuple[Union[TestCase, TestSuite], ...]", '
         + 'variable has type "TestSuite")'
+    ],
+    'template_tests': [
+        'Xtemplate',
+        re.compile(r'Argument 1 to "[a-zA-Z_]+" has incompatible type "int"; expected "str"'),
+        'TestObject',
+        'variable has type "Callable[[Any], Any]',
+        'template_debug',
+        '"yield from" can\'t be applied to',
+        re.compile(r'List item [0-9] has incompatible type "URLResolver"; expected "URLPattern"'),
+        '"WSGIRequest" has no attribute "current_app"'
+    ],
+    'template_backends': [
+        'Incompatible import of "Jinja2" (imported name has type "Type[Jinja2]", local name has type "object")',
+        'TemplateStringsTests'
     ],
     'urlpatterns': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
@@ -367,18 +391,18 @@ TESTS_DIRS = [
     'shortcuts',
     'signals',
     'signed_cookies_tests',
-    # TODO: 'signing',
+    'signing',
     # TODO: 'sitemaps_tests',
     'sites_framework',
-    # TODO: 'sites_tests',
+    'sites_tests',
     # TODO: 'staticfiles_tests',
     'str',
     'string_lookup',
     'swappable_models',
-    # TODO: 'syndication_tests',
-    # TODO: 'template_backends',
+    'syndication_tests',
+    'template_backends',
     'template_loader',
-    # TODO: 'template_tests',
+    'template_tests',
     'test_client',
     'test_client_regress',
     'test_exceptions',
@@ -408,7 +432,7 @@ TESTS_DIRS = [
     'validators',
     'version',
     'view_tests',
-    # TODO: 'wsgi',
+    'wsgi',
 ]
 
 
