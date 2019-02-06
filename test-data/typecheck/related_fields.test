@@ -108,7 +108,7 @@ class View(models.Model):
     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
 
 reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
-reveal_type(View().app.unknown)  # E: Revealed type is 'Any'
+View().app.unknown  # E: "App" has no attribute "unknown"
 [out]
 
 [file myapp/__init__.py]
