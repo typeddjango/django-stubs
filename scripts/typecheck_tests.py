@@ -48,7 +48,8 @@ IGNORED_ERRORS = {
         'full_clean" of "Model" does not return a value',
         # private members
         re.compile(r'has no attribute "|\'_[a-z][a-z_]+"|\''),
-        'Invalid base class'
+        'Invalid base class',
+        'ValuesIterable'
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -75,14 +76,15 @@ IGNORED_ERRORS = {
         '"object" not callable'
     ],
     'aggregation': [
-        'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")'
-        + '"as_sql" undefined in superclass',
+        'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
+        '"as_sql" undefined in superclass',
         'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
         + 'variable has type "ValuesListIterable")'
     ],
     'aggregation_regress': [
         'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")',
-        'Incompatible types in assignment (expression has type "FlatValuesListIterable", variable has type "QuerySet[Any]")'
+        'Incompatible types in assignment (expression has type "FlatValuesListIterable", variable has type "QuerySet[Any]")',
+        'Too few arguments for "count" of "Sequence"'
     ],
     'apps': [
         'Incompatible types in assignment (expression has type "str", target has type "type")',
@@ -576,4 +578,4 @@ if __name__ == '__main__':
         if rc != 0:
             global_rc = 1
 
-    sys.exit(rc)
+    sys.exit(global_rc)
