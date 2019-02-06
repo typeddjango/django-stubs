@@ -529,7 +529,10 @@ def is_ignored(line: str, test_folder_name: str) -> bool:
 def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     raw_path, _, error_line = error.partition(': ')
     fname, _,line_number = raw_path.partition(':')
+
+    print(f'project directory is {PROJECT_DIRECTORY}')
     path = abs_test_folder.joinpath(fname).relative_to(PROJECT_DIRECTORY)
+
     clickable_location = f'./{path}:{line_number or 1}'
     return error.replace(raw_path, clickable_location)
 
