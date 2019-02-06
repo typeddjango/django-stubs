@@ -1,5 +1,7 @@
 from typing import Any, Callable, List, Optional, Set, Union
 
+from django.contrib.auth import REDIRECT_FIELD_NAME as REDIRECT_FIELD_NAME
+
 def user_passes_test(
     test_func: Callable, login_url: Optional[str] = ..., redirect_field_name: str = ...
 ) -> Callable: ...

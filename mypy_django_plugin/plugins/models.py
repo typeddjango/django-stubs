@@ -173,10 +173,12 @@ def get_related_field_type(rvalue: CallExpr, api: SemanticAnalyzerPass2,
 
 def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:
     if isinstance(expr.callee, MemberExpr) and isinstance(expr.callee.expr, NameExpr):
-        module = module_file.names[expr.callee.expr.name]
-        if module.fullname == 'django.db.models' and expr.callee.name in {'ForeignKey',
-                                                                          'OneToOneField',
-                                                                          'ManyToManyField'}:
+        module = module_file.names.get(expr.callee.expr.name)
+        if module \
+            and module.fullname == 'django.db.models' \
+            and expr.callee.name in {'ForeignKey',
+                                     'OneToOneField',
+                                     'ManyToManyField'}:
             return True
     return False
 

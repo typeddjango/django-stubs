@@ -12,6 +12,7 @@ from .aggregates import (
 )
 
 from .fields import (
+    FieldDoesNotExist as FieldDoesNotExist,
     AutoField as AutoField,
     IntegerField as IntegerField,
     PositiveIntegerField as PositiveIntegerField,
@@ -38,6 +39,8 @@ from .fields import (
     BinaryField as BinaryField,
     DurationField as DurationField,
     BigAutoField as BigAutoField,
+    FileField as FileField,
+    CommaSeparatedIntegerField as CommaSeparatedIntegerField,
 )
 
 from .fields.related import (
@@ -45,6 +48,10 @@ from .fields.related import (
     OneToOneField as OneToOneField,
     ManyToManyField as ManyToManyField,
     ForeignObject as ForeignObject,
+    ManyToManyRel as ManyToManyRel,
+    ManyToOneRel as ManyToOneRel,
+    OneToOneRel as OneToOneRel,
+    ForeignObjectRel as ForeignObjectRel,
 )
 from .fields.files import ImageField as ImageField, FileField as FileField
 from .fields.proxy import OrderWrt as OrderWrt

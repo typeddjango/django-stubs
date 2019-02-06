@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, Type, Union
+from typing import Any, Callable, List, Optional, Type, Union, Tuple
 
 from django.core.checks.messages import Error
 from django.core.files.base import File
@@ -8,6 +8,8 @@ from django.db.models.base import Model
 
 from django.db.models.fields import Field
 from django.forms import fields as form_fields
+
+BLANK_CHOICE_DASH: List[Tuple[str, str]] = ...
 
 class FieldFile(File):
     instance: Model = ...

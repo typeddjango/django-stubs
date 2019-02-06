@@ -29,6 +29,7 @@ from django.db.models.fields.reverse_related import (
     ForeignObjectRel as ForeignObjectRel,
     ManyToManyRel as ManyToManyRel,
     ManyToOneRel as ManyToOneRel,
+    OneToOneRel as OneToOneRel,
 )
 from django.db.models.query_utils import PathInfo, Q
 

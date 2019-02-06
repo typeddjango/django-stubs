@@ -1,15 +1,17 @@
 from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type
 import decimal
 
+from django.core.files.storage import Storage
 from django.db.models import Model
 from django.db.models.query_utils import RegisterLookupMixin
 
 from django.db.models.expressions import F, Combinable
+from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.forms import Widget, Field as FormField
 from .mixins import NOT_PROVIDED as NOT_PROVIDED
 
 _Choice = Tuple[Any, str]
-_ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
+_ChoiceNamedGroup = Union[Tuple[str, Iterable[_Choice]], Tuple[str, Any]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 
 _ValidatorCallable = Callable[..., None]
@@ -20,11 +22,12 @@ class Field(RegisterLookupMixin):
     help_text: str
     db_table: str
     remote_field: Field
+    max_length: Optional[int]
     model: Type[Model]
     name: str
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -52,6 +55,7 @@ class Field(RegisterLookupMixin):
     def db_type(self, connection: Any) -> str: ...
     def db_parameters(self, connection: Any) -> Dict[str, str]: ...
     def get_prep_value(self, value: Any) -> Any: ...
+    def get_internal_type(self) -> str: ...
     def formfield(self, **kwargs) -> FormField: ...
     def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
 
@@ -71,7 +75,7 @@ class FloatField(Field): ...
 class DecimalField(Field):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         max_digits: Optional[int] = ...,
         decimal_places: Optional[int] = ...,
@@ -99,7 +103,7 @@ class AutoField(Field):
 class CharField(Field):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -127,7 +131,7 @@ class CharField(Field):
 class SlugField(CharField):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -166,7 +170,34 @@ class NullBooleanField(Field):
     def __set__(self, instance, value: Optional[bool]) -> None: ...
     def __get__(self, instance, owner) -> Optional[bool]: ...
 
-class FileField(Field): ...
+class FileField(Field):
+    def __init__(
+        self,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        upload_to: str = ...,
+        storage: Optional[Storage] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+
 class IPAddressField(Field): ...
 
 class GenericIPAddressField(Field):
@@ -201,7 +232,7 @@ class DateTimeCheckMixin: ...
 class DateField(DateTimeCheckMixin, Field):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
@@ -226,7 +257,7 @@ class DateField(DateTimeCheckMixin, Field):
 class TimeField(DateTimeCheckMixin, Field):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
@@ -251,9 +282,14 @@ class DateTimeField(DateField): ...
 class UUIDField(Field): ...
 
 class FilePathField(Field):
+    path: str = ...
+    match: Optional[Any] = ...
+    recursive: bool = ...
+    allow_files: bool = ...
+    allow_folders: bool = ...
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         path: str = ...,
         match: Optional[Any] = ...,
@@ -281,3 +317,4 @@ class FilePathField(Field):
 class BinaryField(Field): ...
 class DurationField(Field): ...
 class BigAutoField(AutoField): ...
+class CommaSeparatedIntegerField(CharField): ...

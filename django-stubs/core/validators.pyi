@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union, Pattern
 from uuid import UUID
 
 from django.core.files.base import File
+from django.core.exceptions import ValidationError as ValidationError
 
 EMPTY_VALUES: Any
 

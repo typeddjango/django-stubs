@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.db.models.base import Model
 from django.db.models.fields.files import FieldFile
-from django.utils.safestring import SafeText
+from django.utils.safestring import SafeText, mark_safe as mark_safe
 
 TRAILING_PUNCTUATION_CHARS: str
 WRAPPING_PUNCTUATION: Any
