@@ -1,7 +1,8 @@
+import uuid
+from datetime import date, time, datetime, timedelta
 from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type
 import decimal
 
-from django.core.files.storage import Storage
 from django.db.models import Model
 from django.db.models.query_utils import RegisterLookupMixin
 
@@ -10,7 +11,7 @@ from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.forms import Widget, Field as FormField
 from .mixins import NOT_PROVIDED as NOT_PROVIDED
 
-_Choice = Tuple[Any, str]
+_Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Union[Tuple[str, Iterable[_Choice]], Tuple[str, Any]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 
@@ -58,6 +59,7 @@ class Field(RegisterLookupMixin):
     def get_internal_type(self) -> str: ...
     def formfield(self, **kwargs) -> FormField: ...
     def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
+    def to_python(self, value: Any) -> Any: ...
 
 class IntegerField(Field):
     def __set__(self, instance, value: Union[int, F]) -> None: ...
@@ -70,7 +72,9 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
 class SmallIntegerField(IntegerField): ...
 class BigIntegerField(IntegerField): ...
-class FloatField(Field): ...
+
+class FloatField(Field):
+    def __get__(self, instance, owner) -> float: ...
 
 class DecimalField(Field):
     def __init__(
@@ -170,35 +174,8 @@ class NullBooleanField(Field):
     def __set__(self, instance, value: Optional[bool]) -> None: ...
     def __get__(self, instance, owner) -> Optional[bool]: ...
 
-class FileField(Field):
-    def __init__(
-        self,
-        verbose_name: Optional[Union[str, bytes]] = ...,
-        name: Optional[str] = ...,
-        upload_to: str = ...,
-        storage: Optional[Storage] = ...,
-        primary_key: bool = ...,
-        max_length: Optional[int] = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
-
-class IPAddressField(Field): ...
+class IPAddressField(Field):
+    def __get__(self, instance, owner) -> str: ...
 
 class GenericIPAddressField(Field):
     default_error_messages: Any = ...
@@ -226,6 +203,7 @@ class GenericIPAddressField(Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
+    def __get__(self, instance, owner) -> str: ...
 
 class DateTimeCheckMixin: ...
 
@@ -253,6 +231,7 @@ class DateField(DateTimeCheckMixin, Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    def __get__(self, instance, owner) -> date: ...
 
 class TimeField(DateTimeCheckMixin, Field):
     def __init__(
@@ -277,9 +256,13 @@ class TimeField(DateTimeCheckMixin, Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    def __get__(self, instance, owner) -> time: ...
 
-class DateTimeField(DateField): ...
-class UUIDField(Field): ...
+class DateTimeField(DateField):
+    def __get__(self, instance, owner) -> datetime: ...
+
+class UUIDField(Field):
+    def __get__(self, instance, owner) -> uuid.UUID: ...
 
 class FilePathField(Field):
     path: str = ...
@@ -315,6 +298,9 @@ class FilePathField(Field):
     ): ...
 
 class BinaryField(Field): ...
-class DurationField(Field): ...
+
+class DurationField(Field):
+    def __get__(self, instance, owner) -> timedelta: ...
+
 class BigAutoField(AutoField): ...
 class CommaSeparatedIntegerField(CharField): ...

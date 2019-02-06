@@ -47,7 +47,8 @@ IGNORED_ERRORS = {
         # cookies private attribute
         'full_clean" of "Model" does not return a value',
         # private members
-        re.compile(r'has no attribute "|\'_[a-z][a-z_]+"|\'')
+        re.compile(r'has no attribute "|\'_[a-z][a-z_]+"|\''),
+        'Invalid base class'
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -59,6 +60,19 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "RelatedFieldWidgetWrapper", '
         'variable has type "AdminRadioSelect")',
         'Incompatible types in assignment (expression has type "Widget", variable has type "AutocompleteSelect")'
+    ],
+    'admin_utils': [
+        re.compile(r'Argument [0-9] to "lookup_field" has incompatible type'),
+        'MockModelAdmin',
+        'Incompatible types in assignment (expression has type "str", variable has type "Callable[..., Any]")',
+        'Dict entry 0 has incompatible type "str": "Tuple[str, str, List[str]]"; expected "str": '
+        + '"Tuple[str, str, Tuple[str, str]]"',
+        'Incompatible types in assignment (expression has type "bytes", variable has type "str")'
+    ],
+    'admin_views': [
+        'Argument 1 to "FileWrapper" has incompatible type "StringIO"; expected "IO[bytes]"',
+        'Incompatible types in assignment',
+        '"object" not callable'
     ],
     'aggregation': [
         'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
@@ -108,6 +122,9 @@ IGNORED_ERRORS = {
     'defer': [
         'Too many arguments for "refresh_from_db" of "Model"'
     ],
+    'dispatch': [
+        'Argument 1 to "connect" of "Signal" has incompatible type "object"; expected "Callable[..., Any]"'
+    ],
     'db_typecasts': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)'
     ],
@@ -131,6 +148,10 @@ IGNORED_ERRORS = {
     'httpwrappers': [
         'Argument 2 to "appendlist" of "QueryDict" has incompatible type "List[str]"; expected "str"'
     ],
+    'invalid_models_tests': [
+        'Argument "max_length" to "CharField" has incompatible type "str"; expected "Optional[int]"',
+        'Argument "choices" to "CharField" has incompatible type "str"'
+    ],
     'model_inheritance_regress': [
         'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
     ],
@@ -138,11 +159,36 @@ IGNORED_ERRORS = {
         '"object" has no attribute "items"',
         '"Field" has no attribute "many_to_many"'
     ],
+    'model_fields': [
+        'Incompatible types in assignment (expression has type "Type[Person]", variable has type',
+        'Unexpected keyword argument "name" for "Person"',
+        'Cannot assign multiple types to name "PersonTwoImages" without an explicit "Type[...]" annotation',
+    ],
+    'modeladmin': [
+        'BandAdmin',
+    ],
     'migrate_signals': [
         'Value of type "None" is not indexable',
     ],
+    'migrations': [
+        'FakeMigration',
+        'Incompatible types in assignment (expression has type "TextField", base class "Model" '
+        + 'defined the type as "Manager[Model]")',
+        'Incompatible types in assignment (expression has type "DeleteModel", variable has type "RemoveField")',
+        'Argument "bases" to "CreateModel" has incompatible type "Tuple[Type[Mixin], Type[Mixin]]"; '
+        + 'expected "Optional[Sequence[Union[Type[Model], str]]]"',
+        'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
+        'FakeLoader',
+    ],
     'queryset_pickle': [
         '"None" has no attribute "somefield"'
+    ],
+    'postgres_tests': [
+        'Cannot assign multiple types to name',
+        'Incompatible types in assignment (expression has type "Type[Field]',
+        'DummyArrayField',
+        'DummyJSONField',
+        'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"'
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -242,8 +288,8 @@ TESTS_DIRS = [
     'admin_ordering',
     'admin_registration',
     'admin_scripts',
-    # TODO: 'admin_utils',
-    # TODO: 'admin_views',
+    'admin_utils',
+    'admin_views',
     'admin_widgets',
     'aggregation',
     'aggregation_regress',
@@ -282,7 +328,7 @@ TESTS_DIRS = [
     'delete',
     'delete_regress',
     # TODO: 'deprecation',
-    # TODO: 'dispatch',
+    'dispatch',
     'distinct_on_fields',
     'empty',
     'expressions',
@@ -321,7 +367,10 @@ TESTS_DIRS = [
     'inline_formsets',
     'inspectdb',
     'introspection',
-    # TODO: 'invalid_models_tests',
+
+    # not practical
+    # 'invalid_models_tests',
+
     'known_related_objects',
     # TODO: 'logging_tests',
     'lookup',
@@ -345,8 +394,10 @@ TESTS_DIRS = [
     # TODO: 'middleware_exceptions',
     'migrate_signals',
     'migration_test_data_persistence',
+    # wait for redefinitions
     # TODO: 'migrations',
     'migrations2',
+    # waits for allow redefinitions
     # TODO: 'model_fields',
     # TODO: 'model_forms',
     'model_formsets',
@@ -358,7 +409,8 @@ TESTS_DIRS = [
     'model_options',
     'model_package',
     'model_regress',
-    # TODO: 'modeladmin',
+    # not practical
+    # 'modeladmin',
     # TODO: 'multiple_database',
     'mutually_referential',
     'nested_foreign_keys',
@@ -372,7 +424,7 @@ TESTS_DIRS = [
     'ordering',
     'prefetch_related',
     'pagination',
-    # TODO: 'postgres_tests',
+    'postgres_tests',
     'project_template',
     'properties',
     'proxy_model_inheritance',

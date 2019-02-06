@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, DefaultDict
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, DefaultDict, Union, Sequence
 
 from django.apps.registry import Apps
 from django.db.models.base import Model
@@ -31,7 +31,7 @@ class ModelState:
         name: str,
         fields: List[Tuple[str, Field]],
         options: Optional[Dict[str, Any]] = ...,
-        bases: Optional[Tuple[Type[Model]]] = ...,
+        bases: Optional[Sequence[Union[Type[Model], str]]] = ...,
         managers: Optional[List[Tuple[str, Manager]]] = ...,
     ) -> None: ...
     def clone(self) -> ModelState: ...

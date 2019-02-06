@@ -1,5 +1,6 @@
+import collections
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 from uuid import UUID
 
 from django.contrib.admin.options import BaseModelAdmin
@@ -8,28 +9,23 @@ from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.deletion import Collector
-from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel
+from django.db.models.fields.reverse_related import ManyToOneRel
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
+from django.forms.forms import BaseForm
 from django.utils.safestring import SafeText
+
+from django.db.models.fields import Field, reverse_related
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 
 def lookup_needs_distinct(opts: Options, lookup_path: str) -> bool: ...
 def prepare_lookup_value(key: str, value: Union[datetime, str]) -> Union[bool, datetime, str]: ...
-def quote(s: Union[int, str, UUID]) -> Union[int, str, UUID]: ...
+def quote(s: Union[int, str, UUID]) -> str: ...
 def unquote(s: str) -> str: ...
-def flatten(
-    fields: Union[List[Union[Callable, str]], List[Union[List[str], str]], List[Union[Tuple[str, str], str]], Tuple]
-) -> List[Union[Callable, str]]: ...
-def flatten_fieldsets(
-    fieldsets: Union[
-        List[Tuple[Optional[str], Dict[str, Tuple[str]]]],
-        Tuple[Tuple[Optional[str], Dict[str, Tuple[Union[Tuple[str, str], str]]]]],
-    ]
-) -> List[Union[Callable, str]]: ...
+def flatten(fields: Any) -> List[Union[Callable, str]]: ...
+def flatten_fieldsets(fieldsets: Any) -> List[Union[Callable, str]]: ...
 def get_deleted_objects(
     objs: QuerySet, request: WSGIRequest, admin_site: AdminSite
 ) -> Tuple[List[Any], Dict[Any, Any], Set[Any], List[Any]]: ...
@@ -47,7 +43,7 @@ class NestedObjects(Collector):
     def add_edge(self, source: Optional[Model], target: Model) -> None: ...
     def collect(
         self,
-        objs: Union[List[Model], QuerySet],
+        objs: Union[Sequence[Model], QuerySet],
         source: Optional[Type[Model]] = ...,
         source_attr: Optional[str] = ...,
         **kwargs: Any
@@ -62,7 +58,11 @@ def lookup_field(
     name: Union[Callable, str], obj: Model, model_admin: BaseModelAdmin = ...
 ) -> Tuple[Optional[Field], Callable, Callable]: ...
 def label_for_field(
-    name: Union[Callable, str], model: Type[Model], model_admin: Optional[BaseModelAdmin] = ..., return_attr: bool = ...
+    name: Union[Callable, str],
+    model: Type[Model],
+    model_admin: Optional[BaseModelAdmin] = ...,
+    return_attr: bool = ...,
+    form: Optional[BaseForm] = ...,
 ) -> Union[Tuple[Optional[str], Union[Callable, Type[str]]], str]: ...
 def help_text_for_field(name: str, model: Type[Model]) -> str: ...
 def display_for_field(

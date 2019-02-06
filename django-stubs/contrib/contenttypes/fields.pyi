@@ -51,7 +51,7 @@ class GenericForeignKey(FieldCacheMixin):
 
 class GenericRel(ForeignObjectRel):
     field: GenericRelation
-    limit_choices_to: Dict[Any, Any]
+    limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]]
     model: Type[Model]
     multiple: bool
     on_delete: Callable
@@ -65,7 +65,7 @@ class GenericRel(ForeignObjectRel):
         to: Union[Type[Model], str],
         related_name: None = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: None = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
     ) -> None: ...
 
 class GenericRelation(ForeignObject):
@@ -87,7 +87,7 @@ class GenericRelation(ForeignObject):
         content_type_field: str = ...,
         for_concrete_model: bool = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: None = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
         **kwargs: Any
     ) -> None: ...
     def check(self, **kwargs: Any) -> List[Error]: ...

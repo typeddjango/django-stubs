@@ -39,7 +39,6 @@ from .fields import (
     BinaryField as BinaryField,
     DurationField as DurationField,
     BigAutoField as BigAutoField,
-    FileField as FileField,
     CommaSeparatedIntegerField as CommaSeparatedIntegerField,
 )
 
@@ -53,7 +52,12 @@ from .fields.related import (
     OneToOneRel as OneToOneRel,
     ForeignObjectRel as ForeignObjectRel,
 )
-from .fields.files import ImageField as ImageField, FileField as FileField
+from .fields.files import (
+    ImageField as ImageField,
+    FileField as FileField,
+    FieldFile as FieldFile,
+    FileDescriptor as FileDescriptor,
+)
 from .fields.proxy import OrderWrt as OrderWrt
 
 from .deletion import (
