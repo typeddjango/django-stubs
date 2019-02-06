@@ -114,6 +114,9 @@ IGNORED_ERRORS = {
     'from_db_value': [
         'has no attribute "vendor"'
     ],
+    'field_deconstruction': [
+        'Incompatible types in assignment (expression has type "ForeignKey[Any]", variable has type "CharField")'
+    ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
         + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"',
@@ -121,6 +124,12 @@ IGNORED_ERRORS = {
         + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"',
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
         + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"'
+    ],
+    'get_or_create': [
+        'Argument 1 to "update_or_create" of "QuerySet" has incompatible type "**Dict[str, object]"; expected "MutableMapping[str, Any]"'
+    ],
+    'httpwrappers': [
+        'Argument 2 to "appendlist" of "QueryDict" has incompatible type "List[str]"; expected "str"'
     ],
     'model_inheritance_regress': [
         'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
@@ -280,7 +289,7 @@ TESTS_DIRS = [
     'expressions_case',
     # TODO: 'expressions_window',
     # TODO: 'extra_regress',
-    # TODO: 'field_deconstruction',
+    'field_deconstruction',
     'field_defaults',
     'field_subclassing',
     # TODO: 'file_storage',
@@ -301,7 +310,7 @@ TESTS_DIRS = [
     # TODO: 'generic_views',
     'get_earliest_or_latest',
     'get_object_or_404',
-    # TODO: 'get_or_create',
+    'get_or_create',
     # TODO: 'gis_tests',
     'handlers',
     # TODO: 'httpwrappers',

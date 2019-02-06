@@ -125,7 +125,7 @@ class ManyToManyField(RelatedField, Generic[_T]):
         to: Union[Type[_T], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Callable] = ...,
+        limit_choices_to: Optional[Dict[str, Any]] = ...,
         symmetrical: Optional[bool] = ...,
         through: Optional[Union[str, Type[Model]]] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,
