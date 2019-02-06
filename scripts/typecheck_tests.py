@@ -530,8 +530,11 @@ def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     raw_path, _, error_line = error.partition(': ')
     fname, _,line_number = raw_path.partition(':')
 
-    print(f'project directory is {PROJECT_DIRECTORY}')
-    path = abs_test_folder.joinpath(fname).relative_to(PROJECT_DIRECTORY)
+    try:
+        path = abs_test_folder.joinpath(fname).relative_to(PROJECT_DIRECTORY)
+    except ValueError:
+        # fail on travis, just show an error
+        return error
 
     clickable_location = f'./{path}:{line_number or 1}'
     return error.replace(raw_path, clickable_location)
