@@ -75,9 +75,10 @@ IGNORED_ERRORS = {
         '"object" not callable'
     ],
     'aggregation': [
-        'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
-        '"as_sql" undefined in superclass',
-        'Incompatible types in assignment (expression has type "FlatValuesListIterable", variable has type "ValuesListIterable")'
+        'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")'
+        + '"as_sql" undefined in superclass',
+        'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
+        + 'variable has type "ValuesListIterable")'
     ],
     'aggregation_regress': [
         'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")',
