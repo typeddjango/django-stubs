@@ -1,4 +1,5 @@
 import os
+import sys
 from distutils.core import setup
 
 from setuptools import find_packages
@@ -19,6 +20,15 @@ def find_stub_files(name):
 with open('README.md', 'r') as f:
     readme = f.read()
 
+dependencies = [
+    'Django',
+    'mypy>=0.660',
+    'typing-extensions'
+]
+if sys.version_info[:2] < (3, 7):
+    # dataclasses port for 3.6
+    dependencies += ['dataclasses']
+
 setup(
     name="django-stubs",
     version="0.3.0",
@@ -31,11 +41,7 @@ setup(
     author_email="maxim.kurnikov@gmail.com",
     py_modules=[],
     python_requires='>=3',
-    install_requires=[
-        'Django',
-        'mypy>=0.660',
-        'typing-extensions'
-    ],
+    install_requires=dependencies,
     packages=['django-stubs', *find_packages()],
     package_data={'django-stubs': find_stub_files('django-stubs')},
     classifiers=[
