@@ -45,7 +45,6 @@ class ModelClassInitializer(metaclass=ABCMeta):
         var._fullname = self.model_classdef.info.fullname() + '.' + name
         var.is_inferred = True
         var.is_initialized_in_class = True
-        var.is_classvar = True
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var)
 
     @abstractmethod

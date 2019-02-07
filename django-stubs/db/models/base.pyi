@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union, ClassVar
 
 from django.db.models.manager import Manager
 
