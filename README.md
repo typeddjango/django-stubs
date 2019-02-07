@@ -23,7 +23,13 @@ plugins =
 
 in your `mypy.ini` file.
 
-Also, it uses value of `DJANGO_SETTINGS_MODULE` from the environment, so set it before execution, otherwise some features will not work.
+
+### `django.conf.settings` support
+
+`settings.SETTING_NAME` will only work if `DJANGO_SETTINGS_MODULE` will be present in the environment, when mypy is executed.
+
+If some setting is not recognized to the plugin, but it's clearly there, try adding type annotation to it.
+
 
 ## To get help
 

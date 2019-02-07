@@ -1,18 +1,18 @@
 import os
-from typing import Callable, Optional, cast, Dict
+from typing import Callable, Dict, Optional, cast
 
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.options import Options
-from mypy.plugin import Plugin, FunctionContext, ClassDefContext, MethodContext
-from mypy.types import Type, Instance
+from mypy.plugin import ClassDefContext, FunctionContext, MethodContext, Plugin
+from mypy.types import Instance, Type
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field
 from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations
 from mypy_django_plugin.plugins.models import process_model_class
 from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
-from mypy_django_plugin.plugins.settings import DjangoConfSettingsInitializerHook
+from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject
 
 
 def transform_model_class(ctx: ClassDefContext) -> None:
@@ -55,19 +55,21 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
 
 
 class DjangoPlugin(Plugin):
-    def __init__(self,
-                 options: Options) -> None:
+    def __init__(self, options: Options) -> None:
         super().__init__(options)
 
+        monkeypatch.restore_original_load_graph()
+        monkeypatch.restore_original_dependencies_handling()
+
+        settings_modules = ['django.conf.global_settings']
         self.django_settings = os.environ.get('DJANGO_SETTINGS_MODULE')
         if self.django_settings:
-            monkeypatch.load_graph_to_add_settings_file_as_a_source_seed(self.django_settings)
-            monkeypatch.inject_dependencies(self.django_settings)
-        else:
-            monkeypatch.restore_original_load_graph()
-            monkeypatch.restore_original_dependencies_handling()
+            settings_modules.append(self.django_settings)
 
-    def get_current_model_bases(self) -> Dict[str, int]:
+        monkeypatch.add_modules_as_a_source_seed_files(settings_modules)
+        monkeypatch.inject_modules_as_dependencies_for_django_conf_settings(settings_modules)
+
+    def _get_current_model_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
             if 'django' not in model_sym.node.metadata:
@@ -78,7 +80,7 @@ class DjangoPlugin(Plugin):
         else:
             return {}
 
-    def get_current_manager_bases(self) -> Dict[str, int]:
+    def _get_current_manager_bases(self) -> Dict[str, int]:
         manager_sym = self.lookup_fully_qualified(helpers.MANAGER_CLASS_FULLNAME)
         if manager_sym is not None and isinstance(manager_sym.node, TypeInfo):
             if 'django' not in manager_sym.node.metadata:
@@ -99,7 +101,7 @@ class DjangoPlugin(Plugin):
         if fullname == 'django.contrib.postgres.fields.array.ArrayField':
             return determine_type_of_array_field
 
-        manager_bases = self.get_current_manager_bases()
+        manager_bases = self._get_current_manager_bases()
         if fullname in manager_bases:
             return determine_proper_manager_type
 
@@ -112,13 +114,16 @@ class DjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
-        if fullname in self.get_current_model_bases():
+        if fullname in self._get_current_model_bases():
             return transform_model_class
 
         if fullname == helpers.DUMMY_SETTINGS_BASE_CLASS:
-            return DjangoConfSettingsInitializerHook(settings_module=self.django_settings)
+            settings_modules = ['django.conf.global_settings']
+            if self.django_settings:
+                settings_modules.append(self.django_settings)
+            return AddSettingValuesToDjangoConfObject(settings_modules)
 
-        if fullname in self.get_current_manager_bases():
+        if fullname in self._get_current_manager_bases():
             return transform_manager_class
 
         return None

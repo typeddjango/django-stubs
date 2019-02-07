@@ -1,9 +1,9 @@
-from typing import cast, List, Optional
+from typing import List, Optional, cast
 
-from mypy.nodes import Var, Context, SymbolNode, SymbolTableNode
+from mypy.nodes import ClassDef, Context, MypyFile, SymbolNode, SymbolTableNode, Var
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
-from mypy.types import Instance, UnionType, NoneTyp, Type
+from mypy.types import Instance, NoneTyp, Type, UnionType
 
 
 def get_error_context(node: SymbolNode) -> Context:
@@ -36,39 +36,22 @@ def make_sym_copy_of_setting(sym: SymbolTableNode) -> Optional[SymbolTableNode]:
         return None
 
 
-def add_settings_to_django_conf_object(ctx: ClassDefContext,
-                                       settings_module: str) -> None:
-    api = cast(SemanticAnalyzerPass2, ctx.api)
-    if settings_module not in api.modules:
-        return None
-
-    settings_file = api.modules[settings_module]
-    for name, sym in settings_file.names.items():
+def load_settings_from_module(settings_classdef: ClassDef, module: MypyFile) -> None:
+    for name, sym in module.names.items():
         if name.isupper() and isinstance(sym.node, Var):
             if sym.type is not None:
                 copied = make_sym_copy_of_setting(sym)
                 if copied is None:
                     continue
-                ctx.cls.info.names[name] = copied
-            # else:
-                # TODO: figure out suggestion to add type annotation
-                # context = Context()
-                # module, node_name = sym.node.fullname().rsplit('.', 1)
-                # module_file = api.modules.get(module)
-                # if module_file is None:
-                #     return None
-                # context.set_line(sym.node)
-                # api.msg.report(f"Need type annotation for '{sym.node.name()}'", context,
-                #                severity='error', file=module_file.path)
-    ctx.cls.info.fallback_to_any = True
+                settings_classdef.info.names[name] = copied
 
 
-class DjangoConfSettingsInitializerHook(object):
-    def __init__(self, settings_module: Optional[str]):
-        self.settings_module = settings_module
+class AddSettingValuesToDjangoConfObject:
+    def __init__(self, settings_modules: List[str]):
+        self.settings_modules = settings_modules
 
     def __call__(self, ctx: ClassDefContext) -> None:
-        if not self.settings_module:
-            return
-
-        add_settings_to_django_conf_object(ctx, self.settings_module)
+        api = cast(SemanticAnalyzerPass2, ctx.api)
+        for module_name in self.settings_modules:
+            module = api.modules[module_name]
+            load_settings_from_module(ctx.cls, module=module)

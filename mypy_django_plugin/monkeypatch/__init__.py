@@ -1,5 +1,4 @@
-from .dependencies import (load_graph_to_add_settings_file_as_a_source_seed,
-                           inject_dependencies,
+from .dependencies import (add_modules_as_a_source_seed_files,
+                           inject_modules_as_dependencies_for_django_conf_settings,
                            restore_original_load_graph,
-                           restore_original_dependencies_handling,
-                           process_settings_before_dependants)
+                           restore_original_dependencies_handling)

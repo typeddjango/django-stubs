@@ -32,29 +32,12 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__)
 
-[CASE test_circular_dependency_in_settings]
+[CASE global_settings_are_always_loaded]
 from django.conf import settings
-class Class:
-    pass
-reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
-reveal_type(settings.LIST)  # E: Revealed type is 'Any'
-reveal_type(settings.BASE_LIST)  # E: Revealed type is 'Any'
+
+reveal_type(settings.AUTH_USER_MODEL)  # E: Revealed type is 'builtins.str'
+reveal_type(settings.AUTHENTICATION_BACKENDS)  # E: Revealed type is 'builtins.list[builtins.str]'
 [out]
-
-[env DJANGO_SETTINGS_MODULE=mysettings]
-[file mysettings.py]
-from typing import Optional
-from base import *
-
-LIST = ['1', '2']
-
-[file base.py]
-from typing import TYPE_CHECKING, Optional
-if TYPE_CHECKING:
-    from main import Class
-
-REGISTRY: Optional['Class'] = None
-BASE_LIST = ['3', '4']
 
 [CASE test_circular_dependency_in_settings_works_if_settings_have_annotations]
 from django.conf import settings
@@ -76,10 +59,12 @@ MYSETTING = 1122
 REGISTRY: Optional['Class'] = None
 LIST: List[str] = ['1', '2']
 
-[CASE allow_calls_to_nonexistent_members_for_now]
+[CASE fail_if_there_is_no_setting]
 from django.conf import settings
-reveal_type(settings.NOT_EXISTING)  # E: Revealed type is 'Any'
+reveal_type(settings.NOT_EXISTING)
 
 [env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]
 [out]
+main:2: error: Revealed type is 'Any'
+main:2: error: "LazySettings" has no attribute "NOT_EXISTING"

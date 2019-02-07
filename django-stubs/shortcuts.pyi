@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Type, Union, Sequence, P
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponse as HttpResponse, HttpResponseRedirect as HttpResponseRedirect
 
 from django.http import HttpRequest
 

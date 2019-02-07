@@ -1,9 +1,9 @@
-import dataclasses
-from abc import abstractmethod, ABCMeta
-from typing import cast, Iterator, Tuple, Optional, Dict
+from abc import ABCMeta, abstractmethod
+from typing import Dict, Iterator, Optional, Tuple, cast
 
-from mypy.nodes import ClassDef, AssignmentStmt, CallExpr, MemberExpr, StrExpr, NameExpr, MDEF, TypeInfo, Var, SymbolTableNode, \
-    Lvalue, Expression, MypyFile, Context
+import dataclasses
+from mypy.nodes import AssignmentStmt, CallExpr, ClassDef, Context, Expression, Lvalue, MDEF, MemberExpr, MypyFile, NameExpr, \
+    StrExpr, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import Instance
@@ -45,6 +45,7 @@ class ModelClassInitializer(metaclass=ABCMeta):
         var._fullname = self.model_classdef.info.fullname() + '.' + name
         var.is_inferred = True
         var.is_initialized_in_class = True
+        var.is_classvar = True
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var)
 
     @abstractmethod
