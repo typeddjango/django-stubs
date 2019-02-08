@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, time, datetime, timedelta
-from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type
+from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type, TypeVar
 import decimal
 
 from django.db.models import Model

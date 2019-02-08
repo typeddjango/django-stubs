@@ -29,6 +29,7 @@ IGNORED_ERRORS = {
         'Invalid value for a to= parameter',
         'already defined (possibly by an import)',
         'Cannot assign to a type',
+        re.compile(r'Cannot assign to class variable "[a-z_]+" via instance'),
         # forms <-> models plugin support
         '"Model" has no attribute',
         re.compile(r'Cannot determine type of \'(objects|stuff)\''),
@@ -73,7 +74,8 @@ IGNORED_ERRORS = {
     'admin_views': [
         'Argument 1 to "FileWrapper" has incompatible type "StringIO"; expected "IO[bytes]"',
         'Incompatible types in assignment',
-        '"object" not callable'
+        '"object" not callable',
+        'Incompatible type for "pk" of "Collector" (got "int", expected "str")'
     ],
     'aggregation': [
         'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',

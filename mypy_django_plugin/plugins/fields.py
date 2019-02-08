@@ -1,13 +1,12 @@
 from mypy.plugin import FunctionContext
 from mypy.types import Type, Instance
 
+from mypy_django_plugin import helpers
+
 
 def determine_type_of_array_field(ctx: FunctionContext) -> Type:
-    if 'base_field' not in ctx.callee_arg_names:
-        return ctx.default_return_type
-
-    base_field_arg_type = ctx.arg_types[ctx.callee_arg_names.index('base_field')][0]
-    if not isinstance(base_field_arg_type, Instance):
+    base_field_arg_type = helpers.get_argument_type_by_name(ctx, 'base_field')
+    if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
         return ctx.default_return_type
 
     get_method = base_field_arg_type.type.get_method('__get__')

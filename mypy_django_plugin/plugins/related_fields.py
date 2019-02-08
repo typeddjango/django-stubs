@@ -1,20 +1,12 @@
-import typing
 from typing import Optional, cast
 
 from mypy.checker import TypeChecker
 from mypy.nodes import StrExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import Type, CallableType, Instance, AnyType, TypeOfAny
+from mypy.types import CallableType, Instance, Type
 
 from mypy_django_plugin import helpers
-
-
-def reparametrize_with(instance: Instance, new_typevars: typing.List[Type]):
-    return Instance(instance.type, args=new_typevars)
-
-
-def fill_typevars_with_any(instance: Instance) -> Type:
-    return reparametrize_with(instance, [AnyType(TypeOfAny.unannotated)])
+from mypy_django_plugin.helpers import fill_typevars_with_any, reparametrize_with
 
 
 def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:

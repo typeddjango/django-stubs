@@ -2,11 +2,12 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, Iterator, Optional, Tuple, cast
 
 import dataclasses
-from mypy.nodes import AssignmentStmt, CallExpr, ClassDef, Context, Expression, Lvalue, MDEF, MemberExpr, MypyFile, NameExpr, \
-    StrExpr, SymbolTableNode, TypeInfo, Var
+from mypy.nodes import AssignmentStmt, CallExpr, ClassDef, Context, Expression, Lvalue, MDEF, MemberExpr, \
+    MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var, Argument, ARG_STAR2
 from mypy.plugin import ClassDefContext
+from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
-from mypy.types import Instance
+from mypy.types import Instance, AnyType, TypeOfAny, NoneTyp
 
 from mypy_django_plugin import helpers
 
@@ -199,16 +200,27 @@ def extract_ref_to_fullname(rvalue_expr: CallExpr,
     return None
 
 
+def add_dummy_init_method(ctx: ClassDefContext) -> None:
+    any = AnyType(TypeOfAny.special_form)
+    var = Var('kwargs', any)
+    kw_arg = Argument(variable=var, type_annotation=any, initializer=None, kind=ARG_STAR2)
+    add_method(ctx, '__init__', [kw_arg], NoneTyp())
+    # mark as model class
+    ctx.cls.info.metadata.setdefault('django', {})['generated_init'] = True
+
+
 def process_model_class(ctx: ClassDefContext) -> None:
     initializers = [
         InjectAnyAsBaseForNestedMeta,
         AddDefaultObjectsManager,
         AddIdAttributeIfPrimaryKeyTrueIsNotSet,
         SetIdAttrsForRelatedFields,
-        AddRelatedManagers
+        AddRelatedManagers,
     ]
     for initializer_cls in initializers:
         initializer_cls.from_ctx(ctx).run()
+
+    add_dummy_init_method(ctx)
 
     # allow unspecified attributes for now
     ctx.cls.info.fallback_to_any = True

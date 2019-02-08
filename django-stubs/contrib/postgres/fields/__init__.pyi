@@ -8,3 +8,4 @@ from .ranges import (
     DateRangeField as DateRangeField,
     DateTimeRangeField as DateTimeRangeField,
 )
+from .hstore import HStoreField as HStoreField

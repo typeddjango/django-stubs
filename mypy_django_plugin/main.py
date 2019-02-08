@@ -8,6 +8,7 @@ from mypy.plugin import ClassDefContext, FunctionContext, MethodContext, Plugin
 from mypy.types import Instance, Type
 
 from mypy_django_plugin import helpers, monkeypatch
+from mypy_django_plugin.helpers import parse_bool
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field
 from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations
 from mypy_django_plugin.plugins.models import process_model_class
@@ -52,6 +53,40 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
             ret.type.bases[i] = reparametrize_with(base, [Instance(outer_model_info, [])])
             return ret
     return ret
+
+
+def redefine_model_init(ctx: FunctionContext) -> Type:
+    assert isinstance(ctx.default_return_type, Instance)
+
+    api = cast(TypeChecker, ctx.api)
+    model: TypeInfo = ctx.default_return_type.type
+
+    expected_types = helpers.extract_expected_types(ctx, model)
+    for actual_name, actual_type in zip(ctx.arg_names[0], ctx.arg_types[0]):
+        if actual_name is None:
+            # We can't check kwargs reliably.
+            continue
+        if actual_name not in expected_types:
+            ctx.api.fail('Unexpected attribute "{}" for model "{}"'.format(actual_name,
+                                                                           model.name()),
+                         ctx.context)
+            continue
+        api.check_subtype(actual_type, expected_types[actual_name],
+                          ctx.context,
+                          'Incompatible type for "{}" of "{}"'.format(actual_name,
+                                                                      model.name()),
+                          'got', 'expected')
+    return ctx.default_return_type
+
+
+def set_primary_key_marking(ctx: FunctionContext) -> Type:
+    primary_key_arg = helpers.get_argument_by_name(ctx, 'primary_key')
+    if primary_key_arg:
+        is_primary_key = parse_bool(primary_key_arg)
+        if is_primary_key:
+            info = ctx.default_return_type.type
+            info.metadata.setdefault('django', {})['defined_as_primary_key'] = True
+    return ctx.default_return_type
 
 
 class DjangoPlugin(Plugin):
@@ -104,6 +139,13 @@ class DjangoPlugin(Plugin):
         manager_bases = self._get_current_manager_bases()
         if fullname in manager_bases:
             return determine_proper_manager_type
+
+        sym = self.lookup_fully_qualified(fullname)
+        if sym and isinstance(sym.node, TypeInfo):
+            if sym.node.has_base(helpers.FIELD_FULLNAME):
+                return set_primary_key_marking
+            if sym.node.metadata.get('django', {}).get('generated_init'):
+                return redefine_model_init
 
     def get_method_hook(self, fullname: str
                         ) -> Optional[Callable[[MethodContext], Type]]:
