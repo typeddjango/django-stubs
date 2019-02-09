@@ -1,6 +1,8 @@
 import os
+from configparser import ConfigParser
 from typing import Callable, Dict, Optional, cast
 
+from dataclasses import dataclass
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.options import Options
@@ -89,6 +91,23 @@ def set_primary_key_marking(ctx: FunctionContext) -> Type:
     return ctx.default_return_type
 
 
+@dataclass
+class Config:
+    django_settings_module: Optional[str] = None
+    ignore_missing_settings: bool = False
+
+    @classmethod
+    def from_config_file(self, fpath: str) -> 'Config':
+        ini_config = ConfigParser()
+        ini_config.read(fpath)
+        if not ini_config.has_section('mypy_django_plugin'):
+            raise ValueError('Invalid config file: no [mypy_django_plugin] section')
+        return Config(django_settings_module=ini_config.get('mypy_django_plugin', 'django_settings',
+                                                            fallback=None),
+                      ignore_missing_settings=ini_config.get('mypy_django_plugin', 'ignore_missing_settings',
+                                                             fallback=False))
+
+
 class DjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -96,8 +115,18 @@ class DjangoPlugin(Plugin):
         monkeypatch.restore_original_load_graph()
         monkeypatch.restore_original_dependencies_handling()
 
+        config_fpath = os.environ.get('MYPY_DJANGO_CONFIG')
+        if config_fpath:
+            self.config = Config.from_config_file(config_fpath)
+            self.django_settings = self.config.django_settings_module
+        else:
+            self.config = Config()
+            self.django_settings = None
+
+        if 'DJANGO_SETTINGS_MODULE' in os.environ:
+            self.django_settings = os.environ['DJANGO_SETTINGS_MODULE']
+
         settings_modules = ['django.conf.global_settings']
-        self.django_settings = os.environ.get('DJANGO_SETTINGS_MODULE')
         if self.django_settings:
             settings_modules.append(self.django_settings)
 
@@ -163,7 +192,8 @@ class DjangoPlugin(Plugin):
             settings_modules = ['django.conf.global_settings']
             if self.django_settings:
                 settings_modules.append(self.django_settings)
-            return AddSettingValuesToDjangoConfObject(settings_modules)
+            return AddSettingValuesToDjangoConfObject(settings_modules,
+                                                      self.config.ignore_missing_settings)
 
         if fullname in self._get_current_manager_bases():
             return transform_manager_class

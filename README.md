@@ -24,12 +24,23 @@ plugins =
 in your `mypy.ini` file.
 
 
-### `django.conf.settings` support
+## Configuration
 
-`settings.SETTING_NAME` will only work if `DJANGO_SETTINGS_MODULE` will be present in the environment, when mypy is executed.
+In order to specify config file, set `MYPY_DJANGO_CONFIG` environment variable with path to the config file.
 
-If some setting is not recognized to the plugin, but it's clearly there, try adding type annotation to it.
+Config file format (.ini):
+```
+[mypy_django_plugin]
 
+# specify settings module to use for django.conf.settings, this setting
+# could also be specified with DJANGO_SETTINGS_MODULE environment variable
+# (it also takes priority over config file)
+django_settings = mysettings.local
+
+# if True, all unknown settings in django.conf.settings will fallback to Any,
+# specify it if your settings are loaded dynamically to avoid false positives
+ignore_missing_settings = True
+```
 
 ## To get help
 

@@ -47,11 +47,15 @@ def load_settings_from_module(settings_classdef: ClassDef, module: MypyFile) -> 
 
 
 class AddSettingValuesToDjangoConfObject:
-    def __init__(self, settings_modules: List[str]):
+    def __init__(self, settings_modules: List[str], ignore_missing_settings: bool):
         self.settings_modules = settings_modules
+        self.ignore_missing_settings = ignore_missing_settings
 
     def __call__(self, ctx: ClassDefContext) -> None:
         api = cast(SemanticAnalyzerPass2, ctx.api)
         for module_name in self.settings_modules:
             module = api.modules[module_name]
             load_settings_from_module(ctx.cls, module=module)
+
+        if self.ignore_missing_settings:
+            ctx.cls.info.fallback_to_any = True
