@@ -22,7 +22,7 @@ with open('README.md', 'r') as f:
 
 dependencies = [
     'Django',
-    'mypy>=0.660',
+    'mypy>=0.670',
     'typing-extensions'
 ]
 if sys.version_info[:2] < (3, 7):
