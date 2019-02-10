@@ -3,6 +3,8 @@ from datetime import date, time, datetime, timedelta
 from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type, TypeVar
 import decimal
 
+from typing_extensions import Literal
+
 from django.db.models import Model
 from django.db.models.query_utils import RegisterLookupMixin
 
@@ -62,7 +64,7 @@ class Field(RegisterLookupMixin):
     def to_python(self, value: Any) -> Any: ...
 
 class IntegerField(Field):
-    def __set__(self, instance, value: Union[int, Combinable]) -> None: ...
+    def __set__(self, instance, value: Union[int, Combinable, Literal['']]) -> None: ...
     def __get__(self, instance, owner) -> int: ...
 
 class PositiveIntegerRelDbTypeMixin:

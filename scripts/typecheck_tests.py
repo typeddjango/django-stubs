@@ -181,6 +181,9 @@ IGNORED_ERRORS = {
     ],
     'modeladmin': [
         'BandAdmin',
+        'base class "ModelAdmin" defined the type a',
+        'base class "InlineModelAdmin" defined the type a',
+        'List item 0 has incompatible type "Type[ValidationTestInline]"; expected "Type[BaseModelAdmin]"'
     ],
     'migrate_signals': [
         'Value of type "None" is not indexable',
@@ -237,6 +240,7 @@ IGNORED_ERRORS = {
     ],
     'test_client': [
         'Incompatible types in assignment (expression has type "StreamingHttpResponse", variable has type "HttpResponse")',
+        'Incompatible types in assignment (expression has type "HttpResponse", variable has type "StreamingHttpResponse")'
     ],
     'test_client_regress': [
         'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")'
@@ -541,7 +545,7 @@ def is_ignored(line: str, test_folder_name: str) -> bool:
 
 def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     raw_path, _, error_line = error.partition(': ')
-    fname, _,line_number = raw_path.partition(':')
+    fname, _, line_number = raw_path.partition(':')
 
     try:
         path = abs_test_folder.joinpath(fname).relative_to(PROJECT_DIRECTORY)
