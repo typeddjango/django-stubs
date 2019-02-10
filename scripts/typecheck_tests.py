@@ -194,6 +194,7 @@ IGNORED_ERRORS = {
         + 'expected "Optional[Sequence[Union[Type[Model], str]]]"',
         'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'FakeLoader',
+        'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"'
     ],
     'queryset_pickle': [
         '"None" has no attribute "somefield"'
@@ -412,10 +413,8 @@ TESTS_DIRS = [
     # TODO: 'middleware_exceptions',
     'migrate_signals',
     'migration_test_data_persistence',
-    # wait for redefinitions
-    # TODO: 'migrations',
+    'migrations',
     'migrations2',
-    # waits for allow redefinitions
     # TODO: 'model_fields',
     # TODO: 'model_forms',
     'model_formsets',
@@ -493,8 +492,7 @@ TESTS_DIRS = [
     'transactions',
     'unmanaged_models',
 
-    # wait for "allow redefinitions" here
-    # TODO: 'update',
+    'update',
 
     'update_only_fields',
     'urlpatterns',
