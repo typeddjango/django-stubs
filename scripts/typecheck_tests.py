@@ -183,7 +183,7 @@ IGNORED_ERRORS = {
         'BandAdmin',
         'base class "ModelAdmin" defined the type a',
         'base class "InlineModelAdmin" defined the type a',
-        'List item 0 has incompatible type "Type[ValidationTestInline]"; expected "Type[BaseModelAdmin]"'
+        'List item 0 has incompatible type "Type[ValidationTestInline]"; expected "Type[InlineModelAdmin]"'
     ],
     'migrate_signals': [
         'Value of type "None" is not indexable',
