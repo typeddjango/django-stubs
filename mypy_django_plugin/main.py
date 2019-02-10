@@ -1,6 +1,6 @@
 import os
 from configparser import ConfigParser
-from typing import Callable, Dict, Optional, cast
+from typing import Callable, Dict, Optional, Set, cast
 
 from dataclasses import dataclass
 from mypy.checker import TypeChecker
@@ -10,7 +10,6 @@ from mypy.plugin import ClassDefContext, FunctionContext, MethodContext, Plugin
 from mypy.types import Instance, Type
 
 from mypy_django_plugin import helpers, monkeypatch
-from mypy_django_plugin.helpers import parse_bool
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field
 from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations
 from mypy_django_plugin.plugins.models import process_model_class
@@ -57,6 +56,16 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
     return ret
 
 
+def extract_base_pointer_args(model: TypeInfo) -> Set[str]:
+    pointer_args: Set[str] = set()
+    for base in model.bases:
+        if base.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+            parent_name = base.type.name().lower()
+            pointer_args.add(f'{parent_name}_ptr')
+            pointer_args.add(f'{parent_name}_ptr_id')
+    return pointer_args
+
+
 def redefine_model_init(ctx: FunctionContext) -> Type:
     assert isinstance(ctx.default_return_type, Instance)
 
@@ -64,9 +73,33 @@ def redefine_model_init(ctx: FunctionContext) -> Type:
     model: TypeInfo = ctx.default_return_type.type
 
     expected_types = helpers.extract_expected_types(ctx, model)
-    for actual_name, actual_type in zip(ctx.arg_names[0], ctx.arg_types[0]):
+    # order is preserved, can use for positionals
+    positional_names = list(expected_types.keys())
+    positional_names.remove('pk')
+    visited_positionals = set()
+
+    # check positionals
+    for i, (_, actual_pos_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
+        actual_pos_name = positional_names[i]
+        api.check_subtype(actual_pos_type, expected_types[actual_pos_name],
+                          ctx.context,
+                          'Incompatible type for "{}" of "{}"'.format(actual_pos_name,
+                                                                      model.name()),
+                          'got', 'expected')
+        visited_positionals.add(actual_pos_name)
+
+    # extract name of base models for _ptr
+    base_pointer_args = extract_base_pointer_args(model)
+
+    # check kwargs
+    for i, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[1], ctx.arg_types[1])):
+        if actual_name in base_pointer_args:
+            # parent_ptr args are not supported
+            continue
+        if actual_name in visited_positionals:
+            continue
         if actual_name is None:
-            # We can't check kwargs reliably.
+            # unpacked dict as kwargs is not supported
             continue
         if actual_name not in expected_types:
             ctx.api.fail('Unexpected attribute "{}" for model "{}"'.format(actual_name,
@@ -78,16 +111,6 @@ def redefine_model_init(ctx: FunctionContext) -> Type:
                           'Incompatible type for "{}" of "{}"'.format(actual_name,
                                                                       model.name()),
                           'got', 'expected')
-    return ctx.default_return_type
-
-
-def set_primary_key_marking(ctx: FunctionContext) -> Type:
-    primary_key_arg = helpers.get_argument_by_name(ctx, 'primary_key')
-    if primary_key_arg:
-        is_primary_key = parse_bool(primary_key_arg)
-        if is_primary_key:
-            info = ctx.default_return_type.type
-            info.metadata.setdefault('django', {})['defined_as_primary_key'] = True
     return ctx.default_return_type
 
 
@@ -171,8 +194,6 @@ class DjangoPlugin(Plugin):
 
         sym = self.lookup_fully_qualified(fullname)
         if sym and isinstance(sym.node, TypeInfo):
-            if sym.node.has_base(helpers.FIELD_FULLNAME):
-                return set_primary_key_marking
             if sym.node.metadata.get('django', {}).get('generated_init'):
                 return redefine_model_init
 

@@ -16,7 +16,7 @@ class MyUser(models.Model):
     age = models.IntegerField()
 user = MyUser(name=1, age=12)
 [out]
-main:6: error: Incompatible type for "name" of "MyUser" (got "int", expected "str")
+main:6: error: Incompatible type for "name" of "MyUser" (got "int", expected "Union[str, Combinable]")
 
 [CASE arguments_to_init_combined_from_base_classes]
 from django.db import models
@@ -53,7 +53,7 @@ from django.db import models
 class MyUser1(models.Model):
     mypk = models.CharField(primary_key=True)
 class MyUser2(models.Model):
-    pass
+    name = models.CharField(max_length=100)
 user2 = MyUser1(pk='hello')
 user3= MyUser2(pk=1)
 [out]
@@ -63,7 +63,7 @@ from django.db import models
 
 class MyUser1(models.Model):
     mypk = models.CharField(primary_key=True)
-user = MyUser1(pk=1)  # E: Incompatible type for "pk" of "MyUser1" (got "int", expected "str")
+user = MyUser1(pk=1)  # E: Incompatible type for "pk" of "MyUser1" (got "int", expected "Union[str, Combinable]")
 [out]
 
 [CASE can_set_foreign_key_by_its_primary_key]
@@ -78,7 +78,7 @@ class Book(models.Model):
     publisher_with_char_pk = models.ForeignKey(PublisherWithCharPK, on_delete=models.CASCADE)
 
 Book(publisher_id=1, publisher_with_char_pk_id='hello')
-Book(publisher_id=1, publisher_with_char_pk_id=1)  # E: Incompatible type for "publisher_with_char_pk_id" of "Book" (got "int", expected "str")
+Book(publisher_id=1, publisher_with_char_pk_id=1)  # E: Incompatible type for "publisher_with_char_pk_id" of "Book" (got "int", expected "Union[str, Combinable]")
 [out]
 
 [CASE setting_value_to_an_array_of_ints]
@@ -101,6 +101,51 @@ MyModel(array=array_val3)  # E: Incompatible type for "array" of "MyModel" (got 
 from django.db import models
 
 class MyModel(models.Model):
-    pass
-MyModel(id=1)
+    name = models.CharField(max_length=100)
+MyModel(id=1, name='maxim')
 [out]
+
+[CASE arguments_can_be_passed_as_positionals]
+from django.db import models
+class MyModel(models.Model):
+    pass
+MyModel(1)
+
+class MyModel2(models.Model):
+    name = models.CharField(max_length=100)
+MyModel2(1, 'Maxim')
+MyModel2(1, 12)  # E: Incompatible type for "name" of "MyModel2" (got "int", expected "Union[str, Combinable]")
+[out]
+
+[CASE arguments_passed_as_dictionary_unpacking_are_not_supported]
+from django.db import models
+class MyModel(models.Model):
+    name = models.CharField(max_length=100)
+MyModel(**{'name': 'hello'})
+[out]
+
+[CASE pointer_to_parent_model_is_not_supported]
+from django.db import models
+class Place(models.Model):
+    pass
+class Restaurant(Place):
+    pass
+place = Place()
+Restaurant(place_ptr=place)
+Restaurant(place_ptr_id=place.id)
+[out]
+
+[CASE extract_type_of_init_param_from_set_method]
+from typing import Union
+from datetime import time
+
+from django.db import models
+class MyField(models.Field):
+    def __set__(self, instance, value: Union[str, time]) -> None: pass
+    def __get__(self, instance, owner) -> time: pass
+class MyModel(models.Model):
+    field = MyField()
+MyModel(field=time())
+MyModel(field='12:00')
+MyModel(field=100)  # E: Incompatible type for "field" of "MyModel" (got "int", expected "Union[str, time]")
+

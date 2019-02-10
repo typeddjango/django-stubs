@@ -101,7 +101,8 @@ IGNORED_ERRORS = {
     ],
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
-        '"refresh_from_db" of "Model" defined here'
+        '"refresh_from_db" of "Model" defined here',
+        'Unexpected attribute "foo" for model "Article"'
     ],
     'builtin_server': [
         'has no attribute "getvalue"'
@@ -174,6 +175,10 @@ IGNORED_ERRORS = {
         'Unexpected keyword argument "name" for "Person"',
         'Cannot assign multiple types to name "PersonTwoImages" without an explicit "Type[...]" annotation',
     ],
+    'model_regress': [
+        'Too many arguments for "Worker"',
+        re.compile(r'Incompatible type for "[a-z]+" of "Worker" \(got "int", expected')
+    ],
     'modeladmin': [
         'BandAdmin',
     ],
@@ -199,6 +204,9 @@ IGNORED_ERRORS = {
         'DummyArrayField',
         'DummyJSONField',
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"'
+    ],
+    'properties': [
+        re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -420,7 +428,7 @@ TESTS_DIRS = [
     'model_package',
     'model_regress',
     # not practical
-    # 'modeladmin',
+    'modeladmin',
     # TODO: 'multiple_database',
     'mutually_referential',
     'nested_foreign_keys',

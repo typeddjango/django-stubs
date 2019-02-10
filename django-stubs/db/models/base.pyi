@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union, ClassVar
+from typing import Any, Dict, List, Optional, Set, Tuple, TypeVar, Union, ClassVar, Sequence
 
 from django.db.models.manager import Manager
 
@@ -22,8 +22,16 @@ class Model(metaclass=ModelBase):
         force_insert: bool = ...,
         force_update: bool = ...,
         using: Optional[str] = ...,
-        update_fields: Optional[Union[List[str], str]] = ...,
+        update_fields: Optional[Union[Sequence[str], str]] = ...,
     ) -> None: ...
+    def save_base(
+        self,
+        raw: bool = ...,
+        force_insert: bool = ...,
+        force_update: bool = ...,
+        using: Optional[str] = ...,
+        update_fields: Optional[Union[Sequence[str], str]] = ...,
+    ): ...
     def refresh_from_db(self: _Self, using: Optional[str] = ..., fields: Optional[List[str]] = ...) -> _Self: ...
     def get_deferred_fields(self) -> Set[str]: ...
 
