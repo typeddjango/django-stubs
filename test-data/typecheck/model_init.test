@@ -149,3 +149,9 @@ MyModel(field=time())
 MyModel(field='12:00')
 MyModel(field=100)  # E: Incompatible type for "field" of "MyModel" (got "int", expected "Union[str, time]")
 
+[CASE charfield_with_integer_choices]
+from django.db import models
+class MyModel(models.Model):
+    day = models.CharField(max_length=3, choices=((1, 'Fri'), (2, 'Sat')))
+MyModel(day=1)
+[out]

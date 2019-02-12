@@ -1,13 +1,14 @@
-from typing import Any, Dict, Optional, Type, Union
+from typing import Dict, Optional, Type, Union
 
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sessions.base_session import AbstractBaseSession
 from django.contrib.sessions.models import Session
+from django.core.signing import Serializer
 from django.db.models.base import Model
 
 class SessionStore(SessionBase):
     accessed: bool
-    serializer: Type[django.core.signing.JSONSerializer]
+    serializer: Type[Serializer]
     def __init__(self, session_key: Optional[str] = ...) -> None: ...
     @classmethod
     def get_model_class(cls) -> Type[Session]: ...

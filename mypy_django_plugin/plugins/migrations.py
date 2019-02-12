@@ -1,9 +1,9 @@
-from typing import cast, Optional
+from typing import Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import TypeInfo, Expression, StrExpr, NameExpr, RefExpr, Var
+from mypy.nodes import Expression, StrExpr, TypeInfo
 from mypy.plugin import MethodContext
-from mypy.types import Type, Instance, TypeType
+from mypy.types import Instance, Type, TypeType
 
 from mypy_django_plugin import helpers
 

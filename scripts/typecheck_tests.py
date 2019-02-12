@@ -75,7 +75,9 @@ IGNORED_ERRORS = {
         'Argument 1 to "FileWrapper" has incompatible type "StringIO"; expected "IO[bytes]"',
         'Incompatible types in assignment',
         '"object" not callable',
-        'Incompatible type for "pk" of "Collector" (got "int", expected "str")'
+        'Incompatible type for "pk" of "Collector" (got "int", expected "str")',
+        re.compile('Unexpected attribute "[a-z]+" for model "Model"'),
+        'Unexpected attribute "two_id" for model "CyclicOne"'
     ],
     'aggregation': [
         'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
@@ -207,7 +209,8 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Field]',
         'DummyArrayField',
         'DummyJSONField',
-        'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"'
+        'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"',
+        'for model "CITestModel"'
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
@@ -430,7 +433,6 @@ TESTS_DIRS = [
     'model_options',
     'model_package',
     'model_regress',
-    # not practical
     'modeladmin',
     # TODO: 'multiple_database',
     'mutually_referential',
@@ -495,9 +497,7 @@ TESTS_DIRS = [
     'transaction_hooks',
     'transactions',
     'unmanaged_models',
-
     'update',
-
     'update_only_fields',
     'urlpatterns',
 

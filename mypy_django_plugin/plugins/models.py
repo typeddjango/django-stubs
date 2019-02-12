@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Iterator, Optional, Tuple, cast
+from typing import Dict, Iterator, List, Optional, Tuple, cast
 
 import dataclasses
-from mypy.nodes import AssignmentStmt, CallExpr, ClassDef, Context, Expression, Lvalue, MDEF, MemberExpr, \
-    MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var, Argument, ARG_STAR2, ARG_STAR
+from mypy.nodes import ARG_STAR, ARG_STAR2, Argument, AssignmentStmt, CallExpr, ClassDef, Context, Expression, IndexExpr, \
+    Lvalue, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
-from mypy.types import Instance, AnyType, TypeOfAny, NoneTyp
+from mypy.types import AnyType, Instance, NoneTyp, TypeOfAny
 
 from mypy_django_plugin import helpers
 
@@ -27,18 +27,20 @@ class ModelClassInitializer(metaclass=ABCMeta):
             return metaclass_sym.node
         return None
 
-    def is_abstract_model(self) -> bool:
+    def get_meta_attribute(self, name: str) -> Optional[Expression]:
         meta_node = self.get_nested_meta_node()
         if meta_node is None:
-            return False
+            return None
 
         for lvalue, rvalue in iter_over_assignments(meta_node.defn):
-            if isinstance(lvalue, NameExpr) and lvalue.name == 'abstract':
-                is_abstract = self.api.parse_bool(rvalue)
-                if is_abstract:
-                    # abstract model do not need 'objects' queryset
-                    return True
-        return False
+            if isinstance(lvalue, NameExpr) and lvalue.name == name:
+                return rvalue
+
+    def is_abstract_model(self) -> bool:
+        is_abstract_expr = self.get_meta_attribute('abstract')
+        if is_abstract_expr is None:
+            return False
+        return self.api.parse_bool(is_abstract_expr)
 
     def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
         var = Var(name=name, type=typ)
@@ -93,25 +95,65 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         meta_node.fallback_to_any = True
 
 
+def get_model_argument(manager_info: TypeInfo) -> Optional[Instance]:
+    for base in manager_info.bases:
+        if base.args:
+            model_arg = base.args[0]
+            if isinstance(model_arg, Instance) and model_arg.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+                return model_arg
+    return None
+
+
 class AddDefaultObjectsManager(ModelClassInitializer):
-    def is_default_objects_attr(self, sym: SymbolTableNode) -> bool:
-        return sym.fullname == helpers.MODEL_CLASS_FULLNAME + '.' + 'objects'
+    def add_new_manager(self, name: str, manager_type: Optional[Instance]) -> None:
+        if manager_type is None:
+            return None
+        self.add_new_node_to_model_class(name, manager_type)
+
+    def add_private_default_manager(self, manager_type: Optional[Instance]) -> None:
+        if manager_type is None:
+            return None
+        self.add_new_node_to_model_class('_default_manager', manager_type)
+
+    def get_existing_managers(self) -> List[Tuple[str, TypeInfo]]:
+        managers = []
+        for base in self.model_classdef.info.mro:
+            for name_expr, member_expr in iter_call_assignments(base.defn):
+                manager_name = name_expr.name
+                callee_expr = member_expr.callee
+                if isinstance(callee_expr, IndexExpr):
+                    callee_expr = callee_expr.analyzed.expr
+                if isinstance(callee_expr, (MemberExpr, NameExpr)) \
+                    and isinstance(callee_expr.node, TypeInfo) \
+                    and callee_expr.node.has_base(helpers.BASE_MANAGER_CLASS_FULLNAME):
+                    managers.append((manager_name, callee_expr.node))
+        return managers
 
     def run(self) -> None:
-        existing_objects_sym = self.model_classdef.info.get('objects')
-        if (existing_objects_sym is not None
-            and not self.is_default_objects_attr(existing_objects_sym)):
-            return None
+        existing_managers = self.get_existing_managers()
+        if existing_managers:
+            first_manager_type = None
+            for manager_name, manager_type_info in existing_managers:
+                manager_type = Instance(manager_type_info, args=[Instance(self.model_classdef.info, [])])
+                self.add_new_manager(name=manager_name, manager_type=manager_type)
+                if first_manager_type is None:
+                    first_manager_type = manager_type
+        else:
+            if self.is_abstract_model():
+                # abstract models do not need 'objects' queryset
+                return None
+
+            first_manager_type = self.api.named_type_or_none(helpers.MANAGER_CLASS_FULLNAME,
+                                                             args=[Instance(self.model_classdef.info, [])])
+            self.add_new_manager('objects', manager_type=first_manager_type)
 
         if self.is_abstract_model():
-            # abstract models do not need 'objects' queryset
             return None
-
-        typ = self.api.named_type_or_none(helpers.MANAGER_CLASS_FULLNAME,
-                                          args=[Instance(self.model_classdef.info, [])])
-        if not typ:
-            return None
-        self.add_new_node_to_model_class('objects', typ)
+        default_manager_name_expr = self.get_meta_attribute('default_manager_name')
+        if isinstance(default_manager_name_expr, StrExpr):
+            self.add_private_default_manager(self.model_classdef.info.get(default_manager_name_expr.value).type)
+        else:
+            self.add_private_default_manager(first_manager_type)
 
 
 class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):

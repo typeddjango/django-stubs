@@ -1,0 +1,34 @@
+[CASE default_manager_create_is_typechecked]
+from django.db import models
+
+class User(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+
+User.objects.create(name='Max', age=10)
+User.objects.create(name=1010)  # E: Incompatible type for "name" of "User" (got "int", expected "Union[str, Combinable]")
+[out]
+
+[CASE model_recognises_parent_attributes]
+from django.db import models
+
+class Parent(models.Model):
+    name = models.CharField(max_length=100)
+class Child(Parent):
+    lastname = models.CharField(max_length=100)
+Child.objects.create(name='Maxim', lastname='Maxim2')
+[out]
+
+[CASE deep_multiple_inheritance_with_create]
+from django.db import models
+
+class Parent1(models.Model):
+    name1 = models.CharField(max_length=50)
+class Parent2(models.Model):
+    id2 = models.AutoField(primary_key=True)
+    name2 = models.CharField(max_length=50)
+class Child1(Parent1, Parent2):
+    value = models.IntegerField()
+class Child4(Child1):
+    value4 = models.IntegerField()
+Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
