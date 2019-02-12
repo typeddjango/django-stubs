@@ -500,16 +500,12 @@ TESTS_DIRS = [
     'update',
     'update_only_fields',
     'urlpatterns',
-
     # not annotatable without annotation in test
     # TODO: 'urlpatterns_reverse',
-
     'user_commands',
     # TODO: 'utils_tests',
-
     # not annotatable without annotation in test
     # TODO: 'validation',
-
     'validators',
     'version',
     'view_tests',
