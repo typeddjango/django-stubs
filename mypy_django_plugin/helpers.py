@@ -2,10 +2,10 @@ import typing
 from typing import Dict, Optional
 
 from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, Expression, ImportedName, Lvalue, MypyFile, NameExpr, Statement, SymbolNode, TypeInfo, \
-    ClassDef
+from mypy.nodes import AssignmentStmt, ClassDef, Expression, FuncDef, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, \
+    TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeVarType
+from mypy.types import AnyType, CallableType, Instance, Type, TypeOfAny, TypeVarType, UnionType
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FIELD_FULLNAME = 'django.db.models.fields.Field'
@@ -172,7 +172,8 @@ def get_setting_expr(api: TypeChecker, setting_name: str) -> Optional[Expression
     return None
 
 
-def iter_over_assignments(class_or_module: typing.Union[ClassDef, MypyFile]) -> typing.Iterator[typing.Tuple[Lvalue, Expression]]:
+def iter_over_assignments(
+    class_or_module: typing.Union[ClassDef, MypyFile]) -> typing.Iterator[typing.Tuple[Lvalue, Expression]]:
     if isinstance(class_or_module, ClassDef):
         statements = class_or_module.defs.body
     else:
@@ -185,3 +186,71 @@ def iter_over_assignments(class_or_module: typing.Union[ClassDef, MypyFile]) -> 
             # not supported yet
             continue
         yield stmt.lvalues[0], stmt.rvalue
+
+
+def extract_field_setter_type(tp: Instance) -> Optional[Type]:
+    if not isinstance(tp, Instance):
+        return None
+    if tp.type.has_base(FIELD_FULLNAME):
+        set_method = tp.type.get_method('__set__')
+        if isinstance(set_method, FuncDef) and isinstance(set_method.type, CallableType):
+            if 'value' in set_method.type.arg_names:
+                set_value_type = set_method.type.arg_types[set_method.type.arg_names.index('value')]
+                if isinstance(set_value_type, Instance):
+                    set_value_type = fill_typevars(tp, set_value_type)
+                    return set_value_type
+                elif isinstance(set_value_type, UnionType):
+                    items_no_typevars = []
+                    for item in set_value_type.items:
+                        if isinstance(item, Instance):
+                            item = fill_typevars(tp, item)
+                        items_no_typevars.append(item)
+                    return UnionType(items_no_typevars)
+
+    field_getter_type = extract_field_getter_type(tp)
+    if field_getter_type:
+        return field_getter_type
+
+    return None
+
+
+def extract_field_getter_type(tp: Instance) -> Optional[Type]:
+    if not isinstance(tp, Instance):
+        return None
+    if tp.type.has_base(FIELD_FULLNAME):
+        get_method = tp.type.get_method('__get__')
+        if isinstance(get_method, FuncDef) and isinstance(get_method.type, CallableType):
+            return get_method.type.ret_type
+    # GenericForeignKey
+    if tp.type.has_base(GENERIC_FOREIGN_KEY_FULLNAME):
+        return AnyType(TypeOfAny.special_form)
+    return None
+
+
+def get_django_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
+    return model.metadata.setdefault('django', {})
+
+
+def get_related_field_primary_key_names(base_model: TypeInfo) -> typing.List[str]:
+    django_metadata = get_django_metadata(base_model)
+    return django_metadata.setdefault('related_field_primary_keys', [])
+
+
+def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
+    return get_django_metadata(model).setdefault('fields', {})
+
+
+def extract_primary_key_type_for_set(model: TypeInfo) -> Optional[Type]:
+    for field_name, props in get_fields_metadata(model).items():
+        is_primary_key = props.get('primary_key', False)
+        if is_primary_key:
+            return extract_field_setter_type(model.names[field_name].type)
+    return None
+
+
+def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
+    for field_name, props in get_fields_metadata(model).items():
+        is_primary_key = props.get('primary_key', False)
+        if is_primary_key:
+            return extract_field_getter_type(model.names[field_name].type)
+    return None

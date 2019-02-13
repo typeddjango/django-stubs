@@ -22,13 +22,11 @@ class Publisher(models.Model):
 
 class Book(models.Model):
     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
-    class StylesheetError(Exception):
-        pass
     owner = models.ForeignKey(db_column='model_id', to='db.Unknown', on_delete=models.CASCADE)
 
 book = Book()
 reveal_type(book.publisher_id)  # E: Revealed type is 'builtins.int'
-reveal_type(book.owner_id)  # E: Revealed type is 'builtins.int'
+reveal_type(book.owner_id)  # E: Revealed type is 'Any'
 
 [CASE test_foreign_key_field_different_order_of_params]
 from django.db import models
@@ -68,7 +66,7 @@ from django.db import models
 class Publisher(models.Model):
     pass
 
-[CASE test_to_parameter_as_string_with_application_name__fallbacks_to_any_if_model_not_present_in_dependency_graph]
+[CASE test_to_parameter_as_string_with_application_name_fallbacks_to_any_if_model_not_present_in_dependency_graph]
 from django.db import models
 
 class Book(models.Model):
@@ -76,6 +74,9 @@ class Book(models.Model):
 
 book = Book()
 reveal_type(book.publisher)  # E: Revealed type is 'Any'
+reveal_type(book.publisher_id)  # E: Revealed type is 'Any'
+Book(publisher_id=1)
+Book.objects.create(publisher_id=1)
 
 [file myapp/__init__.py]
 [file myapp/models.py]
@@ -247,3 +248,30 @@ class Publisher(models.Model):
 class Book(models.Model):
     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
 reveal_type(Publisher().book_set)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+
+[CASE underscore_id_attribute_has_set_type_of_primary_key_if_explicit]
+from django.db import models
+import datetime
+class Publisher(models.Model):
+    mypk = models.CharField(max_length=100, primary_key=True)
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
+
+reveal_type(Book().publisher_id)  # E: Revealed type is 'builtins.str'
+Book(publisher_id=1)
+Book(publisher_id='hello')
+Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable]")
+Book.objects.create(publisher_id=1)
+Book.objects.create(publisher_id='hello')
+
+class Publisher2(models.Model):
+    mypk = models.IntegerField(primary_key=True)
+class Book2(models.Model):
+    publisher = models.ForeignKey(to=Publisher2, on_delete=models.CASCADE)
+
+reveal_type(Book2().publisher_id)  # E: Revealed type is 'builtins.int'
+Book2(publisher_id=1)
+Book2(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal['']]")
+Book2.objects.create(publisher_id=1)
+Book2.objects.create(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal['']]")
+[out]

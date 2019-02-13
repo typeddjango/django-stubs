@@ -1,11 +1,12 @@
-from typing import Any, Dict, Optional, Set, cast
+from typing import Dict, Optional, Set, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import FuncDef, TypeInfo, Var
+from mypy.nodes import TypeInfo, Var
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, CallableType, Instance, Type, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, Type, TypeOfAny, UnionType
 
 from mypy_django_plugin import helpers
+from mypy_django_plugin.helpers import extract_field_setter_type, extract_primary_key_type_for_set, get_fields_metadata
 
 
 def extract_base_pointer_args(model: TypeInfo) -> Set[str]:
@@ -103,46 +104,6 @@ def redefine_and_typecheck_model_create(ctx: MethodContext) -> Type:
     return ctx.default_return_type
 
 
-def extract_field_setter_type(tp: Instance) -> Optional[Type]:
-    if not isinstance(tp, Instance):
-        return None
-    if tp.type.has_base(helpers.FIELD_FULLNAME):
-        set_method = tp.type.get_method('__set__')
-        if isinstance(set_method, FuncDef) and isinstance(set_method.type, CallableType):
-            if 'value' in set_method.type.arg_names:
-                set_value_type = set_method.type.arg_types[set_method.type.arg_names.index('value')]
-                if isinstance(set_value_type, Instance):
-                    set_value_type = helpers.fill_typevars(tp, set_value_type)
-                    return set_value_type
-                elif isinstance(set_value_type, UnionType):
-                    items_no_typevars = []
-                    for item in set_value_type.items:
-                        if isinstance(item, Instance):
-                            item = helpers.fill_typevars(tp, item)
-                        items_no_typevars.append(item)
-                    return UnionType(items_no_typevars)
-
-        get_method = tp.type.get_method('__get__')
-        if isinstance(get_method, FuncDef) and isinstance(get_method.type, CallableType):
-            return get_method.type.ret_type
-    # GenericForeignKey
-    if tp.type.has_base(helpers.GENERIC_FOREIGN_KEY_FULLNAME):
-        return AnyType(TypeOfAny.special_form)
-    return None
-
-
-def get_fields_metadata(model: TypeInfo) -> Dict[str, Any]:
-    return model.metadata.setdefault('django', {}).setdefault('fields', {})
-
-
-def extract_primary_key_type(model: TypeInfo) -> Optional[Type]:
-    for field_name, props in get_fields_metadata(model).items():
-        is_primary_key = props.get('primary_key', False)
-        if is_primary_key:
-            return extract_field_setter_type(model.names[field_name].type)
-    return None
-
-
 def extract_choices_type(model: TypeInfo, field_name: str) -> Optional[str]:
     field_metadata = get_fields_metadata(model).get(field_name, {})
     if 'choices' in field_metadata:
@@ -153,7 +114,7 @@ def extract_choices_type(model: TypeInfo, field_name: str) -> Optional[str]:
 def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, Type]:
     expected_types: Dict[str, Type] = {}
 
-    primary_key_type = extract_primary_key_type(model)
+    primary_key_type = extract_primary_key_type_for_set(model)
     if not primary_key_type:
         # no explicit primary key, set pk to Any and add id
         primary_key_type = AnyType(TypeOfAny.special_form)
@@ -178,11 +139,13 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
 
                     if tp.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
                         ref_to_model = tp.args[0]
+                        primary_key_type = AnyType(TypeOfAny.special_form)
                         if isinstance(ref_to_model, Instance) and ref_to_model.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-                            primary_key_type = extract_primary_key_type(ref_to_model.type)
-                            if not primary_key_type:
-                                primary_key_type = AnyType(TypeOfAny.special_form)
-                            expected_types[name + '_id'] = primary_key_type
+                            typ = extract_primary_key_type_for_set(ref_to_model.type)
+                            if typ:
+                                primary_key_type = typ
+                        expected_types[name + '_id'] = primary_key_type
+
                     if field_type:
                         expected_types[name] = field_type
                 elif isinstance(sym.node.type, AnyType):
