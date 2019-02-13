@@ -532,7 +532,7 @@ TESTS_DIRS = [
     # TODO: 'urlpatterns_reverse',
     'user_commands',
     # TODO: 'utils_tests',
-    # TODO: 'validation',
+    'validation',
     'validators',
     'version',
     'view_tests',
