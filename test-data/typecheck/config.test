@@ -21,3 +21,15 @@ django_settings = mysettings
 [file mysettings.py]
 MY_SETTING: int = 1
 [out]
+
+[CASE mypy_django_ini_in_current_directory_is_a_default]
+from django.conf import settings
+reveal_type(settings.MY_SETTING)  # E: Revealed type is 'builtins.int'
+
+[file mypy_django.ini]
+[[mypy_django_plugin]
+django_settings = mysettings
+
+[file mysettings.py]
+MY_SETTING: int = 1
+[out]

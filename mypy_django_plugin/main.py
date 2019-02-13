@@ -113,8 +113,8 @@ class DjangoPlugin(Plugin):
         monkeypatch.restore_original_load_graph()
         monkeypatch.restore_original_dependencies_handling()
 
-        config_fpath = os.environ.get('MYPY_DJANGO_CONFIG')
-        if config_fpath:
+        config_fpath = os.environ.get('MYPY_DJANGO_CONFIG', 'mypy_django.ini')
+        if config_fpath and os.path.exists(config_fpath):
             self.config = Config.from_config_file(config_fpath)
             self.django_settings = self.config.django_settings_module
         else:

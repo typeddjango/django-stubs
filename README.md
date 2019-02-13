@@ -26,7 +26,7 @@ in your `mypy.ini` file.
 
 ## Configuration
 
-In order to specify config file, set `MYPY_DJANGO_CONFIG` environment variable with path to the config file.
+In order to specify config file, set `MYPY_DJANGO_CONFIG` environment variable with path to the config file. Default is `./mypy_django.ini`
 
 Config file format (.ini):
 ```
