@@ -1,9 +1,9 @@
-from typing import Any, Callable, Dict, List, Optional, Type, Union, Sequence, Protocol
+from typing import Any, Callable, Dict, List, Optional, Protocol, Sequence, Type, TypeVar, Union
 
-from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
 from django.http.response import HttpResponse as HttpResponse, HttpResponseRedirect as HttpResponseRedirect
 
+from django.db.models import Manager, QuerySet
 from django.http import HttpRequest
 
 def render_to_response(
@@ -28,6 +28,9 @@ class SupportsGetAbsoluteUrl(Protocol):
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool = ..., **kwargs: Any
 ) -> HttpResponseRedirect: ...
-def get_object_or_404(klass: Union[Type[Model], Manager, QuerySet], *args: Any, **kwargs: Any) -> Model: ...
-def get_list_or_404(klass: Union[Type[Model], Manager, QuerySet], *args: Any, **kwargs: Any) -> List[Model]: ...
+
+_T = TypeVar("_T", bound=Model)
+
+def get_object_or_404(klass: Union[Type[_T], Manager[_T], QuerySet[_T]], *args: Any, **kwargs: Any) -> _T: ...
+def get_list_or_404(klass: Union[Type[_T], Manager[_T], QuerySet[_T]], *args: Any, **kwargs: Any) -> List[_T]: ...
 def resolve_url(to: Union[Callable, Model, str], *args: Any, **kwargs: Any) -> str: ...

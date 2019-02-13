@@ -149,11 +149,10 @@ IGNORED_ERRORS = {
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
-        + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"',
-        'Argument 1 to "get_object_or_404" has incompatible type "Type[CustomClass]"; '
-        + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"',
+        + 'expected "Union[Type[<nothing>], Manager[<nothing>], QuerySet[<nothing>]]"',
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
-        + 'expected "Union[Type[Model], Manager[Any], QuerySet[Any]]"'
+        + 'expected "Union[Type[<nothing>], Manager[<nothing>], QuerySet[<nothing>]]"',
+        'CustomClass'
     ],
     'get_or_create': [
         'Argument 1 to "update_or_create" of "QuerySet" has incompatible type "**Dict[str, object]"; expected "MutableMapping[str, Any]"'
