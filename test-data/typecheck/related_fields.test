@@ -239,3 +239,11 @@ class ParkingSpot(BaseModel):
 class Booking(BaseModel):
     parking_spot = models.ForeignKey(to=ParkingSpot, null=True, on_delete=models.SET_NULL)
 [out]
+
+[CASE if_no_related_name_is_passed_create_default_related_managers]
+from django.db import models
+class Publisher(models.Model):
+    pass
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
+reveal_type(Publisher().book_set)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'

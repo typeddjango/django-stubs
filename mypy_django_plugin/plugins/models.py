@@ -179,15 +179,17 @@ class AddRelatedManagers(ModelClassInitializer):
                             return None
 
                         if self.model_classdef.fullname == ref_to_fullname:
+                            related_manager_name = defn.name.lower() + '_set'
                             if 'related_name' in rvalue.arg_names:
                                 related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]
                                 if not isinstance(related_name_expr, StrExpr):
                                     return None
-                                related_name = related_name_expr.value
-                                typ = get_related_field_type(rvalue, self.api, defn.info)
-                                if typ is None:
-                                    return None
-                                self.add_new_node_to_model_class(related_name, typ)
+                                related_manager_name = related_name_expr.value
+
+                            typ = get_related_field_type(rvalue, self.api, defn.info)
+                            if typ is None:
+                                return None
+                            self.add_new_node_to_model_class(related_manager_name, typ)
 
 
 def iter_over_classdefs(module_file: MypyFile) -> Iterator[ClassDef]:
