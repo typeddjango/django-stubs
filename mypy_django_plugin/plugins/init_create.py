@@ -69,11 +69,14 @@ def redefine_and_typecheck_model_init(ctx: FunctionContext) -> Type:
 def redefine_and_typecheck_model_create(ctx: MethodContext) -> Type:
     api = cast(TypeChecker, ctx.api)
     if isinstance(ctx.type, Instance) and len(ctx.type.args) > 0:
-        model: TypeInfo = ctx.type.args[0].type
+        model_generic_arg = ctx.type.args[0]
     else:
-        if isinstance(ctx.default_return_type, AnyType):
-            return ctx.default_return_type
-        model: TypeInfo = ctx.default_return_type.type
+        model_generic_arg = ctx.default_return_type
+
+    if isinstance(model_generic_arg, AnyType):
+        return ctx.default_return_type
+
+    model: TypeInfo = model_generic_arg.type
 
     # extract name of base models for _ptr
     base_pointer_args = extract_base_pointer_args(model)

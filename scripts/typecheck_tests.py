@@ -19,7 +19,7 @@ DJANGO_COMMIT_SHA = '03219b5f709dcd5b0bfacd963508625557ec1ef0'
 
 # Some errors occur for the test suite itself, and cannot be addressed via django-stubs. They should be ignored
 # using this constant.
-MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_args_list', 'call_args']
+MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_args_list', 'call_args', 'MockUser']
 IGNORED_ERRORS = {
     '__common__': [
         *MOCK_OBJECTS,
@@ -28,6 +28,7 @@ IGNORED_ERRORS = {
         'Need type annotation for',
         'Invalid value for a to= parameter',
         'already defined (possibly by an import)',
+        'gets multiple values for keyword argument',
         'Cannot assign to a type',
         re.compile(r'Cannot assign to class variable "[a-z_]+" via instance'),
         # forms <-> models plugin support
@@ -135,6 +136,9 @@ IGNORED_ERRORS = {
     'dispatch': [
         'Argument 1 to "connect" of "Signal" has incompatible type "object"; expected "Callable[..., Any]"'
     ],
+    'deprecation': [
+        re.compile('"(old|new)" undefined in superclass')
+    ],
     'db_typecasts': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)'
     ],
@@ -146,6 +150,12 @@ IGNORED_ERRORS = {
     ],
     'field_deconstruction': [
         'Incompatible types in assignment (expression has type "ForeignKey[Any]", variable has type "CharField")'
+    ],
+    'file_uploads': [
+        '"handle_uncaught_exception" undefined in superclass'
+    ],
+    'fixtures': [
+        'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")'
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
@@ -164,6 +174,9 @@ IGNORED_ERRORS = {
         'Argument "max_length" to "CharField" has incompatible type "str"; expected "Optional[int]"',
         'Argument "choices" to "CharField" has incompatible type "str"'
     ],
+    'logging_tests': [
+        re.compile('"(setUpClass|tearDownClass)" undefined in superclass')
+    ],
     'model_inheritance_regress': [
         'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
     ],
@@ -175,6 +188,8 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Person]", variable has type',
         'Unexpected keyword argument "name" for "Person"',
         'Cannot assign multiple types to name "PersonTwoImages" without an explicit "Type[...]" annotation',
+        'Incompatible types in assignment (expression has type "Type[Person]", '
+        + 'base class "ImageFieldTestMixin" defined the type as "Type[PersonWithHeightAndWidth]")'
     ],
     'model_regress': [
         'Too many arguments for "Worker"',
@@ -199,6 +214,13 @@ IGNORED_ERRORS = {
         'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'FakeLoader',
         'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"'
+    ],
+    'middleware_exceptions': [
+        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
+    ],
+    'multiple_database': [
+        'Unexpected attribute "extra_arg" for model "Book"',
+        'Too many arguments for "create" of "QuerySet"'
     ],
     'queryset_pickle': [
         '"None" has no attribute "somefield"'
@@ -294,6 +316,13 @@ IGNORED_ERRORS = {
     'select_related_onetoone': [
         '"None" has no attribute'
     ],
+    'servers': [
+        re.compile('Argument [0-9] to "WSGIRequestHandler"')
+    ],
+    'sitemaps_tests': [
+        'Incompatible types in assignment (expression has type "str", '
+        + 'base class "Sitemap" defined the type as "Callable[[Sitemap, Model], str]")'
+    ],
     'view_tests': [
         '"Handler" has no attribute "include_html"',
         '"EmailMessage" has no attribute "alternatives"'
@@ -328,10 +357,10 @@ TESTS_DIRS = [
     'builtin_server',
     'bulk_create',
     # TODO: 'cache',
-    # TODO: 'check_framework',
+    'check_framework',
     'choices',
     'conditional_processing',
-    # TODO: 'contenttypes_tests',
+    'contenttypes_tests',
     'context_processors',
     'csrf_tests',
     'custom_columns',
@@ -347,36 +376,36 @@ TESTS_DIRS = [
     'db_typecasts',
     'db_utils',
     'dbshell',
-    # TODO: 'decorators',
+    'decorators',
     'defer',
-    # TODO: 'defer_regress',
+    'defer_regress',
     'delete',
     'delete_regress',
-    # TODO: 'deprecation',
+    'deprecation',
     'dispatch',
     'distinct_on_fields',
     'empty',
     'expressions',
     'expressions_case',
-    # TODO: 'expressions_window',
+    'expressions_window',
     # TODO: 'extra_regress',
     'field_deconstruction',
     'field_defaults',
     'field_subclassing',
     # TODO: 'file_storage',
-    # TODO: 'file_uploads',
+    'file_uploads',
     # TODO: 'files',
     'filtered_relation',
-    # TODO: 'fixtures',
+    'fixtures',
     'fixtures_model_package',
-    # TODO: 'fixtures_regress',
-    # TODO: 'flatpages_tests',
+    'fixtures_regress',
+    'flatpages_tests',
     'force_insert_update',
     'foreign_object',
     # TODO: 'forms_tests',
     'from_db_value',
-    # TODO: 'generic_inline_admin',
-    # TODO: 'generic_relations',
+    'generic_inline_admin',
+    'generic_relations',
     'generic_relations_regress',
     # TODO: 'generic_views',
     'get_earliest_or_latest',
@@ -397,7 +426,7 @@ TESTS_DIRS = [
     # 'invalid_models_tests',
 
     'known_related_objects',
-    # TODO: 'logging_tests',
+    'logging_tests',
     'lookup',
     'm2m_and_m2o',
     'm2m_intermediary',
@@ -415,13 +444,13 @@ TESTS_DIRS = [
     'many_to_one_null',
     'max_lengths',
     # TODO: 'messages_tests',
-    # TODO: 'middleware',
-    # TODO: 'middleware_exceptions',
+    'middleware',
+    'middleware_exceptions',
     'migrate_signals',
     'migration_test_data_persistence',
     'migrations',
     'migrations2',
-    # TODO: 'model_fields',
+    'model_fields',
     # TODO: 'model_forms',
     'model_formsets',
     'model_formsets_regress',
@@ -433,7 +462,7 @@ TESTS_DIRS = [
     'model_package',
     'model_regress',
     'modeladmin',
-    # TODO: 'multiple_database',
+    'multiple_database',
     'mutually_referential',
     'nested_foreign_keys',
     'no_models',
@@ -451,7 +480,7 @@ TESTS_DIRS = [
     'properties',
     'proxy_model_inheritance',
     # TODO: 'proxy_models',
-    # TODO: 'queries',
+    'queries',
     'queryset_pickle',
     'raw_query',
     'redirects_tests',
@@ -467,7 +496,7 @@ TESTS_DIRS = [
     'select_related_onetoone',
     'select_related_regress',
     # TODO: 'serializers',
-    # TODO: 'servers',
+    'servers',
     'sessions_tests',
     'settings_tests',
     'shell',
@@ -503,7 +532,6 @@ TESTS_DIRS = [
     # TODO: 'urlpatterns_reverse',
     'user_commands',
     # TODO: 'utils_tests',
-    # not annotatable without annotation in test
     # TODO: 'validation',
     'validators',
     'version',

@@ -45,6 +45,7 @@ class Origin:
     @property
     def loader_name(self) -> Optional[str]: ...
 
+
 class Template:
     name: Optional[str] = ...
     origin: Origin = ...
@@ -53,7 +54,7 @@ class Template:
     nodelist: NodeList = ...
     def __init__(
         self,
-        template_string: str,
+        template_string: Union[Template, str],
         origin: Optional[Origin] = ...,
         name: Optional[str] = ...,
         engine: Optional[Engine] = ...,

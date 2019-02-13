@@ -62,7 +62,11 @@ def return_user_model_hook(ctx: FunctionContext) -> Type:
     if setting_expr is None:
         return ctx.default_return_type
 
-    app_label, _, model_class_name = get_string_value_from_expr(setting_expr).rpartition('.')
+    model_path = get_string_value_from_expr(setting_expr)
+    if model_path is None:
+        return ctx.default_return_type
+
+    app_label, _, model_class_name = model_path.rpartition('.')
     if app_label is None:
         return ctx.default_return_type
 

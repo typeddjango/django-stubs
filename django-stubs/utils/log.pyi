@@ -1,5 +1,6 @@
 import logging.config
-from typing import Any, Callable, Dict, Optional
+from logging import LogRecord
+from typing import Any, Callable, Dict, Optional, Union
 
 from django.core.mail.backends.locmem import EmailBackend
 from django.core.management.color import Style
@@ -20,9 +21,13 @@ class AdminEmailHandler(logging.Handler):
 class CallbackFilter(logging.Filter):
     callback: Callable = ...
     def __init__(self, callback: Callable) -> None: ...
+    def filter(self, record: Union[str, LogRecord]) -> bool: ...
 
-class RequireDebugFalse(logging.Filter): ...
-class RequireDebugTrue(logging.Filter): ...
+class RequireDebugFalse(logging.Filter):
+    def filter(self, record: Union[str, LogRecord]) -> bool: ...
+
+class RequireDebugTrue(logging.Filter):
+    def filter(self, record: Union[str, LogRecord]) -> bool: ...
 
 class ServerFormatter(logging.Formatter):
     datefmt: None

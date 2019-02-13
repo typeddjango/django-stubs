@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, List
+from typing import Any, Optional, Tuple, List, overload
 
 from django.db import models
 
@@ -30,4 +30,8 @@ class AbstractBaseUser(models.Model):
     @classmethod
     def get_email_field_name(cls) -> str: ...
     @classmethod
+    @overload
     def normalize_username(cls, username: str) -> str: ...
+    @classmethod
+    @overload
+    def normalize_username(cls, username: Any) -> Any: ...

@@ -1,4 +1,4 @@
-from io import BytesIO
+from io import BytesIO, StringIO
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.http.request import QueryDict
@@ -11,7 +11,7 @@ class MultiPartParser:
     def __init__(
         self,
         META: Dict[str, Any],
-        input_data: BytesIO,
+        input_data: Union[StringIO, BytesIO],
         upload_handlers: Union[List[Any], ImmutableList],
         encoding: Optional[str] = ...,
     ) -> None: ...
