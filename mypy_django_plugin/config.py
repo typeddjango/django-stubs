@@ -10,7 +10,7 @@ class Config:
     ignore_missing_settings: bool = False
 
     @classmethod
-    def from_config_file(self, fpath: str) -> 'Config':
+    def from_config_file(cls, fpath: str) -> 'Config':
         ini_config = ConfigParser()
         ini_config.read(fpath)
         if not ini_config.has_section('mypy_django_plugin'):

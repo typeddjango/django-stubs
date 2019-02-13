@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Set, cast, Any
+from typing import Any, Dict, Optional, Set, cast
 
 from mypy.checker import TypeChecker
 from mypy.nodes import FuncDef, TypeInfo, Var
@@ -157,26 +157,31 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
         expected_types['id'] = ctx.api.named_generic_type('builtins.int', [])
 
     expected_types['pk'] = primary_key_type
-
     for base in model.mro:
         for name, sym in base.names.items():
-            if isinstance(sym.node, Var) and isinstance(sym.node.type, Instance):
-                tp = sym.node.type
-                field_type = extract_field_setter_type(tp)
-                if field_type is None:
-                    continue
+            # do not redefine special attrs
+            if name in {'_meta', 'pk'}:
+                continue
+            if isinstance(sym.node, Var):
+                if isinstance(sym.node.type, Instance):
+                    tp = sym.node.type
+                    field_type = extract_field_setter_type(tp)
+                    if field_type is None:
+                        continue
 
-                choices_type_fullname = extract_choices_type(model, name)
-                if choices_type_fullname:
-                    field_type = UnionType([field_type, ctx.api.named_generic_type(choices_type_fullname, [])])
+                    choices_type_fullname = extract_choices_type(model, name)
+                    if choices_type_fullname:
+                        field_type = UnionType([field_type, ctx.api.named_generic_type(choices_type_fullname, [])])
 
-                if tp.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
-                    ref_to_model = tp.args[0]
-                    if isinstance(ref_to_model, Instance) and ref_to_model.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-                        primary_key_type = extract_primary_key_type(ref_to_model.type)
-                        if not primary_key_type:
-                            primary_key_type = AnyType(TypeOfAny.special_form)
-                        expected_types[name + '_id'] = primary_key_type
-                if field_type:
-                    expected_types[name] = field_type
+                    if tp.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
+                        ref_to_model = tp.args[0]
+                        if isinstance(ref_to_model, Instance) and ref_to_model.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+                            primary_key_type = extract_primary_key_type(ref_to_model.type)
+                            if not primary_key_type:
+                                primary_key_type = AnyType(TypeOfAny.special_form)
+                            expected_types[name + '_id'] = primary_key_type
+                    if field_type:
+                        expected_types[name] = field_type
+                elif isinstance(sym.node.type, AnyType):
+                    expected_types[name] = sym.node.type
     return expected_types

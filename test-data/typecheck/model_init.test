@@ -155,3 +155,19 @@ class MyModel(models.Model):
     day = models.CharField(max_length=3, choices=((1, 'Fri'), (2, 'Sat')))
 MyModel(day=1)
 [out]
+
+[CASE if_there_is_no_data_for_base_classes_of_fields_and_ignore_unresolved_attributes_set_to_true_to_not_fail]
+from decimal import Decimal
+from django.db import models
+from fields2 import MoneyField
+
+class InvoiceRow(models.Model):
+    base_amount = MoneyField(max_digits=10, decimal_places=2)
+    vat_rate = models.DecimalField(max_digits=10, decimal_places=2)
+InvoiceRow(1, Decimal(0), Decimal(0))
+InvoiceRow(base_amount=Decimal(0), vat_rate=Decimal(0))
+InvoiceRow.objects.create(base_amount=Decimal(0), vat_rate=Decimal(0))
+[out]
+main:3: error: Cannot find module named 'fields2'
+main:3: note: See https://mypy.readthedocs.io/en/latest/running_mypy.html#missing-imports
+

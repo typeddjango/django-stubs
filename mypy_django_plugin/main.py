@@ -9,8 +9,8 @@ from mypy.types import Instance, Type, TypeType
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
+from mypy_django_plugin.plugins import init_create
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field, record_field_properties_into_outer_model_class
-from mypy_django_plugin.plugins.init_create import redefine_and_typecheck_model_init, redefine_and_typecheck_model_create
 from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations, get_string_value_from_expr
 from mypy_django_plugin.plugins.models import process_model_class
 from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
@@ -81,7 +81,6 @@ def return_user_model_hook(ctx: FunctionContext) -> Type:
     return TypeType(Instance(model_info, []))
 
 
-
 class DjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -150,15 +149,16 @@ class DjangoPlugin(Plugin):
         if sym and isinstance(sym.node, TypeInfo):
             if sym.node.has_base(helpers.FIELD_FULLNAME):
                 return record_field_properties_into_outer_model_class
+
             if sym.node.metadata.get('django', {}).get('generated_init'):
-                return redefine_and_typecheck_model_init
+                return init_create.redefine_and_typecheck_model_init
 
     def get_method_hook(self, fullname: str
                         ) -> Optional[Callable[[MethodContext], Type]]:
         manager_classes = self._get_current_manager_bases()
         class_fullname, _, method_name = fullname.rpartition('.')
         if class_fullname in manager_classes and method_name == 'create':
-            return redefine_and_typecheck_model_create
+            return init_create.redefine_and_typecheck_model_create
 
         if fullname in {'django.apps.registry.Apps.get_model',
                         'django.db.migrations.state.StateApps.get_model'}:
