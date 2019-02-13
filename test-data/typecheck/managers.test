@@ -137,18 +137,3 @@ class AbstractBase2(models.Model):
 class Child(AbstractBase1, AbstractBase2):
     pass
 [out]
-
-[CASE get_object_or_404_returns_proper_types]
-from django.shortcuts import get_object_or_404, get_list_or_404
-from django.db import models
-
-class MyModel(models.Model):
-    pass
-reveal_type(get_object_or_404(MyModel))  # E: Revealed type is 'main.MyModel*'
-reveal_type(get_object_or_404(MyModel.objects))  # E: Revealed type is 'main.MyModel*'
-reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # E: Revealed type is 'main.MyModel*'
-
-reveal_type(get_list_or_404(MyModel))  # E: Revealed type is 'builtins.list[main.MyModel*]'
-reveal_type(get_list_or_404(MyModel.objects))  # E: Revealed type is 'builtins.list[main.MyModel*]'
-reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # E: Revealed type is 'builtins.list[main.MyModel*]'
-[out]

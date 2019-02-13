@@ -1,0 +1,56 @@
+[CASE get_object_or_404_returns_proper_types]
+from django.shortcuts import get_object_or_404, get_list_or_404
+from django.db import models
+
+class MyModel(models.Model):
+    pass
+reveal_type(get_object_or_404(MyModel))  # E: Revealed type is 'main.MyModel*'
+reveal_type(get_object_or_404(MyModel.objects))  # E: Revealed type is 'main.MyModel*'
+reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # E: Revealed type is 'main.MyModel*'
+
+reveal_type(get_list_or_404(MyModel))  # E: Revealed type is 'builtins.list[main.MyModel*]'
+reveal_type(get_list_or_404(MyModel.objects))  # E: Revealed type is 'builtins.list[main.MyModel*]'
+reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # E: Revealed type is 'builtins.list[main.MyModel*]'
+[out]
+
+[CASE get_user_model_returns_proper_class]
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from myapp.models import MyUser
+from django.contrib.auth import get_user_model
+
+UserModel = get_user_model()
+reveal_type(UserModel.objects)  # E: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
+
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[file mysettings.py]
+INSTALLED_APPS = ('myapp',)
+AUTH_USER_MODEL = 'myapp.MyUser'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class MyUser(models.Model):
+    pass
+[out]
+
+[CASE return_type_model_and_show_error_if_model_not_yet_imported]
+from django.contrib.auth import get_user_model
+
+UserModel = get_user_model()
+reveal_type(UserModel.objects)
+
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[file mysettings.py]
+INSTALLED_APPS = ('myapp',)
+AUTH_USER_MODEL = 'myapp.MyUser'
+
+[file myapp/__init__.py]
+[file myapp/models.py]
+from django.db import models
+class MyUser(models.Model):
+    pass
+[out]
+main:3: error: "myapp.MyUser" model class is not imported so far. Try to import it (under if TYPE_CHECKING) at the beginning of the current file
+main:4: error: Revealed type is 'Any'
+main:4: error: "Type[Model]" has no attribute "objects"

@@ -10,6 +10,7 @@ from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import AnyType, Instance, NoneTyp, TypeOfAny
 
 from mypy_django_plugin import helpers
+from mypy_django_plugin.helpers import iter_over_assignments
 
 
 @dataclasses.dataclass
@@ -53,16 +54,6 @@ class ModelClassInitializer(metaclass=ABCMeta):
     @abstractmethod
     def run(self) -> None:
         raise NotImplementedError()
-
-
-def iter_over_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, Expression]]:
-    for stmt in klass.defs.body:
-        if not isinstance(stmt, AssignmentStmt):
-            continue
-        if len(stmt.lvalues) > 1:
-            # not supported yet
-            continue
-        yield stmt.lvalues[0], stmt.rvalue
 
 
 def iter_call_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, CallExpr]]:

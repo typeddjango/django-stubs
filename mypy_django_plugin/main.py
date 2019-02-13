@@ -5,13 +5,13 @@ from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.options import Options
 from mypy.plugin import ClassDefContext, FunctionContext, MethodContext, Plugin
-from mypy.types import Instance, Type
+from mypy.types import Instance, Type, TypeType
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
 from mypy_django_plugin.plugins.fields import determine_type_of_array_field, record_field_properties_into_outer_model_class
 from mypy_django_plugin.plugins.init_create import redefine_and_typecheck_model_init, redefine_and_typecheck_model_create
-from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations
+from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations, get_string_value_from_expr
 from mypy_django_plugin.plugins.models import process_model_class
 from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
 from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject
@@ -54,6 +54,32 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
             ret.type.bases[i] = reparametrize_with(base, [Instance(outer_model_info, [])])
             return ret
     return ret
+
+
+def return_user_model_hook(ctx: FunctionContext) -> Type:
+    api = cast(TypeChecker, ctx.api)
+    setting_expr = helpers.get_setting_expr(api, 'AUTH_USER_MODEL')
+    if setting_expr is None:
+        return ctx.default_return_type
+
+    app_label, _, model_class_name = get_string_value_from_expr(setting_expr).rpartition('.')
+    if app_label is None:
+        return ctx.default_return_type
+
+    model_fullname = helpers.get_model_fullname(app_label, model_class_name,
+                                                all_modules=api.modules)
+    if model_fullname is None:
+        api.fail(f'"{app_label}.{model_class_name}" model class is not imported so far. Try to import it '
+                 f'(under if TYPE_CHECKING) at the beginning of the current file',
+                 context=ctx.context)
+        return ctx.default_return_type
+
+    model_info = helpers.lookup_fully_qualified_generic(model_fullname,
+                                                        all_modules=api.modules)
+    if model_info is None or not isinstance(model_info, TypeInfo):
+        return ctx.default_return_type
+    return TypeType(Instance(model_info, []))
+
 
 
 class DjangoPlugin(Plugin):
@@ -105,6 +131,9 @@ class DjangoPlugin(Plugin):
 
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
+        if fullname == 'django.contrib.auth.get_user_model':
+            return return_user_model_hook
+
         if fullname in {helpers.FOREIGN_KEY_FULLNAME,
                         helpers.ONETOONE_FIELD_FULLNAME,
                         helpers.MANYTOMANY_FIELD_FULLNAME}:
