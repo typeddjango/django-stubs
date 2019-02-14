@@ -2,13 +2,18 @@
 from django.conf import settings
 
 reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'builtins.str'
+reveal_type(settings.APPS_DIR)  # E: Revealed type is 'pathlib.Path'
 reveal_type(settings.OBJ)  # E: Revealed type is 'django.utils.functional.LazyObject'
 reveal_type(settings.NUMBERS)  # E: Revealed type is 'builtins.list[builtins.str]'
 reveal_type(settings.DICT)  # E: Revealed type is 'builtins.dict[Any, Any]'
 [env DJANGO_SETTINGS_MODULE=mysettings]
-[file mysettings.py]
-SECRET_KEY = 112233
+[file base.py]
+from pathlib import Path
 ROOT_DIR = '/etc'
+APPS_DIR = Path(ROOT_DIR)
+[file mysettings.py]
+from base import *
+SECRET_KEY = 112233
 NUMBERS = ['one', 'two']
 DICT = {}  # type: ignore
 from django.utils.functional import LazyObject

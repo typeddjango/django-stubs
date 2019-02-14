@@ -2,11 +2,10 @@ import os
 from typing import Callable, Dict, Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import TypeInfo
+from mypy.nodes import MemberExpr, TypeInfo
 from mypy.options import Options
-from mypy.plugin import ClassDefContext, FunctionContext, MethodContext, Plugin, AttributeContext
-from mypy.types import Instance, Type, TypeType, AnyType, TypeOfAny
-
+from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
+from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
 from mypy_django_plugin.plugins import init_create
@@ -14,7 +13,7 @@ from mypy_django_plugin.plugins.fields import determine_type_of_array_field, rec
 from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations, get_string_value_from_expr
 from mypy_django_plugin.plugins.models import process_model_class
 from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
-from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject
+from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject, SettingContext, get_settings_metadata
 
 
 def transform_model_class(ctx: ClassDefContext) -> None:
@@ -106,6 +105,25 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
     return ctx.default_attr_type
 
 
+class ExtractSettingType:
+    def __init__(self, module_fullname: str):
+        self.module_fullname = module_fullname
+
+    def __call__(self, ctx: AttributeContext) -> Type:
+        api = cast(TypeChecker, ctx.api)
+        original_module = api.modules.get(self.module_fullname)
+        if original_module is None:
+            return ctx.default_attr_type
+
+        definition = ctx.context
+        if isinstance(definition, MemberExpr):
+            sym = original_module.names.get(definition.name)
+            if sym and sym.type:
+                return sym.type
+
+        return ctx.default_attr_type
+
+
 class DjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -116,17 +134,17 @@ class DjangoPlugin(Plugin):
         config_fpath = os.environ.get('MYPY_DJANGO_CONFIG', 'mypy_django.ini')
         if config_fpath and os.path.exists(config_fpath):
             self.config = Config.from_config_file(config_fpath)
-            self.django_settings = self.config.django_settings_module
+            self.django_settings_module = self.config.django_settings_module
         else:
             self.config = Config()
-            self.django_settings = None
+            self.django_settings_module = None
 
         if 'DJANGO_SETTINGS_MODULE' in os.environ:
-            self.django_settings = os.environ['DJANGO_SETTINGS_MODULE']
+            self.django_settings_module = os.environ['DJANGO_SETTINGS_MODULE']
 
         settings_modules = ['django.conf.global_settings']
-        if self.django_settings:
-            settings_modules.append(self.django_settings)
+        if self.django_settings_module:
+            settings_modules.append(self.django_settings_module)
 
         monkeypatch.add_modules_as_a_source_seed_files(settings_modules)
         monkeypatch.inject_modules_as_dependencies_for_django_conf_settings(settings_modules)
@@ -197,8 +215,8 @@ class DjangoPlugin(Plugin):
 
         if fullname == helpers.DUMMY_SETTINGS_BASE_CLASS:
             settings_modules = ['django.conf.global_settings']
-            if self.django_settings:
-                settings_modules.append(self.django_settings)
+            if self.django_settings_module:
+                settings_modules.append(self.django_settings_module)
             return AddSettingValuesToDjangoConfObject(settings_modules,
                                                       self.config.ignore_missing_settings)
 
@@ -209,11 +227,14 @@ class DjangoPlugin(Plugin):
 
     def get_attribute_hook(self, fullname: str
                            ) -> Optional[Callable[[AttributeContext], Type]]:
-        # sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
-        # if sym and isinstance(sym.node, TypeInfo):
-        #     if fullname.rpartition('.')[-1] in helpers.get_related_field_primary_key_names(sym.node):
-        return extract_and_return_primary_key_of_bound_related_field_parameter
+        module, _, name = fullname.rpartition('.')
+        sym = self.lookup_fully_qualified('django.conf.LazySettings')
+        if sym and isinstance(sym.node, TypeInfo):
+            metadata = get_settings_metadata(sym.node)
+            if module == 'builtins.object' and name in metadata:
+                return ExtractSettingType(module_fullname=metadata[name])
 
+        return extract_and_return_primary_key_of_bound_related_field_parameter
 
 
 def plugin(version):

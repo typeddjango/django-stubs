@@ -127,15 +127,16 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
             if name in {'_meta', 'pk'}:
                 continue
             if isinstance(sym.node, Var):
-                if isinstance(sym.node.type, Instance):
+                if sym.node.type is None or isinstance(sym.node.type, AnyType):
+                    # types are not ready, fallback to Any
+                    expected_types[name] = AnyType(TypeOfAny.from_unimported_type)
+                    expected_types[name + '_id'] = AnyType(TypeOfAny.from_unimported_type)
+
+                elif isinstance(sym.node.type, Instance):
                     tp = sym.node.type
                     field_type = extract_field_setter_type(tp)
                     if field_type is None:
                         continue
-
-                    choices_type_fullname = extract_choices_type(model, name)
-                    if choices_type_fullname:
-                        field_type = UnionType([field_type, ctx.api.named_generic_type(choices_type_fullname, [])])
 
                     if tp.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
                         ref_to_model = tp.args[0]
@@ -145,9 +146,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
                             if typ:
                                 primary_key_type = typ
                         expected_types[name + '_id'] = primary_key_type
-
                     if field_type:
                         expected_types[name] = field_type
-                elif isinstance(sym.node.type, AnyType):
-                    expected_types[name] = sym.node.type
+
     return expected_types

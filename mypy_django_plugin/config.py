@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from typing import Optional
+from typing import List, Optional
 
 from dataclasses import dataclass
 
@@ -15,7 +15,11 @@ class Config:
         ini_config.read(fpath)
         if not ini_config.has_section('mypy_django_plugin'):
             raise ValueError('Invalid config file: no [mypy_django_plugin] section')
-        return Config(django_settings_module=ini_config.get('mypy_django_plugin', 'django_settings',
-                                                            fallback=None),
+
+        django_settings = ini_config.get('mypy_django_plugin', 'django_settings',
+                                         fallback=None)
+        if django_settings:
+            django_settings = django_settings.strip()
+        return Config(django_settings_module=django_settings,
                       ignore_missing_settings=ini_config.get('mypy_django_plugin', 'ignore_missing_settings',
                                                              fallback=False))
