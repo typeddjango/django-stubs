@@ -13,7 +13,7 @@ from mypy_django_plugin.plugins.fields import determine_type_of_array_field, rec
 from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations, get_string_value_from_expr
 from mypy_django_plugin.plugins.models import process_model_class
 from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
-from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject, SettingContext, get_settings_metadata
+from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject, get_settings_metadata
 
 
 def transform_model_class(ctx: ClassDefContext) -> None:
