@@ -1,3 +1,3 @@
 black
--e git+https://github.com/mkurnikov/pytest-mypy-plugins.git#egg=pytest-mypy-plugins
+pytest-mypy-plugins
 -e .
