@@ -31,12 +31,12 @@ if sys.version_info[:2] < (3, 7):
 
 setup(
     name="django-stubs",
-    version="0.5.0",
+    version="0.5.1",
     description='Django mypy stubs',
     long_description=readme,
     long_description_content_type='text/markdown',
-    license='BSD',
-    url="https://github.com/mkurnikov/django-stubs.git",
+    license='MIT',
+    url="https://github.com/mkurnikov/django-stubs",
     author="Maksim Kurnikov",
     author_email="maxim.kurnikov@gmail.com",
     py_modules=[],
@@ -46,6 +46,8 @@ setup(
     package_data={'django-stubs': find_stub_files('django-stubs')},
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Programming Language :: Python :: 3'
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
     ]
 )

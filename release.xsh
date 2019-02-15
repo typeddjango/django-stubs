@@ -1,4 +1,9 @@
 #!/usr/local/bin/xonsh
 
-python setup.py sdist
-twine upload dist/*
+try:
+    pip install wheel
+    python setup.py sdist bdist_wheel --universal
+    twine upload dist/*
+
+finally:
+    rm -rf dist/ build/
