@@ -105,6 +105,12 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
     return ctx.default_attr_type
 
 
+def return_integer_type_for_id_for_non_defined_primary_key_in_models(ctx: AttributeContext) -> Type:
+    if isinstance(ctx.type, Instance) and ctx.type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+        return ctx.api.named_generic_type('builtins.int', [])
+    return ctx.default_attr_type
+
+
 class ExtractSettingType:
     def __init__(self, module_fullname: str):
         self.module_fullname = module_fullname
@@ -233,6 +239,9 @@ class DjangoPlugin(Plugin):
             metadata = get_settings_metadata(sym.node)
             if module == 'builtins.object' and name in metadata:
                 return ExtractSettingType(module_fullname=metadata[name])
+
+        if fullname == 'builtins.object.id':
+            return return_integer_type_for_id_for_non_defined_primary_key_in_models
 
         return extract_and_return_primary_key_of_bound_related_field_parameter
 

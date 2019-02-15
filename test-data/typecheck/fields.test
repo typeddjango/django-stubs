@@ -94,3 +94,13 @@ class Abstract(models.Model):
 class User(Abstract):
     id = models.AutoField(primary_key=True)
 [out]
+
+[CASE standard_it_from_parent_model_could_be_overridden_with_non_integer_field_in_child_model]
+from django.db import models
+import uuid
+class ParentModel(models.Model):
+    pass
+class MyModel(ParentModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID'
+[out]

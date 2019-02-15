@@ -8,7 +8,6 @@ from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import AnyType, Instance, NoneTyp, TypeOfAny
-
 from mypy_django_plugin import helpers
 from mypy_django_plugin.helpers import iter_over_assignments
 
@@ -161,7 +160,7 @@ class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
                 and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
                 break
         else:
-            self.add_new_node_to_model_class('id', self.api.builtin_type('builtins.int'))
+            self.add_new_node_to_model_class('id', self.api.builtin_type('builtins.object'))
 
 
 class AddRelatedManagers(ModelClassInitializer):
