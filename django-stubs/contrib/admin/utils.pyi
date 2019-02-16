@@ -43,7 +43,7 @@ class NestedObjects(Collector):
     def add_edge(self, source: Optional[Model], target: Model) -> None: ...
     def collect(
         self,
-        objs: Union[Sequence[Model], QuerySet],
+        objs: Union[Sequence[Optional[Model]], QuerySet],
         source: Optional[Type[Model]] = ...,
         source_attr: Optional[str] = ...,
         **kwargs: Any

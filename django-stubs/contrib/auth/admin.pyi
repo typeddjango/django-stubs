@@ -1,9 +1,13 @@
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from django.contrib.auth.models import User, Group
 from django.core.handlers.wsgi import WSGIRequest
+from django.db.models.fields import Field
 from django.db.models.fields.related import ManyToManyField
+from django.db.models.options import Options
 from django.forms.models import ModelMultipleChoiceField
+from django.forms.fields import Field as FormField
+from django.forms.widgets import Widget
 from django.http.response import HttpResponse
 from django.urls.resolvers import URLPattern
 
@@ -27,10 +31,7 @@ class GroupAdmin(admin.ModelAdmin):
 
 class UserAdmin(admin.ModelAdmin):
     admin_site: AdminSite
-    formfield_overrides: Dict[
-        Type[Union[django.db.models.fields.DateTimeCheckMixin, Field]],
-        Dict[str, Type[Union[django.forms.fields.SplitDateTimeField, Widget]]],
-    ]
+    formfield_overrides: Dict[Type[Field], Dict[str, Type[Union[FormField, Widget]]]]
     model: Type[User]
     opts: Options
     add_form_template: str = ...
