@@ -224,7 +224,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
 class DateTimeCheckMixin: ...
 
 class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, date, datetime, Combinable]
+    _pyi_private_set_type: Union[str, date, Combinable]
     _pyi_private_get_type: date
     def __init__(
         self,

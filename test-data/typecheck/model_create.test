@@ -33,3 +33,32 @@ class Child4(Child1):
     value4 = models.IntegerField()
 Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
 [out]
+
+[CASE optional_primary_key_for_create_is_error]
+from django.db import models
+class MyModel(models.Model):
+    pass
+MyModel.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel" (got "None", expected "int")
+
+[CASE optional_related_model_for_create_is_error]
+from django.db import models
+class Publisher(models.Model):
+    pass
+class Book(models.Model):
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Union[Publisher, Combinable]")
+
+[CASE when_default_for_primary_key_is_specified_allow_none_to_be_set]
+from django.db import models
+def return_int():
+    return 0
+class MyModel(models.Model):
+    id = models.IntegerField(primary_key=True, default=return_int)
+MyModel(id=None)
+MyModel.objects.create(id=None)
+
+class MyModel2(models.Model):
+    id = models.IntegerField(primary_key=True, default=None)
+MyModel2(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[int, Combinable, Literal['']]")
+MyModel2.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[int, Combinable, Literal['']]")
+[out]

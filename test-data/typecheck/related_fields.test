@@ -260,7 +260,7 @@ class Book(models.Model):
 reveal_type(Book().publisher_id)  # E: Revealed type is 'builtins.str'
 Book(publisher_id=1)
 Book(publisher_id='hello')
-Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable]")
+Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable, None]")
 Book.objects.create(publisher_id=1)
 Book.objects.create(publisher_id='hello')
 
@@ -271,7 +271,7 @@ class Book2(models.Model):
 
 reveal_type(Book2().publisher_id)  # E: Revealed type is 'builtins.int'
 Book2(publisher_id=1)
-Book2(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal['']]")
+Book2(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal[''], None]")
 Book2.objects.create(publisher_id=1)
 Book2.objects.create(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal['']]")
 [out]

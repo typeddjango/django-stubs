@@ -78,8 +78,8 @@ class Book(models.Model):
     publisher_dt = models.ForeignKey(PublisherDatetime, on_delete=models.CASCADE)
 
 Book(publisher_id=1)
-Book(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book" (got "List[Any]", expected "Union[Combinable, int, str]")
-Book(publisher_dt_id=11)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "Union[str, date, datetime, Combinable]")
+Book(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book" (got "List[Any]", expected "Union[Combinable, int, str, None]")
+Book(publisher_dt_id=11)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "Union[str, date, Combinable, None]")
 [out]
 
 [CASE setting_value_to_an_array_of_ints]
@@ -158,3 +158,20 @@ InvoiceRow.objects.create(base_amount=Decimal(0), vat_rate=Decimal(0))
 main:3: error: Cannot find module named 'fields2'
 main:3: note: See https://mypy.readthedocs.io/en/latest/running_mypy.html#missing-imports
 
+[CASE optional_primary_key_is_allowed_for_init]
+from django.db import models
+class MyModel(models.Model):
+    pass
+MyModel(id=None)
+MyModel(None)
+[out]
+
+[CASE optional_related_model_is_allowed_for_init]
+from django.db import models
+class Publisher(models.Model):
+    pass
+class Book(models.Model):
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+Book(publisher=None)
+Book(publisher_id=None)
+[out]

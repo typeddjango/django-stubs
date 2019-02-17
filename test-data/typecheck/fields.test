@@ -104,3 +104,10 @@ class MyModel(ParentModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID*'
 [out]
+
+[CASE blank_for_charfield_is_the_same_as_null]
+from django.db import models
+class MyModel(models.Model):
+    text = models.CharField(max_length=30, blank=True)
+MyModel(text=None)
+[out]

@@ -88,7 +88,9 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
         '"as_sql" undefined in superclass',
         'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
-        + 'variable has type "ValuesListIterable")'
+        + 'variable has type "ValuesListIterable")',
+        'Incompatible type for "contact" of "Book" (got "Optional[Author]", expected "Union[Author, Combinable]")',
+        'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", expected "Union[Publisher, Combinable]")'
     ],
     'aggregation_regress': [
         'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")',
@@ -188,6 +190,9 @@ IGNORED_ERRORS = {
     'logging_tests': [
         re.compile('"(setUpClass|tearDownClass)" undefined in superclass')
     ],
+    'many_to_one': [
+        'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")'
+    ],
     'model_inheritance_regress': [
         'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
     ],
@@ -200,7 +205,8 @@ IGNORED_ERRORS = {
         'Unexpected keyword argument "name" for "Person"',
         'Cannot assign multiple types to name "PersonTwoImages" without an explicit "Type[...]" annotation',
         'Incompatible types in assignment (expression has type "Type[Person]", '
-        + 'base class "ImageFieldTestMixin" defined the type as "Type[PersonWithHeightAndWidth]")'
+        + 'base class "ImageFieldTestMixin" defined the type as "Type[PersonWithHeightAndWidth]")',
+        'note: "Person" defined here'
     ],
     'model_regress': [
         'Too many arguments for "Worker"',
@@ -251,7 +257,8 @@ IGNORED_ERRORS = {
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
     ],
     'queries': [
-        'Incompatible types in assignment (expression has type "None", variable has type "str")'
+        'Incompatible types in assignment (expression has type "None", variable has type "str")',
+        'Invalid index type "Optional[str]" for "Dict[str, int]"; expected type "str"'
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -265,7 +272,8 @@ IGNORED_ERRORS = {
         'has no attribute "read_by"'
     ],
     'signals': [
-        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Any, Any]"; expected "Tuple[Any, Any, Any]"'
+        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]"; '
+        + 'expected "Tuple[Any, Any, Any]"'
     ],
     'syndication_tests': [
         'List or tuple expected as variable arguments'
@@ -277,7 +285,8 @@ IGNORED_ERRORS = {
         'Value of type "object" is not indexable'
     ],
     'schema': [
-        'Incompatible type for "info" of "Note" (got "None", expected "Union[str, Combinable]")'
+        'Incompatible type for "info" of "Note" (got "None", expected "Union[str, Combinable]")',
+        'Incompatible type for "detail_info" of "NoteRename" (got "None", expected "Union[str, Combinable]")'
     ],
     'settings_tests': [
         'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'
@@ -290,7 +299,9 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "HttpResponse", variable has type "StreamingHttpResponse")'
     ],
     'test_client_regress': [
-        'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")'
+        'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")',
+        'Unsupported left operand type for + ("None")',
+        'Both left and right operands are unions'
     ],
     'timezones': [
         'Too few arguments for "render" of "Template"'

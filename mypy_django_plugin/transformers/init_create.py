@@ -25,12 +25,13 @@ def redefine_and_typecheck_model_init(ctx: FunctionContext) -> Type:
     api = cast(TypeChecker, ctx.api)
     model: TypeInfo = ctx.default_return_type.type
 
-    expected_types = extract_expected_types(ctx, model)
-    # order is preserved, can use for positionals
+    expected_types = extract_expected_types(ctx, model, is_init=True)
+
+    # order is preserved, can be used for positionals
     positional_names = list(expected_types.keys())
     positional_names.remove('pk')
-    visited_positionals = set()
 
+    visited_positionals = set()
     # check positionals
     for i, (_, actual_pos_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
         actual_pos_name = positional_names[i]
@@ -111,7 +112,8 @@ def extract_choices_type(model: TypeInfo, field_name: str) -> Optional[str]:
     return None
 
 
-def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, Type]:
+def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
+                           is_init: bool = False) -> Dict[str, Type]:
     api = cast(TypeChecker, ctx.api)
 
     expected_types: Dict[str, Type] = {}
@@ -119,7 +121,11 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
     if not primary_key_type:
         # no explicit primary key, set pk to Any and add id
         primary_key_type = AnyType(TypeOfAny.special_form)
-        expected_types['id'] = ctx.api.named_generic_type('builtins.int', [])
+        if is_init:
+            expected_types['id'] = helpers.make_optional(ctx.api.named_generic_type('builtins.int', []))
+        else:
+            expected_types['id'] = ctx.api.named_generic_type('builtins.int', [])
+
     expected_types['pk'] = primary_key_type
 
     for base in model.mro:
@@ -141,8 +147,9 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
                     if field_type is None:
                         continue
 
-                    if typ.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
-                        primary_key_type = AnyType(TypeOfAny.implementation_artifact)
+                    if helpers.has_any_of_bases(typ.type, (helpers.FOREIGN_KEY_FULLNAME,
+                                                           helpers.ONETOONE_FIELD_FULLNAME)):
+                        related_primary_key_type = AnyType(TypeOfAny.implementation_artifact)
                         # in case it's optional, we need Instance type
                         referred_to_model = typ.args[1]
                         is_nullable = helpers.is_optional(referred_to_model)
@@ -156,11 +163,24 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, T
                                 autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
                                 pk_type = get_private_descriptor_type(autofield_info, '_pyi_private_set_type',
                                                                       is_nullable=is_nullable)
-                            primary_key_type = pk_type
+                            related_primary_key_type = pk_type
 
-                        expected_types[name + '_id'] = primary_key_type
+                        if is_init:
+                            related_primary_key_type = helpers.make_optional(related_primary_key_type)
 
+                        expected_types[name + '_id'] = related_primary_key_type
+
+                    field_metadata = get_fields_metadata(model).get(name, {})
                     if field_type:
+                        # related fields could be None in __init__ (but should be specified before save())
+                        if helpers.has_any_of_bases(typ.type, (helpers.FOREIGN_KEY_FULLNAME,
+                                                               helpers.ONETOONE_FIELD_FULLNAME)) and is_init:
+                            field_type = helpers.make_optional(field_type)
+
+                        # if primary_key=True and default specified
+                        elif field_metadata.get('primary_key', False) and field_metadata.get('default_specified', False):
+                            field_type = helpers.make_optional(field_type)
+
                         expected_types[name] = field_type
 
     return expected_types

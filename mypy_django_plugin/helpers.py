@@ -2,13 +2,14 @@ import typing
 from typing import Dict, Optional
 
 from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, ClassDef, Expression, FuncDef, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, \
+from mypy.nodes import AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, \
     TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType
+from mypy.types import AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FIELD_FULLNAME = 'django.db.models.fields.Field'
+CHAR_FIELD_FULLNAME = 'django.db.models.fields.CharField'
 ARRAY_FIELD_FULLNAME = 'django.contrib.postgres.fields.array.ArrayField'
 AUTO_FIELD_FULLNAME = 'django.db.models.fields.AutoField'
 GENERIC_FOREIGN_KEY_FULLNAME = 'django.contrib.contenttypes.fields.GenericForeignKey'
@@ -263,9 +264,12 @@ def is_optional(typ: Type) -> bool:
     return any([isinstance(item, NoneTyp) for item in typ.items])
 
 
-
 def has_any_of_bases(info: TypeInfo, bases: typing.Sequence[str]) -> bool:
     for base_fullname in bases:
         if info.has_base(base_fullname):
             return True
     return False
+
+
+def is_none_expr(expr: Expression) -> bool:
+    return isinstance(expr, NameExpr) and expr.fullname == 'builtins.None'
