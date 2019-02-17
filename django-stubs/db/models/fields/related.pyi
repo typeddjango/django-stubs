@@ -49,7 +49,12 @@ _ErrorMessagesToOverride = Dict[str, Any]
 
 RECURSIVE_RELATIONSHIP_CONSTANT: str = ...
 
-class RelatedField(FieldCacheMixin, Field):
+# __set__ value type
+_ST = TypeVar("_ST")
+# __get__ return type
+_GT = TypeVar("_GT")
+
+class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     one_to_many: bool = ...
     one_to_one: bool = ...
     many_to_many: bool = ...
@@ -83,6 +88,7 @@ class ForeignObject(RelatedField):
         related_query_name: None = ...,
         limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
         parent_link: bool = ...,
+        db_constraint: bool = ...,
         swappable: bool = ...,
         verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
@@ -103,17 +109,82 @@ class ForeignObject(RelatedField):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class ForeignKey(RelatedField, Generic[_T]):
-    def __init__(self, to: Union[Type[_T], str], on_delete: Any, related_name: str = ..., **kwargs): ...
-    def __set__(self, instance, value: Union[Model, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> _T: ...
+class ForeignKey(RelatedField[_ST, _GT]):
+    _pyi_private_set_type: Union[Any, Combinable]
+    _pyi_private_get_type: Any
+    def __init__(
+        self,
+        to: Union[Type[Model], str],
+        on_delete: Callable[..., None],
+        to_field: Optional[str] = ...,
+        related_name: str = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        parent_link: bool = ...,
+        db_constraint: bool = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
 
-class OneToOneField(RelatedField, Generic[_T]):
-    def __init__(self, to: Union[Type[_T], str], on_delete: Any, related_name: str = ..., **kwargs): ...
-    def __set__(self, instance, value: Union[Model, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> _T: ...
+class OneToOneField(RelatedField[_ST, _GT]):
+    _pyi_private_set_type: Union[Any, Combinable]
+    _pyi_private_get_type: Any
+    def __init__(
+        self,
+        to: Union[Type[Model], str],
+        on_delete: Any,
+        to_field: Optional[str] = ...,
+        related_name: str = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        parent_link: bool = ...,
+        db_constraint: bool = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
 
-class ManyToManyField(RelatedField, Generic[_T]):
+class ManyToManyField(RelatedField[_ST, _GT]):
+    _pyi_private_set_type: Sequence[Any]
+    _pyi_private_get_type: RelatedManager[Any]
+
     many_to_many: bool = ...
     many_to_one: bool = ...
     one_to_many: bool = ...
@@ -127,17 +198,35 @@ class ManyToManyField(RelatedField, Generic[_T]):
         to: Union[Type[_T], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
         symmetrical: Optional[bool] = ...,
         through: Optional[Union[str, Type[Model]]] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,
         db_constraint: bool = ...,
         db_table: Optional[str] = ...,
         swappable: bool = ...,
-        **kwargs: Any
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
-    def __set__(self, instance, value: Sequence[_T]) -> None: ...
-    def __get__(self, instance, owner) -> RelatedManager[_T]: ...
     def check(self, **kwargs: Any) -> List[Any]: ...
     def deconstruct(self) -> Tuple[Optional[str], str, List[Any], Dict[str, str]]: ...
     def get_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...

@@ -1,19 +1,18 @@
 import os
-from typing import Callable, Dict, Optional, cast
+from typing import Callable, Dict, Optional, Union, cast
 
 from mypy.checker import TypeChecker
 from mypy.nodes import MemberExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
-from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType
+from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
-from mypy_django_plugin.plugins import init_create
-from mypy_django_plugin.plugins.fields import determine_type_of_array_field, record_field_properties_into_outer_model_class
-from mypy_django_plugin.plugins.migrations import determine_model_cls_from_string_for_migrations, get_string_value_from_expr
-from mypy_django_plugin.plugins.models import process_model_class
-from mypy_django_plugin.plugins.related_fields import extract_to_parameter_as_get_ret_type_for_related_field, reparametrize_with
-from mypy_django_plugin.plugins.settings import AddSettingValuesToDjangoConfObject, get_settings_metadata
+from mypy_django_plugin.transformers import fields, init_create
+from mypy_django_plugin.transformers.migrations import determine_model_cls_from_string_for_migrations, \
+    get_string_value_from_expr
+from mypy_django_plugin.transformers.models import process_model_class
+from mypy_django_plugin.transformers.settings import AddSettingValuesToDjangoConfObject, get_settings_metadata
 
 
 def transform_model_class(ctx: ClassDefContext) -> None:
@@ -50,7 +49,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
         if base.type.fullname() in {helpers.MANAGER_CLASS_FULLNAME,
                                     helpers.RELATED_MANAGER_CLASS_FULLNAME,
                                     helpers.BASE_MANAGER_CLASS_FULLNAME}:
-            ret.type.bases[i] = reparametrize_with(base, [Instance(outer_model_info, [])])
+            ret.type.bases[i] = Instance(base.type, [Instance(outer_model_info, [])])
             return ret
     return ret
 
@@ -84,6 +83,17 @@ def return_user_model_hook(ctx: FunctionContext) -> Type:
     return TypeType(Instance(model_info, []))
 
 
+def _extract_referred_to_type_info(typ: Union[UnionType, Instance]) -> Optional[TypeInfo]:
+    if isinstance(typ, Instance):
+        return typ.type
+    else:
+        # should be Union[TYPE, None]
+        typ = helpers.make_required(typ)
+        if isinstance(typ, Instance):
+            return typ.type
+    return None
+
+
 def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: AttributeContext) -> Type:
     if not isinstance(ctx.default_attr_type, Instance) or not (ctx.default_attr_type.type.fullname() == 'builtins.int'):
         return ctx.default_attr_type
@@ -94,14 +104,22 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
     field_name = ctx.context.name.split('_')[0]
     sym = ctx.type.type.get(field_name)
     if sym and isinstance(sym.type, Instance) and len(sym.type.args) > 0:
-        to_arg = sym.type.args[0]
-        if isinstance(to_arg, AnyType):
-            return AnyType(TypeOfAny.special_form)
+        referred_to = sym.type.args[1]
+        if isinstance(referred_to, AnyType):
+            return AnyType(TypeOfAny.implementation_artifact)
 
-        model_type: TypeInfo = to_arg.type
+        model_type = _extract_referred_to_type_info(referred_to)
+        if model_type is None:
+            return AnyType(TypeOfAny.implementation_artifact)
+
         primary_key_type = helpers.extract_primary_key_type_for_get(model_type)
         if primary_key_type:
             return primary_key_type
+
+    is_nullable = helpers.get_fields_metadata(ctx.type.type).get(field_name, {}).get('null', False)
+    if is_nullable:
+        return helpers.make_optional(ctx.default_attr_type)
+
     return ctx.default_attr_type
 
 
@@ -179,16 +197,12 @@ class DjangoPlugin(Plugin):
 
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
+        sym = self.lookup_fully_qualified(fullname)
+        if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FIELD_FULLNAME):
+            return fields.adjust_return_type_of_field_instantiation
+
         if fullname == 'django.contrib.auth.get_user_model':
             return return_user_model_hook
-
-        if fullname in {helpers.FOREIGN_KEY_FULLNAME,
-                        helpers.ONETOONE_FIELD_FULLNAME,
-                        helpers.MANYTOMANY_FIELD_FULLNAME}:
-            return extract_to_parameter_as_get_ret_type_for_related_field
-
-        if fullname == 'django.contrib.postgres.fields.array.ArrayField':
-            return determine_type_of_array_field
 
         manager_bases = self._get_current_manager_bases()
         if fullname in manager_bases:
@@ -196,9 +210,6 @@ class DjangoPlugin(Plugin):
 
         sym = self.lookup_fully_qualified(fullname)
         if sym and isinstance(sym.node, TypeInfo):
-            if sym.node.has_base(helpers.FIELD_FULLNAME):
-                return record_field_properties_into_outer_model_class
-
             if sym.node.metadata.get('django', {}).get('generated_init'):
                 return init_create.redefine_and_typecheck_model_init
 

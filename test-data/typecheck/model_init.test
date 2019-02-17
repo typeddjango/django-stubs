@@ -71,14 +71,15 @@ from django.db import models
 
 class Publisher(models.Model):
     pass
-class PublisherWithCharPK(models.Model):
-    id = models.IntegerField(primary_key=True)
+class PublisherDatetime(models.Model):
+    dt_pk = models.DateTimeField(primary_key=True)
 class Book(models.Model):
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
-    publisher_with_char_pk = models.ForeignKey(PublisherWithCharPK, on_delete=models.CASCADE)
+    publisher_dt = models.ForeignKey(PublisherDatetime, on_delete=models.CASCADE)
 
-Book(publisher_id=1, publisher_with_char_pk_id=1)
-Book(publisher_id=1, publisher_with_char_pk_id='hello')  # E: Incompatible type for "publisher_with_char_pk_id" of "Book" (got "str", expected "Union[int, Combinable, Literal['']]")
+Book(publisher_id=1)
+Book(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book" (got "List[Any]", expected "Union[Combinable, int, str]")
+Book(publisher_dt_id=11)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "Union[str, date, datetime, Combinable]")
 [out]
 
 [CASE setting_value_to_an_array_of_ints]
@@ -94,7 +95,7 @@ MyModel(array=array_val)
 array_val2: List[int] = [1]
 MyModel(array=array_val2)
 array_val3: List[str] = ['hello']
-MyModel(array=array_val3)  # E: Incompatible type for "array" of "MyModel" (got "List[str]", expected "Sequence[int]")
+MyModel(array=array_val3)  # E: Incompatible type for "array" of "MyModel" (got "List[str]", expected "Union[Sequence[int], Combinable]")
 [out]
 
 [CASE if_no_explicit_primary_key_id_can_be_passed]
@@ -134,20 +135,6 @@ place = Place()
 Restaurant(place_ptr=place)
 Restaurant(place_ptr_id=place.id)
 [out]
-
-[CASE extract_type_of_init_param_from_set_method]
-from typing import Union
-from datetime import time
-
-from django.db import models
-class MyField(models.Field):
-    def __set__(self, instance, value: Union[str, time]) -> None: pass
-    def __get__(self, instance, owner) -> time: pass
-class MyModel(models.Model):
-    field = MyField()
-MyModel(field=time())
-MyModel(field='12:00')
-MyModel(field=100)  # E: Incompatible type for "field" of "MyModel" (got "int", expected "Union[str, time]")
 
 [CASE charfield_with_integer_choices]
 from django.db import models

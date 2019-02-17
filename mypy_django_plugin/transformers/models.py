@@ -73,8 +73,6 @@ def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExp
 class SetIdAttrsForRelatedFields(ModelClassInitializer):
     def run(self) -> None:
         for lvalue, rvalue in iter_over_one_to_n_related_fields(self.model_classdef):
-            # base_model_info = self.api.named_type('builtins.object').type
-            # helpers.get_related_field_primary_key_names(base_model_info).append(node_name)
             node_name = lvalue.name + '_id'
             self.add_new_node_to_model_class(name=node_name,
                                              typ=self.api.builtin_type('builtins.int'))

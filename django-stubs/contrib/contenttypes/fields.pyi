@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, Generic
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import Error

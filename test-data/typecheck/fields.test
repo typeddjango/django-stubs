@@ -6,7 +6,7 @@ class User(models.Model):
     array = ArrayField(base_field=models.Field())
 
 user = User()
-reveal_type(user.array)  # E: Revealed type is 'builtins.list[Any]'
+reveal_type(user.array)  # E: Revealed type is 'builtins.list*[Any]'
 
 [CASE array_field_base_field_parsed_into_generic_typevar]
 from django.db import models
@@ -17,8 +17,8 @@ class User(models.Model):
     members_as_text = ArrayField(base_field=models.CharField(max_length=255))
 
 user = User()
-reveal_type(user.members)  # E: Revealed type is 'builtins.list[builtins.int*]'
-reveal_type(user.members_as_text)  # E: Revealed type is 'builtins.list[builtins.str*]'
+reveal_type(user.members)  # E: Revealed type is 'builtins.list*[builtins.int]'
+reveal_type(user.members_as_text)  # E: Revealed type is 'builtins.list*[builtins.str]'
 
 [CASE test_model_fields_classes_present_as_primitives]
 from django.db import models
@@ -31,13 +31,13 @@ class User(models.Model):
     text = models.TextField()
 
 user = User()
-reveal_type(user.id)  # E: Revealed type is 'builtins.int'
-reveal_type(user.small_int)  # E: Revealed type is 'builtins.int'
-reveal_type(user.name)  # E: Revealed type is 'builtins.str'
-reveal_type(user.slug)  # E: Revealed type is 'builtins.str'
-reveal_type(user.text)  # E: Revealed type is 'builtins.str'
+reveal_type(user.id)  # E: Revealed type is 'builtins.int*'
+reveal_type(user.small_int)  # E: Revealed type is 'builtins.int*'
+reveal_type(user.name)  # E: Revealed type is 'builtins.str*'
+reveal_type(user.slug)  # E: Revealed type is 'builtins.str*'
+reveal_type(user.text)  # E: Revealed type is 'builtins.str*'
 
-[CASE test_model_field_classes_from_exciting_locations]
+[CASE test_model_field_classes_from_existing_locations]
 from django.db import models
 from django.contrib.postgres import fields as pg_fields
 from decimal import Decimal
@@ -48,9 +48,9 @@ class Booking(models.Model):
     some_decimal = models.DecimalField(max_digits=10, decimal_places=5)
 
 booking = Booking()
-reveal_type(booking.id)  # E: Revealed type is 'builtins.int'
+reveal_type(booking.id)  # E: Revealed type is 'builtins.int*'
 reveal_type(booking.time_range)  # E: Revealed type is 'Any'
-reveal_type(booking.some_decimal)  # E: Revealed type is 'decimal.Decimal'
+reveal_type(booking.some_decimal)  # E: Revealed type is 'decimal.Decimal*'
 
 [CASE test_add_id_field_if_no_primary_key_defined]
 from django.db import models
@@ -66,7 +66,7 @@ from django.db import models
 class User(models.Model):
     my_pk = models.IntegerField(primary_key=True)
 
-reveal_type(User().my_pk)  # E: Revealed type is 'builtins.int'
+reveal_type(User().my_pk)  # E: Revealed type is 'builtins.int*'
 reveal_type(User().id)  # E: Revealed type is 'Any'
 [out]
 
@@ -102,5 +102,5 @@ class ParentModel(models.Model):
     pass
 class MyModel(ParentModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID'
+reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID*'
 [out]

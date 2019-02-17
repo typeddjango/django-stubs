@@ -5,10 +5,12 @@ from mypy.checker import TypeChecker
 from mypy.nodes import AssignmentStmt, ClassDef, Expression, FuncDef, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, \
     TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, Type, TypeOfAny, TypeVarType, UnionType
+from mypy.types import AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FIELD_FULLNAME = 'django.db.models.fields.Field'
+ARRAY_FIELD_FULLNAME = 'django.contrib.postgres.fields.array.ArrayField'
+AUTO_FIELD_FULLNAME = 'django.db.models.fields.AutoField'
 GENERIC_FOREIGN_KEY_FULLNAME = 'django.contrib.contenttypes.fields.GenericForeignKey'
 FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
 ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
@@ -95,12 +97,13 @@ def parse_bool(expr: Expression) -> Optional[bool]:
     return None
 
 
-def reparametrize_with(instance: Instance, new_typevars: typing.List[Type]):
-    return Instance(instance.type, args=new_typevars)
+def reparametrize_instance(instance: Instance, new_args: typing.List[Type]) -> Instance:
+    return Instance(instance.type, args=new_args,
+                    line=instance.line, column=instance.column)
 
 
-def fill_typevars_with_any(instance: Instance) -> Type:
-    return reparametrize_with(instance, [AnyType(TypeOfAny.unannotated)])
+def fill_typevars_with_any(instance: Instance) -> Instance:
+    return reparametrize_instance(instance, [AnyType(TypeOfAny.unannotated)])
 
 
 def extract_typevar_value(tp: Instance, typevar_name: str) -> Type:
@@ -117,7 +120,7 @@ def fill_typevars(tp: Instance, type_to_fill: Instance) -> Instance:
     for typevar_arg in type_to_fill.args:
         if isinstance(typevar_arg, TypeVarType):
             typevar_values.append(extract_typevar_value(tp, typevar_arg.name))
-    return reparametrize_with(type_to_fill, typevar_values)
+    return Instance(type_to_fill.type, typevar_values)
 
 
 def get_argument_by_name(ctx: FunctionContext, name: str) -> Optional[Expression]:
@@ -189,28 +192,12 @@ def iter_over_assignments(
 
 
 def extract_field_setter_type(tp: Instance) -> Optional[Type]:
-    if not isinstance(tp, Instance):
-        return None
+    """ Extract __set__ value of a field. """
     if tp.type.has_base(FIELD_FULLNAME):
-        set_method = tp.type.get_method('__set__')
-        if isinstance(set_method, FuncDef) and isinstance(set_method.type, CallableType):
-            if 'value' in set_method.type.arg_names:
-                set_value_type = set_method.type.arg_types[set_method.type.arg_names.index('value')]
-                if isinstance(set_value_type, Instance):
-                    set_value_type = fill_typevars(tp, set_value_type)
-                    return set_value_type
-                elif isinstance(set_value_type, UnionType):
-                    items_no_typevars = []
-                    for item in set_value_type.items:
-                        if isinstance(item, Instance):
-                            item = fill_typevars(tp, item)
-                        items_no_typevars.append(item)
-                    return UnionType(items_no_typevars)
-
-    field_getter_type = extract_field_getter_type(tp)
-    if field_getter_type:
-        return field_getter_type
-
+        return tp.args[0]
+    # GenericForeignKey
+    if tp.type.has_base(GENERIC_FOREIGN_KEY_FULLNAME):
+        return AnyType(TypeOfAny.special_form)
     return None
 
 
@@ -218,9 +205,7 @@ def extract_field_getter_type(tp: Instance) -> Optional[Type]:
     if not isinstance(tp, Instance):
         return None
     if tp.type.has_base(FIELD_FULLNAME):
-        get_method = tp.type.get_method('__get__')
-        if isinstance(get_method, FuncDef) and isinstance(get_method.type, CallableType):
-            return get_method.type.ret_type
+        return tp.args[1]
     # GenericForeignKey
     if tp.type.has_base(GENERIC_FOREIGN_KEY_FULLNAME):
         return AnyType(TypeOfAny.special_form)
@@ -240,7 +225,10 @@ def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
     return get_django_metadata(model).setdefault('fields', {})
 
 
-def extract_primary_key_type_for_set(model: TypeInfo) -> Optional[Type]:
+def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[Type]:
+    """
+    If field with primary_key=True is set on the model, extract its __set__ type.
+    """
     for field_name, props in get_fields_metadata(model).items():
         is_primary_key = props.get('primary_key', False)
         if is_primary_key:
@@ -254,3 +242,30 @@ def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
         if is_primary_key:
             return extract_field_getter_type(model.names[field_name].type)
     return None
+
+
+def make_optional(typ: Type):
+    return UnionType.make_simplified_union([typ, NoneTyp()])
+
+
+def make_required(typ: Type) -> Type:
+    if not isinstance(typ, UnionType):
+        return typ
+    items = [item for item in typ.items if not isinstance(item, NoneTyp)]
+    # will reduce to Instance, if only one item
+    return UnionType.make_union(items)
+
+
+def is_optional(typ: Type) -> bool:
+    if not isinstance(typ, UnionType):
+        return False
+
+    return any([isinstance(item, NoneTyp) for item in typ.items])
+
+
+
+def has_any_of_bases(info: TypeInfo, bases: typing.Sequence[str]) -> bool:
+    for base_fullname in bases:
+        if info.has_base(base_fullname):
+            return True
+    return False

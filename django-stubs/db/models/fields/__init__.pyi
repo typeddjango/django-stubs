@@ -1,16 +1,15 @@
-import uuid
-from datetime import date, time, datetime, timedelta
-from typing import Any, Optional, Tuple, Iterable, Callable, Dict, Union, Type, TypeVar, Generic
 import decimal
-
-from typing_extensions import Literal
+import uuid
+from datetime import date, datetime, time, timedelta
+from typing import Any, Callable, Dict, Generic, Iterable, Optional, Tuple, Type, TypeVar, Union
 
 from django.db.models import Model
-from django.db.models.query_utils import RegisterLookupMixin
-
-from django.db.models.expressions import F, Combinable
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
-from django.forms import Widget, Field as FormField
+from django.db.models.expressions import Combinable
+from django.db.models.query_utils import RegisterLookupMixin
+from django.forms import Field as FormField, Widget
+from typing_extensions import Literal
+
 from .mixins import NOT_PROVIDED as NOT_PROVIDED
 
 _Choice = Tuple[Any, Any]
@@ -20,7 +19,15 @@ _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
-class Field(RegisterLookupMixin):
+# __set__ value type
+_ST = TypeVar("_ST")
+# __get__ return type
+_GT = TypeVar("_GT")
+
+class Field(RegisterLookupMixin, Generic[_ST, _GT]):
+    _pyi_private_set_type: Any
+    _pyi_private_get_type: Any
+
     widget: Widget
     help_text: str
     db_table: str
@@ -52,7 +59,8 @@ class Field(RegisterLookupMixin):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-    def __get__(self, instance, owner) -> Any: ...
+    def __set__(self, instance, value: _ST) -> None: ...
+    def __get__(self, instance, owner) -> _GT: ...
     def deconstruct(self) -> Any: ...
     def set_attributes_from_name(self, name: str) -> None: ...
     def db_type(self, connection: Any) -> str: ...
@@ -63,23 +71,25 @@ class Field(RegisterLookupMixin):
     def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
 
-class IntegerField(Field):
-    def __set__(self, instance, value: Union[int, Combinable, Literal[""]]) -> None: ...
-    def __get__(self, instance, owner) -> int: ...
+class IntegerField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[int, Combinable, Literal[""]]
+    _pyi_private_get_type: int
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: Any): ...
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
-class SmallIntegerField(IntegerField): ...
-class BigIntegerField(IntegerField): ...
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
+class SmallIntegerField(IntegerField[_ST, _GT]): ...
+class BigIntegerField(IntegerField[_ST, _GT]): ...
 
-class FloatField(Field):
-    def __set__(self, instance, value: Union[float, int, str, Combinable]) -> float: ...
-    def __get__(self, instance, owner) -> float: ...
+class FloatField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[float, int, str, Combinable]
+    _pyi_private_get_type: float
 
-class DecimalField(Field):
+class DecimalField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, float, decimal.Decimal, Combinable]
+    _pyi_private_get_type: decimal.Decimal
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -102,13 +112,14 @@ class DecimalField(Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-    def __set__(self, instance, value: Union[str, float, decimal.Decimal, Combinable]) -> decimal.Decimal: ...
-    def __get__(self, instance, owner) -> decimal.Decimal: ...
 
-class AutoField(Field):
-    def __get__(self, instance, owner) -> int: ...
+class AutoField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[Combinable, int, str]
+    _pyi_private_get_type: int
 
-class CharField(Field):
+class CharField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, int, Combinable]
+    _pyi_private_get_type: str
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -133,10 +144,8 @@ class CharField(Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-    def __set__(self, instance, value: Union[str, int, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> str: ...
 
-class SlugField(CharField):
+class SlugField(CharField[_ST, _GT]):
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -163,25 +172,29 @@ class SlugField(CharField):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class EmailField(CharField): ...
-class URLField(CharField): ...
+class EmailField(CharField[_ST, _GT]): ...
+class URLField(CharField[_ST, _GT]): ...
 
-class TextField(Field):
-    def __set__(self, instance, value: Union[str, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> str: ...
+class TextField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, Combinable]
+    _pyi_private_get_type: str
 
-class BooleanField(Field):
-    def __set__(self, instance, value: Union[bool, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> bool: ...
+class BooleanField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[bool, Combinable]
+    _pyi_private_get_type: bool
 
-class NullBooleanField(Field):
-    def __set__(self, instance, value: Optional[Union[bool, Combinable]]) -> None: ...
-    def __get__(self, instance, owner) -> Optional[bool]: ...
+class NullBooleanField(Field[_ST, _GT]):
+    _pyi_private_set_type: Optional[Union[bool, Combinable]]
+    _pyi_private_get_type: Optional[bool]
 
-class IPAddressField(Field):
-    def __get__(self, instance, owner) -> str: ...
+class IPAddressField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, Combinable]
+    _pyi_private_get_type: str
 
-class GenericIPAddressField(Field):
+class GenericIPAddressField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, int, Callable[..., Any], Combinable]
+    _pyi_private_get_type: str
+
     default_error_messages: Any = ...
     unpack_ipv4: Any = ...
     protocol: Any = ...
@@ -207,12 +220,12 @@ class GenericIPAddressField(Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
-    def __set__(self, instance, value: Union[str, int, Callable[..., Any], Combinable]): ...
-    def __get__(self, instance, owner) -> str: ...
 
 class DateTimeCheckMixin: ...
 
-class DateField(DateTimeCheckMixin, Field):
+class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, date, datetime, Combinable]
+    _pyi_private_get_type: date
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -236,10 +249,10 @@ class DateField(DateTimeCheckMixin, Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-    def __set__(self, instance, value: Union[str, date, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> date: ...
 
-class TimeField(DateTimeCheckMixin, Field):
+class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, time, datetime, Combinable]
+    _pyi_private_get_type: time
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -262,18 +275,15 @@ class TimeField(DateTimeCheckMixin, Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-    def __set__(self, instance, value: Union[str, time, datetime, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> time: ...
 
-class DateTimeField(DateField):
-    def __set__(self, instance, value: Union[str, date, datetime, Combinable]) -> None: ...
-    def __get__(self, instance, owner) -> datetime: ...
+class DateTimeField(DateField[_ST, _GT]):
+    _pyi_private_get_type: datetime
 
-class UUIDField(Field):
-    def __set__(self, instance, value: Union[str, uuid.UUID]) -> None: ...
-    def __get__(self, instance, owner) -> uuid.UUID: ...
+class UUIDField(Field[_ST, _GT]):
+    _pyi_private_set_type: Union[str, uuid.UUID]
+    _pyi_private_get_type: uuid.UUID
 
-class FilePathField(Field):
+class FilePathField(Field[_ST, _GT]):
     path: str = ...
     match: Optional[Any] = ...
     recursive: bool = ...
@@ -306,10 +316,10 @@ class FilePathField(Field):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class BinaryField(Field): ...
+class BinaryField(Field[_ST, _GT]): ...
 
-class DurationField(Field):
-    def __get__(self, instance, owner) -> timedelta: ...
+class DurationField(Field[_ST, _GT]):
+    _pyi_private_get_type: timedelta
 
-class BigAutoField(AutoField): ...
-class CommaSeparatedIntegerField(CharField): ...
+class BigAutoField(AutoField[_ST, _GT]): ...
+class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...

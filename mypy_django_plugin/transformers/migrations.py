@@ -4,7 +4,6 @@ from mypy.checker import TypeChecker
 from mypy.nodes import Expression, StrExpr, TypeInfo
 from mypy.plugin import MethodContext
 from mypy.types import Instance, Type, TypeType
-
 from mypy_django_plugin import helpers
 
 

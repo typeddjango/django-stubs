@@ -3,10 +3,10 @@ from typing import Dict, Optional, Set, cast
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo, Var
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, Type, TypeOfAny, UnionType
-
+from mypy.types import AnyType, Instance, Type, TypeOfAny
 from mypy_django_plugin import helpers
-from mypy_django_plugin.helpers import extract_field_setter_type, extract_primary_key_type_for_set, get_fields_metadata
+from mypy_django_plugin.helpers import extract_field_setter_type, extract_explicit_set_type_of_model_primary_key, get_fields_metadata
+from mypy_django_plugin.transformers.fields import get_private_descriptor_type
 
 
 def extract_base_pointer_args(model: TypeInfo) -> Set[str]:
@@ -112,40 +112,54 @@ def extract_choices_type(model: TypeInfo, field_name: str) -> Optional[str]:
 
 
 def extract_expected_types(ctx: FunctionContext, model: TypeInfo) -> Dict[str, Type]:
-    expected_types: Dict[str, Type] = {}
+    api = cast(TypeChecker, ctx.api)
 
-    primary_key_type = extract_primary_key_type_for_set(model)
+    expected_types: Dict[str, Type] = {}
+    primary_key_type = extract_explicit_set_type_of_model_primary_key(model)
     if not primary_key_type:
         # no explicit primary key, set pk to Any and add id
         primary_key_type = AnyType(TypeOfAny.special_form)
         expected_types['id'] = ctx.api.named_generic_type('builtins.int', [])
-
     expected_types['pk'] = primary_key_type
+
     for base in model.mro:
+        # extract all fields for all models in MRO
         for name, sym in base.names.items():
             # do not redefine special attrs
             if name in {'_meta', 'pk'}:
                 continue
+
             if isinstance(sym.node, Var):
-                if sym.node.type is None or isinstance(sym.node.type, AnyType):
+                typ = sym.node.type
+                if typ is None or isinstance(typ, AnyType):
                     # types are not ready, fallback to Any
                     expected_types[name] = AnyType(TypeOfAny.from_unimported_type)
                     expected_types[name + '_id'] = AnyType(TypeOfAny.from_unimported_type)
 
-                elif isinstance(sym.node.type, Instance):
-                    tp = sym.node.type
-                    field_type = extract_field_setter_type(tp)
+                elif isinstance(typ, Instance):
+                    field_type = extract_field_setter_type(typ)
                     if field_type is None:
                         continue
 
-                    if tp.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
-                        ref_to_model = tp.args[0]
-                        primary_key_type = AnyType(TypeOfAny.special_form)
-                        if isinstance(ref_to_model, Instance) and ref_to_model.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-                            typ = extract_primary_key_type_for_set(ref_to_model.type)
-                            if typ:
-                                primary_key_type = typ
+                    if typ.type.fullname() in {helpers.FOREIGN_KEY_FULLNAME, helpers.ONETOONE_FIELD_FULLNAME}:
+                        primary_key_type = AnyType(TypeOfAny.implementation_artifact)
+                        # in case it's optional, we need Instance type
+                        referred_to_model = typ.args[1]
+                        is_nullable = helpers.is_optional(referred_to_model)
+                        if is_nullable:
+                            referred_to_model = helpers.make_required(typ.args[1])
+
+                        if isinstance(referred_to_model, Instance) and referred_to_model.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+                            pk_type = extract_explicit_set_type_of_model_primary_key(referred_to_model.type)
+                            if not pk_type:
+                                # extract set type of AutoField
+                                autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
+                                pk_type = get_private_descriptor_type(autofield_info, '_pyi_private_set_type',
+                                                                      is_nullable=is_nullable)
+                            primary_key_type = pk_type
+
                         expected_types[name + '_id'] = primary_key_type
+
                     if field_type:
                         expected_types[name] = field_type
 

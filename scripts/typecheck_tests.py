@@ -227,7 +227,7 @@ IGNORED_ERRORS = {
     ],
     'postgres_tests': [
         'Cannot assign multiple types to name',
-        'Incompatible types in assignment (expression has type "Type[Field]',
+        'Incompatible types in assignment (expression has type "Type[Field[Any, Any]]',
         'DummyArrayField',
         'DummyJSONField',
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"',

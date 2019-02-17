@@ -198,7 +198,7 @@ class App(models.Model):
     pass
 class Member(models.Model):
     apps = models.ManyToManyField(to=App, related_name='members')
-reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.App*]'
+reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager*[main.App]'
 reveal_type(App().members)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
 [out]
 
@@ -207,7 +207,7 @@ from django.db import models
 from myapp.models import App
 class Member(models.Model):
     apps = models.ManyToManyField(to='myapp.App', related_name='members')
-reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.App*]'
+reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager*[myapp.models.App]'
 
 [file myapp/__init__.py]
 [file myapp/models.py]
@@ -226,8 +226,8 @@ reveal_type(User().parent)  # E: Revealed type is 'main.User*'
 [CASE many_to_many_with_self]
 from django.db import models
 class User(models.Model):
-    friends = models.ManyToManyField('self', on_delete=models.CASCADE)
-reveal_type(User().friends)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.User*]'
+    friends = models.ManyToManyField('self')
+reveal_type(User().friends)  # E: Revealed type is 'django.db.models.manager.RelatedManager*[main.User]'
 [out]
 
 [CASE recursively_checking_for_base_model_in_to_parameter]
