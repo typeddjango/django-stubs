@@ -32,14 +32,4 @@ class Child1(Parent1, Parent2):
 class Child4(Child1):
     value4 = models.IntegerField()
 Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
-
-[CASE create_through_related_manager_of_manytomany_field]
-from django.db import models
-
-class Publication(models.Model):
-    title = models.CharField(max_length=100)
-class Article(models.Model):
-    publications = models.ManyToManyField(Publication)
-article = Article.objects.create()
-article.publications.create(title='my title')
 [out]
