@@ -15,7 +15,7 @@ PROJECT_DIRECTORY = Path(__file__).parent.parent
 DJANGO_BRANCH = 'stable/2.1.x'
 
 # Specific commit in the Django repository to check against
-DJANGO_COMMIT_SHA = '03219b5f709dcd5b0bfacd963508625557ec1ef0'
+DJANGO_COMMIT_SHA = '8fe63dc4cd637c1422a9bf3e3421d64388e14afd'
 
 # Some errors occur for the test suite itself, and cannot be addressed via django-stubs. They should be ignored
 # using this constant.
