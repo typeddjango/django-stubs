@@ -51,7 +51,10 @@ IGNORED_ERRORS = {
         # private members
         re.compile(r'has no attribute "|\'_[a-z][a-z_]+"|\''),
         'Invalid base class',
-        'ValuesIterable'
+        'ValuesIterable',
+        'Value of type "Optional[Dict[str, Any]]" is not indexable',
+        'Argument 1 to "len" has incompatible type "Optional[List[_Record]]"; expected "Sized"',
+        'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; expected "Union[str, bytes, bytearray]"'
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -62,7 +65,7 @@ IGNORED_ERRORS = {
     'admin_widgets': [
         'Incompatible types in assignment (expression has type "RelatedFieldWidgetWrapper", '
         'variable has type "AdminRadioSelect")',
-        'Incompatible types in assignment (expression has type "Widget", variable has type "AutocompleteSelect")'
+        'Incompatible types in assignment (expression has type "Union[Widget, Any]", variable has type "AutocompleteSelect")'
     ],
     'admin_utils': [
         re.compile(r'Argument [0-9] to "lookup_field" has incompatible type'),
@@ -78,7 +81,8 @@ IGNORED_ERRORS = {
         '"object" not callable',
         'Incompatible type for "pk" of "Collector" (got "int", expected "str")',
         re.compile('Unexpected attribute "[a-z]+" for model "Model"'),
-        'Unexpected attribute "two_id" for model "CyclicOne"'
+        'Unexpected attribute "two_id" for model "CyclicOne"',
+        'Argument "is_dst" to "localize" of "BaseTzInfo" has incompatible type "None"; expected "bool"'
     ],
     'aggregation': [
         'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
@@ -94,6 +98,9 @@ IGNORED_ERRORS = {
     'apps': [
         'Incompatible types in assignment (expression has type "str", target has type "type")',
         '"Callable[[bool, bool], List[Type[Model]]]" has no attribute "cache_clear"'
+    ],
+    'annotations': [
+        'Incompatible type for "store" of "Employee" (got "Optional[Store]", expected "Union[Store, Combinable]")'
     ],
     'auth_tests': [
         '"PasswordValidator" has no attribute "min_length"',
@@ -165,10 +172,14 @@ IGNORED_ERRORS = {
         'CustomClass'
     ],
     'get_or_create': [
-        'Argument 1 to "update_or_create" of "QuerySet" has incompatible type "**Dict[str, object]"; expected "MutableMapping[str, Any]"'
+        'Argument 1 to "update_or_create" of "QuerySet" has incompatible type "**Dict[str, object]"; '
+        + 'expected "Optional[MutableMapping[str, Any]]"'
     ],
     'httpwrappers': [
         'Argument 2 to "appendlist" of "QueryDict" has incompatible type "List[str]"; expected "str"'
+    ],
+    'humanize_tests': [
+        'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
     ],
     'invalid_models_tests': [
         'Argument "max_length" to "CharField" has incompatible type "str"; expected "Optional[int]"',
@@ -203,6 +214,7 @@ IGNORED_ERRORS = {
     ],
     'migrate_signals': [
         'Value of type "None" is not indexable',
+        'Argument 1 to "set" has incompatible type "None"; expected "Iterable[<nothing>]"'
     ],
     'migrations': [
         'FakeMigration',
@@ -213,7 +225,8 @@ IGNORED_ERRORS = {
         + 'expected "Optional[Sequence[Union[Type[Model], str]]]"',
         'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'FakeLoader',
-        'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"'
+        'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"',
+        'Unsupported operand types for - ("Set[Any]" and "None")'
     ],
     'middleware_exceptions': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
@@ -231,10 +244,14 @@ IGNORED_ERRORS = {
         'DummyArrayField',
         'DummyJSONField',
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"',
-        'for model "CITestModel"'
+        'for model "CITestModel"',
+        'Incompatible type for "field" of "IntegerArrayModel" (got "None", expected "Union[Sequence[int], Combinable]")'
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
+    ],
+    'queries': [
+        'Incompatible types in assignment (expression has type "None", variable has type "str")'
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -258,6 +275,12 @@ IGNORED_ERRORS = {
         '"setUp" undefined in superclass',
         'Argument 1 to "write" of "IO" has incompatible type "bytes"; expected "str"',
         'Value of type "object" is not indexable'
+    ],
+    'schema': [
+        'Incompatible type for "info" of "Note" (got "None", expected "Union[str, Combinable]")'
+    ],
+    'settings_tests': [
+        'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'
     ],
     'transactions': [
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
@@ -289,11 +312,13 @@ IGNORED_ERRORS = {
         'template_debug',
         '"yield from" can\'t be applied to',
         re.compile(r'List item [0-9] has incompatible type "URLResolver"; expected "URLPattern"'),
-        '"WSGIRequest" has no attribute "current_app"'
+        '"WSGIRequest" has no attribute "current_app"',
+        'Value of type variable "AnyStr" of "urljoin" cannot be "Optional[str]"'
     ],
     'template_backends': [
         'Incompatible import of "Jinja2" (imported name has type "Type[Jinja2]", local name has type "object")',
-        'TemplateStringsTests'
+        'TemplateStringsTests',
+        'Incompatible types in assignment (expression has type "None", variable has type Module)'
     ],
     'urlpatterns': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
@@ -311,7 +336,8 @@ IGNORED_ERRORS = {
         "'django.urls.resolvers.ResolverMatch' object is not iterable"
     ],
     'sessions_tests': [
-        'base class "SessionTestsMixin" defined the type as "None")'
+        'base class "SessionTestsMixin" defined the type as "None")',
+        'Incompatible types in assignment (expression has type "None", variable has type "int")'
     ],
     'select_related_onetoone': [
         '"None" has no attribute'
