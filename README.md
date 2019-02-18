@@ -7,6 +7,10 @@
 
 This package contains type stubs and mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need to accompany the stubs with mypy plugins. The final goal is to be able to get precise types for most common patterns.
 
+Supports Python 3.6/3.7, and Django 2.1.x series.
+
+Could be run on earlier versions of Django, but expect some missing imports warnings.
+
 ## Installation
 
 ```
