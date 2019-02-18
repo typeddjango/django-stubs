@@ -54,9 +54,9 @@ def get_model_fullname(app_name: str, model_name: str,
         return None
 
 
-class InvalidModelString(ValueError):
-    def __init__(self, model_string: str):
-        self.model_string = model_string
+class SameFileModel(Exception):
+    def __init__(self, model_cls_name: str):
+        self.model_cls_name = model_cls_name
 
 
 class SelfReference(ValueError):
@@ -69,7 +69,7 @@ def get_model_fullname_from_string(model_string: str,
         raise SelfReference()
 
     if '.' not in model_string:
-        raise InvalidModelString(model_string)
+        raise SameFileModel(model_string)
 
     app_name, model_name = model_string.split('.')
     return get_model_fullname(app_name, model_name, all_modules)

@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, Iterator, List, Optional, Tuple, cast
 
 import dataclasses
-from mypy.nodes import ARG_STAR, ARG_STAR2, Argument, CallExpr, ClassDef, Context, Expression, IndexExpr, \
+from mypy.nodes import ARG_STAR, ARG_STAR2, Argument, CallExpr, ClassDef, Expression, IndexExpr, \
     Lvalue, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
@@ -173,10 +173,9 @@ class AddRelatedManagers(ModelClassInitializer):
                                                                       all_modules=self.api.modules)
                         except helpers.SelfReference:
                             ref_to_fullname = defn.fullname
-                        except helpers.InvalidModelString as exc:
-                            self.api.fail(f'Invalid value for a to= parameter: {exc.model_string!r}',
-                                          Context(line=rvalue.line))
-                            return None
+
+                        except helpers.SameFileModel as exc:
+                            ref_to_fullname = module_name + '.' + exc.model_cls_name
 
                         if self.model_classdef.fullname == ref_to_fullname:
                             related_manager_name = defn.name.lower() + '_set'

@@ -8,7 +8,7 @@ from mypy_django_plugin import helpers
 from mypy_django_plugin.transformers.models import iter_over_assignments
 
 
-def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
+def extract_referred_to_type(ctx: FunctionContext) -> Optional[Instance]:
     api = cast(TypeChecker, ctx.api)
     if 'to' not in ctx.callee_arg_names:
         api.msg.fail(f'to= parameter must be set for {ctx.context.callee.fullname}',
@@ -26,6 +26,9 @@ def get_valid_to_value_or_none(ctx: FunctionContext) -> Optional[Instance]:
                                                                     all_modules=api.modules)
         except helpers.SelfReference:
             model_fullname = api.tscope.classes[-1].fullname()
+
+        except helpers.SameFileModel as exc:
+            model_fullname = api.tscope.classes[-1].module_name + '.' + exc.model_cls_name
 
         if model_fullname is None:
             return None
@@ -69,19 +72,9 @@ def convert_any_to_type(typ: Type, referred_to_type: Type) -> Type:
     return typ
 
 
-def _extract_referred_to_type(ctx: FunctionContext) -> Optional[Type]:
-    try:
-        referred_to_type = get_valid_to_value_or_none(ctx)
-    except helpers.InvalidModelString as exc:
-        ctx.api.fail(f'Invalid value for a to= parameter: {exc.model_string!r}', ctx.context)
-        return None
-
-    return referred_to_type
-
-
 def fill_descriptor_types_for_related_field(ctx: FunctionContext) -> Type:
     default_return_type = set_descriptor_types_for_field(ctx)
-    referred_to_type = _extract_referred_to_type(ctx)
+    referred_to_type = extract_referred_to_type(ctx)
     if referred_to_type is None:
         return default_return_type
 

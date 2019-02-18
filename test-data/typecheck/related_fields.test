@@ -275,3 +275,13 @@ Book2(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2
 Book2.objects.create(publisher_id=1)
 Book2.objects.create(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal['']]")
 [out]
+
+[CASE if_model_is_defined_as_name_of_the_class_look_for_it_in_the_same_file]
+from django.db import models
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
+class Publisher(models.Model):
+    pass
+reveal_type(Book().publisher)  # E: Revealed type is 'main.Publisher*'
+[out]
