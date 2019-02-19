@@ -246,7 +246,7 @@ def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
 
 
 def make_optional(typ: Type):
-    return UnionType.make_simplified_union([typ, NoneTyp()])
+    return UnionType.make_union([typ, NoneTyp()])
 
 
 def make_required(typ: Type) -> Type:

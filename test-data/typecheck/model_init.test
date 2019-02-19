@@ -14,9 +14,9 @@ from django.db import models
 class MyUser(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
-user = MyUser(name='hello', age='world')
+user = MyUser(name='hello', age=[])
 [out]
-main:6: error: Incompatible type for "age" of "MyUser" (got "str", expected "Union[int, Combinable, Literal['']]")
+main:6: error: Incompatible type for "age" of "MyUser" (got "List[Any]", expected "Union[float, int, str, Combinable]")
 
 [CASE arguments_to_init_combined_from_base_classes]
 from django.db import models
@@ -63,7 +63,7 @@ from django.db import models
 
 class MyUser1(models.Model):
     mypk = models.IntegerField(primary_key=True)
-user = MyUser1(pk='hello')  # E: Incompatible type for "pk" of "MyUser1" (got "str", expected "Union[int, Combinable, Literal['']]")
+user = MyUser1(pk=[])  # E: Incompatible type for "pk" of "MyUser1" (got "List[Any]", expected "Union[float, int, str, Combinable]")
 [out]
 
 [CASE can_set_foreign_key_by_its_primary_key]
@@ -115,7 +115,7 @@ MyModel(1)
 class MyModel2(models.Model):
     name = models.IntegerField()
 MyModel2(1, 12)
-MyModel2(1, 'Maxim')  # E: Incompatible type for "name" of "MyModel2" (got "str", expected "Union[int, Combinable, Literal['']]")
+MyModel2(1, [])  # E: Incompatible type for "name" of "MyModel2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
 [out]
 
 [CASE arguments_passed_as_dictionary_unpacking_are_not_supported]

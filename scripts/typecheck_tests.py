@@ -286,7 +286,8 @@ IGNORED_ERRORS = {
     ],
     'schema': [
         'Incompatible type for "info" of "Note" (got "None", expected "Union[str, Combinable]")',
-        'Incompatible type for "detail_info" of "NoteRename" (got "None", expected "Union[str, Combinable]")'
+        'Incompatible type for "detail_info" of "NoteRename" (got "None", expected "Union[str, Combinable]")',
+        'Incompatible type for "year" of "UniqueTest" (got "None", expected "Union[float, int, str, Combinable]")'
     ],
     'settings_tests': [
         'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'
@@ -348,7 +349,7 @@ IGNORED_ERRORS = {
     ],
     'sessions_tests': [
         'base class "SessionTestsMixin" defined the type as "None")',
-        'Incompatible types in assignment (expression has type "None", variable has type "int")'
+        'Incompatible types in assignment (expression has type "None", variable has type "int")',
     ],
     'select_related_onetoone': [
         '"None" has no attribute'

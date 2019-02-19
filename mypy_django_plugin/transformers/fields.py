@@ -55,8 +55,8 @@ def convert_any_to_type(typ: Type, referred_to_type: Type) -> Type:
         converted_items = []
         for item in typ.items:
             converted_items.append(convert_any_to_type(item, referred_to_type))
-        return UnionType.make_simplified_union(converted_items,
-                                               line=typ.line, column=typ.column)
+        return UnionType.make_union(converted_items,
+                                    line=typ.line, column=typ.column)
     if isinstance(typ, Instance):
         args = []
         for default_arg in typ.args:

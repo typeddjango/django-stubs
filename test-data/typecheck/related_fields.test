@@ -271,9 +271,9 @@ class Book2(models.Model):
 
 reveal_type(Book2().publisher_id)  # E: Revealed type is 'builtins.int'
 Book2(publisher_id=1)
-Book2(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal[''], None]")
+Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable, None]")
 Book2.objects.create(publisher_id=1)
-Book2.objects.create(publisher_id='hello')  # E: Incompatible type for "publisher_id" of "Book2" (got "str", expected "Union[int, Combinable, Literal['']]")
+Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
 [out]
 
 [CASE if_model_is_defined_as_name_of_the_class_look_for_it_in_the_same_file]

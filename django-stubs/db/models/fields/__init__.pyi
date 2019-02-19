@@ -8,7 +8,6 @@ from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.db.models.expressions import Combinable
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
-from typing_extensions import Literal
 
 from .mixins import NOT_PROVIDED as NOT_PROVIDED
 
@@ -72,7 +71,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def to_python(self, value: Any) -> Any: ...
 
 class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[int, Combinable, Literal[""]]
+    _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: int
 
 class PositiveIntegerRelDbTypeMixin:

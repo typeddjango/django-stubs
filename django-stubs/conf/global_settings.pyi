@@ -5,7 +5,7 @@ by the DJANGO_SETTINGS_MODULE environment variable.
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Dict, List, Optional, Pattern, Tuple, Protocol, Union, Callable, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Pattern, Tuple, Protocol, Union, Callable, TYPE_CHECKING, Sequence
 
 ####################
 # CORE             #
@@ -377,7 +377,7 @@ CACHE_MIDDLEWARE_ALIAS = "default"
 
 AUTH_USER_MODEL: str = ...
 
-AUTHENTICATION_BACKENDS: List[str] = ...
+AUTHENTICATION_BACKENDS: Sequence[str] = ...
 
 LOGIN_URL = "/accounts/login/"
 
