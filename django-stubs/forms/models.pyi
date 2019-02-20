@@ -1,11 +1,10 @@
 from collections import OrderedDict
 from datetime import date, datetime
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union, Sequence, MutableMapping
+from typing import Any, Callable, Dict, Iterator, List, MutableMapping, Optional, Sequence, Tuple, Type, Union
 from unittest.mock import MagicMock
 from uuid import UUID
 
 from django.core.files.base import File
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django.db.models import ForeignKey
 from django.db.models.base import Model
@@ -16,9 +15,7 @@ from django.forms.fields import CharField, ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.utils import ErrorList
-from django.forms.widgets import Input, Widget, Select
-from django.http.request import QueryDict
-from django.utils.datastructures import MultiValueDict
+from django.forms.widgets import Input, Widget
 from typing_extensions import Literal
 
 ALL_FIELDS: str
@@ -97,7 +94,7 @@ def modelform_factory(
     help_texts: Optional[MutableMapping[str, str]] = ...,
     error_messages: Optional[MutableMapping[str, Dict[str, Any]]] = ...,
     field_classes: Optional[MutableMapping[str, Type[Field]]] = ...,
-) -> ModelForm: ...
+) -> Type[ModelForm]: ...
 
 class BaseModelFormSet(BaseFormSet):
     model: Any = ...
@@ -155,7 +152,7 @@ def modelformset_factory(
     error_messages: Optional[Dict[str, Dict[str, str]]] = ...,
     validate_min: bool = ...,
     field_classes: Optional[Dict[str, Type[Field]]] = ...,
-) -> BaseModelFormSet: ...
+) -> Type[BaseModelFormSet]: ...
 
 class BaseInlineFormSet(BaseModelFormSet):
     instance: Any = ...
@@ -200,7 +197,7 @@ def inlineformset_factory(
     min_num: Optional[int] = ...,
     validate_min: bool = ...,
     field_classes: Optional[Dict[str, Any]] = ...,
-) -> Any: ...
+) -> Type[BaseInlineFormSet]: ...
 
 class InlineForeignKeyField(Field):
     disabled: bool

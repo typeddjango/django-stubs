@@ -232,6 +232,12 @@ IGNORED_ERRORS = {
         + 'base class "ImageFieldTestMixin" defined the type as "Type[PersonWithHeightAndWidth]")',
         'note: "Person" defined here'
     ],
+    'model_formsets': [
+        'Incompatible types in string interpolation (expression has type "object", placeholder has type "Union[int, float]")'
+    ],
+    'model_formsets_regress': [
+        'Incompatible types in assignment (expression has type "Model", variable has type "User")'
+    ],
     'model_regress': [
         'Too many arguments for "Worker"',
         re.compile(r'Incompatible type for "[a-z]+" of "Worker" \(got "int", expected')
