@@ -7,6 +7,8 @@ class User(models.Model):
 
 user = User()
 reveal_type(user.array)  # E: Revealed type is 'builtins.list*[Any]'
+[mypy_options --no-incremental]
+[out]
 
 [CASE array_field_base_field_parsed_into_generic_typevar]
 from django.db import models
