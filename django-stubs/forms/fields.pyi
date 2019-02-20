@@ -1,12 +1,8 @@
-import decimal
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Type
-from uuid import UUID
+from typing import Any, Callable, List, Optional, Pattern, Sequence, Type, Union
 
-from django.core.files.base import File
 from django.core.validators import BaseValidator
-from django.db.models.fields.files import FieldFile
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
@@ -31,16 +27,16 @@ class Field:
         self,
         *,
         required: bool = ...,
-        widget: Optional[Any] = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
         label: Optional[Any] = ...,
         initial: Optional[Any] = ...,
         help_text: str = ...,
         error_messages: Optional[Any] = ...,
         show_hidden_initial: bool = ...,
-        validators: Any = ...,
+        validators: Sequence[Any] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[Any] = ...
+        label_suffix: Optional[Any] = ...,
     ) -> None: ...
     def prepare_value(self, value: Any) -> Any: ...
     def to_python(self, value: Optional[Any]) -> Optional[Any]: ...
@@ -49,60 +45,60 @@ class Field:
     def clean(self, value: Any) -> Any: ...
     def bound_data(self, data: Any, initial: Any) -> Any: ...
     def widget_attrs(self, widget: Widget) -> Any: ...
-    def has_changed(self, initial: Any, data: Optional[str]) -> bool: ...
+    def has_changed(self, initial: Any, data: Any) -> bool: ...
     def get_bound_field(self, form: BaseForm, field_name: str) -> BoundField: ...
-    def __deepcopy__(self, memo: Dict[Any, Any]) -> Field: ...
 
 class CharField(Field):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
     max_length: Optional[Union[int, str]] = ...
     min_length: Optional[Union[int, str]] = ...
     strip: bool = ...
     empty_value: Optional[str] = ...
     def __init__(
         self,
-        *,
         max_length: Optional[Any] = ...,
         min_length: Optional[Any] = ...,
         strip: bool = ...,
-        empty_value: str = ...,
-        **kwargs: Any
+        empty_value: Optional[str] = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
     ) -> None: ...
 
 class IntegerField(Field):
-    disabled: bool
-    error_messages: Dict[str, str]
     max_value: Optional[Any]
     min_value: Optional[Any]
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     re_decimal: Any = ...
-    def __init__(self, *, max_value: Optional[Any] = ..., min_value: Optional[Any] = ..., **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        max_value: Optional[Any] = ...,
+        min_value: Optional[Any] = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
 class FloatField(IntegerField):
-    disabled: bool
-    error_messages: Dict[str, str]
-    max_value: Optional[float]
-    min_value: Optional[float]
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     def validate(self, value: Optional[float]) -> None: ...
 
 class DecimalField(IntegerField):
     decimal_places: Optional[int]
-    disabled: bool
-    error_messages: Dict[str, str]
     max_digits: Optional[int]
-    max_value: Optional[Union[decimal.Decimal, int]]
-    min_value: Optional[Union[decimal.Decimal, int]]
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     def __init__(
         self,
         *,
@@ -110,118 +106,95 @@ class DecimalField(IntegerField):
         min_value: Optional[Any] = ...,
         max_digits: Optional[Any] = ...,
         decimal_places: Optional[Any] = ...,
-        **kwargs: Any
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
     ) -> None: ...
     def validate(self, value: Optional[Decimal]) -> None: ...
 
 class BaseTemporalField(Field):
     input_formats: Any = ...
-    def __init__(self, *, input_formats: Optional[Any] = ..., **kwargs: Any) -> None: ...
-    def strptime(self, value: Any, format: Any) -> Any: ...
+    def __init__(
+        self,
+        input_formats: Optional[Any] = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
+    def strptime(self, value: Any, format: str) -> Any: ...
 
-class DateField(BaseTemporalField):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
-    input_formats: Any = ...
-    default_error_messages: Any = ...
-    def strptime(self, value: str, format: str) -> date: ...
-
-class TimeField(BaseTemporalField):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
-    input_formats: Any = ...
-    default_error_messages: Any = ...
-    def strptime(self, value: str, format: str) -> time: ...
-
-class DateTimeField(BaseTemporalField):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
-    input_formats: Any = ...
-    default_error_messages: Any = ...
-    def prepare_value(self, value: Optional[datetime]) -> Optional[datetime]: ...
-    def strptime(self, value: str, format: str) -> datetime: ...
+class DateField(BaseTemporalField): ...
+class TimeField(BaseTemporalField): ...
+class DateTimeField(BaseTemporalField): ...
 
 class DurationField(Field):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     def prepare_value(self, value: Optional[Union[timedelta, str]]) -> Optional[str]: ...
 
 class RegexField(CharField):
-    disabled: bool
-    empty_value: str
-    error_messages: Dict[str, str]
-    max_length: Optional[int]
-    min_length: Optional[int]
-    required: bool
-    show_hidden_initial: bool
-    strip: bool
-    def __init__(self, regex: str, **kwargs: Any) -> None: ...
-    regex: Any = ...
+    regex: str = ...
+    def __init__(
+        self,
+        regex: Union[str, Pattern],
+        max_length: Optional[Any] = ...,
+        min_length: Optional[Any] = ...,
+        strip: bool = ...,
+        empty_value: Optional[str] = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
-class EmailField(CharField):
-    disabled: bool
-    empty_value: Optional[str]
-    error_messages: Dict[str, str]
-    max_length: Optional[int]
-    min_length: Optional[int]
-    required: bool
-    show_hidden_initial: bool
-    strip: bool
-    default_validators: Any = ...
-    def __init__(self, **kwargs: Any) -> None: ...
+class EmailField(CharField): ...
 
 class FileField(Field):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     max_length: Optional[int] = ...
     allow_empty_file: bool = ...
-    def __init__(self, *, max_length: Optional[Any] = ..., allow_empty_file: bool = ..., **kwargs: Any) -> None: ...
-    def bound_data(self, data: Any, initial: Optional[FieldFile]) -> Optional[Union[File, str]]: ...
+    def __init__(
+        self,
+        max_length: Optional[Any] = ...,
+        allow_empty_file: bool = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
+    def clean(self, data: Any, initial: Optional[Any] = ...): ...
 
-class ImageField(FileField):
-    allow_empty_file: bool
-    disabled: bool
-    max_length: Optional[int]
-    required: bool
-    show_hidden_initial: bool
-    default_validators: Any = ...
-    default_error_messages: Any = ...
-
-class URLField(CharField):
-    disabled: bool
-    empty_value: Optional[str]
-    error_messages: Dict[str, str]
-    max_length: Optional[int]
-    min_length: Optional[int]
-    required: bool
-    show_hidden_initial: bool
-    strip: bool
-    default_error_messages: Any = ...
-    default_validators: Any = ...
-    def __init__(self, **kwargs: Any) -> None: ...
-
-class BooleanField(Field):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
-    def validate(self, value: bool) -> None: ...
-
-class NullBooleanField(BooleanField):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
-    def validate(self, value: Optional[bool]) -> None: ...
+class ImageField(FileField): ...
+class URLField(CharField): ...
+class BooleanField(Field): ...
+class NullBooleanField(BooleanField): ...
 
 class CallableChoiceIterator:
     choices_func: Callable = ...
@@ -229,125 +202,191 @@ class CallableChoiceIterator:
     def __iter__(self) -> None: ...
 
 class ChoiceField(Field):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     choices: Any = ...
-    def __init__(self, *, choices: Any = ..., **kwargs: Any) -> None: ...
-    def validate(self, value: Any) -> None: ...
+    def __init__(
+        self,
+        choices: Any = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
     def valid_value(self, value: str) -> bool: ...
 
 class TypedChoiceField(ChoiceField):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
-    coerce: Union[Callable, Type[Union[bool, float, str]]] = ...
+    coerce: Union[Callable, Type[Any]] = ...
     empty_value: Optional[str] = ...
-    def __init__(self, *, coerce: Any = ..., empty_value: str = ..., **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        coerce: Any = ...,
+        empty_value: Optional[str] = ...,
+        choices: Any = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
-class MultipleChoiceField(ChoiceField):
-    disabled: bool
-    error_messages: Dict[str, str]
-    required: bool
-    show_hidden_initial: bool
-    hidden_widget: Any = ...
-    default_error_messages: Any = ...
-    def validate(self, value: List[str]) -> None: ...
+class MultipleChoiceField(ChoiceField): ...
 
 class TypedMultipleChoiceField(MultipleChoiceField):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
     coerce: Union[Callable, Type[float]] = ...
     empty_value: Optional[List[Any]] = ...
-    def __init__(self, *, coerce: Any = ..., **kwargs: Any) -> None: ...
-    def validate(self, value: List[str]) -> None: ...
+    def __init__(
+        self,
+        coerce: Any = ...,
+        empty_value: Optional[str] = ...,
+        choices: Any = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
 class ComboField(Field):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
     fields: Any = ...
-    def __init__(self, fields: List[CharField], **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        fields: Sequence[Field],
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
 class MultiValueField(Field):
-    disabled: bool
-    required: bool
-    show_hidden_initial: bool
-    default_error_messages: Any = ...
     require_all_fields: bool = ...
     fields: Any = ...
-    def __init__(self, fields: Tuple[Field, Field], *, require_all_fields: bool = ..., **kwargs: Any) -> None: ...
-    def validate(self, value: Union[datetime, str]) -> None: ...
+    def __init__(
+        self,
+        fields: Sequence[Field],
+        require_all_fields: bool = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
     def compress(self, data_list: Any) -> Any: ...
 
 class FilePathField(ChoiceField):
     allow_files: bool
     allow_folders: bool
-    disabled: bool
     match: Optional[str]
     path: str
     recursive: bool
-    required: bool
-    show_hidden_initial: bool
-    choices: Any = ...
     match_re: Any = ...
     def __init__(
         self,
         path: str,
-        *,
         match: Optional[Any] = ...,
         recursive: bool = ...,
         allow_files: bool = ...,
         allow_folders: bool = ...,
-        **kwargs: Any
+        choices: Any = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
     ) -> None: ...
 
 class SplitDateTimeField(MultiValueField):
-    disabled: bool
-    require_all_fields: bool
-    required: bool
-    show_hidden_initial: bool
-    hidden_widget: Any = ...
-    default_error_messages: Any = ...
     def __init__(
-        self, *, input_date_formats: Optional[Any] = ..., input_time_formats: Optional[Any] = ..., **kwargs: Any
+        self,
+        input_date_formats: Optional[Any] = ...,
+        input_time_formats: Optional[Any] = ...,
+        fields: Sequence[Field] = ...,
+        require_all_fields: bool = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
     ) -> None: ...
     def compress(self, data_list: List[Optional[datetime]]) -> Optional[datetime]: ...
 
 class GenericIPAddressField(CharField):
-    disabled: bool
-    empty_value: str
-    error_messages: Dict[str, str]
-    max_length: None
-    min_length: None
-    required: bool
-    show_hidden_initial: bool
-    strip: bool
     unpack_ipv4: bool = ...
-    default_validators: List[Callable] = ...
-    def __init__(self, *, protocol: str = ..., unpack_ipv4: bool = ..., **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        protocol: str = ...,
+        unpack_ipv4: bool = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
 class SlugField(CharField):
-    disabled: bool
-    empty_value: str
-    max_length: Optional[int]
-    min_length: None
-    required: bool
-    show_hidden_initial: bool
-    strip: bool
     allow_unicode: bool = ...
-    def __init__(self, *, allow_unicode: bool = ..., **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        allow_unicode: bool = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[Any] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[Any] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[Any] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[Any] = ...,
+    ) -> None: ...
 
-class UUIDField(CharField):
-    disabled: bool
-    empty_value: str
-    max_length: None
-    min_length: None
-    required: bool
-    show_hidden_initial: bool
-    strip: bool
-    default_error_messages: Any = ...
-    def prepare_value(self, value: UUID) -> str: ...
+class UUIDField(CharField): ...

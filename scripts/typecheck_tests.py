@@ -32,7 +32,7 @@ IGNORED_ERRORS = {
         'Cannot assign to a type',
         re.compile(r'Cannot assign to class variable "[a-z_]+" via instance'),
         # forms <-> models plugin support
-        '"Model" has no attribute',
+        # '"Model" has no attribute',
         re.compile(r'Cannot determine type of \'(objects|stuff)\''),
         # settings
         re.compile(r'Module has no attribute "[A-Z_]+"'),
@@ -54,7 +54,8 @@ IGNORED_ERRORS = {
         'ValuesIterable',
         'Value of type "Optional[Dict[str, Any]]" is not indexable',
         'Argument 1 to "len" has incompatible type "Optional[List[_Record]]"; expected "Sized"',
-        'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; expected "Union[str, bytes, bytearray]"'
+        'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; expected "Union[str, bytes, bytearray]"',
+        'Incompatible types in assignment (expression has type "None", variable has type Module)'
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -165,6 +166,29 @@ IGNORED_ERRORS = {
     ],
     'fixtures': [
         'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")'
+    ],
+    'forms_tests': [
+        'List item 0 has incompatible type "Jinja2"; expected "DjangoTemplates"',
+        'Not enough arguments for format string',
+        'Argument after ** must be a mapping, not "object"',
+        '"media" undefined in superclass',
+        'expression has type "None", base class "TestFormParent"',
+        'variable has type "SongForm"',
+        '"full_clean" of "BaseForm" does not return a value',
+        'No overload variant of "zip" matches argument types "Tuple[str, str, str]", "object"',
+        'note:',
+        'Incompatible types in assignment (expression has type "GetDateShowHiddenInitial", variable has type "GetDate")',
+        re.compile(r'Incompatible types in assignment \(expression has type "[a-zA-Z]+Field", '
+                   r'base class "BaseForm" defined the type as "Dict\[str, Any\]"\)'),
+        'List or tuple expected as variable arguments',
+        'Argument 1 to "__init__" of "MultiWidget" has incompatible type "List[object]"; '
+        + 'expected "Sequence[Union[Widget, Type[Widget]]]"',
+        'Argument 1 to "issubclass" has incompatible type "ModelFormMetaclass"; expected "type"',
+        'Incompatible types in assignment (expression has type "List[str]", target has type "str")',
+        'Incompatible types in assignment (expression has type "TestForm", variable has type "Person")',
+        'Incompatible types in assignment (expression has type "Type[Textarea]", '
+        + 'base class "Field" defined the type as "Widget")',
+        'Incompatible types in assignment (expression has type "SimpleUploadedFile", variable has type "BinaryIO")'
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
@@ -330,7 +354,6 @@ IGNORED_ERRORS = {
     'template_backends': [
         'Incompatible import of "Jinja2" (imported name has type "Type[Jinja2]", local name has type "object")',
         'TemplateStringsTests',
-        'Incompatible types in assignment (expression has type "None", variable has type Module)'
     ],
     'urlpatterns': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
@@ -440,7 +463,7 @@ TESTS_DIRS = [
     'flatpages_tests',
     'force_insert_update',
     'foreign_object',
-    # TODO: 'forms_tests',
+    'forms_tests',
     'from_db_value',
     'generic_inline_admin',
     'generic_relations',

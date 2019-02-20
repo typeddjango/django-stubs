@@ -1,10 +1,12 @@
 from collections import OrderedDict
 from datetime import date, datetime
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union, Sequence
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union, Sequence, MutableMapping
 from unittest.mock import MagicMock
 from uuid import UUID
 
+from django.core.files.base import File
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import models
 from django.db.models import ForeignKey
 from django.db.models.base import Model
 from django.db.models.manager import Manager
@@ -17,6 +19,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import Input, Widget, Select
 from django.http.request import QueryDict
 from django.utils.datastructures import MultiValueDict
+from typing_extensions import Literal
 
 ALL_FIELDS: str
 
@@ -57,21 +60,19 @@ class ModelFormOptions:
     def __init__(self, options: Optional[type] = ...) -> None: ...
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass):
-    def __new__(
-        mcs: Type[ModelFormMetaclass], name: str, bases: Tuple[Type[ModelForm]], attrs: OrderedDict
-    ) -> Type[ModelForm]: ...
+    def __new__(mcs, name: str, bases: Sequence[Type[ModelForm]], attrs: Dict[str, Any]) -> Type[ModelForm]: ...
 
 class BaseModelForm(BaseForm):
     instance: Any = ...
     def __init__(
         self,
-        data: Optional[Union[Dict[str, Any], QueryDict]] = ...,
-        files: Optional[Union[Dict[str, SimpleUploadedFile], MultiValueDict]] = ...,
+        data: Optional[Dict[str, Any]] = ...,
+        files: Optional[Dict[str, File]] = ...,
         auto_id: Union[bool, str] = ...,
-        prefix: None = ...,
-        initial: Optional[Union[Dict[str, List[int]], Dict[str, int]]] = ...,
+        prefix: Optional[str] = ...,
+        initial: Optional[Dict[str, Any]] = ...,
         error_class: Type[ErrorList] = ...,
-        label_suffix: None = ...,
+        label_suffix: Optional[str] = ...,
         empty_permitted: bool = ...,
         instance: Optional[Model] = ...,
         use_required_attribute: None = ...,
@@ -87,16 +88,16 @@ class ModelForm(BaseModelForm): ...
 def modelform_factory(
     model: Type[Model],
     form: Type[ModelForm] = ...,
-    fields: Optional[Union[List[str], str]] = ...,
-    exclude: None = ...,
-    formfield_callback: Optional[str] = ...,
-    widgets: None = ...,
-    localized_fields: None = ...,
-    labels: None = ...,
-    help_texts: None = ...,
-    error_messages: None = ...,
-    field_classes: None = ...,
-) -> Any: ...
+    fields: Optional[Union[Sequence[str], Literal["__all__"]]] = ...,
+    exclude: Optional[Sequence[str]] = ...,
+    formfield_callback: Optional[Union[str, Callable[[models.Field], Field]]] = ...,
+    widgets: Optional[MutableMapping[str, Widget]] = ...,
+    localized_fields: Optional[Sequence[str]] = ...,
+    labels: Optional[MutableMapping[str, str]] = ...,
+    help_texts: Optional[MutableMapping[str, str]] = ...,
+    error_messages: Optional[MutableMapping[str, Dict[str, Any]]] = ...,
+    field_classes: Optional[MutableMapping[str, Type[Field]]] = ...,
+) -> ModelForm: ...
 
 class BaseModelFormSet(BaseFormSet):
     model: Any = ...
@@ -148,13 +149,13 @@ def modelformset_factory(
     exclude: Optional[Sequence[str]] = ...,
     widgets: Optional[Dict[str, Any]] = ...,
     validate_max: bool = ...,
-    localized_fields: None = ...,
+    localized_fields: Optional[Sequence[str]] = ...,
     labels: Optional[Dict[str, str]] = ...,
     help_texts: Optional[Dict[str, str]] = ...,
     error_messages: Optional[Dict[str, Dict[str, str]]] = ...,
     validate_min: bool = ...,
-    field_classes: Optional[Dict[str, Any]] = ...,
-) -> Any: ...
+    field_classes: Optional[Dict[str, Type[Field]]] = ...,
+) -> BaseModelFormSet: ...
 
 class BaseInlineFormSet(BaseModelFormSet):
     instance: Any = ...
@@ -192,7 +193,7 @@ def inlineformset_factory(
     formfield_callback: Optional[Callable] = ...,
     widgets: Optional[Dict[str, Any]] = ...,
     validate_max: bool = ...,
-    localized_fields: None = ...,
+    localized_fields: Optional[Sequence[str]] = ...,
     labels: Optional[Dict[str, str]] = ...,
     help_texts: Optional[Dict[str, str]] = ...,
     error_messages: Optional[Dict[str, Dict[str, str]]] = ...,

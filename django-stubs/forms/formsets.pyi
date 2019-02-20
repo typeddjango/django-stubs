@@ -1,8 +1,4 @@
-import collections
-from typing import Any, List, Optional, Union, Dict, Type
-
-from django.forms.renderers import BaseRenderer
-from django.forms.utils import ErrorList
+from typing import Any, Dict, Mapping, Optional, Sequence, Sized
 
 from django.forms import Form
 
@@ -17,21 +13,9 @@ DEFAULT_MIN_NUM: int = ...
 DEFAULT_MAX_NUM: int = ...
 
 class ManagementForm(Form):
-    auto_id: Union[bool, str]
     cleaned_data: Dict[str, Optional[int]]
-    data: Dict[str, Union[List[int], int, str]]
-    empty_permitted: bool
-    error_class: Type[ErrorList]
-    fields: collections.OrderedDict
-    files: Dict[Any, Any]
-    initial: Dict[str, int]
-    is_bound: bool
-    label_suffix: str
-    prefix: str
-    renderer: BaseRenderer
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
-class BaseFormSet:
+class BaseFormSet(Sized, Mapping[str, Any]):
     is_bound: Any = ...
     prefix: Any = ...
     auto_id: Any = ...
@@ -101,4 +85,4 @@ def formset_factory(
     min_num: Optional[Any] = ...,
     validate_min: bool = ...,
 ): ...
-def all_valid(formsets: List[Any]) -> bool: ...
+def all_valid(formsets: Sequence[Any]) -> bool: ...
