@@ -21,14 +21,8 @@ class ModelClassInitializer(metaclass=ABCMeta):
     def from_ctx(cls, ctx: ClassDefContext):
         return cls(api=cast(SemanticAnalyzerPass2, ctx.api), model_classdef=ctx.cls)
 
-    def get_nested_meta_node(self) -> Optional[TypeInfo]:
-        metaclass_sym = self.model_classdef.info.names.get('Meta')
-        if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
-            return metaclass_sym.node
-        return None
-
     def get_meta_attribute(self, name: str) -> Optional[Expression]:
-        meta_node = self.get_nested_meta_node()
+        meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             return None
 
@@ -80,7 +74,7 @@ class SetIdAttrsForRelatedFields(ModelClassInitializer):
 
 class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     def run(self) -> None:
-        meta_node = self.get_nested_meta_node()
+        meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             return None
         meta_node.fallback_to_any = True

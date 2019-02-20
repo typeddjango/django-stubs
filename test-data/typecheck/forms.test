@@ -1,0 +1,19 @@
+[CASE no_incompatible_meta_nested_class_false_positive]
+from django.db import models
+from django import forms
+
+class Article(models.Model):
+    pass
+class Category(models.Model):
+    pass
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = '__all__'
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = '__all__'
+class CompositeForm(ArticleForm, CategoryForm):
+    pass
+[out]

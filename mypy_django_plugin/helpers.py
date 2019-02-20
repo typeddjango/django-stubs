@@ -22,6 +22,7 @@ QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
 BASE_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.BaseManager'
 MANAGER_CLASS_FULLNAME = 'django.db.models.manager.Manager'
 RELATED_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.RelatedManager'
+MODELFORM_CLASS_FULLNAME = 'django.forms.models.ModelForm'
 
 MANAGER_CLASSES = {
     MANAGER_CLASS_FULLNAME,
@@ -273,3 +274,10 @@ def has_any_of_bases(info: TypeInfo, bases: typing.Sequence[str]) -> bool:
 
 def is_none_expr(expr: Expression) -> bool:
     return isinstance(expr, NameExpr) and expr.fullname == 'builtins.None'
+
+
+def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]:
+    metaclass_sym = info.names.get('Meta')
+    if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
+        return metaclass_sym.node
+    return None

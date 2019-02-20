@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Dict, Optional, Union, cast
+from typing import Callable, Optional, Set, Union, cast, Dict
 
 from mypy.checker import TypeChecker
 from mypy.nodes import MemberExpr, TypeInfo
@@ -9,6 +9,7 @@ from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
 from mypy_django_plugin.transformers import fields, init_create
+from mypy_django_plugin.transformers.forms import make_meta_nested_class_inherit_from_any
 from mypy_django_plugin.transformers.migrations import determine_model_cls_from_string_for_migrations, \
     get_string_value_from_expr
 from mypy_django_plugin.transformers.models import process_model_class
@@ -31,6 +32,14 @@ def transform_manager_class(ctx: ClassDefContext) -> None:
     sym = ctx.api.lookup_fully_qualified_or_none(helpers.MANAGER_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
         sym.node.metadata['django']['manager_bases'][ctx.cls.fullname] = 1
+
+
+def transform_modelform_class(ctx: ClassDefContext) -> None:
+    sym = ctx.api.lookup_fully_qualified_or_none(helpers.MODELFORM_CLASS_FULLNAME)
+    if sym is not None and isinstance(sym.node, TypeInfo):
+        sym.node.metadata['django']['modelform_bases'][ctx.cls.fullname] = 1
+
+    make_meta_nested_class_inherit_from_any(ctx)
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> Type:
@@ -176,22 +185,27 @@ class DjangoPlugin(Plugin):
     def _get_current_model_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            if 'django' not in model_sym.node.metadata:
-                model_sym.node.metadata['django'] = {
-                    'model_bases': {helpers.MODEL_CLASS_FULLNAME: 1}
-                }
-            return model_sym.node.metadata['django']['model_bases']
+            return (model_sym.node.metadata
+                    .setdefault('django', {})
+                    .setdefault('model_bases', {helpers.MODEL_CLASS_FULLNAME: 1}))
         else:
             return {}
 
     def _get_current_manager_bases(self) -> Dict[str, int]:
-        manager_sym = self.lookup_fully_qualified(helpers.MANAGER_CLASS_FULLNAME)
-        if manager_sym is not None and isinstance(manager_sym.node, TypeInfo):
-            if 'django' not in manager_sym.node.metadata:
-                manager_sym.node.metadata['django'] = {
-                    'manager_bases': {helpers.MANAGER_CLASS_FULLNAME: 1}
-                }
-            return manager_sym.node.metadata['django']['manager_bases']
+        model_sym = self.lookup_fully_qualified(helpers.MANAGER_CLASS_FULLNAME)
+        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
+            return (model_sym.node.metadata
+                    .setdefault('django', {})
+                    .setdefault('manager_bases', {helpers.MANAGER_CLASS_FULLNAME: 1}))
+        else:
+            return {}
+
+    def _get_current_modelform_bases(self) -> Dict[str, int]:
+        model_sym = self.lookup_fully_qualified(helpers.MODELFORM_CLASS_FULLNAME)
+        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
+            return (model_sym.node.metadata
+                    .setdefault('django', {})
+                    .setdefault('modelform_bases', {helpers.MODELFORM_CLASS_FULLNAME: 1}))
         else:
             return {}
 
@@ -230,15 +244,18 @@ class DjangoPlugin(Plugin):
         if fullname in self._get_current_model_bases():
             return transform_model_class
 
+        if fullname in self._get_current_manager_bases():
+            return transform_manager_class
+
+        if fullname in self._get_current_modelform_bases():
+            return transform_modelform_class
+
         if fullname == helpers.DUMMY_SETTINGS_BASE_CLASS:
             settings_modules = ['django.conf.global_settings']
             if self.django_settings_module:
                 settings_modules.append(self.django_settings_module)
             return AddSettingValuesToDjangoConfObject(settings_modules,
                                                       self.config.ignore_missing_settings)
-
-        if fullname in self._get_current_manager_bases():
-            return transform_manager_class
 
         return None
 
