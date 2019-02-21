@@ -1,5 +1,3 @@
-from typing import Any, Optional
-
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseForbidden
 

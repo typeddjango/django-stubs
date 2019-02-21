@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import (
