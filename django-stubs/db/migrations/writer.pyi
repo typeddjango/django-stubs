@@ -1,13 +1,10 @@
-from typing import Any, Optional, Set, Tuple, Type, List, Union
+from typing import Any, List, Set, Tuple, Union
 
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
-
 from django.db.migrations.operations.models import CreateModel
 
 class SettingsReference(str):
-    def __new__(self: Type[SettingsReference], value: str, setting_name: str) -> SettingsReference: ...
-    setting_name: str = ...
     def __init__(self, value: str, setting_name: str) -> None: ...
 
 class OperationWriter:

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Dict
 
 from django.core.signing import JSONSerializer as BaseJSONSerializer
 from django.db.models.base import Model

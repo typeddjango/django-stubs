@@ -1,9 +1,8 @@
 import datetime
 from io import BytesIO
 from json import JSONEncoder
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, Union, overload, AnyStr, IO
+from typing import Any, AnyStr, Dict, Iterable, Iterator, List, Optional, Tuple, Type, Union, overload
 
-import six
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
 from django.test.client import Client
@@ -70,7 +69,6 @@ class HttpResponse(HttpResponseBase):
     request: Dict[str, Any]
     resolver_match: ResolverMatch
     sameorigin: bool
-    status_code: int
     templates: List[Template]
     test_server_port: str
     test_was_secure_request: bool
@@ -88,21 +86,13 @@ class HttpResponse(HttpResponseBase):
     def json(self) -> Dict[str, Any]: ...
 
 class StreamingHttpResponse(HttpResponseBase):
+    content: AnyStr
+    streaming_content: Iterator[AnyStr]
     def __init__(self, streaming_content: Iterable[AnyStr] = ..., *args: Any, **kwargs: Any) -> None: ...
-    @property
-    def content(self) -> AnyStr: ...
-    @content.setter
-    def content(self, value: AnyStr) -> None: ...
-    @property
-    def streaming_content(self) -> Iterator[AnyStr]: ...
-    @streaming_content.setter
-    def streaming_content(self, value: Iterable[AnyStr]) -> None: ...
-    def __iter__(self) -> Iterator[AnyStr]: ...
     def getvalue(self) -> AnyStr: ...
 
 class FileResponse(StreamingHttpResponse):
     client: Client
-    closed: bool
     context: None
     file_to_stream: Optional[BytesIO]
     request: Dict[str, str]
@@ -119,8 +109,6 @@ class FileResponse(StreamingHttpResponse):
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ...  # type: List[str]
     def __init__(self, redirect_to: str, *args: Any, **kwargs: Any) -> None: ...
-    @property
-    def url(self) -> str: ...
 
 class HttpResponseRedirect(HttpResponseRedirectBase): ...
 class HttpResponsePermanentRedirect(HttpResponseRedirectBase): ...

@@ -1,15 +1,16 @@
 from typing import Any, List, Optional, Tuple
 
-from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.message import DEFAULT_ATTACHMENT_MIME_TYPE as DEFAULT_ATTACHMENT_MIME_TYPE
-from django.core.mail.message import BadHeaderError as BadHeaderError
-from django.core.mail.message import EmailMessage as EmailMessage
-from django.core.mail.message import EmailMultiAlternatives as EmailMultiAlternatives
-from django.core.mail.message import SafeMIMEMultipart as SafeMIMEMultipart
-from django.core.mail.message import SafeMIMEText as SafeMIMEText
-from django.core.mail.message import forbid_multi_line_headers as forbid_multi_line_headers
-from django.core.mail.utils import DNS_NAME as DNS_NAME
-from django.core.mail.utils import CachedDnsName as CachedDnsName
+from .backends.base import BaseEmailBackend
+from .message import (
+    BadHeaderError as BadHeaderError,
+    DEFAULT_ATTACHMENT_MIME_TYPE as DEFAULT_ATTACHMENT_MIME_TYPE,
+    EmailMessage as EmailMessage,
+    EmailMultiAlternatives as EmailMultiAlternatives,
+    SafeMIMEMultipart as SafeMIMEMultipart,
+    SafeMIMEText as SafeMIMEText,
+    forbid_multi_line_headers as forbid_multi_line_headers,
+)
+from .utils import CachedDnsName as CachedDnsName, DNS_NAME as DNS_NAME
 
 def get_connection(backend: Optional[str] = ..., fail_silently: bool = ..., **kwds: Any) -> BaseEmailBackend: ...
 def send_mail(
@@ -18,17 +19,17 @@ def send_mail(
     from_email: Optional[str],
     recipient_list: List[str],
     fail_silently: bool = ...,
-    auth_user: None = ...,
-    auth_password: None = ...,
+    auth_user: Optional[str] = ...,
+    auth_password: Optional[str] = ...,
     connection: Optional[BaseEmailBackend] = ...,
     html_message: Optional[str] = ...,
 ) -> int: ...
 def send_mass_mail(
     datatuple: List[Tuple[str, str, str, List[str]]],
     fail_silently: bool = ...,
-    auth_user: None = ...,
-    auth_password: None = ...,
-    connection: BaseEmailBackend = ...,
+    auth_user: Optional[str] = ...,
+    auth_password: Optional[str] = ...,
+    connection: Optional[BaseEmailBackend] = ...,
 ) -> int: ...
 def mail_admins(
     subject: str,
@@ -45,4 +46,4 @@ def mail_managers(
     html_message: Optional[str] = ...,
 ) -> None: ...
 
-outbox = [EmailMessage()]
+outbox: List[EmailMessage] = ...
