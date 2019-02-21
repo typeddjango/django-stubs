@@ -191,6 +191,8 @@ class Profile(models.Model):
 from django.db import models
 class App(models.Model):
     owner = models.ForeignKey(to='myapp.User', on_delete=models.CASCADE, related_name='apps')
+[disable_cache]
+[/CASE]
 
 [CASE many_to_many_field_converts_to_queryset_of_model_type]
 from django.db import models

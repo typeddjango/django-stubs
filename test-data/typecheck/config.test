@@ -1,28 +1,30 @@
 [CASE missing_settings_ignored_flag]
+[env MYPY_DJANGO_CONFIG=${MYPY_CWD}/mypy_django.ini]
+[disable_cache]
 from django.conf import settings
 reveal_type(settings.NO_SUCH_SETTING)  # E: Revealed type is 'Any'
-
-[env MYPY_DJANGO_CONFIG=${MYPY_CWD}/mypy_django.ini]
 
 [file mypy_django.ini]
 [[mypy_django_plugin]
 ignore_missing_settings = True
-[out]
+[/CASE]
 
 [CASE django_settings_via_config_file]
+[env MYPY_DJANGO_CONFIG=${MYPY_CWD}/mypy_django.ini]
+[disable_cache]
 from django.conf import settings
 reveal_type(settings.MY_SETTING)  # E: Revealed type is 'builtins.int'
 
-[env MYPY_DJANGO_CONFIG=${MYPY_CWD}/mypy_django.ini]
 [file mypy_django.ini]
 [[mypy_django_plugin]
 django_settings = mysettings
 
 [file mysettings.py]
 MY_SETTING: int = 1
-[out]
+[/CASE]
 
 [CASE mypy_django_ini_in_current_directory_is_a_default]
+[disable_cache]
 from django.conf import settings
 reveal_type(settings.MY_SETTING)  # E: Revealed type is 'builtins.int'
 
@@ -32,4 +34,4 @@ django_settings = mysettings
 
 [file mysettings.py]
 MY_SETTING: int = 1
-[out]
+[/CASE]
