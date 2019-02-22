@@ -665,6 +665,10 @@ def check_with_mypy(abs_path: Path, config_file_path: Path) -> int:
     return int(error_happened)
 
 
+def get_absolute_path_for_test(test_dirname: str):
+    return (PROJECT_DIRECTORY / tests_root / test_dirname).absolute()
+
+
 if __name__ == '__main__':
     mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()
     repo_directory = PROJECT_DIRECTORY / 'django-sources'
@@ -679,8 +683,14 @@ if __name__ == '__main__':
         repo.remotes['origin'].pull(DJANGO_BRANCH)
 
     repo.git.checkout(DJANGO_COMMIT_SHA)
-    for dirname in TESTS_DIRS:
-        abs_path = (PROJECT_DIRECTORY / tests_root / dirname).absolute()
+
+    if len(sys.argv) > 1:
+        tests_to_run = sys.argv[1:]
+    else:
+        tests_to_run = TESTS_DIRS
+
+    for dirname in tests_to_run:
+        abs_path = get_absolute_path_for_test(dirname)
         print(f'Checking {abs_path}')
 
         rc = check_with_mypy(abs_path, mypy_config_file)
