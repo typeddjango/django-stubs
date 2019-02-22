@@ -214,6 +214,10 @@ IGNORED_ERRORS = {
     'logging_tests': [
         re.compile('"(setUpClass|tearDownClass)" undefined in superclass')
     ],
+    'lookup': [
+        'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
+        'note: '
+    ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")'
     ],
