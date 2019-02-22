@@ -1,3 +1,1 @@
-from django.views.generic.base import View
-
-__all__ = ["View"]
+from .generic.base import View as View

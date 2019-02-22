@@ -1,4 +1,6 @@
 [CASE test_settings_are_parsed_into_django_conf_settings]
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[disable_cache]
 from django.conf import settings
 
 reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'builtins.str'
@@ -6,7 +8,6 @@ reveal_type(settings.APPS_DIR)  # E: Revealed type is 'pathlib.Path'
 reveal_type(settings.OBJ)  # E: Revealed type is 'django.utils.functional.LazyObject'
 reveal_type(settings.NUMBERS)  # E: Revealed type is 'builtins.list[builtins.str]'
 reveal_type(settings.DICT)  # E: Revealed type is 'builtins.dict[Any, Any]'
-[env DJANGO_SETTINGS_MODULE=mysettings]
 [file base.py]
 from pathlib import Path
 ROOT_DIR = '/etc'
@@ -18,14 +19,16 @@ NUMBERS = ['one', 'two']
 DICT = {}  # type: ignore
 from django.utils.functional import LazyObject
 OBJ = LazyObject()
+[/CASE]
 
 [CASE test_settings_could_be_defined_in_different_module_and_imported_with_star]
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[disable_cache]
 from django.conf import settings
 
 reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'pathlib.Path'
 reveal_type(settings.SETUP)  # E: Revealed type is 'builtins.int'
 reveal_type(settings.DATABASES)  # E: Revealed type is 'builtins.dict[builtins.str, builtins.str]'
-[env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]
 from local import *
 DATABASES = {'default': 'mydb'}
@@ -36,24 +39,25 @@ SETUP = 3
 from pathlib import Path
 
 ROOT_DIR = Path(__file__)
+[/CASE]
 
 [CASE global_settings_are_always_loaded]
 from django.conf import settings
 
 reveal_type(settings.AUTH_USER_MODEL)  # E: Revealed type is 'builtins.str'
 reveal_type(settings.AUTHENTICATION_BACKENDS)  # E: Revealed type is 'typing.Sequence[builtins.str]'
-[out]
+[/CASE]
 
 [CASE test_circular_dependency_in_settings_works_if_settings_have_annotations]
+[env DJANGO_SETTINGS_MODULE=mysettings]
+[disable_cache]
 from django.conf import settings
 class Class:
     pass
 reveal_type(settings.MYSETTING)  # E: Revealed type is 'builtins.int'
 reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
 reveal_type(settings.LIST)  # E: Revealed type is 'builtins.list[builtins.str]'
-[out]
 
-[env DJANGO_SETTINGS_MODULE=mysettings]
 [file mysettings.py]
 from typing import TYPE_CHECKING, Optional, List
 
@@ -63,13 +67,16 @@ if TYPE_CHECKING:
 MYSETTING = 1122
 REGISTRY: Optional['Class'] = None
 LIST: List[str] = ['1', '2']
+[/CASE]
 
 [CASE fail_if_there_is_no_setting]
 from django.conf import settings
 reveal_type(settings.NOT_EXISTING)
 
 [env DJANGO_SETTINGS_MODULE=mysettings]
+[disable_cache]
 [file mysettings.py]
 [out]
 main:2: error: Revealed type is 'Any'
 main:2: error: "LazySettings" has no attribute "NOT_EXISTING"
+[/CASE]

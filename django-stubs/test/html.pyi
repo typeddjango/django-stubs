@@ -1,5 +1,5 @@
 from html.parser import HTMLParser
-from typing import Any, List, Optional, Tuple, Union, TypeVar, Iterable, Sequence
+from typing import Any, List, Optional, Sequence, Tuple, TypeVar, Union
 
 _Self = TypeVar("_Self")
 

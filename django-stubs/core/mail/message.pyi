@@ -1,8 +1,8 @@
-import email
+from email._policybase import Policy
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, Sequence
 
 from django.core.mail.backends.base import BaseEmailBackend
 from django.utils.safestring import SafeText
@@ -27,14 +27,14 @@ class MIMEMixin:
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
     defects: List[Any]
     epilogue: None
-    policy: email._policybase.Compat32
+    policy: Policy
     preamble: None
     def __setitem__(self, name: str, val: str) -> None: ...
 
 class SafeMIMEText(MIMEMixin, MIMEText):
     defects: List[Any]
     epilogue: None
-    policy: email._policybase.Compat32
+    policy: Policy
     preamble: None
     encoding: str = ...
     def __init__(self, _text: str, _subtype: str = ..., _charset: str = ...) -> None: ...
@@ -44,7 +44,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     defects: List[Any]
     epilogue: None
-    policy: email._policybase.Compat32
+    policy: Policy
     preamble: None
     encoding: str = ...
     def __init__(
@@ -71,12 +71,12 @@ class EmailMessage:
         subject: str = ...,
         body: Optional[str] = ...,
         from_email: Optional[str] = ...,
-        to: Optional[Union[List[str], Tuple[str, str], str]] = ...,
-        bcc: Optional[Union[List[str], Tuple[str], str]] = ...,
+        to: Optional[Union[Sequence[str], str]] = ...,
+        bcc: Optional[Union[Sequence[str], str]] = ...,
         connection: Optional[BaseEmailBackend] = ...,
         attachments: Optional[Union[List[Tuple[str, str]], List[MIMEText]]] = ...,
         headers: Optional[Dict[str, str]] = ...,
-        cc: Optional[Union[List[str], Tuple[str, str], str]] = ...,
+        cc: Optional[Union[Sequence[str], str]] = ...,
         reply_to: Optional[Union[List[Optional[str]], str]] = ...,
     ) -> None: ...
     def get_connection(self, fail_silently: bool = ...) -> BaseEmailBackend: ...

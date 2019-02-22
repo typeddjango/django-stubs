@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List, Optional, Set
+from typing import Dict, Iterator, List, Set
 
 from django.db.migrations.operations.base import Operation
 

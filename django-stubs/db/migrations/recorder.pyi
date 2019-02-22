@@ -1,8 +1,9 @@
-from typing import Any, Optional, Set, Tuple, Union
+from typing import Any, Optional, Set, Tuple
 
-from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.query import QuerySet
+
+from django.db import models
 
 class MigrationRecorder:
     class Migration(models.Model):

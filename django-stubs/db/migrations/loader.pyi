@@ -1,10 +1,10 @@
-from typing import Any, Dict, Optional, Set, Tuple, Union, Sequence
+from typing import Any, Dict, Optional, Sequence, Set, Tuple, Union
 
-from django.db import DefaultConnectionProxy
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.migrations.migration import Migration, SwappableTuple
 from django.db.migrations.state import ProjectState
+
+from django.db import DefaultConnectionProxy
 
 MIGRATIONS_MODULE_NAME: str
 

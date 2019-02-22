@@ -7,6 +7,7 @@ class User(models.Model):
 
 user = User()
 reveal_type(user.array)  # E: Revealed type is 'builtins.list*[Any]'
+[/CASE]
 
 [CASE array_field_base_field_parsed_into_generic_typevar]
 from django.db import models
@@ -19,6 +20,7 @@ class User(models.Model):
 user = User()
 reveal_type(user.members)  # E: Revealed type is 'builtins.list*[builtins.int]'
 reveal_type(user.members_as_text)  # E: Revealed type is 'builtins.list*[builtins.str]'
+[/CASE]
 
 [CASE test_model_fields_classes_present_as_primitives]
 from django.db import models
@@ -36,6 +38,7 @@ reveal_type(user.small_int)  # E: Revealed type is 'builtins.int*'
 reveal_type(user.name)  # E: Revealed type is 'builtins.str*'
 reveal_type(user.slug)  # E: Revealed type is 'builtins.str*'
 reveal_type(user.text)  # E: Revealed type is 'builtins.str*'
+[/CASE]
 
 [CASE test_model_field_classes_from_existing_locations]
 from django.db import models
@@ -51,6 +54,7 @@ booking = Booking()
 reveal_type(booking.id)  # E: Revealed type is 'builtins.int*'
 reveal_type(booking.time_range)  # E: Revealed type is 'Any'
 reveal_type(booking.some_decimal)  # E: Revealed type is 'decimal.Decimal*'
+[/CASE]
 
 [CASE test_add_id_field_if_no_primary_key_defined]
 from django.db import models
@@ -59,6 +63,7 @@ class User(models.Model):
     pass
 
 reveal_type(User().id)  # E: Revealed type is 'builtins.int'
+[/CASE]
 
 [CASE test_do_not_add_id_if_field_with_primary_key_True_defined]
 from django.db import models
@@ -68,7 +73,7 @@ class User(models.Model):
 
 reveal_type(User().my_pk)  # E: Revealed type is 'builtins.int*'
 reveal_type(User().id)  # E: Revealed type is 'Any'
-[out]
+[/CASE]
 
 [CASE test_meta_nested_class_allows_subclassing_in_multiple_inheritance]
 from typing import Any
@@ -84,7 +89,7 @@ class Mixin2(models.Model):
 
 class User(Mixin1, Mixin2):
     pass
-[out]
+[/CASE]
 
 [CASE test_inheritance_from_abstract_model_does_not_fail_if_field_with_id_exists]
 from django.db import models
@@ -93,7 +98,7 @@ class Abstract(models.Model):
         abstract = True
 class User(Abstract):
     id = models.AutoField(primary_key=True)
-[out]
+[/CASE]
 
 [CASE standard_it_from_parent_model_could_be_overridden_with_non_integer_field_in_child_model]
 from django.db import models
@@ -103,11 +108,11 @@ class ParentModel(models.Model):
 class MyModel(ParentModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID*'
-[out]
+[/CASE]
 
 [CASE blank_for_charfield_is_the_same_as_null]
 from django.db import models
 class MyModel(models.Model):
     text = models.CharField(max_length=30, blank=True)
 MyModel(text=None)
-[out]
+[/CASE]

@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from typing import Any, Callable, Dict, Union
 
-from django.core.cache.backends.base import BaseCache as BaseCache
+from .backends.base import BaseCache as BaseCache
 
 DEFAULT_CACHE_ALIAS: str
 

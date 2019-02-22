@@ -1,5 +1,5 @@
-from django.views.generic.base import RedirectView as RedirectView, TemplateView as TemplateView, View as View
-from django.views.generic.dates import (
+from .base import RedirectView as RedirectView, TemplateView as TemplateView, View as View
+from .dates import (
     ArchiveIndexView as ArchiveIndexView,
     DateDetailView as DateDetailView,
     DayArchiveView as DayArchiveView,
@@ -8,13 +8,8 @@ from django.views.generic.dates import (
     WeekArchiveView as WeekArchiveView,
     YearArchiveView as YearArchiveView,
 )
-from django.views.generic.detail import DetailView as DetailView
-from django.views.generic.edit import (
-    CreateView as CreateView,
-    DeleteView as DeleteView,
-    FormView as FormView,
-    UpdateView as UpdateView,
-)
-from django.views.generic.list import ListView as ListView
+from .detail import DetailView as DetailView
+from .edit import CreateView as CreateView, DeleteView as DeleteView, FormView as FormView, UpdateView as UpdateView
+from .list import ListView as ListView
 
 class GenericViewError(Exception): ...

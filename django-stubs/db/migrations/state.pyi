@@ -1,9 +1,8 @@
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, DefaultDict, Union, Sequence
+from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Sequence, Tuple, Type, Union
 
 from django.apps.registry import Apps
 from django.db.models.base import Model
 from django.db.models.manager import Manager
-from django.utils.functional import cached_property
 
 from django.db.models.fields import Field
 
