@@ -1,0 +1,10 @@
+[CASE test_queryset]
+from django.db import models
+
+class Blog(models.Model):
+    slug = models.CharField(max_length=100)
+reveal_type(Blog.objects.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+reveal_type(Blog.objects.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+reveal_type(Blog.objects.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+
+[out]
