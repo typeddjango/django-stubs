@@ -26,9 +26,7 @@ class ModelClassInitializer(metaclass=ABCMeta):
         if meta_node is None:
             return None
 
-        for lvalue, rvalue in iter_over_assignments(meta_node.defn):
-            if isinstance(lvalue, NameExpr) and lvalue.name == name:
-                return rvalue
+        return helpers.get_assigned_value_for_class(meta_node, name)
 
     def is_abstract_model(self) -> bool:
         is_abstract_expr = self.get_meta_attribute('abstract')

@@ -2,10 +2,10 @@ import os
 from typing import Callable, Dict, Optional, Union, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import MemberExpr, TypeInfo
+from mypy.nodes import MemberExpr, TypeInfo, NameExpr
 from mypy.options import Options
 from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
-from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType
+from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType, CallableType, NoneTyp
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
@@ -35,10 +35,10 @@ def transform_manager_class(ctx: ClassDefContext) -> None:
         sym.node.metadata['django']['manager_bases'][ctx.cls.fullname] = 1
 
 
-def transform_modelform_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(helpers.MODELFORM_CLASS_FULLNAME)
+def transform_form_class(ctx: ClassDefContext) -> None:
+    sym = ctx.api.lookup_fully_qualified_or_none(helpers.BASEFORM_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        sym.node.metadata['django']['modelform_bases'][ctx.cls.fullname] = 1
+        sym.node.metadata['django']['baseform_bases'][ctx.cls.fullname] = 1
 
     make_meta_nested_class_inherit_from_any(ctx)
 
@@ -158,6 +158,47 @@ class ExtractSettingType:
         return ctx.default_attr_type
 
 
+def transform_form_view(ctx: ClassDefContext) -> None:
+    form_class_value = helpers.get_assigned_value_for_class(ctx.cls.info, 'form_class')
+    if isinstance(form_class_value, NameExpr):
+        helpers.get_django_metadata(ctx.cls.info)['form_class'] = form_class_value.fullname
+
+
+def extract_proper_type_for_get_form_class(ctx: MethodContext) -> Type:
+    object_type = ctx.type
+    if not isinstance(object_type, Instance):
+        return ctx.default_return_type
+
+    form_class_fullname = helpers.get_django_metadata(object_type.type).get('form_class', None)
+    if not form_class_fullname:
+        return ctx.default_return_type
+
+    return TypeType(ctx.api.named_generic_type(form_class_fullname, []))
+
+
+def extract_proper_type_for_get_form(ctx: MethodContext) -> Type:
+    object_type = ctx.type
+    if not isinstance(object_type, Instance):
+        return ctx.default_return_type
+
+    form_class_type = helpers.get_argument_type_by_name(ctx, 'form_class')
+    if form_class_type is None or isinstance(form_class_type, NoneTyp):
+        # extract from specified form_class in metadata
+        form_class_fullname = helpers.get_django_metadata(object_type.type).get('form_class', None)
+        if not form_class_fullname:
+            return ctx.default_return_type
+
+        return ctx.api.named_generic_type(form_class_fullname, [])
+
+    if isinstance(form_class_type, TypeType) and isinstance(form_class_type.item, Instance):
+        return form_class_type.item
+
+    if isinstance(form_class_type, CallableType) and isinstance(form_class_type.ret_type, Instance):
+        return form_class_type.ret_type
+
+    return ctx.default_return_type
+
+
 class DjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -186,8 +227,7 @@ class DjangoPlugin(Plugin):
     def _get_current_model_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (model_sym.node.metadata
-                    .setdefault('django', {})
+            return (helpers.get_django_metadata(model_sym.node)
                     .setdefault('model_bases', {helpers.MODEL_CLASS_FULLNAME: 1}))
         else:
             return {}
@@ -195,18 +235,18 @@ class DjangoPlugin(Plugin):
     def _get_current_manager_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(helpers.MANAGER_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (model_sym.node.metadata
-                    .setdefault('django', {})
+            return (helpers.get_django_metadata(model_sym.node)
                     .setdefault('manager_bases', {helpers.MANAGER_CLASS_FULLNAME: 1}))
         else:
             return {}
 
-    def _get_current_modelform_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(helpers.MODELFORM_CLASS_FULLNAME)
+    def _get_current_form_bases(self) -> Dict[str, int]:
+        model_sym = self.lookup_fully_qualified(helpers.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (model_sym.node.metadata
-                    .setdefault('django', {})
-                    .setdefault('modelform_bases', {helpers.MODELFORM_CLASS_FULLNAME: 1}))
+            return (helpers.get_django_metadata(model_sym.node)
+                    .setdefault('baseform_bases', {helpers.BASEFORM_CLASS_FULLNAME: 1,
+                                                   helpers.FORM_CLASS_FULLNAME: 1,
+                                                   helpers.MODELFORM_CLASS_FULLNAME: 1}))
         else:
             return {}
 
@@ -229,6 +269,17 @@ class DjangoPlugin(Plugin):
 
     def get_method_hook(self, fullname: str
                         ) -> Optional[Callable[[MethodContext], Type]]:
+        class_name, _, method_name = fullname.rpartition('.')
+        if method_name == 'get_form_class':
+            sym = self.lookup_fully_qualified(class_name)
+            if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+                return extract_proper_type_for_get_form_class
+
+        if method_name == 'get_form':
+            sym = self.lookup_fully_qualified(class_name)
+            if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+                return extract_proper_type_for_get_form
+
         if fullname in {'django.apps.registry.Apps.get_model',
                         'django.db.migrations.state.StateApps.get_model'}:
             return determine_model_cls_from_string_for_migrations
@@ -254,8 +305,12 @@ class DjangoPlugin(Plugin):
         if fullname in self._get_current_manager_bases():
             return transform_manager_class
 
-        if fullname in self._get_current_modelform_bases():
-            return transform_modelform_class
+        if fullname in self._get_current_form_bases():
+            return transform_form_class
+
+        sym = self.lookup_fully_qualified(fullname)
+        if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+            return transform_form_view
 
         return None
 

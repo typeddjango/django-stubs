@@ -16,4 +16,26 @@ class CategoryForm(forms.ModelForm):
         fields = '__all__'
 class CompositeForm(ArticleForm, CategoryForm):
     pass
-[out]
+[/CASE]
+
+[CASE formview_methods_on_forms_return_proper_types]
+from typing import Any
+from django import forms
+from django.views.generic.edit import FormView
+
+class MyForm(forms.ModelForm):
+    pass
+class MyForm2(forms.ModelForm):
+    pass
+
+class MyView(FormView):
+    form_class = MyForm
+
+    def post(self, request, *args: Any, **kwds: Any):
+        form_class = self.get_form_class()
+        reveal_type(form_class)  # E: Revealed type is 'Type[main.MyForm]'
+        reveal_type(self.get_form(None))  # E: Revealed type is 'main.MyForm'
+        reveal_type(self.get_form())  # E: Revealed type is 'main.MyForm'
+        reveal_type(self.get_form(form_class))  # E: Revealed type is 'main.MyForm'
+        reveal_type(self.get_form(MyForm2))  # E: Revealed type is 'main.MyForm2'
+[/CASE]

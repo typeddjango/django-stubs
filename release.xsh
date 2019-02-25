@@ -1,7 +1,7 @@
 #!/usr/local/bin/xonsh
 
 try:
-    pip install wheel
+    pip install wheel twine
     python setup.py sdist bdist_wheel --universal
     twine upload dist/*
 

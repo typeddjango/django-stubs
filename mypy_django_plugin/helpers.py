@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from mypy.checker import TypeChecker
 from mypy.nodes import AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, \
     TypeInfo
-from mypy.plugin import FunctionContext
+from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
@@ -22,7 +22,12 @@ QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
 BASE_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.BaseManager'
 MANAGER_CLASS_FULLNAME = 'django.db.models.manager.Manager'
 RELATED_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.RelatedManager'
+
+BASEFORM_CLASS_FULLNAME = 'django.forms.forms.BaseForm'
+FORM_CLASS_FULLNAME = 'django.forms.forms.Form'
 MODELFORM_CLASS_FULLNAME = 'django.forms.models.ModelForm'
+
+FORM_MIXIN_CLASS_FULLNAME = 'django.views.generic.edit.FormMixin'
 
 MANAGER_CLASSES = {
     MANAGER_CLASS_FULLNAME,
@@ -125,7 +130,7 @@ def fill_typevars(tp: Instance, type_to_fill: Instance) -> Instance:
     return Instance(type_to_fill.type, typevar_values)
 
 
-def get_argument_by_name(ctx: FunctionContext, name: str) -> Optional[Expression]:
+def get_argument_by_name(ctx: typing.Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
     """Return the expression for the specific argument.
 
     This helper should only be used with non-star arguments.
@@ -140,7 +145,7 @@ def get_argument_by_name(ctx: FunctionContext, name: str) -> Optional[Expression
     return args[0]
 
 
-def get_argument_type_by_name(ctx: FunctionContext, name: str) -> Optional[Type]:
+def get_argument_type_by_name(ctx: typing.Union[FunctionContext, MethodContext], name: str) -> Optional[Type]:
     """Return the type for the specific argument.
 
     This helper should only be used with non-star arguments.
@@ -177,8 +182,8 @@ def get_setting_expr(api: TypeChecker, setting_name: str) -> Optional[Expression
     return None
 
 
-def iter_over_assignments(
-    class_or_module: typing.Union[ClassDef, MypyFile]) -> typing.Iterator[typing.Tuple[Lvalue, Expression]]:
+def iter_over_assignments(class_or_module: typing.Union[ClassDef, MypyFile]
+                          ) -> typing.Iterator[typing.Tuple[Lvalue, Expression]]:
     if isinstance(class_or_module, ClassDef):
         statements = class_or_module.defs.body
     else:
@@ -280,4 +285,11 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     metaclass_sym = info.names.get('Meta')
     if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
         return metaclass_sym.node
+    return None
+
+
+def get_assigned_value_for_class(type_info: TypeInfo, name: str) -> Optional[Expression]:
+    for lvalue, rvalue in iter_over_assignments(type_info.defn):
+        if isinstance(lvalue, NameExpr) and lvalue.name == name:
+            return rvalue
     return None

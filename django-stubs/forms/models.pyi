@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from datetime import date, datetime
-from typing import Any, Callable, Dict, Iterator, List, MutableMapping, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Callable, Dict, Iterator, List, MutableMapping, Optional, Sequence, Tuple, Type, Union, Mapping
 from unittest.mock import MagicMock
 from uuid import UUID
 
@@ -20,19 +20,17 @@ from typing_extensions import Literal
 
 ALL_FIELDS: str
 
-_Fields = Union[List[Union[Callable, str]], Tuple[str]]
+_Fields = Union[List[Union[Callable, str]], Sequence[str], Literal["__all__"]]
 _Labels = Dict[str, str]
 _ErrorMessages = Dict[str, Dict[str, str]]
 
 def model_to_dict(
-    instance: Model,
-    fields: Optional[_Fields] = ...,
-    exclude: Optional[Union[List[Union[Callable, str]], Tuple[str]]] = ...,
-) -> Dict[str, Optional[Union[bool, date, float]]]: ...
+    instance: Model, fields: Optional[_Fields] = ..., exclude: Optional[_Fields] = ...
+) -> Dict[str, Any]: ...
 def fields_for_model(
     model: Type[Model],
     fields: Optional[_Fields] = ...,
-    exclude: Optional[Union[List[Union[Callable, str]], Tuple]] = ...,
+    exclude: Optional[_Fields] = ...,
     widgets: Optional[Union[Dict[str, Type[Input]], Dict[str, Widget]]] = ...,
     formfield_callback: Optional[Union[Callable, str]] = ...,
     localized_fields: Optional[Union[Tuple[str], str]] = ...,
@@ -42,12 +40,12 @@ def fields_for_model(
     field_classes: Optional[Dict[str, Type[CharField]]] = ...,
     *,
     apply_limit_choices_to: bool = ...
-) -> OrderedDict: ...
+) -> Dict[str, Any]: ...
 
 class ModelFormOptions:
     model: Optional[Type[Model]] = ...
     fields: Optional[_Fields] = ...
-    exclude: Optional[Union[List[Union[Callable, str]], Tuple, str]] = ...
+    exclude: Optional[_Fields] = ...
     widgets: Optional[Dict[str, Union[Widget, Input]]] = ...
     localized_fields: Optional[Union[Tuple[str], str]] = ...
     labels: Optional[_Labels] = ...
@@ -57,14 +55,14 @@ class ModelFormOptions:
     def __init__(self, options: Optional[type] = ...) -> None: ...
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass):
-    def __new__(mcs, name: str, bases: Sequence[Type[ModelForm]], attrs: Dict[str, Any]) -> Type[ModelForm]: ...
+    def __new__(mcs, name: str, bases: Sequence[Type[Any]], attrs: Dict[str, Any]) -> Type[ModelForm]: ...
 
 class BaseModelForm(BaseForm):
     instance: Any = ...
     def __init__(
         self,
-        data: Optional[Dict[str, Any]] = ...,
-        files: Optional[Dict[str, File]] = ...,
+        data: Optional[Mapping[str, Any]] = ...,
+        files: Optional[Mapping[str, File]] = ...,
         auto_id: Union[bool, str] = ...,
         prefix: Optional[str] = ...,
         initial: Optional[Dict[str, Any]] = ...,
@@ -72,21 +70,21 @@ class BaseModelForm(BaseForm):
         label_suffix: Optional[str] = ...,
         empty_permitted: bool = ...,
         instance: Optional[Model] = ...,
-        use_required_attribute: None = ...,
+        use_required_attribute: Optional[bool] = ...,
         renderer: Any = ...,
     ) -> None: ...
     def clean(self) -> Dict[str, Any]: ...
     def validate_unique(self) -> None: ...
     save_m2m: Any = ...
-    def save(self, commit: bool = ...) -> Model: ...
+    def save(self, commit: bool = ...) -> Any: ...
 
 class ModelForm(BaseModelForm): ...
 
 def modelform_factory(
     model: Type[Model],
     form: Type[ModelForm] = ...,
-    fields: Optional[Union[Sequence[str], Literal["__all__"]]] = ...,
-    exclude: Optional[Sequence[str]] = ...,
+    fields: Optional[_Fields] = ...,
+    exclude: Optional[_Fields] = ...,
     formfield_callback: Optional[Union[str, Callable[[models.Field], Field]]] = ...,
     widgets: Optional[MutableMapping[str, Widget]] = ...,
     localized_fields: Optional[Sequence[str]] = ...,
@@ -142,8 +140,8 @@ def modelformset_factory(
     can_order: bool = ...,
     min_num: Optional[int] = ...,
     max_num: Optional[int] = ...,
-    fields: Optional[Union[str, Sequence[str]]] = ...,
-    exclude: Optional[Sequence[str]] = ...,
+    fields: Optional[_Fields] = ...,
+    exclude: Optional[_Fields] = ...,
     widgets: Optional[Dict[str, Any]] = ...,
     validate_max: bool = ...,
     localized_fields: Optional[Sequence[str]] = ...,
@@ -181,8 +179,8 @@ def inlineformset_factory(
     form: Type[ModelForm] = ...,
     formset: Type[BaseInlineFormSet] = ...,
     fk_name: Optional[str] = ...,
-    fields: Optional[Union[str, Sequence[str]]] = ...,
-    exclude: Optional[Sequence[str]] = ...,
+    fields: Optional[_Fields] = ...,
+    exclude: Optional[_Fields] = ...,
     extra: int = ...,
     can_order: bool = ...,
     can_delete: bool = ...,
@@ -239,7 +237,7 @@ class ModelChoiceField(ChoiceField):
         self,
         queryset: Optional[Union[Manager, QuerySet]],
         *,
-        empty_label: str = ...,
+        empty_label: Optional[str] = ...,
         required: bool = ...,
         widget: Optional[Any] = ...,
         label: Optional[Any] = ...,

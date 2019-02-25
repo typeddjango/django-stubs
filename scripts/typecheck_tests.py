@@ -228,6 +228,10 @@ IGNORED_ERRORS = {
         '"object" has no attribute "items"',
         '"Field" has no attribute "many_to_many"'
     ],
+    'model_forms': [
+        'Argument "instance" to "InvalidModelForm" has incompatible type "Type[Category]"; expected "Optional[Model]"',
+        'Invalid type "NewForm"'
+    ],
     'model_fields': [
         'Incompatible types in assignment (expression has type "Type[Person]", variable has type',
         'Unexpected keyword argument "name" for "Person"',
