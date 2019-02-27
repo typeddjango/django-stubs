@@ -14,6 +14,12 @@ jobs:
         set -e
         pytest
 
+    - name: Run plugin test suite with python 3.6
+      python: 3.6
+      script: |
+        set -e
+        pytest
+
     - name: Lint with black
       python: 3.7
       script: 'black --check --line-length=120 django-stubs/'
