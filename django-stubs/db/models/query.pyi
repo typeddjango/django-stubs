@@ -48,7 +48,7 @@ class FlatValuesListIterable(BaseIterable):
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 
-class QuerySet(Generic[_T, _Row], Sized):
+class QuerySet(Generic[_T, _Row], Iterable[_Row], Sized):
     query: Query
     def __init__(
         self,
