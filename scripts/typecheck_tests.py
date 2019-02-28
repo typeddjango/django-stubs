@@ -85,6 +85,11 @@ IGNORED_ERRORS = {
         'Unexpected attribute "two_id" for model "CyclicOne"',
         'Argument "is_dst" to "localize" of "BaseTzInfo" has incompatible type "None"; expected "bool"'
     ],
+    'aggregation': [
+        '"as_sql" undefined in superclass',
+        'Incompatible type for "contact" of "Book" (got "Optional[Author]", expected "Union[Author, Combinable]")',
+        'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", expected "Union[Publisher, Combinable]")'
+    ],
     'apps': [
         'Incompatible types in assignment (expression has type "str", target has type "type")',
         '"Callable[[bool, bool], List[Type[Model]]]" has no attribute "cache_clear"'
