@@ -3,9 +3,11 @@ from typing import Optional, cast
 from mypy.checker import TypeChecker
 from mypy.nodes import ListExpr, NameExpr, StrExpr, TupleExpr, TypeInfo, Var
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, TupleType, Type, TypeOfAny, UnionType
+from mypy.types import (
+    AnyType, CallableType, Instance, TupleType, Type, TypeOfAny, UnionType,
+)
+
 from mypy_django_plugin import helpers
-from mypy_django_plugin.transformers.models import iter_over_assignments
 
 
 def extract_referred_to_type(ctx: FunctionContext) -> Optional[Instance]:
@@ -154,7 +156,7 @@ def record_field_properties_into_outer_model_class(ctx: FunctionContext) -> None
         return
 
     field_name = None
-    for name_expr, stmt in iter_over_assignments(outer_model.defn):
+    for name_expr, stmt in helpers.iter_over_assignments(outer_model.defn):
         if stmt == ctx.context and isinstance(name_expr, NameExpr):
             field_name = name_expr.name
             break

@@ -37,7 +37,8 @@ IGNORED_ERRORS = {
         # settings
         re.compile(r'Module has no attribute "[A-Z_]+"'),
         # attributes assigned to test functions
-        re.compile(r'"Callable\[(\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\]|\.\.\.), Any\]" has no attribute'),
+        re.compile(
+            r'"Callable\[(\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\]|\.\.\.), Any\]" has no attribute'),
         # assign empty tuple
         re.compile(r'Incompatible types in assignment \(expression has type "Tuple\[\]", '
                    r'variable has type "Tuple\[[A-Za-z, ]+\]"'),
@@ -54,8 +55,9 @@ IGNORED_ERRORS = {
         'ValuesIterable',
         'Value of type "Optional[Dict[str, Any]]" is not indexable',
         'Argument 1 to "len" has incompatible type "Optional[List[_Record]]"; expected "Sized"',
-        'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; expected "Union[str, bytes, bytearray]"',
-        'Incompatible types in assignment (expression has type "None", variable has type Module)'
+        'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; '
+        + 'expected "Union[str, bytes, bytearray]"',
+        'Incompatible types in assignment (expression has type "None", variable has type Module)',
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -65,8 +67,9 @@ IGNORED_ERRORS = {
     ],
     'admin_widgets': [
         'Incompatible types in assignment (expression has type "RelatedFieldWidgetWrapper", '
-        'variable has type "AdminRadioSelect")',
-        'Incompatible types in assignment (expression has type "Union[Widget, Any]", variable has type "AutocompleteSelect")'
+        + 'variable has type "AdminRadioSelect")',
+        'Incompatible types in assignment (expression has type "Union[Widget, Any]", '
+        + 'variable has type "AutocompleteSelect")'
     ],
     'admin_utils': [
         re.compile(r'Argument [0-9] to "lookup_field" has incompatible type'),
@@ -91,11 +94,13 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
         + 'variable has type "ValuesListIterable")',
         'Incompatible type for "contact" of "Book" (got "Optional[Author]", expected "Union[Author, Combinable]")',
-        'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", expected "Union[Publisher, Combinable]")'
+        'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", '
+        + 'expected "Union[Publisher, Combinable]")'
     ],
     'aggregation_regress': [
         'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")',
-        'Incompatible types in assignment (expression has type "FlatValuesListIterable", variable has type "QuerySet[Any]")',
+        'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
+        + 'variable has type "QuerySet[Any]")',
         'Too few arguments for "count" of "Sequence"'
     ],
     'apps': [
@@ -176,8 +181,8 @@ IGNORED_ERRORS = {
         'variable has type "SongForm"',
         '"full_clean" of "BaseForm" does not return a value',
         'No overload variant of "zip" matches argument types "Tuple[str, str, str]", "object"',
-        'note:',
-        'Incompatible types in assignment (expression has type "GetDateShowHiddenInitial", variable has type "GetDate")',
+        'Incompatible types in assignment (expression has type "GetDateShowHiddenInitial", '
+        + 'variable has type "GetDate")',
         re.compile(r'Incompatible types in assignment \(expression has type "[a-zA-Z]+Field", '
                    r'base class "BaseForm" defined the type as "Dict\[str, Any\]"\)'),
         'List or tuple expected as variable arguments',
@@ -216,13 +221,13 @@ IGNORED_ERRORS = {
     ],
     'lookup': [
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
-        'note: '
     ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")'
     ],
     'model_inheritance_regress': [
-        'Incompatible types in assignment (expression has type "List[Supplier]", variable has type "QuerySet[Supplier]")'
+        'Incompatible types in assignment (expression has type "List[Supplier]", '
+        + 'variable has type "QuerySet[Supplier]")'
     ],
     'model_meta': [
         '"object" has no attribute "items"',
@@ -238,10 +243,10 @@ IGNORED_ERRORS = {
         'Cannot assign multiple types to name "PersonTwoImages" without an explicit "Type[...]" annotation',
         'Incompatible types in assignment (expression has type "Type[Person]", '
         + 'base class "ImageFieldTestMixin" defined the type as "Type[PersonWithHeightAndWidth]")',
-        'note: "Person" defined here'
     ],
     'model_formsets': [
-        'Incompatible types in string interpolation (expression has type "object", placeholder has type "Union[int, float]")'
+        'Incompatible types in string interpolation (expression has type "object", '
+        + 'placeholder has type "Union[int, float]")'
     ],
     'model_formsets_regress': [
         'Incompatible types in assignment (expression has type "Model", variable has type "User")'
@@ -287,9 +292,11 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Field[Any, Any]]',
         'DummyArrayField',
         'DummyJSONField',
-        'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; expected "Optional[Type[JSONEncoder]]"',
+        'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; '
+        + 'expected "Optional[Type[JSONEncoder]]"',
         'for model "CITestModel"',
-        'Incompatible type for "field" of "IntegerArrayModel" (got "None", expected "Union[Sequence[int], Combinable]")'
+        'Incompatible type for "field" of "IntegerArrayModel" (got "None", '
+        + 'expected "Union[Sequence[int], Combinable]")'
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
@@ -334,11 +341,14 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
     ],
     'test_client': [
-        'Incompatible types in assignment (expression has type "StreamingHttpResponse", variable has type "HttpResponse")',
-        'Incompatible types in assignment (expression has type "HttpResponse", variable has type "StreamingHttpResponse")'
+        'Incompatible types in assignment (expression has type "StreamingHttpResponse", '
+        + 'variable has type "HttpResponse")',
+        'Incompatible types in assignment (expression has type "HttpResponse", '
+        + 'variable has type "StreamingHttpResponse")'
     ],
     'test_client_regress': [
-        'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")',
+        'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", '
+        + 'variable has type "SessionBase")',
         'Unsupported left operand type for + ("None")',
         'Both left and right operands are unions'
     ],
@@ -348,7 +358,8 @@ IGNORED_ERRORS = {
     'test_runner': [
         'Value of type "TestSuite" is not indexable',
         '"TestSuite" has no attribute "_tests"',
-        'Argument "result" to "run" of "TestCase" has incompatible type "RemoteTestResult"; expected "Optional[TestResult]"',
+        'Argument "result" to "run" of "TestCase" has incompatible type "RemoteTestResult"; '
+        + 'expected "Optional[TestResult]"',
         'Item "TestSuite" of "Union[TestCase, TestSuite]" has no attribute "id"',
         'MockTestRunner',
         'Incompatible types in assignment (expression has type "Tuple[Union[TestCase, TestSuite], ...]", '

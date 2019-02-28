@@ -2,14 +2,16 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, Iterator, List, Optional, Tuple, cast
 
 import dataclasses
-from mypy.nodes import ARG_STAR, ARG_STAR2, Argument, CallExpr, ClassDef, Expression, IndexExpr, \
-    Lvalue, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var
+from mypy.nodes import (
+    ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, Lvalue, MemberExpr, MypyFile,
+    NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import AnyType, Instance, NoneTyp, TypeOfAny
+
 from mypy_django_plugin import helpers
-from mypy_django_plugin.helpers import iter_over_assignments
 
 
 @dataclasses.dataclass
@@ -48,7 +50,7 @@ class ModelClassInitializer(metaclass=ABCMeta):
 
 
 def iter_call_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, CallExpr]]:
-    for lvalue, rvalue in iter_over_assignments(klass):
+    for lvalue, rvalue in helpers.iter_over_assignments(klass):
         if isinstance(rvalue, CallExpr):
             yield lvalue, rvalue
 
@@ -56,7 +58,7 @@ def iter_call_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, CallExpr]]:
 def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExpr, CallExpr]]:
     for lvalue, rvalue in iter_call_assignments(klass):
         if (isinstance(lvalue, NameExpr)
-            and isinstance(rvalue.callee, MemberExpr)):
+                and isinstance(rvalue.callee, MemberExpr)):
             if rvalue.callee.fullname in {helpers.FOREIGN_KEY_FULLNAME,
                                           helpers.ONETOONE_FIELD_FULLNAME}:
                 yield lvalue, rvalue
@@ -107,8 +109,8 @@ class AddDefaultObjectsManager(ModelClassInitializer):
                 if isinstance(callee_expr, IndexExpr):
                     callee_expr = callee_expr.analyzed.expr
                 if isinstance(callee_expr, (MemberExpr, NameExpr)) \
-                    and isinstance(callee_expr.node, TypeInfo) \
-                    and callee_expr.node.has_base(helpers.BASE_MANAGER_CLASS_FULLNAME):
+                        and isinstance(callee_expr.node, TypeInfo) \
+                        and callee_expr.node.has_base(helpers.BASE_MANAGER_CLASS_FULLNAME):
                     managers.append((manager_name, callee_expr.node))
         return managers
 
@@ -147,7 +149,7 @@ class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
 
         for _, rvalue in iter_call_assignments(self.model_classdef):
             if ('primary_key' in rvalue.arg_names
-                and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
+                    and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
                 break
         else:
             self.add_new_node_to_model_class('id', self.api.builtin_type('builtins.object'))
@@ -202,10 +204,10 @@ def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:
     if isinstance(expr.callee, MemberExpr) and isinstance(expr.callee.expr, NameExpr):
         module = module_file.names.get(expr.callee.expr.name)
         if module \
-            and module.fullname == 'django.db.models' \
-            and expr.callee.name in {'ForeignKey',
-                                     'OneToOneField',
-                                     'ManyToManyField'}:
+                and module.fullname == 'django.db.models' \
+                and expr.callee.name in {'ForeignKey',
+                                         'OneToOneField',
+                                         'ManyToManyField'}:
             return True
     return False
 
