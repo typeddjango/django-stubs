@@ -9,6 +9,7 @@ reveal_type(Blog.objects.in_bulk(['beatles_blog'], field_name='slug')) # E: Reve
 
 reveal_type(Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict[builtins.str, Any]]'
 reveal_type(Blog.objects.values()[0]) # E: Revealed type is 'builtins.dict*[builtins.str, Any]'
+reveal_type(Blog.objects.values()[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
 
 
 reveal_type(Blog.objects.values_list('id', 'slug')) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.tuple[Any]]'
