@@ -5,7 +5,7 @@ from mypy.checker import TypeChecker
 from mypy.nodes import MemberExpr, TypeInfo, NameExpr
 from mypy.options import Options
 from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
-from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType, CallableType, NoneTyp
+from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType, CallableType, NoneTyp, UninhabitedType
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
@@ -55,13 +55,20 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
     if not isinstance(ret, Instance):
         return ret
 
+    has_manager_base = False
     for i, base in enumerate(ret.type.bases):
         if base.type.fullname() in {helpers.MANAGER_CLASS_FULLNAME,
                                     helpers.RELATED_MANAGER_CLASS_FULLNAME,
                                     helpers.BASE_MANAGER_CLASS_FULLNAME}:
-            ret.type.bases[i] = Instance(base.type, [Instance(outer_model_info, [])])
-            return ret
-    return ret
+            has_manager_base = True
+            break
+
+    if has_manager_base:
+        # Fill in the manager's type argument from the outer model
+        new_type_args = [Instance(outer_model_info, [])]
+        return Instance(typ=ret.type, args=new_type_args, line=ret.line, column=ret.column)
+    else:
+        return ret
 
 
 def return_user_model_hook(ctx: FunctionContext) -> Type:

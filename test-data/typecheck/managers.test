@@ -137,3 +137,65 @@ class AbstractBase2(models.Model):
 class Child(AbstractBase1, AbstractBase2):
     pass
 [out]
+
+[CASE managers_from_unrelated_models_dont_interfere]
+
+from django.db import models
+
+# Normal scenario where one model has a manager with an annotation of the same type as the model
+class UnrelatedModel(models.Model):
+    objects = models.Manager[UnrelatedModel]()
+
+class MyModel(models.Model):
+    pass
+
+reveal_type(UnrelatedModel.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.UnrelatedModel]'
+reveal_type(UnrelatedModel.objects.first()) # E: Revealed type is 'Union[main.UnrelatedModel*, None]'
+
+reveal_type(MyModel.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
+reveal_type(MyModel.objects.first()) # E: Revealed type is 'Union[main.MyModel*, None]'
+
+# Possible to specify objects without explicit annotation of models.Manager()
+class UnrelatedModel2(models.Model):
+    objects = models.Manager()
+
+class MyModel2(models.Model):
+    pass
+
+reveal_type(UnrelatedModel2.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.UnrelatedModel2]'
+reveal_type(UnrelatedModel2.objects.first()) # E: Revealed type is 'Union[main.UnrelatedModel2*, None]'
+
+reveal_type(MyModel2.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel2]'
+reveal_type(MyModel2.objects.first()) # E: Revealed type is 'Union[main.MyModel2*, None]'
+
+
+# Inheritance works
+class ParentOfMyModel3(models.Model):
+    objects = models.Manager()
+
+class MyModel3(ParentOfMyModel3):
+    pass
+
+
+reveal_type(ParentOfMyModel3.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.ParentOfMyModel3]'
+reveal_type(ParentOfMyModel3.objects.first()) # E: Revealed type is 'Union[main.ParentOfMyModel3*, None]'
+
+reveal_type(MyModel3.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel3]'
+reveal_type(MyModel3.objects.first()) # E: Revealed type is 'Union[main.MyModel3*, None]'
+
+
+# Inheritance works with explicit objects in child
+class ParentOfMyModel4(models.Model):
+    objects = models.Manager()
+
+class MyModel4(ParentOfMyModel4):
+    objects = models.Manager[MyModel4]()
+
+reveal_type(ParentOfMyModel4.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.ParentOfMyModel4]'
+reveal_type(ParentOfMyModel4.objects.first()) # E: Revealed type is 'Union[main.ParentOfMyModel4*, None]'
+
+reveal_type(MyModel4.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel4]'
+reveal_type(MyModel4.objects.first()) # E: Revealed type is 'Union[main.MyModel4*, None]'
+
+
+[out]
