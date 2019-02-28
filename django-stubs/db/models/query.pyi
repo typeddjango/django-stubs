@@ -15,6 +15,7 @@ from typing import (
     overload,
     Generic,
     NamedTuple,
+    Collection,
 )
 
 from django.db.models.base import Model
@@ -48,7 +49,7 @@ class FlatValuesListIterable(BaseIterable):
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 
-class QuerySet(Generic[_T, _Row], Iterable[_Row], Sized):
+class QuerySet(Generic[_T, _Row], Collection[_Row]):
     query: Query
     def __init__(
         self,
