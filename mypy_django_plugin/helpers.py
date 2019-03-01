@@ -2,10 +2,13 @@ import typing
 from typing import Dict, Optional
 
 from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, \
-    TypeInfo
+from mypy.nodes import (
+    AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, TypeInfo,
+)
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType
+from mypy.types import (
+    AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType,
+)
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FIELD_FULLNAME = 'django.db.models.fields.Field'

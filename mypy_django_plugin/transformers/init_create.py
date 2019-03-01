@@ -4,8 +4,8 @@ from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo, Var
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type, TypeOfAny
+
 from mypy_django_plugin import helpers
-from mypy_django_plugin.helpers import extract_field_setter_type, extract_explicit_set_type_of_model_primary_key, get_fields_metadata
 from mypy_django_plugin.transformers.fields import get_private_descriptor_type
 
 
@@ -106,7 +106,7 @@ def redefine_and_typecheck_model_create(ctx: MethodContext) -> Type:
 
 
 def extract_choices_type(model: TypeInfo, field_name: str) -> Optional[str]:
-    field_metadata = get_fields_metadata(model).get(field_name, {})
+    field_metadata = helpers.get_fields_metadata(model).get(field_name, {})
     if 'choices' in field_metadata:
         return field_metadata['choices']
     return None
@@ -117,7 +117,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
     api = cast(TypeChecker, ctx.api)
 
     expected_types: Dict[str, Type] = {}
-    primary_key_type = extract_explicit_set_type_of_model_primary_key(model)
+    primary_key_type = helpers.extract_explicit_set_type_of_model_primary_key(model)
     if not primary_key_type:
         # no explicit primary key, set pk to Any and add id
         primary_key_type = AnyType(TypeOfAny.special_form)
@@ -143,7 +143,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                     expected_types[name + '_id'] = AnyType(TypeOfAny.from_unimported_type)
 
                 elif isinstance(typ, Instance):
-                    field_type = extract_field_setter_type(typ)
+                    field_type = helpers.extract_field_setter_type(typ)
                     if field_type is None:
                         continue
 
@@ -156,8 +156,9 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                         if is_nullable:
                             referred_to_model = helpers.make_required(typ.args[1])
 
-                        if isinstance(referred_to_model, Instance) and referred_to_model.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-                            pk_type = extract_explicit_set_type_of_model_primary_key(referred_to_model.type)
+                        if isinstance(referred_to_model, Instance) and referred_to_model.type.has_base(
+                                helpers.MODEL_CLASS_FULLNAME):
+                            pk_type = helpers.extract_explicit_set_type_of_model_primary_key(referred_to_model.type)
                             if not pk_type:
                                 # extract set type of AutoField
                                 autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
@@ -170,7 +171,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
 
                         expected_types[name + '_id'] = related_primary_key_type
 
-                    field_metadata = get_fields_metadata(model).get(name, {})
+                    field_metadata = helpers.get_fields_metadata(model).get(name, {})
                     if field_type:
                         # related fields could be None in __init__ (but should be specified before save())
                         if helpers.has_any_of_bases(typ.type, (helpers.FOREIGN_KEY_FULLNAME,
@@ -178,7 +179,8 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                             field_type = helpers.make_optional(field_type)
 
                         # if primary_key=True and default specified
-                        elif field_metadata.get('primary_key', False) and field_metadata.get('default_specified', False):
+                        elif field_metadata.get('primary_key', False) and field_metadata.get('default_specified',
+                                                                                             False):
                             field_type = helpers.make_optional(field_type)
 
                         expected_types[name] = field_type

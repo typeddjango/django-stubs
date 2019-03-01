@@ -4,10 +4,6 @@ dist: xenial
 sudo: required
 jobs:
   include:
-    - name: Typecheck Django test suite
-      python: 3.7
-      script: 'python ./scripts/typecheck_tests.py'
-
     - name: Run plugin test suite with python 3.7
       python: 3.7
       script: |
@@ -20,9 +16,21 @@ jobs:
         set -e
         pytest
 
+    - name: Typecheck Django test suite
+      python: 3.7
+      script: 'python ./scripts/typecheck_tests.py'
+
     - name: Lint with black
       python: 3.7
       script: 'black --check --line-length=120 django-stubs/'
+
+    - name: Lint plugin code with flake8
+      python: 3.7
+      script: 'flake8'
+
+    - name: Lint plugin code with isort
+      python: 3.7
+      script: 'isort --check'
 
 before_install: |
   # Upgrade pip, setuptools, and wheel
