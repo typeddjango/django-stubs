@@ -1,3 +1,4 @@
+import itertools
 import os
 import re
 import sys
@@ -58,6 +59,7 @@ IGNORED_ERRORS = {
         'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; '
         + 'expected "Union[str, bytes, bytearray]"',
         'Incompatible types in assignment (expression has type "None", variable has type Module)',
+        'note:'
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -193,7 +195,7 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "TestForm", variable has type "Person")',
         'Incompatible types in assignment (expression has type "Type[Textarea]", '
         + 'base class "Field" defined the type as "Widget")',
-        'Incompatible types in assignment (expression has type "SimpleUploadedFile", variable has type "BinaryIO")'
+        'Incompatible types in assignment (expression has type "SimpleUploadedFile", variable has type "BinaryIO")',
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
@@ -642,7 +644,8 @@ def cd(path):
 
 
 def is_ignored(line: str, test_folder_name: str) -> bool:
-    for pattern in IGNORED_ERRORS['__common__'] + IGNORED_ERRORS.get(test_folder_name, []):
+    for pattern in itertools.chain(IGNORED_ERRORS['__common__'],
+                                   IGNORED_ERRORS.get(test_folder_name, [])):
         if isinstance(pattern, Pattern):
             if pattern.search(line):
                 return True
