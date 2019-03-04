@@ -101,10 +101,6 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
 def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
     is_nullable = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'null'))
-    if not is_nullable and default_return_type.type.has_base(helpers.CHAR_FIELD_FULLNAME):
-        # blank=True for CharField can be interpreted as null=True
-        is_nullable = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'blank'))
-
     set_type = get_private_descriptor_type(default_return_type.type, '_pyi_private_set_type',
                                            is_nullable=is_nullable)
     get_type = get_private_descriptor_type(default_return_type.type, '_pyi_private_get_type',
