@@ -110,9 +110,11 @@ class MyModel(ParentModel):
 reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID*'
 [/CASE]
 
-[CASE blank_for_charfield_is_the_same_as_null]
+[CASE blank_for_charfield_is_not_the_same_as_null]
 from django.db import models
 class MyModel(models.Model):
     text = models.CharField(max_length=30, blank=True)
-MyModel(text=None)
+MyModel(text=None)  # E: Incompatible type for "text" of "MyModel" (got "None", expected "Union[str, int, Combinable]")
+MyModel(text="")
+reveal_type(MyModel().text)  # E: Revealed type is 'builtins.str*'
 [/CASE]
