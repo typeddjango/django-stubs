@@ -254,7 +254,9 @@ def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
     return None
 
 
-def make_optional(typ: Type):
+def make_optional(typ: Type) -> UnionType:
+    if isinstance(typ, AnyType):
+        return typ
     return UnionType.make_union([typ, NoneTyp()])
 
 
