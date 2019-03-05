@@ -30,7 +30,7 @@ if sys.version_info[:2] < (3, 7):
 
 setup(
     name="django-stubs",
-    version="0.8.0",
+    version="0.8.1",
     description='Django mypy stubs',
     long_description=readme,
     long_description_content_type='text/markdown',
