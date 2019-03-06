@@ -2,84 +2,86 @@
 from django.db import models
 
 class Blog(models.Model):
-    slug = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField()
+
+
 reveal_type(Blog.objects.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(Blog.objects.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(Blog.objects.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+reveal_type(Blog.objects.in_bulk(['beatles_blog'], field_name='name')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
+# When ANDing QuerySets, the left-side's _Row parameter is used
+reveal_type(Blog.objects.all() & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
+reveal_type(Blog.objects.values() & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
+reveal_type(Blog.objects.values_list('id', 'name') & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.tuple*[Any]]'
+reveal_type(Blog.objects.values_list('id', 'name', named=True) & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, typing.NamedTuple*]'
+reveal_type(Blog.objects.values_list('id', flat=True) & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Any]'
+
+# .dates / .datetimes
+reveal_type(Blog.objects.dates("created_at", "day")) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, datetime.date]'
+reveal_type(Blog.objects.datetimes("created_at", "day")) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, datetime.datetime]'
 
 qs = Blog.objects.all()
 reveal_type(qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
+reveal_type(qs.get(id=1)) # E: Revealed type is 'main.Blog*'
 reveal_type(iter(qs)) # E: Revealed type is 'typing.Iterator[main.Blog*]'
 reveal_type(qs.iterator()) # E: Revealed type is 'typing.Iterator[main.Blog*]'
 reveal_type(qs.first()) # E: Revealed type is 'Union[main.Blog*, None]'
-reveal_type(qs.last()) # E: Revealed type is 'Union[main.Blog*, None]'
 reveal_type(qs.earliest()) # E: Revealed type is 'main.Blog*'
-reveal_type(qs.latest()) # E: Revealed type is 'main.Blog*'
 reveal_type(qs[0]) # E: Revealed type is 'main.Blog*'
 reveal_type(qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
-reveal_type(qs.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(qs.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
 
 values_qs = Blog.objects.values()
 reveal_type(values_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict[builtins.str, Any]]'
+reveal_type(values_qs.all()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
+reveal_type(values_qs.get(id=1)) # E: Revealed type is 'builtins.dict*[builtins.str, Any]'
 reveal_type(iter(values_qs)) # E: Revealed type is 'typing.Iterator[builtins.dict*[builtins.str, Any]]'
 reveal_type(values_qs.iterator()) # E: Revealed type is 'typing.Iterator[builtins.dict*[builtins.str, Any]]'
 reveal_type(values_qs.first()) # E: Revealed type is 'Union[builtins.dict*[builtins.str, Any], None]'
-reveal_type(values_qs.last()) # E: Revealed type is 'Union[builtins.dict*[builtins.str, Any], None]'
 reveal_type(values_qs.earliest()) # E: Revealed type is 'builtins.dict*[builtins.str, Any]'
-reveal_type(values_qs.latest()) # E: Revealed type is 'builtins.dict*[builtins.str, Any]'
 reveal_type(values_qs[0]) # E: Revealed type is 'builtins.dict*[builtins.str, Any]'
 reveal_type(values_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
-reveal_type(values_qs.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(values_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(values_qs.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
 
-values_list_qs = Blog.objects.values_list('id', 'slug')
+values_list_qs = Blog.objects.values_list('id', 'name')
 reveal_type(values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.tuple[Any]]'
+reveal_type(values_list_qs.all()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.tuple*[Any]]'
+reveal_type(values_list_qs.get(id=1)) # E: Revealed type is 'builtins.tuple*[Any]'
 reveal_type(iter(values_list_qs)) # E: Revealed type is 'typing.Iterator[builtins.tuple*[Any]]'
 reveal_type(values_list_qs.iterator()) # E: Revealed type is 'typing.Iterator[builtins.tuple*[Any]]'
 reveal_type(values_list_qs.first()) # E: Revealed type is 'Union[builtins.tuple*[Any], None]'
-reveal_type(values_list_qs.last()) # E: Revealed type is 'Union[builtins.tuple*[Any], None]'
 reveal_type(values_list_qs.earliest()) # E: Revealed type is 'builtins.tuple*[Any]'
-reveal_type(values_list_qs.latest()) # E: Revealed type is 'builtins.tuple*[Any]'
 reveal_type(values_list_qs[0]) # E: Revealed type is 'builtins.tuple*[Any]'
 reveal_type(values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.tuple*[Any]]'
-reveal_type(values_list_qs.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(values_list_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(values_list_qs.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
 
 flat_values_list_qs = Blog.objects.values_list('id', flat=True)
 reveal_type(flat_values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Any]'
+reveal_type(flat_values_list_qs.all()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Any]'
+reveal_type(flat_values_list_qs.get(id=1)) # E: Revealed type is 'Any'
 reveal_type(iter(flat_values_list_qs)) # E: Revealed type is 'typing.Iterator[Any]'
 reveal_type(flat_values_list_qs.iterator()) # E: Revealed type is 'typing.Iterator[Any]'
 reveal_type(flat_values_list_qs.first()) # E: Revealed type is 'Union[Any, None]'
-reveal_type(flat_values_list_qs.last()) # E: Revealed type is 'Union[Any, None]'
 reveal_type(flat_values_list_qs.earliest()) # E: Revealed type is 'Any'
-reveal_type(flat_values_list_qs.latest()) # E: Revealed type is 'Any'
 reveal_type(flat_values_list_qs[0]) # E: Revealed type is 'Any'
 reveal_type(flat_values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Any]'
-reveal_type(flat_values_list_qs.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(flat_values_list_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(flat_values_list_qs.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
 
 named_values_list_qs = Blog.objects.values_list('id', named=True)
 reveal_type(named_values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, typing.NamedTuple]'
+reveal_type(named_values_list_qs.all()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, typing.NamedTuple*]'
+reveal_type(named_values_list_qs.get(id=1)) # E: Revealed type is 'typing.NamedTuple*'
 reveal_type(iter(named_values_list_qs)) # E: Revealed type is 'typing.Iterator[typing.NamedTuple*]'
 reveal_type(named_values_list_qs.iterator()) # E: Revealed type is 'typing.Iterator[typing.NamedTuple*]'
 reveal_type(named_values_list_qs.first()) # E: Revealed type is 'Union[typing.NamedTuple*, None]'
-reveal_type(named_values_list_qs.last()) # E: Revealed type is 'Union[typing.NamedTuple*, None]'
 reveal_type(named_values_list_qs.earliest()) # E: Revealed type is 'typing.NamedTuple*'
-reveal_type(named_values_list_qs.latest()) # E: Revealed type is 'typing.NamedTuple*'
 reveal_type(named_values_list_qs[0]) # E: Revealed type is 'typing.NamedTuple*'
 reveal_type(named_values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, typing.NamedTuple*]'
-reveal_type(named_values_list_qs.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(named_values_list_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(named_values_list_qs.in_bulk(['beatles_blog'], field_name='slug')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
 [out]
