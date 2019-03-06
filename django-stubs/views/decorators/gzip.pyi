@@ -1,0 +1,3 @@
+from typing import Callable
+
+def gzip_page(view_func: Callable) -> Callable: ...
