@@ -1,18 +1,10 @@
 from typing import Any, Callable, Optional, Set, Tuple, Type, Union
 
-from django.contrib.auth.mixins import AccessMixin
-from django.contrib.messages.views import SuccessMessageMixin
 from django.middleware.cache import CacheMiddleware
 from django.test.testcases import LiveServerTestCase
 from django.utils.deprecation import MiddlewareMixin
-from django.views.generic.base import TemplateResponseMixin, View
 
-class classonlymethod(classmethod):
-    def __get__(
-        self,
-        instance: Optional[View],
-        cls: Type[Union[AccessMixin, SuccessMessageMixin, TemplateResponseMixin, View]] = ...,
-    ) -> Callable: ...
+class classonlymethod(classmethod): ...
 
 def method_decorator(
     decorator: Union[Callable, Set[Callable], Tuple[Callable, Callable]], name: str = ...
