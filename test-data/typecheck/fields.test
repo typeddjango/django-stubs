@@ -110,9 +110,22 @@ class MyModel(ParentModel):
 reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID*'
 [/CASE]
 
-[CASE blank_for_charfield_is_the_same_as_null]
+[CASE blank_and_null_char_field_allows_none]
 from django.db import models
 class MyModel(models.Model):
-    text = models.CharField(max_length=30, blank=True)
-MyModel(text=None)
+    nulltext=models.CharField(max_length=1, blank=True, null=True)
+MyModel(nulltext="")
+MyModel(nulltext=None)
+MyModel().nulltext=None
+reveal_type(MyModel().nulltext)  # E: Revealed type is 'Union[builtins.str, None]'
+[/CASE]
+
+[CASE blank_and_not_null_charfield_does_not_allow_none]
+from django.db import models
+class MyModel(models.Model):
+    notnulltext=models.CharField(max_length=1, blank=True, null=False)
+MyModel(notnulltext=None)  # Should allow None in constructor
+MyModel(notnulltext="")
+MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")
+reveal_type(MyModel().notnulltext)  # E: Revealed type is 'builtins.str*'
 [/CASE]

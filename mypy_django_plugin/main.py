@@ -2,19 +2,28 @@ import os
 from typing import Callable, Dict, Optional, Union, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import MemberExpr, TypeInfo, NameExpr
+from mypy.nodes import MemberExpr, NameExpr, TypeInfo
 from mypy.options import Options
-from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
-from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType, UnionType, CallableType, NoneTyp
+from mypy.plugin import (
+    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
+)
+from mypy.types import (
+    AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeType, UnionType,
+)
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
 from mypy_django_plugin.transformers import fields, init_create
-from mypy_django_plugin.transformers.forms import make_meta_nested_class_inherit_from_any
-from mypy_django_plugin.transformers.migrations import determine_model_cls_from_string_for_migrations, \
-    get_string_value_from_expr
+from mypy_django_plugin.transformers.forms import (
+    make_meta_nested_class_inherit_from_any,
+)
+from mypy_django_plugin.transformers.migrations import (
+    determine_model_cls_from_string_for_migrations, get_string_value_from_expr,
+)
 from mypy_django_plugin.transformers.models import process_model_class
-from mypy_django_plugin.transformers.settings import AddSettingValuesToDjangoConfObject, get_settings_metadata
+from mypy_django_plugin.transformers.settings import (
+    AddSettingValuesToDjangoConfObject, get_settings_metadata,
+)
 
 
 def transform_model_class(ctx: ClassDefContext) -> None:

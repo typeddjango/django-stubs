@@ -1,6 +1,8 @@
 from typing import Iterable, List, Optional, cast
 
-from mypy.nodes import ClassDef, Context, ImportAll, MypyFile, SymbolNode, SymbolTableNode, TypeInfo, Var
+from mypy.nodes import (
+    ClassDef, Context, ImportAll, MypyFile, SymbolNode, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import ClassDefContext
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import AnyType, Instance, NoneTyp, Type, TypeOfAny, UnionType
@@ -56,8 +58,8 @@ def load_settings_from_names(settings_classdef: ClassDef,
                     settings_classdef.info.names[name] = copied
                 else:
                     var = Var(name, AnyType(TypeOfAny.unannotated))
-                    var.info = api.named_type('__builtins__.object').type
-                    settings_classdef.info.names[name] = SymbolTableNode(sym.kind, var)
+                    var.info = api.named_type('__builtins__.object').type  # outer class type
+                    settings_classdef.info.names[name] = SymbolTableNode(sym.kind, var, plugin_generated=True)
 
                 settings_metadata[name] = module.fullname()
 
@@ -67,11 +69,12 @@ def get_import_star_modules(api: SemanticAnalyzerPass2, module: MypyFile) -> Lis
     for module_import in module.imports:
         # relative import * are not resolved by mypy
         if isinstance(module_import, ImportAll) and module_import.relative:
-            absolute_import_path, correct = correct_relative_import(module.fullname(), module_import.relative, module_import.id,
-                                                                    is_cur_package_init_file=False)
+            absolute_import_path, correct = correct_relative_import(module.fullname(), module_import.relative,
+                                                                    module_import.id, is_cur_package_init_file=False)
             if not correct:
                 return []
-            for path in [absolute_import_path] + get_import_star_modules(api, module=api.modules.get(absolute_import_path)):
+            for path in [absolute_import_path] + get_import_star_modules(api,
+                                                                         module=api.modules.get(absolute_import_path)):
                 if path not in import_star_modules:
                     import_star_modules.append(path)
     return import_star_modules

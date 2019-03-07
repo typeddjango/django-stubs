@@ -3,9 +3,11 @@ from typing import Optional, cast
 from mypy.checker import TypeChecker
 from mypy.nodes import ListExpr, NameExpr, StrExpr, TupleExpr, TypeInfo, Var
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, TupleType, Type, TypeOfAny, UnionType
+from mypy.types import (
+    AnyType, CallableType, Instance, TupleType, Type, TypeOfAny, UnionType,
+)
+
 from mypy_django_plugin import helpers
-from mypy_django_plugin.transformers.models import iter_over_assignments
 
 
 def extract_referred_to_type(ctx: FunctionContext) -> Optional[Instance]:
@@ -99,10 +101,6 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
 def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
     is_nullable = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'null'))
-    if not is_nullable and default_return_type.type.has_base(helpers.CHAR_FIELD_FULLNAME):
-        # blank=True for CharField can be interpreted as null=True
-        is_nullable = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'blank'))
-
     set_type = get_private_descriptor_type(default_return_type.type, '_pyi_private_set_type',
                                            is_nullable=is_nullable)
     get_type = get_private_descriptor_type(default_return_type.type, '_pyi_private_get_type',
@@ -154,7 +152,7 @@ def record_field_properties_into_outer_model_class(ctx: FunctionContext) -> None
         return
 
     field_name = None
-    for name_expr, stmt in iter_over_assignments(outer_model.defn):
+    for name_expr, stmt in helpers.iter_over_assignments(outer_model.defn):
         if stmt == ctx.context and isinstance(name_expr, NameExpr):
             field_name = name_expr.name
             break

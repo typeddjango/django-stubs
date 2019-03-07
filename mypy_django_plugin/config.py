@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from typing import List, Optional
+from typing import Optional
 
 from dataclasses import dataclass
 
@@ -20,6 +20,7 @@ class Config:
                                          fallback=None)
         if django_settings:
             django_settings = django_settings.strip()
+
         return Config(django_settings_module=django_settings,
-                      ignore_missing_settings=ini_config.get('mypy_django_plugin', 'ignore_missing_settings',
-                                                             fallback=False))
+                      ignore_missing_settings=bool(ini_config.get('mypy_django_plugin', 'ignore_missing_settings',
+                                                                  fallback=False)))
