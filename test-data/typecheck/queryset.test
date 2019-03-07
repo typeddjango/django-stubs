@@ -5,6 +5,14 @@ class Blog(models.Model):
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField()
 
+# QuerySet where second type argument is not specified shouldn't raise any errors
+class BlogQuerySet(models.QuerySet[Blog]):
+    pass
+
+# Test that second type argument gets filled automatically
+blog_qs: models.QuerySet[Blog]
+reveal_type(blog_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog, main.Blog]'
+
 
 reveal_type(Blog.objects.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(Blog.objects.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
