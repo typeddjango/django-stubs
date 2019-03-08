@@ -199,9 +199,9 @@ IGNORED_ERRORS = {
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
-        + 'expected "Union[Type[<nothing>], Manager[<nothing>], QuerySet[<nothing>]]"',
+        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
-        + 'expected "Union[Type[<nothing>], Manager[<nothing>], QuerySet[<nothing>]]"',
+        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
         'CustomClass'
     ],
     'get_or_create': [
