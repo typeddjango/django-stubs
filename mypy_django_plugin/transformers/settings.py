@@ -59,7 +59,7 @@ def load_settings_from_names(settings_classdef: ClassDef,
                 else:
                     var = Var(name, AnyType(TypeOfAny.unannotated))
                     var.info = api.named_type('__builtins__.object').type  # outer class type
-                    settings_classdef.info.names[name] = SymbolTableNode(sym.kind, var)
+                    settings_classdef.info.names[name] = SymbolTableNode(sym.kind, var, plugin_generated=True)
 
                 settings_metadata[name] = module.fullname()
 

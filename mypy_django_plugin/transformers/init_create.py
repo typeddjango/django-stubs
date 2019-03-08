@@ -183,6 +183,13 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                                                                                              False):
                             field_type = helpers.make_optional(field_type)
 
+                        # if CharField(blank=True,...) and not nullable, then field can be None in __init__
+                        elif (
+                            helpers.has_any_of_bases(typ.type, (helpers.CHAR_FIELD_FULLNAME,)) and is_init and
+                            field_metadata.get('blank', False) and not field_metadata.get('null', False)
+                        ):
+                            field_type = helpers.make_optional(field_type)
+
                         expected_types[name] = field_type
 
     return expected_types
