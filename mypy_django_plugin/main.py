@@ -1,3 +1,5 @@
+from functools import partial
+
 import os
 from typing import Callable, Dict, Optional, Union, cast
 
@@ -6,7 +8,7 @@ from mypy.nodes import MemberExpr, NameExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
     AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
-)
+    AnalyzeTypeContext)
 from mypy.types import (
     AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeType, UnionType,
 )
@@ -78,6 +80,18 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
         return helpers.reparametrize_instance(ret, new_type_args)
     else:
         return ret
+
+
+def set_first_generic_param_as_default_for_second(fullname: str, ctx: AnalyzeTypeContext) -> Type:
+    if not ctx.type.args:
+        return ctx.api.named_type(fullname, [AnyType(TypeOfAny.explicit),
+                                             AnyType(TypeOfAny.explicit)])
+    args = ctx.type.args
+    if len(args) == 1:
+        args = [args[0], args[0]]
+
+    analyzed_args = [ctx.api.analyze_type(arg) for arg in args]
+    return ctx.api.named_type(fullname, analyzed_args)
 
 
 def return_user_model_hook(ctx: FunctionContext) -> Type:
@@ -266,6 +280,14 @@ class DjangoPlugin(Plugin):
         else:
             return {}
 
+    def _get_current_queryset_bases(self) -> Dict[str, int]:
+        model_sym = self.lookup_fully_qualified(helpers.QUERYSET_CLASS_FULLNAME)
+        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
+            return (helpers.get_django_metadata(model_sym.node)
+                    .setdefault('queryset_bases', {helpers.QUERYSET_CLASS_FULLNAME: 1}))
+        else:
+            return {}
+
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
         if fullname == 'django.contrib.auth.get_user_model':
@@ -343,6 +365,14 @@ class DjangoPlugin(Plugin):
                 return ExtractSettingType(module_fullname=metadata[name])
 
         return extract_and_return_primary_key_of_bound_related_field_parameter
+
+    def get_type_analyze_hook(self, fullname: str
+                              ) -> Optional[Callable[[AnalyzeTypeContext], Type]]:
+        queryset_bases = self._get_current_queryset_bases()
+        if fullname in queryset_bases:
+            return partial(set_first_generic_param_as_default_for_second, fullname)
+
+        return None
 
 
 def plugin(version):

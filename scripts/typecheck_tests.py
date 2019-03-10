@@ -91,19 +91,10 @@ IGNORED_ERRORS = {
         'Argument "is_dst" to "localize" of "BaseTzInfo" has incompatible type "None"; expected "bool"'
     ],
     'aggregation': [
-        'Incompatible types in assignment (expression has type "QuerySet[Any]", variable has type "List[Any]")',
         '"as_sql" undefined in superclass',
-        'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
-        + 'variable has type "ValuesListIterable")',
         'Incompatible type for "contact" of "Book" (got "Optional[Author]", expected "Union[Author, Combinable]")',
         'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", '
         + 'expected "Union[Publisher, Combinable]")'
-    ],
-    'aggregation_regress': [
-        'Incompatible types in assignment (expression has type "List[str]", variable has type "QuerySet[Author]")',
-        'Incompatible types in assignment (expression has type "FlatValuesListIterable", '
-        + 'variable has type "QuerySet[Any]")',
-        'Too few arguments for "count" of "Sequence"'
     ],
     'apps': [
         'Incompatible types in assignment (expression has type "str", target has type "type")',
@@ -159,9 +150,6 @@ IGNORED_ERRORS = {
     'db_typecasts': [
         '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)'
     ],
-    'expressions': [
-        'Argument 1 to "Subquery" has incompatible type "Sequence[Dict[str, Any]]"; expected "QuerySet[Any]"'
-    ],
     'from_db_value': [
         'has no attribute "vendor"'
     ],
@@ -199,9 +187,9 @@ IGNORED_ERRORS = {
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
-        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
+        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>, <nothing>]]"',
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
-        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
+        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>, <nothing>]]"',
         'CustomClass'
     ],
     'get_or_create': [
@@ -226,10 +214,6 @@ IGNORED_ERRORS = {
     ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")'
-    ],
-    'model_inheritance_regress': [
-        'Incompatible types in assignment (expression has type "List[Supplier]", '
-        + 'variable has type "QuerySet[Supplier]")'
     ],
     'model_meta': [
         '"object" has no attribute "items"',
@@ -305,7 +289,8 @@ IGNORED_ERRORS = {
     ],
     'queries': [
         'Incompatible types in assignment (expression has type "None", variable has type "str")',
-        'Invalid index type "Optional[str]" for "Dict[str, int]"; expected type "str"'
+        'Invalid index type "Optional[str]" for "Dict[str, int]"; expected type "str"',
+        'No overload variant of "values_list" of "QuerySet" matches argument types "str", "bool", "bool"',
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -314,7 +299,7 @@ IGNORED_ERRORS = {
         'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"'
     ],
     'prefetch_related': [
-        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room]")',
+        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
         '"None" has no attribute "__iter__"',
         'has no attribute "read_by"'
     ],
