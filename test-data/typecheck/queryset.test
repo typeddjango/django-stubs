@@ -13,6 +13,8 @@ class BlogQuerySet(models.QuerySet[Blog]):
 blog_qs: models.QuerySet[Blog]
 reveal_type(blog_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog, main.Blog]'
 
+Blog.objects.values_list('id', flat=True, named=True) # E: 'flat' and 'named' can't be used together.
+Blog.objects.values_list('id', 'extra_arg', flat=True) # E: 'flat' is not valid when values_list is called with more than one field.
 
 reveal_type(Blog.objects.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 reveal_type(Blog.objects.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
