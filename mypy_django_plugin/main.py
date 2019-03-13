@@ -8,13 +8,14 @@ from mypy.nodes import MemberExpr, NameExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
     AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
-    AnalyzeTypeContext)
+    AnalyzeTypeContext, DynamicClassDefContext, MethodSigContext)
 from mypy.types import (
     AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeType, UnionType,
 )
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
+from mypy_django_plugin.helpers import is_field_nullable
 from mypy_django_plugin.transformers import fields, init_create
 from mypy_django_plugin.transformers.forms import (
     make_meta_nested_class_inherit_from_any,
@@ -23,6 +24,7 @@ from mypy_django_plugin.transformers.migrations import (
     determine_model_cls_from_string_for_migrations, get_string_value_from_expr,
 )
 from mypy_django_plugin.transformers.models import process_model_class
+from mypy_django_plugin.transformers.queryset import extract_proper_type_for_values_and_values_list
 from mypy_django_plugin.transformers.settings import (
     AddSettingValuesToDjangoConfObject, get_settings_metadata,
 )
@@ -156,7 +158,7 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
         if primary_key_type:
             return primary_key_type
 
-    is_nullable = helpers.get_fields_metadata(ctx.type.type).get(field_name, {}).get('null', False)
+    is_nullable = is_field_nullable(ctx.type.type, field_name)
     if is_nullable:
         return helpers.make_optional(ctx.default_attr_type)
 
@@ -227,38 +229,6 @@ def extract_proper_type_for_get_form(ctx: MethodContext) -> Type:
         return form_class_type.ret_type
 
     return ctx.default_return_type
-
-
-def extract_proper_type_for_values_list(ctx: MethodContext) -> Type:
-    object_type = ctx.type
-    if not isinstance(object_type, Instance):
-        return ctx.default_return_type
-
-    flat = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'flat'))
-    named = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'named'))
-
-    ret = ctx.default_return_type
-
-    any_type = AnyType(TypeOfAny.implementation_artifact)
-    if named and flat:
-        ctx.api.fail("'flat' and 'named' can't be used together.", ctx.context)
-        return ret
-    elif named:
-        # TODO: Fill in namedtuple fields/types
-        row_arg = ctx.api.named_generic_type('typing.NamedTuple', [])
-    elif flat:
-        # TODO: Figure out row_arg type dependent on the argument passed in
-        if len(ctx.args[0]) > 1:
-            ctx.api.fail("'flat' is not valid when values_list is called with more than one field.", ctx.context)
-            return ret
-        row_arg = any_type
-    else:
-        # TODO: Figure out tuple argument types dependent on the arguments passed in
-        row_arg = ctx.api.named_generic_type('builtins.tuple', [any_type])
-
-    first_arg = ret.args[0] if len(ret.args) > 0 else any_type
-    new_type_args = [first_arg, row_arg]
-    return helpers.reparametrize_instance(ret, new_type_args)
 
 
 class DjangoPlugin(Plugin):
@@ -350,10 +320,10 @@ class DjangoPlugin(Plugin):
             if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
                 return extract_proper_type_for_get_form
 
-        if method_name == 'values_list':
+        if method_name in ('values', 'values_list'):
             sym = self.lookup_fully_qualified(class_name)
             if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.QUERYSET_CLASS_FULLNAME):
-                return extract_proper_type_for_values_list
+                return partial(extract_proper_type_for_values_and_values_list, method_name)
 
         if fullname in {'django.apps.registry.Apps.get_model',
                         'django.db.migrations.state.StateApps.get_model'}:

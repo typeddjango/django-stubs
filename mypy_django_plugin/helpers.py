@@ -1,14 +1,16 @@
 import typing
-from typing import Dict, Optional
+from collections import OrderedDict
+from typing import Dict, Optional, cast
 
-from mypy.checker import TypeChecker
+from mypy.checker import TypeChecker, gen_unique_name
+from mypy.mro import calculate_mro
 from mypy.nodes import (
     AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, TypeInfo,
-)
+    SymbolTable, SymbolTableNode, Block, GDEF, MDEF, Var)
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import (
     AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType,
-)
+    TupleType, TypedDictType)
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FIELD_FULLNAME = 'django.db.models.fields.Field'
@@ -211,7 +213,7 @@ def extract_field_setter_type(tp: Instance) -> Optional[Type]:
     return None
 
 
-def extract_field_getter_type(tp: Instance) -> Optional[Type]:
+def extract_field_getter_type(tp: Type) -> Optional[Type]:
     if not isinstance(tp, Instance):
         return None
     if tp.type.has_base(FIELD_FULLNAME):
@@ -233,6 +235,10 @@ def get_related_field_primary_key_names(base_model: TypeInfo) -> typing.List[str
 
 def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
     return get_django_metadata(model).setdefault('fields', {})
+
+
+def get_lookups_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
+    return get_django_metadata(model).setdefault('lookups', {})
 
 
 def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[Type]:
@@ -296,3 +302,86 @@ def get_assigned_value_for_class(type_info: TypeInfo, name: str) -> Optional[Exp
         if isinstance(lvalue, NameExpr) and lvalue.name == name:
             return rvalue
     return None
+
+
+def is_field_nullable(model: TypeInfo, field_name: str) -> bool:
+    return get_fields_metadata(model).get(field_name, {}).get('null', False)
+
+
+def is_foreign_key(t: Type) -> bool:
+    if not isinstance(t, Instance):
+        return False
+    return has_any_of_bases(t.type, (FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME))
+
+
+def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'OrderedDict[str, Type]', name: str) -> Instance:
+    """Build an Instance with `name` that contains the specified `fields` as attributes and extends `base`."""
+    # Credit: This code is largely copied/modified from TypeChecker.intersect_instance_callable and
+    # NamedTupleAnalyzer.build_namedtuple_typeinfo
+
+    # In order for this to work in incremental mode, the type we generate needs to
+    # have a valid fullname and a corresponding entry in a symbol table. We generate
+    # a unique name inside the symbol table of the current module.
+    cur_module = cast(MypyFile, api.scope.stack[0])
+    gen_name = gen_unique_name(name, cur_module.names)
+
+    # Build the fake ClassDef and TypeInfo together.
+    # The ClassDef is full of lies and doesn't actually contain a body.
+    # We skip fully filling out a handful of TypeInfo fields because they
+    # should be irrelevant for a generated type like this:
+    # is_protocol, protocol_members, is_abstract
+    cdef = ClassDef(name, Block([]))
+    cdef.fullname = cur_module.fullname() + '.' + gen_name
+    info = TypeInfo(SymbolTable(), cdef, cur_module.fullname())
+    cdef.info = info
+    info.bases = [base]
+
+    def add_field(var: Var, is_initialized_in_class: bool = False,
+                  is_property: bool = False) -> None:
+        var.info = info
+        var.is_initialized_in_class = is_initialized_in_class
+        var.is_property = is_property
+        var._fullname = '%s.%s' % (info.fullname(), var.name())
+        info.names[var.name()] = SymbolTableNode(MDEF, var)
+
+    vars = [Var(item, typ) for item, typ in fields.items()]
+    for var in vars:
+        add_field(var, is_property=True)
+
+    calculate_mro(info)
+    info.calculate_metaclass_type()
+
+    cur_module.names[gen_name] = SymbolTableNode(GDEF, info, plugin_generated=True)
+    return Instance(info, [])
+
+
+def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: str) -> Type:
+    if not fields:
+        # No fields specified, so fallback to an ordinary NamedTuple without fields
+        fallback = api.named_generic_type('typing.NamedTuple', [])
+
+        # Make a copy of the type so we don't mess around with the actual typing.NamedTuple type
+        fallback.type = TypeInfo.deserialize(fallback.type.serialize())
+
+        # Allow attribute access without errors for now
+        fallback.type.fallback_to_any = True
+    else:
+        fallback = build_class_with_annotated_fields(
+            api=api,
+            base=api.named_generic_type('typing.NamedTuple', []),
+            fields=fields,
+            name=name
+        )
+    return TupleType(list(fields.values()), fallback=fallback)
+
+
+def make_typeddict(api: TypeChecker, fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
+    implicit_any = AnyType(TypeOfAny.special_form)
+    fallback = api.named_generic_type('builtins.object', [implicit_any])
+    return TypedDictType(fields, required_keys=required_keys, fallback=fallback)
+
+
+def make_tuple(api: TypeChecker, fields: typing.List[Type]) -> Type:
+    implicit_any = AnyType(TypeOfAny.special_form)
+    fallback = api.named_generic_type('builtins.tuple', [implicit_any])
+    return TupleType(fields, fallback=fallback)
