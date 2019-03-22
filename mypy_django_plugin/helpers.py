@@ -375,7 +375,7 @@ def make_typeddict(api: TypeChecker, fields: 'OrderedDict[str, Type]', required_
     # Hack this TypedDictType instance to believe it is anonymous
     # Normally, it expects its fullname to be 'mypy_extensions.TypedDict', but we can't make
     # it that, since that type apparently cannot be looked up at this point.
-    typed_dict_type.is_anonymous = lambda: True
+    typed_dict_type.fallback.type._fullname = 'mypy_extensions._TypedDict'
     return typed_dict_type
 
 
