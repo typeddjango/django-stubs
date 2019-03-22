@@ -205,7 +205,7 @@ reveal_type(row_named_no_fields._asdict()) # E: Revealed type is 'Any'
 dict_row = Blog.objects.values('id', 'created_at').get()
 reveal_type(dict_row["id"]) # E: Revealed type is 'builtins.int'
 reveal_type(dict_row["created_at"]) # E: Revealed type is 'datetime.datetime'
-dict_row["non_existent_field"] # E: TypedDict "object[Any]" has no key 'non_existent_field'
+dict_row["non_existent_field"] # E: 'non_existent_field' is not a valid TypedDict key; expected one of ('id', 'created_at')
 
 
 row_dict_no_fields = Blog.objects.values().get()

@@ -314,7 +314,8 @@ def is_foreign_key(t: Type) -> bool:
     return has_any_of_bases(t.type, (FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME))
 
 
-def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'OrderedDict[str, Type]', name: str) -> Instance:
+def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'OrderedDict[str, Type]',
+                                      name: str) -> Instance:
     """Build an Instance with `name` that contains the specified `fields` as attributes and extends `base`."""
     # Credit: This code is largely copied/modified from TypeChecker.intersect_instance_callable and
     # NamedTupleAnalyzer.build_namedtuple_typeinfo
@@ -376,9 +377,14 @@ def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: s
 
 
 def make_typeddict(api: TypeChecker, fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
-    implicit_any = AnyType(TypeOfAny.special_form)
-    fallback = api.named_generic_type('builtins.object', [implicit_any])
-    return TypedDictType(fields, required_keys=required_keys, fallback=fallback)
+    fallback = api.named_generic_type('builtins.object', [])
+    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback)
+
+    # Hack this TypedDictType instance to believe it is anonymous
+    # Normally, it expects its fullname to be 'mypy_extensions.TypedDict', but we can't make
+    # it that, since that type apparently cannot be looked up at this point.
+    typed_dict_type.is_anonymous = lambda: True
+    return typed_dict_type
 
 
 def make_tuple(api: TypeChecker, fields: typing.List[Type]) -> Type:
