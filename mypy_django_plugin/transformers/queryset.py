@@ -105,8 +105,7 @@ def resolve_values_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo
     """Resolves a values/values_list lookup if possible, to a Type."""
     try:
         nodes = resolve_lookup(api, model_type_info, lookup)
-    except LookupException as e:
-        # api.msg.note(f"Got exception when looking up {lookup}: {e}", context)
+    except LookupException:
         nodes = []
 
     if not nodes:

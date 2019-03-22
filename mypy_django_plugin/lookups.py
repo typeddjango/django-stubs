@@ -91,7 +91,7 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
     field_node_type = field_node.type
     if field_node_type is None or not isinstance(field_node_type, Instance):
         raise LookupException(
-            f'When resolving lookup "{lookup}", could not determine field type for {model_type_info.name()}.{field_name}')
+            f'When resolving lookup "{lookup}", could not determine type for {model_type_info.name()}.{field_name}')
 
     if helpers.is_foreign_key(field_node_type):
         field_type = helpers.extract_field_getter_type(field_node_type)
@@ -122,7 +122,7 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
             # Reverse relation
             return RelatedModelNode(typ=related_manager_arg, is_nullable=True)
         raise LookupException(
-            f'When resolving lookup "{lookup}", could not determine field type for {model_type_info.name()}.{field_name}')
+            f'When resolving lookup "{lookup}", could not determine type for {model_type_info.name()}.{field_name}')
 
 
 def get_actual_field_name_for_lookup_field(lookup: str, model_type_info: TypeInfo) -> str:
