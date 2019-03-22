@@ -320,17 +320,9 @@ def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'Ord
     # Credit: This code is largely copied/modified from TypeChecker.intersect_instance_callable and
     # NamedTupleAnalyzer.build_namedtuple_typeinfo
 
-    # In order for this to work in incremental mode, the type we generate needs to
-    # have a valid fullname and a corresponding entry in a symbol table. We generate
-    # a unique name inside the symbol table of the current module.
     cur_module = cast(MypyFile, api.scope.stack[0])
     gen_name = gen_unique_name(name, cur_module.names)
 
-    # Build the fake ClassDef and TypeInfo together.
-    # The ClassDef is full of lies and doesn't actually contain a body.
-    # We skip fully filling out a handful of TypeInfo fields because they
-    # should be irrelevant for a generated type like this:
-    # is_protocol, protocol_members, is_abstract
     cdef = ClassDef(name, Block([]))
     cdef.fullname = cur_module.fullname() + '.' + gen_name
     info = TypeInfo(SymbolTable(), cdef, cur_module.fullname())
