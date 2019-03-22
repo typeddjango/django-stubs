@@ -1,6 +1,5 @@
-from functools import partial
-
 import os
+from functools import partial
 from typing import Callable, Dict, Optional, Union, cast
 
 from mypy.checker import TypeChecker
@@ -8,7 +7,7 @@ from mypy.nodes import MemberExpr, NameExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
     AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
-    AnalyzeTypeContext, DynamicClassDefContext, MethodSigContext)
+    AnalyzeTypeContext)
 from mypy.types import (
     AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeType, UnionType,
 )
@@ -229,6 +228,38 @@ def extract_proper_type_for_get_form(ctx: MethodContext) -> Type:
         return form_class_type.ret_type
 
     return ctx.default_return_type
+
+
+def extract_proper_type_for_values_list(ctx: MethodContext) -> Type:
+    object_type = ctx.type
+    if not isinstance(object_type, Instance):
+        return ctx.default_return_type
+
+    flat = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'flat'))
+    named = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'named'))
+
+    ret = ctx.default_return_type
+
+    any_type = AnyType(TypeOfAny.implementation_artifact)
+    if named and flat:
+        ctx.api.fail("'flat' and 'named' can't be used together.", ctx.context)
+        return ret
+    elif named:
+        # TODO: Fill in namedtuple fields/types
+        row_arg = ctx.api.named_generic_type('typing.NamedTuple', [])
+    elif flat:
+        # TODO: Figure out row_arg type dependent on the argument passed in
+        if len(ctx.args[0]) > 1:
+            ctx.api.fail("'flat' is not valid when values_list is called with more than one field.", ctx.context)
+            return ret
+        row_arg = any_type
+    else:
+        # TODO: Figure out tuple argument types dependent on the arguments passed in
+        row_arg = ctx.api.named_generic_type('builtins.tuple', [any_type])
+
+    first_arg = ret.args[0] if len(ret.args) > 0 else any_type
+    new_type_args = [first_arg, row_arg]
+    return helpers.reparametrize_instance(ret, new_type_args)
 
 
 class DjangoPlugin(Plugin):
