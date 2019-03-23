@@ -84,14 +84,23 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
 
 def set_first_generic_param_as_default_for_second(fullname: str, ctx: AnalyzeTypeContext) -> Type:
     if not ctx.type.args:
-        return ctx.api.named_type(fullname, [AnyType(TypeOfAny.explicit),
-                                             AnyType(TypeOfAny.explicit)])
+        try:
+            return ctx.api.named_type(fullname, [AnyType(TypeOfAny.explicit),
+                                                 AnyType(TypeOfAny.explicit)])
+        except KeyError:
+            # really should never happen
+            return AnyType(TypeOfAny.explicit)
+
     args = ctx.type.args
     if len(args) == 1:
         args = [args[0], args[0]]
 
     analyzed_args = [ctx.api.analyze_type(arg) for arg in args]
-    return ctx.api.named_type(fullname, analyzed_args)
+    try:
+        return ctx.api.named_type(fullname, analyzed_args)
+    except KeyError:
+        # really should never happen
+        return AnyType(TypeOfAny.explicit)
 
 
 def return_user_model_hook(ctx: FunctionContext) -> Type:
