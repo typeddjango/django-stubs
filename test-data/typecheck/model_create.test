@@ -27,7 +27,9 @@ class Parent1(models.Model):
 class Parent2(models.Model):
     id2 = models.AutoField(primary_key=True)
     name2 = models.CharField(max_length=50)
-class Child1(Parent1, Parent2):
+
+# TODO: Remove the 2 expected errors on the next line once mypy issue https://github.com/python/mypy/issues/2619 is resolved:
+class Child1(Parent1, Parent2): # E: Definition of "objects" in base class "Parent1" is incompatible with definition in base class "Parent2" # E: Definition of "_default_manager" in base class "Parent1" is incompatible with definition in base class "Parent2"
     value = models.IntegerField()
 class Child4(Child1):
     value4 = models.IntegerField()

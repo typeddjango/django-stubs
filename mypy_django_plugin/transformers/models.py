@@ -5,7 +5,7 @@ import dataclasses
 from mypy.nodes import (
     ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, Lvalue, MemberExpr, MypyFile,
     NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var,
-)
+    ARG_POS)
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
@@ -255,8 +255,21 @@ def add_dummy_init_method(ctx: ClassDefContext) -> None:
                       type_annotation=any, initializer=None, kind=ARG_STAR2)
 
     add_method(ctx, '__init__', [pos_arg, kw_arg], NoneTyp())
+
     # mark as model class
     ctx.cls.info.metadata.setdefault('django', {})['generated_init'] = True
+
+
+def add_get_set_attr_fallback_to_any(ctx: ClassDefContext):
+    any = AnyType(TypeOfAny.special_form)
+
+    name_arg = Argument(variable=Var('name', any),
+                        type_annotation=any, initializer=None, kind=ARG_POS)
+    add_method(ctx, '__getattr__', [name_arg], any)
+
+    value_arg = Argument(variable=Var('value', any),
+                         type_annotation=any, initializer=None, kind=ARG_POS)
+    add_method(ctx, '__setattr__', [name_arg, value_arg], any)
 
 
 def process_model_class(ctx: ClassDefContext) -> None:
@@ -273,4 +286,4 @@ def process_model_class(ctx: ClassDefContext) -> None:
     add_dummy_init_method(ctx)
 
     # allow unspecified attributes for now
-    ctx.cls.info.fallback_to_any = True
+    add_get_set_attr_fallback_to_any(ctx)

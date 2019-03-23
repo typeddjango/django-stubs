@@ -1,0 +1,28 @@
+[CASE test_model_subtype_relationship_and_getting_and_setting_attributes]
+from django.db import models
+
+class A(models.Model):
+    pass
+
+class B(models.Model):
+    b_attr = 1
+    pass
+
+class C(A):
+    pass
+
+def service(a: A) -> int:
+    pass
+
+a_instance = A()
+b_instance = B()
+reveal_type(b_instance.b_attr) # E: Revealed type is 'builtins.int'
+
+
+reveal_type(b_instance.non_existent_attribute) # E: Revealed type is 'Any'
+b_instance.non_existent_attribute = 2
+
+service(b_instance)  # E: Argument 1 to "service" has incompatible type "B"; expected "A"
+
+c_instance = C()
+service(c_instance)
