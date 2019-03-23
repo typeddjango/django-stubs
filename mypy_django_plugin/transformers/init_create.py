@@ -6,9 +6,6 @@ from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type, TypeOfAny
 
 from mypy_django_plugin import helpers
-from mypy_django_plugin.transformers.fields import get_private_descriptor_type
-
-
 def extract_base_pointer_args(model: TypeInfo) -> Set[str]:
     pointer_args: Set[str] = set()
     for base in model.bases:
@@ -162,7 +159,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                             if not pk_type:
                                 # extract set type of AutoField
                                 autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
-                                pk_type = get_private_descriptor_type(autofield_info, '_pyi_private_set_type',
+                                pk_type = helpers.get_private_descriptor_type(autofield_info, '_pyi_private_set_type',
                                                                       is_nullable=is_nullable)
                             related_primary_key_type = pk_type
 

@@ -14,7 +14,6 @@ from mypy.types import (
 
 from mypy_django_plugin import helpers, monkeypatch
 from mypy_django_plugin.config import Config
-from mypy_django_plugin.helpers import is_field_nullable
 from mypy_django_plugin.transformers import fields, init_create
 from mypy_django_plugin.transformers.forms import (
     make_meta_nested_class_inherit_from_any,
@@ -157,7 +156,7 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
         if primary_key_type:
             return primary_key_type
 
-    is_nullable = is_field_nullable(ctx.type.type, field_name)
+    is_nullable = helpers.is_field_nullable(ctx.type.type, field_name)
     if is_nullable:
         return helpers.make_optional(ctx.default_attr_type)
 

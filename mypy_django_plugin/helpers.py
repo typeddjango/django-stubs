@@ -386,3 +386,13 @@ def make_tuple(api: TypeChecker, fields: typing.List[Type]) -> Type:
     implicit_any = AnyType(TypeOfAny.special_form)
     fallback = api.named_generic_type('builtins.tuple', [implicit_any])
     return TupleType(fields, fallback=fallback)
+
+
+def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> Type:
+    node = type_info.get(private_field_name).node
+    if isinstance(node, Var):
+        descriptor_type = node.type
+        if is_nullable:
+            descriptor_type = make_optional(descriptor_type)
+        return descriptor_type
+    return AnyType(TypeOfAny.unannotated)

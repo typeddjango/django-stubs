@@ -1,10 +1,10 @@
 from typing import Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import ListExpr, NameExpr, StrExpr, TupleExpr, TypeInfo, Var
+from mypy.nodes import ListExpr, NameExpr, StrExpr, TupleExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import (
-    AnyType, CallableType, Instance, TupleType, Type, TypeOfAny, UnionType,
+    AnyType, CallableType, Instance, TupleType, Type, UnionType,
 )
 
 from mypy_django_plugin import helpers
@@ -88,23 +88,13 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext) -> Type:
     return helpers.reparametrize_instance(ctx.default_return_type, new_args=args)
 
 
-def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> Type:
-    node = type_info.get(private_field_name).node
-    if isinstance(node, Var):
-        descriptor_type = node.type
-        if is_nullable:
-            descriptor_type = helpers.make_optional(descriptor_type)
-        return descriptor_type
-    return AnyType(TypeOfAny.unannotated)
-
-
 def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
     is_nullable = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'null'))
-    set_type = get_private_descriptor_type(default_return_type.type, '_pyi_private_set_type',
-                                           is_nullable=is_nullable)
-    get_type = get_private_descriptor_type(default_return_type.type, '_pyi_private_get_type',
-                                           is_nullable=is_nullable)
+    set_type = helpers.get_private_descriptor_type(default_return_type.type, '_pyi_private_set_type',
+                                                   is_nullable=is_nullable)
+    get_type = helpers.get_private_descriptor_type(default_return_type.type, '_pyi_private_get_type',
+                                                   is_nullable=is_nullable)
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
 

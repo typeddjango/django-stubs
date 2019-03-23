@@ -6,9 +6,6 @@ from mypy.plugin import CheckerPluginInterface
 from mypy.types import Type, Instance
 
 from mypy_django_plugin import helpers
-from mypy_django_plugin.transformers.fields import get_private_descriptor_type
-
-
 @dataclasses.dataclass
 class RelatedModelNode:
     typ: Instance
@@ -69,7 +66,7 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
         else:
             # No PK, use the get type for AutoField as PK type.
             autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
-            pk_type = get_private_descriptor_type(autofield_info, '_pyi_private_get_type',
+            pk_type = helpers.get_private_descriptor_type(autofield_info, '_pyi_private_get_type',
                                                   is_nullable=False)
             return FieldNode(pk_type)
 
