@@ -368,17 +368,19 @@ def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: s
     return TupleType(list(fields.values()), fallback=fallback)
 
 
-class AnonymousTypedDictType(TypedDictType):
-    def is_anonymous(self):
-        # Hack this TypedDictType instance to believe it is anonymous
-        # Normally, it expects its fullname to be 'mypy_extensions.TypedDict', but we can't make
-        # it that, since that type apparently cannot be looked up by the plugin?
-        return True
-
-
 def make_typeddict(api: TypeChecker, fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
+    # Normally, the fallback type should be mypy_extensions._TypedDict
     fallback = api.named_generic_type('builtins.object', [])
-    typed_dict_type = AnonymousTypedDictType(fields, required_keys=required_keys, fallback=fallback)
+
+    # Make a copy of the type so we don't mess around with the actual typing.NamedTuple type
+    fallback.type = TypeInfo.deserialize(fallback.type.serialize())
+
+    # Hack this TypedDictType instance to believe it is anonymous.
+    # Normally, it expects the fallback type to be 'mypy_extensions._TypedDict', however,
+    # attempting to lookup that type using api.named_generic_type('mypy_extensions._TypedDict') fails.
+    fallback.type._fullname = "mypy_extensions._TypedDict"
+
+    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback)
     return typed_dict_type
 
 

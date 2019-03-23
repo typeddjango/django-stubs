@@ -107,6 +107,12 @@ class Blog(models.Model):
 class Entry(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="entries")
 
+# Blog has a primary key field specified, so no automatic 'id' field is expected to exist
+reveal_type(Blog.objects.values_list('id', flat=True).get()) # E: Revealed type is 'Any'
+
+# Access Blog's pk (which is UUID field)
+reveal_type(Blog.objects.values_list('pk', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+
 # Accessing PK of model pointed to by foreign key
 reveal_type(Entry.objects.values_list('blog', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
 # Alternative way of accessing PK of model pointed to by foreign key
