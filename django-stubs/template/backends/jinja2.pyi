@@ -1,21 +1,14 @@
-from typing import Callable, Dict, List, Optional, Tuple, Any
+from typing import Any, Callable, Dict, List, Optional
 
-from django.template.base import Template as Template
 from django.template.exceptions import TemplateSyntaxError
 
 from .base import BaseEngine
 
 class Jinja2(BaseEngine):
-    app_dirs: bool
-    dirs: List[str]
-    name: str
-    template_context_processors: List[Callable]
-    template_dirs: Tuple[str]
-    app_dirname: str = ...
     context_processors: List[str] = ...
     def __init__(self, params: Dict[str, Any]) -> None: ...
-    def from_string(self, template_code: str) -> Template: ...
-    def get_template(self, template_name: str) -> Template: ...
+    @property
+    def template_context_processors(self) -> List[Callable]: ...
 
 class Origin:
     name: str = ...

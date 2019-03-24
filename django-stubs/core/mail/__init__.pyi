@@ -1,6 +1,5 @@
 from typing import Any, List, Optional, Tuple
 
-from .backends.base import BaseEmailBackend
 from .message import (
     BadHeaderError as BadHeaderError,
     DEFAULT_ATTACHMENT_MIME_TYPE as DEFAULT_ATTACHMENT_MIME_TYPE,
@@ -12,7 +11,7 @@ from .message import (
 )
 from .utils import CachedDnsName as CachedDnsName, DNS_NAME as DNS_NAME
 
-def get_connection(backend: Optional[str] = ..., fail_silently: bool = ..., **kwds: Any) -> BaseEmailBackend: ...
+def get_connection(backend: Optional[str] = ..., fail_silently: bool = ..., **kwds: Any) -> Any: ...
 def send_mail(
     subject: str,
     message: str,
@@ -21,7 +20,7 @@ def send_mail(
     fail_silently: bool = ...,
     auth_user: Optional[str] = ...,
     auth_password: Optional[str] = ...,
-    connection: Optional[BaseEmailBackend] = ...,
+    connection: Optional[Any] = ...,
     html_message: Optional[str] = ...,
 ) -> int: ...
 def send_mass_mail(
@@ -29,20 +28,20 @@ def send_mass_mail(
     fail_silently: bool = ...,
     auth_user: Optional[str] = ...,
     auth_password: Optional[str] = ...,
-    connection: Optional[BaseEmailBackend] = ...,
+    connection: Optional[Any] = ...,
 ) -> int: ...
 def mail_admins(
     subject: str,
     message: str,
     fail_silently: bool = ...,
-    connection: Optional[BaseEmailBackend] = ...,
+    connection: Optional[Any] = ...,
     html_message: Optional[str] = ...,
 ) -> None: ...
 def mail_managers(
     subject: str,
     message: str,
     fail_silently: bool = ...,
-    connection: Optional[BaseEmailBackend] = ...,
+    connection: Optional[Any] = ...,
     html_message: Optional[str] = ...,
 ) -> None: ...
 
