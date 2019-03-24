@@ -1,27 +1,17 @@
-import collections
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, Type
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
-from django import forms
 from django.contrib.auth.forms import AdminPasswordChangeForm
-from django.db.models.fields import AutoField
-from django.forms.utils import ErrorDict, ErrorList
+from django.forms.boundfield import BoundField
+from django.forms.utils import ErrorDict
 from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeText
 
-from django.forms.boundfield import BoundField
+from django import forms
+from django.db.models.fields import AutoField
 
 ACTION_CHECKBOX_NAME: str
 
 class ActionForm(forms.Form):
-    auto_id: None
-    data: Dict[Any, Any]
-    empty_permitted: bool
-    error_class: Type[ErrorList]
-    fields: collections.OrderedDict
-    files: Dict[Any, Any]
-    initial: Dict[Any, Any]
-    is_bound: bool
-    label_suffix: str
     action: Any = ...
     select_across: Any = ...
 
@@ -36,8 +26,8 @@ class AdminForm:
         form: AdminPasswordChangeForm,
         fieldsets: List[Tuple[None, Dict[str, List[str]]]],
         prepopulated_fields: Dict[Any, Any],
-        readonly_fields: None = ...,
-        model_admin: None = ...,
+        readonly_fields: Any = ...,
+        model_admin: Any = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[Fieldset]: ...
     @property
@@ -137,7 +127,6 @@ class InlineAdminFormSet:
 
 class InlineAdminForm(AdminForm):
     formset: Any = ...
-    model_admin: Any = ...
     original: Any = ...
     show_url: Any = ...
     absolute_url: Any = ...
@@ -152,7 +141,6 @@ class InlineAdminForm(AdminForm):
         model_admin: Optional[Any] = ...,
         view_on_site_url: Optional[Any] = ...,
     ) -> None: ...
-    def __iter__(self) -> Iterator[InlineFieldset]: ...
     def needs_explicit_pk_field(self) -> Union[bool, AutoField]: ...
     def pk_field(self) -> AdminField: ...
     def fk_field(self) -> AdminField: ...
@@ -162,9 +150,6 @@ class InlineAdminForm(AdminForm):
 class InlineFieldset(Fieldset):
     formset: Any = ...
     def __init__(self, formset: Any, *args: Any, **kwargs: Any) -> None: ...
-    def __iter__(self) -> Iterator[Fieldline]: ...
 
 class AdminErrorList(forms.utils.ErrorList):
-    data: List[Any]
-    error_class: str
     def __init__(self, form: Any, inline_formsets: Any) -> None: ...

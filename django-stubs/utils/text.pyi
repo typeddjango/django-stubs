@@ -1,4 +1,4 @@
-from typing import Any, Iterator, List, Optional, Union
+from typing import Any, Iterable, Iterator, List, Optional, Union
 
 from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject
@@ -34,7 +34,7 @@ class StreamingBuffer:
     def flush(self): ...
     def close(self): ...
 
-def compress_sequence(sequence: Union[List[bytes], map]) -> Iterator[bytes]: ...
+def compress_sequence(sequence: Iterable[bytes]) -> Iterator[bytes]: ...
 
 smart_split_re: Any
 

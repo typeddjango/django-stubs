@@ -1,11 +1,8 @@
-from email._policybase import Policy
+from email._policybase import Policy  # type: ignore
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List, Optional, Tuple, Union, Sequence
-
-from django.core.mail.backends.base import BaseEmailBackend
-from django.utils.safestring import SafeText
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 utf8_charset: Any
 utf8_charset_qp: Any
@@ -20,16 +17,13 @@ def forbid_multi_line_headers(name: str, val: str, encoding: str) -> Tuple[str, 
 def split_addr(addr: str, encoding: str) -> Tuple[str, str]: ...
 def sanitize_address(addr: Union[Tuple[str, str], str], encoding: str) -> str: ...
 
-class MIMEMixin:
-    def as_string(self, unixfrom: bool = ..., linesep: str = ...) -> str: ...
-    def as_bytes(self, unixfrom: bool = ..., linesep: str = ...) -> bytes: ...
+class MIMEMixin: ...
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
     defects: List[Any]
     epilogue: None
     policy: Policy
     preamble: None
-    def __setitem__(self, name: str, val: str) -> None: ...
 
 class SafeMIMEText(MIMEMixin, MIMEText):
     defects: List[Any]
@@ -38,8 +32,6 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     preamble: None
     encoding: str = ...
     def __init__(self, _text: str, _subtype: str = ..., _charset: str = ...) -> None: ...
-    def __setitem__(self, name: str, val: str) -> None: ...
-    def set_payload(self, payload: str, charset: str = ...) -> None: ...
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     defects: List[Any]
@@ -50,7 +42,6 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     def __init__(
         self, _subtype: str = ..., boundary: None = ..., _subparts: None = ..., encoding: str = ..., **_params: Any
     ) -> None: ...
-    def __setitem__(self, name: str, val: str) -> None: ...
 
 class EmailMessage:
     content_subtype: str = ...
@@ -65,7 +56,7 @@ class EmailMessage:
     body: str = ...
     attachments: List[Any] = ...
     extra_headers: Dict[Any, Any] = ...
-    connection: None = ...
+    connection: Any = ...
     def __init__(
         self,
         subject: str = ...,
@@ -73,13 +64,13 @@ class EmailMessage:
         from_email: Optional[str] = ...,
         to: Optional[Union[Sequence[str], str]] = ...,
         bcc: Optional[Union[Sequence[str], str]] = ...,
-        connection: Optional[BaseEmailBackend] = ...,
+        connection: Optional[Any] = ...,
         attachments: Optional[Union[List[Tuple[str, str]], List[MIMEText]]] = ...,
         headers: Optional[Dict[str, str]] = ...,
         cc: Optional[Union[Sequence[str], str]] = ...,
         reply_to: Optional[Union[List[Optional[str]], str]] = ...,
     ) -> None: ...
-    def get_connection(self, fail_silently: bool = ...) -> BaseEmailBackend: ...
+    def get_connection(self, fail_silently: bool = ...) -> Any: ...
     def message(self) -> MIMEMixin: ...
     def recipients(self) -> List[str]: ...
     def send(self, fail_silently: bool = ...) -> int: ...
@@ -92,16 +83,6 @@ class EmailMessage:
     def attach_file(self, path: str, mimetype: Optional[str] = ...) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
-    attachments: List[Any]
-    bcc: List[Any]
-    body: SafeText
-    cc: List[Any]
-    connection: None
-    extra_headers: Dict[Any, Any]
-    from_email: str
-    reply_to: List[Any]
-    subject: str
-    to: List[str]
     alternative_subtype: str = ...
     alternatives: Any = ...
     def __init__(
@@ -111,7 +92,7 @@ class EmailMultiAlternatives(EmailMessage):
         from_email: Optional[str] = ...,
         to: Optional[List[str]] = ...,
         bcc: Optional[List[str]] = ...,
-        connection: Optional[BaseEmailBackend] = ...,
+        connection: Optional[Any] = ...,
         attachments: None = ...,
         headers: Optional[Dict[str, str]] = ...,
         alternatives: Optional[List[Tuple[str, str]]] = ...,
