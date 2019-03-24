@@ -292,7 +292,10 @@ class DjangoPlugin(Plugin):
         if self.django_settings_module:
             settings_modules.append(self.django_settings_module)
 
-        monkeypatch.add_modules_as_a_source_seed_files(settings_modules)
+        auto_imports = ['mypy_extensions']
+        auto_imports.extend(settings_modules)
+
+        monkeypatch.add_modules_as_a_source_seed_files(auto_imports)
         monkeypatch.inject_modules_as_dependencies_for_django_conf_settings(settings_modules)
 
     def _get_current_model_bases(self) -> Dict[str, int]:

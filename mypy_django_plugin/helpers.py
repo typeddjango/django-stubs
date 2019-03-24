@@ -350,14 +350,9 @@ def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'Ord
 
 def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: str) -> Type:
     if not fields:
-        # No fields specified, so fallback to an ordinary NamedTuple without fields
-        fallback = api.named_generic_type('typing.NamedTuple', [])
-
-        # Make a copy of the type so we don't mess around with the actual typing.NamedTuple type
-        fallback.type = TypeInfo.deserialize(fallback.type.serialize())
-
-        # Allow attribute access without errors for now
-        fallback.type.fallback_to_any = True
+        # No fields specified, so fallback to a subclass of NamedTuple that allows
+        # __getattr__ / __setattr__ for any attribute name.
+        fallback = api.named_generic_type('django._NamedTupleAnyAttr', [])
     else:
         fallback = build_class_with_annotated_fields(
             api=api,
@@ -369,18 +364,8 @@ def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: s
 
 
 def make_typeddict(api: TypeChecker, fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
-    # Normally, the fallback type should be mypy_extensions._TypedDict
-    fallback = api.named_generic_type('builtins.object', [])
-
-    # Make a copy of the type so we don't mess around with the actual typing.NamedTuple type
-    fallback.type = TypeInfo.deserialize(fallback.type.serialize())
-
-    # Hack this TypedDictType instance to believe it is anonymous.
-    # Normally, it expects the fallback type to be 'mypy_extensions._TypedDict', however,
-    # attempting to lookup that type using api.named_generic_type('mypy_extensions._TypedDict') fails.
-    fallback.type._fullname = "mypy_extensions._TypedDict"
-
-    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback)
+    object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
+    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
 
 
