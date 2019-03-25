@@ -287,3 +287,23 @@ class Publisher(models.Model):
     pass
 reveal_type(Book().publisher)  # E: Revealed type is 'main.Publisher*'
 [out]
+
+[CASE test_foreign_key_field_without_backwards_relation]
+from django.db import models
+
+class Publisher(models.Model):
+    pass
+
+class Book(models.Model):
+    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
+                                  related_name='+')
+    publisher2 = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
+                                   related_name='books2')
+
+book = Book()
+reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+
+publisher = Publisher()
+reveal_type(publisher.books)  # E: Revealed type is 'Any'
+reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+

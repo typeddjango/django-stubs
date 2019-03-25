@@ -6,7 +6,6 @@ from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type, TypeOfAny
 
 from mypy_django_plugin import helpers
-from mypy_django_plugin.transformers.fields import get_private_descriptor_type
 
 
 def extract_base_pointer_args(model: TypeInfo) -> Set[str]:
@@ -162,8 +161,8 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                             if not pk_type:
                                 # extract set type of AutoField
                                 autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
-                                pk_type = get_private_descriptor_type(autofield_info, '_pyi_private_set_type',
-                                                                      is_nullable=is_nullable)
+                                pk_type = helpers.get_private_descriptor_type(autofield_info, '_pyi_private_set_type',
+                                                                              is_nullable=is_nullable)
                             related_primary_key_type = pk_type
 
                         if is_init:
@@ -185,8 +184,8 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
 
                         # if CharField(blank=True,...) and not nullable, then field can be None in __init__
                         elif (
-                            helpers.has_any_of_bases(typ.type, (helpers.CHAR_FIELD_FULLNAME,)) and is_init and
-                            field_metadata.get('blank', False) and not field_metadata.get('null', False)
+                                helpers.has_any_of_bases(typ.type, (helpers.CHAR_FIELD_FULLNAME,)) and is_init and
+                                field_metadata.get('blank', False) and not field_metadata.get('null', False)
                         ):
                             field_type = helpers.make_optional(field_type)
 

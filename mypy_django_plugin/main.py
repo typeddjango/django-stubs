@@ -1,6 +1,5 @@
-from functools import partial
-
 import os
+from functools import partial
 from typing import Callable, Dict, Optional, Union, cast
 
 from mypy.checker import TypeChecker
@@ -23,6 +22,7 @@ from mypy_django_plugin.transformers.migrations import (
     determine_model_cls_from_string_for_migrations, get_string_value_from_expr,
 )
 from mypy_django_plugin.transformers.models import process_model_class
+from mypy_django_plugin.transformers.queryset import extract_proper_type_for_values_and_values_list
 from mypy_django_plugin.transformers.settings import (
     AddSettingValuesToDjangoConfObject, get_settings_metadata,
 )
@@ -165,7 +165,7 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
         if primary_key_type:
             return primary_key_type
 
-    is_nullable = helpers.get_fields_metadata(ctx.type.type).get(field_name, {}).get('null', False)
+    is_nullable = helpers.is_field_nullable(ctx.type.type, field_name)
     if is_nullable:
         return helpers.make_optional(ctx.default_attr_type)
 
@@ -292,7 +292,10 @@ class DjangoPlugin(Plugin):
         if self.django_settings_module:
             settings_modules.append(self.django_settings_module)
 
-        monkeypatch.add_modules_as_a_source_seed_files(settings_modules)
+        auto_imports = ['mypy_extensions']
+        auto_imports.extend(settings_modules)
+
+        monkeypatch.add_modules_as_a_source_seed_files(auto_imports)
         monkeypatch.inject_modules_as_dependencies_for_django_conf_settings(settings_modules)
 
     def _get_current_model_bases(self) -> Dict[str, int]:
@@ -359,10 +362,10 @@ class DjangoPlugin(Plugin):
             if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
                 return extract_proper_type_for_get_form
 
-        if method_name == 'values_list':
+        if method_name in ('values', 'values_list'):
             sym = self.lookup_fully_qualified(class_name)
             if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.QUERYSET_CLASS_FULLNAME):
-                return extract_proper_type_for_values_list
+                return partial(extract_proper_type_for_values_and_values_list, method_name)
 
         if fullname in {'django.apps.registry.Apps.get_model',
                         'django.db.migrations.state.StateApps.get_model'}:

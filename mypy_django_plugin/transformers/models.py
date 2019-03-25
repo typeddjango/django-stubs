@@ -172,17 +172,35 @@ class AddRelatedManagers(ModelClassInitializer):
                             ref_to_fullname = module_name + '.' + exc.model_cls_name
 
                         if self.model_classdef.fullname == ref_to_fullname:
-                            related_manager_name = defn.name.lower() + '_set'
+                            related_name = defn.name.lower() + '_set'
                             if 'related_name' in rvalue.arg_names:
                                 related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]
                                 if not isinstance(related_name_expr, StrExpr):
-                                    return None
-                                related_manager_name = related_name_expr.value
+                                    continue
+                                related_name = related_name_expr.value
+                                if related_name == '+':
+                                    # No backwards relation is desired
+                                    continue
 
+                            if 'related_query_name' in rvalue.arg_names:
+                                related_query_name_expr = rvalue.args[rvalue.arg_names.index('related_query_name')]
+                                if not isinstance(related_query_name_expr, StrExpr):
+                                    related_query_name = None
+                                else:
+                                    related_query_name = related_query_name_expr.value
+                                # TODO: Handle defaulting to model name if related_name is not set
+                            else:
+                                # No related_query_name specified, default to related_name
+                                related_query_name = related_name
                             typ = get_related_field_type(rvalue, self.api, defn.info)
                             if typ is None:
-                                return None
-                            self.add_new_node_to_model_class(related_manager_name, typ)
+                                continue
+                            self.add_new_node_to_model_class(related_name, typ)
+                            if related_query_name is not None:
+                                # Only create related_query_name if it is a string literal
+                                helpers.get_lookups_metadata(self.model_classdef.info)[related_query_name] = {
+                                    'related_query_name_target': related_name
+                                }
 
 
 def iter_over_classdefs(module_file: MypyFile) -> Iterator[ClassDef]:
