@@ -2,7 +2,7 @@
 
 try:
     pip install wheel twine
-    python setup.py sdist bdist_wheel --universal
+    python setup.py sdist bdist_wheel
     twine upload dist/*
 
 finally:
