@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union, Iterable
 
 from django.apps.config import AppConfig
 from django.db.models.base import Model
@@ -33,5 +32,5 @@ def serialize(
 ) -> Optional[Union[bytes, str]]: ...
 def deserialize(format: str, stream_or_string: Any, **options: Any) -> Union[Iterator[Any], Deserializer]: ...
 def sort_dependencies(
-    app_list: Union[List[Tuple[AppConfig, None]], List[Tuple[str, List[Type[Model]]]]]
+    app_list: Union[Iterable[Tuple[AppConfig, None]], Iterable[Tuple[str, Iterable[Type[Model]]]]]
 ) -> List[Type[Model]]: ...

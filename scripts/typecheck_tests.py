@@ -59,7 +59,12 @@ IGNORED_ERRORS = {
         'Argument 1 to "loads" has incompatible type "Union[bytes, str, None]"; '
         + 'expected "Union[str, bytes, bytearray]"',
         'Incompatible types in assignment (expression has type "None", variable has type Module)',
-        'note:'
+        'note:',
+        # Suppress false-positive error due to mypy being overly strict with base class compatibility checks even though
+        # objects/_default_manager are redefined in the subclass to be compatible with the base class definition.
+        # Can be removed when mypy issue is fixed: https://github.com/python/mypy/issues/2619
+        re.compile(r'Definition of "(objects|_default_manager)" in base class "[A-Za-z0-9]+" is incompatible with '
+                   r'definition in base class "[A-Za-z0-9]+"'),
     ],
     'admin_changelist': [
         'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
@@ -213,11 +218,12 @@ IGNORED_ERRORS = {
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
     ],
     'many_to_one': [
-        'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")'
+        'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")',
+        'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")'
     ],
     'model_meta': [
         '"object" has no attribute "items"',
-        '"Field" has no attribute "many_to_many"'
+        '"Field" has no attribute "many_to_many"',
     ],
     'model_forms': [
         'Argument "instance" to "InvalidModelForm" has incompatible type "Type[Category]"; expected "Optional[Model]"',
@@ -227,8 +233,14 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Person]", variable has type',
         'Unexpected keyword argument "name" for "Person"',
         'Cannot assign multiple types to name "PersonTwoImages" without an explicit "Type[...]" annotation',
-        'Incompatible types in assignment (expression has type "Type[Person]", '
-        + 'base class "ImageFieldTestMixin" defined the type as "Type[PersonWithHeightAndWidth]")',
+        re.compile(
+            r'Incompatible types in assignment \(expression has type "Type\[.+?\]", base class "IntegerFieldTests"'
+            r' defined the type as "Type\[IntegerModel\]"\)'),
+        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", base class'
+                   r' "ImageFieldTestMixin" defined the type as "Type\[PersonWithHeightAndWidth\]"\)'),
+        'Incompatible import of "Person"',
+        'Incompatible types in assignment (expression has type "FloatModel", variable has type '
+        '"Union[float, int, str, Combinable]")',
     ],
     'model_formsets': [
         'Incompatible types in string interpolation (expression has type "object", '
@@ -261,7 +273,7 @@ IGNORED_ERRORS = {
         'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'FakeLoader',
         'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"',
-        'Unsupported operand types for - ("Set[Any]" and "None")'
+        'Unsupported operand types for - ("Set[Any]" and "None")',
     ],
     'middleware_exceptions': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
@@ -282,7 +294,11 @@ IGNORED_ERRORS = {
         + 'expected "Optional[Type[JSONEncoder]]"',
         'for model "CITestModel"',
         'Incompatible type for "field" of "IntegerArrayModel" (got "None", '
-        + 'expected "Union[Sequence[int], Combinable]")'
+        + 'expected "Union[Sequence[int], Combinable]")',
+        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", base class "UnaccentTest" '
+                   r'defined the type as "Type\[CharFieldModel\]"\)'),
+        'Incompatible types in assignment (expression has type "Type[TextFieldModel]", base class "TrigramTest" '
+        'defined the type as "Type[CharFieldModel]")',
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
@@ -291,6 +307,12 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "None", variable has type "str")',
         'Invalid index type "Optional[str]" for "Dict[str, int]"; expected type "str"',
         'No overload variant of "values_list" of "QuerySet" matches argument types "str", "bool", "bool"',
+        'Unsupported operand types for & ("QuerySet[Author, Author]" and "QuerySet[Tag, Tag]")',
+        'Unsupported operand types for | ("QuerySet[Author, Author]" and "QuerySet[Tag, Tag]")',
+        'Incompatible types in assignment (expression has type "ObjectB", variable has type "ObjectA")',
+        'Incompatible types in assignment (expression has type "ObjectC", variable has type "ObjectA")',
+        'Incompatible type for "objectb" of "ObjectC" (got "ObjectA", expected'
+        ' "Union[ObjectB, Combinable, None, None]")',
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -302,6 +324,9 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
         '"None" has no attribute "__iter__"',
         'has no attribute "read_by"'
+    ],
+    'proxy_model_inheritance': [
+        'Incompatible import of "ProxyModel"'
     ],
     'signals': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]"; '
@@ -387,7 +412,8 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "None", variable has type "int")',
     ],
     'select_related_onetoone': [
-        '"None" has no attribute'
+        '"None" has no attribute',
+        'Incompatible types in assignment (expression has type "Parent2", variable has type "Parent1")',
     ],
     'servers': [
         re.compile('Argument [0-9] to "WSGIRequestHandler"')
