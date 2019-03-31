@@ -39,7 +39,7 @@ setup(
     author="Maksim Kurnikov",
     author_email="maxim.kurnikov@gmail.com",
     py_modules=[],
-    python_requires='>=3',
+    python_requires='>=3.6',
     install_requires=dependencies,
     packages=['django-stubs', *find_packages()],
     package_data={'django-stubs': find_stub_files('django-stubs')},
