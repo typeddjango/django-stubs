@@ -21,7 +21,7 @@ with open('README.md', 'r') as f:
     readme = f.read()
 
 dependencies = [
-    'mypy>=0.670',
+    'mypy>=0.670,<0.700',
     'typing-extensions'
 ]
 if sys.version_info[:2] < (3, 7):
