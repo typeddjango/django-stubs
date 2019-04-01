@@ -2,7 +2,6 @@ import typing
 from collections import OrderedDict
 from typing import Dict, Optional, cast
 
-from mypy.checker import TypeChecker, gen_unique_name
 from mypy.mro import calculate_mro
 from mypy.nodes import (
     AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, TypeInfo,
@@ -11,6 +10,9 @@ from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import (
     AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType,
     TupleType, TypedDictType)
+
+if typing.TYPE_CHECKING:
+    from mypy.checker import TypeChecker
 
 MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
 FIELD_FULLNAME = 'django.db.models.fields.Field'
@@ -165,7 +167,7 @@ def get_argument_type_by_name(ctx: typing.Union[FunctionContext, MethodContext],
     return arg_types[0]
 
 
-def get_setting_expr(api: TypeChecker, setting_name: str) -> Optional[Expression]:
+def get_setting_expr(api: 'TypeChecker', setting_name: str) -> Optional[Expression]:
     try:
         settings_sym = api.modules['django.conf'].names['settings']
     except KeyError:
@@ -314,11 +316,12 @@ def is_foreign_key(t: Type) -> bool:
     return has_any_of_bases(t.type, (FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME))
 
 
-def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'OrderedDict[str, Type]',
+def build_class_with_annotated_fields(api: 'TypeChecker', base: Type, fields: 'OrderedDict[str, Type]',
                                       name: str) -> Instance:
     """Build an Instance with `name` that contains the specified `fields` as attributes and extends `base`."""
     # Credit: This code is largely copied/modified from TypeChecker.intersect_instance_callable and
     # NamedTupleAnalyzer.build_namedtuple_typeinfo
+    from mypy.checker import gen_unique_name
 
     cur_module = cast(MypyFile, api.scope.stack[0])
     gen_name = gen_unique_name(name, cur_module.names)
@@ -348,7 +351,7 @@ def build_class_with_annotated_fields(api: TypeChecker, base: Type, fields: 'Ord
     return Instance(info, [])
 
 
-def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: str) -> Type:
+def make_named_tuple(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', name: str) -> Type:
     if not fields:
         # No fields specified, so fallback to a subclass of NamedTuple that allows
         # __getattr__ / __setattr__ for any attribute name.
@@ -363,13 +366,13 @@ def make_named_tuple(api: TypeChecker, fields: 'OrderedDict[str, Type]', name: s
     return TupleType(list(fields.values()), fallback=fallback)
 
 
-def make_typeddict(api: TypeChecker, fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
+def make_typeddict(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
     object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
 
 
-def make_tuple(api: TypeChecker, fields: typing.List[Type]) -> Type:
+def make_tuple(api: 'TypeChecker', fields: typing.List[Type]) -> Type:
     implicit_any = AnyType(TypeOfAny.special_form)
     fallback = api.named_generic_type('builtins.tuple', [implicit_any])
     return TupleType(fields, fallback=fallback)

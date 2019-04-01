@@ -2,7 +2,6 @@ import os
 from functools import partial
 from typing import Callable, Dict, Optional, Union, cast
 
-from mypy.checker import TypeChecker
 from mypy.nodes import MemberExpr, NameExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
@@ -55,6 +54,8 @@ def transform_form_class(ctx: ClassDefContext) -> None:
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> Type:
+    from mypy.checker import TypeChecker
+
     api = cast(TypeChecker, ctx.api)
     ret = ctx.default_return_type
     if not api.tscope.classes:
@@ -104,6 +105,8 @@ def set_first_generic_param_as_default_for_second(fullname: str, ctx: AnalyzeTyp
 
 
 def return_user_model_hook(ctx: FunctionContext) -> Type:
+    from mypy.checker import TypeChecker
+
     api = cast(TypeChecker, ctx.api)
     setting_expr = helpers.get_setting_expr(api, 'AUTH_USER_MODEL')
     if setting_expr is None:
@@ -183,6 +186,8 @@ class ExtractSettingType:
         self.module_fullname = module_fullname
 
     def __call__(self, ctx: AttributeContext) -> Type:
+        from mypy.checker import TypeChecker
+
         api = cast(TypeChecker, ctx.api)
         original_module = api.modules.get(self.module_fullname)
         if original_module is None:
