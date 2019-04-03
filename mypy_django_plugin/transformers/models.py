@@ -3,9 +3,9 @@ from typing import Dict, Iterator, List, Optional, Tuple, cast
 
 import dataclasses
 from mypy.nodes import (
-    ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, Lvalue, MemberExpr, MypyFile,
+    ARG_POS, ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, MemberExpr, MypyFile,
     NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var,
-    ARG_POS)
+)
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
@@ -49,14 +49,8 @@ class ModelClassInitializer(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-def iter_call_assignments(klass: ClassDef) -> Iterator[Tuple[Lvalue, CallExpr]]:
-    for lvalue, rvalue in helpers.iter_over_assignments(klass):
-        if isinstance(rvalue, CallExpr):
-            yield lvalue, rvalue
-
-
 def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExpr, CallExpr]]:
-    for lvalue, rvalue in iter_call_assignments(klass):
+    for lvalue, rvalue in helpers.iter_call_assignments(klass):
         if (isinstance(lvalue, NameExpr)
                 and isinstance(rvalue.callee, MemberExpr)):
             if rvalue.callee.fullname in {helpers.FOREIGN_KEY_FULLNAME,
@@ -80,15 +74,6 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         meta_node.fallback_to_any = True
 
 
-def get_model_argument(manager_info: TypeInfo) -> Optional[Instance]:
-    for base in manager_info.bases:
-        if base.args:
-            model_arg = base.args[0]
-            if isinstance(model_arg, Instance) and model_arg.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-                return model_arg
-    return None
-
-
 class AddDefaultObjectsManager(ModelClassInitializer):
     def add_new_manager(self, name: str, manager_type: Optional[Instance]) -> None:
         if manager_type is None:
@@ -103,7 +88,7 @@ class AddDefaultObjectsManager(ModelClassInitializer):
     def get_existing_managers(self) -> List[Tuple[str, TypeInfo]]:
         managers = []
         for base in self.model_classdef.info.mro:
-            for name_expr, member_expr in iter_call_assignments(base.defn):
+            for name_expr, member_expr in helpers.iter_call_assignments(base.defn):
                 manager_name = name_expr.name
                 callee_expr = member_expr.callee
                 if isinstance(callee_expr, IndexExpr):
@@ -147,7 +132,7 @@ class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
             # no need for .id attr
             return None
 
-        for _, rvalue in iter_call_assignments(self.model_classdef):
+        for _, rvalue in helpers.iter_call_assignments(self.model_classdef):
             if ('primary_key' in rvalue.arg_names
                     and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
                 break
@@ -158,8 +143,8 @@ class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
 class AddRelatedManagers(ModelClassInitializer):
     def run(self) -> None:
         for module_name, module_file in self.api.modules.items():
-            for defn in iter_over_classdefs(module_file):
-                for lvalue, rvalue in iter_call_assignments(defn):
+            for defn in helpers.iter_over_classdefs(module_file):
+                for lvalue, rvalue in helpers.iter_call_assignments(defn):
                     if is_related_field(rvalue, module_file):
                         try:
                             ref_to_fullname = extract_ref_to_fullname(rvalue,
@@ -201,12 +186,6 @@ class AddRelatedManagers(ModelClassInitializer):
                                 helpers.get_lookups_metadata(self.model_classdef.info)[related_query_name] = {
                                     'related_query_name_target': related_name
                                 }
-
-
-def iter_over_classdefs(module_file: MypyFile) -> Iterator[ClassDef]:
-    for defn in module_file.defs:
-        if isinstance(defn, ClassDef):
-            yield defn
 
 
 def get_related_field_type(rvalue: CallExpr, api: SemanticAnalyzerPass2,

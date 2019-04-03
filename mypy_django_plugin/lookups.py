@@ -1,9 +1,9 @@
-import dataclasses
-from typing import Union, List
+from typing import List, Union
 
+import dataclasses
 from mypy.nodes import TypeInfo
 from mypy.plugin import CheckerPluginInterface
-from mypy.types import Type, Instance
+from mypy.types import Instance, Type
 
 from mypy_django_plugin import helpers
 

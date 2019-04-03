@@ -1,13 +1,17 @@
 from collections import OrderedDict
-from typing import Union, List, cast, Optional
+from typing import List, Optional, Union, cast
 
 from mypy.checker import TypeChecker
 from mypy.nodes import StrExpr, TypeInfo
-from mypy.plugin import MethodContext, CheckerPluginInterface
-from mypy.types import Type, Instance, AnyType, TypeOfAny
+from mypy.plugin import (
+    AnalyzeTypeContext, CheckerPluginInterface, MethodContext,
+)
+from mypy.types import AnyType, Instance, Type, TypeOfAny
 
 from mypy_django_plugin import helpers
-from mypy_django_plugin.lookups import resolve_lookup, RelatedModelNode, LookupException
+from mypy_django_plugin.lookups import (
+    LookupException, RelatedModelNode, resolve_lookup,
+)
 
 
 def extract_proper_type_for_values_and_values_list(method_name: str, ctx: MethodContext) -> Type:
@@ -137,3 +141,24 @@ def resolve_values_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo
         return helpers.make_optional(node_type)
     else:
         return node_type
+
+
+def set_first_generic_param_as_default_for_second(fullname: str, ctx: AnalyzeTypeContext) -> Type:
+    if not ctx.type.args:
+        try:
+            return ctx.api.named_type(fullname, [AnyType(TypeOfAny.explicit),
+                                                 AnyType(TypeOfAny.explicit)])
+        except KeyError:
+            # really should never happen
+            return AnyType(TypeOfAny.explicit)
+
+    args = ctx.type.args
+    if len(args) == 1:
+        args = [args[0], args[0]]
+
+    analyzed_args = [ctx.api.analyze_type(arg) for arg in args]
+    try:
+        return ctx.api.named_type(fullname, analyzed_args)
+    except KeyError:
+        # really should never happen
+        return AnyType(TypeOfAny.explicit)

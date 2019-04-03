@@ -4,12 +4,13 @@ from typing import Dict, Optional, cast
 
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, TypeInfo,
-    SymbolTable, SymbolTableNode, Block, GDEF, MDEF, Var)
+    GDEF, MDEF, AssignmentStmt, Block, CallExpr, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr,
+    SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import (
-    AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType,
-    TupleType, TypedDictType)
+    AnyType, Instance, NoneTyp, TupleType, Type, TypedDictType, TypeOfAny, TypeVarType, UnionType,
+)
 
 if typing.TYPE_CHECKING:
     from mypy.checker import TypeChecker
@@ -386,3 +387,15 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
             descriptor_type = make_optional(descriptor_type)
         return descriptor_type
     return AnyType(TypeOfAny.unannotated)
+
+
+def iter_over_classdefs(module_file: MypyFile) -> typing.Iterator[ClassDef]:
+    for defn in module_file.defs:
+        if isinstance(defn, ClassDef):
+            yield defn
+
+
+def iter_call_assignments(klass: ClassDef) -> typing.Iterator[typing.Tuple[Lvalue, CallExpr]]:
+    for lvalue, rvalue in iter_over_assignments(klass):
+        if isinstance(rvalue, CallExpr):
+            yield lvalue, rvalue

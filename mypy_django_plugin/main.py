@@ -1,29 +1,32 @@
 import os
 from functools import partial
-from typing import Callable, Dict, Optional, Union, cast
+from typing import Callable, Dict, List, Optional, Tuple, cast
 
-from mypy.nodes import MemberExpr, NameExpr, TypeInfo
+from mypy.nodes import MypyFile, NameExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
-    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
-    AnalyzeTypeContext)
-from mypy.types import (
-    AnyType, CallableType, Instance, NoneTyp, Type, TypeOfAny, TypeType, UnionType,
+    AnalyzeTypeContext, AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
 )
+from mypy.types import Instance, Type
 
-from mypy_django_plugin import helpers, monkeypatch
+from mypy_django_plugin import helpers
 from mypy_django_plugin.config import Config
 from mypy_django_plugin.transformers import fields, init_create
 from mypy_django_plugin.transformers.forms import (
-    make_meta_nested_class_inherit_from_any,
+    extract_proper_type_for_get_form, extract_proper_type_for_get_form_class, make_meta_nested_class_inherit_from_any,
 )
 from mypy_django_plugin.transformers.migrations import (
-    determine_model_cls_from_string_for_migrations, get_string_value_from_expr,
+    determine_model_cls_from_string_for_migrations,
 )
 from mypy_django_plugin.transformers.models import process_model_class
-from mypy_django_plugin.transformers.queryset import extract_proper_type_for_values_and_values_list
+from mypy_django_plugin.transformers.queryset import (
+    extract_proper_type_for_values_and_values_list, set_first_generic_param_as_default_for_second,
+)
+from mypy_django_plugin.transformers.related import (
+    extract_and_return_primary_key_of_bound_related_field_parameter,
+)
 from mypy_django_plugin.transformers.settings import (
-    AddSettingValuesToDjangoConfObject, get_settings_metadata,
+    get_type_of_setting, return_user_model_hook,
 )
 
 
@@ -83,123 +86,10 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
         return ret
 
 
-def set_first_generic_param_as_default_for_second(fullname: str, ctx: AnalyzeTypeContext) -> Type:
-    if not ctx.type.args:
-        try:
-            return ctx.api.named_type(fullname, [AnyType(TypeOfAny.explicit),
-                                                 AnyType(TypeOfAny.explicit)])
-        except KeyError:
-            # really should never happen
-            return AnyType(TypeOfAny.explicit)
-
-    args = ctx.type.args
-    if len(args) == 1:
-        args = [args[0], args[0]]
-
-    analyzed_args = [ctx.api.analyze_type(arg) for arg in args]
-    try:
-        return ctx.api.named_type(fullname, analyzed_args)
-    except KeyError:
-        # really should never happen
-        return AnyType(TypeOfAny.explicit)
-
-
-def return_user_model_hook(ctx: FunctionContext) -> Type:
-    from mypy.checker import TypeChecker
-
-    api = cast(TypeChecker, ctx.api)
-    setting_expr = helpers.get_setting_expr(api, 'AUTH_USER_MODEL')
-    if setting_expr is None:
-        return ctx.default_return_type
-
-    model_path = get_string_value_from_expr(setting_expr)
-    if model_path is None:
-        return ctx.default_return_type
-
-    app_label, _, model_class_name = model_path.rpartition('.')
-    if app_label is None:
-        return ctx.default_return_type
-
-    model_fullname = helpers.get_model_fullname(app_label, model_class_name,
-                                                all_modules=api.modules)
-    if model_fullname is None:
-        api.fail(f'"{app_label}.{model_class_name}" model class is not imported so far. Try to import it '
-                 f'(under if TYPE_CHECKING) at the beginning of the current file',
-                 context=ctx.context)
-        return ctx.default_return_type
-
-    model_info = helpers.lookup_fully_qualified_generic(model_fullname,
-                                                        all_modules=api.modules)
-    if model_info is None or not isinstance(model_info, TypeInfo):
-        return ctx.default_return_type
-    return TypeType(Instance(model_info, []))
-
-
-def _extract_referred_to_type_info(typ: Union[UnionType, Instance]) -> Optional[TypeInfo]:
-    if isinstance(typ, Instance):
-        return typ.type
-    else:
-        # should be Union[TYPE, None]
-        typ = helpers.make_required(typ)
-        if isinstance(typ, Instance):
-            return typ.type
-    return None
-
-
-def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: AttributeContext) -> Type:
-    if not isinstance(ctx.default_attr_type, Instance) or not (ctx.default_attr_type.type.fullname() == 'builtins.int'):
-        return ctx.default_attr_type
-
-    if not isinstance(ctx.type, Instance) or not ctx.type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-        return ctx.default_attr_type
-
-    field_name = ctx.context.name.split('_')[0]
-    sym = ctx.type.type.get(field_name)
-    if sym and isinstance(sym.type, Instance) and len(sym.type.args) > 0:
-        referred_to = sym.type.args[1]
-        if isinstance(referred_to, AnyType):
-            return AnyType(TypeOfAny.implementation_artifact)
-
-        model_type = _extract_referred_to_type_info(referred_to)
-        if model_type is None:
-            return AnyType(TypeOfAny.implementation_artifact)
-
-        primary_key_type = helpers.extract_primary_key_type_for_get(model_type)
-        if primary_key_type:
-            return primary_key_type
-
-    is_nullable = helpers.is_field_nullable(ctx.type.type, field_name)
-    if is_nullable:
-        return helpers.make_optional(ctx.default_attr_type)
-
-    return ctx.default_attr_type
-
-
 def return_integer_type_for_id_for_non_defined_primary_key_in_models(ctx: AttributeContext) -> Type:
     if isinstance(ctx.type, Instance) and ctx.type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
         return ctx.api.named_generic_type('builtins.int', [])
     return ctx.default_attr_type
-
-
-class ExtractSettingType:
-    def __init__(self, module_fullname: str):
-        self.module_fullname = module_fullname
-
-    def __call__(self, ctx: AttributeContext) -> Type:
-        from mypy.checker import TypeChecker
-
-        api = cast(TypeChecker, ctx.api)
-        original_module = api.modules.get(self.module_fullname)
-        if original_module is None:
-            return ctx.default_attr_type
-
-        definition = ctx.context
-        if isinstance(definition, MemberExpr):
-            sym = original_module.names.get(definition.name)
-            if sym and sym.type:
-                return sym.type
-
-        return ctx.default_attr_type
 
 
 def transform_form_view(ctx: ClassDefContext) -> None:
@@ -208,79 +98,9 @@ def transform_form_view(ctx: ClassDefContext) -> None:
         helpers.get_django_metadata(ctx.cls.info)['form_class'] = form_class_value.fullname
 
 
-def extract_proper_type_for_get_form_class(ctx: MethodContext) -> Type:
-    object_type = ctx.type
-    if not isinstance(object_type, Instance):
-        return ctx.default_return_type
-
-    form_class_fullname = helpers.get_django_metadata(object_type.type).get('form_class', None)
-    if not form_class_fullname:
-        return ctx.default_return_type
-
-    return TypeType(ctx.api.named_generic_type(form_class_fullname, []))
-
-
-def extract_proper_type_for_get_form(ctx: MethodContext) -> Type:
-    object_type = ctx.type
-    if not isinstance(object_type, Instance):
-        return ctx.default_return_type
-
-    form_class_type = helpers.get_argument_type_by_name(ctx, 'form_class')
-    if form_class_type is None or isinstance(form_class_type, NoneTyp):
-        # extract from specified form_class in metadata
-        form_class_fullname = helpers.get_django_metadata(object_type.type).get('form_class', None)
-        if not form_class_fullname:
-            return ctx.default_return_type
-
-        return ctx.api.named_generic_type(form_class_fullname, [])
-
-    if isinstance(form_class_type, TypeType) and isinstance(form_class_type.item, Instance):
-        return form_class_type.item
-
-    if isinstance(form_class_type, CallableType) and isinstance(form_class_type.ret_type, Instance):
-        return form_class_type.ret_type
-
-    return ctx.default_return_type
-
-
-def extract_proper_type_for_values_list(ctx: MethodContext) -> Type:
-    object_type = ctx.type
-    if not isinstance(object_type, Instance):
-        return ctx.default_return_type
-
-    flat = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'flat'))
-    named = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'named'))
-
-    ret = ctx.default_return_type
-
-    any_type = AnyType(TypeOfAny.implementation_artifact)
-    if named and flat:
-        ctx.api.fail("'flat' and 'named' can't be used together.", ctx.context)
-        return ret
-    elif named:
-        # TODO: Fill in namedtuple fields/types
-        row_arg = ctx.api.named_generic_type('typing.NamedTuple', [])
-    elif flat:
-        # TODO: Figure out row_arg type dependent on the argument passed in
-        if len(ctx.args[0]) > 1:
-            ctx.api.fail("'flat' is not valid when values_list is called with more than one field.", ctx.context)
-            return ret
-        row_arg = any_type
-    else:
-        # TODO: Figure out tuple argument types dependent on the arguments passed in
-        row_arg = ctx.api.named_generic_type('builtins.tuple', [any_type])
-
-    first_arg = ret.args[0] if len(ret.args) > 0 else any_type
-    new_type_args = [first_arg, row_arg]
-    return helpers.reparametrize_instance(ret, new_type_args)
-
-
 class DjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
-
-        monkeypatch.restore_original_load_graph()
-        monkeypatch.restore_original_dependencies_handling()
 
         config_fpath = os.environ.get('MYPY_DJANGO_CONFIG', 'mypy_django.ini')
         if config_fpath and os.path.exists(config_fpath):
@@ -292,16 +112,6 @@ class DjangoPlugin(Plugin):
 
         if 'DJANGO_SETTINGS_MODULE' in os.environ:
             self.django_settings_module = os.environ['DJANGO_SETTINGS_MODULE']
-
-        settings_modules = ['django.conf.global_settings']
-        if self.django_settings_module:
-            settings_modules.append(self.django_settings_module)
-
-        auto_imports = ['mypy_extensions']
-        auto_imports.extend(settings_modules)
-
-        monkeypatch.add_modules_as_a_source_seed_files(auto_imports)
-        monkeypatch.inject_modules_as_dependencies_for_django_conf_settings(settings_modules)
 
     def _get_current_model_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
@@ -337,10 +147,28 @@ class DjangoPlugin(Plugin):
         else:
             return {}
 
+    def _get_settings_modules_in_order_of_priority(self) -> List[str]:
+        settings_modules = []
+        if self.django_settings_module:
+            settings_modules.append(self.django_settings_module)
+
+        settings_modules.append('django.conf.global_settings')
+        return settings_modules
+
+    def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
+        if file.fullname() == 'django.conf' and self.django_settings_module:
+            return [(10, self.django_settings_module, -1)]
+
+        if file.fullname() == 'django.db.models.query':
+            return [(10, 'mypy_extensions', -1)]
+
+        return []
+
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
         if fullname == 'django.contrib.auth.get_user_model':
-            return return_user_model_hook
+            return partial(return_user_model_hook,
+                           settings_modules=self._get_settings_modules_in_order_of_priority())
 
         manager_bases = self._get_current_manager_bases()
         if fullname in manager_bases:
@@ -384,13 +212,6 @@ class DjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
-        if fullname == helpers.DUMMY_SETTINGS_BASE_CLASS:
-            settings_modules = ['django.conf.global_settings']
-            if self.django_settings_module:
-                settings_modules.append(self.django_settings_module)
-            return AddSettingValuesToDjangoConfObject(settings_modules,
-                                                      self.config.ignore_missing_settings)
-
         if fullname in self._get_current_model_bases():
             return transform_model_class
 
@@ -411,14 +232,15 @@ class DjangoPlugin(Plugin):
         if fullname == 'builtins.object.id':
             return return_integer_type_for_id_for_non_defined_primary_key_in_models
 
-        module, _, name = fullname.rpartition('.')
-        sym = self.lookup_fully_qualified('django.conf.LazySettings')
-        if sym and isinstance(sym.node, TypeInfo):
-            metadata = get_settings_metadata(sym.node)
-            if module == 'builtins.object' and name in metadata:
-                return ExtractSettingType(module_fullname=metadata[name])
+        class_name, _, name = fullname.rpartition('.')
+        if class_name == helpers.DUMMY_SETTINGS_BASE_CLASS:
+            return partial(get_type_of_setting,
+                           setting_name=name,
+                           settings_modules=self._get_settings_modules_in_order_of_priority(),
+                           ignore_missing_settings=self.config.ignore_missing_settings)
 
-        return extract_and_return_primary_key_of_bound_related_field_parameter
+        if fullname.endswith('_id'):
+            return extract_and_return_primary_key_of_bound_related_field_parameter
 
     def get_type_analyze_hook(self, fullname: str
                               ) -> Optional[Callable[[AnalyzeTypeContext], Type]]:
