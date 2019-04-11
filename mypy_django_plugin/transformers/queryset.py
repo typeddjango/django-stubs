@@ -14,7 +14,7 @@ from mypy_django_plugin.lookups import (
 )
 
 
-def extract_proper_type_for_values_and_values_list(method_name: str, ctx: MethodContext) -> Type:
+def extract_proper_type_for_values_and_values_list(ctx: MethodContext, method_name: str) -> Type:
     api = cast(TypeChecker, ctx.api)
 
     object_type = ctx.type

@@ -72,7 +72,10 @@ class User(models.Model):
     my_pk = models.IntegerField(primary_key=True)
 
 reveal_type(User().my_pk)  # E: Revealed type is 'builtins.int*'
-reveal_type(User().id)  # E: Revealed type is 'Any'
+reveal_type(User().id)
+[out]
+main:7: error: Revealed type is 'Any'
+main:7: error: Default primary key 'id' is not defined
 [/CASE]
 
 [CASE test_meta_nested_class_allows_subclassing_in_multiple_inheritance]

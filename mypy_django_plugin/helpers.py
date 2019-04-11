@@ -7,7 +7,7 @@ from mypy.nodes import (
     GDEF, MDEF, AssignmentStmt, Block, CallExpr, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr,
     SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
-from mypy.plugin import FunctionContext, MethodContext
+from mypy.plugin import FunctionContext, MethodContext, CheckerPluginInterface
 from mypy.types import (
     AnyType, Instance, NoneTyp, TupleType, Type, TypedDictType, TypeOfAny, TypeVarType, UnionType,
 )
@@ -227,13 +227,12 @@ def extract_field_getter_type(tp: Type) -> Optional[Type]:
     return None
 
 
-def get_django_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
-    return model.metadata.setdefault('django', {})
+def get_django_metadata(model_info: TypeInfo) -> Dict[str, typing.Any]:
+    return model_info.metadata.setdefault('django', {})
 
 
 def get_related_field_primary_key_names(base_model: TypeInfo) -> typing.List[str]:
-    django_metadata = get_django_metadata(base_model)
-    return django_metadata.setdefault('related_field_primary_keys', [])
+    return get_django_metadata(base_model).setdefault('related_field_primary_keys', [])
 
 
 def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
@@ -242,6 +241,10 @@ def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
 
 def get_lookups_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
     return get_django_metadata(model).setdefault('lookups', {})
+
+
+def get_related_managers_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
+    return get_django_metadata(model).setdefault('related_managers', {})
 
 
 def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[Type]:
@@ -399,3 +402,21 @@ def iter_call_assignments(klass: ClassDef) -> typing.Iterator[typing.Tuple[Lvalu
     for lvalue, rvalue in iter_over_assignments(klass):
         if isinstance(rvalue, CallExpr):
             yield lvalue, rvalue
+
+
+def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager_name: str,
+                                           api: CheckerPluginInterface) -> Optional[Instance]:
+    related_manager_metadata = get_related_managers_metadata(model_info)
+    if not related_manager_metadata:
+        return None
+
+    manager_class_name = related_manager_metadata[related_manager_name]['manager']
+    of = related_manager_metadata[related_manager_name]['of']
+    of_types = []
+    for of_type_name in of:
+        if of_type_name == 'any':
+            of_types.append(AnyType(TypeOfAny.implementation_artifact))
+        else:
+            of_types.append(api.named_generic_type(of_type_name, []))
+
+    return api.named_generic_type(manager_class_name, of_types)

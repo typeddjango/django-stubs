@@ -1,4 +1,4 @@
-[CASE test_queryset]
+[CASE test_queryset_methods]
 from django.db import models
 
 class Blog(models.Model):
@@ -123,7 +123,7 @@ reveal_type(Entry.objects.values_list('blog__pk', flat=True).get()) # E: Reveale
 # Blog has a primary key field specified, so no automatic 'id' field is expected to exist
 reveal_type(Entry.objects.values_list('blog__id', flat=True).get()) # E: Revealed type is 'Any'
 
-[CASE test_queryset_values_list]
+[CASE test_queryset_values_list_flat_named_true]
 from django.db import models
 
 class Blog(models.Model):
@@ -181,7 +181,6 @@ reveal_type(Blog.objects.values_list('my_related_query_name__id', flat=True).get
 
 # Basic inheritance
 reveal_type(BlogChild.objects.values_list('id', 'created_at', 'child_field').get()) # E: Revealed type is 'Tuple[builtins.int, datetime.datetime, builtins.str]'
-
 
 
 [CASE test_queryset_values_list_and_values_behavior_with_no_fields_specified_and_accessing_unknown_attributes]

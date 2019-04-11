@@ -45,3 +45,15 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
         return helpers.make_optional(ctx.default_attr_type)
 
     return ctx.default_attr_type
+
+
+def determine_type_of_related_manager(ctx: AttributeContext, related_manager_name: str) -> Type:
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_attr_type
+
+    related_manager_type = helpers.get_related_manager_type_from_metadata(ctx.type.type,
+                                                                          related_manager_name, ctx.api)
+    if not related_manager_type:
+        return ctx.default_attr_type
+
+    return related_manager_type

@@ -24,7 +24,7 @@ from mypy_django_plugin.transformers.queryset import (
 )
 from mypy_django_plugin.transformers.related import (
     extract_and_return_primary_key_of_bound_related_field_parameter,
-)
+    determine_type_of_related_manager)
 from mypy_django_plugin.transformers.settings import (
     get_type_of_setting, return_user_model_hook,
 )
@@ -38,20 +38,21 @@ def transform_model_class(ctx: ClassDefContext) -> None:
         pass
     else:
         if sym is not None and isinstance(sym.node, TypeInfo):
-            sym.node.metadata['django']['model_bases'][ctx.cls.fullname] = 1
+            helpers.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
+
     process_model_class(ctx)
 
 
 def transform_manager_class(ctx: ClassDefContext) -> None:
     sym = ctx.api.lookup_fully_qualified_or_none(helpers.MANAGER_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        sym.node.metadata['django']['manager_bases'][ctx.cls.fullname] = 1
+        helpers.get_django_metadata(sym.node)['manager_bases'][ctx.cls.fullname] = 1
 
 
 def transform_form_class(ctx: ClassDefContext) -> None:
     sym = ctx.api.lookup_fully_qualified_or_none(helpers.BASEFORM_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        sym.node.metadata['django']['baseform_bases'][ctx.cls.fullname] = 1
+        helpers.get_django_metadata(sym.node)['baseform_bases'][ctx.cls.fullname] = 1
 
     make_meta_nested_class_inherit_from_any(ctx)
 
@@ -86,10 +87,19 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
         return ret
 
 
-def return_integer_type_for_id_for_non_defined_primary_key_in_models(ctx: AttributeContext) -> Type:
-    if isinstance(ctx.type, Instance) and ctx.type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-        return ctx.api.named_generic_type('builtins.int', [])
-    return ctx.default_attr_type
+def return_type_for_id_field(ctx: AttributeContext) -> Type:
+    model_info = cast(TypeInfo, ctx.type.type)
+    for base in model_info.mro:
+        fields = helpers.get_fields_metadata(base)
+        for field_name, field_props in fields.items():
+            is_primary_key = field_props.get('primary_key', False)
+            if is_primary_key:
+                if field_name != 'id':
+                    ctx.api.fail("Default primary key 'id' is not defined", ctx.context)
+                return ctx.default_attr_type
+
+    # primary key not defined in mro
+    return ctx.api.named_generic_type('builtins.int', [])
 
 
 def transform_form_view(ctx: ClassDefContext) -> None:
@@ -155,6 +165,12 @@ class DjangoPlugin(Plugin):
         settings_modules.append('django.conf.global_settings')
         return settings_modules
 
+    def _get_typeinfo_or_none(self, class_name: str) -> Optional[TypeInfo]:
+        sym = self.lookup_fully_qualified(class_name)
+        if sym is not None and isinstance(sym.node, TypeInfo):
+            return sym.node
+        return None
+
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         if file.fullname() == 'django.conf' and self.django_settings_module:
             return [(10, self.django_settings_module, -1)]
@@ -198,7 +214,8 @@ class DjangoPlugin(Plugin):
         if method_name in ('values', 'values_list'):
             sym = self.lookup_fully_qualified(class_name)
             if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.QUERYSET_CLASS_FULLNAME):
-                return partial(extract_proper_type_for_values_and_values_list, method_name)
+                return partial(extract_proper_type_for_values_and_values_list,
+                               method_name=method_name)
 
         if fullname in {'django.apps.registry.Apps.get_model',
                         'django.db.migrations.state.StateApps.get_model'}:
@@ -229,18 +246,26 @@ class DjangoPlugin(Plugin):
 
     def get_attribute_hook(self, fullname: str
                            ) -> Optional[Callable[[AttributeContext], Type]]:
-        if fullname == 'builtins.object.id':
-            return return_integer_type_for_id_for_non_defined_primary_key_in_models
-
-        class_name, _, name = fullname.rpartition('.')
+        class_name, _, attr_name = fullname.rpartition('.')
         if class_name == helpers.DUMMY_SETTINGS_BASE_CLASS:
             return partial(get_type_of_setting,
-                           setting_name=name,
+                           setting_name=attr_name,
                            settings_modules=self._get_settings_modules_in_order_of_priority(),
                            ignore_missing_settings=self.config.ignore_missing_settings)
 
-        if fullname.endswith('_id'):
-            return extract_and_return_primary_key_of_bound_related_field_parameter
+        if class_name in self._get_current_model_bases():
+            if attr_name == 'id':
+                return return_type_for_id_field
+
+            model_info = self._get_typeinfo_or_none(class_name)
+            if model_info:
+                related_managers = helpers.get_related_managers_metadata(model_info)
+                if attr_name in related_managers:
+                    return partial(determine_type_of_related_manager,
+                                   related_manager_name=attr_name)
+
+            if attr_name.endswith('_id'):
+                return extract_and_return_primary_key_of_bound_related_field_parameter
 
     def get_type_analyze_hook(self, fullname: str
                               ) -> Optional[Callable[[AnalyzeTypeContext], Type]]:

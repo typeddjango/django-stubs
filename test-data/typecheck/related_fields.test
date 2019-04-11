@@ -136,7 +136,7 @@ reveal_type(App().views)  # E: Revealed type is 'django.db.models.manager.Relate
 reveal_type(App().views2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View2]'
 [out]
 
-[CASE models_imported_inside_init_file]
+[CASE models_imported_inside_init_file_foreign_key]
 from django.db import models
 from myapp.models import App
 class View(models.Model):
@@ -150,6 +150,7 @@ from .app import App
 from django.db import models
 class App(models.Model):
     pass
+[/CASE]
 
 [CASE models_imported_inside_init_file_one_to_one_field]
 from django.db import models

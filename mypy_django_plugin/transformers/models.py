@@ -1,11 +1,9 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Iterator, List, Optional, Tuple, cast
+from typing import Dict, Iterator, List, Optional, Tuple, cast, Any
 
 import dataclasses
-from mypy.nodes import (
-    ARG_POS, ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, MemberExpr, MypyFile,
-    NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var,
-)
+from mypy.nodes import (ARG_POS, ARG_STAR, ARG_STAR2, Argument, CallExpr, ClassDef, Expression, IndexExpr, MDEF, MemberExpr,
+                        MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var)
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
@@ -37,8 +35,10 @@ class ModelClassInitializer(metaclass=ABCMeta):
         return self.api.parse_bool(is_abstract_expr)
 
     def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+        # type=: type of the variable itself
         var = Var(name=name, type=typ)
-        var.info = typ.type
+        # var.info: type of the object variable is bound to
+        var.info = self.model_classdef.info
         var._fullname = self.model_classdef.info.fullname() + '.' + name
         var.is_inferred = True
         var.is_initialized_in_class = True
@@ -141,23 +141,31 @@ class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
 
 
 class AddRelatedManagers(ModelClassInitializer):
+    def add_related_manager_variable(self, manager_name: str, related_field_type_data: Dict[str, Any]) -> None:
+        # add dummy related manager for use later
+        self.add_new_node_to_model_class(manager_name, self.api.builtin_type('builtins.object'))
+
+        # save name in metadata for use in get_attribute_hook later
+        related_managers_metadata = helpers.get_related_managers_metadata(self.model_classdef.info)
+        related_managers_metadata[manager_name] = related_field_type_data
+
     def run(self) -> None:
         for module_name, module_file in self.api.modules.items():
-            for defn in helpers.iter_over_classdefs(module_file):
-                for lvalue, rvalue in helpers.iter_call_assignments(defn):
+            for model_defn in helpers.iter_over_classdefs(module_file):
+                for lvalue, rvalue in helpers.iter_call_assignments(model_defn):
                     if is_related_field(rvalue, module_file):
                         try:
-                            ref_to_fullname = extract_ref_to_fullname(rvalue,
-                                                                      module_file=module_file,
-                                                                      all_modules=self.api.modules)
+                            referenced_model_fullname = extract_ref_to_fullname(rvalue,
+                                                                                module_file=module_file,
+                                                                                all_modules=self.api.modules)
                         except helpers.SelfReference:
-                            ref_to_fullname = defn.fullname
+                            referenced_model_fullname = model_defn.fullname
 
                         except helpers.SameFileModel as exc:
-                            ref_to_fullname = module_name + '.' + exc.model_cls_name
+                            referenced_model_fullname = module_name + '.' + exc.model_cls_name
 
-                        if self.model_classdef.fullname == ref_to_fullname:
-                            related_name = defn.name.lower() + '_set'
+                        if self.model_classdef.fullname == referenced_model_fullname:
+                            related_name = model_defn.name.lower() + '_set'
                             if 'related_name' in rvalue.arg_names:
                                 related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]
                                 if not isinstance(related_name_expr, StrExpr):
@@ -177,10 +185,28 @@ class AddRelatedManagers(ModelClassInitializer):
                             else:
                                 # No related_query_name specified, default to related_name
                                 related_query_name = related_name
-                            typ = get_related_field_type(rvalue, self.api, defn.info)
-                            if typ is None:
-                                continue
-                            self.add_new_node_to_model_class(related_name, typ)
+
+                            # field_type_data = get_related_field_type(rvalue, self.api, defn.info)
+                            # if typ is None:
+                            #     continue
+
+                            # TODO: recursively serialize types, or just https://github.com/python/mypy/issues/6506
+                            # as long as Model is not a Generic, one level depth is fine
+                            if rvalue.callee.name in {'ForeignKey', 'ManyToManyField'}:
+                                field_type_data = {
+                                    'manager': helpers.RELATED_MANAGER_CLASS_FULLNAME,
+                                    'of': [model_defn.info.fullname()]
+                                }
+                                # return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
+                                #                               args=[Instance(related_model_typ, [])])
+                            else:
+                                field_type_data = {
+                                    'manager': model_defn.info.fullname(),
+                                    'of': []
+                                }
+
+                            self.add_related_manager_variable(related_name, related_field_type_data=field_type_data)
+
                             if related_query_name is not None:
                                 # Only create related_query_name if it is a string literal
                                 helpers.get_lookups_metadata(self.model_classdef.info)[related_query_name] = {
@@ -188,13 +214,20 @@ class AddRelatedManagers(ModelClassInitializer):
                                 }
 
 
-def get_related_field_type(rvalue: CallExpr, api: SemanticAnalyzerPass2,
-                           related_model_typ: TypeInfo) -> Optional[Instance]:
+def get_related_field_type(rvalue: CallExpr, related_model_typ: TypeInfo) -> Dict[str, Any]:
     if rvalue.callee.name in {'ForeignKey', 'ManyToManyField'}:
-        return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
-                                      args=[Instance(related_model_typ, [])])
+        return {
+            'manager': helpers.RELATED_MANAGER_CLASS_FULLNAME,
+            'of': [related_model_typ.fullname()]
+        }
+        # return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
+        #                               args=[Instance(related_model_typ, [])])
     else:
-        return Instance(related_model_typ, [])
+        return {
+            'manager': related_model_typ.fullname(),
+            'of': []
+        }
+        # return Instance(related_model_typ, [])
 
 
 def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:

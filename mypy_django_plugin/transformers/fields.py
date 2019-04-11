@@ -149,7 +149,7 @@ def record_field_properties_into_outer_model_class(ctx: FunctionContext) -> None
     if field_name is None:
         return
 
-    fields_metadata = outer_model.metadata.setdefault('django', {}).setdefault('fields', {})
+    fields_metadata = helpers.get_fields_metadata(outer_model)
 
     # primary key
     is_primary_key = False

@@ -92,16 +92,27 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
         raise LookupException(
             f'When resolving lookup "{lookup}", could not determine type for {model_type_info.name()}.{field_name}')
 
-    if helpers.is_foreign_key(field_node_type):
-        field_type = helpers.extract_field_getter_type(field_node_type)
-        is_nullable = helpers.is_optional(field_type)
-        if is_nullable:
-            field_type = helpers.make_required(field_type)
+    related_manager_type = helpers.get_related_manager_type_from_metadata(model_type_info, field_name, api)
+    if related_manager_type:
+        return RelatedModelNode(typ=related_manager_type, is_nullable=False)
 
-        if isinstance(field_type, Instance):
-            return RelatedModelNode(typ=field_type, is_nullable=is_nullable)
-        else:
-            raise LookupException(f"Not an instance for field {field_type} lookup {lookup}")
+    # related_manager_data = (helpers
+    #                         .get_django_metadata(model_type_info)
+    #                         .get('related_managers', {})
+    #                         .get(field_name))
+    # if related_manager_data:
+    #
+    #
+    # if helpers.is_foreign_key(field_node_type):
+    #     field_type = helpers.extract_field_getter_type(field_node_type)
+    #     is_nullable = helpers.is_optional(field_type)
+    #     if is_nullable:
+    #         field_type = helpers.make_required(field_type)
+    #
+    #     if isinstance(field_type, Instance):
+    #         return RelatedModelNode(typ=field_type, is_nullable=is_nullable)
+    #     else:
+    #         raise LookupException(f"Not an instance for field {field_type} lookup {lookup}")
 
     field_type = helpers.extract_field_getter_type(field_node_type)
 
