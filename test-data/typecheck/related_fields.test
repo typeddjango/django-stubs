@@ -137,6 +137,7 @@ reveal_type(App().views2)  # E: Revealed type is 'django.db.models.manager.Relat
 [out]
 
 [CASE models_imported_inside_init_file_foreign_key]
+[disable_cache]
 from django.db import models
 from myapp.models import App
 class View(models.Model):
@@ -153,6 +154,7 @@ class App(models.Model):
 [/CASE]
 
 [CASE models_imported_inside_init_file_one_to_one_field]
+[disable_cache]
 from django.db import models
 from myapp.models import User
 class Profile(models.Model):
