@@ -31,7 +31,7 @@ from mypy_django_plugin.transformers.settings import (
 )
 
 
-def transform_model_class(ctx: ClassDefContext) -> None:
+def transform_model_class(ctx: ClassDefContext, ignore_missing_model_attributes: bool) -> None:
     try:
         sym = ctx.api.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
     except KeyError:
@@ -41,7 +41,7 @@ def transform_model_class(ctx: ClassDefContext) -> None:
         if sym is not None and isinstance(sym.node, TypeInfo):
             helpers.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
 
-    process_model_class(ctx)
+    process_model_class(ctx, ignore_missing_model_attributes)
 
 
 def transform_manager_class(ctx: ClassDefContext) -> None:
@@ -248,7 +248,8 @@ class DjangoPlugin(Plugin):
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
         if fullname in self._get_current_model_bases():
-            return transform_model_class
+            return partial(transform_model_class,
+                           ignore_missing_model_attributes=self.config.ignore_missing_model_attributes)
 
         if fullname in self._get_current_manager_bases():
             return transform_manager_class

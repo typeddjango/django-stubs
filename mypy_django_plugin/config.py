@@ -8,6 +8,7 @@ from dataclasses import dataclass
 class Config:
     django_settings_module: Optional[str] = None
     ignore_missing_settings: bool = False
+    ignore_missing_model_attributes: bool = False
 
     @classmethod
     def from_config_file(cls, fpath: str) -> 'Config':
@@ -22,5 +23,9 @@ class Config:
             django_settings = django_settings.strip()
 
         return Config(django_settings_module=django_settings,
-                      ignore_missing_settings=bool(ini_config.get('mypy_django_plugin', 'ignore_missing_settings',
-                                                                  fallback=False)))
+                      ignore_missing_settings=bool(ini_config.get('mypy_django_plugin',
+                                                                  'ignore_missing_settings',
+                                                                  fallback=False)),
+                      ignore_missing_model_attributes=bool(ini_config.get('mypy_django_plugin',
+                                                                          'ignore_missing_model_attributes',
+                                                                          fallback=False)))

@@ -109,8 +109,10 @@ class View(models.Model):
     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
 
 reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
-reveal_type(View().app.unknown)  # E: Revealed type is 'Any'
+reveal_type(View().app.unknown)
 [out]
+main:7: error: Revealed type is 'Any'
+main:7: error: "App" has no attribute "unknown"
 
 [file myapp/__init__.py]
 [file myapp/models.py]
@@ -307,6 +309,10 @@ book = Book()
 reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
-reveal_type(publisher.books)  # E: Revealed type is 'Any'
+reveal_type(publisher.books)
 reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+[out]
+main:16: error: Revealed type is 'Any'
+main:16: error: "Publisher" has no attribute "books"; maybe "books2"?
+[/CASE]
 
