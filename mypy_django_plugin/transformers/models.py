@@ -286,7 +286,7 @@ def add_get_set_attr_fallback_to_any(ctx: ClassDefContext):
     add_method(ctx, '__setattr__', [name_arg, value_arg], any)
 
 
-def process_model_class(ctx: ClassDefContext) -> None:
+def process_model_class(ctx: ClassDefContext, ignore_unknown_attributes: bool) -> None:
     initializers = [
         InjectAnyAsBaseForNestedMeta,
         AddDefaultObjectsManager,
@@ -299,5 +299,5 @@ def process_model_class(ctx: ClassDefContext) -> None:
 
     add_dummy_init_method(ctx)
 
-    # allow unspecified attributes for now
-    add_get_set_attr_fallback_to_any(ctx)
+    if ignore_unknown_attributes:
+        add_get_set_attr_fallback_to_any(ctx)

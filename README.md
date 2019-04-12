@@ -44,6 +44,9 @@ django_settings = mysettings.local
 # if True, all unknown settings in django.conf.settings will fallback to Any,
 # specify it if your settings are loaded dynamically to avoid false positives
 ignore_missing_settings = True
+
+# if True, unknown attributes on Model instances won't produce errors
+ignore_missing_model_attributes = True
 ```
 
 ## To get help
