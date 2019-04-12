@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, List, Optional, cast
 
 from mypy.checkexpr import FunctionContext
 from mypy.checkmember import AttributeContext
-from mypy.nodes import NameExpr, StrExpr, SymbolTableNode, TypeInfo, Context
+from mypy.nodes import NameExpr, StrExpr, SymbolTableNode, TypeInfo
 from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType
 
 from mypy_django_plugin import helpers
