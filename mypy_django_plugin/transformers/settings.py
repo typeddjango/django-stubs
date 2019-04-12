@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, List, Optional, cast
 
 from mypy.checkexpr import FunctionContext
 from mypy.checkmember import AttributeContext
-from mypy.nodes import NameExpr, StrExpr, SymbolTableNode, TypeInfo
+from mypy.nodes import NameExpr, StrExpr, SymbolTableNode, TypeInfo, Context
 from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType
 
 from mypy_django_plugin import helpers
@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 
 def get_setting_sym(name: str, api: 'TypeChecker', settings_modules: List[str]) -> Optional[SymbolTableNode]:
     for settings_mod_name in settings_modules:
+        if settings_mod_name not in api.modules:
+            continue
+
         file = api.modules[settings_mod_name]
         sym = file.names.get(name)
         if sym is not None:
