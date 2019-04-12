@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, List, Optional, cast
 from mypy.checkexpr import FunctionContext
 from mypy.checkmember import AttributeContext
 from mypy.nodes import NameExpr, StrExpr, SymbolTableNode, TypeInfo
-from mypy.types import Instance, Type, TypeType
+from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType
 
 from mypy_django_plugin import helpers
 
@@ -24,7 +24,11 @@ def get_setting_sym(name: str, api: 'TypeChecker', settings_modules: List[str]) 
 def get_type_of_setting(ctx: AttributeContext, setting_name: str,
                         settings_modules: List[str], ignore_missing_settings: bool) -> Type:
     setting_sym = get_setting_sym(setting_name, ctx.api, settings_modules)
-    if setting_sym is not None:
+    if setting_sym:
+        if setting_sym.type is None:
+            # TODO: defer till setting_sym.type is not None
+            return AnyType(TypeOfAny.implementation_artifact)
+
         return setting_sym.type
 
     if not ignore_missing_settings:

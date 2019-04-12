@@ -422,7 +422,13 @@ def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager
         if of_type_name == 'any':
             of_types.append(AnyType(TypeOfAny.implementation_artifact))
         else:
-            of_types.append(api.named_generic_type(of_type_name, []))
+            try:
+                of_type = api.named_generic_type(of_type_name, [])
+            except AssertionError:
+                # Internal error: attempted lookup of unknown name
+                of_type = AnyType(TypeOfAny.implementation_artifact)
+
+            of_types.append(of_type)
 
     return api.named_generic_type(manager_class_name, of_types)
 
