@@ -5,14 +5,11 @@ by the DJANGO_SETTINGS_MODULE environment variable.
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Dict, List, Optional, Pattern, Tuple, Protocol, Union, Callable, TYPE_CHECKING, Sequence
+from typing import Any, Dict, List, Optional, Pattern, Protocol, Sequence, Tuple, Union
 
 ####################
 # CORE             #
 ####################
-if TYPE_CHECKING:
-    from django.db.models.base import Model
-
 DEBUG: bool = ...
 
 # Whether the framework should propagate raw exceptions rather than catching
@@ -153,7 +150,7 @@ FORCE_SCRIPT_NAME = None
 #     ]
 DISALLOWED_USER_AGENTS: List[Pattern] = ...
 
-ABSOLUTE_URL_OVERRIDES: Dict[str, Callable[[Model], str]] = ...
+ABSOLUTE_URL_OVERRIDES: Dict[str, Any] = ...
 
 # List of compiled regular expression objects representing URLs that need not
 # be reported by BrokenLinkEmailsMiddleware. Here are a few examples:

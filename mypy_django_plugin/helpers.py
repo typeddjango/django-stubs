@@ -4,12 +4,13 @@ from typing import Dict, Optional, cast
 
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    AssignmentStmt, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr, SymbolNode, TypeInfo,
-    SymbolTable, SymbolTableNode, Block, GDEF, MDEF, Var)
-from mypy.plugin import FunctionContext, MethodContext
+    GDEF, MDEF, AssignmentStmt, Block, CallExpr, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr,
+    SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
+)
+from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
 from mypy.types import (
-    AnyType, Instance, NoneTyp, Type, TypeOfAny, TypeVarType, UnionType,
-    TupleType, TypedDictType)
+    AnyType, Instance, NoneTyp, TupleType, Type, TypedDictType, TypeOfAny, TypeVarType, UnionType,
+)
 
 if typing.TYPE_CHECKING:
     from mypy.checker import TypeChecker
@@ -216,6 +217,7 @@ def extract_field_setter_type(tp: Instance) -> Optional[Type]:
 
 
 def extract_field_getter_type(tp: Type) -> Optional[Type]:
+    """ Extract return type of __get__ of subclass of Field"""
     if not isinstance(tp, Instance):
         return None
     if tp.type.has_base(FIELD_FULLNAME):
@@ -226,13 +228,12 @@ def extract_field_getter_type(tp: Type) -> Optional[Type]:
     return None
 
 
-def get_django_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
-    return model.metadata.setdefault('django', {})
+def get_django_metadata(model_info: TypeInfo) -> Dict[str, typing.Any]:
+    return model_info.metadata.setdefault('django', {})
 
 
 def get_related_field_primary_key_names(base_model: TypeInfo) -> typing.List[str]:
-    django_metadata = get_django_metadata(base_model)
-    return django_metadata.setdefault('related_field_primary_keys', [])
+    return get_django_metadata(base_model).setdefault('related_field_primary_keys', [])
 
 
 def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
@@ -241,6 +242,10 @@ def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
 
 def get_lookups_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
     return get_django_metadata(model).setdefault('lookups', {})
+
+
+def get_related_managers_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
+    return get_django_metadata(model).setdefault('related_managers', {})
 
 
 def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[Type]:
@@ -310,7 +315,7 @@ def is_field_nullable(model: TypeInfo, field_name: str) -> bool:
     return get_fields_metadata(model).get(field_name, {}).get('null', False)
 
 
-def is_foreign_key(t: Type) -> bool:
+def is_foreign_key_like(t: Type) -> bool:
     if not isinstance(t, Instance):
         return False
     return has_any_of_bases(t.type, (FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME))
@@ -366,13 +371,14 @@ def make_named_tuple(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', name:
     return TupleType(list(fields.values()), fallback=fallback)
 
 
-def make_typeddict(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
+def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, Type]',
+                   required_keys: typing.Set[str]) -> TypedDictType:
     object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
 
 
-def make_tuple(api: 'TypeChecker', fields: typing.List[Type]) -> Type:
+def make_tuple(api: 'TypeChecker', fields: typing.List[Type]) -> TupleType:
     implicit_any = AnyType(TypeOfAny.special_form)
     fallback = api.named_generic_type('builtins.tuple', [implicit_any])
     return TupleType(fields, fallback=fallback)
@@ -386,3 +392,52 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
             descriptor_type = make_optional(descriptor_type)
         return descriptor_type
     return AnyType(TypeOfAny.unannotated)
+
+
+def iter_over_classdefs(module_file: MypyFile) -> typing.Iterator[ClassDef]:
+    for defn in module_file.defs:
+        if isinstance(defn, ClassDef):
+            yield defn
+
+
+def iter_call_assignments(klass: ClassDef) -> typing.Iterator[typing.Tuple[Lvalue, CallExpr]]:
+    for lvalue, rvalue in iter_over_assignments(klass):
+        if isinstance(rvalue, CallExpr):
+            yield lvalue, rvalue
+
+
+def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager_name: str,
+                                           api: CheckerPluginInterface) -> Optional[Instance]:
+    related_manager_metadata = get_related_managers_metadata(model_info)
+    if not related_manager_metadata:
+        return None
+
+    if related_manager_name not in related_manager_metadata:
+        return None
+
+    manager_class_name = related_manager_metadata[related_manager_name]['manager']
+    of = related_manager_metadata[related_manager_name]['of']
+    of_types = []
+    for of_type_name in of:
+        if of_type_name == 'any':
+            of_types.append(AnyType(TypeOfAny.implementation_artifact))
+        else:
+            try:
+                of_type = api.named_generic_type(of_type_name, [])
+            except AssertionError:
+                # Internal error: attempted lookup of unknown name
+                of_type = AnyType(TypeOfAny.implementation_artifact)
+
+            of_types.append(of_type)
+
+    return api.named_generic_type(manager_class_name, of_types)
+
+
+def get_primary_key_field_name(model_info: TypeInfo) -> Optional[str]:
+    for base in model_info.mro:
+        fields = get_fields_metadata(base)
+        for field_name, field_props in fields.items():
+            is_primary_key = field_props.get('primary_key', False)
+            if is_primary_key:
+                return field_name
+    return None

@@ -25,7 +25,10 @@ UserModel = get_user_model()
 reveal_type(UserModel.objects)  # E: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
 
 [file mysettings.py]
+from basic import *
 INSTALLED_APPS = ('myapp',)
+
+[file basic.py]
 AUTH_USER_MODEL = 'myapp.MyUser'
 
 [file myapp/__init__.py]

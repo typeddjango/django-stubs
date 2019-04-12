@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 from typing import List
 
-
 STUBS_ROOT = Path(__file__).parent.parent / 'django-stubs'
 
 

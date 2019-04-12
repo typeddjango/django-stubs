@@ -3,10 +3,13 @@
 [disable_cache]
 from django.conf import settings
 
+# standard settings
+reveal_type(settings.AUTH_USER_MODEL)  # E: Revealed type is 'builtins.str'
+
 reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'builtins.str'
 reveal_type(settings.APPS_DIR)  # E: Revealed type is 'pathlib.Path'
 reveal_type(settings.OBJ)  # E: Revealed type is 'django.utils.functional.LazyObject'
-reveal_type(settings.NUMBERS)  # E: Revealed type is 'builtins.list[builtins.str]'
+reveal_type(settings.NUMBERS)  # E: Revealed type is 'builtins.list[builtins.str*]'
 reveal_type(settings.DICT)  # E: Revealed type is 'builtins.dict[Any, Any]'
 [file base.py]
 from pathlib import Path
@@ -27,18 +30,32 @@ OBJ = LazyObject()
 from django.conf import settings
 
 reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'pathlib.Path'
-reveal_type(settings.SETUP)  # E: Revealed type is 'builtins.int'
-reveal_type(settings.DATABASES)  # E: Revealed type is 'builtins.dict[builtins.str, builtins.str]'
+reveal_type(settings.SETUP)  # E: Revealed type is 'Union[builtins.int, None]'
+reveal_type(settings.DATABASES)  # E: Revealed type is 'builtins.dict[builtins.str*, builtins.str*]'
+
+reveal_type(settings.LOCAL_SETTING)  # E: Revealed type is 'builtins.int'
+reveal_type(settings.BASE_SETTING)  # E: Revealed type is 'builtins.int'
+
 [file mysettings.py]
 from local import *
-DATABASES = {'default': 'mydb'}
+from typing import Optional
+SETUP: Optional[int] = 3
+
 [file local.py]
 from base import *
-SETUP = 3
+SETUP: int = 3
+DATABASES = {'default': 'mydb'}
+
+LOCAL_SETTING = 1
+
 [file base.py]
 from pathlib import Path
-
+from typing import Any
+SETUP: Any = None
 ROOT_DIR = Path(__file__)
+
+BASE_SETTING = 1
+
 [/CASE]
 
 [CASE global_settings_are_always_loaded]
@@ -73,10 +90,10 @@ LIST: List[str] = ['1', '2']
 from django.conf import settings
 reveal_type(settings.NOT_EXISTING)
 
-[env DJANGO_SETTINGS_MODULE=mysettings]
+[env DJANGO_SETTINGS_MODULE=mysettings2]
 [disable_cache]
-[file mysettings.py]
+[file mysettings2.py]
 [out]
 main:2: error: Revealed type is 'Any'
-main:2: error: "LazySettings" has no attribute "NOT_EXISTING"
+main:2: error: 'Settings' object has no attribute 'NOT_EXISTING'
 [/CASE]

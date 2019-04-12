@@ -1,9 +1,9 @@
-import dataclasses
-from typing import Union, List
+from typing import List, Union
 
+import dataclasses
 from mypy.nodes import TypeInfo
 from mypy.plugin import CheckerPluginInterface
-from mypy.types import Type, Instance
+from mypy.types import Instance, Type
 
 from mypy_django_plugin import helpers
 
@@ -57,20 +57,24 @@ def resolve_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo, looku
     return nodes
 
 
+def resolve_model_pk_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo) -> LookupNode:
+    # Primary keys are special-cased
+    primary_key_type = helpers.extract_primary_key_type_for_get(model_type_info)
+    if primary_key_type:
+        return FieldNode(primary_key_type)
+    else:
+        # No PK, use the get type for AutoField as PK type.
+        autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
+        pk_type = helpers.get_private_descriptor_type(autofield_info, '_pyi_private_get_type',
+                                                      is_nullable=False)
+        return FieldNode(pk_type)
+
+
 def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
                          lookup: str) -> LookupNode:
     """Resolve a lookup on the given model."""
     if lookup == 'pk':
-        # Primary keys are special-cased
-        primary_key_type = helpers.extract_primary_key_type_for_get(model_type_info)
-        if primary_key_type:
-            return FieldNode(primary_key_type)
-        else:
-            # No PK, use the get type for AutoField as PK type.
-            autofield_info = api.lookup_typeinfo('django.db.models.fields.AutoField')
-            pk_type = helpers.get_private_descriptor_type(autofield_info, '_pyi_private_get_type',
-                                                          is_nullable=False)
-            return FieldNode(pk_type)
+        return resolve_model_pk_lookup(api, model_type_info)
 
     field_name = get_actual_field_name_for_lookup_field(lookup, model_type_info)
 
@@ -82,7 +86,7 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
     if field_name.endswith('_id'):
         field_name_without_id = field_name.rstrip('_id')
         foreign_key_field = model_type_info.get(field_name_without_id)
-        if foreign_key_field is not None and helpers.is_foreign_key(foreign_key_field.type):
+        if foreign_key_field is not None and helpers.is_foreign_key_like(foreign_key_field.type):
             # Hack: If field ends with '_id' and there is a model field without the '_id' suffix, then use that field.
             field_node = foreign_key_field
             field_name = field_name_without_id
@@ -92,10 +96,23 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
         raise LookupException(
             f'When resolving lookup "{lookup}", could not determine type for {model_type_info.name()}.{field_name}')
 
-    if helpers.is_foreign_key(field_node_type):
+    if field_node_type.type.fullname() == 'builtins.object':
+        # could be related manager
+        related_manager_type = helpers.get_related_manager_type_from_metadata(model_type_info, field_name, api)
+        if related_manager_type:
+            model_arg = related_manager_type.args[0]
+            if not isinstance(model_arg, Instance):
+                raise LookupException(
+                    f'When resolving lookup "{lookup}", could not determine type '
+                    f'for {model_type_info.name()}.{field_name}')
+
+            return RelatedModelNode(typ=model_arg, is_nullable=False)
+
+    if helpers.is_foreign_key_like(field_node_type):
         field_type = helpers.extract_field_getter_type(field_node_type)
         is_nullable = helpers.is_optional(field_type)
         if is_nullable:
+            # type is always non-optional
             field_type = helpers.make_required(field_type)
 
         if isinstance(field_type, Instance):
@@ -104,24 +121,16 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
             raise LookupException(f"Not an instance for field {field_type} lookup {lookup}")
 
     field_type = helpers.extract_field_getter_type(field_node_type)
-
     if field_type:
         return FieldNode(typ=field_type)
-    else:
-        # Not a Field
-        if field_name == 'id':
-            # If no 'id' field was fouond, use an int
-            return FieldNode(api.named_generic_type('builtins.int', []))
 
-        related_manager_arg = None
-        if field_node_type.type.has_base(helpers.RELATED_MANAGER_CLASS_FULLNAME):
-            related_manager_arg = field_node_type.args[0]
+    # Not a Field
+    if field_name == 'id':
+        # If no 'id' field was found, use an int
+        return FieldNode(api.named_generic_type('builtins.int', []))
 
-        if related_manager_arg is not None:
-            # Reverse relation
-            return RelatedModelNode(typ=related_manager_arg, is_nullable=True)
-        raise LookupException(
-            f'When resolving lookup "{lookup}", could not determine type for {model_type_info.name()}.{field_name}')
+    raise LookupException(
+        f'When resolving lookup {lookup!r}, could not determine type for {model_type_info.name()}.{field_name}')
 
 
 def get_actual_field_name_for_lookup_field(lookup: str, model_type_info: TypeInfo) -> str:

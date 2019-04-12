@@ -8,3 +8,4 @@ out/
 django-sources
 build/
 dist/
+pip-wheel-metadata/
