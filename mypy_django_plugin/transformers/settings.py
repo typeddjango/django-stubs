@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 
 def get_setting_sym(name: str, api: 'TypeChecker', settings_modules: List[str]) -> Optional[SymbolTableNode]:
     for settings_mod_name in settings_modules:
+        if settings_mod_name not in api.modules:
+            continue
+
         file = api.modules[settings_mod_name]
         sym = file.names.get(name)
         if sym is not None:
