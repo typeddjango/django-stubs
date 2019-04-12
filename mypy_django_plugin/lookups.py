@@ -3,7 +3,7 @@ from typing import List, Union
 import dataclasses
 from mypy.nodes import TypeInfo
 from mypy.plugin import CheckerPluginInterface
-from mypy.types import Instance, Type, AnyType, TypeOfAny
+from mypy.types import Instance, Type
 
 from mypy_django_plugin import helpers
 
@@ -122,18 +122,12 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
     field_type = helpers.extract_field_getter_type(field_node_type)
     if field_type:
         return FieldNode(typ=field_type)
-        # Not a Field
+
+    # Not a Field
     if field_name == 'id':
         # If no 'id' field was found, use an int
         return FieldNode(api.named_generic_type('builtins.int', []))
 
-        # related_manager_arg = None
-        # if field_node_type.type.has_base(helpers.RELATED_MANAGER_CLASS_FULLNAME):
-        #     related_manager_arg = field_node_type.args[0]
-        #
-        # if related_manager_arg is not None:
-        #     # Reverse relation
-        #     return RelatedModelNode(typ=related_manager_arg, is_nullable=True)
     raise LookupException(
         f'When resolving lookup {lookup!r}, could not determine type for {model_type_info.name()}.{field_name}')
 

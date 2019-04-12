@@ -21,15 +21,6 @@ def get_queryset_model_arg(ret_type: Instance) -> Type:
         return AnyType(TypeOfAny.implementation_artifact)
 
 
-def get_expression_columns(expression_arg_names: Iterable[str]) -> 'OrderedDict[str, Type]':
-    expression_columns = OrderedDict()
-    for expression_name in expression_arg_names:
-        # Arbitrary additional annotation expressions are supported, but they all have type Any for now
-        expression_columns[expression_name] = AnyType(TypeOfAny.implementation_artifact)
-
-    return expression_columns
-
-
 def extract_proper_type_for_queryset_values(ctx: MethodContext) -> Type:
     object_type = ctx.type
     if not isinstance(object_type, Instance):
@@ -159,20 +150,6 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext) -> Type:
         else:
             args = [any_type]
         row_arg = helpers.make_tuple(api, fields=args)
-
-    # elif method_name == 'values':
-    #     expression_arg_names = ctx.arg_names[ctx.callee_arg_names.index('expressions')]
-    #     for expression_name in expression_arg_names:
-    #         # Arbitrary additional annotation expressions are supported, but they all have type Any for now
-    #         column_names.append(expression_name)
-    #         column_types[expression_name] = any_type
-    #
-    #     if fill_column_types and not has_dynamic_column_names:
-    #         row_arg = helpers.make_typeddict(api, fields=column_types, required_keys=set())
-    #     else:
-    #         return ctx.default_return_type
-    # else:
-    #     raise Exception(f"extract_proper_type_for_values_list doesn't support method {method_name}")
 
     new_type_args = [model_arg, row_arg]
     return helpers.reparametrize_instance(ret, new_type_args)

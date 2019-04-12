@@ -103,6 +103,16 @@ class User(Abstract):
     id = models.AutoField(primary_key=True)
 [/CASE]
 
+[CASE test_primary_key_on_optional_queryset_method]
+from django.db import models
+class User(models.Model):
+    pass
+reveal_type(User.objects.first().id)
+[out]
+main:4: error: Revealed type is 'Any'
+main:4: error: Item "None" of "Optional[User]" has no attribute "id"
+[/CASE]
+
 [CASE standard_it_from_parent_model_could_be_overridden_with_non_integer_field_in_child_model]
 from django.db import models
 import uuid

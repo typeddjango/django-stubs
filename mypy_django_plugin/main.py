@@ -7,7 +7,7 @@ from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext, AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
 )
-from mypy.types import Instance, Type
+from mypy.types import Instance, Type, TypeOfAny, AnyType
 
 from mypy_django_plugin import helpers
 from mypy_django_plugin.config import Config
@@ -88,12 +88,16 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
 
 
 def return_type_for_id_field(ctx: AttributeContext) -> Type:
+    if not isinstance(ctx.type, Instance):
+        return AnyType(TypeOfAny.from_error)
+
     model_info = cast(TypeInfo, ctx.type.type)
     primary_key_field_name = helpers.get_primary_key_field_name(model_info)
     if primary_key_field_name:
         if primary_key_field_name != 'id':
             ctx.api.fail("Default primary key 'id' is not defined", ctx.context)
-        return ctx.default_attr_type
+
+        return AnyType(TypeOfAny.from_error)
 
     return ctx.api.named_generic_type('builtins.int', [])
 
