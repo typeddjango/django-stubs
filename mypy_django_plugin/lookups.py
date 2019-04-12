@@ -103,7 +103,8 @@ def resolve_model_lookup(api: CheckerPluginInterface, model_type_info: TypeInfo,
             model_arg = related_manager_type.args[0]
             if not isinstance(model_arg, Instance):
                 raise LookupException(
-                    f'When resolving lookup "{lookup}", could not determine type for {model_type_info.name()}.{field_name}')
+                    f'When resolving lookup "{lookup}", could not determine type '
+                    f'for {model_type_info.name()}.{field_name}')
 
             return RelatedModelNode(typ=model_arg, is_nullable=False)
 

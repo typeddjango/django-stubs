@@ -7,7 +7,7 @@ from mypy.nodes import (
     GDEF, MDEF, AssignmentStmt, Block, CallExpr, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr,
     SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
-from mypy.plugin import FunctionContext, MethodContext, CheckerPluginInterface
+from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
 from mypy.types import (
     AnyType, Instance, NoneTyp, TupleType, Type, TypedDictType, TypeOfAny, TypeVarType, UnionType,
 )

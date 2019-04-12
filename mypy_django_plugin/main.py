@@ -7,7 +7,7 @@ from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext, AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
 )
-from mypy.types import Instance, Type, TypeOfAny, AnyType
+from mypy.types import AnyType, Instance, Type, TypeOfAny
 
 from mypy_django_plugin import helpers
 from mypy_django_plugin.config import Config
@@ -20,11 +20,12 @@ from mypy_django_plugin.transformers.migrations import (
 )
 from mypy_django_plugin.transformers.models import process_model_class
 from mypy_django_plugin.transformers.queryset import (
-    extract_proper_type_queryset_values_list, set_first_generic_param_as_default_for_second,
-    extract_proper_type_for_queryset_values)
+    extract_proper_type_for_queryset_values, extract_proper_type_queryset_values_list,
+    set_first_generic_param_as_default_for_second,
+)
 from mypy_django_plugin.transformers.related import (
-    extract_and_return_primary_key_of_bound_related_field_parameter,
-    determine_type_of_related_manager)
+    determine_type_of_related_manager, extract_and_return_primary_key_of_bound_related_field_parameter,
+)
 from mypy_django_plugin.transformers.settings import (
     get_type_of_setting, return_user_model_hook,
 )

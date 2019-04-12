@@ -1,9 +1,11 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Iterator, List, Optional, Tuple, cast, Any
+from typing import Any, Dict, Iterator, List, Optional, Tuple, cast
 
 import dataclasses
-from mypy.nodes import (ARG_POS, ARG_STAR, ARG_STAR2, Argument, CallExpr, ClassDef, Expression, IndexExpr, MDEF, MemberExpr,
-                        MypyFile, NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var)
+from mypy.nodes import (
+    ARG_POS, ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, MemberExpr, MypyFile,
+    NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import ClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2

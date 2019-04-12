@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from typing import List, Optional, Union, cast, Iterable, Dict
+from typing import List, Optional, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import StrExpr, TypeInfo, Expression
+from mypy.nodes import StrExpr, TypeInfo
 from mypy.plugin import (
     AnalyzeTypeContext, CheckerPluginInterface, MethodContext,
 )
