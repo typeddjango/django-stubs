@@ -217,6 +217,7 @@ def extract_field_setter_type(tp: Instance) -> Optional[Type]:
 
 
 def extract_field_getter_type(tp: Type) -> Optional[Type]:
+    """ Extract return type of __get__ of subclass of Field"""
     if not isinstance(tp, Instance):
         return None
     if tp.type.has_base(FIELD_FULLNAME):
@@ -314,7 +315,7 @@ def is_field_nullable(model: TypeInfo, field_name: str) -> bool:
     return get_fields_metadata(model).get(field_name, {}).get('null', False)
 
 
-def is_foreign_key(t: Type) -> bool:
+def is_foreign_key_like(t: Type) -> bool:
     if not isinstance(t, Instance):
         return False
     return has_any_of_bases(t.type, (FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME))
@@ -370,13 +371,14 @@ def make_named_tuple(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', name:
     return TupleType(list(fields.values()), fallback=fallback)
 
 
-def make_typeddict(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', required_keys: typing.Set[str]) -> Type:
+def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, Type]',
+                   required_keys: typing.Set[str]) -> TypedDictType:
     object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
 
 
-def make_tuple(api: 'TypeChecker', fields: typing.List[Type]) -> Type:
+def make_tuple(api: 'TypeChecker', fields: typing.List[Type]) -> TupleType:
     implicit_any = AnyType(TypeOfAny.special_form)
     fallback = api.named_generic_type('builtins.tuple', [implicit_any])
     return TupleType(fields, fallback=fallback)
@@ -410,6 +412,9 @@ def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager
     if not related_manager_metadata:
         return None
 
+    if related_manager_name not in related_manager_metadata:
+        return None
+
     manager_class_name = related_manager_metadata[related_manager_name]['manager']
     of = related_manager_metadata[related_manager_name]['of']
     of_types = []
@@ -420,3 +425,13 @@ def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager
             of_types.append(api.named_generic_type(of_type_name, []))
 
     return api.named_generic_type(manager_class_name, of_types)
+
+
+def get_primary_key_field_name(model_info: TypeInfo) -> Optional[str]:
+    for base in model_info.mro:
+        fields = get_fields_metadata(base)
+        for field_name, field_props in fields.items():
+            is_primary_key = field_props.get('primary_key', False)
+            if is_primary_key:
+                return field_name
+    return None

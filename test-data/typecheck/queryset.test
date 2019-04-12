@@ -1,37 +1,22 @@
-[CASE test_queryset_methods]
+[CASE test_queryset_second_argument_filled_automatically]
 from django.db import models
 
-class Blog(models.Model):
-    name = models.CharField(max_length=100)
-    created_at = models.DateTimeField()
+class Blog(models.Model): pass
 
 # QuerySet where second type argument is not specified shouldn't raise any errors
 class BlogQuerySet(models.QuerySet[Blog]):
     pass
 
-class Entry(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="entries")
-    title = models.CharField(max_length=100)
-
-
-# Test that second type argument gets filled automatically
 blog_qs: models.QuerySet[Blog]
 reveal_type(blog_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog, main.Blog]'
+[/CASE]
 
-reveal_type(Blog.objects.in_bulk([1])) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(Blog.objects.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
-reveal_type(Blog.objects.in_bulk(['beatles_blog'], field_name='name')) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
-# When ANDing QuerySets, the left-side's _Row parameter is used
-reveal_type(Blog.objects.all() & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
-reveal_type(Blog.objects.values() & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
-reveal_type(Blog.objects.values_list('id', 'name') & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, builtins.str]]'
-reveal_type(Blog.objects.values_list('id', 'name', named=True) & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, builtins.str, fallback=main.Row]]'
-reveal_type(Blog.objects.values_list('id', flat=True) & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.int*]'
+[CASE test_queryset_methods]
+from django.db import models
 
-# .dates / .datetimes
-reveal_type(Blog.objects.dates("created_at", "day")) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, datetime.date]'
-reveal_type(Blog.objects.datetimes("created_at", "day")) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, datetime.datetime]'
+class Blog(models.Model):
+    created_at = models.DateTimeField()
 
 qs = Blog.objects.all()
 reveal_type(qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
@@ -44,6 +29,32 @@ reveal_type(qs[0]) # E: Revealed type is 'main.Blog*'
 reveal_type(qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
 reveal_type(qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
 
+# .dates / .datetimes
+reveal_type(Blog.objects.dates("created_at", "day")) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, datetime.date]'
+reveal_type(Blog.objects.datetimes("created_at", "day")) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, datetime.datetime]'
+[/CASE]
+
+
+[CASE test_combine_querysets_with_and]
+from django.db import models
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField()
+
+# When ANDing QuerySets, the left-side's _Row parameter is used
+reveal_type(Blog.objects.all() & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, main.Blog*]'
+reveal_type(Blog.objects.values() & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
+reveal_type(Blog.objects.values_list('id', 'name') & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, builtins.str]]'
+reveal_type(Blog.objects.values_list('id', 'name', named=True) & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, builtins.str, fallback=main.Row]]'
+reveal_type(Blog.objects.values_list('id', flat=True) & Blog.objects.values()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.int*]'
+[/CASE]
+
+
+[CASE test_queryset_values_method]
+from django.db import models
+
+class Blog(models.Model): pass
 
 values_qs = Blog.objects.values()
 reveal_type(values_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict[builtins.str, Any]]'
@@ -56,7 +67,14 @@ reveal_type(values_qs.earliest()) # E: Revealed type is 'builtins.dict*[builtins
 reveal_type(values_qs[0]) # E: Revealed type is 'builtins.dict*[builtins.str, Any]'
 reveal_type(values_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.dict*[builtins.str, Any]]'
 reveal_type(values_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+[/CASE]
 
+
+[CASE test_queryset_values_list_named_false_flat_false]
+from django.db import models
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
 
 values_list_qs = Blog.objects.values_list('id', 'name')
 reveal_type(values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, builtins.str]]'
@@ -69,7 +87,14 @@ reveal_type(values_list_qs.earliest()) # E: Revealed type is 'Tuple[builtins.int
 reveal_type(values_list_qs[0]) # E: Revealed type is 'Tuple[builtins.int, builtins.str]'
 reveal_type(values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, builtins.str]]'
 reveal_type(values_list_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+[/CASE]
 
+
+[CASE test_queryset_values_list_named_false_flat_true]
+from django.db import models
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
 
 flat_values_list_qs = Blog.objects.values_list('id', flat=True)
 reveal_type(flat_values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.int]'
@@ -82,23 +107,44 @@ reveal_type(flat_values_list_qs.earliest()) # E: Revealed type is 'builtins.int*
 reveal_type(flat_values_list_qs[0]) # E: Revealed type is 'builtins.int*'
 reveal_type(flat_values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, builtins.int*]'
 reveal_type(flat_values_list_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+[/CASE]
 
+
+[CASE test_queryset_values_list_named_true_flat_false]
+from django.db import models
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
 
 named_values_list_qs = Blog.objects.values_list('id', named=True)
-reveal_type(named_values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, fallback=main.Row1]]'
-reveal_type(named_values_list_qs.all()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, fallback=main.Row1]]'
-reveal_type(named_values_list_qs.get(id=1)) # E: Revealed type is 'Tuple[builtins.int, fallback=main.Row1]'
-reveal_type(iter(named_values_list_qs)) # E: Revealed type is 'typing.Iterator[Tuple[builtins.int, fallback=main.Row1]]'
-reveal_type(named_values_list_qs.iterator()) # E: Revealed type is 'typing.Iterator[Tuple[builtins.int, fallback=main.Row1]]'
-reveal_type(named_values_list_qs.first()) # E: Revealed type is 'Union[Tuple[builtins.int, fallback=main.Row1], None]'
-reveal_type(named_values_list_qs.earliest()) # E: Revealed type is 'Tuple[builtins.int, fallback=main.Row1]'
-reveal_type(named_values_list_qs[0]) # E: Revealed type is 'Tuple[builtins.int, fallback=main.Row1]'
-reveal_type(named_values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, fallback=main.Row1]]'
+reveal_type(named_values_list_qs) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, fallback=main.Row]]'
+reveal_type(named_values_list_qs.all()) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, fallback=main.Row]]'
+reveal_type(named_values_list_qs.get(id=1)) # E: Revealed type is 'Tuple[builtins.int, fallback=main.Row]'
+reveal_type(iter(named_values_list_qs)) # E: Revealed type is 'typing.Iterator[Tuple[builtins.int, fallback=main.Row]]'
+reveal_type(named_values_list_qs.iterator()) # E: Revealed type is 'typing.Iterator[Tuple[builtins.int, fallback=main.Row]]'
+reveal_type(named_values_list_qs.first()) # E: Revealed type is 'Union[Tuple[builtins.int, fallback=main.Row], None]'
+reveal_type(named_values_list_qs.earliest()) # E: Revealed type is 'Tuple[builtins.int, fallback=main.Row]'
+reveal_type(named_values_list_qs[0]) # E: Revealed type is 'Tuple[builtins.int, fallback=main.Row]'
+reveal_type(named_values_list_qs[:9]) # E: Revealed type is 'django.db.models.query.QuerySet[main.Blog*, Tuple[builtins.int, fallback=main.Row]]'
 reveal_type(named_values_list_qs.in_bulk()) # E: Revealed type is 'builtins.dict[Any, main.Blog*]'
+[/CASE]
 
-[out]
 
-[CASE test_queryset_values_list_custom_primary_key]
+[CASE test_queryset_values_list_flat_true_custom_primary_key_get_element]
+from django.db import models
+
+class Blog(models.Model):
+    primary_uuid = models.UUIDField(primary_key=True)
+
+# Blog has a primary key field specified, so no automatic 'id' field is expected to exist
+reveal_type(Blog.objects.values_list('id', flat=True).get()) # E: Revealed type is 'Any'
+
+# Access Blog's pk (which is UUID field)
+reveal_type(Blog.objects.values_list('pk', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+[/CASE]
+
+
+[CASE test_queryset_values_list_flat_true_custom_primary_key_related_field]
 from django.db import models
 
 class Blog(models.Model):
@@ -106,12 +152,6 @@ class Blog(models.Model):
 
 class Entry(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="entries")
-
-# Blog has a primary key field specified, so no automatic 'id' field is expected to exist
-reveal_type(Blog.objects.values_list('id', flat=True).get()) # E: Revealed type is 'Any'
-
-# Access Blog's pk (which is UUID field)
-reveal_type(Blog.objects.values_list('pk', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
 
 # Accessing PK of model pointed to by foreign key
 reveal_type(Entry.objects.values_list('blog', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
@@ -122,26 +162,27 @@ reveal_type(Entry.objects.values_list('blog__pk', flat=True).get()) # E: Reveale
 
 # Blog has a primary key field specified, so no automatic 'id' field is expected to exist
 reveal_type(Entry.objects.values_list('blog__id', flat=True).get()) # E: Revealed type is 'Any'
+[/CASE]
 
-[CASE test_queryset_values_list_flat_named_true]
+
+[CASE test_queryset_values_list_error_conditions]
+from django.db import models
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
+
+# Emulate at type-check time the errors that Django reports
+Blog.objects.values_list('id', flat=True, named=True) # E: 'flat' and 'named' can't be used together.
+Blog.objects.values_list('id', 'name', flat=True) # E: 'flat' is not valid when values_list is called with more than one field.
+[/CASE]
+
+
+[CASE test_queryset_values_list_returns_tuple_of_fields]
 from django.db import models
 
 class Blog(models.Model):
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField()
-
-class Entry(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="entries")
-    nullable_blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="+", null=True)
-    blog_with_related_query_name = models.ForeignKey(Blog, on_delete=models.CASCADE, related_query_name="my_related_query_name")
-    title = models.CharField(max_length=100)
-
-class BlogChild(Blog):
-    child_field = models.CharField(max_length=100)
-
-# Emulate at type-check time the errors that Django reports
-Blog.objects.values_list('id', flat=True, named=True) # E: 'flat' and 'named' can't be used together.
-Blog.objects.values_list('id', 'created_at', flat=True) # E: 'flat' is not valid when values_list is called with more than one field.
 
 # values_list where parameter types are all known
 reveal_type(Blog.objects.values_list('id', 'created_at').get()) # E: Revealed type is 'Tuple[builtins.int, datetime.datetime]'
@@ -152,35 +193,123 @@ tup[2] # E: Tuple index out of range
 
 # values_list returning namedtuple
 reveal_type(Blog.objects.values_list('id', 'created_at', named=True).get()) # E: Revealed type is 'Tuple[builtins.int, datetime.datetime, fallback=main.Row]'
+[/CASE]
+
+
+[CASE test_queryset_values_list_invalid_lookups_produce_any]
+from django.db import models
+
+class Blog(models.Model): pass
+class Entry(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="entries")
 
 # Invalid lookups produce Any type rather than giving errors.
 reveal_type(Blog.objects.values_list('id', 'invalid_lookup').get()) # E: Revealed type is 'Tuple[builtins.int, Any]'
 reveal_type(Blog.objects.values_list('entries_id', flat=True).get()) # E: Revealed type is 'Any'
 reveal_type(Blog.objects.values_list('entries__foo', flat=True).get()) # E: Revealed type is 'Any'
 reveal_type(Blog.objects.values_list('+', flat=True).get()) # E: Revealed type is 'Any'
+[/CASE]
+
+
+[CASE test_queryset_values_list_basic_inheritance]
+from django.db import models
+
+class Blog(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField()
+
+class BlogChild(Blog):
+    child_field = models.CharField(max_length=100)
+
+# Basic inheritance
+reveal_type(BlogChild.objects.values_list('id', 'created_at', 'child_field').get()) # E: Revealed type is 'Tuple[builtins.int, datetime.datetime, builtins.str]'
+[/CASE]
+
+
+[CASE test_query_values_list_flat_true_plain_foreign_key]
+from django.db import models
+
+class Blog(models.Model): pass
+class Entry(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
 
 # Foreign key
 reveal_type(Entry.objects.values_list('blog', flat=True).get()) # E: Revealed type is 'builtins.int*'
 reveal_type(Entry.objects.values_list('blog__id', flat=True).get()) # E: Revealed type is 'builtins.int*'
 reveal_type(Entry.objects.values_list('blog__pk', flat=True).get()) # E: Revealed type is 'builtins.int*'
 reveal_type(Entry.objects.values_list('blog_id', flat=True).get()) # E: Revealed type is 'builtins.int*'
+[/CASE]
+
+
+[CASE test_query_values_list_flat_true_custom_primary_key]
+from django.db import models
+
+class Blog(models.Model):
+    id = models.UUIDField(primary_key=True)
+
+class Entry(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+# Foreign key
+reveal_type(Entry.objects.values_list('blog', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+reveal_type(Entry.objects.values_list('blog__id', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+reveal_type(Entry.objects.values_list('blog__pk', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+reveal_type(Entry.objects.values_list('blog_id', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+[/CASE]
+
+
+[CASE test_query_values_list_flat_true_nullable_foreign_key]
+from django.db import models
+
+class Blog(models.Model): pass
+class Entry(models.Model):
+    nullable_blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="+", null=True)
 
 # Foreign key (nullable=True)
 reveal_type(Entry.objects.values_list('nullable_blog', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
 reveal_type(Entry.objects.values_list('nullable_blog_id', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
 reveal_type(Entry.objects.values_list('nullable_blog__id', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
 reveal_type(Entry.objects.values_list('nullable_blog__pk', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
+[/CASE]
+
+
+[CASE test_query_values_list_flat_true_foreign_key_reverse_relation]
+from django.db import models
+
+class Blog(models.Model): pass
+class Entry(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='entries')
+    blog_with_related_query_name = models.ForeignKey(Blog, on_delete=models.CASCADE, related_query_name="my_related_query_name")
+    title = models.CharField(max_length=100)
 
 # Reverse relation of ForeignKey
-reveal_type(Blog.objects.values_list('entries', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
-reveal_type(Blog.objects.values_list('entries__id', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
-reveal_type(Blog.objects.values_list('entries__title', flat=True).get()) # E: Revealed type is 'Union[builtins.str, None]'
+reveal_type(Blog.objects.values_list('entries', flat=True).get()) # E: Revealed type is 'builtins.int*'
+reveal_type(Blog.objects.values_list('entries__id', flat=True).get()) # E: Revealed type is 'builtins.int*'
+reveal_type(Blog.objects.values_list('entries__title', flat=True).get()) # E: Revealed type is 'builtins.str*'
 
 # Reverse relation of ForeignKey (with related_query_name set)
-reveal_type(Blog.objects.values_list('my_related_query_name__id', flat=True).get()) # E: Revealed type is 'Union[builtins.int, None]'
+reveal_type(Blog.objects.values_list('my_related_query_name__id', flat=True).get()) # E: Revealed type is 'builtins.int*'
+[/CASE]
 
-# Basic inheritance
-reveal_type(BlogChild.objects.values_list('id', 'created_at', 'child_field').get()) # E: Revealed type is 'Tuple[builtins.int, datetime.datetime, builtins.str]'
+
+[CASE test_query_values_list_flat_true_foreign_key_custom_primary_key_reverse_relation]
+from django.db import models
+
+class Blog(models.Model): pass
+
+class Entry(models.Model):
+    id = models.UUIDField(primary_key=True)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='entries')
+    blog_with_related_query_name = models.ForeignKey(Blog, on_delete=models.CASCADE, related_query_name="my_related_query_name")
+    title = models.CharField(max_length=100)
+
+# Reverse relation of ForeignKey
+reveal_type(Blog.objects.values_list('entries', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+reveal_type(Blog.objects.values_list('entries__id', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+
+# Reverse relation of ForeignKey (with related_query_name set)
+reveal_type(Blog.objects.values_list('my_related_query_name__id', flat=True).get()) # E: Revealed type is 'uuid.UUID*'
+[/CASE]
 
 
 [CASE test_queryset_values_list_and_values_behavior_with_no_fields_specified_and_accessing_unknown_attributes]

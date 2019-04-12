@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from typing import List, Optional, Union, cast
+from typing import List, Optional, Union, cast, Iterable, Dict
 
 from mypy.checker import TypeChecker
-from mypy.nodes import StrExpr, TypeInfo
+from mypy.nodes import StrExpr, TypeInfo, Expression
 from mypy.plugin import (
     AnalyzeTypeContext, CheckerPluginInterface, MethodContext,
 )
@@ -14,37 +14,95 @@ from mypy_django_plugin.lookups import (
 )
 
 
-def extract_proper_type_for_values_and_values_list(ctx: MethodContext, method_name: str) -> Type:
-    api = cast(TypeChecker, ctx.api)
+def get_queryset_model_arg(ret_type: Instance) -> Type:
+    if ret_type.args:
+        return ret_type.args[0]
+    else:
+        return AnyType(TypeOfAny.implementation_artifact)
 
+
+def get_expression_columns(expression_arg_names: Iterable[str]) -> 'OrderedDict[str, Type]':
+    expression_columns = OrderedDict()
+    for expression_name in expression_arg_names:
+        # Arbitrary additional annotation expressions are supported, but they all have type Any for now
+        expression_columns[expression_name] = AnyType(TypeOfAny.implementation_artifact)
+
+    return expression_columns
+
+
+def extract_proper_type_for_queryset_values(ctx: MethodContext) -> Type:
+    object_type = ctx.type
+    if not isinstance(object_type, Instance):
+        return ctx.default_return_type
+
+    fields_arg_expr = ctx.args[ctx.callee_arg_names.index('fields')]
+    if len(fields_arg_expr) == 0:
+        # values_list/values with no args is not yet supported, so default to Any types for field types
+        # It should in the future include all model fields, "extra" fields and "annotated" fields
+        return ctx.default_return_type
+
+    model_arg = get_queryset_model_arg(ctx.default_return_type)
+    if isinstance(model_arg, Instance):
+        model_type_info = model_arg.type
+    else:
+        model_type_info = None
+
+    column_types: OrderedDict[str, Type] = OrderedDict()
+
+    # parse *fields
+    for field_expr in fields_arg_expr:
+        if isinstance(field_expr, StrExpr):
+            field_name = field_expr.value
+            # Default to any type
+            column_types[field_name] = AnyType(TypeOfAny.implementation_artifact)
+
+            if model_type_info:
+                resolved_lookup_type = resolve_values_lookup(ctx.api, model_type_info, field_name)
+                if resolved_lookup_type is not None:
+                    column_types[field_name] = resolved_lookup_type
+        else:
+            return ctx.default_return_type
+
+    # parse **expressions
+    expression_arg_names = ctx.arg_names[ctx.callee_arg_names.index('expressions')]
+    for expression_name in expression_arg_names:
+        # Arbitrary additional annotation expressions are supported, but they all have type Any for now
+        column_types[expression_name] = AnyType(TypeOfAny.implementation_artifact)
+
+    row_arg = helpers.make_typeddict(ctx.api, fields=column_types,
+                                     required_keys=set())
+    return helpers.reparametrize_instance(ctx.default_return_type, [model_arg, row_arg])
+
+
+def extract_proper_type_queryset_values_list(ctx: MethodContext) -> Type:
     object_type = ctx.type
     if not isinstance(object_type, Instance):
         return ctx.default_return_type
 
     ret = ctx.default_return_type
 
-    any_type = AnyType(TypeOfAny.implementation_artifact)
-    fields_arg_expr = ctx.args[ctx.callee_arg_names.index('fields')]
-
-    model_arg: Union[AnyType, Type] = ret.args[0] if len(ret.args) > 0 else any_type
+    model_arg = get_queryset_model_arg(ctx.default_return_type)
+    # model_arg: Union[AnyType, Type] = ret.args[0] if len(ret.args) > 0 else any_type
 
     column_names: List[Optional[str]] = []
     column_types: OrderedDict[str, Type] = OrderedDict()
 
-    fill_column_types = True
-
+    fields_arg_expr = ctx.args[ctx.callee_arg_names.index('fields')]
+    fields_param_is_specified = True
     if len(fields_arg_expr) == 0:
         # values_list/values with no args is not yet supported, so default to Any types for field types
         # It should in the future include all model fields, "extra" fields and "annotated" fields
-        fill_column_types = False
+        fields_param_is_specified = False
 
     if isinstance(model_arg, Instance):
         model_type_info = model_arg.type
     else:
         model_type_info = None
 
+    any_type = AnyType(TypeOfAny.implementation_artifact)
+
     # Figure out each field name passed to fields
-    has_dynamic_column_names = False
+    only_strings_as_fields_expressions = True
     for field_expr in fields_arg_expr:
         if isinstance(field_expr, StrExpr):
             field_name = field_expr.value
@@ -59,52 +117,62 @@ def extract_proper_type_for_values_and_values_list(ctx: MethodContext, method_na
         else:
             # Dynamic field names are partially supported for values_list, but not values
             column_names.append(None)
-            has_dynamic_column_names = True
+            only_strings_as_fields_expressions = False
 
-    if method_name == 'values_list':
-        flat = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'flat'))
-        named = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'named'))
+    flat = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'flat'))
+    named = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'named'))
 
-        if named and flat:
-            api.fail("'flat' and 'named' can't be used together.", ctx.context)
-            return ret
-        elif named:
-            if fill_column_types and not has_dynamic_column_names:
-                row_arg = helpers.make_named_tuple(api, fields=column_types, name="Row")
-            else:
-                row_arg = helpers.make_named_tuple(api, fields=OrderedDict(), name="Row")
-        elif flat:
-            if len(ctx.args[0]) > 1:
-                api.fail("'flat' is not valid when values_list is called with more than one field.", ctx.context)
-                return ret
-            if fill_column_types and not has_dynamic_column_names:
-                # Grab first element
-                row_arg = column_types[column_names[0]]
-            else:
-                row_arg = any_type
+    api = cast(TypeChecker, ctx.api)
+    if named and flat:
+        api.fail("'flat' and 'named' can't be used together.", ctx.context)
+        return ret
+
+    elif named:
+        # named=True, flat=False -> List[NamedTuple]
+        if fields_param_is_specified and only_strings_as_fields_expressions:
+            row_arg = helpers.make_named_tuple(api, fields=column_types, name="Row")
         else:
-            if fill_column_types:
-                args = [
-                    # Fallback to Any if the column name is unknown (e.g. dynamic)
-                    column_types.get(column_name, any_type) if column_name is not None else any_type
-                    for column_name in column_names
-                ]
-            else:
-                args = [any_type]
-            row_arg = helpers.make_tuple(api, fields=args)
-    elif method_name == 'values':
-        expression_arg_names = ctx.arg_names[ctx.callee_arg_names.index('expressions')]
-        for expression_name in expression_arg_names:
-            # Arbitrary additional annotation expressions are supported, but they all have type Any for now
-            column_names.append(expression_name)
-            column_types[expression_name] = any_type
+            # fallback to catch-all NamedTuple
+            row_arg = helpers.make_named_tuple(api, fields=OrderedDict(), name="Row")
 
-        if fill_column_types and not has_dynamic_column_names:
-            row_arg = helpers.make_typeddict(api, fields=column_types, required_keys=set())
-        else:
+    elif flat:
+        # named=False, flat=True -> List of elements
+        if len(ctx.args[0]) > 1:
+            api.fail("'flat' is not valid when values_list is called with more than one field.",
+                     ctx.context)
             return ctx.default_return_type
+
+        if fields_param_is_specified and only_strings_as_fields_expressions:
+            # Grab first element
+            row_arg = column_types[column_names[0]]
+        else:
+            row_arg = any_type
+
     else:
-        raise Exception(f"extract_proper_type_for_values_list doesn't support method {method_name}")
+        # named=False, flat=False -> List[Tuple]
+        if fields_param_is_specified:
+            args = [
+                # Fallback to Any if the column name is unknown (e.g. dynamic)
+                column_types.get(column_name, any_type) if column_name is not None else any_type
+                for column_name in column_names
+            ]
+        else:
+            args = [any_type]
+        row_arg = helpers.make_tuple(api, fields=args)
+
+    # elif method_name == 'values':
+    #     expression_arg_names = ctx.arg_names[ctx.callee_arg_names.index('expressions')]
+    #     for expression_name in expression_arg_names:
+    #         # Arbitrary additional annotation expressions are supported, but they all have type Any for now
+    #         column_names.append(expression_name)
+    #         column_types[expression_name] = any_type
+    #
+    #     if fill_column_types and not has_dynamic_column_names:
+    #         row_arg = helpers.make_typeddict(api, fields=column_types, required_keys=set())
+    #     else:
+    #         return ctx.default_return_type
+    # else:
+    #     raise Exception(f"extract_proper_type_for_values_list doesn't support method {method_name}")
 
     new_type_args = [model_arg, row_arg]
     return helpers.reparametrize_instance(ret, new_type_args)

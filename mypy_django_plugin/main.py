@@ -20,8 +20,8 @@ from mypy_django_plugin.transformers.migrations import (
 )
 from mypy_django_plugin.transformers.models import process_model_class
 from mypy_django_plugin.transformers.queryset import (
-    extract_proper_type_for_values_and_values_list, set_first_generic_param_as_default_for_second,
-)
+    extract_proper_type_queryset_values_list, set_first_generic_param_as_default_for_second,
+    extract_proper_type_for_queryset_values)
 from mypy_django_plugin.transformers.related import (
     extract_and_return_primary_key_of_bound_related_field_parameter,
     determine_type_of_related_manager)
@@ -89,16 +89,12 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
 
 def return_type_for_id_field(ctx: AttributeContext) -> Type:
     model_info = cast(TypeInfo, ctx.type.type)
-    for base in model_info.mro:
-        fields = helpers.get_fields_metadata(base)
-        for field_name, field_props in fields.items():
-            is_primary_key = field_props.get('primary_key', False)
-            if is_primary_key:
-                if field_name != 'id':
-                    ctx.api.fail("Default primary key 'id' is not defined", ctx.context)
-                return ctx.default_attr_type
+    primary_key_field_name = helpers.get_primary_key_field_name(model_info)
+    if primary_key_field_name:
+        if primary_key_field_name != 'id':
+            ctx.api.fail("Default primary key 'id' is not defined", ctx.context)
+        return ctx.default_attr_type
 
-    # primary key not defined in mro
     return ctx.api.named_generic_type('builtins.int', [])
 
 
@@ -190,32 +186,37 @@ class DjangoPlugin(Plugin):
         if fullname in manager_bases:
             return determine_proper_manager_type
 
-        sym = self.lookup_fully_qualified(fullname)
-        if sym is not None and isinstance(sym.node, TypeInfo):
-            if sym.node.has_base(helpers.FIELD_FULLNAME):
+        info = self._get_typeinfo_or_none(fullname)
+        if info:
+            if info.has_base(helpers.FIELD_FULLNAME):
                 return fields.adjust_return_type_of_field_instantiation
 
-            if sym.node.metadata.get('django', {}).get('generated_init'):
+            if helpers.get_django_metadata(info).get('generated_init'):
                 return init_create.redefine_and_typecheck_model_init
 
     def get_method_hook(self, fullname: str
                         ) -> Optional[Callable[[MethodContext], Type]]:
         class_name, _, method_name = fullname.rpartition('.')
+
         if method_name == 'get_form_class':
-            sym = self.lookup_fully_qualified(class_name)
-            if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
                 return extract_proper_type_for_get_form_class
 
         if method_name == 'get_form':
-            sym = self.lookup_fully_qualified(class_name)
-            if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
                 return extract_proper_type_for_get_form
 
-        if method_name in ('values', 'values_list'):
-            sym = self.lookup_fully_qualified(class_name)
-            if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.QUERYSET_CLASS_FULLNAME):
-                return partial(extract_proper_type_for_values_and_values_list,
-                               method_name=method_name)
+        if method_name == 'values':
+            model_info = self._get_typeinfo_or_none(class_name)
+            if model_info and model_info.has_base(helpers.QUERYSET_CLASS_FULLNAME):
+                return extract_proper_type_for_queryset_values
+
+        if method_name == 'values_list':
+            model_info = self._get_typeinfo_or_none(class_name)
+            if model_info and model_info.has_base(helpers.QUERYSET_CLASS_FULLNAME):
+                return extract_proper_type_queryset_values_list
 
         if fullname in {'django.apps.registry.Apps.get_model',
                         'django.db.migrations.state.StateApps.get_model'}:
@@ -238,8 +239,8 @@ class DjangoPlugin(Plugin):
         if fullname in self._get_current_form_bases():
             return transform_form_class
 
-        sym = self.lookup_fully_qualified(fullname)
-        if sym and isinstance(sym.node, TypeInfo) and sym.node.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+        info = self._get_typeinfo_or_none(fullname)
+        if info and info.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
             return transform_form_view
 
         return None
