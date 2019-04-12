@@ -91,15 +91,27 @@ def return_type_for_id_field(ctx: AttributeContext) -> Type:
     if not isinstance(ctx.type, Instance):
         return AnyType(TypeOfAny.from_error)
 
-    model_info = cast(TypeInfo, ctx.type.type)
+    model_info = ctx.type.type  # type: TypeInfo
     primary_key_field_name = helpers.get_primary_key_field_name(model_info)
-    if primary_key_field_name:
-        if primary_key_field_name != 'id':
-            ctx.api.fail("Default primary key 'id' is not defined", ctx.context)
+    if not primary_key_field_name:
+        # no field with primary_key=True, just return id as int
+        return ctx.api.named_generic_type('builtins.int', [])
 
+    if primary_key_field_name != 'id':
+        # there's field with primary_key=True, but it's name is not 'id', fail
+        ctx.api.fail("Default primary key 'id' is not defined", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
-    return ctx.api.named_generic_type('builtins.int', [])
+    primary_key_sym = model_info.get(primary_key_field_name)
+    if primary_key_sym and isinstance(primary_key_sym.type, Instance):
+        pass
+
+    # try to parse field type out of primary key field
+    field_type = helpers.extract_field_getter_type(primary_key_sym.type)
+    if field_type:
+        return field_type
+
+    return primary_key_sym.type
 
 
 def transform_form_view(ctx: ClassDefContext) -> None:

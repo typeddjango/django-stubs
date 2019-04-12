@@ -33,7 +33,7 @@ class User(models.Model):
     text = models.TextField()
 
 user = User()
-reveal_type(user.id)  # E: Revealed type is 'builtins.int*'
+reveal_type(user.id)  # E: Revealed type is 'builtins.int'
 reveal_type(user.small_int)  # E: Revealed type is 'builtins.int*'
 reveal_type(user.name)  # E: Revealed type is 'builtins.str*'
 reveal_type(user.slug)  # E: Revealed type is 'builtins.str*'
@@ -51,7 +51,7 @@ class Booking(models.Model):
     some_decimal = models.DecimalField(max_digits=10, decimal_places=5)
 
 booking = Booking()
-reveal_type(booking.id)  # E: Revealed type is 'builtins.int*'
+reveal_type(booking.id)  # E: Revealed type is 'builtins.int'
 reveal_type(booking.time_range)  # E: Revealed type is 'Any'
 reveal_type(booking.some_decimal)  # E: Revealed type is 'decimal.Decimal*'
 [/CASE]
@@ -120,7 +120,7 @@ class ParentModel(models.Model):
     pass
 class MyModel(ParentModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID*'
+reveal_type(MyModel().id)  # E: Revealed type is 'uuid.UUID'
 [/CASE]
 
 [CASE blank_and_null_char_field_allows_none]
