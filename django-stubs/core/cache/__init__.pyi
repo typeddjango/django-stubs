@@ -1,7 +1,11 @@
 from collections import OrderedDict
 from typing import Any, Callable, Dict, Union
 
-from .backends.base import BaseCache as BaseCache
+from .backends.base import (
+    BaseCache as BaseCache,
+    CacheKeyWarning as CacheKeyWarning,
+    InvalidCacheBackendError as InvalidCacheBackendError,
+)
 
 DEFAULT_CACHE_ALIAS: str
 
