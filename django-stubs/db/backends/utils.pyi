@@ -1,8 +1,12 @@
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
+from uuid import UUID
 
 logger: Any
+
+# Python types that can be adapted to SQL.
+_SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
 
 class CursorWrapper:
     cursor: Any = ...
@@ -15,10 +19,10 @@ class CursorWrapper:
     def __exit__(self, type: None, value: None, traceback: None) -> None: ...
     def callproc(self, procname: str, params: List[Any] = ..., kparams: Dict[str, int] = ...) -> Any: ...
     def execute(
-        self, sql: str, params: Optional[Union[List[bool], List[datetime], List[float], Tuple]] = ...
+        self, sql: str, params: Optional[Union[Sequence[_SQLType], Mapping[str, _SQLType]]] = ...
     ) -> Optional[Any]: ...
     def executemany(
-        self, sql: str, param_list: Union[Iterator[Any], List[Tuple[Union[int, str]]]]
+        self, sql: str, param_list: Sequence[Optional[Union[Sequence[_SQLType], Mapping[str, _SQLType]]]]
     ) -> Optional[Any]: ...
 
 class CursorDebugWrapper(CursorWrapper):
