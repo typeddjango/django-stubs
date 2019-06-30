@@ -9,10 +9,10 @@ class Book(models.Model):
                                   related_name='books')
 
 book = Book()
-reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+reveal_type(book.publisher)  # N: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
-reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+reveal_type(publisher.books)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
 
 [CASE test_foreign_key_field_creates_attribute_with_underscore_id]
 from django.db import models
@@ -25,8 +25,8 @@ class Book(models.Model):
     owner = models.ForeignKey(db_column='model_id', to='db.Unknown', on_delete=models.CASCADE)
 
 book = Book()
-reveal_type(book.publisher_id)  # E: Revealed type is 'builtins.int'
-reveal_type(book.owner_id)  # E: Revealed type is 'Any'
+reveal_type(book.publisher_id)  # N: Revealed type is 'builtins.int'
+reveal_type(book.owner_id)  # N: Revealed type is 'Any'
 
 [CASE test_foreign_key_field_different_order_of_params]
 from django.db import models
@@ -40,12 +40,12 @@ class Book(models.Model):
     publisher2 = models.ForeignKey(to=Publisher, related_name='books2', on_delete=models.CASCADE)
 
 book = Book()
-reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
-reveal_type(book.publisher2)  # E: Revealed type is 'main.Publisher*'
+reveal_type(book.publisher)  # N: Revealed type is 'main.Publisher*'
+reveal_type(book.publisher2)  # N: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
-reveal_type(publisher.books)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
-reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+reveal_type(publisher.books)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+reveal_type(publisher.books2)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
 
 [CASE test_to_parameter_as_string_with_application_name__model_imported]
 from django.db import models
@@ -58,7 +58,7 @@ class Book(models.Model):
     publisher = models.ForeignKey(to='myapp.Publisher', on_delete=models.CASCADE)
 
 book = Book()
-reveal_type(book.publisher)  # E: Revealed type is 'myapp.models.Publisher*'
+reveal_type(book.publisher)  # N: Revealed type is 'myapp.models.Publisher*'
 
 [file myapp/__init__.py]
 [file myapp/models.py]
@@ -73,8 +73,8 @@ class Book(models.Model):
     publisher = models.ForeignKey(to='myapp.Publisher', on_delete=models.CASCADE)
 
 book = Book()
-reveal_type(book.publisher)  # E: Revealed type is 'Any'
-reveal_type(book.publisher_id)  # E: Revealed type is 'Any'
+reveal_type(book.publisher)  # N: Revealed type is 'Any'
+reveal_type(book.publisher_id)  # N: Revealed type is 'Any'
 Book(publisher_id=1)
 Book.objects.create(publisher_id=1)
 
@@ -89,10 +89,10 @@ from django.db import models
 
 class App(models.Model):
     def method(self) -> None:
-        reveal_type(self.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
-        reveal_type(self.members)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
-        reveal_type(self.sheets)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Sheet]'
-        reveal_type(self.profile)  # E: Revealed type is 'main.Profile'
+        reveal_type(self.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+        reveal_type(self.members)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
+        reveal_type(self.sheets)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Sheet]'
+        reveal_type(self.profile)  # N: Revealed type is 'main.Profile'
 class View(models.Model):
     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
 class Member(models.Model):
@@ -108,10 +108,10 @@ from myapp.models import App
 class View(models.Model):
     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
 
-reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+reveal_type(View().app.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
 reveal_type(View().app.unknown)
 [out]
-main:7: error: Revealed type is 'Any'
+main:7: note: Revealed type is 'Any'
 main:7: error: "App" has no attribute "unknown"
 
 [file myapp/__init__.py]
@@ -119,7 +119,7 @@ main:7: error: "App" has no attribute "unknown"
 from django.db import models
 class App(models.Model):
     def method(self) -> None:
-        reveal_type(self.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+        reveal_type(self.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
 
 [CASE models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model]
 from django.db.models import Model
@@ -134,8 +134,8 @@ class View(Model):
 class View2(View):
     app = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views2')
 
-reveal_type(App().views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
-reveal_type(App().views2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View2]'
+reveal_type(App().views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+reveal_type(App().views2)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.View2]'
 [out]
 
 [CASE models_imported_inside_init_file_foreign_key]
@@ -144,7 +144,7 @@ from django.db import models
 from myapp.models import App
 class View(models.Model):
     app = models.ForeignKey(to='myapp.App', related_name='views', on_delete=models.CASCADE)
-reveal_type(View().app.views)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
+reveal_type(View().app.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.View]'
 
 [file myapp/__init__.py]
 [file myapp/models/__init__.py]
@@ -161,7 +161,7 @@ from django.db import models
 from myapp.models import User
 class Profile(models.Model):
     user = models.OneToOneField(to='myapp.User', related_name='profile', on_delete=models.CASCADE)
-reveal_type(Profile().user.profile)  # E: Revealed type is 'main.Profile'
+reveal_type(Profile().user.profile)  # N: Revealed type is 'main.Profile'
 
 [file myapp/__init__.py]
 [file myapp/models/__init__.py]
@@ -173,7 +173,7 @@ class User(models.Model):
 
 [CASE models_triple_circular_reference]
 from myapp.models import App
-reveal_type(App().owner.profile)  # E: Revealed type is 'myapp.models.profile.Profile'
+reveal_type(App().owner.profile)  # N: Revealed type is 'myapp.models.profile.Profile'
 
 [file myapp/__init__.py]
 [file myapp/models/__init__.py]
@@ -205,8 +205,8 @@ class App(models.Model):
     pass
 class Member(models.Model):
     apps = models.ManyToManyField(to=App, related_name='members')
-reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager*[main.App]'
-reveal_type(App().members)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
+reveal_type(Member().apps)  # N: Revealed type is 'django.db.models.manager.RelatedManager*[main.App]'
+reveal_type(App().members)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Member]'
 [out]
 
 [CASE many_to_many_works_with_string_if_imported]
@@ -214,7 +214,7 @@ from django.db import models
 from myapp.models import App
 class Member(models.Model):
     apps = models.ManyToManyField(to='myapp.App', related_name='members')
-reveal_type(Member().apps)  # E: Revealed type is 'django.db.models.manager.RelatedManager*[myapp.models.App]'
+reveal_type(Member().apps)  # N: Revealed type is 'django.db.models.manager.RelatedManager*[myapp.models.App]'
 
 [file myapp/__init__.py]
 [file myapp/models.py]
@@ -227,14 +227,14 @@ class App(models.Model):
 from django.db import models
 class User(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE)
-reveal_type(User().parent)  # E: Revealed type is 'main.User*'
+reveal_type(User().parent)  # N: Revealed type is 'main.User*'
 [out]
 
 [CASE many_to_many_with_self]
 from django.db import models
 class User(models.Model):
     friends = models.ManyToManyField('self')
-reveal_type(User().friends)  # E: Revealed type is 'django.db.models.manager.RelatedManager*[main.User]'
+reveal_type(User().friends)  # N: Revealed type is 'django.db.models.manager.RelatedManager*[main.User]'
 [out]
 
 [CASE recursively_checking_for_base_model_in_to_parameter]
@@ -254,7 +254,7 @@ class Publisher(models.Model):
     pass
 class Book(models.Model):
     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
-reveal_type(Publisher().book_set)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+reveal_type(Publisher().book_set)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
 
 [CASE underscore_id_attribute_has_set_type_of_primary_key_if_explicit]
 from django.db import models
@@ -264,7 +264,7 @@ class Publisher(models.Model):
 class Book(models.Model):
     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
 
-reveal_type(Book().publisher_id)  # E: Revealed type is 'builtins.str'
+reveal_type(Book().publisher_id)  # N: Revealed type is 'builtins.str'
 Book(publisher_id=1)
 Book(publisher_id='hello')
 Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable, None]")
@@ -276,7 +276,7 @@ class Publisher2(models.Model):
 class Book2(models.Model):
     publisher = models.ForeignKey(to=Publisher2, on_delete=models.CASCADE)
 
-reveal_type(Book2().publisher_id)  # E: Revealed type is 'builtins.int'
+reveal_type(Book2().publisher_id)  # N: Revealed type is 'builtins.int'
 Book2(publisher_id=1)
 Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable, None]")
 Book2.objects.create(publisher_id=1)
@@ -290,7 +290,7 @@ class Book(models.Model):
     publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
 class Publisher(models.Model):
     pass
-reveal_type(Book().publisher)  # E: Revealed type is 'main.Publisher*'
+reveal_type(Book().publisher)  # N: Revealed type is 'main.Publisher*'
 [out]
 
 [CASE test_foreign_key_field_without_backwards_relation]
@@ -306,13 +306,13 @@ class Book(models.Model):
                                    related_name='books2')
 
 book = Book()
-reveal_type(book.publisher)  # E: Revealed type is 'main.Publisher*'
+reveal_type(book.publisher)  # N: Revealed type is 'main.Publisher*'
 
 publisher = Publisher()
 reveal_type(publisher.books)
-reveal_type(publisher.books2)  # E: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
+reveal_type(publisher.books2)  # N: Revealed type is 'django.db.models.manager.RelatedManager[main.Book]'
 [out]
-main:16: error: Revealed type is 'Any'
+main:16: note: Revealed type is 'Any'
 main:16: error: "Publisher" has no attribute "books"; maybe "books2"?
 [/CASE]
 

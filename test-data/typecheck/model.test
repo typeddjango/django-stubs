@@ -30,12 +30,12 @@ class B(models.Model):
     pass
 
 b_instance = B()
-reveal_type(b_instance.b_attr) # E: Revealed type is 'builtins.int'
+reveal_type(b_instance.b_attr) # N: Revealed type is 'builtins.int'
 
 reveal_type(b_instance.non_existent_attribute)
 b_instance.non_existent_attribute = 2
 [out]
-main:10: error: Revealed type is 'Any'
+main:10: note: Revealed type is 'Any'
 main:10: error: "B" has no attribute "non_existent_attribute"
 main:11: error: "B" has no attribute "non_existent_attribute"
 [/CASE]
@@ -48,7 +48,7 @@ class B(models.Model):
     pass
 
 b_instance = B()
-reveal_type(b_instance.non_existent_attribute) # E: Revealed type is 'Any'
+reveal_type(b_instance.non_existent_attribute) # N: Revealed type is 'Any'
 b_instance.non_existent_attribute = 2
 
 [env MYPY_DJANGO_CONFIG=${MYPY_CWD}/mypy_django.ini]

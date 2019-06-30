@@ -33,9 +33,9 @@ class MyView(FormView):
 
     def post(self, request, *args: Any, **kwds: Any):
         form_class = self.get_form_class()
-        reveal_type(form_class)  # E: Revealed type is 'Type[main.MyForm]'
-        reveal_type(self.get_form(None))  # E: Revealed type is 'main.MyForm'
-        reveal_type(self.get_form())  # E: Revealed type is 'main.MyForm'
-        reveal_type(self.get_form(form_class))  # E: Revealed type is 'main.MyForm'
-        reveal_type(self.get_form(MyForm2))  # E: Revealed type is 'main.MyForm2'
+        reveal_type(form_class)  # N: Revealed type is 'Type[main.MyForm]'
+        reveal_type(self.get_form(None))  # N: Revealed type is 'main.MyForm'
+        reveal_type(self.get_form())  # N: Revealed type is 'main.MyForm'
+        reveal_type(self.get_form(form_class))  # N: Revealed type is 'main.MyForm'
+        reveal_type(self.get_form(MyForm2))  # N: Revealed type is 'main.MyForm2'
 [/CASE]
