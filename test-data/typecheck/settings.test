@@ -4,13 +4,13 @@
 from django.conf import settings
 
 # standard settings
-reveal_type(settings.AUTH_USER_MODEL)  # E: Revealed type is 'builtins.str'
+reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is 'builtins.str'
 
-reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'builtins.str'
-reveal_type(settings.APPS_DIR)  # E: Revealed type is 'pathlib.Path'
-reveal_type(settings.OBJ)  # E: Revealed type is 'django.utils.functional.LazyObject'
-reveal_type(settings.NUMBERS)  # E: Revealed type is 'builtins.list[builtins.str*]'
-reveal_type(settings.DICT)  # E: Revealed type is 'builtins.dict[Any, Any]'
+reveal_type(settings.ROOT_DIR)  # N: Revealed type is 'builtins.str'
+reveal_type(settings.APPS_DIR)  # N: Revealed type is 'pathlib.Path'
+reveal_type(settings.OBJ)  # N: Revealed type is 'django.utils.functional.LazyObject'
+reveal_type(settings.NUMBERS)  # N: Revealed type is 'builtins.list[builtins.str*]'
+reveal_type(settings.DICT)  # N: Revealed type is 'builtins.dict[Any, Any]'
 [file base.py]
 from pathlib import Path
 ROOT_DIR = '/etc'
@@ -29,12 +29,12 @@ OBJ = LazyObject()
 [disable_cache]
 from django.conf import settings
 
-reveal_type(settings.ROOT_DIR)  # E: Revealed type is 'pathlib.Path'
-reveal_type(settings.SETUP)  # E: Revealed type is 'Union[builtins.int, None]'
-reveal_type(settings.DATABASES)  # E: Revealed type is 'builtins.dict[builtins.str*, builtins.str*]'
+reveal_type(settings.ROOT_DIR)  # N: Revealed type is 'pathlib.Path'
+reveal_type(settings.SETUP)  # N: Revealed type is 'Union[builtins.int, None]'
+reveal_type(settings.DATABASES)  # N: Revealed type is 'builtins.dict[builtins.str*, builtins.str*]'
 
-reveal_type(settings.LOCAL_SETTING)  # E: Revealed type is 'builtins.int'
-reveal_type(settings.BASE_SETTING)  # E: Revealed type is 'builtins.int'
+reveal_type(settings.LOCAL_SETTING)  # N: Revealed type is 'builtins.int'
+reveal_type(settings.BASE_SETTING)  # N: Revealed type is 'builtins.int'
 
 [file mysettings.py]
 from local import *
@@ -61,8 +61,8 @@ BASE_SETTING = 1
 [CASE global_settings_are_always_loaded]
 from django.conf import settings
 
-reveal_type(settings.AUTH_USER_MODEL)  # E: Revealed type is 'builtins.str'
-reveal_type(settings.AUTHENTICATION_BACKENDS)  # E: Revealed type is 'typing.Sequence[builtins.str]'
+reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is 'builtins.str'
+reveal_type(settings.AUTHENTICATION_BACKENDS)  # N: Revealed type is 'typing.Sequence[builtins.str]'
 [/CASE]
 
 [CASE test_circular_dependency_in_settings_works_if_settings_have_annotations]
@@ -71,9 +71,9 @@ reveal_type(settings.AUTHENTICATION_BACKENDS)  # E: Revealed type is 'typing.Seq
 from django.conf import settings
 class Class:
     pass
-reveal_type(settings.MYSETTING)  # E: Revealed type is 'builtins.int'
-reveal_type(settings.REGISTRY)  # E: Revealed type is 'Union[main.Class, None]'
-reveal_type(settings.LIST)  # E: Revealed type is 'builtins.list[builtins.str]'
+reveal_type(settings.MYSETTING)  # N: Revealed type is 'builtins.int'
+reveal_type(settings.REGISTRY)  # N: Revealed type is 'Union[main.Class, None]'
+reveal_type(settings.LIST)  # N: Revealed type is 'builtins.list[builtins.str]'
 
 [file mysettings.py]
 from typing import TYPE_CHECKING, Optional, List
@@ -94,6 +94,6 @@ reveal_type(settings.NOT_EXISTING)
 [disable_cache]
 [file mysettings2.py]
 [out]
-main:2: error: Revealed type is 'Any'
+main:2: note: Revealed type is 'Any'
 main:2: error: 'Settings' object has no attribute 'NOT_EXISTING'
 [/CASE]

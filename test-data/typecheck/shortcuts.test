@@ -4,13 +4,13 @@ from django.db import models
 
 class MyModel(models.Model):
     pass
-reveal_type(get_object_or_404(MyModel))  # E: Revealed type is 'main.MyModel*'
-reveal_type(get_object_or_404(MyModel.objects))  # E: Revealed type is 'main.MyModel*'
-reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # E: Revealed type is 'main.MyModel*'
+reveal_type(get_object_or_404(MyModel))  # N: Revealed type is 'main.MyModel*'
+reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is 'main.MyModel*'
+reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is 'main.MyModel*'
 
-reveal_type(get_list_or_404(MyModel))  # E: Revealed type is 'builtins.list[main.MyModel*]'
-reveal_type(get_list_or_404(MyModel.objects))  # E: Revealed type is 'builtins.list[main.MyModel*]'
-reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # E: Revealed type is 'builtins.list[main.MyModel*]'
+reveal_type(get_list_or_404(MyModel))  # N: Revealed type is 'builtins.list[main.MyModel*]'
+reveal_type(get_list_or_404(MyModel.objects))  # N: Revealed type is 'builtins.list[main.MyModel*]'
+reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is 'builtins.list[main.MyModel*]'
 [/CASE]
 
 [CASE get_user_model_returns_proper_class]
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 from django.contrib.auth import get_user_model
 
 UserModel = get_user_model()
-reveal_type(UserModel.objects)  # E: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
+reveal_type(UserModel.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
 
 [file mysettings.py]
 from basic import *
@@ -57,6 +57,6 @@ class MyUser(models.Model):
     pass
 [out]
 main:3: error: "myapp.MyUser" model class is not imported so far. Try to import it (under if TYPE_CHECKING) at the beginning of the current file
-main:4: error: Revealed type is 'Any'
+main:4: note: Revealed type is 'Any'
 main:4: error: "Type[Model]" has no attribute "objects"
 [/CASE]

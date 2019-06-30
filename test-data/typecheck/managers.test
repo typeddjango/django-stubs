@@ -2,8 +2,8 @@
 from django.db import models
 class User(models.Model):
     pass
-reveal_type(User.objects)  # E: Revealed type is 'django.db.models.manager.Manager[main.User]'
-reveal_type(User.objects.get())  # E: Revealed type is 'main.User*'
+reveal_type(User.objects)  # N: Revealed type is 'django.db.models.manager.Manager[main.User]'
+reveal_type(User.objects.get())  # N: Revealed type is 'main.User*'
 
 [CASE every_model_has_its_own_objects_queryset]
 from django.db import models
@@ -11,8 +11,8 @@ class Parent(models.Model):
     pass
 class Child(Parent):
     pass
-reveal_type(Parent.objects)  # E: Revealed type is 'django.db.models.manager.Manager[main.Parent]'
-reveal_type(Child.objects)  # E: Revealed type is 'django.db.models.manager.Manager[main.Child]'
+reveal_type(Parent.objects)  # N: Revealed type is 'django.db.models.manager.Manager[main.Parent]'
+reveal_type(Child.objects)  # N: Revealed type is 'django.db.models.manager.Manager[main.Child]'
 [out]
 
 [CASE if_manager_is_defined_on_model_do_not_add_objects]
@@ -20,7 +20,7 @@ from django.db import models
 
 class MyModel(models.Model):
     authors = models.Manager[MyModel]()
-reveal_type(MyModel.authors)  # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
+reveal_type(MyModel.authors)  # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
 MyModel.objects  # E: "Type[MyModel]" has no attribute "objects"
 [out]
 
@@ -32,15 +32,15 @@ _T = TypeVar('_T', bound=models.Model)
 class Base(Generic[_T]):
     def __init__(self, model_cls: Type[_T]):
         self.model_cls = model_cls
-        reveal_type(self.model_cls._default_manager)  # E: Revealed type is 'django.db.models.manager.Manager[django.db.models.base.Model]'
+        reveal_type(self.model_cls._default_manager)  # N: Revealed type is 'django.db.models.manager.Manager[django.db.models.base.Model]'
 class MyModel(models.Model):
     pass
 base_instance = Base(MyModel)
-reveal_type(base_instance.model_cls._default_manager)  # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
+reveal_type(base_instance.model_cls._default_manager)  # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
 
 class Child(Base[MyModel]):
     def method(self) -> None:
-        reveal_type(self.model_cls._default_manager)  # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
+        reveal_type(self.model_cls._default_manager)  # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
 
 [CASE if_custom_manager_defined_it_is_set_to_default_manager]
 from typing import TypeVar
@@ -50,7 +50,7 @@ class CustomManager(models.Manager[_T]):
     pass
 class MyModel(models.Model):
     manager = CustomManager[MyModel]()
-reveal_type(MyModel._default_manager)  # E: Revealed type is 'main.CustomManager[main.MyModel]'
+reveal_type(MyModel._default_manager)  # N: Revealed type is 'main.CustomManager[main.MyModel]'
 
 [CASE if_default_manager_name_is_passed_set_default_manager_to_it]
 from typing import TypeVar
@@ -66,7 +66,7 @@ class MyModel(models.Model):
         default_manager_name = 'm2'
     m1: Manager1[MyModel]
     m2: Manager2[MyModel]
-reveal_type(MyModel._default_manager)  # E: Revealed type is 'main.Manager2[main.MyModel]'
+reveal_type(MyModel._default_manager)  # N: Revealed type is 'main.Manager2[main.MyModel]'
 
 [CASE test_leave_as_is_if_objects_is_set_and_fill_typevars_with_outer_class]
 from django.db import models
@@ -78,9 +78,9 @@ class UserManager(models.Manager[MyUser]):
 class MyUser(models.Model):
     objects = UserManager()
 
-reveal_type(MyUser.objects)  # E: Revealed type is 'main.UserManager[main.MyUser]'
-reveal_type(MyUser.objects.get())  # E: Revealed type is 'main.MyUser*'
-reveal_type(MyUser.objects.get_or_404())  # E: Revealed type is 'main.MyUser'
+reveal_type(MyUser.objects)  # N: Revealed type is 'main.UserManager[main.MyUser]'
+reveal_type(MyUser.objects.get())  # N: Revealed type is 'main.MyUser*'
+reveal_type(MyUser.objects.get_or_404())  # N: Revealed type is 'main.MyUser'
 
 [CASE model_imported_from_different_file]
 from django.db import models
@@ -88,8 +88,8 @@ from models.main import Inventory
 
 class Band(models.Model):
     pass
-reveal_type(Inventory.objects)  # E: Revealed type is 'django.db.models.manager.Manager[models.main.Inventory]'
-reveal_type(Band.objects)  # E: Revealed type is 'django.db.models.manager.Manager[main.Band]'
+reveal_type(Inventory.objects)  # N: Revealed type is 'django.db.models.manager.Manager[models.main.Inventory]'
+reveal_type(Band.objects)  # N: Revealed type is 'django.db.models.manager.Manager[main.Band]'
 [file models/__init__.py]
 [file models/main.py]
 from django.db import models
@@ -110,10 +110,10 @@ class Book(models.Model):
     published_objects = PublishedBookManager()
     annotated_objects = AnnotatedBookManager()
 
-reveal_type(AbstractPerson.abstract_persons)  # E: Revealed type is 'django.db.models.manager.Manager[main.AbstractPerson]'
-reveal_type(Book.published_objects)  # E: Revealed type is 'main.PublishedBookManager[main.Book]'
+reveal_type(AbstractPerson.abstract_persons)  # N: Revealed type is 'django.db.models.manager.Manager[main.AbstractPerson]'
+reveal_type(Book.published_objects)  # N: Revealed type is 'main.PublishedBookManager[main.Book]'
 Book.published_objects.create(title='hello')
-reveal_type(Book.annotated_objects)  # E: Revealed type is 'main.AnnotatedBookManager[main.Book]'
+reveal_type(Book.annotated_objects)  # N: Revealed type is 'main.AnnotatedBookManager[main.Book]'
 Book.annotated_objects.create(title='hello')
 [out]
 
@@ -149,11 +149,11 @@ class UnrelatedModel(models.Model):
 class MyModel(models.Model):
     pass
 
-reveal_type(UnrelatedModel.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.UnrelatedModel]'
-reveal_type(UnrelatedModel.objects.first()) # E: Revealed type is 'Union[main.UnrelatedModel*, None]'
+reveal_type(UnrelatedModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.UnrelatedModel]'
+reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is 'Union[main.UnrelatedModel*, None]'
 
-reveal_type(MyModel.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
-reveal_type(MyModel.objects.first()) # E: Revealed type is 'Union[main.MyModel*, None]'
+reveal_type(MyModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel]'
+reveal_type(MyModel.objects.first()) # N: Revealed type is 'Union[main.MyModel*, None]'
 
 # Possible to specify objects without explicit annotation of models.Manager()
 class UnrelatedModel2(models.Model):
@@ -162,11 +162,11 @@ class UnrelatedModel2(models.Model):
 class MyModel2(models.Model):
     pass
 
-reveal_type(UnrelatedModel2.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.UnrelatedModel2]'
-reveal_type(UnrelatedModel2.objects.first()) # E: Revealed type is 'Union[main.UnrelatedModel2*, None]'
+reveal_type(UnrelatedModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.UnrelatedModel2]'
+reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is 'Union[main.UnrelatedModel2*, None]'
 
-reveal_type(MyModel2.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel2]'
-reveal_type(MyModel2.objects.first()) # E: Revealed type is 'Union[main.MyModel2*, None]'
+reveal_type(MyModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel2]'
+reveal_type(MyModel2.objects.first()) # N: Revealed type is 'Union[main.MyModel2*, None]'
 
 
 # Inheritance works
@@ -177,11 +177,11 @@ class MyModel3(ParentOfMyModel3):
     pass
 
 
-reveal_type(ParentOfMyModel3.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.ParentOfMyModel3]'
-reveal_type(ParentOfMyModel3.objects.first()) # E: Revealed type is 'Union[main.ParentOfMyModel3*, None]'
+reveal_type(ParentOfMyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.ParentOfMyModel3]'
+reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is 'Union[main.ParentOfMyModel3*, None]'
 
-reveal_type(MyModel3.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel3]'
-reveal_type(MyModel3.objects.first()) # E: Revealed type is 'Union[main.MyModel3*, None]'
+reveal_type(MyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel3]'
+reveal_type(MyModel3.objects.first()) # N: Revealed type is 'Union[main.MyModel3*, None]'
 
 
 # Inheritance works with explicit objects in child
@@ -191,11 +191,11 @@ class ParentOfMyModel4(models.Model):
 class MyModel4(ParentOfMyModel4):
     objects = models.Manager[MyModel4]()
 
-reveal_type(ParentOfMyModel4.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.ParentOfMyModel4]'
-reveal_type(ParentOfMyModel4.objects.first()) # E: Revealed type is 'Union[main.ParentOfMyModel4*, None]'
+reveal_type(ParentOfMyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.ParentOfMyModel4]'
+reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is 'Union[main.ParentOfMyModel4*, None]'
 
-reveal_type(MyModel4.objects) # E: Revealed type is 'django.db.models.manager.Manager[main.MyModel4]'
-reveal_type(MyModel4.objects.first()) # E: Revealed type is 'Union[main.MyModel4*, None]'
+reveal_type(MyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[main.MyModel4]'
+reveal_type(MyModel4.objects.first()) # N: Revealed type is 'Union[main.MyModel4*, None]'
 
 
 [out]
