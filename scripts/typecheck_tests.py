@@ -205,7 +205,8 @@ IGNORED_ERRORS = {
         'base class "ModelAdmin" defined the type a',
         'base class "InlineModelAdmin" defined the type a',
         'List item 0 has incompatible type',
-        'Incompatible types in assignment (expression has type "None", base class "AdminBase" defined the type as "List[str]")'
+        'Incompatible types in assignment (expression has type "None", base class "AdminBase" '
+        + 'defined the type as "List[str]")'
     ],
     'migrate_signals': [
         'Value of type "None" is not indexable',
@@ -230,8 +231,8 @@ IGNORED_ERRORS = {
         + 'expected "Optional[Type[JSONEncoder]]"',
         'Incompatible type for "field" of "IntegerArrayModel" (got "None", '
         + 'expected "Union[Sequence[int], Combinable]")',
-        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", base class "(UnaccentTest|TrigramTest)" '
-                   r'defined the type as "Type\[CharFieldModel\]"\)'),
+        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", '
+                   r'base class "(UnaccentTest|TrigramTest)" defined the type as "Type\[CharFieldModel\]"\)'),
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
