@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 from uuid import UUID
 
 from django.contrib.admin.sites import AdminSite
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel
 from django.forms.models import ModelChoiceIterator
-from django.forms.widgets import ChoiceWidget, Media
+from django.forms.widgets import Media
 
 from django import forms
 
@@ -43,7 +43,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget): ...
 class RelatedFieldWidgetWrapper(forms.Widget):
     template_name: str = ...
     choices: ModelChoiceIterator = ...
-    widget: AutocompleteSelect = ...
+    widget: forms.Widget = ...
     rel: ManyToOneRel = ...
     can_add_related: bool = ...
     can_change_related: bool = ...
@@ -52,7 +52,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     admin_site: AdminSite = ...
     def __init__(
         self,
-        widget: ChoiceWidget,
+        widget: forms.Widget,
         rel: ForeignObjectRel,
         admin_site: AdminSite,
         can_add_related: Optional[bool] = ...,

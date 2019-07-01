@@ -1,6 +1,7 @@
 import itertools
 import os
 import re
+import shutil
 import sys
 from contextlib import contextmanager
 from pathlib import Path
@@ -13,10 +14,10 @@ from mypy.main import process_options
 PROJECT_DIRECTORY = Path(__file__).parent.parent
 
 # Django branch to typecheck against
-DJANGO_BRANCH = 'stable/2.1.x'
+DJANGO_BRANCH = 'stable/2.2.x'
 
 # Specific commit in the Django repository to check against
-DJANGO_COMMIT_SHA = '8fe63dc4cd637c1422a9bf3e3421d64388e14afd'
+DJANGO_COMMIT_SHA = '395cf7c37514b642c4bcf30e01fc1a2c4f82b2fe'
 
 # Some errors occur for the test suite itself, and cannot be addressed via django-stubs. They should be ignored
 # using this constant.
@@ -60,40 +61,19 @@ IGNORED_ERRORS = {
         + 'expected "Union[str, bytes, bytearray]"',
         'Incompatible types in assignment (expression has type "None", variable has type Module)',
         'note:',
-        # Suppress false-positive error due to mypy being overly strict with base class compatibility checks even though
-        # objects/_default_manager are redefined in the subclass to be compatible with the base class definition.
-        # Can be removed when mypy issue is fixed: https://github.com/python/mypy/issues/2619
-        re.compile(r'Definition of "(objects|_default_manager)" in base class "[A-Za-z0-9]+" is incompatible with '
-                   r'definition in base class "[A-Za-z0-9]+"'),
-    ],
-    'admin_changelist': [
-        'Incompatible types in assignment (expression has type "FilteredChildAdmin", variable has type "ChildAdmin")'
     ],
     'admin_scripts': [
         'Incompatible types in assignment (expression has type "Callable['
-    ],
-    'admin_widgets': [
-        'Incompatible types in assignment (expression has type "RelatedFieldWidgetWrapper", '
-        + 'variable has type "AdminRadioSelect")',
-        'Incompatible types in assignment (expression has type "Union[Widget, Any]", '
-        + 'variable has type "AutocompleteSelect")'
     ],
     'admin_utils': [
         re.compile(r'Argument [0-9] to "lookup_field" has incompatible type'),
         'MockModelAdmin',
         'Incompatible types in assignment (expression has type "str", variable has type "Callable[..., Any]")',
-        'Dict entry 0 has incompatible type "str": "Tuple[str, str, List[str]]"; expected "str": '
-        + '"Tuple[str, str, Tuple[str, str]]"',
-        'Incompatible types in assignment (expression has type "bytes", variable has type "str")'
     ],
     'admin_views': [
         'Argument 1 to "FileWrapper" has incompatible type "StringIO"; expected "IO[bytes]"',
         'Incompatible types in assignment',
         '"object" not callable',
-        'Incompatible type for "pk" of "Collector" (got "int", expected "str")',
-        re.compile('Unexpected attribute "[a-z]+" for model "Model"'),
-        'Unexpected attribute "two_id" for model "CyclicOne"',
-        'Argument "is_dst" to "localize" of "BaseTzInfo" has incompatible type "None"; expected "bool"'
     ],
     'aggregation': [
         '"as_sql" undefined in superclass',
@@ -101,12 +81,11 @@ IGNORED_ERRORS = {
         'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", '
         + 'expected "Union[Publisher, Combinable]")'
     ],
-    'apps': [
-        'Incompatible types in assignment (expression has type "str", target has type "type")',
-        '"Callable[[bool, bool], List[Type[Model]]]" has no attribute "cache_clear"'
-    ],
     'annotations': [
         'Incompatible type for "store" of "Employee" (got "Optional[Store]", expected "Union[Store, Combinable]")'
+    ],
+    'apps': [
+        'Incompatible types in assignment (expression has type "str", target has type "type")',
     ],
     'auth_tests': [
         '"PasswordValidator" has no attribute "min_length"',
@@ -117,24 +96,10 @@ IGNORED_ERRORS = {
     ],
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
-        '"refresh_from_db" of "Model" defined here',
         'Unexpected attribute "foo" for model "Article"'
-    ],
-    'builtin_server': [
-        'has no attribute "getvalue"'
     ],
     'custom_lookups': [
         'in base class "SQLFuncMixin"'
-    ],
-    'custom_managers': [
-        '_filter_CustomQuerySet',
-        '_filter_CustomManager',
-        re.compile(r'Cannot determine type of \'(abstract_persons|cars|plain_manager)\''),
-        # TODO: remove after 'objects' and '_default_manager' are handled in the plugin
-        'Incompatible types in assignment (expression has type "CharField", '
-        + 'base class "Model" defined the type as "Manager[Model]")',
-        # TODO: remove after from_queryset() handled in the plugin
-        'Invalid base class'
     ],
     'csrf_tests': [
         'Incompatible types in assignment (expression has type "property", ' +
@@ -152,14 +117,10 @@ IGNORED_ERRORS = {
     'deprecation': [
         re.compile('"(old|new)" undefined in superclass')
     ],
-    'db_typecasts': [
-        '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)'
-    ],
-    'from_db_value': [
-        'has no attribute "vendor"'
-    ],
-    'field_deconstruction': [
-        'Incompatible types in assignment (expression has type "ForeignKey[Any]", variable has type "CharField")'
+    'db_functions': [
+        'for **',
+        'expected "float"',
+        'Incompatible types in assignment (expression has type "Optional[FloatModel]", variable has type "FloatModel")'
     ],
     'file_uploads': [
         '"handle_uncaught_exception" undefined in superclass'
@@ -201,15 +162,8 @@ IGNORED_ERRORS = {
         'Argument 1 to "update_or_create" of "QuerySet" has incompatible type "**Dict[str, object]"; '
         + 'expected "Optional[MutableMapping[str, Any]]"'
     ],
-    'httpwrappers': [
-        'Argument 2 to "appendlist" of "QueryDict" has incompatible type "List[str]"; expected "str"'
-    ],
     'humanize_tests': [
         'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
-    ],
-    'invalid_models_tests': [
-        'Argument "max_length" to "CharField" has incompatible type "str"; expected "Optional[int]"',
-        'Argument "choices" to "CharField" has incompatible type "str"'
     ],
     'logging_tests': [
         re.compile('"(setUpClass|tearDownClass)" undefined in superclass')
@@ -217,17 +171,15 @@ IGNORED_ERRORS = {
     'lookup': [
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
     ],
+    'm2o_recursive': [
+        'Incompatible type for "id" of "Category" (got "None", expected "int")'
+    ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")',
         'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")'
     ],
-    'model_meta': [
-        '"object" has no attribute "items"',
-        '"Field" has no attribute "many_to_many"',
-    ],
-    'model_forms': [
-        'Argument "instance" to "InvalidModelForm" has incompatible type "Type[Category]"; expected "Optional[Model]"',
-        'Invalid type "NewForm"'
+    'middleware_exceptions': [
+        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
     ],
     'model_fields': [
         'Incompatible types in assignment (expression has type "Type[Person]", variable has type',
@@ -242,22 +194,18 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "FloatModel", variable has type '
         '"Union[float, int, str, Combinable]")',
     ],
-    'model_formsets': [
-        'Incompatible types in string interpolation (expression has type "object", '
-        + 'placeholder has type "Union[int, float]")'
-    ],
-    'model_formsets_regress': [
-        'Incompatible types in assignment (expression has type "Model", variable has type "User")'
+    'model_indexes': [
+        'Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'
     ],
     'model_regress': [
-        'Too many arguments for "Worker"',
         re.compile(r'Incompatible type for "[a-z]+" of "Worker" \(got "int", expected')
     ],
     'modeladmin': [
         'BandAdmin',
         'base class "ModelAdmin" defined the type a',
         'base class "InlineModelAdmin" defined the type a',
-        'List item 0 has incompatible type "Type[ValidationTestInline]"; expected "Type[InlineModelAdmin]"'
+        'List item 0 has incompatible type',
+        'Incompatible types in assignment (expression has type "None", base class "AdminBase" defined the type as "List[str]")'
     ],
     'migrate_signals': [
         'Value of type "None" is not indexable',
@@ -265,40 +213,25 @@ IGNORED_ERRORS = {
     ],
     'migrations': [
         'FakeMigration',
-        'Incompatible types in assignment (expression has type "TextField", base class "Model" '
-        + 'defined the type as "Manager[Model]")',
-        'Incompatible types in assignment (expression has type "DeleteModel", variable has type "RemoveField")',
-        'Argument "bases" to "CreateModel" has incompatible type "Tuple[Type[Mixin], Type[Mixin]]"; '
-        + 'expected "Optional[Sequence[Union[Type[Model], str]]]"',
-        'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'FakeLoader',
+        'Dict entry 0 has incompatible type "Any": "Set[Tuple[Any, ...]]"; expected "Any": "str"',
+        'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"',
-        'Unsupported operand types for - ("Set[Any]" and "None")',
-    ],
-    'middleware_exceptions': [
-        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
     ],
     'multiple_database': [
-        'Unexpected attribute "extra_arg" for model "Book"',
         'Too many arguments for "create" of "QuerySet"'
     ],
-    'queryset_pickle': [
-        '"None" has no attribute "somefield"'
-    ],
     'postgres_tests': [
-        'Cannot assign multiple types to name',
-        'Incompatible types in assignment (expression has type "Type[Field[Any, Any]]',
         'DummyArrayField',
         'DummyJSONField',
+        'Cannot assign multiple types to name',
+        'Incompatible types in assignment (expression has type "Type[Field[Any, Any]]',
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder"; '
         + 'expected "Optional[Type[JSONEncoder]]"',
-        'for model "CITestModel"',
         'Incompatible type for "field" of "IntegerArrayModel" (got "None", '
         + 'expected "Union[Sequence[int], Combinable]")',
-        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", base class "UnaccentTest" '
+        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", base class "(UnaccentTest|TrigramTest)" '
                    r'defined the type as "Type\[CharFieldModel\]"\)'),
-        'Incompatible types in assignment (expression has type "Type[TextFieldModel]", base class "TrigramTest" '
-        'defined the type as "Type[CharFieldModel]")',
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
@@ -314,32 +247,17 @@ IGNORED_ERRORS = {
         'Incompatible type for "objectb" of "ObjectC" (got "ObjectA", expected'
         ' "Union[ObjectB, Combinable, None, None]")',
     ],
+    'prefetch_related': [
+        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
+    ],
+    'proxy_model_inheritance': [
+        'Incompatible import of "ProxyModel"'
+    ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
     ],
     'responses': [
         'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"'
-    ],
-    'prefetch_related': [
-        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
-        '"None" has no attribute "__iter__"',
-        'has no attribute "read_by"'
-    ],
-    'proxy_model_inheritance': [
-        'Incompatible import of "ProxyModel"'
-    ],
-    'signals': [
-        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]"; '
-        + 'expected "Tuple[Any, Any, Any]"'
-    ],
-    'syndication_tests': [
-        'List or tuple expected as variable arguments'
-    ],
-    'staticfiles_tests': [
-        'Value of type "stat_result" is not indexable',
-        '"setUp" undefined in superclass',
-        'Argument 1 to "write" of "IO" has incompatible type "bytes"; expected "str"',
-        'Value of type "object" is not indexable'
     ],
     'schema': [
         'Incompatible type for "info" of "Note" (got "None", expected "Union[str, Combinable]")',
@@ -349,12 +267,34 @@ IGNORED_ERRORS = {
     'settings_tests': [
         'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'
     ],
-    'transactions': [
-        'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
+    'signals': [
+        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]"; '
+        + 'expected "Tuple[Any, Any, Any]"'
+    ],
+    'syndication_tests': [
+        'List or tuple expected as variable arguments'
+    ],
+    'sessions_tests': [
+        'base class "SessionTestsMixin" defined the type as "None")',
+        'Incompatible types in assignment (expression has type "None", variable has type "int")',
+    ],
+    'select_related_onetoone': [
+        'Incompatible types in assignment (expression has type "Parent2", variable has type "Parent1")',
+    ],
+    'servers': [
+        re.compile('Argument [0-9] to "WSGIRequestHandler"')
+    ],
+    'template_tests': [
+        re.compile(r'Argument 1 to "[a-zA-Z_]+" has incompatible type "int"; expected "str"'),
+        'TestObject',
+        'variable has type "Callable[[Any], Any]',
+        'Value of type variable "AnyStr" of "urljoin" cannot be "Optional[str]"'
+    ],
+    'template_backends': [
+        'Incompatible import of "Jinja2" (imported name has type "Type[Jinja2]", local name has type "object")',
+        'TemplateStringsTests',
     ],
     'test_client': [
-        'Incompatible types in assignment (expression has type "StreamingHttpResponse", '
-        + 'variable has type "HttpResponse")',
         'Incompatible types in assignment (expression has type "HttpResponse", '
         + 'variable has type "StreamingHttpResponse")'
     ],
@@ -362,70 +302,23 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Dict[<nothing>, <nothing>]", '
         + 'variable has type "SessionBase")',
         'Unsupported left operand type for + ("None")',
-        'Both left and right operands are unions'
     ],
     'timezones': [
         'Too few arguments for "render" of "Template"'
     ],
     'test_runner': [
-        'Value of type "TestSuite" is not indexable',
-        '"TestSuite" has no attribute "_tests"',
         'Argument "result" to "run" of "TestCase" has incompatible type "RemoteTestResult"; '
         + 'expected "Optional[TestResult]"',
-        'Item "TestSuite" of "Union[TestCase, TestSuite]" has no attribute "id"',
-        'MockTestRunner',
-        'Incompatible types in assignment (expression has type "Tuple[Union[TestCase, TestSuite], ...]", '
-        + 'variable has type "TestSuite")'
     ],
-    'template_tests': [
-        'Xtemplate',
-        re.compile(r'Argument 1 to "[a-zA-Z_]+" has incompatible type "int"; expected "str"'),
-        'TestObject',
-        'variable has type "Callable[[Any], Any]',
-        'template_debug',
-        '"yield from" can\'t be applied to',
-        re.compile(r'List item [0-9] has incompatible type "URLResolver"; expected "URLPattern"'),
-        '"WSGIRequest" has no attribute "current_app"',
-        'Value of type variable "AnyStr" of "urljoin" cannot be "Optional[str]"'
-    ],
-    'template_backends': [
-        'Incompatible import of "Jinja2" (imported name has type "Type[Jinja2]", local name has type "object")',
-        'TemplateStringsTests',
+    'transactions': [
+        'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
     ],
     'urlpatterns': [
-        '"object" has no attribute "__iter__"; maybe "__str__" or "__dir__"? (not iterable)',
         '"object" not callable'
     ],
     'user_commands': [
         'Incompatible types in assignment (expression has type "Callable[[Any, KwArg(Any)], Any]", variable has type'
     ],
-    'utils_tests': [
-        re.compile(r'Argument ([1-9]) to "__get__" of "classproperty" has incompatible type')
-    ],
-    'urlpatterns_reverse': [
-        'to "reverse" has incompatible type "object"',
-        'Module has no attribute "_translations"',
-        "'django.urls.resolvers.ResolverMatch' object is not iterable"
-    ],
-    'sessions_tests': [
-        'base class "SessionTestsMixin" defined the type as "None")',
-        'Incompatible types in assignment (expression has type "None", variable has type "int")',
-    ],
-    'select_related_onetoone': [
-        '"None" has no attribute',
-        'Incompatible types in assignment (expression has type "Parent2", variable has type "Parent1")',
-    ],
-    'servers': [
-        re.compile('Argument [0-9] to "WSGIRequestHandler"')
-    ],
-    'sitemaps_tests': [
-        'Incompatible types in assignment (expression has type "str", '
-        + 'base class "Sitemap" defined the type as "Callable[[Sitemap, Model], str]")'
-    ],
-    'view_tests': [
-        '"Handler" has no attribute "include_html"',
-        '"EmailMessage" has no attribute "alternatives"'
-    ]
 }
 # Test folders to typecheck
 TESTS_DIRS = [
@@ -520,10 +413,8 @@ TESTS_DIRS = [
     'inline_formsets',
     'inspectdb',
     'introspection',
-
     # not practical
     # 'invalid_models_tests',
-
     'known_related_objects',
     'logging_tests',
     'lookup',
@@ -701,6 +592,7 @@ def get_absolute_path_for_test(test_dirname: str):
 if __name__ == '__main__':
     mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()
     repo_directory = PROJECT_DIRECTORY / 'django-sources'
+    mypy_cache_dir = Path(__file__).parent / '.mypy_cache'
     tests_root = repo_directory / 'tests'
     global_rc = 0
 
@@ -718,12 +610,17 @@ if __name__ == '__main__':
     else:
         tests_to_run = TESTS_DIRS
 
-    for dirname in tests_to_run:
-        abs_path = get_absolute_path_for_test(dirname)
-        print(f'Checking {abs_path}')
+    try:
+        for dirname in tests_to_run:
+            abs_path = get_absolute_path_for_test(dirname)
+            print(f'Checking {abs_path}')
 
-        rc = check_with_mypy(abs_path, mypy_config_file)
-        if rc != 0:
-            global_rc = 1
+            rc = check_with_mypy(abs_path, mypy_config_file)
+            if rc != 0:
+                global_rc = 1
 
-    sys.exit(global_rc)
+        sys.exit(global_rc)
+
+    except BaseException as exc:
+        shutil.rmtree(mypy_cache_dir, ignore_errors=True)
+        raise exc
