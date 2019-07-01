@@ -1,11 +1,8 @@
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple
 
-from .resolvers import URLPattern, URLResolver
+from .resolvers import URLResolver
 
-def include(
-    arg: Union[List[Tuple[str, Callable]], List[URLPattern], List[URLResolver], Tuple[List[URLResolver], str], str],
-    namespace: Optional[str] = ...,
-) -> Tuple[List[URLResolver], Optional[str], Optional[str]]: ...
+def include(arg: Any, namespace: Optional[str] = ...) -> Tuple[List[URLResolver], Optional[str], Optional[str]]: ...
 
 path: Any
 re_path: Any
