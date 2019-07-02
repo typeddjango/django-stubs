@@ -1,0 +1,10 @@
+[CASE successmessagemixin_compatible_with_formmixin]
+from django.views.generic.edit import FormMixin
+from django.contrib.messages.views import SuccessMessageMixin
+
+class FormFirstView(FormMixin, SuccessMessageMixin):
+    pass
+
+class SuccessMessageFirstView(FormMixin, SuccessMessageMixin):
+    pass
+[/CASE]
