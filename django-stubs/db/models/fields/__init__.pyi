@@ -25,7 +25,9 @@ from django.db.models.expressions import Combinable, Col
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
 
-from .mixins import NOT_PROVIDED as NOT_PROVIDED
+class NOT_PROVIDED:
+    pass
+
 
 _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
@@ -128,6 +130,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     @property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
+    def get_attname(self) -> str: ...
 
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
