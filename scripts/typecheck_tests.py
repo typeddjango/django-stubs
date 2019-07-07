@@ -61,6 +61,8 @@ IGNORED_ERRORS = {
         + 'expected "Union[str, bytes, bytearray]"',
         'Incompatible types in assignment (expression has type "None", variable has type Module)',
         'note:',
+        'undefined in superclass',
+        '**Dict'
     ],
     'admin_scripts': [
         'Incompatible types in assignment (expression has type "Callable['
@@ -76,7 +78,6 @@ IGNORED_ERRORS = {
         '"object" not callable',
     ],
     'aggregation': [
-        '"as_sql" undefined in superclass',
         'Incompatible type for "contact" of "Book" (got "Optional[Author]", expected "Union[Author, Combinable]")',
         'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", '
         + 'expected "Union[Publisher, Combinable]")'
@@ -114,16 +115,18 @@ IGNORED_ERRORS = {
     'dispatch': [
         'Argument 1 to "connect" of "Signal" has incompatible type "object"; expected "Callable[..., Any]"'
     ],
-    'deprecation': [
-        re.compile('"(old|new)" undefined in superclass')
-    ],
     'db_functions': [
         'for **',
         'expected "float"',
         'Incompatible types in assignment (expression has type "Optional[FloatModel]", variable has type "FloatModel")'
     ],
-    'file_uploads': [
-        '"handle_uncaught_exception" undefined in superclass'
+    'file_storage': [
+        'Incompatible types in assignment (expression has type "Callable[[], Any]"'
+    ],
+    'files': [
+        '"file_move_safe" does not return a value',
+        'Argument 1 to "unlink" has incompatible type "Optional[str]"; expected "Union[bytes, str, _PathLike[Any]]"',
+        'Incompatible types in assignment (expression has type "IOBase", variable has type "File")'
     ],
     'fixtures': [
         'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")'
@@ -132,7 +135,6 @@ IGNORED_ERRORS = {
         'List item 0 has incompatible type "Jinja2"; expected "DjangoTemplates"',
         'Not enough arguments for format string',
         'Argument after ** must be a mapping, not "object"',
-        '"media" undefined in superclass',
         'expression has type "None", base class "TestFormParent"',
         'variable has type "SongForm"',
         '"full_clean" of "BaseForm" does not return a value',
@@ -158,15 +160,8 @@ IGNORED_ERRORS = {
         + 'expected "Union[Type[<nothing>], QuerySet[<nothing>, <nothing>]]"',
         'CustomClass'
     ],
-    'get_or_create': [
-        'Argument 1 to "update_or_create" of "QuerySet" has incompatible type "**Dict[str, object]"; '
-        + 'expected "Optional[MutableMapping[str, Any]]"'
-    ],
     'humanize_tests': [
         'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
-    ],
-    'logging_tests': [
-        re.compile('"(setUpClass|tearDownClass)" undefined in superclass')
     ],
     'lookup': [
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
@@ -385,9 +380,9 @@ TESTS_DIRS = [
     'field_deconstruction',
     'field_defaults',
     'field_subclassing',
-    # TODO: 'file_storage',
+    'file_storage',
     'file_uploads',
-    # TODO: 'files',
+    'files',
     'filtered_relation',
     'fixtures',
     'fixtures_model_package',
