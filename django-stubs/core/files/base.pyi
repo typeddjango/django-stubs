@@ -1,5 +1,5 @@
 from io import StringIO
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Iterator, Optional, Union, IO
 
 from django.core.files.utils import FileProxyMixin
 
