@@ -1,10 +1,10 @@
 from typing import Any, Callable, Optional, Type
 
-from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
 class RemovedInDjango30Warning(PendingDeprecationWarning): ...
+class RemovedInDjango31Warning(PendingDeprecationWarning): ...
 class RemovedInNextVersionWarning(DeprecationWarning): ...
 
 class warn_about_renamed_method:

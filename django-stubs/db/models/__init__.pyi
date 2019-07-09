@@ -99,6 +99,10 @@ from .expressions import (
     ExpressionList as ExpressionList,
     Random as Random,
     Ref as Ref,
+    Window as Window,
+    WindowFrame as WindowFrame,
+    RowRange as RowRange,
+    ValueRange as ValueRange,
 )
 
 from .manager import BaseManager as BaseManager, Manager as Manager
@@ -118,3 +122,9 @@ from .aggregates import (
 from .indexes import Index as Index
 
 from . import signals as signals
+
+from .constraints import (
+    BaseConstraint as BaseConstraint,
+    CheckConstraint as CheckConstraint,
+    UniqueConstraint as UniqueConstraint,
+)

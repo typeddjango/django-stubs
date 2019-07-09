@@ -1,5 +1,5 @@
-from typing import Any, Dict, IO, Iterator, Optional, Union
-from django.core.files import temp as tempfile
+from typing import Any, Dict, IO, Optional, Union
+
 from django.core.files.base import File
 
 class UploadedFile(File):
@@ -39,8 +39,6 @@ class InMemoryUploadedFile(UploadedFile):
         charset: Optional[str],
         content_type_extra: Dict[str, str] = ...,
     ) -> None: ...
-    def chunks(self, chunk_size: Optional[int] = ...) -> Iterator[bytes]: ...
-    def multiple_chunks(self, chunk_size: Optional[int] = ...) -> bool: ...
 
 class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name: str, content: Optional[Union[bytes, str]], content_type: str = ...) -> None: ...

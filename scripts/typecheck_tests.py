@@ -30,6 +30,7 @@ IGNORED_ERRORS = {
         'Need type annotation for',
         'Invalid value for a to= parameter',
         'already defined (possibly by an import)',
+        'already defined on line',
         'gets multiple values for keyword argument',
         'Cannot assign to a type',
         re.compile(r'Cannot assign to class variable "[a-z_]+" via instance'),
@@ -52,7 +53,7 @@ IGNORED_ERRORS = {
         # cookies private attribute
         'full_clean" of "Model" does not return a value',
         # private members
-        re.compile(r'has no attribute "|\'_[a-z][a-z_]+"|\''),
+        re.compile(r'has no attribute ("|\')_[a-zA-Z_]+("|\')'),
         'Invalid base class',
         'ValuesIterable',
         'Value of type "Optional[Dict[str, Any]]" is not indexable',
@@ -61,8 +62,37 @@ IGNORED_ERRORS = {
         + 'expected "Union[str, bytes, bytearray]"',
         'Incompatible types in assignment (expression has type "None", variable has type Module)',
         'note:',
-        'undefined in superclass',
-        '**Dict'
+        '\'Settings\' object has no attribute',
+        re.compile(r'"Type\[Model\]" has no attribute "[a-zA-Z_]+"'),
+        re.compile(r'Item "None" of "[a-zA-Z_ ,\[\]]+" has no attribute'),
+        'Xtemplate',
+        re.compile(r'has no attribute "get_[a-z_]+_display"'),
+        re.compile(r'has no attribute "get_next_by_[a-z_]+"'),
+        re.compile(r'has no attribute "get_previous_by_[a-z_]+"'),
+        re.compile(r'has no attribute "set_[a-z_]+_order"'),
+        'psycopg2',
+        'PIL',
+        'has no attribute "getvalue"',
+        'MySQLdb',
+        'sqlparse',
+        'selenium',
+        'oracle',
+        'mysql',
+        'sqlite3',
+        'LogEntry',
+        '"HttpResponse" has no attribute',
+        '"HttpResponseBase" has no attribute',
+        '"object" has no attribute',
+        '"HttpRequest" has no attribute',
+        'xml.dom',
+        'numpy',
+        'tblib',
+        # TODO: values().annotate()
+        'TypedDict',
+        'namedtuple',
+        'has no attribute "deconstruct"',
+        '**Dict',
+        'undefined in superclass'
     ],
     'admin_scripts': [
         'Incompatible types in assignment (expression has type "Callable['
@@ -71,22 +101,36 @@ IGNORED_ERRORS = {
         re.compile(r'Argument [0-9] to "lookup_field" has incompatible type'),
         'MockModelAdmin',
         'Incompatible types in assignment (expression has type "str", variable has type "Callable[..., Any]")',
+        '"Article" has no attribute "non_field"'
     ],
     'admin_views': [
         'Argument 1 to "FileWrapper" has incompatible type "StringIO"; expected "IO[bytes]"',
         'Incompatible types in assignment',
         '"object" not callable',
+        '"Type[SubscriberAdmin]" has no attribute "overridden"'
+    ],
+    'admin_ordering': [
+        '"Band" has no attribute "field"'
     ],
     'aggregation': [
         'Incompatible type for "contact" of "Book" (got "Optional[Author]", expected "Union[Author, Combinable]")',
         'Incompatible type for "publisher" of "Book" (got "Optional[Publisher]", '
-        + 'expected "Union[Publisher, Combinable]")'
+        + 'expected "Union[Publisher, Combinable]")',
+        'has no attribute'
+    ],
+    'aggregation_regress': [
+        'has no attribute'
     ],
     'annotations': [
-        'Incompatible type for "store" of "Employee" (got "Optional[Store]", expected "Union[Store, Combinable]")'
+        'Incompatible type for "store" of "Employee" (got "Optional[Store]", expected "Union[Store, Combinable]")',
+        '"Book" has no attribute',
+        '"Employee" has no attribute',
+        'Item "Book" of',
+        'Item "Ticket" of'
     ],
     'apps': [
         'Incompatible types in assignment (expression has type "str", target has type "type")',
+        '"Callable[[bool, bool], List[Type[Model]]]" has no attribute "cache_clear"'
     ],
     'auth_tests': [
         '"PasswordValidator" has no attribute "min_length"',
@@ -97,10 +141,30 @@ IGNORED_ERRORS = {
     ],
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
-        'Unexpected attribute "foo" for model "Article"'
+        'Unexpected attribute "foo" for model "Article"',
+        'has no attribute'
+    ],
+    'backends': [
+        '"DatabaseError" has no attribute "pgcode"'
+    ],
+    'check_framework': [
+        'base class "Model" defined the type as "Callable',
+        'Cannot determine type of \'check\''
+    ],
+    'constraints': [
+        'Argument "condition" to "UniqueConstraint" has incompatible type "str"; expected "Optional[Q]"'
+    ],
+    'contenttypes_tests': [
+        'Item "Model" of "Union[GenericForeignKey, Model, None]" has no attribute'
     ],
     'custom_lookups': [
         'in base class "SQLFuncMixin"'
+    ],
+    'custom_pk': [
+        '"Employee" has no attribute "id"'
+    ],
+    'custom_managers': [
+        '"Type[Book]" has no attribute "objects"'
     ],
     'csrf_tests': [
         'Incompatible types in assignment (expression has type "property", ' +
@@ -113,23 +177,66 @@ IGNORED_ERRORS = {
         'Too many arguments for "refresh_from_db" of "Model"'
     ],
     'dispatch': [
-        'Argument 1 to "connect" of "Signal" has incompatible type "object"; expected "Callable[..., Any]"'
+        'Argument 1 to "connect" of "Signal" has incompatible type "object"; expected "Callable[..., Any]"',
+        'Item "str" of "Union[ValueError, str]" has no attribute "args"'
+    ],
+    'deprecation': [
+        '"Manager" has no attribute "old"',
+        '"Manager" has no attribute "new"'
     ],
     'db_functions': [
         'for **',
         'expected "float"',
-        'Incompatible types in assignment (expression has type "Optional[FloatModel]", variable has type "FloatModel")'
+        'Incompatible types in assignment (expression has type "Optional[FloatModel]", variable has type "FloatModel")',
+        re.compile(r'Item .* has no attribute'),
+        'Module has no attribute',
+        'Module \'datetime\' has no attribute',
+        '"DTModel" has no attribute',
+        '"Author" has no attribute',
+        '"FloatModel" has no attribute',
+        '"Article" has no attribute'
+    ],
+    'decorators': [
+        'DummyRequest',
+        'DummyUser',
+        '"Type[object]" has no attribute "method"'
+    ],
+    'defer_regress': [
+        '"Base" has no attribute "derived"'
+    ],
+    'delete': [
+        '"RChild" has no attribute',
+        '"Child" has no attribute "parent_ptr"'
+    ],
+    'expressions': [
+        'Item "Experiment" of',
+        'Item "Time" of',
+        '"Experiment" has no attribute',
+        '"Time" has no attribute',
+    ],
+    'expressions_case': [
+        '"CaseTestModel" has no attribute "selected"'
+    ],
+    'expressions_window': [
+        'has incompatible type "str"'
+    ],
+    'file_uploads': [
+        '"Iterable[Any]" has no attribute',
+        '"IO[Any]" has no attribute'
     ],
     'file_storage': [
         'Incompatible types in assignment (expression has type "Callable[[], Any]"'
     ],
     'files': [
         '"file_move_safe" does not return a value',
-        'Argument 1 to "unlink" has incompatible type "Optional[str]"; expected "Union[bytes, str, _PathLike[Any]]"',
-        'Incompatible types in assignment (expression has type "IOBase", variable has type "File")'
+        'Incompatible types in assignment (expression has type "IOBase", variable has type "File")',
+        'Module has no attribute "open"'
     ],
     'fixtures': [
         'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")'
+    ],
+    'flatpages_tests': [
+        '"Site" has no attribute "add"',
     ],
     'forms_tests': [
         'List item 0 has incompatible type "Jinja2"; expected "DjangoTemplates"',
@@ -152,6 +259,15 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Textarea]", '
         + 'base class "Field" defined the type as "Widget")',
         'Incompatible types in assignment (expression has type "SimpleUploadedFile", variable has type "BinaryIO")',
+        'has no attribute',
+        'Name \'forms.Field\' is not defined'
+    ],
+    'foreign_object': [
+        '"Person" has no attribute',
+        '"SlugPage" has no attribute'
+    ],
+    'from_db_value': [
+        '"Cash" has no attribute'
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
@@ -160,11 +276,26 @@ IGNORED_ERRORS = {
         + 'expected "Union[Type[<nothing>], QuerySet[<nothing>, <nothing>]]"',
         'CustomClass'
     ],
+    'generic_relations': [
+        'has no attribute "id"',
+        'has no attribute "pk"'
+    ],
+    'generic_relations_regress': [
+        '"HasLinkThing" has no attribute',
+        '"Link" has no attribute'
+    ],
     'humanize_tests': [
         'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
     ],
+    'inline_formsets': [
+        'has no attribute "form"'
+    ],
+    'logging_tests': [
+        '"Handler" has no attribute "stream"'
+    ],
     'lookup': [
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
+        '\'flat\' is not valid when values_list is called with more than one field.'
     ],
     'm2o_recursive': [
         'Incompatible type for "id" of "Category" (got "None", expected "int")'
@@ -172,6 +303,9 @@ IGNORED_ERRORS = {
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")',
         'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")'
+    ],
+    'managers_regress': [
+        '"Type[AbstractBase3]" has no attribute "objects"'
     ],
     'middleware_exceptions': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
@@ -188,12 +322,31 @@ IGNORED_ERRORS = {
         'Incompatible import of "Person"',
         'Incompatible types in assignment (expression has type "FloatModel", variable has type '
         '"Union[float, int, str, Combinable]")',
+        '"UUIDGrandchild" has no attribute "uuidchild_ptr_id"',
+        '"Person" has no attribute',
+        '"Foo" has no attribute',
+    ],
+    'model_formsets': [
+        'has no attribute'
     ],
     'model_indexes': [
         'Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'
     ],
+    'model_inheritance_regress': [
+        '"Restaurant" has no attribute',
+        '"ArticleWithAuthor" has no attribute',
+        '"Person" has no attribute',
+        '"MessyBachelorParty" has no attribute',
+        '"Place" has no attribute',
+        '"ItalianRestaurant" has no attribute'
+    ],
+    'model_meta': [
+        '"Field[Any, Any]" has no attribute "many_to_many"'
+    ],
     'model_regress': [
-        re.compile(r'Incompatible type for "[a-z]+" of "Worker" \(got "int", expected')
+        re.compile(r'Incompatible type for "[a-z]+" of "Worker" \(got "int", expected'),
+        '"PickledModel" has no attribute',
+        '"Department" has no attribute'
     ],
     'modeladmin': [
         'BandAdmin',
@@ -213,9 +366,23 @@ IGNORED_ERRORS = {
         'Dict entry 0 has incompatible type "Any": "Set[Tuple[Any, ...]]"; expected "Any": "str"',
         'Argument 1 to "RunPython" has incompatible type "str"; expected "Callable[..., Any]"',
         'Argument 1 to "append" of "list" has incompatible type "AddIndex"; expected "CreateModel"',
+        'Argument 2 to "register_serializer" of "MigrationWriter" has incompatible type '
+        + '"Type[TestModel1]"; expected "Type[BaseSerializer]"',
+        'Argument 1 to "append" of "list" has incompatible type "AddConstraint"; expected "CreateModel"'
     ],
     'multiple_database': [
-        'Too many arguments for "create" of "QuerySet"'
+        'Too many arguments for "create" of "QuerySet"',
+        '"User" has no attribute "userprofile"',
+        'Item "GenericForeignKey" of',
+        'Item "Model" of'
+    ],
+    'known_related_objects': [
+        '"Pool" has no attribute'
+    ],
+    'one_to_one': [
+        '"Place" has no attribute',
+        '"Type[Place]" has no attribute',
+        '"ManualPrimaryKey" has no attribute'
     ],
     'postgres_tests': [
         'DummyArrayField',
@@ -228,9 +395,26 @@ IGNORED_ERRORS = {
         + 'expected "Union[Sequence[int], Combinable]")',
         re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", '
                    r'base class "(UnaccentTest|TrigramTest)" defined the type as "Type\[CharFieldModel\]"\)'),
+        '"Type[PostgreSQLModel]" has no attribute "objects"',
+        '("None" and "SearchQuery")',
+        # TODO:
+        'django.contrib.postgres.forms',
+        'django.contrib.postgres.aggregates',
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
+    ],
+    'prefetch_related': [
+        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
+        '"Person" has no attribute',
+        '"Author" has no attribute',
+        '"Book" has no attribute',
+        'Item "Room" of',
+        '"AuthorWithAge" has no attribute',
+        'has no attribute "read_by"'
+    ],
+    'proxy_model_inheritance': [
+        'Incompatible import of "ProxyModel"'
     ],
     'queries': [
         'Incompatible types in assignment (expression has type "None", variable has type "str")',
@@ -242,12 +426,15 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "ObjectC", variable has type "ObjectA")',
         'Incompatible type for "objectb" of "ObjectC" (got "ObjectA", expected'
         ' "Union[ObjectB, Combinable, None, None]")',
+        '"Note" has no attribute',
+        '"Ranking" has no attribute',
+        '"BaseUser" has no attribute',
+        '"Item" has no attribute',
+        "'flat' and 'named' can't be used together.",
     ],
-    'prefetch_related': [
-        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
-    ],
-    'proxy_model_inheritance': [
-        'Incompatible import of "ProxyModel"'
+    'queryset_pickle': [
+        'RelatedObjectDoesNotExist',
+        '"Type[Event]" has no attribute "happening"'
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -267,28 +454,43 @@ IGNORED_ERRORS = {
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]"; '
         + 'expected "Tuple[Any, Any, Any]"'
     ],
+    'sites_tests': [
+        'Item "RequestSite" of "Union[Site, RequestSite]" has no attribute "id"'
+    ],
     'syndication_tests': [
         'List or tuple expected as variable arguments'
     ],
     'sessions_tests': [
         'base class "SessionTestsMixin" defined the type as "None")',
         'Incompatible types in assignment (expression has type "None", variable has type "int")',
+        '"AbstractBaseSession" has no attribute'
+    ],
+    'select_related': [
+        '"Species" has no attribute',
+        'Item "object" of "Union[object, Any]" has no attribute "first"'
     ],
     'select_related_onetoone': [
         'Incompatible types in assignment (expression has type "Parent2", variable has type "Parent1")',
+        'has no attribute'
     ],
     'servers': [
-        re.compile('Argument [0-9] to "WSGIRequestHandler"')
+        re.compile('Argument [0-9] to "WSGIRequestHandler"'),
+        '"HTTPResponse" has no attribute',
+        '"type" has no attribute',
+        '"WSGIRequest" has no attribute "makefile"'
     ],
     'template_tests': [
         re.compile(r'Argument 1 to "[a-zA-Z_]+" has incompatible type "int"; expected "str"'),
         'TestObject',
         'variable has type "Callable[[Any], Any]',
-        'Value of type variable "AnyStr" of "urljoin" cannot be "Optional[str]"'
+        'Value of type variable "AnyStr" of "urljoin" cannot be "Optional[str]"',
+        'has no attribute "template_debug"',
+        "Module 'django.template.base' has no attribute 'TemplateSyntaxError'"
     ],
     'template_backends': [
         'Incompatible import of "Jinja2" (imported name has type "Type[Jinja2]", local name has type "object")',
         'TemplateStringsTests',
+        "Cannot find module named 'DoesNotExist'"
     ],
     'test_client': [
         'Incompatible types in assignment (expression has type "HttpResponse", '
@@ -305,6 +507,8 @@ IGNORED_ERRORS = {
     'test_runner': [
         'Argument "result" to "run" of "TestCase" has incompatible type "RemoteTestResult"; '
         + 'expected "Optional[TestResult]"',
+        'has no attribute "id"',
+        'MockTestRunner'
     ],
     'transactions': [
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
@@ -313,8 +517,14 @@ IGNORED_ERRORS = {
         '"object" not callable'
     ],
     'user_commands': [
-        'Incompatible types in assignment (expression has type "Callable[[Any, KwArg(Any)], Any]", variable has type'
+        'Incompatible types in assignment (expression has type "Callable[[Any, KwArg(Any)], Any]", variable has type',
+        'Cannot find module named \'user_commands.management.commands\''
     ],
+    'view_tests': [
+        '"EmailMessage" has no attribute "alternatives"',
+        '"Handler" has no attribute "include_html"',
+        "Module 'django.views.debug' has no attribute 'Path'"
+    ]
 }
 # Test folders to typecheck
 TESTS_DIRS = [
@@ -339,6 +549,7 @@ TESTS_DIRS = [
     'app_loading',
     'apps',
     # TODO: 'auth_tests',
+    'backends',
     'base',
     'bash_completion',
     'basic',
@@ -348,6 +559,7 @@ TESTS_DIRS = [
     'check_framework',
     'choices',
     'conditional_processing',
+    'constraints',
     'contenttypes_tests',
     'context_processors',
     'csrf_tests',
@@ -459,9 +671,9 @@ TESTS_DIRS = [
     'or_lookups',
     'order_with_respect_to',
     'ordering',
-    'prefetch_related',
     'pagination',
     'postgres_tests',
+    'prefetch_related',
     'project_template',
     'properties',
     'proxy_model_inheritance',
@@ -515,7 +727,7 @@ TESTS_DIRS = [
     'update_only_fields',
     'urlpatterns',
     # not annotatable without annotation in test
-    # TODO: 'urlpatterns_reverse',
+    # 'urlpatterns_reverse',
     'user_commands',
     # TODO: 'utils_tests',
     'validation',

@@ -1,8 +1,9 @@
-from typing import Any, List, Set, Tuple, Union
+from typing import Any, List, Set, Tuple, Union, Type
 
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.models import CreateModel
+from django.db.migrations.serializer import BaseSerializer
 
 class SettingsReference(str):
     def __init__(self, value: str, setting_name: str) -> None: ...
@@ -31,5 +32,9 @@ class MigrationWriter:
     def path(self) -> str: ...
     @classmethod
     def serialize(cls, value: Any) -> Tuple[str, Set[str]]: ...
+    @classmethod
+    def register_serializer(cls, type_: type, serializer: Type[BaseSerializer]) -> None: ...
+    @classmethod
+    def unregister_serializer(cls, type_: type) -> None: ...
 
 MIGRATION_TEMPLATE: str

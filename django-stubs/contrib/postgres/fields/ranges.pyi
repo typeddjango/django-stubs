@@ -18,6 +18,9 @@ class IntegerRangeField(RangeField):
 class BigIntegerRangeField(RangeField):
     def __get__(self, instance, owner) -> NumericRange: ...
 
+class DecimalRangeField(RangeField):
+    def __get__(self, instance, owner) -> NumericRange: ...
+
 class FloatRangeField(RangeField):
     def __get__(self, instance, owner) -> NumericRange: ...
 

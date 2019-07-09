@@ -4,6 +4,7 @@ from django.db.migrations.operations.base import Operation
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
 
+from django.db.models.constraints import BaseConstraint
 from django.db.models.fields import Field
 
 class ModelOperation(Operation):
@@ -78,3 +79,9 @@ class RemoveIndex(IndexOperation):
     model_name: str = ...
     name: str = ...
     def __init__(self, model_name: str, name: Union[str, Index]) -> None: ...
+
+class AddConstraint(IndexOperation):
+    def __init__(self, model_name: str, constraint: BaseConstraint): ...
+
+class RemoveConstraint(IndexOperation):
+    def __init__(self, model_name: str, name: str) -> None: ...
