@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Iterable, Union, Optional, List
 
 COMPILED_REGEX_TYPE: Any
 

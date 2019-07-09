@@ -17,6 +17,7 @@ from .text import (
     StrIndex as StrIndex,
     Replace as Replace,
     Substr as Substr,
+    Reverse as Reverse,
 )
 
 from .window import (
@@ -44,6 +45,7 @@ from .datetime import (
     ExtractWeek as ExtractWeek,
     ExtractWeekDay as ExtractWeekDay,
     ExtractYear as ExtractYear,
+    ExtractIsoYear as ExtractIsoYear,
     Trunc as Trunc,
     TruncDate as TruncDate,
     TruncDay as TruncDay,
@@ -58,4 +60,28 @@ from .datetime import (
     Now as Now,
 )
 
-from .comparison import Coalesce as Coalesce, Greatest as Greatest, Least as Least, Cast as Cast
+from .comparison import Coalesce as Coalesce, Greatest as Greatest, Least as Least, Cast as Cast, NullIf as NullIf
+
+from .math import (
+    Abs as Abs,
+    ACos as ACos,
+    ASin as ASin,
+    ATan as ATan,
+    ATan2 as ATan2,
+    Ceil as Ceil,
+    Cos as Cos,
+    Cot as Cot,
+    Degrees as Degrees,
+    Floor as Floor,
+    Exp as Exp,
+    Ln as Ln,
+    Log as Log,
+    Mod as Mod,
+    Pi as Pi,
+    Power as Power,
+    Radians as Radians,
+    Round as Round,
+    Sin as Sin,
+    Sqrt as Sqrt,
+    Tan as Tan,
+)

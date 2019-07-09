@@ -7,10 +7,14 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Ty
 
 from django.apps.registry import Apps
 from django.core.checks.registry import CheckRegistry
+from django.db.models.lookups import Lookup, Transform
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
 
 from django.conf import LazySettings, Settings
+from django.db.models.query_utils import RegisterLookupMixin
+
+from django.db.models.fields import Field
 
 _TestClass = Type[SimpleTestCase]
 _DecoratedTest = Union[Callable, _TestClass]
@@ -130,3 +134,7 @@ def teardown_databases(
     old_config: Iterable[Tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
 ) -> None: ...
 def require_jinja2(test_func: Callable) -> Callable: ...
+@contextmanager
+def register_lookup(
+    field: Type[RegisterLookupMixin], *lookups: Type[Union[Lookup, Transform]], lookup_name: Optional[str] = ...
+) -> Iterator[None]: ...

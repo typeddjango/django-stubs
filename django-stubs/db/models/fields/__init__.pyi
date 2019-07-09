@@ -1,7 +1,7 @@
 import decimal
 import uuid
 from datetime import date, datetime, time, timedelta
-from typing import Any, Callable, Dict, Generic, Iterable, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterable, Optional, Tuple, Type, TypeVar, Union, Sequence
 
 from django.db.models import Model
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -34,6 +34,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     max_length: Optional[int]
     model: Type[Model]
     name: str
+    blank: bool = ...
+    null: bool = ...
+    editable: bool = ...
+    choices: Optional[_FieldChoices] = ...
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -69,6 +73,15 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def formfield(self, **kwargs) -> FormField: ...
     def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
+    def clean(self, value: Any, model_instance: Optional[Model]) -> Any: ...
+    def get_choices(
+        self,
+        include_blank: bool = ...,
+        blank_choice: _Choice = ...,
+        limit_choices_to: Optional[Any] = ...,
+        ordering: Sequence[str] = ...,
+    ) -> Sequence[Union[_Choice, _ChoiceNamedGroup]]: ...
+    def get_default(self) -> Any: ...
 
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]

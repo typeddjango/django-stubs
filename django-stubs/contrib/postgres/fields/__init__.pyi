@@ -4,8 +4,15 @@ from .ranges import (
     RangeField as RangeField,
     IntegerRangeField as IntegerRangeField,
     BigIntegerRangeField as BigIntegerRangeField,
+    DecimalRangeField as DecimalRangeField,
     FloatRangeField as FloatRangeField,
     DateRangeField as DateRangeField,
     DateTimeRangeField as DateTimeRangeField,
 )
 from .hstore import HStoreField as HStoreField
+from .citext import (
+    CICharField as CICharField,
+    CIEmailField as CIEmailField,
+    CIText as CIText,
+    CITextField as CITextField,
+)

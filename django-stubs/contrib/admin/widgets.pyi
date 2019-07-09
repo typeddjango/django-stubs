@@ -74,6 +74,9 @@ class AdminIntegerFieldWidget(forms.NumberInput):
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget): ...
 
+class AdminUUIDInputWidget(forms.TextInput):
+    def __init__(self, attrs: Optional[Dict[str, str]] = ...) -> None: ...
+
 SELECT2_TRANSLATIONS: Any
 
 class AutocompleteMixin:

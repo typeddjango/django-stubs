@@ -1,4 +1,4 @@
-from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Sequence, Tuple, Type, Union
+from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Sequence, Tuple, Type, Union, Set
 
 from django.apps.registry import Apps
 from django.db.models.base import Model
@@ -41,6 +41,9 @@ class ModelState:
     @property
     def name_lower(self) -> str: ...
     def render(self, apps: Apps) -> Any: ...
+
+def get_related_models_tuples(model: Type[Model]) -> Set[Tuple[str, str]]: ...
+def get_related_models_recursive(model: Type[Model]) -> Set[Tuple[str, str]]: ...
 
 class ProjectState:
     is_delayed: bool
