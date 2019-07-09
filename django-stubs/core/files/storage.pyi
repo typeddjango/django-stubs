@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, IO, List, Optional, Tuple
+from typing import Any, IO, List, Optional, Tuple, Type
 
 from django.core.files.base import File
 from django.utils.functional import LazyObject
@@ -44,4 +44,4 @@ class DefaultStorage(LazyObject): ...
 
 default_storage: Any
 
-def get_storage_class(import_path: Optional[str] = ...) -> Storage: ...
+def get_storage_class(import_path: Optional[str] = ...) -> Type[Storage]: ...
