@@ -92,7 +92,8 @@ IGNORED_ERRORS = {
         'namedtuple',
         'has no attribute "deconstruct"',
         '**Dict',
-        'undefined in superclass'
+        'undefined in superclass',
+        'SimpleLazyObject'
     ],
     'admin_scripts': [
         'Incompatible types in assignment (expression has type "Callable['
@@ -501,9 +502,6 @@ IGNORED_ERRORS = {
         + 'variable has type "SessionBase")',
         'Unsupported left operand type for + ("None")',
     ],
-    'timezones': [
-        'Too few arguments for "render" of "Template"'
-    ],
     'test_runner': [
         'Argument "result" to "run" of "TestCase" has incompatible type "RemoteTestResult"; '
         + 'expected "Optional[TestResult]"',
@@ -519,6 +517,24 @@ IGNORED_ERRORS = {
     'user_commands': [
         'Incompatible types in assignment (expression has type "Callable[[Any, KwArg(Any)], Any]", variable has type',
         'Cannot find module named \'user_commands.management.commands\''
+    ],
+    'utils_tests': [
+        'a_package_name_that_does_not_exist',
+        'Too few arguments for "__init__"',
+        'Argument 1 to "activate" has incompatible type "None"; expected "Union[tzinfo, str]"',
+        'Module has no attribute "content"',
+        'Argument 1 to "int_to_base36" has incompatible type "object"; expected "int"',
+        'Argument 1 to "base36_to_int" has incompatible type "object"; expected "str"',
+        'Incompatible types in assignment (expression has type "None", base class "object" defined the type as',
+        'Invalid type "Class"',
+        'has no attribute "cp"',
+        'Argument "name" to "cached_property" has incompatible type "int"; expected "Optional[str]"',
+        'foo',
+        '"ImmutableList[int]" has no attribute "sort"',
+        'has no attribute "cache_clear"',
+        'has no attribute "cache_info"',
+        'Argument 1 to "Path" has incompatible type "Optional[str]"; expected "Union[str, _PathLike[str]]"',
+        'defined the type as "None"'
     ],
     'view_tests': [
         '"EmailMessage" has no attribute "alternatives"',
@@ -729,7 +745,7 @@ TESTS_DIRS = [
     # not annotatable without annotation in test
     # 'urlpatterns_reverse',
     'user_commands',
-    # TODO: 'utils_tests',
+    'utils_tests',
     'validation',
     'validators',
     'version',
