@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, Optional, Tuple, Union, Sequence
 
 from django.db.models.sql.where import NothingNode
 
@@ -8,7 +8,7 @@ class Node:
     negated: bool = ...
     def __init__(
         self,
-        children: Optional[Iterable[Union[Node, NothingNode]]] = ...,
+        children: Optional[Iterable[Union[Node, NothingNode, Sequence[Any]]]] = ...,
         connector: Optional[str] = ...,
         negated: bool = ...,
     ) -> None: ...
