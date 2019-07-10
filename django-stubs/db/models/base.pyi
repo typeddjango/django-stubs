@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, TypeVar, Union
 
-from django.core import checks
 from django.db.models.manager import Manager
 
 from django.core.checks.messages import CheckMessage
