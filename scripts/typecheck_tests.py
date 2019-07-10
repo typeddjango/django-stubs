@@ -87,6 +87,8 @@ IGNORED_ERRORS = {
         'xml.dom',
         'numpy',
         'tblib',
+        'bcrypt',
+        'argon2',
         # TODO: values().annotate()
         'TypedDict',
         'namedtuple',
@@ -138,7 +140,21 @@ IGNORED_ERRORS = {
         '"validate_password" does not return a value',
         '"password_changed" does not return a value',
         re.compile(r'"validate" of "([A-Za-z]+)" does not return a value'),
-        'Module has no attribute "SessionStore"'
+        'Module has no attribute "SessionStore"',
+        'AbstractBaseUser',
+        'Argument "user" to "password_changed" has incompatible type "object"',
+        'Argument "password_validators" to "password_changed" has incompatible type "Tuple[Validator]"; '
+        + 'expected "Optional[Sequence[PasswordValidator]]"',
+        'Value of type "Optional[List[_Record]]" is not indexable',
+        '"Model" has no attribute',
+        'Incompatible type for "id" of "User"',
+        re.compile(r'Module has no attribute "(update|revert)_proxy_model_permissions"'),
+        'Unsupported right operand type for in ("object")',
+        'mock_getpass',
+        'Unsupported left operand type for + ("Sequence[str]")',
+        'AuthenticationFormWithInactiveUsersOkay',
+        'has no attribute "alternatives"',
+        'Incompatible types in assignment (expression has type "Dict[str, Any]", variable has type "QueryDict")'
     ],
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
@@ -221,6 +237,9 @@ IGNORED_ERRORS = {
     'expressions_window': [
         'has incompatible type "str"'
     ],
+    'extra_regress': [
+        '"User" has no attribute "alpha"'
+    ],
     'file_uploads': [
         '"Iterable[Any]" has no attribute',
         '"IO[Any]" has no attribute'
@@ -285,11 +304,22 @@ IGNORED_ERRORS = {
         '"HasLinkThing" has no attribute',
         '"Link" has no attribute'
     ],
+    'httpwrappers': [
+        'Argument 2 to "appendlist" of "QueryDict"',
+        'Incompatible types in assignment (expression has type "int", target has type "Union[str, List[str]]")',
+        'Argument 1 to "fromkeys" of "QueryDict" has incompatible type "int"'
+    ],
     'humanize_tests': [
         'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
     ],
     'inline_formsets': [
         'has no attribute "form"'
+    ],
+    'i18n': [
+        'Incompatible types in assignment (expression has type "I18nForm", variable has type "SelectDateForm")',
+        'has incompatible type "object"',
+        'Value of type "Optional[List[_Record]]" is not indexable',
+        '"Command" has no attribute'
     ],
     'logging_tests': [
         '"Handler" has no attribute "stream"'
@@ -474,6 +504,9 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Parent2", variable has type "Parent1")',
         'has no attribute'
     ],
+    'select_for_update': [
+        'has incompatible type "object"'
+    ],
     'servers': [
         re.compile('Argument [0-9] to "WSGIRequestHandler"'),
         '"HTTPResponse" has no attribute',
@@ -564,7 +597,7 @@ TESTS_DIRS = [
     'annotations',
     'app_loading',
     'apps',
-    # TODO: 'auth_tests',
+    'auth_tests',
     'backends',
     'base',
     'bash_completion',
@@ -604,7 +637,7 @@ TESTS_DIRS = [
     'expressions',
     'expressions_case',
     'expressions_window',
-    # TODO: 'extra_regress',
+    'extra_regress',
     'field_deconstruction',
     'field_defaults',
     'field_subclassing',
@@ -629,9 +662,9 @@ TESTS_DIRS = [
     'get_or_create',
     # TODO: 'gis_tests',
     'handlers',
-    # TODO: 'httpwrappers',
+    'httpwrappers',
     'humanize_tests',
-    # TODO: 'i18n',
+    'i18n',
     'import_error_package',
     'indexes',
     'inline_formsets',
@@ -705,7 +738,7 @@ TESTS_DIRS = [
     'reverse_lookup',
     'save_delete_hooks',
     'schema',
-    # TODO: 'select_for_update',
+    'select_for_update',
     'select_related',
     'select_related_onetoone',
     'select_related_regress',

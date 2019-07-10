@@ -1,5 +1,20 @@
 from io import BytesIO
-from typing import Any, BinaryIO, Dict, Iterable, List, Mapping, Optional, Pattern, Set, Tuple, Union, overload
+from typing import (
+    Any,
+    BinaryIO,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Pattern,
+    Set,
+    Tuple,
+    Union,
+    overload,
+    TypeVar,
+    Type,
+)
 
 from django.contrib.sessions.backends.base import SessionBase
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
@@ -60,8 +75,10 @@ class HttpRequest(BytesIO):
     def body(self) -> bytes: ...
     def _load_post_and_files(self) -> None: ...
 
+_Q = TypeVar("_Q", bound="QueryDict")
+
 class QueryDict(MultiValueDict[str, str]):
-    encoding: Any = ...
+    encoding: str = ...
     _mutable: bool = ...
     def __init__(
         self, query_string: Optional[Union[str, bytes]] = ..., mutable: bool = ..., encoding: Optional[str] = ...
@@ -70,6 +87,14 @@ class QueryDict(MultiValueDict[str, str]):
     def setlistdefault(self, key: str, default_list: Optional[List[str]] = ...) -> List[str]: ...
     def appendlist(self, key: str, value: str) -> None: ...
     def urlencode(self, safe: Optional[str] = ...) -> str: ...
+    @classmethod
+    def fromkeys(
+        cls: Type[_Q],
+        iterable: Iterable[Union[bytes, str]],
+        value: Any = ...,
+        mutable: bool = ...,
+        encoding: Optional[str] = ...,
+    ) -> _Q: ...
 
 @overload
 def bytes_to_text(s: bytes, encoding: str) -> str: ...
