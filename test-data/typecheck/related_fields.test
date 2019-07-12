@@ -173,6 +173,7 @@ class User(models.Model):
 
 [CASE models_triple_circular_reference]
 from myapp.models import App
+reveal_type(App().owner)  # N: Revealed type is 'myapp.models.user.User'
 reveal_type(App().owner.profile)  # N: Revealed type is 'myapp.models.profile.Profile'
 
 [file myapp/__init__.py]

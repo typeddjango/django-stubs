@@ -11,7 +11,7 @@ from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzerPass2
 from mypy.types import AnyType, Instance, NoneTyp, TypeOfAny
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import metadata, fullnames, helpers
 
 
 @dataclasses.dataclass
@@ -55,8 +55,8 @@ def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExp
     for lvalue, rvalue in helpers.iter_call_assignments(klass):
         if (isinstance(lvalue, NameExpr)
                 and isinstance(rvalue.callee, MemberExpr)):
-            if rvalue.callee.fullname in {helpers.FOREIGN_KEY_FULLNAME,
-                                          helpers.ONETOONE_FIELD_FULLNAME}:
+            if rvalue.callee.fullname in {fullnames.FOREIGN_KEY_FULLNAME,
+                                          fullnames.ONETOONE_FIELD_FULLNAME}:
                 yield lvalue, rvalue
 
 
@@ -97,7 +97,7 @@ class AddDefaultObjectsManager(ModelClassInitializer):
                     callee_expr = callee_expr.analyzed.expr
                 if isinstance(callee_expr, (MemberExpr, NameExpr)) \
                         and isinstance(callee_expr.node, TypeInfo) \
-                        and callee_expr.node.has_base(helpers.BASE_MANAGER_CLASS_FULLNAME):
+                        and callee_expr.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                     managers.append((manager_name, callee_expr.node))
         return managers
 
@@ -115,7 +115,7 @@ class AddDefaultObjectsManager(ModelClassInitializer):
                 # abstract models do not need 'objects' queryset
                 return None
 
-            first_manager_type = self.api.named_type_or_none(helpers.MANAGER_CLASS_FULLNAME,
+            first_manager_type = self.api.named_type_or_none(fullnames.MANAGER_CLASS_FULLNAME,
                                                              args=[Instance(self.model_classdef.info, [])])
             self.add_new_manager('objects', manager_type=first_manager_type)
 
@@ -148,18 +148,21 @@ class AddRelatedManagers(ModelClassInitializer):
         self.add_new_node_to_model_class(manager_name, self.api.builtin_type('builtins.object'))
 
         # save name in metadata for use in get_attribute_hook later
-        related_managers_metadata = helpers.get_related_managers_metadata(self.model_classdef.info)
+        related_managers_metadata = metadata.get_related_managers_metadata(self.model_classdef.info)
         related_managers_metadata[manager_name] = related_field_type_data
 
     def run(self) -> None:
         for module_name, module_file in self.api.modules.items():
             for model_defn in helpers.iter_over_classdefs(module_file):
-                for lvalue, rvalue in helpers.iter_call_assignments(model_defn):
-                    if is_related_field(rvalue, module_file):
+                if not model_defn.info:
+                    self.api.defer()
+
+                for lvalue, field_init in helpers.iter_call_assignments(model_defn):
+                    if is_related_field(field_init, module_file):
                         try:
-                            referenced_model_fullname = extract_ref_to_fullname(rvalue,
-                                                                                module_file=module_file,
-                                                                                all_modules=self.api.modules)
+                            referenced_model_fullname = extract_referenced_model_fullname(field_init,
+                                                                                          module_file=module_file,
+                                                                                          all_modules=self.api.modules)
                         except helpers.SelfReference:
                             referenced_model_fullname = model_defn.fullname
 
@@ -168,39 +171,33 @@ class AddRelatedManagers(ModelClassInitializer):
 
                         if self.model_classdef.fullname == referenced_model_fullname:
                             related_name = model_defn.name.lower() + '_set'
-                            if 'related_name' in rvalue.arg_names:
-                                related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]
+                            if 'related_name' in field_init.arg_names:
+                                related_name_expr = field_init.args[field_init.arg_names.index('related_name')]
                                 if not isinstance(related_name_expr, StrExpr):
+                                    # not string 'related_name=' not yet supported
                                     continue
                                 related_name = related_name_expr.value
                                 if related_name == '+':
                                     # No backwards relation is desired
                                     continue
 
-                            if 'related_query_name' in rvalue.arg_names:
-                                related_query_name_expr = rvalue.args[rvalue.arg_names.index('related_query_name')]
-                                if not isinstance(related_query_name_expr, StrExpr):
-                                    related_query_name = None
-                                else:
+                            # Default related_query_name to related_name
+                            related_query_name = related_name
+                            if 'related_query_name' in field_init.arg_names:
+                                related_query_name_expr = field_init.args[field_init.arg_names.index('related_query_name')]
+                                if isinstance(related_query_name_expr, StrExpr):
                                     related_query_name = related_query_name_expr.value
+                                else:
+                                    # not string 'related_query_name=' is not yet supported
+                                    related_query_name = None
                                 # TODO: Handle defaulting to model name if related_name is not set
-                            else:
-                                # No related_query_name specified, default to related_name
-                                related_query_name = related_name
 
-                            # field_type_data = get_related_field_type(rvalue, self.api, defn.info)
-                            # if typ is None:
-                            #     continue
-
-                            # TODO: recursively serialize types, or just https://github.com/python/mypy/issues/6506
                             # as long as Model is not a Generic, one level depth is fine
-                            if rvalue.callee.name in {'ForeignKey', 'ManyToManyField'}:
+                            if field_init.callee.name in {'ForeignKey', 'ManyToManyField'}:
                                 field_type_data = {
-                                    'manager': helpers.RELATED_MANAGER_CLASS_FULLNAME,
+                                    'manager': fullnames.RELATED_MANAGER_CLASS_FULLNAME,
                                     'of': [model_defn.info.fullname()]
                                 }
-                                # return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
-                                #                               args=[Instance(related_model_typ, [])])
                             else:
                                 field_type_data = {
                                     'manager': model_defn.info.fullname(),
@@ -211,7 +208,7 @@ class AddRelatedManagers(ModelClassInitializer):
 
                             if related_query_name is not None:
                                 # Only create related_query_name if it is a string literal
-                                helpers.get_lookups_metadata(self.model_classdef.info)[related_query_name] = {
+                                metadata.get_lookups_metadata(self.model_classdef.info)[related_query_name] = {
                                     'related_query_name_target': related_name
                                 }
 
@@ -219,20 +216,18 @@ class AddRelatedManagers(ModelClassInitializer):
 def get_related_field_type(rvalue: CallExpr, related_model_typ: TypeInfo) -> Dict[str, Any]:
     if rvalue.callee.name in {'ForeignKey', 'ManyToManyField'}:
         return {
-            'manager': helpers.RELATED_MANAGER_CLASS_FULLNAME,
+            'manager': fullnames.RELATED_MANAGER_CLASS_FULLNAME,
             'of': [related_model_typ.fullname()]
         }
-        # return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
-        #                               args=[Instance(related_model_typ, [])])
     else:
         return {
             'manager': related_model_typ.fullname(),
             'of': []
         }
-        # return Instance(related_model_typ, [])
 
 
 def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:
+    """ Checks whether current CallExpr represents any supported RelatedField subclass"""
     if isinstance(expr.callee, MemberExpr) and isinstance(expr.callee.expr, NameExpr):
         module = module_file.names.get(expr.callee.expr.name)
         if module \
@@ -244,12 +239,15 @@ def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:
     return False
 
 
-def extract_ref_to_fullname(rvalue_expr: CallExpr,
-                            module_file: MypyFile, all_modules: Dict[str, MypyFile]) -> Optional[str]:
+def extract_referenced_model_fullname(rvalue_expr: CallExpr,
+                                      module_file: MypyFile,
+                                      all_modules: Dict[str, MypyFile]) -> Optional[str]:
+    """ Returns fullname of a Model referenced in "to=" argument of the CallExpr"""
     if 'to' in rvalue_expr.arg_names:
         to_expr = rvalue_expr.args[rvalue_expr.arg_names.index('to')]
     else:
         to_expr = rvalue_expr.args[0]
+
     if isinstance(to_expr, NameExpr):
         return module_file.names[to_expr.name].fullname
     elif isinstance(to_expr, StrExpr):

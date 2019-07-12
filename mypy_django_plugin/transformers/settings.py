@@ -5,7 +5,7 @@ from mypy.checkmember import AttributeContext
 from mypy.nodes import NameExpr, StrExpr, SymbolTableNode, TypeInfo
 from mypy.types import AnyType, Instance, Type, TypeOfAny, TypeType
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
     from mypy.checker import TypeChecker

@@ -12,37 +12,10 @@ from mypy.types import (
     AnyType, Instance, NoneTyp, TupleType, Type, TypedDictType, TypeOfAny, TypeVarType, UnionType,
 )
 
+from mypy_django_plugin.lib import metadata, fullnames
+
 if typing.TYPE_CHECKING:
     from mypy.checker import TypeChecker
-
-MODEL_CLASS_FULLNAME = 'django.db.models.base.Model'
-FIELD_FULLNAME = 'django.db.models.fields.Field'
-CHAR_FIELD_FULLNAME = 'django.db.models.fields.CharField'
-ARRAY_FIELD_FULLNAME = 'django.contrib.postgres.fields.array.ArrayField'
-AUTO_FIELD_FULLNAME = 'django.db.models.fields.AutoField'
-GENERIC_FOREIGN_KEY_FULLNAME = 'django.contrib.contenttypes.fields.GenericForeignKey'
-FOREIGN_KEY_FULLNAME = 'django.db.models.fields.related.ForeignKey'
-ONETOONE_FIELD_FULLNAME = 'django.db.models.fields.related.OneToOneField'
-MANYTOMANY_FIELD_FULLNAME = 'django.db.models.fields.related.ManyToManyField'
-DUMMY_SETTINGS_BASE_CLASS = 'django.conf._DjangoConfLazyObject'
-
-QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
-BASE_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.BaseManager'
-MANAGER_CLASS_FULLNAME = 'django.db.models.manager.Manager'
-RELATED_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.RelatedManager'
-
-BASEFORM_CLASS_FULLNAME = 'django.forms.forms.BaseForm'
-FORM_CLASS_FULLNAME = 'django.forms.forms.Form'
-MODELFORM_CLASS_FULLNAME = 'django.forms.models.ModelForm'
-
-FORM_MIXIN_CLASS_FULLNAME = 'django.views.generic.edit.FormMixin'
-
-MANAGER_CLASSES = {
-    MANAGER_CLASS_FULLNAME,
-    RELATED_MANAGER_CLASS_FULLNAME,
-    BASE_MANAGER_CLASS_FULLNAME,
-    QUERYSET_CLASS_FULLNAME
-}
 
 
 def get_models_file(app_name: str, all_modules: typing.Dict[str, MypyFile]) -> Optional[MypyFile]:
@@ -208,10 +181,10 @@ def iter_over_assignments(class_or_module: typing.Union[ClassDef, MypyFile]
 
 def extract_field_setter_type(tp: Instance) -> Optional[Type]:
     """ Extract __set__ value of a field. """
-    if tp.type.has_base(FIELD_FULLNAME):
+    if tp.type.has_base(fullnames.FIELD_FULLNAME):
         return tp.args[0]
     # GenericForeignKey
-    if tp.type.has_base(GENERIC_FOREIGN_KEY_FULLNAME):
+    if tp.type.has_base(fullnames.GENERIC_FOREIGN_KEY_FULLNAME):
         return AnyType(TypeOfAny.special_form)
     return None
 
@@ -220,39 +193,19 @@ def extract_field_getter_type(tp: Type) -> Optional[Type]:
     """ Extract return type of __get__ of subclass of Field"""
     if not isinstance(tp, Instance):
         return None
-    if tp.type.has_base(FIELD_FULLNAME):
+    if tp.type.has_base(fullnames.FIELD_FULLNAME):
         return tp.args[1]
     # GenericForeignKey
-    if tp.type.has_base(GENERIC_FOREIGN_KEY_FULLNAME):
+    if tp.type.has_base(fullnames.GENERIC_FOREIGN_KEY_FULLNAME):
         return AnyType(TypeOfAny.special_form)
     return None
-
-
-def get_django_metadata(model_info: TypeInfo) -> Dict[str, typing.Any]:
-    return model_info.metadata.setdefault('django', {})
-
-
-def get_related_field_primary_key_names(base_model: TypeInfo) -> typing.List[str]:
-    return get_django_metadata(base_model).setdefault('related_field_primary_keys', [])
-
-
-def get_fields_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
-    return get_django_metadata(model).setdefault('fields', {})
-
-
-def get_lookups_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
-    return get_django_metadata(model).setdefault('lookups', {})
-
-
-def get_related_managers_metadata(model: TypeInfo) -> Dict[str, typing.Any]:
-    return get_django_metadata(model).setdefault('related_managers', {})
 
 
 def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[Type]:
     """
     If field with primary_key=True is set on the model, extract its __set__ type.
     """
-    for field_name, props in get_fields_metadata(model).items():
+    for field_name, props in metadata.get_fields_metadata(model).items():
         is_primary_key = props.get('primary_key', False)
         if is_primary_key:
             return extract_field_setter_type(model.names[field_name].type)
@@ -260,7 +213,7 @@ def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[
 
 
 def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
-    for field_name, props in get_fields_metadata(model).items():
+    for field_name, props in metadata.get_fields_metadata(model).items():
         is_primary_key = props.get('primary_key', False)
         if is_primary_key:
             return extract_field_getter_type(model.names[field_name].type)
@@ -312,13 +265,13 @@ def get_assigned_value_for_class(type_info: TypeInfo, name: str) -> Optional[Exp
 
 
 def is_field_nullable(model: TypeInfo, field_name: str) -> bool:
-    return get_fields_metadata(model).get(field_name, {}).get('null', False)
+    return metadata.get_fields_metadata(model).get(field_name, {}).get('null', False)
 
 
 def is_foreign_key_like(t: Type) -> bool:
     if not isinstance(t, Instance):
         return False
-    return has_any_of_bases(t.type, (FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME))
+    return has_any_of_bases(t.type, (fullnames.FOREIGN_KEY_FULLNAME, fullnames.ONETOONE_FIELD_FULLNAME))
 
 
 def build_class_with_annotated_fields(api: 'TypeChecker', base: Type, fields: 'OrderedDict[str, Type]',
@@ -408,7 +361,7 @@ def iter_call_assignments(klass: ClassDef) -> typing.Iterator[typing.Tuple[Lvalu
 
 def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager_name: str,
                                            api: CheckerPluginInterface) -> Optional[Instance]:
-    related_manager_metadata = get_related_managers_metadata(model_info)
+    related_manager_metadata = metadata.get_related_managers_metadata(model_info)
     if not related_manager_metadata:
         return None
 
@@ -435,7 +388,7 @@ def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager
 
 def get_primary_key_field_name(model_info: TypeInfo) -> Optional[str]:
     for base in model_info.mro:
-        fields = get_fields_metadata(base)
+        fields = metadata.get_fields_metadata(base)
         for field_name, field_props in fields.items():
             is_primary_key = field_props.get('primary_key', False)
             if is_primary_key:

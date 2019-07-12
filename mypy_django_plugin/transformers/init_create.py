@@ -5,13 +5,13 @@ from mypy.nodes import TypeInfo, Var
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type, TypeOfAny
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import metadata, fullnames, helpers
 
 
 def extract_base_pointer_args(model: TypeInfo) -> Set[str]:
     pointer_args: Set[str] = set()
     for base in model.bases:
-        if base.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+        if base.type.has_base(fullnames.MODEL_CLASS_FULLNAME):
             parent_name = base.type.name().lower()
             pointer_args.add(f'{parent_name}_ptr')
             pointer_args.add(f'{parent_name}_ptr_id')
@@ -105,7 +105,7 @@ def redefine_and_typecheck_model_create(ctx: MethodContext) -> Type:
 
 
 def extract_choices_type(model: TypeInfo, field_name: str) -> Optional[str]:
-    field_metadata = helpers.get_fields_metadata(model).get(field_name, {})
+    field_metadata = metadata.get_fields_metadata(model).get(field_name, {})
     if 'choices' in field_metadata:
         return field_metadata['choices']
     return None
@@ -146,8 +146,8 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                     if field_type is None:
                         continue
 
-                    if helpers.has_any_of_bases(typ.type, (helpers.FOREIGN_KEY_FULLNAME,
-                                                           helpers.ONETOONE_FIELD_FULLNAME)):
+                    if helpers.has_any_of_bases(typ.type, (fullnames.FOREIGN_KEY_FULLNAME,
+                                                           fullnames.ONETOONE_FIELD_FULLNAME)):
                         related_primary_key_type = AnyType(TypeOfAny.implementation_artifact)
                         # in case it's optional, we need Instance type
                         referred_to_model = typ.args[1]
@@ -156,7 +156,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
                             referred_to_model = helpers.make_required(typ.args[1])
 
                         if isinstance(referred_to_model, Instance) and referred_to_model.type.has_base(
-                                helpers.MODEL_CLASS_FULLNAME):
+                                fullnames.MODEL_CLASS_FULLNAME):
                             pk_type = helpers.extract_explicit_set_type_of_model_primary_key(referred_to_model.type)
                             if not pk_type:
                                 # extract set type of AutoField
@@ -170,11 +170,11 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
 
                         expected_types[name + '_id'] = related_primary_key_type
 
-                    field_metadata = helpers.get_fields_metadata(model).get(name, {})
+                    field_metadata = metadata.get_fields_metadata(model).get(name, {})
                     if field_type:
                         # related fields could be None in __init__ (but should be specified before save())
-                        if helpers.has_any_of_bases(typ.type, (helpers.FOREIGN_KEY_FULLNAME,
-                                                               helpers.ONETOONE_FIELD_FULLNAME)) and is_init:
+                        if helpers.has_any_of_bases(typ.type, (fullnames.FOREIGN_KEY_FULLNAME,
+                                                               fullnames.ONETOONE_FIELD_FULLNAME)) and is_init:
                             field_type = helpers.make_optional(field_type)
 
                         # if primary_key=True and default specified
@@ -184,7 +184,7 @@ def extract_expected_types(ctx: FunctionContext, model: TypeInfo,
 
                         # if CharField(blank=True,...) and not nullable, then field can be None in __init__
                         elif (
-                                helpers.has_any_of_bases(typ.type, (helpers.CHAR_FIELD_FULLNAME,)) and is_init and
+                                helpers.has_any_of_bases(typ.type, (fullnames.CHAR_FIELD_FULLNAME,)) and is_init and
                                 field_metadata.get('blank', False) and not field_metadata.get('null', False)
                         ):
                             field_type = helpers.make_optional(field_type)

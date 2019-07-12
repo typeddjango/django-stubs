@@ -7,7 +7,7 @@ from mypy.types import (
     AnyType, CallableType, Instance, TupleType, Type, UnionType,
 )
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import metadata, fullnames, helpers
 
 
 def extract_referred_to_type(ctx: FunctionContext) -> Optional[Instance]:
@@ -43,9 +43,9 @@ def extract_referred_to_type(ctx: FunctionContext) -> Optional[Instance]:
     referred_to_type = arg_type.ret_type
     if not isinstance(referred_to_type, Instance):
         return None
-    if not referred_to_type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+    if not referred_to_type.type.has_base(fullnames.MODEL_CLASS_FULLNAME):
         ctx.api.msg.fail(f'to= parameter value must be '
-                         f'a subclass of {helpers.MODEL_CLASS_FULLNAME}',
+                         f'a subclass of {fullnames.MODEL_CLASS_FULLNAME!r}',
                          context=ctx.context)
         return None
 
@@ -118,26 +118,27 @@ def transform_into_proper_return_type(ctx: FunctionContext) -> Type:
     if not isinstance(default_return_type, Instance):
         return default_return_type
 
-    if helpers.has_any_of_bases(default_return_type.type, (helpers.FOREIGN_KEY_FULLNAME,
-                                                           helpers.ONETOONE_FIELD_FULLNAME,
-                                                           helpers.MANYTOMANY_FIELD_FULLNAME)):
+    if helpers.has_any_of_bases(default_return_type.type, (fullnames.FOREIGN_KEY_FULLNAME,
+                                                           fullnames.ONETOONE_FIELD_FULLNAME,
+                                                           fullnames.MANYTOMANY_FIELD_FULLNAME)):
         return fill_descriptor_types_for_related_field(ctx)
 
-    if default_return_type.type.has_base(helpers.ARRAY_FIELD_FULLNAME):
+    if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
         return determine_type_of_array_field(ctx)
 
     return set_descriptor_types_for_field(ctx)
 
 
-def adjust_return_type_of_field_instantiation(ctx: FunctionContext) -> Type:
-    record_field_properties_into_outer_model_class(ctx)
+def process_field_instantiation(ctx: FunctionContext) -> Type:
+    # Parse __init__ parameters of field into corresponding Model's metadata
+    parse_field_init_arguments_into_model_metadata(ctx)
     return transform_into_proper_return_type(ctx)
 
 
-def record_field_properties_into_outer_model_class(ctx: FunctionContext) -> None:
+def parse_field_init_arguments_into_model_metadata(ctx: FunctionContext) -> None:
     api = cast(TypeChecker, ctx.api)
     outer_model = api.scope.active_class()
-    if outer_model is None or not outer_model.has_base(helpers.MODEL_CLASS_FULLNAME):
+    if outer_model is None or not outer_model.has_base(fullnames.MODEL_CLASS_FULLNAME):
         # outside models.Model class, undetermined
         return
 
@@ -149,7 +150,7 @@ def record_field_properties_into_outer_model_class(ctx: FunctionContext) -> None
     if field_name is None:
         return
 
-    fields_metadata = helpers.get_fields_metadata(outer_model)
+    fields_metadata = metadata.get_fields_metadata(outer_model)
 
     # primary key
     is_primary_key = False

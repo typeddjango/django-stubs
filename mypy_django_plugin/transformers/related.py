@@ -4,7 +4,7 @@ from mypy.checkmember import AttributeContext
 from mypy.nodes import TypeInfo
 from mypy.types import AnyType, Instance, Type, TypeOfAny, UnionType
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import fullnames, helpers
 
 
 def _extract_referred_to_type_info(typ: Union[UnionType, Instance]) -> Optional[TypeInfo]:
@@ -22,7 +22,7 @@ def extract_and_return_primary_key_of_bound_related_field_parameter(ctx: Attribu
     if not isinstance(ctx.default_attr_type, Instance) or not (ctx.default_attr_type.type.fullname() == 'builtins.int'):
         return ctx.default_attr_type
 
-    if not isinstance(ctx.type, Instance) or not ctx.type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
+    if not isinstance(ctx.type, Instance) or not ctx.type.type.has_base(fullnames.MODEL_CLASS_FULLNAME):
         return ctx.default_attr_type
 
     field_name = ctx.context.name.split('_')[0]

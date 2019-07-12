@@ -5,7 +5,7 @@ from mypy.nodes import Expression, StrExpr, TypeInfo
 from mypy.plugin import MethodContext
 from mypy.types import Instance, Type, TypeType
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import helpers
 
 
 def get_string_value_from_expr(expr: Expression) -> Optional[str]:

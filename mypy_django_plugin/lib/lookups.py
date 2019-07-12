@@ -5,7 +5,7 @@ from mypy.nodes import TypeInfo
 from mypy.plugin import CheckerPluginInterface
 from mypy.types import Instance, Type
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import metadata, helpers
 
 
 @dataclasses.dataclass
@@ -138,12 +138,12 @@ def get_actual_field_name_for_lookup_field(lookup: str, model_type_info: TypeInf
 
     If it's not, return the original lookup.
     """
-    lookups_metadata = helpers.get_lookups_metadata(model_type_info)
+    lookups_metadata = metadata.get_lookups_metadata(model_type_info)
     lookup_metadata = lookups_metadata.get(lookup)
     if lookup_metadata is None:
         # If not found on current model, look in all bases for their lookup metadata
         for base in model_type_info.mro:
-            lookups_metadata = helpers.get_lookups_metadata(base)
+            lookups_metadata = metadata.get_lookups_metadata(base)
             lookup_metadata = lookups_metadata.get(lookup)
             if lookup_metadata:
                 break

@@ -9,7 +9,7 @@ from mypy.plugin import (
 )
 from mypy.types import AnyType, Instance, Type, TypeOfAny
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.lib import metadata, fullnames, helpers
 from mypy_django_plugin.config import Config
 from mypy_django_plugin.transformers import fields, init_create
 from mypy_django_plugin.transformers.forms import (
@@ -33,27 +33,27 @@ from mypy_django_plugin.transformers.settings import (
 
 def transform_model_class(ctx: ClassDefContext, ignore_missing_model_attributes: bool) -> None:
     try:
-        sym = ctx.api.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
+        sym = ctx.api.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
     except KeyError:
         # models.Model is not loaded, skip metadata model write
         pass
     else:
         if sym is not None and isinstance(sym.node, TypeInfo):
-            helpers.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
+            metadata.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
 
     process_model_class(ctx, ignore_missing_model_attributes)
 
 
 def transform_manager_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(helpers.MANAGER_CLASS_FULLNAME)
+    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        helpers.get_django_metadata(sym.node)['manager_bases'][ctx.cls.fullname] = 1
+        metadata.get_django_metadata(sym.node)['manager_bases'][ctx.cls.fullname] = 1
 
 
 def transform_form_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(helpers.BASEFORM_CLASS_FULLNAME)
+    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        helpers.get_django_metadata(sym.node)['baseform_bases'][ctx.cls.fullname] = 1
+        metadata.get_django_metadata(sym.node)['baseform_bases'][ctx.cls.fullname] = 1
 
     make_meta_nested_class_inherit_from_any(ctx)
 
@@ -67,16 +67,16 @@ def determine_proper_manager_type(ctx: FunctionContext) -> Type:
         # not in class
         return ret
     outer_model_info = api.tscope.classes[0]
-    if not outer_model_info.has_base(helpers.MODEL_CLASS_FULLNAME):
+    if not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
         return ret
     if not isinstance(ret, Instance):
         return ret
 
     has_manager_base = False
     for i, base in enumerate(ret.type.bases):
-        if base.type.fullname() in {helpers.MANAGER_CLASS_FULLNAME,
-                                    helpers.RELATED_MANAGER_CLASS_FULLNAME,
-                                    helpers.BASE_MANAGER_CLASS_FULLNAME}:
+        if base.type.fullname() in {fullnames.MANAGER_CLASS_FULLNAME,
+                                    fullnames.RELATED_MANAGER_CLASS_FULLNAME,
+                                    fullnames.BASE_MANAGER_CLASS_FULLNAME}:
             has_manager_base = True
             break
 
@@ -118,7 +118,7 @@ def return_type_for_id_field(ctx: AttributeContext) -> Type:
 def transform_form_view(ctx: ClassDefContext) -> None:
     form_class_value = helpers.get_assigned_value_for_class(ctx.cls.info, 'form_class')
     if isinstance(form_class_value, NameExpr):
-        helpers.get_django_metadata(ctx.cls.info)['form_class'] = form_class_value.fullname
+        metadata.get_django_metadata(ctx.cls.info)['form_class'] = form_class_value.fullname
 
 
 class DjangoPlugin(Plugin):
@@ -137,36 +137,36 @@ class DjangoPlugin(Plugin):
             self.django_settings_module = os.environ['DJANGO_SETTINGS_MODULE']
 
     def _get_current_model_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(helpers.MODEL_CLASS_FULLNAME)
+        model_sym = self.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (helpers.get_django_metadata(model_sym.node)
-                    .setdefault('model_bases', {helpers.MODEL_CLASS_FULLNAME: 1}))
+            return (metadata.get_django_metadata(model_sym.node)
+                    .setdefault('model_bases', {fullnames.MODEL_CLASS_FULLNAME: 1}))
         else:
             return {}
 
     def _get_current_manager_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(helpers.MANAGER_CLASS_FULLNAME)
+        model_sym = self.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (helpers.get_django_metadata(model_sym.node)
-                    .setdefault('manager_bases', {helpers.MANAGER_CLASS_FULLNAME: 1}))
+            return (metadata.get_django_metadata(model_sym.node)
+                    .setdefault('manager_bases', {fullnames.MANAGER_CLASS_FULLNAME: 1}))
         else:
             return {}
 
     def _get_current_form_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(helpers.BASEFORM_CLASS_FULLNAME)
+        model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (helpers.get_django_metadata(model_sym.node)
-                    .setdefault('baseform_bases', {helpers.BASEFORM_CLASS_FULLNAME: 1,
-                                                   helpers.FORM_CLASS_FULLNAME: 1,
-                                                   helpers.MODELFORM_CLASS_FULLNAME: 1}))
+            return (metadata.get_django_metadata(model_sym.node)
+                    .setdefault('baseform_bases', {fullnames.BASEFORM_CLASS_FULLNAME: 1,
+                                                   fullnames.FORM_CLASS_FULLNAME: 1,
+                                                   fullnames.MODELFORM_CLASS_FULLNAME: 1}))
         else:
             return {}
 
     def _get_current_queryset_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(helpers.QUERYSET_CLASS_FULLNAME)
+        model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return (helpers.get_django_metadata(model_sym.node)
-                    .setdefault('queryset_bases', {helpers.QUERYSET_CLASS_FULLNAME: 1}))
+            return (metadata.get_django_metadata(model_sym.node)
+                    .setdefault('queryset_bases', {fullnames.QUERYSET_CLASS_FULLNAME: 1}))
         else:
             return {}
 
@@ -205,10 +205,10 @@ class DjangoPlugin(Plugin):
 
         info = self._get_typeinfo_or_none(fullname)
         if info:
-            if info.has_base(helpers.FIELD_FULLNAME):
-                return fields.adjust_return_type_of_field_instantiation
+            if info.has_base(fullnames.FIELD_FULLNAME):
+                return fields.process_field_instantiation
 
-            if helpers.get_django_metadata(info).get('generated_init'):
+            if metadata.get_django_metadata(info).get('generated_init'):
                 return init_create.redefine_and_typecheck_model_init
 
     def get_method_hook(self, fullname: str
@@ -217,22 +217,22 @@ class DjangoPlugin(Plugin):
 
         if method_name == 'get_form_class':
             info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+            if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return extract_proper_type_for_get_form_class
 
         if method_name == 'get_form':
             info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+            if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return extract_proper_type_for_get_form
 
         if method_name == 'values':
             model_info = self._get_typeinfo_or_none(class_name)
-            if model_info and model_info.has_base(helpers.QUERYSET_CLASS_FULLNAME):
+            if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return extract_proper_type_for_queryset_values
 
         if method_name == 'values_list':
             model_info = self._get_typeinfo_or_none(class_name)
-            if model_info and model_info.has_base(helpers.QUERYSET_CLASS_FULLNAME):
+            if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return extract_proper_type_queryset_values_list
 
         if fullname in {'django.apps.registry.Apps.get_model',
@@ -254,11 +254,11 @@ class DjangoPlugin(Plugin):
         if fullname in self._get_current_manager_bases():
             return transform_manager_class
 
-        if fullname in self._get_current_form_bases():
-            return transform_form_class
+        # if fullname in self._get_current_form_bases():
+        #     return transform_form_class
 
         info = self._get_typeinfo_or_none(fullname)
-        if info and info.has_base(helpers.FORM_MIXIN_CLASS_FULLNAME):
+        if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
             return transform_form_view
 
         return None
@@ -266,7 +266,7 @@ class DjangoPlugin(Plugin):
     def get_attribute_hook(self, fullname: str
                            ) -> Optional[Callable[[AttributeContext], Type]]:
         class_name, _, attr_name = fullname.rpartition('.')
-        if class_name == helpers.DUMMY_SETTINGS_BASE_CLASS:
+        if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
             return partial(get_type_of_setting,
                            setting_name=attr_name,
                            settings_modules=self._get_settings_modules_in_order_of_priority(),
@@ -278,7 +278,7 @@ class DjangoPlugin(Plugin):
 
             model_info = self._get_typeinfo_or_none(class_name)
             if model_info:
-                related_managers = helpers.get_related_managers_metadata(model_info)
+                related_managers = metadata.get_related_managers_metadata(model_info)
                 if attr_name in related_managers:
                     return partial(determine_type_of_related_manager,
                                    related_manager_name=attr_name)

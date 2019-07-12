@@ -8,8 +8,8 @@ from mypy.plugin import (
 )
 from mypy.types import AnyType, Instance, Type, TypeOfAny
 
-from mypy_django_plugin import helpers
-from mypy_django_plugin.lookups import (
+from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib.lookups import (
     LookupException, RelatedModelNode, resolve_lookup,
 )
 
