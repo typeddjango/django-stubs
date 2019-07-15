@@ -2,6 +2,7 @@ import os
 from functools import partial
 from typing import Callable, Dict, List, Optional, Tuple, cast
 
+import toml
 from mypy.nodes import MypyFile, NameExpr, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
@@ -10,7 +11,7 @@ from mypy.plugin import (
 from mypy.types import AnyType, Instance, Type, TypeOfAny
 
 from mypy_django_plugin.lib import metadata, fullnames, helpers
-from mypy_django_plugin.config import Config
+from mypy_django_plugin.lib.config import Config, extract_app_model_aliases
 from mypy_django_plugin.transformers import fields, init_create
 from mypy_django_plugin.transformers.forms import (
     extract_proper_type_for_get_form, extract_proper_type_for_get_form_class, make_meta_nested_class_inherit_from_any,
@@ -31,7 +32,9 @@ from mypy_django_plugin.transformers.settings import (
 )
 
 
-def transform_model_class(ctx: ClassDefContext, ignore_missing_model_attributes: bool) -> None:
+def transform_model_class(ctx: ClassDefContext,
+                          ignore_missing_model_attributes: bool,
+                          app_models_mapping: Optional[Dict[str, str]]) -> None:
     try:
         sym = ctx.api.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
     except KeyError:
@@ -41,7 +44,7 @@ def transform_model_class(ctx: ClassDefContext, ignore_missing_model_attributes:
         if sym is not None and isinstance(sym.node, TypeInfo):
             metadata.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
 
-    process_model_class(ctx, ignore_missing_model_attributes)
+    process_model_class(ctx, ignore_missing_model_attributes, app_models_mapping)
 
 
 def transform_manager_class(ctx: ClassDefContext) -> None:
@@ -116,7 +119,7 @@ def return_type_for_id_field(ctx: AttributeContext) -> Type:
 
 
 def transform_form_view(ctx: ClassDefContext) -> None:
-    form_class_value = helpers.get_assigned_value_for_class(ctx.cls.info, 'form_class')
+    form_class_value = helpers.get_assignment_stmt_by_name(ctx.cls.info, 'form_class')
     if isinstance(form_class_value, NameExpr):
         metadata.get_django_metadata(ctx.cls.info)['form_class'] = form_class_value.fullname
 
@@ -124,6 +127,17 @@ def transform_form_view(ctx: ClassDefContext) -> None:
 class DjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
+
+        django_plugin_config = None
+        if os.path.exists('pyproject.toml'):
+            with open('pyproject.toml', 'r') as f:
+                pyproject_toml = toml.load(f)
+                django_plugin_config = pyproject_toml.get('tool', {}).get('django-stubs')
+
+        if django_plugin_config and 'django_settings_module' in django_plugin_config:
+            self.app_models_mapping = extract_app_model_aliases(django_plugin_config['django_settings_module'])
+        else:
+            self.app_models_mapping = None
 
         config_fpath = os.environ.get('MYPY_DJANGO_CONFIG', 'mypy_django.ini')
         if config_fpath and os.path.exists(config_fpath):
@@ -195,10 +209,10 @@ class DjangoPlugin(Plugin):
 
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], Type]]:
-        if fullname == 'django.contrib.auth.get_user_model':
-            return partial(return_user_model_hook,
-                           settings_modules=self._get_settings_modules_in_order_of_priority())
-
+    #     if fullname == 'django.contrib.auth.get_user_model':
+    #         return partial(return_user_model_hook,
+    #                        settings_modules=self._get_settings_modules_in_order_of_priority())
+    #
         manager_bases = self._get_current_manager_bases()
         if fullname in manager_bases:
             return determine_proper_manager_type
@@ -208,48 +222,48 @@ class DjangoPlugin(Plugin):
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return fields.process_field_instantiation
 
-            if metadata.get_django_metadata(info).get('generated_init'):
-                return init_create.redefine_and_typecheck_model_init
+    #         if metadata.get_django_metadata(info).get('generated_init'):
+    #             return init_create.redefine_and_typecheck_model_init
 
-    def get_method_hook(self, fullname: str
-                        ) -> Optional[Callable[[MethodContext], Type]]:
-        class_name, _, method_name = fullname.rpartition('.')
-
-        if method_name == 'get_form_class':
-            info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-                return extract_proper_type_for_get_form_class
-
-        if method_name == 'get_form':
-            info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-                return extract_proper_type_for_get_form
-
-        if method_name == 'values':
-            model_info = self._get_typeinfo_or_none(class_name)
-            if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return extract_proper_type_for_queryset_values
-
-        if method_name == 'values_list':
-            model_info = self._get_typeinfo_or_none(class_name)
-            if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return extract_proper_type_queryset_values_list
-
-        if fullname in {'django.apps.registry.Apps.get_model',
-                        'django.db.migrations.state.StateApps.get_model'}:
-            return determine_model_cls_from_string_for_migrations
-
-        manager_classes = self._get_current_manager_bases()
-        class_fullname, _, method_name = fullname.rpartition('.')
-        if class_fullname in manager_classes and method_name == 'create':
-            return init_create.redefine_and_typecheck_model_create
-        return None
+    # def get_method_hook(self, fullname: str
+    #                     ) -> Optional[Callable[[MethodContext], Type]]:
+    #     class_name, _, method_name = fullname.rpartition('.')
+    #
+    #     if method_name == 'get_form_class':
+    #         info = self._get_typeinfo_or_none(class_name)
+    #         if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
+    #             return extract_proper_type_for_get_form_class
+    #
+    #     if method_name == 'get_form':
+    #         info = self._get_typeinfo_or_none(class_name)
+    #         if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
+    #             return extract_proper_type_for_get_form
+    #
+    #     if method_name == 'values':
+    #         model_info = self._get_typeinfo_or_none(class_name)
+    #         if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+    #             return extract_proper_type_for_queryset_values
+    #
+    #     if method_name == 'values_list':
+    #         model_info = self._get_typeinfo_or_none(class_name)
+    #         if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+    #             return extract_proper_type_queryset_values_list
+    #
+    #     if fullname in {'django.apps.registry.Apps.get_model',
+    #                     'django.db.migrations.state.StateApps.get_model'}:
+    #         return determine_model_cls_from_string_for_migrations
+    #
+    #     manager_classes = self._get_current_manager_bases()
+    #     class_fullname, _, method_name = fullname.rpartition('.')
+    #     if class_fullname in manager_classes and method_name == 'create':
+    #         return init_create.redefine_and_typecheck_model_create
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
         if fullname in self._get_current_model_bases():
             return partial(transform_model_class,
-                           ignore_missing_model_attributes=self.config.ignore_missing_model_attributes)
+                           ignore_missing_model_attributes=self.config.ignore_missing_model_attributes,
+                           app_models_mapping=self.app_models_mapping)
 
         if fullname in self._get_current_manager_bases():
             return transform_manager_class
@@ -257,20 +271,20 @@ class DjangoPlugin(Plugin):
         # if fullname in self._get_current_form_bases():
         #     return transform_form_class
 
-        info = self._get_typeinfo_or_none(fullname)
-        if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-            return transform_form_view
+        # info = self._get_typeinfo_or_none(fullname)
+        # if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
+        #     return transform_form_view
 
         return None
 
     def get_attribute_hook(self, fullname: str
                            ) -> Optional[Callable[[AttributeContext], Type]]:
         class_name, _, attr_name = fullname.rpartition('.')
-        if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-            return partial(get_type_of_setting,
-                           setting_name=attr_name,
-                           settings_modules=self._get_settings_modules_in_order_of_priority(),
-                           ignore_missing_settings=self.config.ignore_missing_settings)
+        # if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
+        #     return partial(get_type_of_setting,
+        #                    setting_name=attr_name,
+        #                    settings_modules=self._get_settings_modules_in_order_of_priority(),
+        #                    ignore_missing_settings=self.config.ignore_missing_settings)
 
         if class_name in self._get_current_model_bases():
             if attr_name == 'id':

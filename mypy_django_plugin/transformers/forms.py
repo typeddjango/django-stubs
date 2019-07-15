@@ -16,7 +16,7 @@ def extract_proper_type_for_get_form(ctx: MethodContext) -> Type:
     if not isinstance(object_type, Instance):
         return ctx.default_return_type
 
-    form_class_type = helpers.get_argument_type_by_name(ctx, 'form_class')
+    form_class_type = helpers.get_call_argument_type_by_name(ctx, 'form_class')
     if form_class_type is None or isinstance(form_class_type, NoneTyp):
         # extract from specified form_class in metadata
         form_class_fullname = metadata.get_django_metadata(object_type.type).get('form_class', None)

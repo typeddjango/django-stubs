@@ -110,8 +110,8 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext) -> Type:
             column_names.append(None)
             only_strings_as_fields_expressions = False
 
-    flat = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'flat'))
-    named = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'named'))
+    flat = helpers.parse_bool(helpers.get_call_argument_by_name(ctx, 'flat'))
+    named = helpers.parse_bool(helpers.get_call_argument_by_name(ctx, 'named'))
 
     api = cast(TypeChecker, ctx.api)
     if named and flat:

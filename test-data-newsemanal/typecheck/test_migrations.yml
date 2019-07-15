@@ -1,0 +1,33 @@
+-   case: registry_apps_get_model
+    main: |
+        from django.apps.registry import Apps
+        apps = Apps()
+        model_cls = apps.get_model('myapp', 'User')
+        reveal_type(model_cls)  # N: Revealed type is 'Type[myapp.models.User]'
+        reveal_type(model_cls.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+
+-   case: state_apps_get_model
+    main: |
+        from django.db.migrations.state import StateApps
+        apps = StateApps([], {})
+        model_cls = apps.get_model('myapp', 'User')
+        reveal_type(model_cls)  # N: Revealed type is 'Type[myapp.models.User]'
+        reveal_type(model_cls.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass

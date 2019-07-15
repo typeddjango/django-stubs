@@ -53,7 +53,7 @@ def return_user_model_hook(ctx: FunctionContext, settings_modules: List[str]) ->
     setting_module = api.modules[setting_module_name]
 
     model_path = None
-    for name_expr, rvalue_expr in helpers.iter_over_assignments(setting_module):
+    for name_expr, rvalue_expr in helpers.iter_over_assignments_in_class(setting_module):
         if isinstance(name_expr, NameExpr) and isinstance(rvalue_expr, StrExpr):
             if name_expr.name == 'AUTH_USER_MODEL':
                 model_path = rvalue_expr.value

@@ -1,24 +1,20 @@
-import typing
 from collections import OrderedDict
-from typing import Dict, Optional, cast
+from typing import Dict, Iterator, List, Optional, Set, TYPE_CHECKING, Tuple, Union, cast
 
 from mypy.mro import calculate_mro
-from mypy.nodes import (
-    GDEF, MDEF, AssignmentStmt, Block, CallExpr, ClassDef, Expression, ImportedName, Lvalue, MypyFile, NameExpr,
-    SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
-)
+from mypy.nodes import (AssignmentStmt, Block, CallExpr, ClassDef, Expression, FakeInfo, GDEF, ImportedName, Lvalue, MDEF,
+                        MemberExpr, MypyFile, NameExpr, SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var)
 from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
-from mypy.types import (
-    AnyType, Instance, NoneTyp, TupleType, Type, TypedDictType, TypeOfAny, TypeVarType, UnionType,
-)
+from mypy.types import (AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypeVarType, TypedDictType,
+                        UnionType)
 
-from mypy_django_plugin.lib import metadata, fullnames
+from mypy_django_plugin.lib import fullnames, metadata
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from mypy.checker import TypeChecker
 
 
-def get_models_file(app_name: str, all_modules: typing.Dict[str, MypyFile]) -> Optional[MypyFile]:
+def get_models_file(app_name: str, all_modules: Dict[str, MypyFile]) -> Optional[MypyFile]:
     models_module = '.'.join([app_name, 'models'])
     return all_modules.get(models_module)
 
@@ -85,7 +81,7 @@ def parse_bool(expr: Expression) -> Optional[bool]:
     return None
 
 
-def reparametrize_instance(instance: Instance, new_args: typing.List[Type]) -> Instance:
+def reparametrize_instance(instance: Instance, new_args: List[MypyType]) -> Instance:
     return Instance(instance.type, args=new_args,
                     line=instance.line, column=instance.column)
 
@@ -94,7 +90,7 @@ def fill_typevars_with_any(instance: Instance) -> Instance:
     return reparametrize_instance(instance, [AnyType(TypeOfAny.unannotated)])
 
 
-def extract_typevar_value(tp: Instance, typevar_name: str) -> Type:
+def extract_typevar_value(tp: Instance, typevar_name: str) -> MypyType:
     if typevar_name in {'_T', '_T_co'}:
         if '_T' in tp.type.type_vars:
             return tp.args[tp.type.type_vars.index('_T')]
@@ -104,16 +100,16 @@ def extract_typevar_value(tp: Instance, typevar_name: str) -> Type:
 
 
 def fill_typevars(tp: Instance, type_to_fill: Instance) -> Instance:
-    typevar_values: typing.List[Type] = []
+    typevar_values: List[MypyType] = []
     for typevar_arg in type_to_fill.args:
         if isinstance(typevar_arg, TypeVarType):
             typevar_values.append(extract_typevar_value(tp, typevar_arg.name))
     return Instance(type_to_fill.type, typevar_values)
 
 
-def get_argument_by_name(ctx: typing.Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
-    """Return the expression for the specific argument.
-
+def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
+    """
+    Return the expression for the specific argument.
     This helper should only be used with non-star arguments.
     """
     if name not in ctx.callee_arg_names:
@@ -126,7 +122,7 @@ def get_argument_by_name(ctx: typing.Union[FunctionContext, MethodContext], name
     return args[0]
 
 
-def get_argument_type_by_name(ctx: typing.Union[FunctionContext, MethodContext], name: str) -> Optional[Type]:
+def get_call_argument_type_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[MypyType]:
     """Return the type for the specific argument.
 
     This helper should only be used with non-star arguments.
@@ -157,14 +153,38 @@ def get_setting_expr(api: 'TypeChecker', setting_name: str) -> Optional[Expressi
         return None
 
     module_file = api.modules.get(module)
-    for name_expr, value_expr in iter_over_assignments(module_file):
+    for name_expr, value_expr in iter_over_module_level_assignments(module_file):
         if isinstance(name_expr, NameExpr) and name_expr.name == setting_name:
             return value_expr
     return None
 
 
-def iter_over_assignments(class_or_module: typing.Union[ClassDef, MypyFile]
-                          ) -> typing.Iterator[typing.Tuple[Lvalue, Expression]]:
+def iter_over_class_level_assignments(klass: ClassDef) -> Iterator[Tuple[str, Expression]]:
+    for stmt in klass.defs.body:
+        if not isinstance(stmt, AssignmentStmt):
+            continue
+        if len(stmt.lvalues) > 1:
+            # skip multiple assignments
+            continue
+        lvalue = stmt.lvalues[0]
+        if isinstance(lvalue, NameExpr):
+            yield lvalue.name, stmt.rvalue
+
+
+def iter_over_module_level_assignments(module: MypyFile) -> Iterator[Tuple[str, Expression]]:
+    for stmt in module.defs:
+        if not isinstance(stmt, AssignmentStmt):
+            continue
+        if len(stmt.lvalues) > 1:
+            # skip multiple assignments
+            continue
+        lvalue = stmt.lvalues[0]
+        if isinstance(lvalue, NameExpr):
+            yield lvalue.name, stmt.rvalue
+
+
+def iter_over_assignments_in_class(class_or_module: Union[ClassDef, MypyFile]
+                                   ) -> Iterator[Tuple[str, Expression]]:
     if isinstance(class_or_module, ClassDef):
         statements = class_or_module.defs.body
     else:
@@ -176,10 +196,12 @@ def iter_over_assignments(class_or_module: typing.Union[ClassDef, MypyFile]
         if len(stmt.lvalues) > 1:
             # not supported yet
             continue
-        yield stmt.lvalues[0], stmt.rvalue
+        lvalue = stmt.lvalues[0]
+        if isinstance(lvalue, NameExpr):
+            yield lvalue.name, stmt.rvalue
 
 
-def extract_field_setter_type(tp: Instance) -> Optional[Type]:
+def extract_field_setter_type(tp: Instance) -> Optional[MypyType]:
     """ Extract __set__ value of a field. """
     if tp.type.has_base(fullnames.FIELD_FULLNAME):
         return tp.args[0]
@@ -189,7 +211,7 @@ def extract_field_setter_type(tp: Instance) -> Optional[Type]:
     return None
 
 
-def extract_field_getter_type(tp: Type) -> Optional[Type]:
+def extract_field_getter_type(tp: MypyType) -> Optional[MypyType]:
     """ Extract return type of __get__ of subclass of Field"""
     if not isinstance(tp, Instance):
         return None
@@ -201,7 +223,7 @@ def extract_field_getter_type(tp: Type) -> Optional[Type]:
     return None
 
 
-def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[Type]:
+def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[MypyType]:
     """
     If field with primary_key=True is set on the model, extract its __set__ type.
     """
@@ -212,7 +234,7 @@ def extract_explicit_set_type_of_model_primary_key(model: TypeInfo) -> Optional[
     return None
 
 
-def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
+def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[MypyType]:
     for field_name, props in metadata.get_fields_metadata(model).items():
         is_primary_key = props.get('primary_key', False)
         if is_primary_key:
@@ -220,11 +242,11 @@ def extract_primary_key_type_for_get(model: TypeInfo) -> Optional[Type]:
     return None
 
 
-def make_optional(typ: Type):
+def make_optional(typ: MypyType) -> MypyType:
     return UnionType.make_union([typ, NoneTyp()])
 
 
-def make_required(typ: Type) -> Type:
+def make_required(typ: MypyType) -> MypyType:
     if not isinstance(typ, UnionType):
         return typ
     items = [item for item in typ.items if not isinstance(item, NoneTyp)]
@@ -232,14 +254,14 @@ def make_required(typ: Type) -> Type:
     return UnionType.make_union(items)
 
 
-def is_optional(typ: Type) -> bool:
+def is_optional(typ: MypyType) -> bool:
     if not isinstance(typ, UnionType):
         return False
 
     return any([isinstance(item, NoneTyp) for item in typ.items])
 
 
-def has_any_of_bases(info: TypeInfo, bases: typing.Sequence[str]) -> bool:
+def has_any_of_bases(info: TypeInfo, bases: Set[str]) -> bool:
     for base_fullname in bases:
         if info.has_base(base_fullname):
             return True
@@ -257,10 +279,10 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
-def get_assigned_value_for_class(type_info: TypeInfo, name: str) -> Optional[Expression]:
-    for lvalue, rvalue in iter_over_assignments(type_info.defn):
-        if isinstance(lvalue, NameExpr) and lvalue.name == name:
-            return rvalue
+def get_assignment_stmt_by_name(type_info: TypeInfo, name: str) -> Optional[Expression]:
+    for assignment_name, call_expr in iter_over_class_level_assignments(type_info.defn):
+        if assignment_name == name:
+            return call_expr
     return None
 
 
@@ -268,13 +290,13 @@ def is_field_nullable(model: TypeInfo, field_name: str) -> bool:
     return metadata.get_fields_metadata(model).get(field_name, {}).get('null', False)
 
 
-def is_foreign_key_like(t: Type) -> bool:
+def is_foreign_key_like(t: MypyType) -> bool:
     if not isinstance(t, Instance):
         return False
-    return has_any_of_bases(t.type, (fullnames.FOREIGN_KEY_FULLNAME, fullnames.ONETOONE_FIELD_FULLNAME))
+    return has_any_of_bases(t.type, {fullnames.FOREIGN_KEY_FULLNAME, fullnames.ONETOONE_FIELD_FULLNAME})
 
 
-def build_class_with_annotated_fields(api: 'TypeChecker', base: Type, fields: 'OrderedDict[str, Type]',
+def build_class_with_annotated_fields(api: 'TypeChecker', base: MypyType, fields: 'OrderedDict[str, MypyType]',
                                       name: str) -> Instance:
     """Build an Instance with `name` that contains the specified `fields` as attributes and extends `base`."""
     # Credit: This code is largely copied/modified from TypeChecker.intersect_instance_callable and
@@ -309,7 +331,7 @@ def build_class_with_annotated_fields(api: 'TypeChecker', base: Type, fields: 'O
     return Instance(info, [])
 
 
-def make_named_tuple(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', name: str) -> Type:
+def make_named_tuple(api: 'TypeChecker', fields: 'OrderedDict[str, MypyType]', name: str) -> MypyType:
     if not fields:
         # No fields specified, so fallback to a subclass of NamedTuple that allows
         # __getattr__ / __setattr__ for any attribute name.
@@ -317,27 +339,27 @@ def make_named_tuple(api: 'TypeChecker', fields: 'OrderedDict[str, Type]', name:
     else:
         fallback = build_class_with_annotated_fields(
             api=api,
-            base=api.named_generic_type('typing.NamedTuple', []),
+            base=api.named_generic_type('NamedTuple', []),
             fields=fields,
             name=name
         )
     return TupleType(list(fields.values()), fallback=fallback)
 
 
-def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, Type]',
-                   required_keys: typing.Set[str]) -> TypedDictType:
+def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, MypyType]',
+                   required_keys: Set[str]) -> TypedDictType:
     object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
 
 
-def make_tuple(api: 'TypeChecker', fields: typing.List[Type]) -> TupleType:
+def make_tuple(api: 'TypeChecker', fields: List[MypyType]) -> TupleType:
     implicit_any = AnyType(TypeOfAny.special_form)
     fallback = api.named_generic_type('builtins.tuple', [implicit_any])
     return TupleType(fields, fallback=fallback)
 
 
-def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> Type:
+def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
     node = type_info.get(private_field_name).node
     if isinstance(node, Var):
         descriptor_type = node.type
@@ -347,16 +369,33 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.unannotated)
 
 
-def iter_over_classdefs(module_file: MypyFile) -> typing.Iterator[ClassDef]:
+class IncompleteDefnException(Exception):
+    pass
+
+
+def iter_over_toplevel_classes(module_file: MypyFile) -> Iterator[ClassDef]:
     for defn in module_file.defs:
         if isinstance(defn, ClassDef):
             yield defn
 
 
-def iter_call_assignments(klass: ClassDef) -> typing.Iterator[typing.Tuple[Lvalue, CallExpr]]:
-    for lvalue, rvalue in iter_over_assignments(klass):
-        if isinstance(rvalue, CallExpr):
-            yield lvalue, rvalue
+def iter_call_assignments_in_class(klass: ClassDef) -> Iterator[Tuple[str, CallExpr]]:
+    for name, expression in iter_over_assignments_in_class(klass):
+        if isinstance(expression, CallExpr):
+            yield name, expression
+
+
+def iter_over_field_inits_in_class(klass: ClassDef) -> Iterator[Tuple[str, CallExpr]]:
+    for lvalue, rvalue in iter_over_assignments_in_class(klass):
+        if isinstance(lvalue, NameExpr) and isinstance(rvalue, CallExpr):
+            field_name = lvalue.name
+            if isinstance(rvalue.callee, MemberExpr) and isinstance(rvalue.callee.node, TypeInfo):
+                if isinstance(rvalue.callee.node, FakeInfo):
+                    raise IncompleteDefnException()
+
+                field_info = rvalue.callee.node
+                if field_info.has_base(fullnames.FIELD_FULLNAME):
+                    yield field_name, rvalue
 
 
 def get_related_manager_type_from_metadata(model_info: TypeInfo, related_manager_name: str,
@@ -394,3 +433,20 @@ def get_primary_key_field_name(model_info: TypeInfo) -> Optional[str]:
             if is_primary_key:
                 return field_name
     return None
+
+
+def _get_app_models_file(app_name: str, all_modules: Dict[str, MypyFile]) -> Optional[MypyFile]:
+    models_module = '.'.join([app_name, 'models'])
+    return all_modules.get(models_module)
+
+
+def get_model_info(app_name_dot_model_name: str, all_modules: Dict[str, MypyFile]) -> Optional[TypeInfo]:
+    """ Resolve app_name.ModelName into model fullname """
+    app_name, model_name = app_name_dot_model_name.split('.')
+    models_file = _get_app_models_file(app_name, all_modules)
+    if models_file is None:
+        return None
+
+    sym = models_file.names.get(model_name)
+    if sym and isinstance(sym.node, TypeInfo):
+        return sym.node

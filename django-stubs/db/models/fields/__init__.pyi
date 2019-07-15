@@ -30,6 +30,9 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     widget: Widget
     help_text: str
     db_table: str
+    attname: str
+    auto_created: bool
+    primary_key: bool
     remote_field: Field
     max_length: Optional[int]
     model: Type[Model]

@@ -21,7 +21,7 @@ with open('README.md', 'r') as f:
     readme = f.read()
 
 dependencies = [
-    'mypy>=0.710,<0.720',
+    'mypy>=0.720,<0.730',
     'typing-extensions'
 ]
 if sys.version_info[:2] < (3, 7):
@@ -30,7 +30,7 @@ if sys.version_info[:2] < (3, 7):
 
 setup(
     name="django-stubs",
-    version="0.13.0",
+    version="1.0.0",
     description='Django mypy stubs',
     long_description=readme,
     long_description_content_type='text/markdown',

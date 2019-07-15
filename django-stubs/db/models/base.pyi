@@ -1,8 +1,11 @@
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, TypeVar, Union, ClassVar
 
 from django.db.models.manager import Manager
 
 from django.core.checks.messages import CheckMessage
+
+from django.db.models.options import Options
+
 
 class ModelBase(type): ...
 
@@ -12,7 +15,7 @@ class Model(metaclass=ModelBase):
     class DoesNotExist(Exception): ...
     class MultipleObjectsReturned(Exception): ...
     class Meta: ...
-    _meta: Any
+    _meta: Options
     _default_manager: Manager[Model]
     pk: Any = ...
     def __init__(self: _Self, *args, **kwargs) -> None: ...
