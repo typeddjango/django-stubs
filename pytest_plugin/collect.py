@@ -24,9 +24,12 @@ class NewSemanalDjangoTestItem(YamlTestItem):
                 name, _, val = item.partition('=')
                 settings[name] = val
 
-        installed_apps = self.parsed_test_data.get('installed_apps')
-        if installed_apps:
-            installed_apps_as_str = '(' + ','.join([repr(app) for app in installed_apps]) + ',)'
+        installed_apps = self.parsed_test_data.get('installed_apps', None)
+        if installed_apps is not None:
+            if not installed_apps:
+                installed_apps_as_str = '()'
+            else:
+                installed_apps_as_str = '(' + ','.join([repr(app) for app in installed_apps]) + ',)'
 
             pyproject_toml_file = File(path='pyproject.toml',
                                        content='[tool.django-stubs]\ndjango_settings_module=\'mysettings\'')

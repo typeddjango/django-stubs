@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Set, Union
 
 from mypy.checker import TypeChecker
-from mypy.nodes import Expression, MypyFile, NameExpr, SymbolNode, TypeInfo, Var
+from mypy.nodes import Expression, MypyFile, NameExpr, SymbolNode, TypeInfo, Var, SymbolTableNode
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, NoneTyp, Type as MypyType, TypeOfAny, UnionType
 
@@ -10,15 +10,22 @@ class IncompleteDefnException(Exception):
     pass
 
 
-def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolNode]:
-    if '.' not in name:
+def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
+    if '.' not in fullname:
         return None
-    module, cls_name = name.rsplit('.', 1)
+    module, cls_name = fullname.rsplit('.', 1)
 
     module_file = all_modules.get(module)
     if module_file is None:
         return None
     sym = module_file.names.get(cls_name)
+    if sym is None:
+        return None
+    return sym
+
+
+def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolNode]:
+    sym = lookup_fully_qualified_sym(name, all_modules)
     if sym is None:
         return None
     return sym.node

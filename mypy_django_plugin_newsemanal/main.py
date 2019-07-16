@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional, Tuple, Type
 import toml
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
-from mypy.plugin import ClassDefContext, FunctionContext, Plugin, MethodContext
+from mypy.plugin import ClassDefContext, FunctionContext, Plugin, MethodContext, AttributeContext
 from mypy.types import Type as MypyType
 
 from django.db.models.fields.related import RelatedField
@@ -81,6 +81,10 @@ class NewSemanalDjangoPlugin(Plugin):
         return 10, module, -1
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
+        # for settings
+        if file.fullname() == 'django.conf' and self.django_context.django_settings_module:
+            return [self._new_dependency(self.django_context.django_settings_module)]
+
         # for `get_user_model()`
         if file.fullname() == 'django.contrib.auth':
             auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
@@ -142,34 +146,12 @@ class NewSemanalDjangoPlugin(Plugin):
         if fullname in self._get_current_manager_bases():
             return add_new_manager_base
 
-    # def get_attribute_hook(self, fullname: str
-    #                        ) -> Optional[Callable[[AttributeContext], MypyType]]:
-    #     print(fullname)
-    #     class_name, _, attr_name = fullname.rpartition('.')
-    #     # if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-    #     #     return partial(get_type_of_setting,
-    #     #                    setting_name=attr_name,
-    #     #                    settings_modules=self._get_settings_modules_in_order_of_priority(),
-    #     #                    ignore_missing_settings=self.config.ignore_missing_settings)
-    #
-    #     if class_name in self._get_current_model_bases():
-    #         # if attr_name == 'id':
-    #         #     return return_type_for_id_field
-    #
-    #         model_info = self._get_typeinfo_or_none(class_name)
-    #         if model_info:
-    #             attr_sym = model_info.get(attr_name)
-    #             if attr_sym and isinstance(attr_sym.node, TypeInfo) \
-    #                     and helpers.has_any_of_bases(attr_sym.node, fullnames.MANAGER_CLASSES):
-    #                 return partial(querysets.determite_manager_type, django_context=self.django_context)
-    #
-    #             # related_managers = metadata.get_related_managers_metadata(model_info)
-    #             # if attr_name in related_managers:
-    #             #     return partial(determine_type_of_related_manager,
-    #             #                    related_manager_name=attr_name)
-    #
-    #         # if attr_name.endswith('_id'):
-    #         #     return extract_and_return_primary_key_of_bound_related_field_parameter
+    def get_attribute_hook(self, fullname: str
+                           ) -> Optional[Callable[[AttributeContext], MypyType]]:
+        class_name, _, attr_name = fullname.rpartition('.')
+        if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
+            return partial(settings.get_type_of_settings_attribute,
+                           django_context=self.django_context)
 
     # def get_type_analyze_hook(self, fullname: str
     #                           ) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:

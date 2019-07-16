@@ -24,16 +24,6 @@
                 if TYPE_CHECKING:
                     reveal_type(MyModel.user)  # N: Revealed type is 'django.contrib.auth.models.User*'
 
--   case: missing_settings_ignored_flag
-    main: |
-        from django.conf import settings
-        reveal_type(settings.NO_SUCH_SETTING)  # N: Revealed type is 'Any'
-    files:
-        -   path: pyproject.toml
-            content: |
-                [tool.django-stubs]
-                ignore_missing_settings = true
-
 -   case: generate_pyproject_toml_and_settings_file_from_installed_apps_key
     main: |
         from myapp.models import MyModel

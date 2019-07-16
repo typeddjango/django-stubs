@@ -87,16 +87,16 @@ class DjangoContext:
         self.config = DjangoPluginConfig()
         self.fields_context = DjangoFieldsContext()
 
-        django_settings_module = None
+        self.django_settings_module = None
         if plugin_toml_config:
             self.config.ignore_missing_settings = plugin_toml_config.get('ignore_missing_settings', False)
             self.config.ignore_missing_model_attributes = plugin_toml_config.get('ignore_missing_model_attributes', False)
-            django_settings_module = plugin_toml_config.get('django_settings_module', None)
+            self.django_settings_module = plugin_toml_config.get('django_settings_module', None)
 
         self.apps_registry: Optional[Dict[str, str]] = None
         self.settings: LazySettings = None
-        if django_settings_module:
-            apps, settings = initialize_django(django_settings_module)
+        if self.django_settings_module:
+            apps, settings = initialize_django(self.django_settings_module)
             self.apps_registry = apps
             self.settings = settings
 
