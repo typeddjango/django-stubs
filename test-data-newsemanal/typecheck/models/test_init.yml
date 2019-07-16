@@ -3,8 +3,8 @@
         from myapp.models import MyUser
         user = MyUser(name=1, age=12)
     out: |
-        main:2: error: Unexpected keyword argument "name" for "MyUser"
-        main:2: error: Unexpected keyword argument "age" for "MyUser"
+        main:2: error: Unexpected attribute "name" for model "MyUser"
+        main:2: error: Unexpected attribute "age" for model "MyUser"
     installed_apps:
         - myapp
     files:
@@ -16,12 +16,28 @@
                 class MyUser(models.Model):
                     pass
 
+-   case: plain_function_which_returns_model
+    main: |
+        from myapp.models import MyUser
+        def func(i: int) -> MyUser:
+            pass
+        func("hello")  # E: Argument 1 to "func" has incompatible type "str"; expected "int"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
+
 -   case: arguments_to_init_from_class_incompatible_type
     main: |
         from myapp.models import MyUser
         user = MyUser(name='hello', age=[])
     out: |
-        main:2: error: Argument "age" to "MyUser" has incompatible type "List[<nothing>]"; expected "Union[float, int, str, Combinable]"
+        main:2: error: Incompatible type for "age" of "MyUser" (got "List[Any]", expected "Union[float, int, str, Combinable]")
     installed_apps:
         - myapp
     files:
@@ -91,7 +107,7 @@
 -   case: typechecking_of_pk
     main: |
         from myapp.models import MyUser1
-        user = MyUser1(pk=[])  # E: Argument "pk" to "MyUser1" has incompatible type "List[<nothing>]"; expected "Union[float, int, str, Combinable, None]"
+        user = MyUser1(pk=[])  # E: Incompatible type for "pk" of "MyUser1" (got "List[Any]", expected "Union[float, int, str, Combinable, None]")
     installed_apps:
         - myapp
     files:
@@ -110,8 +126,8 @@
 
         from myapp.models import Publisher, PublisherDatetime, Book
         Book(publisher_id=1, publisher_dt_id=now)
-        Book(publisher_id=[], publisher_dt_id=now)  # E: Argument "publisher_id" to "Book" has incompatible type "List[<nothing>]"; expected "Union[Combinable, int, str, None]"
-        Book(publisher_id=1, publisher_dt_id=1)  # E: Argument "publisher_dt_id" to "Book" has incompatible type "int"; expected "Union[str, date, Combinable, None]"
+        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "List[Any]", expected "Union[Combinable, int, str, None]")
+        Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "Union[str, date, Combinable, None]")
     installed_apps:
         - myapp
     files:
@@ -139,7 +155,7 @@
         class NotAValid:
             pass
         array_val3: List[NotAValid] = [NotAValid()]
-        MyModel(array=array_val3)  # E: Argument "array" to "MyModel" has incompatible type "List[NotAValid]"; expected "Union[Sequence[Union[float, int, str, Combinable]], Combinable]"
+        MyModel(array=array_val3)  # E: Incompatible type for "array" of "MyModel" (got "List[NotAValid]", expected "Union[Sequence[Union[float, int, str, Combinable]], Combinable]")
     installed_apps:
         - myapp
     files:

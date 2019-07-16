@@ -1,35 +1,69 @@
-from typing import cast
+from typing import List, Tuple, Type, Union
 
-from mypy.checker import TypeChecker
-from mypy.nodes import Argument, Var, ARG_NAMED
-from mypy.plugin import FunctionContext
-from mypy.types import Type as MypyType, Instance
+from django.db.models.base import Model
+from mypy.plugin import FunctionContext, MethodContext
+from mypy.types import Instance, Type as MypyType
 
-from mypy_django_plugin_newsemanal.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import helpers
+from mypy_django_plugin_newsemanal.django.context import DjangoContext
+
+
+def get_actual_types(ctx: Union[MethodContext, FunctionContext], expected_keys: List[str]) -> List[Tuple[str, MypyType]]:
+    actual_types = []
+    # positionals
+    for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
+        if actual_name is None:
+            if ctx.callee_arg_names[0] == 'kwargs':
+                # unpacked dict as kwargs is not supported
+                continue
+            actual_name = expected_keys[pos]
+        actual_types.append((actual_name, actual_type))
+    # kwargs
+    if len(ctx.callee_arg_names) > 1:
+        for actual_name, actual_type in zip(ctx.arg_names[1], ctx.arg_types[1]):
+            if actual_name is None:
+                # unpacked dict as kwargs is not supported
+                continue
+            actual_types.append((actual_name, actual_type))
+    return actual_types
+
+
+def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext,
+                           model_cls: Type[Model], method: str) -> MypyType:
+    expected_types = django_context.get_expected_types(ctx.api, model_cls, method)
+    expected_keys = [key for key in expected_types.keys() if key != 'pk']
+
+    for actual_name, actual_type in get_actual_types(ctx, expected_keys):
+        if actual_name not in expected_types:
+            ctx.api.fail('Unexpected attribute "{}" for model "{}"'.format(actual_name,
+                                                                           model_cls.__name__),
+                         ctx.context)
+            continue
+        ctx.api.check_subtype(actual_type, expected_types[actual_name],
+                              ctx.context,
+                              'Incompatible type for "{}" of "{}"'.format(actual_name,
+                                                                          model_cls.__name__),
+                              'got', 'expected')
+
+    return ctx.default_return_type
 
 
 def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.default_return_type, Instance)
 
-    api = cast(TypeChecker, ctx.api)
+    model_fullname = ctx.default_return_type.type.fullname()
+    model_cls = django_context.get_model_class_by_fullname(model_fullname)
+    if model_cls is None:
+        return ctx.default_return_type
 
-    model_info = ctx.default_return_type.type
-    model_cls = django_context.get_model_class_by_fullname(model_info.fullname())
+    return typecheck_model_method(ctx, django_context, model_cls, '__init__')
 
-    # expected_types = {}
-    # for field in model_cls._meta.get_fields():
-    #     field_fullname = helpers.get_class_fullname(field.__class__)
-    #     field_info = api.lookup_typeinfo(field_fullname)
-    #     field_set_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_set_type',
-    #                                                          is_nullable=False)
-    # field_kwarg = Argument(variable=Var(field.attname, field_set_type),
-    #                        type_annotation=field_set_type,
-    #                        initializer=None,
-    #                        kind=ARG_NAMED)
-    # expected_types[field.attname] = field_set_type
-    # for field_name, field in model_cls._meta.fields_map.items():
-    #     print()
 
-    # print()
-    return ctx.default_return_type
+def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    isinstance(ctx.default_return_type, Instance)
+
+    model_fullname = ctx.default_return_type.type.fullname()
+    model_cls = django_context.get_model_class_by_fullname(model_fullname)
+    if model_cls is None:
+        return ctx.default_return_type
+
+    return typecheck_model_method(ctx, django_context, model_cls, 'create')

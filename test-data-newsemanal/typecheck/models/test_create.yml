@@ -58,9 +58,9 @@
 -   case: optional_id_fields_for_create_is_error
     main: |
         from myapp.models import Publisher, Book
-        Book.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel" (got "None", expected "int")
-        Book.objects.create(publisher=None)  # E: Incompatible type for "id" of "MyModel" (got "None", expected "int")
-        Book.objects.create(publisher_id=None)  # E: Incompatible type for "id" of "MyModel" (got "None", expected "int")
+        Book.objects.create(id=None)  # E: Incompatible type for "id" of "Book" (got "None", expected "Union[Combinable, int, str]")
+        Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Union[Publisher, Combinable]")
+        Book.objects.create(publisher_id=None)  # E: Incompatible type for "publisher_id" of "Book" (got "None", expected "Union[Combinable, int, str]")
     installed_apps:
         - myapp
     files:
@@ -80,7 +80,7 @@
         MyModel.objects.create(id=None)
 
         from myapp.models import MyModel2
-        MyModel2(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, int, str, Combinable]")
+        MyModel2(id=None)
         MyModel2.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, int, str, Combinable]")
     installed_apps:
         - myapp
@@ -94,4 +94,4 @@
                 class MyModel(models.Model):
                     id = models.IntegerField(primary_key=True, default=return_int)
                 class MyModel2(models.Model):
-                    id = models.IntegerField(primary_key=True, default=None)
+                    id = models.IntegerField(primary_key=True)

@@ -2,7 +2,7 @@ from mypy.nodes import TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import Type as MypyType, TypeType, Instance
 
-from mypy_django_plugin_newsemanal.context import DjangoContext
+from mypy_django_plugin_newsemanal.django.context import DjangoContext
 from mypy_django_plugin_newsemanal.lib import helpers
 
 

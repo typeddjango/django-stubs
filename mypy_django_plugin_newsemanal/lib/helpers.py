@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Set, Union
 
+from mypy.checker import TypeChecker
 from mypy.nodes import Expression, MypyFile, NameExpr, SymbolNode, TypeInfo, Var
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, NoneTyp, Type as MypyType, TypeOfAny, UnionType
@@ -21,6 +22,19 @@ def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) 
     if sym is None:
         return None
     return sym.node
+
+
+def lookup_fully_qualified_typeinfo(api: TypeChecker, fullname: str) -> Optional[TypeInfo]:
+    node = lookup_fully_qualified_generic(fullname, api.modules)
+    if not isinstance(node, TypeInfo):
+        return None
+    return node
+
+
+def lookup_class_typeinfo(api: TypeChecker, klass: type) -> TypeInfo:
+    fullname = get_class_fullname(klass)
+    field_info = lookup_fully_qualified_typeinfo(api, fullname)
+    return field_info
 
 
 def reparametrize_instance(instance: Instance, new_args: List[MypyType]) -> Instance:
@@ -97,3 +111,25 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
         return metaclass_sym.node
     return None
+
+
+def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
+    if isinstance(typ, UnionType):
+        converted_items = []
+        for item in typ.items:
+            converted_items.append(convert_any_to_type(item, referred_to_type))
+        return UnionType.make_union(converted_items,
+                                    line=typ.line, column=typ.column)
+    if isinstance(typ, Instance):
+        args = []
+        for default_arg in typ.args:
+            if isinstance(default_arg, AnyType):
+                args.append(referred_to_type)
+            else:
+                args.append(default_arg)
+        return reparametrize_instance(typ, args)
+
+    if isinstance(typ, AnyType):
+        return referred_to_type
+
+    return typ

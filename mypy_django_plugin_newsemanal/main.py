@@ -8,7 +8,7 @@ from mypy.options import Options
 from mypy.plugin import ClassDefContext, FunctionContext, Plugin, MethodContext
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin_newsemanal.context import DjangoContext
+from mypy_django_plugin_newsemanal.django.context import DjangoContext
 from mypy_django_plugin_newsemanal.lib import fullnames, metadata
 from mypy_django_plugin_newsemanal.transformers import fields, settings, querysets, init_create
 from mypy_django_plugin_newsemanal.transformers.models import process_model_class
@@ -28,7 +28,7 @@ def transform_model_class(ctx: ClassDefContext,
     process_model_class(ctx, django_context)
 
 
-def transform_manager_class(ctx: ClassDefContext) -> None:
+def add_new_manager_base(ctx: ClassDefContext) -> None:
     sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
         metadata.get_django_metadata(sym.node)['manager_bases'][ctx.cls.fullname] = 1
@@ -116,14 +116,15 @@ class NewSemanalDjangoPlugin(Plugin):
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return partial(fields.process_field_instantiation, django_context=self.django_context)
 
-            # if info.has_base(fullnames.MODEL_CLASS_FULLNAME):
-            #     return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+            if info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+                return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
 
-    # def get_method_hook(self, fullname: str
-    #                     ) -> Optional[Callable[[MethodContext], Type]]:
-    #     class_name, _, method_name = fullname.rpartition('.')
-    #
-    #
+    def get_method_hook(self, fullname: str
+                        ) -> Optional[Callable[[MethodContext], Type]]:
+        manager_classes = self._get_current_manager_bases()
+        class_fullname, _, method_name = fullname.rpartition('.')
+        if class_fullname in manager_classes and method_name == 'create':
+            return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
@@ -131,7 +132,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(transform_model_class, django_context=self.django_context)
 
         if fullname in self._get_current_manager_bases():
-            return transform_manager_class
+            return add_new_manager_base
 
     # def get_attribute_hook(self, fullname: str
     #                        ) -> Optional[Callable[[AttributeContext], MypyType]]:

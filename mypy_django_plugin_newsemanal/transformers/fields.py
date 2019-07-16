@@ -1,12 +1,12 @@
 from typing import Optional, Tuple, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import Expression, ListExpr, NameExpr, StrExpr, TupleExpr, TypeInfo
+from mypy.nodes import StrExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, TupleType, Type as MypyType, UnionType
+from mypy.types import AnyType, CallableType, Instance, Type as MypyType, UnionType
 
-from mypy_django_plugin_newsemanal.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import fullnames, helpers, metadata
+from mypy_django_plugin_newsemanal.django.context import DjangoContext
+from mypy_django_plugin_newsemanal.lib import fullnames, helpers
 
 
 def extract_referred_to_type(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Instance]:
