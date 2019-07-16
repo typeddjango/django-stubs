@@ -18,13 +18,15 @@
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
                                                   related_name='books')
 
--   case: test_foreign_key_field_creates_attribute_with_underscore_id
+-   case: foreign_key_field_creates_attribute_with_underscore_id
     main: |
         from myapp.models import Book
         book = Book()
-        reveal_type(book.publisher_id)  # N: Revealed type is 'builtins.int'
-        reveal_type(book.owner_id)  # N: Revealed type is 'Any'
+        reveal_type(book.publisher_id)  # N: Revealed type is 'builtins.int*'
+        reveal_type(book.owner_id)  # N: Revealed type is 'builtins.int*'
     installed_apps:
+        - django.contrib.contenttypes
+        - django.contrib.auth
         - myapp
     files:
         -   path: myapp/__init__.py
@@ -35,9 +37,9 @@
                     pass
                 class Book(models.Model):
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
-                    owner = models.ForeignKey(db_column='model_id', to='db.Unknown', on_delete=models.CASCADE)
+                    owner = models.ForeignKey(db_column='model_id', to='auth.User', on_delete=models.CASCADE)
 
--   case: test_foreign_key_field_different_order_of_params
+-   case: foreign_key_field_different_order_of_params
     main: |
         from myapp.models import Book, Publisher
         book = Book()
@@ -61,7 +63,7 @@
                                                   related_name='books')
                     publisher2 = models.ForeignKey(to=Publisher, related_name='books2', on_delete=models.CASCADE)
 
--   case: test_to_parameter_as_string_with_application_name__model_imported
+-   case: to_parameter_as_string_with_application_name__model_imported
     main: |
         from myapp2.models import Book
         book = Book()
@@ -85,6 +87,7 @@
 
 -   case: test_circular_dependency_in_imports_with_foreign_key
     main: |
+        from myapp import models
     installed_apps:
         - myapp
     files:
@@ -113,16 +116,17 @@
         reveal_type(View().app.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.View]'
         reveal_type(View().app.unknown)
     out: |
-        main:7: note: Revealed type is 'Any'
-        main:7: error: "App" has no attribute "unknown"
+        main:3: note: Revealed type is 'Any'
+        main:3: error: "App" has no attribute "unknown"
     installed_apps:
         - myapp
+        - myapp2
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from myapp.models import App
+                from myapp2.models import App
                 class View(models.Model):
                     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
         -   path: myapp2/__init__.py
@@ -150,12 +154,12 @@
                 class View(models.Model):
                     app = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views')
                 class View2(View):
-                    app = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views2')
+                    app2 = models.ForeignKey(to=App, on_delete=models.CASCADE, related_name='views2')
 
 -   case: models_imported_inside_init_file_foreign_key
     main: |
         from myapp2.models import View
-        reveal_type(View().app.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.View]'
+        reveal_type(View().app.views)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp2.models.View]'
     installed_apps:
         - myapp
         - myapp2
@@ -180,7 +184,7 @@
 -   case: models_imported_inside_init_file_one_to_one_field
     main: |
         from myapp2.models import Profile
-        reveal_type(Profile().user.profile)  # N: Revealed type is 'myapp.models.Profile'
+        reveal_type(Profile().user.profile)  # N: Revealed type is 'myapp2.models.Profile'
     installed_apps:
         - myapp
         - myapp2
@@ -189,7 +193,7 @@
         -   path: myapp/models/__init__.py
             content: |
                 from .user import User
-        -   path: myapp/models/app.py
+        -   path: myapp/models/user.py
             content: |
                 from django.db import models
                 class User(models.Model):
@@ -205,7 +209,7 @@
 -   case: models_triple_circular_reference
     main: |
         from myapp.models import App
-        reveal_type(App().owner)  # N: Revealed type is 'myapp.models.user.User'
+        reveal_type(App().owner)  # N: Revealed type is 'myapp.models.user.User*'
         reveal_type(App().owner.profile)  # N: Revealed type is 'myapp.models.profile.Profile'
     installed_apps:
         - myapp
@@ -224,7 +228,6 @@
         -   path: myapp/models/profile.py
             content: |
                 from django.db import models
-                from myapp.models import User
                 class Profile(models.Model):
                     user = models.OneToOneField(to='myapp.User', related_name='profile', on_delete=models.CASCADE)
         -   path: myapp/models/app.py
@@ -253,7 +256,7 @@
 -   case: many_to_many_works_with_string_if_imported
     main: |
         from myapp.models import Member
-        reveal_type(Member().apps)  # N: Revealed type is 'django.db.models.manager.RelatedManager*[myapp.models.App]'
+        reveal_type(Member().apps)  # N: Revealed type is 'django.db.models.manager.RelatedManager*[myapp2.models.App]'
     installed_apps:
         - myapp
         - myapp2
@@ -262,9 +265,8 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from myapp.models import App
                 class Member(models.Model):
-                    apps = models.ManyToManyField(to='myapp.App', related_name='members')
+                    apps = models.ManyToManyField(to='myapp2.App', related_name='members')
         -   path: myapp2/__init__.py
         -   path: myapp2/models.py
             content: |
@@ -335,15 +337,17 @@
 
 -   case: underscore_id_attribute_has_set_type_of_primary_key_if_explicit
     main: |
-        from myapp.models import Book
-        reveal_type(Book().publisher_id)  # N: Revealed type is 'builtins.str'
+        import datetime
+        from myapp.models import Book, Book2
+
+        reveal_type(Book().publisher_id)  # N: Revealed type is 'builtins.str*'
         Book(publisher_id=1)
         Book(publisher_id='hello')
         Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable, None]")
         Book.objects.create(publisher_id=1)
         Book.objects.create(publisher_id='hello')
 
-        reveal_type(Book2().publisher_id)  # N: Revealed type is 'builtins.int'
+        reveal_type(Book2().publisher_id)  # N: Revealed type is 'builtins.int*'
         Book2(publisher_id=1)
         Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable, None]")
         Book2.objects.create(publisher_id=1)
@@ -392,8 +396,8 @@
         reveal_type(publisher.books)
         reveal_type(publisher.books2)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Book]'
     out: |
-        main:16: note: Revealed type is 'Any'
-        main:16: error: "Publisher" has no attribute "books"; maybe "books2"?
+        main:6: error: "Publisher" has no attribute "books"; maybe "books2"?
+        main:6: note: Revealed type is 'Any'
     installed_apps:
         - myapp
     files:

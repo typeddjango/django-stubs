@@ -12,6 +12,7 @@ from pytest_mypy.utils import temp_environ
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.fields import CharField, Field
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy_django_plugin_newsemanal.lib import helpers
 
 if TYPE_CHECKING:
@@ -120,6 +121,11 @@ class DjangoContext:
     def get_model_fields(self, model_cls: Type[Model]) -> Iterator[Field]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
+                yield field
+
+    def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, ForeignObjectRel):
                 yield field
 
     def get_primary_key_field(self, model_cls: Type[Model]) -> Field:

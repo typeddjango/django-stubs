@@ -8,6 +8,7 @@ from mypy.options import Options
 from mypy.plugin import ClassDefContext, FunctionContext, Plugin, MethodContext
 from mypy.types import Type as MypyType
 
+from django.db.models.fields.related import RelatedField
 from mypy_django_plugin_newsemanal.django.context import DjangoContext
 from mypy_django_plugin_newsemanal.lib import fullnames, metadata
 from mypy_django_plugin_newsemanal.transformers import fields, settings, querysets, init_create
@@ -96,8 +97,15 @@ class NewSemanalDjangoPlugin(Plugin):
             return []
         deps = set()
         for model_class in defined_model_classes:
-            for related_object in model_class._meta.related_objects:
-                related_model_module = related_object.related_model.__module__
+            # forward relations
+            for field in self.django_context.get_model_fields(model_class):
+                if isinstance(field, RelatedField):
+                    related_model_module = field.related_model.__module__
+                    if related_model_module != file.fullname():
+                        deps.add(self._new_dependency(related_model_module))
+            # reverse relations
+            for relation in model_class._meta.related_objects:
+                related_model_module = relation.related_model.__module__
                 if related_model_module != file.fullname():
                     deps.add(self._new_dependency(related_model_module))
         return list(deps)
@@ -114,7 +122,7 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(fullname)
         if info:
             if info.has_base(fullnames.FIELD_FULLNAME):
-                return partial(fields.process_field_instantiation, django_context=self.django_context)
+                return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
             if info.has_base(fullnames.MODEL_CLASS_FULLNAME):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)

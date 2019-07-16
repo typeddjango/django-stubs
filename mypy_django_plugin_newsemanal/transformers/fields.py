@@ -105,7 +105,7 @@ def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoC
 def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     referred_to_fullname = get_referred_to_model_fullname(ctx, django_context)
     referred_to_typeinfo = helpers.lookup_fully_qualified_generic(referred_to_fullname, ctx.api.modules)
-    assert isinstance(referred_to_typeinfo, TypeInfo)
+    assert isinstance(referred_to_typeinfo, TypeInfo), f'Cannot resolve {referred_to_fullname!r}'
     referred_to_type = Instance(referred_to_typeinfo, [])
 
     default_related_field_type = set_descriptor_types_for_field(ctx)
@@ -143,12 +143,6 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
         return determine_type_of_array_field(ctx, django_context)
 
     return set_descriptor_types_for_field(ctx)
-
-
-def process_field_instantiation(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    # Parse __init__ parameters of field into corresponding Model's metadata
-    # parse_field_init_arguments_into_model_metadata(ctx)
-    return transform_into_proper_return_type(ctx, django_context)
 
 
 def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:

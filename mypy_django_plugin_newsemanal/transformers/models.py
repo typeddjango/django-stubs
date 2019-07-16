@@ -9,8 +9,9 @@ from mypy.plugin import ClassDefContext
 from mypy.types import Instance
 
 from django.db.models.fields import Field
+from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel, ManyToManyRel
 from mypy_django_plugin_newsemanal.django.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import helpers
+from mypy_django_plugin_newsemanal.lib import helpers, fullnames
 from mypy_django_plugin_newsemanal.transformers import fields
 from mypy_django_plugin_newsemanal.transformers.fields import get_field_descriptor_types
 
@@ -35,8 +36,8 @@ class ModelClassInitializer(metaclass=ABCMeta):
             raise helpers.IncompleteDefnException(f'No {fullname!r} found')
         return sym.node
 
-    def lookup_field_typeinfo_or_incomplete_defn_error(self, field: Field) -> TypeInfo:
-        fullname = helpers.get_class_fullname(field.__class__)
+    def lookup_class_typeinfo_or_incomplete_defn_error(self, klass: type) -> TypeInfo:
+        fullname = helpers.get_class_fullname(klass)
         field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
         return field_info
 
@@ -101,7 +102,7 @@ class AddRelatedModelsId(ModelClassInitializer):
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignKey):
                 rel_primary_key_field = self.django_context.get_primary_key_field(field.related_model)
-                field_info = self.lookup_field_typeinfo_or_incomplete_defn_error(rel_primary_key_field)
+                field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
                 is_nullable = self.django_context.fields_context.get_field_nullability(field, None)
                 set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
                 self.add_new_node_to_model_class(field.attname,
@@ -128,6 +129,22 @@ class AddManagers(ModelClassInitializer):
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
             default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
             self.add_new_node_to_model_class('_default_manager', default_manager)
+
+        # add related managers
+        for relation in self.django_context.get_model_relations(model_cls):
+            attname = relation.related_name
+            if attname is None:
+                attname = relation.name + '_set'
+
+            related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(relation.related_model)
+            if isinstance(relation, OneToOneRel):
+                self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
+                continue
+            if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS_FULLNAME)
+                self.add_new_node_to_model_class(attname,
+                                                 Instance(manager_info, [Instance(related_model_info, [])]))
+                continue
 
 
 def process_model_class(ctx: ClassDefContext,
