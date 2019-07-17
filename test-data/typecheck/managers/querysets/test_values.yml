@@ -5,6 +5,10 @@
         reveal_type(values)  # N: Revealed type is 'TypedDict({'num_posts': builtins.int, 'text': builtins.str})'
         reveal_type(values["num_posts"])  # N: Revealed type is 'builtins.int'
         reveal_type(values["text"])  # N: Revealed type is 'builtins.str'
+
+        values_pk = Blog.objects.values('pk').get()
+        reveal_type(values_pk)  # N: Revealed type is 'TypedDict({'pk': builtins.int})'
+        reveal_type(values_pk["pk"])  # N: Revealed type is 'builtins.int'
     installed_apps:
         - myapp
     files:
@@ -31,6 +35,8 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                class Publisher(models.Model):
+                    pass
                 class Blog(models.Model):
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100)
@@ -60,3 +66,26 @@
                     pass
                 class Blog(models.Model):
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
+
+-   case: values_with_related_model_fields
+    main: |
+        from myapp.models import Entry
+        values = Entry.objects.values('blog__num_articles', 'blog__publisher__name').get()
+        reveal_type(values)  # N: Revealed type is 'TypedDict({'blog__num_articles': builtins.int, 'blog__publisher__name': builtins.str})'
+
+        pk_values = Entry.objects.values('blog__pk', 'blog__publisher__pk').get()
+        reveal_type(pk_values)  # N: Revealed type is 'TypedDict({'blog__pk': builtins.int, 'blog__publisher__pk': builtins.int})'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Publisher(models.Model):
+                    name = models.CharField(max_length=100)
+                class Blog(models.Model):
+                    num_articles = models.IntegerField()
+                    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
+                class Entry(models.Model):
+                    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)

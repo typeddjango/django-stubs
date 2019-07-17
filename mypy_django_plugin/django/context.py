@@ -103,7 +103,10 @@ class DjangoFieldsContext:
 
 
 class DjangoLookupsContext:
-    def resolve_lookup(self, model_cls: Type[Model], lookup: str) -> Any:
+    def __init__(self, django_context: 'DjangoContext'):
+        self.django_context = django_context
+
+    def resolve_lookup(self, model_cls: Type[Model], lookup: str) -> Optional[Field]:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
         if lookup_parts:
@@ -111,8 +114,11 @@ class DjangoLookupsContext:
 
         currently_observed_model = model_cls
         current_field = None
-        for field_name in field_parts:
-            current_field = currently_observed_model._meta.get_field(field_name)
+        for field_part in field_parts:
+            if field_part == 'pk':
+                return self.django_context.get_primary_key_field(currently_observed_model)
+
+            current_field = currently_observed_model._meta.get_field(field_part)
             if isinstance(current_field, RelatedField):
                 currently_observed_model = current_field.related_model
 
@@ -123,7 +129,7 @@ class DjangoContext:
     def __init__(self, plugin_toml_config: Optional[Dict[str, Any]]) -> None:
         self.config = DjangoPluginConfig()
         self.fields_context = DjangoFieldsContext(self)
-        self.lookups_context = DjangoLookupsContext()
+        self.lookups_context = DjangoLookupsContext(self)
 
         self.django_settings_module = None
         if plugin_toml_config:

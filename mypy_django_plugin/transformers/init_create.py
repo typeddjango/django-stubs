@@ -59,7 +59,9 @@ def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: Djan
 
 
 def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    isinstance(ctx.default_return_type, Instance)
+    if not isinstance(ctx.default_return_type, Instance):
+        # only work with ctx.default_return_type = model Instance
+        return ctx.default_return_type
 
     model_fullname = ctx.default_return_type.type.fullname()
     model_cls = django_context.get_model_class_by_fullname(model_fullname)

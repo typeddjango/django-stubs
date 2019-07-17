@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, cast
 
 from mypy.checker import TypeChecker
-from mypy.nodes import StrExpr, TypeInfo
+from mypy.nodes import StrExpr, TypeInfo, Expression
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, Type as MypyType, UnionType
+from mypy.types import AnyType, CallableType, Instance, Type as MypyType, UnionType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
@@ -77,34 +77,55 @@ def convert_any_to_type(typ: MypyType, replacement_type: MypyType) -> MypyType:
     return typ
 
 
-def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoContext) -> str:
+def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoContext) -> Optional[str]:
     to_arg_type = helpers.get_call_argument_type_by_name(ctx, 'to')
     if isinstance(to_arg_type, CallableType):
         assert isinstance(to_arg_type.ret_type, Instance)
         return to_arg_type.ret_type.type.fullname()
 
-    to_arg_expr = helpers.get_call_argument_by_name(ctx, 'to')
-    if not isinstance(to_arg_expr, StrExpr):
-        raise helpers.IncompleteDefnException(f'Not a string: {to_arg_expr}')
-
     outer_model_info = ctx.api.tscope.classes[-1]
     assert isinstance(outer_model_info, TypeInfo)
 
-    model_string = to_arg_expr.value
+    to_arg_expr = helpers.get_call_argument_by_name(ctx, 'to')
+
+    model_string = helpers.resolve_string_attribute_value(to_arg_expr, ctx, django_context)
+    if model_string is None:
+        # unresolvable
+        return None
+
     if model_string == 'self':
         return outer_model_info.fullname()
     if '.' not in model_string:
         # same file class
         return outer_model_info.module_name + '.' + model_string
 
-    model_cls = django_context.apps_registry.get_model(model_string)
+    app_label, model_name = model_string.split('.')
+    if app_label not in django_context.apps_registry.app_configs:
+        ctx.api.fail(f'No installed app with label {app_label!r}', ctx.context)
+        return None
+
+    try:
+        model_cls = django_context.apps_registry.get_model(app_label, model_name)
+    except LookupError as exc:
+        # no model in app
+        ctx.api.fail(exc.args[0], ctx.context)
+        return None
+
     model_fullname = helpers.get_class_fullname(model_cls)
     return model_fullname
 
 
 def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     referred_to_fullname = get_referred_to_model_fullname(ctx, django_context)
+    if referred_to_fullname is None:
+        return AnyType(TypeOfAny.from_error)
+
     referred_to_typeinfo = helpers.lookup_fully_qualified_generic(referred_to_fullname, ctx.api.modules)
+    if referred_to_typeinfo is None:
+        ctx.api.fail(f'Cannot resolve {referred_to_fullname!r}. Please, report it to package developers.',
+                     ctx.context)
+        return AnyType(TypeOfAny.from_error)
+
     assert isinstance(referred_to_typeinfo, TypeInfo), f'Cannot resolve {referred_to_fullname!r}'
     referred_to_type = Instance(referred_to_typeinfo, [])
 

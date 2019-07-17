@@ -1,13 +1,16 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional, Set, Union, Any
+from typing import Any, Dict, List, Optional, Set, Union, TYPE_CHECKING
 
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
-from mypy.nodes import Block, ClassDef, Expression, GDEF, MDEF, MypyFile, NameExpr, SymbolNode, SymbolTable, SymbolTableNode, \
-    TypeInfo, Var
+from mypy.nodes import Block, ClassDef, Expression, GDEF, MDEF, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable, \
+    SymbolTableNode, TypeInfo, Var, MemberExpr
 from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
+
+if TYPE_CHECKING:
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:
@@ -202,3 +205,19 @@ def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, MypyTy
     object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
+
+
+def resolve_string_attribute_value(attr_expr: Expression, ctx: Union[FunctionContext, MethodContext],
+                                   django_context: 'DjangoContext') -> Optional[str]:
+    if isinstance(attr_expr, StrExpr):
+        return attr_expr.value
+
+    # support extracting from settings, in general case it's unresolvable yet
+    if isinstance(attr_expr, MemberExpr):
+        member_name = attr_expr.name
+        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == 'django.conf.settings':
+            if hasattr(django_context.settings, member_name):
+                return getattr(django_context.settings, member_name)
+
+    ctx.api.fail(f'Expression of type {type(attr_expr).__name__!r} is not supported', ctx.context)
+    return None

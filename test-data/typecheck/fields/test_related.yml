@@ -412,3 +412,25 @@
                                                   related_name='+')
                     publisher2 = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
                                                    related_name='books2')
+
+-   case: to_parameter_could_be_resolved_if_passed_from_settings
+    main: |
+        from myapp.models import Book
+        book = Book()
+        reveal_type(book.publisher)  # N: Revealed type is 'myapp.models.Publisher*'
+    installed_apps:
+        - myapp
+    additional_settings:
+        - BOOK_RELATED_MODEL='myapp.Publisher'
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.conf import settings
+                from django.db import models
+
+                class Publisher(models.Model):
+                    pass
+                class Book(models.Model):
+                    publisher = models.ForeignKey(to=settings.BOOK_RELATED_MODEL, on_delete=models.CASCADE,
+                                                  related_name='books')

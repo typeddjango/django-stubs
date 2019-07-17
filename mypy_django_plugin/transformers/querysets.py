@@ -1,10 +1,10 @@
 from collections import OrderedDict
-from typing import Optional, Tuple, Type
+from typing import Optional, Tuple, Type, Sequence, List, Union
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey
-from mypy.nodes import NameExpr
+from mypy.nodes import NameExpr, Expression
 from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
 
@@ -56,28 +56,31 @@ def get_lookup_field_get_type(ctx: MethodContext, django_context: DjangoContext,
         return None
 
     field_get_type = django_context.fields_context.get_field_get_type(ctx.api, lookup_field, method)
-    return lookup_field.attname, field_get_type
+    return lookup, field_get_type
 
 
 def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model],
                              flat: bool, named: bool) -> MypyType:
-    field_lookups = [expr.value for expr in ctx.args[0]]
+    field_lookups = resolve_field_lookups(ctx.args[0], ctx, django_context)
+    if field_lookups is None:
+        return AnyType(TypeOfAny.from_error)
+
     if len(field_lookups) == 0:
         if flat:
             primary_key_field = django_context.get_primary_key_field(model_cls)
-            _, field_get_type = get_lookup_field_get_type(ctx, django_context, model_cls,
+            _, column_type = get_lookup_field_get_type(ctx, django_context, model_cls,
                                                           primary_key_field.attname, 'values_list')
-            return field_get_type
+            return column_type
         elif named:
             column_types = OrderedDict()
             for field in django_context.get_model_fields(model_cls):
-                field_get_type = django_context.fields_context.get_field_get_type(ctx.api, field, 'values_list')
-                column_types[field.attname] = field_get_type
+                column_type = django_context.fields_context.get_field_get_type(ctx.api, field, 'values_list')
+                column_types[field.attname] = column_type
             return helpers.make_oneoff_named_tuple(ctx.api, 'Row', column_types)
         else:
             # flat=False, named=False, all fields
             field_lookups = []
-            for field in model_cls._meta.get_fields():
+            for field in django_context.get_model_fields(model_cls):
                 field_lookups.append(field.attname)
 
     if len(field_lookups) > 1 and flat:
@@ -89,8 +92,9 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
         result = get_lookup_field_get_type(ctx, django_context, model_cls, field_lookup, 'values_list')
         if result is None:
             return AnyType(TypeOfAny.from_error)
-        field_name, field_get_type = result
-        column_types[field_name] = field_get_type
+
+        column_name, column_type = result
+        column_types[column_name] = column_type
 
     if flat:
         assert len(column_types) == 1
@@ -133,6 +137,17 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
 
 
+def resolve_field_lookups(lookup_exprs: Sequence[Expression], ctx: Union[FunctionContext, MethodContext],
+                          django_context: DjangoContext) -> Optional[List[str]]:
+    field_lookups = []
+    for field_lookup_expr in lookup_exprs:
+        field_lookup = helpers.resolve_string_attribute_value(field_lookup_expr, ctx, django_context)
+        if field_lookup is None:
+            return None
+        field_lookups.append(field_lookup)
+    return field_lookups
+
+
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.type, Instance)
     assert isinstance(ctx.type.args[0], Instance)
@@ -142,25 +157,22 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if model_cls is None:
         return ctx.default_return_type
 
-    field_lookups = [expr.value for expr in ctx.args[0]]
+    field_lookups = resolve_field_lookups(ctx.args[0], ctx, django_context)
+    if field_lookups is None:
+        return AnyType(TypeOfAny.from_error)
+
     if len(field_lookups) == 0:
-        for field in model_cls._meta.get_fields():
+        for field in django_context.get_model_fields(model_cls):
             field_lookups.append(field.attname)
 
     column_types = OrderedDict()
     for field_lookup in field_lookups:
-        try:
-            lookup_field = django_context.lookups_context.resolve_lookup(model_cls, field_lookup)
-        except FieldError as exc:
-            ctx.api.fail(exc.args[0], ctx.context)
+        result = get_lookup_field_get_type(ctx, django_context, model_cls, field_lookup, 'values')
+        if result is None:
             return helpers.reparametrize_instance(ctx.default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
-        field_get_type = django_context.fields_context.get_field_get_type(ctx.api, lookup_field, 'values')
-        field_name = lookup_field.attname
-        if isinstance(lookup_field, ForeignKey) and field_lookup == lookup_field.name:
-            field_name = lookup_field.name
-
-        column_types[field_name] = field_get_type
+        column_name, column_type = result
+        column_types[column_name] = column_type
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()))
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
