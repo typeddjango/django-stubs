@@ -108,8 +108,12 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
 
 
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    # called on the Instance
     assert isinstance(ctx.type, Instance)
-    assert isinstance(ctx.type.args[0], Instance)
+
+    # bail if queryset of Any or other non-instances
+    if not isinstance(ctx.type.args[0], Instance):
+        return AnyType(TypeOfAny.from_omitted_generics)
 
     model_type = ctx.type.args[0]
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
