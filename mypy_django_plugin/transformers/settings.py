@@ -2,8 +2,8 @@ from mypy.nodes import TypeInfo, MemberExpr
 from mypy.plugin import FunctionContext, AttributeContext
 from mypy.types import Type as MypyType, TypeType, Instance
 
-from mypy_django_plugin_newsemanal.django.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import helpers
+from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.lib import helpers
 
 
 def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:

@@ -4,7 +4,7 @@ from django.db.models.base import Model
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import Instance, Type as MypyType
 
-from mypy_django_plugin_newsemanal.django.context import DjangoContext
+from mypy_django_plugin.django.context import DjangoContext
 
 
 def get_actual_types(ctx: Union[MethodContext, FunctionContext], expected_keys: List[str]) -> List[Tuple[str, MypyType]]:

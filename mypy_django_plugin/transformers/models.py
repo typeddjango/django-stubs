@@ -9,10 +9,10 @@ from mypy.nodes import ClassDef, MDEF, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.types import Instance
 
-from mypy_django_plugin_newsemanal.django.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import fullnames, helpers
-from mypy_django_plugin_newsemanal.transformers import fields
-from mypy_django_plugin_newsemanal.transformers.fields import get_field_descriptor_types
+from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.transformers import fields
+from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
 
 @dataclasses.dataclass

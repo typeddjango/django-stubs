@@ -16,7 +16,7 @@ from django.db.models.fields import CharField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel
 
 from django.db.models.sql.query import Query
-from mypy_django_plugin_newsemanal.lib import helpers
+from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
     from django.apps.registry import Apps

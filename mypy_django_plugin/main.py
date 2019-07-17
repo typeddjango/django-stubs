@@ -9,10 +9,10 @@ from mypy.options import Options
 from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin_newsemanal.django.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import fullnames, helpers
-from mypy_django_plugin_newsemanal.transformers import fields, forms, init_create, querysets, settings
-from mypy_django_plugin_newsemanal.transformers.models import process_model_class
+from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.transformers import fields, forms, init_create, querysets, settings
+from mypy_django_plugin.transformers.models import process_model_class
 
 
 def transform_model_class(ctx: ClassDefContext,
