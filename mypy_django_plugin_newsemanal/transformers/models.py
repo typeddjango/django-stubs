@@ -3,15 +3,14 @@ from abc import ABCMeta, abstractmethod
 from typing import cast
 
 from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.newsemanal.semanal import NewSemanticAnalyzer
 from mypy.nodes import ClassDef, MDEF, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.types import Instance
 
-from django.db.models.fields import Field
-from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel, ManyToManyRel
 from mypy_django_plugin_newsemanal.django.context import DjangoContext
-from mypy_django_plugin_newsemanal.lib import helpers, fullnames
+from mypy_django_plugin_newsemanal.lib import fullnames, helpers
 from mypy_django_plugin_newsemanal.transformers import fields
 from mypy_django_plugin_newsemanal.transformers.fields import get_field_descriptor_types
 

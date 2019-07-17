@@ -1,10 +1,11 @@
 import os
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type
+from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type, Sequence
 
+from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related import ForeignKey, RelatedField
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
 from mypy.types import Instance, Type as MypyType
@@ -13,6 +14,8 @@ from pytest_mypy.utils import temp_environ
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.fields import CharField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel
+
+from django.db.models.sql.query import Query
 from mypy_django_plugin_newsemanal.lib import helpers
 
 if TYPE_CHECKING:
@@ -53,6 +56,9 @@ def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
 
 
 class DjangoFieldsContext:
+    def __init__(self, django_context: 'DjangoContext') -> None:
+        self.django_context = django_context
+
     def get_attname(self, field: Field) -> str:
         attname = field.attname
         return attname
@@ -81,11 +87,43 @@ class DjangoFieldsContext:
             field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
         return field_set_type
 
+    def get_field_get_type(self, api: TypeChecker, field: Field, method: str) -> MypyType:
+        field_info = helpers.lookup_class_typeinfo(api, field.__class__)
+        is_nullable = self.get_field_nullability(field, method)
+        if isinstance(field, RelatedField):
+            if method == 'values':
+                primary_key_field = self.django_context.get_primary_key_field(field.related_model)
+                return self.get_field_get_type(api, primary_key_field, method)
+
+            model_info = helpers.lookup_class_typeinfo(api, field.related_model)
+            return Instance(model_info, [])
+        else:
+            return helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
+                                                                 is_nullable=is_nullable)
+
+
+class DjangoLookupsContext:
+    def resolve_lookup(self, model_cls: Type[Model], lookup: str) -> Any:
+        query = Query(model_cls)
+        lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
+        if lookup_parts:
+            raise FieldError('Lookups not supported yet')
+
+        currently_observed_model = model_cls
+        current_field = None
+        for field_name in field_parts:
+            current_field = currently_observed_model._meta.get_field(field_name)
+            if isinstance(current_field, RelatedField):
+                currently_observed_model = current_field.related_model
+
+        return current_field
+
 
 class DjangoContext:
     def __init__(self, plugin_toml_config: Optional[Dict[str, Any]]) -> None:
         self.config = DjangoPluginConfig()
-        self.fields_context = DjangoFieldsContext()
+        self.fields_context = DjangoFieldsContext(self)
+        self.lookups_context = DjangoLookupsContext()
 
         self.django_settings_module = None
         if plugin_toml_config:

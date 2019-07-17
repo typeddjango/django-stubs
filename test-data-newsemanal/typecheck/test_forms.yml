@@ -1,5 +1,6 @@
 -   case: no_incompatible_meta_nested_class_false_positive
     main: |
+        from django import forms
         from myapp.models import Article, Category
         class ArticleForm(forms.ModelForm):
             class Meta:

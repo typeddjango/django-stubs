@@ -1,9 +1,17 @@
-from typing import Dict, List, Optional, Set, Union
+from collections import OrderedDict
+from typing import Dict, List, Optional, Set, Union, Any
 
+from mypy import checker
 from mypy.checker import TypeChecker
-from mypy.nodes import Expression, MypyFile, NameExpr, SymbolNode, TypeInfo, Var, SymbolTableNode
-from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, NoneTyp, Type as MypyType, TypeOfAny, UnionType
+from mypy.mro import calculate_mro
+from mypy.nodes import Block, ClassDef, Expression, GDEF, MDEF, MypyFile, NameExpr, SymbolNode, SymbolTable, SymbolTableNode, \
+    TypeInfo, Var
+from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
+from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
+
+
+def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:
+    return model_info.metadata.setdefault('django', {})
 
 
 class IncompleteDefnException(Exception):
@@ -120,6 +128,53 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
+def add_new_class_for_current_module(api: TypeChecker, name: str, bases: List[Instance],
+                                     fields: 'OrderedDict[str, MypyType]') -> TypeInfo:
+    current_module = api.scope.stack[0]
+    new_class_unique_name = checker.gen_unique_name(name, current_module.names)
+
+    # make new class expression
+    classdef = ClassDef(new_class_unique_name, Block([]))
+    classdef.fullname = current_module.fullname() + '.' + new_class_unique_name
+
+    # make new TypeInfo
+    new_typeinfo = TypeInfo(SymbolTable(), classdef, current_module.fullname())
+    new_typeinfo.bases = bases
+    calculate_mro(new_typeinfo)
+    new_typeinfo.calculate_metaclass_type()
+
+    def add_field_to_new_typeinfo(var: Var, is_initialized_in_class: bool = False,
+                                  is_property: bool = False) -> None:
+        var.info = new_typeinfo
+        var.is_initialized_in_class = is_initialized_in_class
+        var.is_property = is_property
+        var._fullname = new_typeinfo.fullname() + '.' + var.name()
+        new_typeinfo.names[var.name()] = SymbolTableNode(MDEF, var)
+
+    # add fields
+    var_items = [Var(item, typ) for item, typ in fields.items()]
+    for var_item in var_items:
+        add_field_to_new_typeinfo(var_item, is_property=True)
+
+    classdef.info = new_typeinfo
+    current_module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
+    return new_typeinfo
+
+
+def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: 'OrderedDict[str, MypyType]') -> TupleType:
+    namedtuple_info = add_new_class_for_current_module(api, name,
+                                                       bases=[api.named_generic_type('typing.NamedTuple', [])],
+                                                       fields=fields)
+    return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
+
+
+def make_tuple(api: 'TypeChecker', fields: List[MypyType]) -> TupleType:
+    # fallback for tuples is any builtins.tuple instance
+    fallback = api.named_generic_type('builtins.tuple',
+                                      [AnyType(TypeOfAny.special_form)])
+    return TupleType(fields, fallback=fallback)
+
+
 def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
     if isinstance(typ, UnionType):
         converted_items = []
@@ -140,3 +195,10 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
         return referred_to_type
 
     return typ
+
+
+def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, MypyType]',
+                   required_keys: Set[str]) -> TypedDictType:
+    object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
+    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
+    return typed_dict_type
