@@ -1,5 +1,6 @@
 import os
 from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type
 
@@ -11,7 +12,6 @@ from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
 from mypy.types import Instance, Type as MypyType
-from pytest_mypy.utils import temp_environ
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.fields import CharField, Field
@@ -26,6 +26,17 @@ if TYPE_CHECKING:
 class DjangoPluginConfig:
     ignore_missing_settings: bool = False
     ignore_missing_model_attributes: bool = False
+
+
+@contextmanager
+def temp_environ():
+    """Allow the ability to set os.environ temporarily"""
+    environ = dict(os.environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(environ)
 
 
 def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
