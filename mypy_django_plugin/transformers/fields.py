@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, cast
 
-from mypy.nodes import TypeInfo
+from mypy.nodes import MypyFile, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import AnyType, CallableType, Instance, Type as MypyType, TypeOfAny
 
@@ -14,11 +14,13 @@ def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoC
         assert isinstance(to_arg_type.ret_type, Instance)
         return to_arg_type.ret_type.type.fullname()
 
-    outer_model_info = ctx.api.tscope.classes[-1]
+    outer_model_info = ctx.api.scope.active_class()
+    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+        # not inside models.Model class
+        return None
     assert isinstance(outer_model_info, TypeInfo)
 
     to_arg_expr = helpers.get_call_argument_by_name(ctx, 'to')
-
     model_string = helpers.resolve_string_attribute_value(to_arg_expr, ctx, django_context)
     if model_string is None:
         # unresolvable
@@ -28,10 +30,21 @@ def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoC
         return outer_model_info.fullname()
     if '.' not in model_string:
         # same file class
-        current_module = ctx.api.tree
-        if model_string not in current_module.names:
+        model_cls_is_accessible = False
+        for scope in ctx.api.scope.stack:
+            if isinstance(scope, (MypyFile, TypeInfo)):
+                model_class_candidate = scope.names.get(model_string)
+                model_cls_is_accessible = (model_class_candidate is not None
+                                           and isinstance(model_class_candidate.node, TypeInfo)
+                                           and model_class_candidate.node.has_base(fullnames.MODEL_CLASS_FULLNAME))
+                if model_cls_is_accessible:
+                    break
+            # TODO: FuncItem
+
+        if not model_cls_is_accessible:
             ctx.api.fail(f'No model {model_string!r} defined in the current module', ctx.context)
             return None
+
         return outer_model_info.module_name + '.' + model_string
 
     app_label, model_name = model_string.split('.')
@@ -87,12 +100,6 @@ def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = ctx.default_return_type
     assert isinstance(default_return_type, Instance)
-
-    # bail out if we're inside migration, not supported yet
-    active_class = ctx.api.scope.active_class()
-    if active_class is not None:
-        if active_class.has_base(fullnames.MIGRATION_CLASS_FULLNAME):
-            return ctx.default_return_type
 
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)

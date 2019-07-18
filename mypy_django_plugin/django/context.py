@@ -1,11 +1,13 @@
 import os
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type, Sequence
+from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type
 
-from django.core.exceptions import FieldError, FieldDoesNotExist
+from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey, RelatedField
+from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
 from mypy.types import Instance, Type as MypyType
@@ -13,9 +15,6 @@ from pytest_mypy.utils import temp_environ
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.fields import CharField, Field
-from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, ManyToManyRel
-
-from django.db.models.sql.query import Query
 from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
@@ -99,7 +98,7 @@ class DjangoFieldsContext:
             return Instance(model_info, [])
         else:
             return helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
-                                                                 is_nullable=is_nullable)
+                                                       is_nullable=is_nullable)
 
 
 class DjangoLookupsContext:
@@ -184,27 +183,38 @@ class DjangoContext:
         raise ValueError('No primary key defined')
 
     def get_expected_types(self, api: TypeChecker, model_cls: Type[Model], method: str) -> Dict[str, MypyType]:
+        from django.contrib.contenttypes.fields import GenericForeignKey
+
         expected_types = {}
-        if method == '__init__':
-            # add pk
-            primary_key_field = self.get_primary_key_field(model_cls)
-            field_set_type = self.fields_context.get_field_set_type(api, primary_key_field, method)
-            expected_types['pk'] = field_set_type
+        # add pk
+        primary_key_field = self.get_primary_key_field(model_cls)
+        field_set_type = self.fields_context.get_field_set_type(api, primary_key_field, method)
+        expected_types['pk'] = field_set_type
 
-        for field in self.get_model_fields(model_cls):
-            field_name = field.attname
-            field_set_type = self.fields_context.get_field_set_type(api, field, method)
-            expected_types[field_name] = field_set_type
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, Field):
+                field_name = field.attname
+                field_set_type = self.fields_context.get_field_set_type(api, field, method)
+                expected_types[field_name] = field_set_type
 
-            if isinstance(field, ForeignKey):
+                if isinstance(field, ForeignKey):
+                    field_name = field.name
+                    foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
+                    related_model_info = helpers.lookup_class_typeinfo(api, field.related_model)
+                    is_nullable = self.fields_context.get_field_nullability(field, method)
+                    foreign_key_set_type = helpers.get_private_descriptor_type(foreign_key_info,
+                                                                               '_pyi_private_set_type',
+                                                                               is_nullable=is_nullable)
+                    model_set_type = helpers.convert_any_to_type(foreign_key_set_type,
+                                                                 Instance(related_model_info, []))
+                    expected_types[field_name] = model_set_type
+
+            elif isinstance(field, GenericForeignKey):
+                # it's generic, so cannot set specific model
                 field_name = field.name
-                foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                related_model_info = helpers.lookup_class_typeinfo(api, field.related_model)
-                is_nullable = self.fields_context.get_field_nullability(field, method)
-                foreign_key_set_type = helpers.get_private_descriptor_type(foreign_key_info,
-                                                                           '_pyi_private_set_type',
-                                                                           is_nullable=is_nullable)
-                model_set_type = helpers.convert_any_to_type(foreign_key_set_type,
-                                                             Instance(related_model_info, []))
-                expected_types[field_name] = model_set_type
+                gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
+                gfk_set_type = helpers.get_private_descriptor_type(gfk_info, '_pyi_private_set_type',
+                                                                   is_nullable=True)
+                expected_types[field_name] = gfk_set_type
+
         return expected_types

@@ -6,7 +6,6 @@ from django.core.checks.messages import CheckMessage
 
 from django.db.models.options import Options
 
-
 class ModelBase(type): ...
 
 _Self = TypeVar("_Self", bound="Model")

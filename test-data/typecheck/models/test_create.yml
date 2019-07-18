@@ -1,7 +1,7 @@
 -   case: default_manager_create_is_typechecked
     main: |
         from myapp.models import User
-        User.objects.create(name='Max', age=10)
+        User.objects.create(pk=1, name='Max', age=10)
         User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, int, str, Combinable]")
     installed_apps:
         - myapp

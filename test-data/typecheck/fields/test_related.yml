@@ -381,10 +381,10 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                class Book(models.Model):
-                    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
                 class Publisher(models.Model):
                     pass
+                class Book(models.Model):
+                    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
 
 -   case: test_foreign_key_field_without_backwards_relation
     main: |

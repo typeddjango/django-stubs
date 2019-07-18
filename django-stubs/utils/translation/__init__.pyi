@@ -39,10 +39,10 @@ ungettext = ngettext
 def pgettext(context: str, message: str) -> str: ...
 def npgettext(context: str, singular: str, plural: str, number: int) -> str: ...
 
-gettext_lazy: Any
+gettext_lazy: Callable[[str], str]
 
-ugettext_lazy: Any
-pgettext_lazy: Any
+ugettext_lazy: Callable[[str], str]
+pgettext_lazy: Callable[[str], str]
 
 def ngettext_lazy(singular: Any, plural: Any, number: Optional[Any] = ...): ...
 
