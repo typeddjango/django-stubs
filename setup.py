@@ -23,7 +23,8 @@ with open('README.md', 'r') as f:
 dependencies = [
     'mypy>=0.720,<0.730',
     'typing-extensions',
-    'toml'
+    'toml',
+    'django'
 ]
 if sys.version_info[:2] < (3, 7):
     # dataclasses port for 3.6
