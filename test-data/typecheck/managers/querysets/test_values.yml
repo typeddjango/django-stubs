@@ -89,3 +89,21 @@
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
                 class Entry(models.Model):
                     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+-   case: select_all_related_model_values_for_every_current_value
+    main: |
+        from myapp.models import Publisher
+        related_model_values = Publisher.objects.values('id', 'blog__name').get()
+        reveal_type(related_model_values)  # N: Revealed type is 'TypedDict({'id': builtins.int, 'blog__name': builtins.str})'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Publisher(models.Model):
+                    pass
+                class Blog(models.Model):
+                    name = models.CharField(max_length=100)
+                    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)

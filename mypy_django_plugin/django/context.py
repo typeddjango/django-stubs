@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type, Sequence
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, FieldDoesNotExist
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.utils.functional import cached_property
@@ -13,7 +13,7 @@ from pytest_mypy.utils import temp_environ
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.fields import CharField, Field
-from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, ManyToManyRel
 
 from django.db.models.sql.query import Query
 from mypy_django_plugin.lib import helpers
@@ -119,8 +119,12 @@ class DjangoLookupsContext:
                 return self.django_context.get_primary_key_field(currently_observed_model)
 
             current_field = currently_observed_model._meta.get_field(field_part)
-            if isinstance(current_field, RelatedField):
+            if isinstance(current_field, ForeignObjectRel):
                 currently_observed_model = current_field.related_model
+                current_field = self.django_context.get_primary_key_field(currently_observed_model)
+            else:
+                if isinstance(current_field, RelatedField):
+                    currently_observed_model = current_field.related_model
 
         return current_field
 

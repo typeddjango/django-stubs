@@ -28,12 +28,15 @@
 
 -   case: values_list_related_model_fields
     main: |
-        from myapp.models import Post
+        from myapp.models import Post, Blog
         values_tuple = Post.objects.values_list('blog', 'blog__num_posts', 'blog__publisher', 'blog__publisher__name').get()
         reveal_type(values_tuple[0])  # N: Revealed type is 'myapp.models.Blog'
         reveal_type(values_tuple[1])  # N: Revealed type is 'builtins.int'
         reveal_type(values_tuple[2])  # N: Revealed type is 'myapp.models.Publisher'
         reveal_type(values_tuple[3])  # N: Revealed type is 'builtins.str'
+
+        reverse_fields_list = Blog.objects.values_list('post__text').get()
+        reveal_type(reverse_fields_list)  # N: Revealed type is 'Tuple[builtins.str]'
     installed_apps:
         - myapp
     files:
@@ -47,6 +50,7 @@
                     num_posts = models.IntegerField()
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
                 class Post(models.Model):
+                    text = models.CharField(max_length=100)
                     blog = models.ForeignKey(to=Blog, on_delete=models.CASCADE)
 
 -   case: values_list_flat_true
@@ -152,7 +156,7 @@
 
 -   case: named_true_with_related_model_fields
     main: |
-        from myapp.models import Entry
+        from myapp.models import Entry, Blog
         values = Entry.objects.values_list('blog__num_articles', 'blog__publisher__name', named=True).get()
         reveal_type(values.blog__num_articles)  # N: Revealed type is 'builtins.int'
         reveal_type(values.blog__publisher__name)  # N: Revealed type is 'builtins.str'
@@ -160,6 +164,10 @@
         pk_values = Entry.objects.values_list('blog__pk', 'blog__publisher__pk', named=True).get()
         reveal_type(pk_values.blog__pk)  # N: Revealed type is 'builtins.int'
         reveal_type(pk_values.blog__publisher__pk)  # N: Revealed type is 'builtins.int'
+
+        # reverse relation
+        reverse_values = Blog.objects.values_list('entry__text', named=True).get()
+        reveal_type(reverse_values.entry__text)  # N: Revealed type is 'builtins.str'
     installed_apps:
         - myapp
     files:
@@ -173,4 +181,5 @@
                     num_articles = models.IntegerField()
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
                 class Entry(models.Model):
+                    text = models.CharField(max_length=100)
                     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
