@@ -1,11 +1,11 @@
-import dataclasses
+from abc import ABCMeta, abstractmethod
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.newsemanal.semanal import NewSemanticAnalyzer
-from mypy.nodes import ClassDef, MDEF, SymbolTableNode, TypeInfo, Var
+from mypy.nodes import MDEF, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.types import Instance
 
@@ -15,19 +15,12 @@ from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
 
-@dataclasses.dataclass
 class ModelClassInitializer(metaclass=ABCMeta):
-    api: NewSemanticAnalyzer
-    model_classdef: ClassDef
-    django_context: DjangoContext
-    ctx: ClassDefContext
-
-    @classmethod
-    def from_ctx(cls, ctx: ClassDefContext, django_context: DjangoContext):
-        return cls(api=cast(NewSemanticAnalyzer, ctx.api),
-                   model_classdef=ctx.cls,
-                   django_context=django_context,
-                   ctx=ctx)
+    def __init__(self, ctx: ClassDefContext, django_context: DjangoContext):
+        self.api = cast(NewSemanticAnalyzer, ctx.api)
+        self.model_classdef = ctx.cls
+        self.django_context = django_context
+        self.ctx = ctx
 
     def lookup_typeinfo_or_incomplete_defn_error(self, fullname: str) -> TypeInfo:
         sym = self.api.lookup_fully_qualified_or_none(fullname)
@@ -156,7 +149,7 @@ def process_model_class(ctx: ClassDefContext,
     ]
     for initializer_cls in initializers:
         try:
-            initializer_cls.from_ctx(ctx, django_context).run()
+            initializer_cls(ctx, django_context).run()
         except helpers.IncompleteDefnException:
             if not ctx.api.final_iteration:
                 ctx.api.defer()

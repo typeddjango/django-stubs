@@ -26,9 +26,6 @@ dependencies = [
     'toml',
     'django'
 ]
-if sys.version_info[:2] < (3, 7):
-    # dataclasses port for 3.6
-    dependencies += ['dataclasses']
 
 setup(
     name="django-stubs",

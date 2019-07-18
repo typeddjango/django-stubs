@@ -1,7 +1,6 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from dataclasses import dataclass
 from typing import Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type
 
 from django.core.exceptions import FieldError
@@ -20,12 +19,6 @@ from mypy_django_plugin.lib import helpers
 if TYPE_CHECKING:
     from django.apps.registry import Apps
     from django.conf import LazySettings
-
-
-@dataclass
-class DjangoPluginConfig:
-    ignore_missing_settings: bool = False
-    ignore_missing_model_attributes: bool = False
 
 
 @contextmanager
@@ -141,14 +134,11 @@ class DjangoLookupsContext:
 
 class DjangoContext:
     def __init__(self, plugin_toml_config: Optional[Dict[str, Any]]) -> None:
-        self.config = DjangoPluginConfig()
         self.fields_context = DjangoFieldsContext(self)
         self.lookups_context = DjangoLookupsContext(self)
 
         self.django_settings_module = None
         if plugin_toml_config:
-            self.config.ignore_missing_settings = plugin_toml_config.get('ignore_missing_settings', False)
-            self.config.ignore_missing_model_attributes = plugin_toml_config.get('ignore_missing_model_attributes', False)
             self.django_settings_module = plugin_toml_config.get('django_settings_module', None)
 
         self.apps_registry: Optional[Dict[str, str]] = None
