@@ -106,7 +106,7 @@ class DjangoLookupsContext:
     def __init__(self, django_context: 'DjangoContext'):
         self.django_context = django_context
 
-    def resolve_lookup(self, model_cls: Type[Model], lookup: str) -> Optional[Field]:
+    def resolve_lookup(self, model_cls: Type[Model], lookup: str) -> Field:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
         if lookup_parts:

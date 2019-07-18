@@ -153,8 +153,11 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], ctx: Union[Functio
 
 
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    # queryset method
     assert isinstance(ctx.type, Instance)
-    assert isinstance(ctx.type.args[0], Instance)
+    # if queryset of non-instance type
+    if not isinstance(ctx.type.args[0], Instance):
+        return AnyType(TypeOfAny.from_omitted_generics)
 
     model_type = ctx.type.args[0]
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
