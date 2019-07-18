@@ -7,6 +7,7 @@ from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel,
 from mypy.newsemanal.semanal import NewSemanticAnalyzer
 from mypy.nodes import MDEF, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
+from mypy.plugins import common
 from mypy.types import Instance
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -139,6 +140,22 @@ class AddManagers(ModelClassInitializer):
                 continue
 
 
+class AddFieldChoicesDisplayMethods(ModelClassInitializer):
+    def run(self):
+        model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
+        if model_cls is None:
+            return
+
+        for field in self.django_context.get_model_fields(model_cls):
+            if field.choices:
+                info = self.lookup_typeinfo_or_incomplete_defn_error('builtins.str')
+                return_type = Instance(info, [])
+                common.add_method(self.ctx,
+                                  name='get_{}_display'.format(field.attname),
+                                  args=[],
+                                  return_type=return_type)
+
+
 def process_model_class(ctx: ClassDefContext,
                         django_context: DjangoContext) -> None:
     initializers = [
@@ -146,6 +163,7 @@ def process_model_class(ctx: ClassDefContext,
         AddDefaultPrimaryKey,
         AddRelatedModelsId,
         AddManagers,
+        AddFieldChoicesDisplayMethods,
     ]
     for initializer_cls in initializers:
         try:
