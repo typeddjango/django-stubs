@@ -25,7 +25,6 @@
         reveal_type(book.publisher_id)  # N: Revealed type is 'builtins.int*'
         reveal_type(book.owner_id)  # N: Revealed type is 'builtins.int*'
     installed_apps:
-        - django.contrib.contenttypes
         - django.contrib.auth
         - myapp
     files:

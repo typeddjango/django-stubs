@@ -8,7 +8,6 @@
         Tag.objects.create(content_object=myuser)
         reveal_type(Tag().content_object)  # N: Revealed type is 'Union[Any, None]'
     installed_apps:
-        - django.contrib.contenttypes
         - myapp
     files:
         -   path: myapp/__init__.py

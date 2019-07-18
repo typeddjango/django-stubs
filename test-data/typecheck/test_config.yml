@@ -30,7 +30,6 @@
         mymodel = MyModel(user_id=1)
         reveal_type(mymodel.id)  # N: Revealed type is 'builtins.int*'
     installed_apps:
-        - django.contrib.contenttypes
         - django.contrib.auth
         - myapp
     files:
