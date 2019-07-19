@@ -1,0 +1,33 @@
+-   case: meta_attribute_has_a_type_of_current_model
+    main: |
+        from myapp.models import MyUser
+        reveal_type(MyUser._meta)  # N: Revealed type is 'django.db.models.options.Options[myapp.models.MyUser]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
+
+-   case: get_field_returns_proper_field_type
+    main: |
+        from myapp.models import MyUser
+        reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is 'django.db.models.fields.CharField[Any, Any]'
+        reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is 'django.db.models.fields.IntegerField[Any, Any]'
+        reveal_type(MyUser._meta.get_field('unknown'))
+    out: |
+        main:4: note: Revealed type is 'Any'
+        main:4: error: MyUser has no field named 'unknown'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    name = models.CharField(max_length=100)
+                    age = models.IntegerField()

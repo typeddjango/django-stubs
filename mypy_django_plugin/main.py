@@ -11,7 +11,7 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import fields, forms, init_create, querysets, settings
+from mypy_django_plugin.transformers import fields, forms, init_create, querysets, settings, meta
 from mypy_django_plugin.transformers.models import process_model_class
 
 
@@ -168,14 +168,19 @@ class NewSemanalDjangoPlugin(Plugin):
                 return forms.extract_proper_type_for_get_form
 
         if method_name == 'values':
-            model_info = self._get_typeinfo_or_none(class_fullname)
-            if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
 
         if method_name == 'values_list':
-            model_info = self._get_typeinfo_or_none(class_fullname)
-            if model_info and model_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
+
+        if method_name == 'get_field':
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
+                return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':

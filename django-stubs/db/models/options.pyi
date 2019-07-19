@@ -1,5 +1,5 @@
 import collections
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, TypeVar, Generic
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -29,7 +29,9 @@ def make_immutable_fields_list(
     name: str, data: Union[Iterator[Any], List[Union[ArrayField, CIText]], List[Union[Field, FieldCacheMixin]]]
 ) -> ImmutableList: ...
 
-class Options:
+_M = TypeVar('_M', bound=Model)
+
+class Options(Generic[_M]):
     base_manager: Manager
     concrete_fields: ImmutableList
     default_manager: Manager

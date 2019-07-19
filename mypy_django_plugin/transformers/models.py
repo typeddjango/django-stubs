@@ -2,15 +2,15 @@ from abc import ABCMeta, abstractmethod
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
-from django.db.models.fields import DateTimeField, DateField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.newsemanal.semanal import NewSemanticAnalyzer
-from mypy.nodes import MDEF, SymbolTableNode, TypeInfo, Var, Argument, ARG_NAMED_OPT, ARG_STAR2
+from mypy.nodes import ARG_STAR2, Argument, MDEF, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
-from mypy.types import Instance, TypeOfAny, AnyType
+from mypy.types import AnyType, Instance, TypeOfAny
 
+from django.db.models.fields import DateField, DateTimeField
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields
@@ -177,6 +177,15 @@ class AddExtraFieldMethods(ModelClassInitializer):
                                   return_type=return_type)
 
 
+class AddMetaOptionsAttribute(ModelClassInitializer):
+    def run(self):
+        if '_meta' not in self.model_classdef.info.names:
+            options_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OPTIONS_CLASS_FULLNAME)
+            self.add_new_node_to_model_class('_meta',
+                                             Instance(options_info, [
+                                                 Instance(self.model_classdef.info, [])
+                                             ]))
+
 
 def process_model_class(ctx: ClassDefContext,
                         django_context: DjangoContext) -> None:
@@ -186,6 +195,7 @@ def process_model_class(ctx: ClassDefContext,
         AddRelatedModelsId,
         AddManagers,
         AddExtraFieldMethods,
+        AddMetaOptionsAttribute
     ]
     for initializer_cls in initializers:
         try:

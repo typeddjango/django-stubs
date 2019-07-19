@@ -35,3 +35,4 @@ RELATED_FIELDS_CLASSES = {
 }
 
 MIGRATION_CLASS_FULLNAME = 'django.db.migrations.migration.Migration'
+OPTIONS_CLASS_FULLNAME = 'django.db.models.options.Options'
