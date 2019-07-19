@@ -116,6 +116,9 @@ class FloatField(Field[_ST, _GT]):
 class DecimalField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, float, decimal.Decimal, Combinable]
     _pyi_private_get_type: decimal.Decimal
+    # attributes
+    max_digits: int = ...
+    decimal_places: int = ...
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,

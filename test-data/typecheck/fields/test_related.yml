@@ -84,6 +84,23 @@
                 class Book(models.Model):
                     publisher = models.ForeignKey(to='myapp.Publisher', on_delete=models.CASCADE)
 
+-   case: one_to_one_field_no_related_name
+    main: |
+        from myapp.models import User, Profile
+        reveal_type(User().profile)  # N: Revealed type is 'myapp.models.Profile'
+        reveal_type(Profile().user)  # N: Revealed type is 'myapp.models.User*'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+                class Profile(models.Model):
+                    user = models.OneToOneField(to=User, on_delete=models)
+
 -   case: test_circular_dependency_in_imports_with_foreign_key
     main: |
         from myapp import models
