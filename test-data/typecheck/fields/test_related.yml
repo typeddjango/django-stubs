@@ -183,6 +183,7 @@
 -   case: models_imported_inside_init_file_one_to_one_field
     main: |
         from myapp2.models import Profile
+        reveal_type(Profile().user)  # N: Revealed type is 'myapp.models.user.User*'
         reveal_type(Profile().user.profile)  # N: Revealed type is 'myapp2.models.Profile'
     installed_apps:
         - myapp
