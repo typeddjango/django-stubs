@@ -124,3 +124,11 @@
                 from django.db import models
                 class MyUser(models.Model):
                     name = models.CharField(max_length=100)
+
+-   case: fields_on_non_model_classes_resolve_to_field_type
+    main: |
+        from django.db import models
+        class MyClass:
+            myfield: models.IntegerField[int, int]
+        reveal_type(MyClass.myfield)  # N: Revealed type is 'django.db.models.fields.IntegerField[builtins.int, builtins.int]'
+        reveal_type(MyClass().myfield)  # N: Revealed type is 'django.db.models.fields.IntegerField[builtins.int, builtins.int]'
