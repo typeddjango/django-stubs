@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Type, cast
+from typing import Type, cast, OrderedDict
 
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey
@@ -35,7 +35,7 @@ class ModelClassInitializer:
         field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
         return field_info
 
-    def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+    def create_new_var(self, name: str, typ: Instance, is_classvar=False) -> Var:
         # type=: type of the variable itself
         var = Var(name=name, type=typ)
         # var.info: type of the object variable is bound to
@@ -43,6 +43,11 @@ class ModelClassInitializer:
         var._fullname = self.model_classdef.info.fullname() + '.' + name
         var.is_initialized_in_class = True
         var.is_inferred = True
+        var.is_classvar = is_classvar
+        return var
+
+    def add_new_node_to_model_class(self, name: str, typ: Instance, is_classvar=False) -> None:
+        var = self.create_new_var(name, typ, is_classvar=is_classvar)
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
     def run(self) -> None:
@@ -101,21 +106,45 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 
 class AddManagers(ModelClassInitializer):
+    def _is_manager_any(self, typ: Instance) -> bool:
+        return typ.type.fullname() == fullnames.MANAGER_CLASS_FULLNAME and type(typ.args[0]) == AnyType
+
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
-            if manager_name not in self.model_classdef.info.names:
-                manager_fullname = helpers.get_class_fullname(manager.__class__)
-                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            manager_fullname = helpers.get_class_fullname(manager.__class__)
+            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
 
+            if manager_name not in self.model_classdef.info.names:
                 manager = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-                self.add_new_node_to_model_class(manager_name, manager)
+                self.add_new_node_to_model_class(manager_name, manager, is_classvar=True)
+            else:
+                # create new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
+                has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)
+                if has_manager_any_base:
+                    custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
+                    bases = []
+                    for original_base in manager_info.bases:
+                        if self._is_manager_any(original_base):
+                            if original_base.type is None:
+                                if not self.api.final_iteration:
+                                    self.api.defer()
+                            original_base = helpers.reparametrize_instance(original_base,
+                                                                           [Instance(self.model_classdef.info, [])])
+                        bases.append(original_base)
+                    current_module = self.api.modules[self.model_classdef.info.module_name]
+                    custom_manager_info = helpers.add_new_class_for_module(current_module,
+                                                                           custom_model_manager_name,
+                                                                           bases=bases,
+                                                                           fields=OrderedDict())
+                    custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
+                    self.add_new_node_to_model_class(manager_name, custom_manager_type, is_classvar=True)
 
         # add _default_manager
         if '_default_manager' not in self.model_classdef.info.names:
             default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
             default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
-            self.add_new_node_to_model_class('_default_manager', default_manager)
+            self.add_new_node_to_model_class('_default_manager', default_manager, is_classvar=True)
 
         # add related managers
         for relation in self.django_context.get_model_relations(model_cls):

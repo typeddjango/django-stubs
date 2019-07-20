@@ -318,3 +318,20 @@
 #                    pass
 #                class MyUser(MyBaseUser):
 #                    objects = MyManager()
+
+-   case: custom_manager_returns_proper_model_types
+    main: |
+        from myapp.models import User
+        reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
+        reveal_type(User.objects.select_related())  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.User*, myapp.models.User*]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyManager(models.Manager):
+                    pass
+                class User(models.Model):
+                    objects = MyManager()

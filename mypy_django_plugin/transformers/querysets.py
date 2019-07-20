@@ -1,11 +1,10 @@
 from collections import OrderedDict
-from typing import Optional, Tuple, Type, Sequence, List, Union, cast
+from typing import List, Optional, Sequence, Tuple, Type, Union, cast
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from django.db.models.fields.related import ForeignKey
-from mypy.newsemanal.typeanal import TypeAnalyser
-from mypy.nodes import NameExpr, Expression
+from mypy.checker import TypeChecker
+from mypy.nodes import Expression, NameExpr
 from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
 
@@ -41,6 +40,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     if not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
         return ret
 
+    api = cast(TypeChecker, ctx.api)
     return helpers.reparametrize_instance(ret, [Instance(outer_model_info, [])])
 
 

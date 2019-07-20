@@ -131,17 +131,16 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
-def add_new_class_for_current_module(api: TypeChecker, name: str, bases: List[Instance],
-                                     fields: 'OrderedDict[str, MypyType]') -> TypeInfo:
-    current_module = api.scope.stack[0]
-    new_class_unique_name = checker.gen_unique_name(name, current_module.names)
+def add_new_class_for_module(module: MypyFile, name: str, bases: List[Instance],
+                             fields: 'OrderedDict[str, MypyType]') -> TypeInfo:
+    new_class_unique_name = checker.gen_unique_name(name, module.names)
 
     # make new class expression
     classdef = ClassDef(new_class_unique_name, Block([]))
-    classdef.fullname = current_module.fullname() + '.' + new_class_unique_name
+    classdef.fullname = module.fullname() + '.' + new_class_unique_name
 
     # make new TypeInfo
-    new_typeinfo = TypeInfo(SymbolTable(), classdef, current_module.fullname())
+    new_typeinfo = TypeInfo(SymbolTable(), classdef, module.fullname())
     new_typeinfo.bases = bases
     calculate_mro(new_typeinfo)
     new_typeinfo.calculate_metaclass_type()
@@ -160,14 +159,15 @@ def add_new_class_for_current_module(api: TypeChecker, name: str, bases: List[In
         add_field_to_new_typeinfo(var_item, is_property=True)
 
     classdef.info = new_typeinfo
-    current_module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
+    module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
     return new_typeinfo
 
 
 def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: 'OrderedDict[str, MypyType]') -> TupleType:
-    namedtuple_info = add_new_class_for_current_module(api, name,
-                                                       bases=[api.named_generic_type('typing.NamedTuple', [])],
-                                                       fields=fields)
+    current_module = api.scope.stack[0]
+    namedtuple_info = add_new_class_for_module(current_module, name,
+                                               bases=[api.named_generic_type('typing.NamedTuple', [])],
+                                               fields=fields)
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
 
