@@ -40,7 +40,6 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     if not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
         return ret
 
-    api = cast(TypeChecker, ctx.api)
     return helpers.reparametrize_instance(ret, [Instance(outer_model_info, [])])
 
 

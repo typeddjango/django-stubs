@@ -30,21 +30,6 @@
                 class Child(Parent):
                     pass
 
--   case: if_manager_is_defined_on_model_do_not_add_objects
-    main: |
-        from myapp.models import MyModel
-        reveal_type(MyModel.authors)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
-        MyModel.objects  # E: "Type[MyModel]" has no attribute "objects"
-    installed_apps:
-        - myapp
-    files:
-        -   path: myapp/__init__.py
-        -   path: myapp/models.py
-            content: |
-                from django.db import models
-                class MyModel(models.Model):
-                    authors = models.Manager['MyModel']()
-
 -   case: test_model_objects_attribute_present_in_case_of_model_cls_passed_as_generic_parameter
     main: |
         from myapp.models import Base, MyModel
