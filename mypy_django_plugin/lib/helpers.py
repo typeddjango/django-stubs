@@ -49,7 +49,7 @@ def lookup_fully_qualified_typeinfo(api: TypeChecker, fullname: str) -> Optional
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: type) -> TypeInfo:
+def lookup_class_typeinfo(api: TypeChecker, klass: type) -> Optional[TypeInfo]:
     fullname = get_class_fullname(klass)
     field_info = lookup_fully_qualified_typeinfo(api, fullname)
     return field_info

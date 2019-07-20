@@ -15,9 +15,6 @@ def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoC
         return to_arg_type.ret_type.type.fullname()
 
     outer_model_info = ctx.api.scope.active_class()
-    # if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
-    #     # not inside models.Model class
-    #     return None
     assert isinstance(outer_model_info, TypeInfo)
 
     to_arg_expr = helpers.get_call_argument_by_name(ctx, 'to')

@@ -17,8 +17,10 @@ from typing import (
 )
 
 from django.contrib.sessions.backends.base import SessionBase
+from django.db.models.base import Model
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 
@@ -49,6 +51,7 @@ class HttpRequest(BytesIO):
     resolver_match: ResolverMatch = ...
     content_type: Optional[str] = ...
     content_params: Optional[Dict[str, str]] = ...
+    user: AbstractBaseUser
     session: SessionBase
     encoding: Optional[str] = ...
     upload_handlers: UploadHandlerList = ...
