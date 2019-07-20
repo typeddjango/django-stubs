@@ -451,3 +451,30 @@
                 class Book(models.Model):
                     publisher = models.ForeignKey(to=settings.BOOK_RELATED_MODEL, on_delete=models.CASCADE,
                                                   related_name='books')
+
+-   case: foreign_key_with_custom_app_name
+    main: |
+        from myapp.models import MyMain
+        reveal_type(MyMain().user)  # N: Revealed type is 'myapp2.models.MyUser*'
+    installed_apps:
+        - myapp
+        - myapp2.apps.MyApp2Config
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyMain(models.Model):
+                    user = models.ForeignKey('myapp2__user.MyUser', on_delete=models.CASCADE)
+        -   path: myapp2/__init__.py
+        -   path: myapp2/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
+        -   path: myapp2/apps.py
+            content: |
+                from django.apps.config import AppConfig
+                class MyApp2Config(AppConfig):
+                    name = 'myapp2'
+                    label = 'myapp2__user'
