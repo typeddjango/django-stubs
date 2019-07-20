@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, cast
 
-from mypy.nodes import MypyFile, TypeInfo
+from mypy.nodes import MypyFile, TypeInfo, Var, AssignmentStmt, SymbolTableNode, MDEF
 from mypy.plugin import FunctionContext
 from mypy.types import AnyType, CallableType, Instance, Type as MypyType, TypeOfAny
 
@@ -15,9 +15,9 @@ def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoC
         return to_arg_type.ret_type.type.fullname()
 
     outer_model_info = ctx.api.scope.active_class()
-    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
-        # not inside models.Model class
-        return None
+    # if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+    #     # not inside models.Model class
+    #     return None
     assert isinstance(outer_model_info, TypeInfo)
 
     to_arg_expr = helpers.get_call_argument_by_name(ctx, 'to')
@@ -100,6 +100,12 @@ def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = ctx.default_return_type
     assert isinstance(default_return_type, Instance)
+
+    outer_model_info = ctx.api.scope.active_class()
+    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+        # not inside models.Model class
+        return ctx.default_return_type
+    assert isinstance(outer_model_info, TypeInfo)
 
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)

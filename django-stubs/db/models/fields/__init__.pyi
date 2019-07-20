@@ -1,13 +1,27 @@
 import decimal
 import uuid
 from datetime import date, datetime, time, timedelta
-from typing import Any, Callable, Dict, Generic, Iterable, Optional, Tuple, Type, TypeVar, Union, Sequence, List
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    Sequence,
+    List,
+    overload,
+)
 
 from django.core import checks
 
 from django.db.models import Model
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
-from django.db.models.expressions import Combinable
+from django.db.models.expressions import Combinable, Col
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
 
@@ -20,6 +34,7 @@ _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
+_T = TypeVar("_T", bound="Field")
 # __set__ value type
 _ST = TypeVar("_ST")
 # __get__ return type
@@ -36,7 +51,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     auto_created: bool
     primary_key: bool
     remote_field: Field
-    max_length: Optional[int]
+    max_length: int
     model: Type[Model]
     name: str
     verbose_name: str
@@ -72,6 +87,11 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
     def __set__(self, instance, value: _ST) -> None: ...
+    # class access
+    @overload
+    def __get__(self: _T, instance: None, owner) -> _T: ...
+    # instance access
+    @overload
     def __get__(self, instance, owner) -> _GT: ...
     def deconstruct(self) -> Any: ...
     def set_attributes_from_name(self, name: str) -> None: ...
@@ -96,6 +116,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def check(self, **kwargs: Any) -> List[checks.Error]: ...
     @property
     def validators(self) -> List[_ValidatorCallable]: ...
+    def get_col(self, alias: str, output_field: Optional[Field] = ...) -> Col: ...
+    @property
+    def cached_col(self) -> Col: ...
+    def value_from_object(self, obj: Model) -> _GT: ...
 
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]

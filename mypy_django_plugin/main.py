@@ -204,6 +204,12 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(settings.get_type_of_settings_attribute,
                            django_context=self.django_context)
 
+    # def get_type_analyze_hook(self, fullname: str
+    #                 (          ):
+    #     info = self._get_typeinfo_or_none(fullname)
+    #     if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+    #         return partial(querysets.set_first_generic_param_as_default_for_second, fullname=fullname)
+
 
 def plugin(version):
     return NewSemanalDjangoPlugin

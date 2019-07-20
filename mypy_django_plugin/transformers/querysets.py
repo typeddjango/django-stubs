@@ -1,9 +1,10 @@
 from collections import OrderedDict
-from typing import Optional, Tuple, Type, Sequence, List, Union
+from typing import Optional, Tuple, Type, Sequence, List, Union, cast
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey
+from mypy.newsemanal.typeanal import TypeAnalyser
 from mypy.nodes import NameExpr, Expression
 from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
@@ -13,24 +14,20 @@ from mypy_django_plugin.lib import fullnames, helpers
 
 
 def set_first_generic_param_as_default_for_second(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
+    info = helpers.lookup_fully_qualified_typeinfo(ctx.api.api, fullname)
+    if info is None:
+        if not ctx.api.api.final_iteration:
+            ctx.api.api.defer()
+
     if not ctx.type.args:
-        try:
-            return ctx.api.named_type(fullname, [AnyType(TypeOfAny.explicit),
-                                                 AnyType(TypeOfAny.explicit)])
-        except KeyError:
-            # really should never happen
-            return AnyType(TypeOfAny.explicit)
+        return Instance(info, [AnyType(TypeOfAny.explicit), AnyType(TypeOfAny.explicit)])
 
     args = ctx.type.args
     if len(args) == 1:
         args = [args[0], args[0]]
 
     analyzed_args = [ctx.api.analyze_type(arg) for arg in args]
-    ctx.api.analyze_type(ctx.type)
-    try:
-        return ctx.api.named_type(fullname, analyzed_args)
-    except KeyError:
-        return AnyType(TypeOfAny.explicit)
+    return Instance(info, analyzed_args)
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -69,7 +66,7 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
         if flat:
             primary_key_field = django_context.get_primary_key_field(model_cls)
             _, column_type = get_lookup_field_get_type(ctx, django_context, model_cls,
-                                                          primary_key_field.attname, 'values_list')
+                                                       primary_key_field.attname, 'values_list')
             return column_type
         elif named:
             column_types = OrderedDict()

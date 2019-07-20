@@ -7,7 +7,7 @@
         reveal_type(qs.get(id=1)) # N: Revealed type is 'myapp.models.Blog*'
         reveal_type(iter(qs)) # N: Revealed type is 'typing.Iterator[myapp.models.Blog*]'
         reveal_type(qs.iterator()) # N: Revealed type is 'typing.Iterator[myapp.models.Blog*]'
-        reveal_type(qs.first()) # N: Revealed type is 'Union[myapp.models.Blog*, None]'
+        reveal_type(qs.first()) # N: Revealed type is 'myapp.models.Blog*'
         reveal_type(qs.earliest()) # N: Revealed type is 'myapp.models.Blog*'
         reveal_type(qs[0]) # N: Revealed type is 'myapp.models.Blog*'
         reveal_type(qs[:9]) # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.Blog*, myapp.models.Blog*]'

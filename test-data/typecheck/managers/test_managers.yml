@@ -212,10 +212,10 @@
     main: |
         from myapp.models import UnrelatedModel, MyModel
         reveal_type(UnrelatedModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.UnrelatedModel]'
-        reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is 'Union[myapp.models.UnrelatedModel*, None]'
+        reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is 'myapp.models.UnrelatedModel*'
 
         reveal_type(MyModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
-        reveal_type(MyModel.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel*, None]'
+        reveal_type(MyModel.objects.first()) # N: Revealed type is 'myapp.models.MyModel*'
     installed_apps:
         - myapp
     files:
@@ -233,10 +233,10 @@
     main: |
         from myapp.models import UnrelatedModel2, MyModel2
         reveal_type(UnrelatedModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.UnrelatedModel2]'
-        reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is 'Union[myapp.models.UnrelatedModel2*, None]'
+        reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is 'myapp.models.UnrelatedModel2*'
 
         reveal_type(MyModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel2]'
-        reveal_type(MyModel2.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel2*, None]'
+        reveal_type(MyModel2.objects.first()) # N: Revealed type is 'myapp.models.MyModel2*'
     installed_apps:
         - myapp
     files:
@@ -254,10 +254,10 @@
     main: |
         from myapp.models import ParentOfMyModel3, MyModel3
         reveal_type(ParentOfMyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.ParentOfMyModel3]'
-        reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is 'Union[myapp.models.ParentOfMyModel3*, None]'
+        reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is 'myapp.models.ParentOfMyModel3*'
 
         reveal_type(MyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel3]'
-        reveal_type(MyModel3.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel3*, None]'
+        reveal_type(MyModel3.objects.first()) # N: Revealed type is 'myapp.models.MyModel3*'
     installed_apps:
         - myapp
     files:
@@ -275,10 +275,10 @@
     main: |
         from myapp.models import ParentOfMyModel4, MyModel4
         reveal_type(ParentOfMyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.ParentOfMyModel4]'
-        reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is 'Union[myapp.models.ParentOfMyModel4*, None]'
+        reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is 'myapp.models.ParentOfMyModel4*'
 
         reveal_type(MyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel4]'
-        reveal_type(MyModel4.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel4*, None]'
+        reveal_type(MyModel4.objects.first()) # N: Revealed type is 'myapp.models.MyModel4*'
     installed_apps:
         - myapp
     files:
@@ -291,3 +291,30 @@
 
                 class MyModel4(ParentOfMyModel4):
                     objects = models.Manager['MyModel4']()
+
+# TODO: make it work someday
+#-   case: inheritance_of_two_models_with_custom_objects_manager
+#    main: |
+#        from myapp.models import MyBaseUser, MyUser
+#        reveal_type(MyBaseUser.objects)  # N: Revealed type is 'myapp.models.MyBaseManager[myapp.models.MyBaseUser]'
+#        reveal_type(MyBaseUser.objects.get())  # N: Revealed type is 'myapp.models.MyBaseUser'
+#
+#        reveal_type(MyUser.objects)  # N: Revealed type is 'myapp.models.MyManager[myapp.models.MyUser]'
+#        reveal_type(MyUser.objects.get())  # N: Revealed type is 'myapp.models.MyUser'
+#    installed_apps:
+#        - myapp
+#    files:
+#        -   path: myapp/__init__.py
+#        -   path: myapp/models.py
+#            content: |
+#                from django.db import models
+#
+#                class MyBaseManager(models.Manager):
+#                    pass
+#                class MyBaseUser(models.Model):
+#                    objects = MyBaseManager()
+#
+#                class MyManager(models.Manager):
+#                    pass
+#                class MyUser(MyBaseUser):
+#                    objects = MyManager()

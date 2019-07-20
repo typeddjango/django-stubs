@@ -15,12 +15,14 @@
 -   case: get_field_returns_proper_field_type
     main: |
         from myapp.models import MyUser
+        reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is 'django.db.models.fields.CharField[Any, Any]'
         reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is 'django.db.models.fields.CharField[Any, Any]'
         reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is 'django.db.models.fields.IntegerField[Any, Any]'
         reveal_type(MyUser._meta.get_field('unknown'))
+        reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is 'django.db.models.fields.related.ForeignKey[Any, Any]'
     out: |
-        main:4: note: Revealed type is 'Any'
-        main:4: error: MyUser has no field named 'unknown'
+        main:5: note: Revealed type is 'Any'
+        main:5: error: MyUser has no field named 'unknown'
     installed_apps:
         - myapp
     files:
@@ -28,6 +30,9 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                class MyUser(models.Model):
+                class MyBaseUser(models.Model):
+                    base_name = models.CharField(max_length=100)
+                class MyUser(MyBaseUser):
                     name = models.CharField(max_length=100)
                     age = models.IntegerField()
+                    to_user = models.ForeignKey('self', on_delete=models.SET_NULL)

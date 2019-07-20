@@ -77,23 +77,6 @@
                 class User(models.Model):
                     my_pk = models.IntegerField(primary_key=True)
 
--   case: test_primary_key_on_optional_queryset_method
-    main: |
-        from myapp.models import User
-        reveal_type(User.objects.first().id)
-    out: |
-        main:2: note: Revealed type is 'Union[builtins.int*, Any]'
-        main:2: error: Item "None" of "Optional[User]" has no attribute "id"
-    installed_apps:
-        - myapp
-    files:
-        -   path: myapp/__init__.py
-        -   path: myapp/models.py
-            content: |
-                from django.db import models
-                class User(models.Model):
-                    pass
-
 -   case: blank_and_null_char_field_allows_none
     main: |
         from myapp.models import MyModel
@@ -127,3 +110,17 @@
                 from django.db import models
                 class MyModel(models.Model):
                     notnulltext=models.CharField(max_length=1, blank=True, null=False)
+
+-   case: if_field_called_on_class_return_field_itself
+    main: |
+        from myapp.models import MyUser
+        reveal_type(MyUser.name)  # N: Revealed type is 'django.db.models.fields.CharField[Union[builtins.str, builtins.int, django.db.models.expressions.Combinable], builtins.str]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    name = models.CharField(max_length=100)

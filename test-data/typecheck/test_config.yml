@@ -22,7 +22,7 @@
                 class MyModel(models.Model):
                     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
                 if TYPE_CHECKING:
-                    reveal_type(MyModel.user)  # N: Revealed type is 'django.contrib.auth.models.User*'
+                    reveal_type(MyModel().user)  # N: Revealed type is 'django.contrib.auth.models.User*'
 
 -   case: generate_pyproject_toml_and_settings_file_from_installed_apps_key
     main: |
