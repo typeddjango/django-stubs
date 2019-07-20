@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, cast
 
-from mypy.nodes import MypyFile, TypeInfo, Var, AssignmentStmt, SymbolTableNode, MDEF
+from mypy.nodes import MypyFile, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import AnyType, CallableType, Instance, Type as MypyType, TypeOfAny
 
@@ -94,6 +94,21 @@ def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
 
+def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    default_return_type = set_descriptor_types_for_field(ctx)
+
+    base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, 'base_field')
+    if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
+        return default_return_type
+
+    base_type = base_field_arg_type.args[1]  # extract __get__ type
+    args = []
+    for default_arg in default_return_type.args:
+        args.append(helpers.convert_any_to_type(default_arg, base_type))
+
+    return helpers.reparametrize_instance(default_return_type, args)
+
+
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = ctx.default_return_type
     assert isinstance(default_return_type, Instance)
@@ -111,18 +126,3 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
         return determine_type_of_array_field(ctx, django_context)
 
     return set_descriptor_types_for_field(ctx)
-
-
-def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    default_return_type = set_descriptor_types_for_field(ctx)
-
-    base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, 'base_field')
-    if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
-        return default_return_type
-
-    base_type = base_field_arg_type.args[1]  # extract __get__ type
-    args = []
-    for default_arg in default_return_type.args:
-        args.append(helpers.convert_any_to_type(default_arg, base_type))
-
-    return helpers.reparametrize_instance(default_return_type, args)
