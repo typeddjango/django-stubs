@@ -3,6 +3,8 @@
     main: |
         from django.http.request import HttpRequest
         reveal_type(HttpRequest().user)  # N: Revealed type is 'myapp.models.MyUser'
+        # check that other fields work ok
+        reveal_type(HttpRequest().method)  # N: Revealed type is 'Union[builtins.str, None]'
     installed_apps:
         - myapp
     additional_settings:

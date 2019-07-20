@@ -205,7 +205,7 @@ class NewSemanalDjangoPlugin(Plugin):
                            django_context=self.django_context)
 
         info = self._get_typeinfo_or_none(class_name)
-        if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME):
+        if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
 
 
