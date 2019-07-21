@@ -6,12 +6,16 @@ import toml
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
-from mypy.plugin import AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
+from mypy.plugin import (
+    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
+)
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import fields, forms, init_create, querysets, settings, meta, request
+from mypy_django_plugin.transformers import (
+    fields, forms, init_create, meta, querysets, request, settings,
+)
 from mypy_django_plugin.transformers.models import process_model_class
 
 
@@ -109,7 +113,8 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for `get_user_model()`
         if self.django_context.settings:
-            if (file.fullname() == 'django.contrib.auth') or (file.fullname() in {'django.http', 'django.http.request'}):
+            if (file.fullname() == 'django.contrib.auth'
+                    or file.fullname() in {'django.http', 'django.http.request'}):
                 auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
                 try:
                     auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
@@ -207,7 +212,6 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(class_name)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
-
 
     # def get_type_analyze_hook(self, fullname: str
     #                 (          ):

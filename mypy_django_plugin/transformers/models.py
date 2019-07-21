@@ -2,15 +2,19 @@ from collections import OrderedDict
 from typing import Type, cast
 
 from django.db.models.base import Model
+from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey
-from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
+from django.db.models.fields.reverse_related import (
+    ManyToManyRel, ManyToOneRel, OneToOneRel,
+)
 from mypy.newsemanal.semanal import NewSemanticAnalyzer
-from mypy.nodes import ARG_STAR2, Argument, MDEF, SymbolTableNode, TypeInfo, Var
+from mypy.nodes import (
+    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
 from mypy.types import AnyType, Instance, TypeOfAny
 
-from django.db.models.fields import DateField, DateTimeField
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields

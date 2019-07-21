@@ -1,5 +1,7 @@
 # noinspection PyUnresolvedReferences
-from pytest_mypy.collect import File, YamlTestFile, pytest_addoption
+from pytest_mypy.collect import (  # noqa: F401
+    File, YamlTestFile, pytest_addoption,
+)
 from pytest_mypy.item import YamlTestItem
 
 
@@ -38,5 +40,3 @@ class NewSemanalDjangoTestItem(YamlTestItem):
 
             mysettings_file = File(path='mysettings.py', content=settings_contents)
             self.files.append(mysettings_file)
-
-

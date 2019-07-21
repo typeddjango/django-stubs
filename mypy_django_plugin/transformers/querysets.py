@@ -1,12 +1,13 @@
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Tuple, Type, Union, cast
+from typing import List, Optional, Sequence, Tuple, Type, Union
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from mypy.checker import TypeChecker
 from mypy.nodes import Expression, NameExpr
 from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers

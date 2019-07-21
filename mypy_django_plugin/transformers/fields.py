@@ -2,7 +2,9 @@ from typing import Optional, Tuple, cast
 
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance, Type as MypyType, TypeOfAny
+from mypy.types import AnyType, CallableType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers

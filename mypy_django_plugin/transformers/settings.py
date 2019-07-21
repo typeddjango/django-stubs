@@ -1,6 +1,8 @@
-from mypy.nodes import TypeInfo, MemberExpr
-from mypy.plugin import FunctionContext, AttributeContext
-from mypy.types import Type as MypyType, TypeType, Instance
+from mypy.nodes import MemberExpr, TypeInfo
+from mypy.plugin import AttributeContext, FunctionContext
+from mypy.types import Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
@@ -42,4 +44,3 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
         return ctx.default_attr_type
 
     return Instance(value_info, [])
-
