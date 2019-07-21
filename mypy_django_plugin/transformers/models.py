@@ -1,5 +1,5 @@
-from abc import ABCMeta, abstractmethod
-from typing import Type, cast, OrderedDict
+from collections import OrderedDict
+from typing import Type, cast
 
 from django.db.models.base import Model
 from django.db.models.fields.related import ForeignKey
@@ -35,7 +35,7 @@ class ModelClassInitializer:
         field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
         return field_info
 
-    def create_new_var(self, name: str, typ: Instance, is_classvar=False) -> Var:
+    def create_new_var(self, name: str, typ: Instance) -> Var:
         # type=: type of the variable itself
         var = Var(name=name, type=typ)
         # var.info: type of the object variable is bound to
@@ -43,11 +43,10 @@ class ModelClassInitializer:
         var._fullname = self.model_classdef.info.fullname() + '.' + name
         var.is_initialized_in_class = True
         var.is_inferred = True
-        var.is_classvar = is_classvar
         return var
 
-    def add_new_node_to_model_class(self, name: str, typ: Instance, is_classvar=False) -> None:
-        var = self.create_new_var(name, typ, is_classvar=is_classvar)
+    def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+        var = self.create_new_var(name, typ)
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
     def run(self) -> None:
@@ -116,7 +115,7 @@ class AddManagers(ModelClassInitializer):
 
             if manager_name not in self.model_classdef.info.names:
                 manager = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-                self.add_new_node_to_model_class(manager_name, manager, is_classvar=True)
+                self.add_new_node_to_model_class(manager_name, manager)
             else:
                 # create new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
                 has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)
@@ -137,14 +136,14 @@ class AddManagers(ModelClassInitializer):
                                                                            bases=bases,
                                                                            fields=OrderedDict())
                     custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
-                    self.add_new_node_to_model_class(manager_name, custom_manager_type, is_classvar=True)
+                    self.add_new_node_to_model_class(manager_name, custom_manager_type)
 
         # add _default_manager
         if '_default_manager' not in self.model_classdef.info.names:
             default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
             default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
-            self.add_new_node_to_model_class('_default_manager', default_manager, is_classvar=True)
+            self.add_new_node_to_model_class('_default_manager', default_manager)
 
         # add related managers
         for relation in self.django_context.get_model_relations(model_cls):
