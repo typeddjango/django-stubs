@@ -39,15 +39,20 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         return AnyType(TypeOfAny.from_error)
 
     assert isinstance(current_field, RelatedField)
-    referred_to_typeinfo = helpers.lookup_class_typeinfo(ctx.api, current_field.related_model)
-    referred_to_type = Instance(referred_to_typeinfo, [])
+
+    related_model = related_model_to_set = current_field.related_model
+    if related_model_to_set._meta.proxy_for_model:
+        related_model_to_set = related_model._meta.proxy_for_model
+
+    related_model_info = helpers.lookup_class_typeinfo(ctx.api, related_model)
+    related_model_to_set_info = helpers.lookup_class_typeinfo(ctx.api, related_model_to_set)
 
     default_related_field_type = set_descriptor_types_for_field(ctx)
     # replace Any with referred_to_type
-    args = []
-    for default_arg in default_related_field_type.args:
-        args.append(helpers.convert_any_to_type(default_arg, referred_to_type))
-
+    args = [
+        helpers.convert_any_to_type(default_related_field_type.args[0], Instance(related_model_to_set_info, [])),
+        helpers.convert_any_to_type(default_related_field_type.args[1], Instance(related_model_info, [])),
+    ]
     return helpers.reparametrize_instance(default_related_field_type, new_args=args)
 
 

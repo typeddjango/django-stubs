@@ -1,7 +1,8 @@
-from typing import Any, Collection, Optional, Set, Tuple, Type, Union
+from typing import Any, List, Optional, Set, Tuple, Type, Union, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser, BaseUserManager as BaseUserManager
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -27,13 +28,15 @@ class Group(models.Model):
     permissions: models.ManyToManyField = models.ManyToManyField(Permission)
     def natural_key(self): ...
 
-class UserManager(BaseUserManager):
+_T = TypeVar('_T', bound=Model)
+
+class UserManager(BaseUserManager[_T]):
     def create_user(
         self, username: str, email: Optional[str] = ..., password: Optional[str] = ..., **extra_fields: Any
-    ) -> AbstractBaseUser: ...
+    ) -> _T: ...
     def create_superuser(
         self, username: str, email: Optional[str], password: Optional[str], **extra_fields: Any
-    ) -> AbstractBaseUser: ...
+    ) -> _T: ...
 
 class PermissionsMixin(models.Model):
     is_superuser: models.BooleanField = ...

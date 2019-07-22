@@ -1,22 +1,19 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import (
-    TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple, Type,
-)
+from typing import (Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type)
 
-from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from django.db.models.fields import CharField, Field, AutoField
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
-from mypy.types import Instance
-from mypy.types import Type as MypyType
+from mypy.types import Instance, Type as MypyType
 
+from django.contrib.postgres.fields import ArrayField
+from django.db.models.fields import AutoField, CharField, Field
 from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
@@ -210,13 +207,19 @@ class DjangoContext:
                 if isinstance(field, ForeignKey):
                     field_name = field.name
                     foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                    related_model_info = helpers.lookup_class_typeinfo(api, field.related_model)
+
+                    related_model = field.related_model
+                    if related_model._meta.proxy_for_model:
+                        related_model = field.related_model._meta.proxy_for_model
+
+                    related_model_info = helpers.lookup_class_typeinfo(api, related_model)
                     is_nullable = self.fields_context.get_field_nullability(field, method)
                     foreign_key_set_type = helpers.get_private_descriptor_type(foreign_key_info,
                                                                                '_pyi_private_set_type',
                                                                                is_nullable=is_nullable)
                     model_set_type = helpers.convert_any_to_type(foreign_key_set_type,
                                                                  Instance(related_model_info, []))
+
                     expected_types[field_name] = model_set_type
 
             elif isinstance(field, GenericForeignKey):
