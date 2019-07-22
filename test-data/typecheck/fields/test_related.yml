@@ -478,3 +478,46 @@
                 class MyApp2Config(AppConfig):
                     name = 'myapp2'
                     label = 'myapp2__user'
+
+
+-   case: related_field_to_extracted_from_function
+    main: |
+        from myapp.models import Profile
+        reveal_type(Profile().user)  # N: Revealed type is 'myapp.models.User*'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+                def get_user_model_name():
+                    return 'myapp.User'
+                class Profile(models.Model):
+                    user = models.ForeignKey(to=get_user_model_name(), on_delete=models.CASCADE)
+
+
+-   case: related_manager_name_defined_by_pattern
+    main: |
+        from myapp.models import Publisher
+        reveal_type(Publisher().books)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Book]'
+        reveal_type(Publisher().articles)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Article]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Publisher(models.Model):
+                    pass
+                class Entry(models.Model):
+                    class Meta:
+                        abstract = True
+                    publisher = models.ForeignKey(to=Publisher, related_name='%(class)ss', on_delete=models.CASCADE)
+                class Book(Entry):
+                    pass
+                class Article(Entry):
+                    pass

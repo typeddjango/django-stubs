@@ -8,7 +8,7 @@ from typing import (
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from django.db.models.fields import CharField, Field
+from django.db.models.fields import CharField, Field, AutoField
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
@@ -78,6 +78,9 @@ class DjangoFieldsContext:
             return True
         if method == '__init__':
             if field.primary_key or isinstance(field, ForeignKey):
+                return True
+        if method == 'create':
+            if isinstance(field, AutoField):
                 return True
         if field.has_default():
             return True

@@ -1,75 +1,45 @@
 from typing import Optional, Tuple, cast
 
-from mypy.nodes import MypyFile, TypeInfo
+from django.db.models.fields.related import RelatedField
+from mypy.nodes import AssignmentStmt, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, CallableType, Instance
-from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
 
+from django.db.models.fields import Field
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 
 
-def get_referred_to_model_fullname(ctx: FunctionContext, django_context: DjangoContext) -> Optional[str]:
-    to_arg_type = helpers.get_call_argument_type_by_name(ctx, 'to')
-    if isinstance(to_arg_type, CallableType):
-        assert isinstance(to_arg_type.ret_type, Instance)
-        return to_arg_type.ret_type.type.fullname()
-
+def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Field]:
     outer_model_info = ctx.api.scope.active_class()
     assert isinstance(outer_model_info, TypeInfo)
-
-    to_arg_expr = helpers.get_call_argument_by_name(ctx, 'to')
-    model_string = helpers.resolve_string_attribute_value(to_arg_expr, ctx, django_context)
-    if model_string is None:
-        # unresolvable
+    if not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
         return None
 
-    if model_string == 'self':
-        return outer_model_info.fullname()
-    if '.' not in model_string:
-        # same file class
-        model_cls_is_accessible = False
-        for scope in ctx.api.scope.stack:
-            if isinstance(scope, (MypyFile, TypeInfo)):
-                model_class_candidate = scope.names.get(model_string)
-                model_cls_is_accessible = (model_class_candidate is not None
-                                           and isinstance(model_class_candidate.node, TypeInfo)
-                                           and model_class_candidate.node.has_base(fullnames.MODEL_CLASS_FULLNAME))
-                if model_cls_is_accessible:
-                    break
-            # TODO: FuncItem
-
-        if not model_cls_is_accessible:
-            ctx.api.fail(f'No model {model_string!r} defined in the current module', ctx.context)
-            return None
-
-        return outer_model_info.module_name + '.' + model_string
-
-    app_label, model_name = model_string.split('.')
-    if app_label not in django_context.apps_registry.app_configs:
-        ctx.api.fail(f'No installed app with label {app_label!r}', ctx.context)
+    field_name = None
+    for stmt in outer_model_info.defn.defs.body:
+        if isinstance(stmt, AssignmentStmt):
+            if stmt.rvalue == ctx.context:
+                field_name = stmt.lvalues[0].name
+                break
+    if field_name is None:
         return None
 
-    try:
-        model_cls = django_context.apps_registry.get_model(app_label, model_name)
-    except LookupError as exc:
-        # no model in app
-        ctx.api.fail(exc.args[0], ctx.context)
+    model_cls = django_context.get_model_class_by_fullname(outer_model_info.fullname())
+    if model_cls is None:
         return None
 
-    model_fullname = helpers.get_class_fullname(model_cls)
-    return model_fullname
+    current_field = model_cls._meta.get_field(field_name)
+    return current_field
 
 
 def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    referred_to_fullname = get_referred_to_model_fullname(ctx, django_context)
-    if referred_to_fullname is None:
+    current_field = _get_current_field_from_assignment(ctx, django_context)
+    if current_field is None:
         return AnyType(TypeOfAny.from_error)
 
-    referred_to_typeinfo = helpers.lookup_fully_qualified_generic(referred_to_fullname, ctx.api.modules)
-    assert isinstance(referred_to_typeinfo, TypeInfo), f'Cannot resolve {referred_to_fullname!r}'
-
+    assert isinstance(current_field, RelatedField)
+    referred_to_typeinfo = helpers.lookup_class_typeinfo(ctx.api, current_field.related_model)
     referred_to_type = Instance(referred_to_typeinfo, [])
 
     default_related_field_type = set_descriptor_types_for_field(ctx)
