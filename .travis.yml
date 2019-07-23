@@ -8,8 +8,7 @@ jobs:
       python: 3.7
       script: |
         set -e
-        pip install pytest_plugin/
-        pytest -p no:pytest-mypy-plugins
+        pytest
 
     - name: Typecheck Django test suite
       python: 3.7
