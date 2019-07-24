@@ -10,6 +10,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
+from mypy.errors import Errors
 from mypy.types import Instance, Type as MypyType
 
 from django.contrib.postgres.fields import ArrayField
@@ -139,13 +140,11 @@ class DjangoLookupsContext:
 
 
 class DjangoContext:
-    def __init__(self, plugin_toml_config: Optional[Dict[str, Any]]) -> None:
+    def __init__(self, django_settings_module: str) -> None:
         self.fields_context = DjangoFieldsContext(self)
         self.lookups_context = DjangoLookupsContext(self)
 
-        self.django_settings_module = None
-        if plugin_toml_config:
-            self.django_settings_module = plugin_toml_config.get('django_settings_module', None)
+        self.django_settings_module = django_settings_module
 
         self.apps_registry: Optional[Dict[str, str]] = None
         self.settings: LazySettings = None

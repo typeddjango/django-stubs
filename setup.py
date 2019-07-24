@@ -22,7 +22,6 @@ with open('README.md', 'r') as f:
 dependencies = [
     'mypy>=0.720,<0.730',
     'typing-extensions',
-    'toml',
     'django'
 ]
 

@@ -435,10 +435,9 @@
         from myapp.models import Book
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is 'myapp.models.Publisher*'
-    installed_apps:
-        - myapp
-    additional_settings:
-        - BOOK_RELATED_MODEL='myapp.Publisher'
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
+        BOOK_RELATED_MODEL = 'myapp.Publisher'
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py

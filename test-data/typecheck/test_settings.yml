@@ -8,17 +8,12 @@
         reveal_type(settings.APPS_DIR)  # N: Revealed type is 'pathlib.Path'
         reveal_type(settings.NUMBERS)  # N: Revealed type is 'builtins.list[builtins.str*]'
         reveal_type(settings.DICT)  # N: Revealed type is 'builtins.dict[Any, Any]'
+    custom_settings: |
+        from base import *
+        SECRET_KEY = 112233
+        NUMBERS = ['one', 'two']
+        DICT = {}  # type: ignore
     files:
-        -   path: pyproject.toml
-            content: |
-                [tool.django-stubs]
-                django_settings_module = 'mysettings'
-        -   path: mysettings.py
-            content: |
-                from base import *
-                SECRET_KEY = 112233
-                NUMBERS = ['one', 'two']
-                DICT = {}  # type: ignore
         -   path: base.py
             content: |
                 from pathlib import Path

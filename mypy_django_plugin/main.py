@@ -1,9 +1,9 @@
-import os
+import configparser
 from functools import partial
 from typing import Callable, Dict, List, Optional, Tuple
 
-import toml
 from django.db.models.fields.related import RelatedField
+from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
@@ -47,17 +47,33 @@ def add_new_manager_base(ctx: ClassDefContext) -> None:
         helpers.get_django_metadata(sym.node)['manager_bases'][ctx.cls.fullname] = 1
 
 
+def extract_django_settings_module(config_file_path: Optional[str]) -> str:
+    errors = Errors()
+    if config_file_path is None:
+        errors.report(0, None, "'django_settings_module' is not set: no mypy config file specified")
+        errors.raise_error()
+
+    parser = configparser.ConfigParser()
+    parser.read(config_file_path)
+
+    if not parser.has_section('mypy.plugins.django-stubs'):
+        errors.report(0, None, "'django_settings_module' is not set: no section [mypy.plugins.django-stubs]",
+                      file=config_file_path)
+        errors.raise_error()
+    if not parser.has_option('mypy.plugins.django-stubs', 'django_settings_module'):
+        errors.report(0, None, "'django_settings_module' is not set: setting is not provided",
+                      file=config_file_path)
+        errors.raise_error()
+
+    django_settings_module = parser.get('mypy.plugins.django-stubs', 'django_settings_module').strip('\'"')
+    return django_settings_module
+
+
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
-
-        plugin_toml_config = None
-        if os.path.exists('pyproject.toml'):
-            with open('pyproject.toml', 'r') as f:
-                pyproject_toml = toml.load(f)
-                plugin_toml_config = pyproject_toml.get('tool', {}).get('django-stubs')
-
-        self.django_context = DjangoContext(plugin_toml_config)
+        django_settings_module = extract_django_settings_module(options.config_file)
+        self.django_context = DjangoContext(django_settings_module)
 
     def _get_current_queryset_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)

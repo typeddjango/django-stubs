@@ -5,15 +5,13 @@
         reveal_type(mymodel.id)  # N: Revealed type is 'builtins.int*'
         reveal_type(mymodel.user)  # N: Revealed type is 'django.contrib.auth.models.User*'
         reveal_type(mymodel.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = mysettings
+    custom_settings: |
+        SECRET_KEY = '1'
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
     files:
-        -   path: pyproject.toml
-            content: |
-                [tool.django-stubs]
-                django_settings_module = 'mysettings'
-        -   path: mysettings.py
-            content: |
-                SECRET_KEY = '1'
-                INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |

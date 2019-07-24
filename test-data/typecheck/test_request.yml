@@ -5,10 +5,9 @@
         reveal_type(HttpRequest().user)  # N: Revealed type is 'myapp.models.MyUser'
         # check that other fields work ok
         reveal_type(HttpRequest().method)  # N: Revealed type is 'Union[builtins.str, None]'
-    installed_apps:
-        - myapp
-    additional_settings:
-        - AUTH_USER_MODEL='myapp.MyUser'
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
+        AUTH_USER_MODEL='myapp.MyUser'
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py

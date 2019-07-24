@@ -26,10 +26,9 @@
         from django.contrib.auth import get_user_model
         UserModel = get_user_model()
         reveal_type(UserModel.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
-    additional_settings:
-        - AUTH_USER_MODEL='myapp.MyUser'
-    installed_apps:
-        - myapp
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
+        AUTH_USER_MODEL = 'myapp.MyUser'
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
