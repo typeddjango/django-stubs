@@ -31,4 +31,3 @@ before_install: |
   pip install -U pip setuptools wheel
 install: |
   pip install -r ./dev-requirements.txt
-  pip install -r ./scripts/typecheck-tests-requirements.txt
