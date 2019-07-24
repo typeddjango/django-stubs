@@ -1,11 +1,13 @@
 from typing import Optional, Tuple, cast
 
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
-from django.db.models.fields import Field
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 

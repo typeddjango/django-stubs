@@ -1,20 +1,20 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import (Any, Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type)
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
+from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
-from mypy.errors import Errors
-from mypy.types import Instance, Type as MypyType
+from mypy.types import Instance
+from mypy.types import Type as MypyType
 
-from django.contrib.postgres.fields import ArrayField
-from django.db.models.fields import AutoField, CharField, Field
 from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
