@@ -17,6 +17,10 @@ Could be run on earlier versions of Django, but expect some missing imports warn
 pip install django-stubs
 ```
 
+### WARNING: All configuration from pre-1.0.0 versions is dropped, use one below.
+
+### WARNING: 1.0.0 breaks `dmypy`, if you need it, stay on the 0.12.x series. 
+
 To make mypy aware of the plugin, you need to add
 
 ```
@@ -27,27 +31,20 @@ plugins =
 
 in your `mypy.ini` file.
 
-
-## Configuration
-
-In order to specify config file, set `MYPY_DJANGO_CONFIG` environment variable with path to the config file. Default is `./mypy_django.ini`
-
-Config file format (.ini):
+Plugin requires Django settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified inside `mypy.ini` file.
 ```
-[mypy_django_plugin]
+[mypy]
+strict_optional = True
 
-# specify settings module to use for django.conf.settings, this setting
-# could also be specified with DJANGO_SETTINGS_MODULE environment variable
-# (it also takes priority over config file)
-django_settings = mysettings.local
-
-# if True, all unknown settings in django.conf.settings will fallback to Any,
-# specify it if your settings are loaded dynamically to avoid false positives
-ignore_missing_settings = True
-
-# if True, unknown attributes on Model instances won't produce errors
-ignore_missing_model_attributes = True
+; this one is new
+[mypy.plugins.django-stubs]
+django_settings_module = mysettings
 ```
+where `mysettings` is a value of `DJANGO_SETTINGS_MODULE` (with or without quotes)
+
+New implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
+
+In other words, if your `manage.py runserver` crashes, mypy will crash too. 
 
 ## To get help
 
