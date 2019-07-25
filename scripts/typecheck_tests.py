@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from re import Pattern
+from typing import Pattern
 
 from scripts.enabled_test_modules import IGNORED_ERRORS, IGNORED_MODULES
 

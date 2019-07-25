@@ -10,8 +10,12 @@ jobs:
         set -e
         pytest
 
-    - name: Typecheck Django test suite
+    - name: Typecheck Django test suite with python 3.7
       python: 3.7
+      script: 'python ./scripts/typecheck_tests.py'
+
+    - name: Typecheck Django test suite with python 3.6
+      python: 3.6
       script: 'python ./scripts/typecheck_tests.py'
 
     - name: Lint with black
