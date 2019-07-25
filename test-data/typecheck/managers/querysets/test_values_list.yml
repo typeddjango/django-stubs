@@ -188,3 +188,20 @@
                 class Entry(models.Model):
                     text = models.CharField(max_length=100)
                     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+-   case: values_list_flat_true_with_ids
+    main: |
+        from myapp.models import Blog, Publisher
+        reveal_type(Blog.objects.values_list('id', flat=True))  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.Blog, builtins.int]'
+        reveal_type(Blog.objects.values_list('publisher_id', flat=True))  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.Blog, builtins.int]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Publisher(models.Model):
+                    pass
+                class Blog(models.Model):
+                    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
