@@ -3,6 +3,8 @@ from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
+from mypy.nodes import TypeInfo
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
@@ -12,7 +14,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
-from mypy.types import Instance
+from mypy.types import Instance, AnyType, TypeOfAny
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import helpers
@@ -42,14 +44,14 @@ def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
 
         from django.db import models
 
-        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)
-        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)
+        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
+        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
 
         from django.conf import settings
         from django.apps import apps
 
-        apps.get_models.cache_clear()
-        apps.get_swappable_settings_name.cache_clear()
+        apps.get_models.cache_clear()  # type: ignore
+        apps.get_swappable_settings_name.cache_clear()  # type: ignore
 
         if not settings.configured:
             settings._setup()
@@ -84,28 +86,37 @@ class DjangoFieldsContext:
             return True
         return nullable
 
-    def get_field_set_type(self, api: TypeChecker, field: Field, method: str) -> MypyType:
+    def get_field_set_type(self, api: TypeChecker, field: Field, *, method: str) -> MypyType:
+        """ Get a type of __set__ for this specific Django field. """
         target_field = field
         if isinstance(field, ForeignKey):
             target_field = field.target_field
 
         field_info = helpers.lookup_class_typeinfo(api, target_field.__class__)
+        if field_info is None:
+            return AnyType(TypeOfAny.from_error)
+
         field_set_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_set_type',
                                                              is_nullable=self.get_field_nullability(field, method))
         if isinstance(target_field, ArrayField):
-            argument_field_type = self.get_field_set_type(api, target_field.base_field, method)
+            argument_field_type = self.get_field_set_type(api, target_field.base_field, method=method)
             field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
         return field_set_type
 
-    def get_field_get_type(self, api: TypeChecker, field: Field, method: str) -> MypyType:
+    def get_field_get_type(self, api: TypeChecker, field: Field, *, method: str) -> MypyType:
+        """ Get a type of __get__ for this specific Django field. """
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
+        assert isinstance(field_info, TypeInfo)
+
         is_nullable = self.get_field_nullability(field, method)
         if isinstance(field, RelatedField):
             if method == 'values':
                 primary_key_field = self.django_context.get_primary_key_field(field.related_model)
-                return self.get_field_get_type(api, primary_key_field, method)
+                return self.get_field_get_type(api, primary_key_field, method=method)
 
             model_info = helpers.lookup_class_typeinfo(api, field.related_model)
+            assert isinstance(model_info, TypeInfo)
+
             return Instance(model_info, [])
         else:
             return helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
@@ -136,6 +147,8 @@ class DjangoLookupsContext:
                 if isinstance(current_field, RelatedField):
                     currently_observed_model = current_field.related_model
 
+        # if it is None, solve_lookup_type() will fail earlier
+        assert current_field is not None
         return current_field
 
 
@@ -146,12 +159,9 @@ class DjangoContext:
 
         self.django_settings_module = django_settings_module
 
-        self.apps_registry: Optional[Dict[str, str]] = None
-        self.settings: LazySettings = None
-        if self.django_settings_module:
-            apps, settings = initialize_django(self.django_settings_module)
-            self.apps_registry = apps
-            self.settings = settings
+        apps, settings = initialize_django(self.django_settings_module)
+        self.apps_registry = apps
+        self.settings = settings
 
     @cached_property
     def model_modules(self) -> Dict[str, List[Type[Model]]]:
@@ -170,6 +180,7 @@ class DjangoContext:
         for model_cls in self.model_modules.get(module, []):
             if model_cls.__name__ == model_cls_name:
                 return model_cls
+        return None
 
     def get_model_fields(self, model_cls: Type[Model]) -> Iterator[Field]:
         for field in model_cls._meta.get_fields():
@@ -188,30 +199,33 @@ class DjangoContext:
                     return field
         raise ValueError('No primary key defined')
 
-    def get_expected_types(self, api: TypeChecker, model_cls: Type[Model], method: str) -> Dict[str, MypyType]:
+    def get_expected_types(self, api: TypeChecker, model_cls: Type[Model], *, method: str) -> Dict[str, MypyType]:
         from django.contrib.contenttypes.fields import GenericForeignKey
 
         expected_types = {}
         # add pk
         primary_key_field = self.get_primary_key_field(model_cls)
-        field_set_type = self.fields_context.get_field_set_type(api, primary_key_field, method)
+        field_set_type = self.fields_context.get_field_set_type(api, primary_key_field, method=method)
         expected_types['pk'] = field_set_type
 
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 field_name = field.attname
-                field_set_type = self.fields_context.get_field_set_type(api, field, method)
+                field_set_type = self.fields_context.get_field_set_type(api, field, method=method)
                 expected_types[field_name] = field_set_type
 
                 if isinstance(field, ForeignKey):
                     field_name = field.name
                     foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
+                    assert isinstance(foreign_key_info, TypeInfo)
 
                     related_model = field.related_model
                     if related_model._meta.proxy_for_model:
                         related_model = field.related_model._meta.proxy_for_model
 
                     related_model_info = helpers.lookup_class_typeinfo(api, related_model)
+                    assert isinstance(related_model_info, TypeInfo)
+
                     is_nullable = self.fields_context.get_field_nullability(field, method)
                     foreign_key_set_type = helpers.get_private_descriptor_type(foreign_key_info,
                                                                                '_pyi_private_set_type',

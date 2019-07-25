@@ -97,6 +97,11 @@
         pk_values = MyUser.objects.values_list('pk', named=True).get()
         reveal_type(pk_values)  # N: Revealed type is 'Tuple[builtins.int, fallback=main.Row2]'
         reveal_type(pk_values.pk)  # N: # N: Revealed type is 'builtins.int'
+
+        # values_list(named=True) inside function
+        def func() -> None:
+            from myapp.models import MyUser
+            reveal_type(MyUser.objects.values_list('name', named=True).get())  # N: Revealed type is 'Tuple[builtins.str, fallback=main.Row3]'
     installed_apps:
         - myapp
     files:

@@ -118,8 +118,8 @@ class AddManagers(ModelClassInitializer):
             manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
 
             if manager_name not in self.model_classdef.info.names:
-                manager = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-                self.add_new_node_to_model_class(manager_name, manager)
+                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+                self.add_new_node_to_model_class(manager_name, manager_type)
             else:
                 # create new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
                 has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)

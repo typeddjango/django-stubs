@@ -1,17 +1,13 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
-from mypy.nodes import (
-    GDEF, MDEF, Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable,
-    SymbolTableNode, TypeInfo, Var,
-)
-from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, NoneTyp, TupleType
-from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, UnionType
+from mypy.nodes import (Block, ClassDef, Expression, GDEF, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
+                        SymbolTable, SymbolTableNode, TypeInfo, Var)
+from mypy.plugin import AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext
+from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
@@ -119,9 +115,17 @@ def has_any_of_bases(info: TypeInfo, bases: Set[str]) -> bool:
 
 
 def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
-    node = type_info.get(private_field_name).node
+    """ Return declared type of type_info's private_field_name (used for private Field attributes)"""
+    sym = type_info.get(private_field_name)
+    if sym is None:
+        return AnyType(TypeOfAny.unannotated)
+
+    node = sym.node
     if isinstance(node, Var):
         descriptor_type = node.type
+        if descriptor_type is None:
+            return AnyType(TypeOfAny.unannotated)
+
         if is_nullable:
             descriptor_type = make_optional(descriptor_type)
         return descriptor_type
@@ -167,8 +171,18 @@ def add_new_class_for_module(module: MypyFile, name: str, bases: List[Instance],
     return new_typeinfo
 
 
+def get_current_module(api: TypeChecker) -> MypyFile:
+    current_module = None
+    for item in reversed(api.scope.stack):
+        if isinstance(item, MypyFile):
+            current_module = item
+            break
+    assert current_module is not None
+    return current_module
+
+
 def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: 'OrderedDict[str, MypyType]') -> TupleType:
-    current_module = api.scope.stack[0]
+    current_module = get_current_module(api)
     namedtuple_info = add_new_class_for_module(current_module, name,
                                                bases=[api.named_generic_type('typing.NamedTuple', [])],
                                                fields=fields)
@@ -225,3 +239,9 @@ def resolve_string_attribute_value(attr_expr: Expression, ctx: Union[FunctionCon
 
     ctx.api.fail(f'Expression of type {type(attr_expr).__name__!r} is not supported', ctx.context)
     return None
+
+
+def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionContext]) -> TypeChecker:
+    if not isinstance(ctx.api, TypeChecker):
+        raise ValueError('Not a TypeChecker')
+    return cast(TypeChecker, ctx.api)

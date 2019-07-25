@@ -2,10 +2,10 @@ from typing import List, Tuple, Type, Union
 
 from django.db.models.base import Model
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import Instance
-from mypy.types import Type as MypyType
+from mypy.types import Instance, Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.lib import helpers
 
 
 def get_actual_types(ctx: Union[MethodContext, FunctionContext],
@@ -31,7 +31,8 @@ def get_actual_types(ctx: Union[MethodContext, FunctionContext],
 
 def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext,
                            model_cls: Type[Model], method: str) -> MypyType:
-    expected_types = django_context.get_expected_types(ctx.api, model_cls, method)
+    typechecker_api = helpers.get_typechecker_api(ctx)
+    expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
     expected_keys = [key for key in expected_types.keys() if key != 'pk']
 
     for actual_name, actual_type in get_actual_types(ctx, expected_keys):
@@ -40,11 +41,11 @@ def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_co
                                                                            model_cls.__name__),
                          ctx.context)
             continue
-        ctx.api.check_subtype(actual_type, expected_types[actual_name],
-                              ctx.context,
-                              'Incompatible type for "{}" of "{}"'.format(actual_name,
-                                                                          model_cls.__name__),
-                              'got', 'expected')
+        typechecker_api.check_subtype(actual_type, expected_types[actual_name],
+                                      ctx.context,
+                                      'Incompatible type for "{}" of "{}"'.format(actual_name,
+                                                                                  model_cls.__name__),
+                                      'got', 'expected')
 
     return ctx.default_return_type
 

@@ -54,7 +54,7 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
         errors.raise_error()
 
     parser = configparser.ConfigParser()
-    parser.read(config_file_path)
+    parser.read(config_file_path)  # type: ignore
 
     if not parser.has_section('mypy.plugins.django-stubs'):
         errors.report(0, None, "'django_settings_module' is not set: no section [mypy.plugins.django-stubs]",
@@ -174,6 +174,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
             if info.has_base(fullnames.MODEL_CLASS_FULLNAME):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+        return None
 
     def get_method_hook(self, fullname: str
                         ) -> Optional[Callable[[MethodContext], MypyType]]:
@@ -206,6 +207,7 @@ class NewSemanalDjangoPlugin(Plugin):
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+        return None
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
@@ -217,6 +219,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if fullname in self._get_current_form_bases():
             return transform_form_class
+        return None
 
     def get_attribute_hook(self, fullname: str
                            ) -> Optional[Callable[[AttributeContext], MypyType]]:
@@ -228,12 +231,7 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(class_name)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
-
-    # def get_type_analyze_hook(self, fullname: str
-    #                 (          ):
-    #     info = self._get_typeinfo_or_none(fullname)
-    #     if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-    #         return partial(querysets.set_first_generic_param_as_default_for_second, fullname=fullname)
+        return None
 
 
 def plugin(version):
