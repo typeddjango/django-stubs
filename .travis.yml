@@ -18,6 +18,10 @@ jobs:
       python: 3.6
       script: 'python ./scripts/typecheck_tests.py'
 
+    - name: Mypy for plugin code
+      python: 3.7
+      script: 'mypy ./mypy_django_plugin'
+
     - name: Lint with black
       python: 3.7
       script: 'black --check --line-length=120 django-stubs/'
