@@ -10,15 +10,17 @@ jobs:
         set -e
         pytest
 
-    - name: Run plugin test suite with python 3.6
-      python: 3.6
-      script: |
-        set -e
-        pytest
-
-    - name: Typecheck Django test suite
+    - name: Typecheck Django test suite with python 3.7
       python: 3.7
       script: 'python ./scripts/typecheck_tests.py'
+
+    - name: Typecheck Django test suite with python 3.6
+      python: 3.6
+      script: 'python ./scripts/typecheck_tests.py'
+
+    - name: Mypy for plugin code
+      python: 3.7
+      script: 'mypy ./mypy_django_plugin'
 
     - name: Lint with black
       python: 3.7
@@ -37,12 +39,3 @@ before_install: |
   pip install -U pip setuptools wheel
 install: |
   pip install -r ./dev-requirements.txt
-  pip install -r ./scripts/typecheck-tests-requirements.txt
-
-#deploy:
-#  provider: pypi
-#  user: "mkurnikov"
-#  password:
-#    secure: 0E+hkaIdtpEtyL1KZeglunZ5/PKjouFfa8ljakAwoig7VNUL+2sO/bTyg38wRQl0NvzDzEHSMEt1bzg4Tq7b7Zp6nLuewG/w7mGLzqaOlTySiPEfRsg8s6uO2KrTn7g9VhlXH6UtyTXoQdMt6aE8+bt/GmEesanS57NB2mhwmylFgQwlJFu4LfIv/+aGmc4eLeGI2Qhvs9QYf7qvYlLQldgFh8mAckQEEvaBg35sf+puypZgf4nkx1k/dfG9wnFWZU8PJ41LbMw/Wj+k/9NpF8ePwiAr0fvRMErZd8nvoiWjQQjhzgrLVHhXEP5pTHh3zjDuGFMWyKuBhC6WLsG4qOQz/HvxeYvNI+jaTp15BgxtefG/pCNDUl/8GlCde7xVt7xzEcYNJSRaZPY2oofEFSd9qDnr4kqmyCXpNsaHRHvkL61bFjXUcfOsMMYvQCC6N2Jjb7S97RbnDdkOZO/lnFhVANT2rigsaXlSlWyN6f7ApxDNvu6Ehu5yrx6IjlPZJ0sI9vvY3IoS6Fik7w9E6zjNVjbmUn1D4MKFP4v5ppNASOqYcZeLd42j8rjEp0gIc3ccz9aUIT9q8VqSXSdUbqA6SVwvHXIVPxJMXj0bqWBG1iKs0cPBuzRVpRrwkENWCSWElDAewM1qFEnK0LppyoYFbqoQ8F5FG0+re7QttKQ=
-#  on:
-#    tags: true

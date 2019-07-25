@@ -1,0 +1,38 @@
+-   case: get_object_or_404_returns_proper_types
+    main: |
+        from django.shortcuts import get_object_or_404, get_list_or_404
+        from myapp.models import MyModel
+
+        reveal_type(get_object_or_404(MyModel))  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is 'myapp.models.MyModel*'
+
+        reveal_type(get_list_or_404(MyModel))  # N: Revealed type is 'builtins.list[myapp.models.MyModel*]'
+        reveal_type(get_list_or_404(MyModel.objects))  # N: Revealed type is 'builtins.list[myapp.models.MyModel*]'
+        reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is 'builtins.list[myapp.models.MyModel*]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    pass
+
+-   case: get_user_model_returns_proper_class
+    disable_cache: true
+    main: |
+        from django.contrib.auth import get_user_model
+        UserModel = get_user_model()
+        reveal_type(UserModel.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
+        AUTH_USER_MODEL = 'myapp.MyUser'
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass

@@ -5,7 +5,7 @@ out/
 /django
 .idea/
 .mypy_cache/
-django-sources
 build/
 dist/
 pip-wheel-metadata/
+.pytest_cache/

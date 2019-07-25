@@ -1,188 +1,127 @@
-from typing import Optional, cast
+from typing import Optional, Tuple, cast
 
-from mypy.checker import TypeChecker
-from mypy.nodes import ListExpr, NameExpr, StrExpr, TupleExpr, TypeInfo
+from django.db.models.fields import Field
+from django.db.models.fields.related import RelatedField
+from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import (
-    AnyType, CallableType, Instance, TupleType, Type, UnionType,
-)
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.lib import fullnames, helpers
 
 
-def extract_referred_to_type(ctx: FunctionContext) -> Optional[Instance]:
-    api = cast(TypeChecker, ctx.api)
-    if 'to' not in ctx.callee_arg_names:
-        api.msg.fail(f'to= parameter must be set for {ctx.context.callee.fullname}',
-                     context=ctx.context)
+def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Field]:
+    outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
+    if (outer_model_info is None
+            or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)):
         return None
 
-    arg_type = ctx.arg_types[ctx.callee_arg_names.index('to')][0]
-    if not isinstance(arg_type, CallableType):
-        to_arg_expr = ctx.args[ctx.callee_arg_names.index('to')][0]
-        if not isinstance(to_arg_expr, StrExpr):
-            # not string, not supported
-            return None
-        try:
-            model_fullname = helpers.get_model_fullname_from_string(to_arg_expr.value,
-                                                                    all_modules=api.modules)
-        except helpers.SelfReference:
-            model_fullname = api.tscope.classes[-1].fullname()
-
-        except helpers.SameFileModel as exc:
-            model_fullname = api.tscope.classes[-1].module_name + '.' + exc.model_cls_name
-
-        if model_fullname is None:
-            return None
-        model_info = helpers.lookup_fully_qualified_generic(model_fullname,
-                                                            all_modules=api.modules)
-        if model_info is None or not isinstance(model_info, TypeInfo):
-            return None
-        return Instance(model_info, [])
-
-    referred_to_type = arg_type.ret_type
-    if not isinstance(referred_to_type, Instance):
-        return None
-    if not referred_to_type.type.has_base(helpers.MODEL_CLASS_FULLNAME):
-        ctx.api.msg.fail(f'to= parameter value must be '
-                         f'a subclass of {helpers.MODEL_CLASS_FULLNAME}',
-                         context=ctx.context)
+    field_name = None
+    for stmt in outer_model_info.defn.defs.body:
+        if isinstance(stmt, AssignmentStmt):
+            if stmt.rvalue == ctx.context:
+                if not isinstance(stmt.lvalues[0], NameExpr):
+                    return None
+                field_name = stmt.lvalues[0].name
+                break
+    if field_name is None:
         return None
 
-    return referred_to_type
+    model_cls = django_context.get_model_class_by_fullname(outer_model_info.fullname())
+    if model_cls is None:
+        return None
+
+    current_field = model_cls._meta.get_field(field_name)
+    return current_field
 
 
-def convert_any_to_type(typ: Type, referred_to_type: Type) -> Type:
-    if isinstance(typ, UnionType):
-        converted_items = []
-        for item in typ.items:
-            converted_items.append(convert_any_to_type(item, referred_to_type))
-        return UnionType.make_union(converted_items,
-                                    line=typ.line, column=typ.column)
-    if isinstance(typ, Instance):
-        args = []
-        for default_arg in typ.args:
-            if isinstance(default_arg, AnyType):
-                args.append(referred_to_type)
-            else:
-                args.append(default_arg)
-        return helpers.reparametrize_instance(typ, args)
+def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    current_field = _get_current_field_from_assignment(ctx, django_context)
+    if current_field is None:
+        return AnyType(TypeOfAny.from_error)
 
-    if isinstance(typ, AnyType):
-        return referred_to_type
+    assert isinstance(current_field, RelatedField)
 
-    return typ
+    related_model = related_model_to_set = current_field.related_model
+    if related_model_to_set._meta.proxy_for_model:
+        related_model_to_set = related_model._meta.proxy_for_model
 
+    typechecker_api = helpers.get_typechecker_api(ctx)
 
-def fill_descriptor_types_for_related_field(ctx: FunctionContext) -> Type:
-    default_return_type = set_descriptor_types_for_field(ctx)
-    referred_to_type = extract_referred_to_type(ctx)
-    if referred_to_type is None:
-        return default_return_type
+    related_model_info = helpers.lookup_class_typeinfo(typechecker_api, related_model)
+    if related_model_info is None:
+        # maybe no type stub
+        related_model_type = AnyType(TypeOfAny.unannotated)
+    else:
+        related_model_type = Instance(related_model_info, [])  # type: ignore
 
+    related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
+    if related_model_to_set_info is None:
+        # maybe no type stub
+        related_model_to_set_type = AnyType(TypeOfAny.unannotated)
+    else:
+        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
+
+    default_related_field_type = set_descriptor_types_for_field(ctx)
     # replace Any with referred_to_type
-    args = []
-    for default_arg in default_return_type.args:
-        args.append(convert_any_to_type(default_arg, referred_to_type))
+    args = [
+        helpers.convert_any_to_type(default_related_field_type.args[0], related_model_to_set_type),
+        helpers.convert_any_to_type(default_related_field_type.args[1], related_model_type),
+    ]
+    return helpers.reparametrize_instance(default_related_field_type, new_args=args)
 
-    return helpers.reparametrize_instance(ctx.default_return_type, new_args=args)
+
+def get_field_descriptor_types(field_info: TypeInfo, is_nullable: bool) -> Tuple[MypyType, MypyType]:
+    set_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_set_type',
+                                                   is_nullable=is_nullable)
+    get_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
+                                                   is_nullable=is_nullable)
+    return set_type, get_type
 
 
 def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
-    is_nullable = helpers.parse_bool(helpers.get_argument_by_name(ctx, 'null'))
-    set_type = helpers.get_private_descriptor_type(default_return_type.type, '_pyi_private_set_type',
-                                                   is_nullable=is_nullable)
-    get_type = helpers.get_private_descriptor_type(default_return_type.type, '_pyi_private_get_type',
-                                                   is_nullable=is_nullable)
+
+    is_nullable = False
+    null_expr = helpers.get_call_argument_by_name(ctx, 'null')
+    if null_expr is not None:
+        is_nullable = helpers.parse_bool(null_expr) or False
+
+    set_type, get_type = get_field_descriptor_types(default_return_type.type, is_nullable)
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
 
-def determine_type_of_array_field(ctx: FunctionContext) -> Type:
+def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = set_descriptor_types_for_field(ctx)
 
-    base_field_arg_type = helpers.get_argument_type_by_name(ctx, 'base_field')
+    base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, 'base_field')
     if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
         return default_return_type
 
     base_type = base_field_arg_type.args[1]  # extract __get__ type
     args = []
     for default_arg in default_return_type.args:
-        args.append(convert_any_to_type(default_arg, base_type))
+        args.append(helpers.convert_any_to_type(default_arg, base_type))
 
     return helpers.reparametrize_instance(default_return_type, args)
 
 
-def transform_into_proper_return_type(ctx: FunctionContext) -> Type:
+def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = ctx.default_return_type
-    if not isinstance(default_return_type, Instance):
-        return default_return_type
+    assert isinstance(default_return_type, Instance)
 
-    if helpers.has_any_of_bases(default_return_type.type, (helpers.FOREIGN_KEY_FULLNAME,
-                                                           helpers.ONETOONE_FIELD_FULLNAME,
-                                                           helpers.MANYTOMANY_FIELD_FULLNAME)):
-        return fill_descriptor_types_for_related_field(ctx)
+    outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
+    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+        # not inside models.Model class
+        return ctx.default_return_type
+    assert isinstance(outer_model_info, TypeInfo)
 
-    if default_return_type.type.has_base(helpers.ARRAY_FIELD_FULLNAME):
-        return determine_type_of_array_field(ctx)
+    if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
+        return fill_descriptor_types_for_related_field(ctx, django_context)
+
+    if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
+        return determine_type_of_array_field(ctx, django_context)
 
     return set_descriptor_types_for_field(ctx)
-
-
-def adjust_return_type_of_field_instantiation(ctx: FunctionContext) -> Type:
-    record_field_properties_into_outer_model_class(ctx)
-    return transform_into_proper_return_type(ctx)
-
-
-def record_field_properties_into_outer_model_class(ctx: FunctionContext) -> None:
-    api = cast(TypeChecker, ctx.api)
-    outer_model = api.scope.active_class()
-    if outer_model is None or not outer_model.has_base(helpers.MODEL_CLASS_FULLNAME):
-        # outside models.Model class, undetermined
-        return
-
-    field_name = None
-    for name_expr, stmt in helpers.iter_over_assignments(outer_model.defn):
-        if stmt == ctx.context and isinstance(name_expr, NameExpr):
-            field_name = name_expr.name
-            break
-    if field_name is None:
-        return
-
-    fields_metadata = helpers.get_fields_metadata(outer_model)
-
-    # primary key
-    is_primary_key = False
-    primary_key_arg = helpers.get_argument_by_name(ctx, 'primary_key')
-    if primary_key_arg:
-        is_primary_key = helpers.parse_bool(primary_key_arg)
-    fields_metadata[field_name] = {'primary_key': is_primary_key}
-
-    # choices
-    choices_arg = helpers.get_argument_by_name(ctx, 'choices')
-    if choices_arg and isinstance(choices_arg, (TupleExpr, ListExpr)):
-        # iterable of 2 element tuples of two kinds
-        _, analyzed_choices = api.analyze_iterable_item_type(choices_arg)
-        if isinstance(analyzed_choices, TupleType):
-            first_element_type = analyzed_choices.items[0]
-            if isinstance(first_element_type, Instance):
-                fields_metadata[field_name]['choices'] = first_element_type.type.fullname()
-
-    # nullability
-    null_arg = helpers.get_argument_by_name(ctx, 'null')
-    is_nullable = False
-    if null_arg:
-        is_nullable = helpers.parse_bool(null_arg)
-    fields_metadata[field_name]['null'] = is_nullable
-
-    # is_blankable
-    blank_arg = helpers.get_argument_by_name(ctx, 'blank')
-    is_blankable = False
-    if blank_arg:
-        is_blankable = helpers.parse_bool(blank_arg)
-    fields_metadata[field_name]['blank'] = is_blankable
-
-    # default
-    default_arg = helpers.get_argument_by_name(ctx, 'default')
-    if default_arg and not helpers.is_none_expr(default_arg):
-        fields_metadata[field_name]['default_specified'] = True

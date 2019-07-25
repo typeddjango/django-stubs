@@ -1,11 +1,11 @@
 import os
-import sys
 from distutils.core import setup
+from typing import List
 
 from setuptools import find_packages
 
 
-def find_stub_files(name):
+def find_stub_files(name: str) -> List[str]:
     result = []
     for root, dirs, files in os.walk(name):
         for file in files:
@@ -21,27 +21,27 @@ with open('README.md', 'r') as f:
     readme = f.read()
 
 dependencies = [
-    'mypy>=0.710,<0.720',
-    'typing-extensions'
+    'mypy>=0.720,<0.730',
+    'typing-extensions',
+    'django',
+    # depends on psycopg2 because of Postgres' ArrayField support
+    'psycopg2'
 ]
-if sys.version_info[:2] < (3, 7):
-    # dataclasses port for 3.6
-    dependencies += ['dataclasses']
 
 setup(
     name="django-stubs",
-    version="0.13.0",
-    description='Django mypy stubs',
+    version="1.0.0",
+    description='Mypy stubs for Django',
     long_description=readme,
     long_description_content_type='text/markdown',
     license='MIT',
-    url="https://github.com/mkurnikov/django-stubs",
+    url="https://github.com/typeddjango/django-stubs",
     author="Maksim Kurnikov",
     author_email="maxim.kurnikov@gmail.com",
     py_modules=[],
     python_requires='>=3.6',
     install_requires=dependencies,
-    packages=['django-stubs', *find_packages()],
+    packages=['django-stubs', *find_packages(exclude=['scripts'])],
     package_data={'django-stubs': find_stub_files('django-stubs')},
     classifiers=[
         'Development Status :: 3 - Alpha',

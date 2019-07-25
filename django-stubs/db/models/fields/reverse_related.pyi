@@ -10,13 +10,10 @@ from django.db.models.sql.where import WhereNode
 from .mixins import FieldCacheMixin
 
 class ForeignObjectRel(FieldCacheMixin):
-    hidden: bool
     many_to_many: bool
     many_to_one: bool
-    name: str
     one_to_many: bool
     one_to_one: bool
-    related_model: Type[Model]
     auto_created: bool = ...
     concrete: bool = ...
     editable: bool = ...
@@ -43,6 +40,12 @@ class ForeignObjectRel(FieldCacheMixin):
         on_delete: Optional[Callable] = ...,
     ) -> None: ...
     @property
+    def hidden(self) -> bool: ...
+    @property
+    def name(self) -> str: ...
+    @property
+    def related_model(self) -> Type[Model]: ...
+    @property
     def remote_field(self) -> RelatedField: ...
     @property
     def target_field(self) -> AutoField: ...
@@ -63,22 +66,6 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_path_info(self, filtered_relation: Optional[FilteredRelation] = ...) -> List[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
-    field: RelatedField
-    hidden: bool
-    limit_choices_to: Any
-    many_to_many: bool
-    many_to_one: bool
-    model: Union[Type[Model], str]
-    multiple: bool
-    name: str
-    on_delete: Callable
-    one_to_many: bool
-    one_to_one: bool
-    parent_link: bool
-    related_model: Type[Model]
-    related_name: Optional[str]
-    related_query_name: Optional[str]
-    symmetrical: bool
     def __init__(
         self,
         field: ForeignKey,
@@ -91,25 +78,8 @@ class ManyToOneRel(ForeignObjectRel):
         on_delete: Callable = ...,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
-    def set_field_name(self) -> None: ...
 
 class OneToOneRel(ManyToOneRel):
-    field_name: Optional[str]
-    hidden: bool
-    limit_choices_to: Dict[str, str]
-    many_to_many: bool
-    many_to_one: bool
-    model: Union[Type[Model], str]
-    name: str
-    on_delete: Callable
-    one_to_many: bool
-    one_to_one: bool
-    parent_link: bool
-    related_model: Type[Model]
-    related_name: Optional[str]
-    related_query_name: Optional[str]
-    symmetrical: bool
-    multiple: bool = ...
     def __init__(
         self,
         field: OneToOneField,
@@ -123,14 +93,8 @@ class OneToOneRel(ManyToOneRel):
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
-    field_name: None
-    multiple: bool
-    name: str
-    parent_link: bool
-    related_model: Type[Model]
     through: Optional[Union[Type[Model], str]] = ...
     through_fields: Optional[Tuple[str, str]] = ...
-    symmetrical: bool = ...
     db_constraint: bool = ...
     def __init__(
         self,

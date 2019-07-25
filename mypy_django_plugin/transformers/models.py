@@ -1,74 +1,81 @@
-from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, Iterator, List, Optional, Tuple, cast
+from collections import OrderedDict
+from typing import Type, cast
 
-import dataclasses
+from django.db.models.base import Model
+from django.db.models.fields import DateField, DateTimeField
+from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.reverse_related import (
+    ManyToManyRel, ManyToOneRel, OneToOneRel,
+)
+from mypy.newsemanal.semanal import NewSemanticAnalyzer
 from mypy.nodes import (
-    ARG_POS, ARG_STAR, ARG_STAR2, MDEF, Argument, CallExpr, ClassDef, Expression, IndexExpr, MemberExpr, MypyFile,
-    NameExpr, StrExpr, SymbolTableNode, TypeInfo, Var,
+    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import ClassDefContext
-from mypy.plugins.common import add_method
-from mypy.semanal import SemanticAnalyzerPass2
-from mypy.types import AnyType, Instance, NoneTyp, TypeOfAny
+from mypy.plugins import common
+from mypy.types import AnyType, Instance, TypeOfAny
 
-from mypy_django_plugin import helpers
+from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.transformers import fields
+from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
 
-@dataclasses.dataclass
-class ModelClassInitializer(metaclass=ABCMeta):
-    api: SemanticAnalyzerPass2
-    model_classdef: ClassDef
+class ModelClassInitializer:
+    def __init__(self, ctx: ClassDefContext, django_context: DjangoContext):
+        self.api = cast(NewSemanticAnalyzer, ctx.api)
+        self.model_classdef = ctx.cls
+        self.django_context = django_context
+        self.ctx = ctx
 
-    @classmethod
-    def from_ctx(cls, ctx: ClassDefContext):
-        return cls(api=cast(SemanticAnalyzerPass2, ctx.api), model_classdef=ctx.cls)
+    def lookup_typeinfo_or_incomplete_defn_error(self, fullname: str) -> TypeInfo:
+        sym = self.api.lookup_fully_qualified_or_none(fullname)
+        if sym is None or not isinstance(sym.node, TypeInfo):
+            raise helpers.IncompleteDefnException(f'No {fullname!r} found')
+        return sym.node
 
-    def get_meta_attribute(self, name: str) -> Optional[Expression]:
-        meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
-        if meta_node is None:
-            return None
+    def lookup_class_typeinfo_or_incomplete_defn_error(self, klass: type) -> TypeInfo:
+        fullname = helpers.get_class_fullname(klass)
+        field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
+        return field_info
 
-        return helpers.get_assigned_value_for_class(meta_node, name)
-
-    def is_abstract_model(self) -> bool:
-        is_abstract_expr = self.get_meta_attribute('abstract')
-        if is_abstract_expr is None:
-            return False
-        return self.api.parse_bool(is_abstract_expr)
-
-    def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+    def create_new_var(self, name: str, typ: Instance) -> Var:
         # type=: type of the variable itself
         var = Var(name=name, type=typ)
         # var.info: type of the object variable is bound to
         var.info = self.model_classdef.info
         var._fullname = self.model_classdef.info.fullname() + '.' + name
-        var.is_inferred = True
         var.is_initialized_in_class = True
+        var.is_inferred = True
+        return var
+
+    def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+        var = self.create_new_var(name, typ)
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
-    @abstractmethod
     def run(self) -> None:
-        raise NotImplementedError()
+        model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
+        if model_cls is None:
+            return
+        self.run_with_model_cls(model_cls)
 
-
-def iter_over_one_to_n_related_fields(klass: ClassDef) -> Iterator[Tuple[NameExpr, CallExpr]]:
-    for lvalue, rvalue in helpers.iter_call_assignments(klass):
-        if (isinstance(lvalue, NameExpr)
-                and isinstance(rvalue.callee, MemberExpr)):
-            if rvalue.callee.fullname in {helpers.FOREIGN_KEY_FULLNAME,
-                                          helpers.ONETOONE_FIELD_FULLNAME}:
-                yield lvalue, rvalue
-
-
-class SetIdAttrsForRelatedFields(ModelClassInitializer):
-    def run(self) -> None:
-        for lvalue, rvalue in iter_over_one_to_n_related_fields(self.model_classdef):
-            node_name = lvalue.name + '_id'
-            self.add_new_node_to_model_class(name=node_name,
-                                             typ=self.api.builtin_type('builtins.int'))
+    def run_with_model_cls(self, model_cls):
+        pass
 
 
 class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
+    """
+    Replaces
+        class MyModel(models.Model):
+            class Meta:
+                pass
+    with
+        class MyModel(models.Model):
+            class Meta(Any):
+                pass
+    to get around incompatible Meta inner classes for different models.
+    """
+
     def run(self) -> None:
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
@@ -76,228 +83,147 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         meta_node.fallback_to_any = True
 
 
-class AddDefaultObjectsManager(ModelClassInitializer):
-    def add_new_manager(self, name: str, manager_type: Optional[Instance]) -> None:
-        if manager_type is None:
-            return None
-        self.add_new_node_to_model_class(name, manager_type)
+class AddDefaultPrimaryKey(ModelClassInitializer):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        auto_field = model_cls._meta.auto_field
+        if auto_field and not self.model_classdef.info.has_readable_member(auto_field.attname):
+            # autogenerated field
+            auto_field_fullname = helpers.get_class_fullname(auto_field.__class__)
+            auto_field_info = self.lookup_typeinfo_or_incomplete_defn_error(auto_field_fullname)
 
-    def add_private_default_manager(self, manager_type: Optional[Instance]) -> None:
-        if manager_type is None:
-            return None
-        self.add_new_node_to_model_class('_default_manager', manager_type)
-
-    def get_existing_managers(self) -> List[Tuple[str, TypeInfo]]:
-        managers = []
-        for base in self.model_classdef.info.mro:
-            for name_expr, member_expr in helpers.iter_call_assignments(base.defn):
-                manager_name = name_expr.name
-                callee_expr = member_expr.callee
-                if isinstance(callee_expr, IndexExpr):
-                    callee_expr = callee_expr.analyzed.expr
-                if isinstance(callee_expr, (MemberExpr, NameExpr)) \
-                        and isinstance(callee_expr.node, TypeInfo) \
-                        and callee_expr.node.has_base(helpers.BASE_MANAGER_CLASS_FULLNAME):
-                    managers.append((manager_name, callee_expr.node))
-        return managers
-
-    def run(self) -> None:
-        existing_managers = self.get_existing_managers()
-        if existing_managers:
-            first_manager_type = None
-            for manager_name, manager_type_info in existing_managers:
-                manager_type = Instance(manager_type_info, args=[Instance(self.model_classdef.info, [])])
-                self.add_new_manager(name=manager_name, manager_type=manager_type)
-                if first_manager_type is None:
-                    first_manager_type = manager_type
-        else:
-            if self.is_abstract_model():
-                # abstract models do not need 'objects' queryset
-                return None
-
-            first_manager_type = self.api.named_type_or_none(helpers.MANAGER_CLASS_FULLNAME,
-                                                             args=[Instance(self.model_classdef.info, [])])
-            self.add_new_manager('objects', manager_type=first_manager_type)
-
-        if self.is_abstract_model():
-            return None
-        default_manager_name_expr = self.get_meta_attribute('default_manager_name')
-        if isinstance(default_manager_name_expr, StrExpr):
-            self.add_private_default_manager(self.model_classdef.info.get(default_manager_name_expr.value).type)
-        else:
-            self.add_private_default_manager(first_manager_type)
+            set_type, get_type = fields.get_field_descriptor_types(auto_field_info, is_nullable=False)
+            self.add_new_node_to_model_class(auto_field.attname, Instance(auto_field_info,
+                                                                          [set_type, get_type]))
 
 
-class AddIdAttributeIfPrimaryKeyTrueIsNotSet(ModelClassInitializer):
-    def run(self) -> None:
-        if self.is_abstract_model():
-            # no need for .id attr
-            return None
-
-        for _, rvalue in helpers.iter_call_assignments(self.model_classdef):
-            if ('primary_key' in rvalue.arg_names
-                    and self.api.parse_bool(rvalue.args[rvalue.arg_names.index('primary_key')])):
-                break
-        else:
-            self.add_new_node_to_model_class('id', self.api.builtin_type('builtins.object'))
+class AddRelatedModelsId(ModelClassInitializer):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, ForeignKey):
+                rel_primary_key_field = self.django_context.get_primary_key_field(field.related_model)
+                field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+                is_nullable = self.django_context.fields_context.get_field_nullability(field, None)
+                set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
+                self.add_new_node_to_model_class(field.attname,
+                                                 Instance(field_info, [set_type, get_type]))
 
 
-class AddRelatedManagers(ModelClassInitializer):
-    def add_related_manager_variable(self, manager_name: str, related_field_type_data: Dict[str, Any]) -> None:
-        # add dummy related manager for use later
-        self.add_new_node_to_model_class(manager_name, self.api.builtin_type('builtins.object'))
+class AddManagers(ModelClassInitializer):
+    def _is_manager_any(self, typ: Instance) -> bool:
+        return typ.type.fullname() == fullnames.MANAGER_CLASS_FULLNAME and type(typ.args[0]) == AnyType
 
-        # save name in metadata for use in get_attribute_hook later
-        related_managers_metadata = helpers.get_related_managers_metadata(self.model_classdef.info)
-        related_managers_metadata[manager_name] = related_field_type_data
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        for manager_name, manager in model_cls._meta.managers_map.items():
+            manager_fullname = helpers.get_class_fullname(manager.__class__)
+            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
 
-    def run(self) -> None:
-        for module_name, module_file in self.api.modules.items():
-            for model_defn in helpers.iter_over_classdefs(module_file):
-                for lvalue, rvalue in helpers.iter_call_assignments(model_defn):
-                    if is_related_field(rvalue, module_file):
-                        try:
-                            referenced_model_fullname = extract_ref_to_fullname(rvalue,
-                                                                                module_file=module_file,
-                                                                                all_modules=self.api.modules)
-                        except helpers.SelfReference:
-                            referenced_model_fullname = model_defn.fullname
+            if manager_name not in self.model_classdef.info.names:
+                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+                self.add_new_node_to_model_class(manager_name, manager_type)
+            else:
+                # create new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
+                has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)
+                if has_manager_any_base:
+                    custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
+                    bases = []
+                    for original_base in manager_info.bases:
+                        if self._is_manager_any(original_base):
+                            if original_base.type is None:
+                                if not self.api.final_iteration:
+                                    self.api.defer()
+                            original_base = helpers.reparametrize_instance(original_base,
+                                                                           [Instance(self.model_classdef.info, [])])
+                        bases.append(original_base)
+                    current_module = self.api.modules[self.model_classdef.info.module_name]
+                    custom_manager_info = helpers.add_new_class_for_module(current_module,
+                                                                           custom_model_manager_name,
+                                                                           bases=bases,
+                                                                           fields=OrderedDict())
+                    custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
+                    self.add_new_node_to_model_class(manager_name, custom_manager_type)
 
-                        except helpers.SameFileModel as exc:
-                            referenced_model_fullname = module_name + '.' + exc.model_cls_name
+        # add _default_manager
+        if '_default_manager' not in self.model_classdef.info.names:
+            default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
+            default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
+            default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+            self.add_new_node_to_model_class('_default_manager', default_manager)
 
-                        if self.model_classdef.fullname == referenced_model_fullname:
-                            related_name = model_defn.name.lower() + '_set'
-                            if 'related_name' in rvalue.arg_names:
-                                related_name_expr = rvalue.args[rvalue.arg_names.index('related_name')]
-                                if not isinstance(related_name_expr, StrExpr):
-                                    continue
-                                related_name = related_name_expr.value
-                                if related_name == '+':
-                                    # No backwards relation is desired
-                                    continue
+        # add related managers
+        for relation in self.django_context.get_model_relations(model_cls):
+            attname = relation.get_accessor_name()
+            if attname is None:
+                # no reverse accessor
+                continue
 
-                            if 'related_query_name' in rvalue.arg_names:
-                                related_query_name_expr = rvalue.args[rvalue.arg_names.index('related_query_name')]
-                                if not isinstance(related_query_name_expr, StrExpr):
-                                    related_query_name = None
-                                else:
-                                    related_query_name = related_query_name_expr.value
-                                # TODO: Handle defaulting to model name if related_name is not set
-                            else:
-                                # No related_query_name specified, default to related_name
-                                related_query_name = related_name
+            related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(relation.related_model)
 
-                            # field_type_data = get_related_field_type(rvalue, self.api, defn.info)
-                            # if typ is None:
-                            #     continue
+            if isinstance(relation, OneToOneRel):
+                self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
+                continue
 
-                            # TODO: recursively serialize types, or just https://github.com/python/mypy/issues/6506
-                            # as long as Model is not a Generic, one level depth is fine
-                            if rvalue.callee.name in {'ForeignKey', 'ManyToManyField'}:
-                                field_type_data = {
-                                    'manager': helpers.RELATED_MANAGER_CLASS_FULLNAME,
-                                    'of': [model_defn.info.fullname()]
-                                }
-                                # return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
-                                #                               args=[Instance(related_model_typ, [])])
-                            else:
-                                field_type_data = {
-                                    'manager': model_defn.info.fullname(),
-                                    'of': []
-                                }
-
-                            self.add_related_manager_variable(related_name, related_field_type_data=field_type_data)
-
-                            if related_query_name is not None:
-                                # Only create related_query_name if it is a string literal
-                                helpers.get_lookups_metadata(self.model_classdef.info)[related_query_name] = {
-                                    'related_query_name_target': related_name
-                                }
+            if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS_FULLNAME)
+                self.add_new_node_to_model_class(attname,
+                                                 Instance(manager_info, [Instance(related_model_info, [])]))
+                continue
 
 
-def get_related_field_type(rvalue: CallExpr, related_model_typ: TypeInfo) -> Dict[str, Any]:
-    if rvalue.callee.name in {'ForeignKey', 'ManyToManyField'}:
-        return {
-            'manager': helpers.RELATED_MANAGER_CLASS_FULLNAME,
-            'of': [related_model_typ.fullname()]
-        }
-        # return api.named_type_or_none(helpers.RELATED_MANAGER_CLASS_FULLNAME,
-        #                               args=[Instance(related_model_typ, [])])
-    else:
-        return {
-            'manager': related_model_typ.fullname(),
-            'of': []
-        }
-        # return Instance(related_model_typ, [])
+class AddExtraFieldMethods(ModelClassInitializer):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        # get_FOO_display for choices
+        for field in self.django_context.get_model_fields(model_cls):
+            if field.choices:
+                info = self.lookup_typeinfo_or_incomplete_defn_error('builtins.str')
+                return_type = Instance(info, [])
+                common.add_method(self.ctx,
+                                  name='get_{}_display'.format(field.attname),
+                                  args=[],
+                                  return_type=return_type)
+
+        # get_next_by, get_previous_by for Date, DateTime
+        for field in self.django_context.get_model_fields(model_cls):
+            if isinstance(field, (DateField, DateTimeField)) and not field.null:
+                return_type = Instance(self.model_classdef.info, [])
+                common.add_method(self.ctx,
+                                  name='get_next_by_{}'.format(field.attname),
+                                  args=[Argument(Var('kwargs', AnyType(TypeOfAny.explicit)),
+                                                 AnyType(TypeOfAny.explicit),
+                                                 initializer=None,
+                                                 kind=ARG_STAR2)],
+                                  return_type=return_type)
+                common.add_method(self.ctx,
+                                  name='get_previous_by_{}'.format(field.attname),
+                                  args=[Argument(Var('kwargs', AnyType(TypeOfAny.explicit)),
+                                                 AnyType(TypeOfAny.explicit),
+                                                 initializer=None,
+                                                 kind=ARG_STAR2)],
+                                  return_type=return_type)
 
 
-def is_related_field(expr: CallExpr, module_file: MypyFile) -> bool:
-    if isinstance(expr.callee, MemberExpr) and isinstance(expr.callee.expr, NameExpr):
-        module = module_file.names.get(expr.callee.expr.name)
-        if module \
-                and module.fullname == 'django.db.models' \
-                and expr.callee.name in {'ForeignKey',
-                                         'OneToOneField',
-                                         'ManyToManyField'}:
-            return True
-    return False
+class AddMetaOptionsAttribute(ModelClassInitializer):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        if '_meta' not in self.model_classdef.info.names:
+            options_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OPTIONS_CLASS_FULLNAME)
+            self.add_new_node_to_model_class('_meta',
+                                             Instance(options_info, [
+                                                 Instance(self.model_classdef.info, [])
+                                             ]))
 
 
-def extract_ref_to_fullname(rvalue_expr: CallExpr,
-                            module_file: MypyFile, all_modules: Dict[str, MypyFile]) -> Optional[str]:
-    if 'to' in rvalue_expr.arg_names:
-        to_expr = rvalue_expr.args[rvalue_expr.arg_names.index('to')]
-    else:
-        to_expr = rvalue_expr.args[0]
-    if isinstance(to_expr, NameExpr):
-        return module_file.names[to_expr.name].fullname
-    elif isinstance(to_expr, StrExpr):
-        typ_fullname = helpers.get_model_fullname_from_string(to_expr.value, all_modules)
-        if typ_fullname is None:
-            return None
-        return typ_fullname
-    return None
-
-
-def add_dummy_init_method(ctx: ClassDefContext) -> None:
-    any = AnyType(TypeOfAny.special_form)
-
-    pos_arg = Argument(variable=Var('args', any),
-                       type_annotation=any, initializer=None, kind=ARG_STAR)
-    kw_arg = Argument(variable=Var('kwargs', any),
-                      type_annotation=any, initializer=None, kind=ARG_STAR2)
-
-    add_method(ctx, '__init__', [pos_arg, kw_arg], NoneTyp())
-
-    # mark as model class
-    ctx.cls.info.metadata.setdefault('django', {})['generated_init'] = True
-
-
-def add_get_set_attr_fallback_to_any(ctx: ClassDefContext):
-    any = AnyType(TypeOfAny.special_form)
-
-    name_arg = Argument(variable=Var('name', any),
-                        type_annotation=any, initializer=None, kind=ARG_POS)
-    add_method(ctx, '__getattr__', [name_arg], any)
-
-    value_arg = Argument(variable=Var('value', any),
-                         type_annotation=any, initializer=None, kind=ARG_POS)
-    add_method(ctx, '__setattr__', [name_arg, value_arg], any)
-
-
-def process_model_class(ctx: ClassDefContext, ignore_unknown_attributes: bool) -> None:
+def process_model_class(ctx: ClassDefContext,
+                        django_context: DjangoContext) -> None:
     initializers = [
         InjectAnyAsBaseForNestedMeta,
-        AddDefaultObjectsManager,
-        AddIdAttributeIfPrimaryKeyTrueIsNotSet,
-        SetIdAttrsForRelatedFields,
-        AddRelatedManagers,
+        AddDefaultPrimaryKey,
+        AddRelatedModelsId,
+        AddManagers,
+        AddExtraFieldMethods,
+        AddMetaOptionsAttribute
     ]
     for initializer_cls in initializers:
-        initializer_cls.from_ctx(ctx).run()
-
-    add_dummy_init_method(ctx)
-
-    if ignore_unknown_attributes:
-        add_get_set_attr_fallback_to_any(ctx)
+        try:
+            initializer_cls(ctx, django_context).run()
+        except helpers.IncompleteDefnException:
+            if not ctx.api.final_iteration:
+                ctx.api.defer()

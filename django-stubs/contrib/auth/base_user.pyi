@@ -1,12 +1,16 @@
-from typing import Any, Optional, Tuple, List, overload
+from typing import Any, Optional, Tuple, List, overload, TypeVar
+
+from django.db.models.base import Model
 
 from django.db import models
 
-class BaseUserManager(models.Manager):
+_T = TypeVar("_T", bound=Model)
+
+class BaseUserManager(models.Manager[_T]):
     @classmethod
     def normalize_email(cls, email: Optional[str]) -> str: ...
     def make_random_password(self, length: int = ..., allowed_chars: str = ...) -> str: ...
-    def get_by_natural_key(self, username: Optional[str]) -> AbstractBaseUser: ...
+    def get_by_natural_key(self, username: Optional[str]) -> _T: ...
 
 class AbstractBaseUser(models.Model):
     password: models.CharField = ...
