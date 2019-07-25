@@ -6,9 +6,7 @@ from django.db.models.fields.related import RelatedField
 from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
-from mypy.plugin import (
-    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
-)
+from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -231,6 +229,15 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(class_name)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
+        return None
+
+    def get_type_analyze_hook(self, fullname: str
+                              ) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
+        info = self._get_typeinfo_or_none(fullname)
+        if (info
+                and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
+                and not info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)):
+            return partial(querysets.set_first_generic_param_as_default_for_second, fullname=fullname)
         return None
 
 

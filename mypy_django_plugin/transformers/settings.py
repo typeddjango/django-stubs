@@ -1,11 +1,6 @@
-from typing import cast
-
-from mypy.checker import TypeChecker
 from mypy.nodes import MemberExpr, TypeInfo
 from mypy.plugin import AttributeContext, FunctionContext
-from mypy.types import Instance
-from mypy.types import Type as MypyType
-from mypy.types import TypeType
+from mypy.types import Instance, Type as MypyType, TypeType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers

@@ -29,3 +29,10 @@
 
                 class Blog(models.Model):
                     created_at = models.DateTimeField()
+
+-   case: queryset_could_be_specified_with_one_type
+    main: |
+        from typing import Optional
+        from django.db import models
+        queryset: models.QuerySet[models.Model] = models.QuerySet()
+        reveal_type(queryset)  # N: Revealed type is 'django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]'
