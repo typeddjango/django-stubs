@@ -46,6 +46,19 @@ New implementation uses Django runtime to extract models information, so it will
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too. 
 
+## Notes
+
+Implementation monkey-patches Django to add `__class_getitem__` to the `Manager` class. If you'd use Python3.7 and do that too in your code, you can make things like
+```
+class MyUserManager(models.Manager['MyUser']):
+    pass
+class MyUser(models.Model):
+    objects = UserManager()
+```
+work, which should make a error messages a bit better. 
+
+Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, which will rewrite base manager as `models.Manager[User]` to make methods like `get_queryset()` and others return properly typed `QuerySet`. 
+
 ## To get help
 
 We have Gitter here https://gitter.im/mypy-django/Lobby.
