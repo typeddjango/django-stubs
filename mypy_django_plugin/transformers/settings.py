@@ -1,6 +1,8 @@
-from mypy.nodes import MemberExpr, TypeInfo
+from mypy.nodes import MemberExpr
 from mypy.plugin import AttributeContext, FunctionContext
-from mypy.types import Instance, Type as MypyType, TypeType
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny, TypeType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
@@ -11,9 +13,10 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
     model_cls = django_context.apps_registry.get_model(auth_user_model)
     model_cls_fullname = helpers.get_class_fullname(model_cls)
 
-    model_info = helpers.lookup_fully_qualified_generic(model_cls_fullname,
-                                                        helpers.get_typechecker_api(ctx).modules)
-    assert isinstance(model_info, TypeInfo)
+    model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx),
+                                                         model_cls_fullname)
+    if model_info is None:
+        return AnyType(TypeOfAny.unannotated)
 
     return TypeType(Instance(model_info, []))
 

@@ -6,7 +6,9 @@ from django.db.models.fields.related import RelatedField
 from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
-from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin
+from mypy.plugin import (
+    AnalyzeTypeContext, AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
+)
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext

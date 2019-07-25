@@ -1,5 +1,4 @@
 from django.core.exceptions import FieldDoesNotExist
-from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
@@ -12,7 +11,8 @@ from mypy_django_plugin.lib import fullnames, helpers
 def _get_field_instance(ctx: MethodContext, field_fullname: str) -> MypyType:
     field_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx),
                                                          field_fullname)
-    assert isinstance(field_info, TypeInfo)
+    if field_info is None:
+        return AnyType(TypeOfAny.unannotated)
     return Instance(field_info, [AnyType(TypeOfAny.explicit), AnyType(TypeOfAny.explicit)])
 
 

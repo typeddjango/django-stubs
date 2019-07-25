@@ -2,7 +2,7 @@ from typing import Optional, Tuple, cast
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
-from mypy.nodes import AssignmentStmt, TypeInfo, NameExpr
+from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
@@ -22,7 +22,8 @@ def _get_current_field_from_assignment(ctx: FunctionContext, django_context: Dja
     for stmt in outer_model_info.defn.defs.body:
         if isinstance(stmt, AssignmentStmt):
             if stmt.rvalue == ctx.context:
-                assert isinstance(stmt.lvalues[0], NameExpr)
+                if not isinstance(stmt.lvalues[0], NameExpr):
+                    return None
                 field_name = stmt.lvalues[0].name
                 break
     if field_name is None:
@@ -50,16 +51,24 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     related_model_info = helpers.lookup_class_typeinfo(typechecker_api, related_model)
-    assert isinstance(related_model_info, TypeInfo)
+    if related_model_info is None:
+        # maybe no type stub
+        related_model_type = AnyType(TypeOfAny.unannotated)
+    else:
+        related_model_type = Instance(related_model_info, [])  # type: ignore
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
-    assert isinstance(related_model_to_set_info, TypeInfo)
+    if related_model_to_set_info is None:
+        # maybe no type stub
+        related_model_to_set_type = AnyType(TypeOfAny.unannotated)
+    else:
+        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
 
     default_related_field_type = set_descriptor_types_for_field(ctx)
     # replace Any with referred_to_type
     args = [
-        helpers.convert_any_to_type(default_related_field_type.args[0], Instance(related_model_to_set_info, [])),
-        helpers.convert_any_to_type(default_related_field_type.args[1], Instance(related_model_info, [])),
+        helpers.convert_any_to_type(default_related_field_type.args[0], related_model_to_set_type),
+        helpers.convert_any_to_type(default_related_field_type.args[1], related_model_type),
     ]
     return helpers.reparametrize_instance(default_related_field_type, new_args=args)
 

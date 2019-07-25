@@ -5,8 +5,10 @@ from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from mypy.newsemanal.typeanal import TypeAnalyser
 from mypy.nodes import Expression, NameExpr, TypeInfo
-from mypy.plugin import FunctionContext, MethodContext, AnalyzeTypeContext
-from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
+from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers

@@ -2,7 +2,8 @@ from typing import List, Tuple, Type, Union
 
 from django.db.models.base import Model
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import Instance, Type as MypyType
+from mypy.types import Instance
+from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers

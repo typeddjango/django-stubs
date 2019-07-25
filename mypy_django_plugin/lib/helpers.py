@@ -1,13 +1,19 @@
 from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
-from mypy.nodes import (Block, ClassDef, Expression, GDEF, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
-                        SymbolTable, SymbolTableNode, TypeInfo, Var)
-from mypy.plugin import AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
+from mypy.nodes import (
+    GDEF, MDEF, Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable,
+    SymbolTableNode, TypeInfo, Var,
+)
+from mypy.plugin import (
+    AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
+)
+from mypy.types import AnyType, Instance, NoneTyp, TupleType
+from mypy.types import Type as MypyType
+from mypy.types import TypedDictType, TypeOfAny, UnionType
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext

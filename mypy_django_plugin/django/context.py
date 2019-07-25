@@ -1,20 +1,21 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import Dict, Iterator, List, Optional, TYPE_CHECKING, Tuple, Type
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
+from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
-from mypy.nodes import TypeInfo
-from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
-from django.contrib.postgres.fields import ArrayField
-from django.db.models.fields import AutoField, CharField, Field
 from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
@@ -104,7 +105,8 @@ class DjangoFieldsContext:
     def get_field_get_type(self, api: TypeChecker, field: Field, *, method: str) -> MypyType:
         """ Get a type of __get__ for this specific Django field. """
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
-        assert isinstance(field_info, TypeInfo)
+        if field_info is None:
+            return AnyType(TypeOfAny.unannotated)
 
         is_nullable = self.get_field_nullability(field, method)
         if isinstance(field, RelatedField):
@@ -113,7 +115,8 @@ class DjangoFieldsContext:
                 return self.get_field_get_type(api, primary_key_field, method=method)
 
             model_info = helpers.lookup_class_typeinfo(api, field.related_model)
-            assert isinstance(model_info, TypeInfo)
+            if model_info is None:
+                return AnyType(TypeOfAny.unannotated)
 
             return Instance(model_info, [])
         else:
@@ -215,14 +218,19 @@ class DjangoContext:
                 if isinstance(field, ForeignKey):
                     field_name = field.name
                     foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                    assert isinstance(foreign_key_info, TypeInfo)
+                    if foreign_key_info is None:
+                        # maybe there's no type annotation for the field
+                        expected_types[field_name] = AnyType(TypeOfAny.unannotated)
+                        continue
 
                     related_model = field.related_model
                     if related_model._meta.proxy_for_model:
                         related_model = field.related_model._meta.proxy_for_model
 
                     related_model_info = helpers.lookup_class_typeinfo(api, related_model)
-                    assert isinstance(related_model_info, TypeInfo)
+                    if related_model_info is None:
+                        expected_types[field_name] = AnyType(TypeOfAny.unannotated)
+                        continue
 
                     is_nullable = self.fields_context.get_field_nullability(field, method)
                     foreign_key_set_type = helpers.get_private_descriptor_type(foreign_key_info,
