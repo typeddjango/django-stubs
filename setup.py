@@ -24,13 +24,11 @@ dependencies = [
     'mypy>=0.720,<0.730',
     'typing-extensions',
     'django',
-    # depends on psycopg2 because of Postgres' ArrayField support
-    'psycopg2'
 ]
 
 setup(
     name="django-stubs",
-    version="1.0.0",
+    version="1.0.1",
     description='Mypy stubs for Django',
     long_description=readme,
     long_description_content_type='text/markdown',
