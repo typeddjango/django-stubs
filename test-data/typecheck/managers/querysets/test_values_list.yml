@@ -205,3 +205,21 @@
                     pass
                 class Blog(models.Model):
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
+
+-   case: subclass_of_queryset_has_proper_typings_on_methods
+    main: |
+        from myapp.models import TransactionQuerySet
+        reveal_type(TransactionQuerySet())  # N: Revealed type is 'myapp.models.TransactionQuerySet'
+        reveal_type(TransactionQuerySet().values())  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.Transaction, TypedDict({'id': builtins.int, 'total': builtins.int})]'
+        reveal_type(TransactionQuerySet().values_list())  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.Transaction, Tuple[builtins.int, builtins.int]]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class TransactionQuerySet(models.QuerySet['Transaction']):
+                    pass
+                class Transaction(models.Model):
+                    total = models.IntegerField()

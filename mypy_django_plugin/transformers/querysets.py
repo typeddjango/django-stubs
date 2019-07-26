@@ -3,6 +3,7 @@ from typing import List, Optional, Sequence, Type, Union, cast
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
+from django.db.models.fields.related import RelatedField
 from mypy.newsemanal.typeanal import TypeAnalyser
 from mypy.nodes import Expression, NameExpr, TypeInfo
 from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
@@ -10,9 +11,17 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
-from django.db.models.fields.related import RelatedField
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
+
+
+def _extract_model_type_from_queryset(queryset_type: Instance) -> Optional[Instance]:
+    for base_type in [queryset_type, *queryset_type.type.bases]:
+        if (len(base_type.args)
+                and isinstance(base_type.args[0], Instance)
+                and base_type.args[0].type.has_base(fullnames.MODEL_CLASS_FULLNAME)):
+            return base_type.args[0]
+    return None
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -98,11 +107,10 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     assert isinstance(ctx.type, Instance)
     assert isinstance(ctx.default_return_type, Instance)
 
-    # bail if queryset of Any or other non-instances
-    if not isinstance(ctx.type.args[0], Instance):
+    model_type = _extract_model_type_from_queryset(ctx.type)
+    if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    model_type = ctx.type.args[0]
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
     if model_cls is None:
         return ctx.default_return_type
@@ -148,11 +156,10 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     assert isinstance(ctx.type, Instance)
     assert isinstance(ctx.default_return_type, Instance)
 
-    # if queryset of non-instance type
-    if not isinstance(ctx.type.args[0], Instance):
+    model_type = _extract_model_type_from_queryset(ctx.type)
+    if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    model_type = ctx.type.args[0]
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
     if model_cls is None:
         return ctx.default_return_type
