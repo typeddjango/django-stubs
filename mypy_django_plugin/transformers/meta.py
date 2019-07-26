@@ -5,7 +5,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import helpers
 
 
 def _get_field_instance(ctx: MethodContext, field_fullname: str) -> MypyType:
@@ -20,21 +20,25 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     # Options instance
     assert isinstance(ctx.type, Instance)
 
+    # bail if list of generic params is empty
+    if len(ctx.type.args) == 0:
+        return ctx.default_return_type
+
     model_type = ctx.type.args[0]
     if not isinstance(model_type, Instance):
-        return _get_field_instance(ctx, fullnames.FIELD_FULLNAME)
+        return ctx.default_return_type
 
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
     if model_cls is None:
-        return _get_field_instance(ctx, fullnames.FIELD_FULLNAME)
+        return ctx.default_return_type
 
     field_name_expr = helpers.get_call_argument_by_name(ctx, 'field_name')
     if field_name_expr is None:
-        return _get_field_instance(ctx, fullnames.FIELD_FULLNAME)
+        return ctx.default_return_type
 
     field_name = helpers.resolve_string_attribute_value(field_name_expr, ctx, django_context)
     if field_name is None:
-        return _get_field_instance(ctx, fullnames.FIELD_FULLNAME)
+        return ctx.default_return_type
 
     try:
         field = model_cls._meta.get_field(field_name)
