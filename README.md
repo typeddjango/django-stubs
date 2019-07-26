@@ -42,6 +42,11 @@ django_settings_module = mysettings
 ```
 where `mysettings` is a value of `DJANGO_SETTINGS_MODULE` (with or without quotes)
 
+Do you have trouble with mypy / the django plugin not finding your settings module? Try adding the root path of your project to your PYTHONPATH environment variable. If you use pipenv you can add the following to an `.env` file in your project root which pipenv will run automatically before executing any commands.:
+```
+PYTHONPATH=${PYTHONPATH}:${PWD}
+```
+
 New implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too. 
