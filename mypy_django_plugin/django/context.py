@@ -20,7 +20,7 @@ from mypy_django_plugin.lib import helpers
 try:
     from django.contrib.postgres.fields import ArrayField
 except ImportError:
-    class ArrayField:
+    class ArrayField:  # type: ignore
         pass
 
 if TYPE_CHECKING:
