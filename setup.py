@@ -24,8 +24,6 @@ dependencies = [
     'mypy>=0.720,<0.730',
     'typing-extensions',
     'django',
-    # depends on psycopg2 because of Postgres' ArrayField support
-    'psycopg2'
 ]
 
 setup(

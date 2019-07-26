@@ -3,7 +3,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
-from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields import AutoField, CharField, Field
@@ -17,6 +16,12 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.lib import helpers
+
+try:
+    from django.contrib.postgres.fields import ArrayField
+except ImportError:
+    class ArrayField:
+        pass
 
 if TYPE_CHECKING:
     from django.apps.registry import Apps  # noqa: F401
