@@ -430,6 +430,35 @@
                     publisher2 = models.ForeignKey(to=Publisher, on_delete=models.CASCADE,
                                                    related_name='books2')
 
+-   case: test_foreign_key_from_superclass_inherits_correctly
+    main: |
+        from myapp.models import MyUser, Book
+        book = Book()
+        reveal_type(book.text)  # N: Revealed type is 'builtins.str*'
+        reveal_type(book.registered_by_user)  # N: Revealed type is 'myapp.models.MyUser*'
+
+        user = MyUser()
+        reveal_type(user.book_set) # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Book]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyUser(models.Model):
+                    pass
+
+                class LibraryEntity(models.Model):
+                    registered_by_user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+
+                    class Meta:
+                        abstract = True
+
+                class Book(LibraryEntity):
+                    text = models.TextField(blank=True)
+
 -   case: to_parameter_could_be_resolved_if_passed_from_settings
     main: |
         from myapp.models import Book
