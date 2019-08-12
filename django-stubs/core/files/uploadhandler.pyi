@@ -25,7 +25,12 @@ class FileUploadHandler:
     field_name = ...  # type: str
     def __init__(self, request: Optional[HttpRequest] = ...) -> None: ...
     def handle_raw_input(
-        self, input_data: IO[bytes], META: Dict[str, str], content_length: int, boundary: str, encoding: Optional[str] = ...
+        self,
+        input_data: IO[bytes],
+        META: Dict[str, str],
+        content_length: int,
+        boundary: str,
+        encoding: Optional[str] = ...,
     ) -> Optional[Tuple[QueryDict, MultiValueDict[str, UploadedFile]]]: ...
     def new_file(
         self,
@@ -59,7 +64,12 @@ class MemoryFileUploadHandler(FileUploadHandler):
     activated = ...  # type: bool
     file = ...  # type: IO[bytes]
     def handle_raw_input(
-        self, input_data: IO[bytes], META: Dict[str, str], content_length: int, boundary: str, encoding: Optional[str] = ...
+        self,
+        input_data: IO[bytes],
+        META: Dict[str, str],
+        content_length: int,
+        boundary: str,
+        encoding: Optional[str] = ...,
     ) -> Optional[Tuple[QueryDict, MultiValueDict[str, UploadedFile]]]: ...
     def new_file(
         self,
