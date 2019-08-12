@@ -65,7 +65,7 @@ class EmailMessage:
         to: Optional[Union[Sequence[str], str]] = ...,
         bcc: Optional[Union[Sequence[str], str]] = ...,
         connection: Optional[Any] = ...,
-        attachments: Optional[Union[List[Tuple[str, str]], List[MIMEText]]] = ...,
+        attachments: Optional[Union[List[Tuple[str, Union[str, bytes], str]], List[MIMEText]]] = ...,
         headers: Optional[Dict[str, str]] = ...,
         cc: Optional[Union[Sequence[str], str]] = ...,
         reply_to: Optional[Union[List[Optional[str]], str]] = ...,
