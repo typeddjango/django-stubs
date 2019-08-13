@@ -23,9 +23,14 @@ class FileUploadHandler:
     content_type_extra = ...  # type: Optional[Dict[str, str]]
     request = ...  # type: Optional[HttpRequest]
     field_name = ...  # type: str
-    def __init__(self, request: HttpRequest = None) -> None: ...
+    def __init__(self, request: Optional[HttpRequest] = ...) -> None: ...
     def handle_raw_input(
-        self, input_data: IO[bytes], META: Dict[str, str], content_length: int, boundary: str, encoding: str = None
+        self,
+        input_data: IO[bytes],
+        META: Dict[str, str],
+        content_length: int,
+        boundary: str,
+        encoding: Optional[str] = ...,
     ) -> Optional[Tuple[QueryDict, MultiValueDict[str, UploadedFile]]]: ...
     def new_file(
         self,
@@ -33,15 +38,15 @@ class FileUploadHandler:
         file_name: str,
         content_type: str,
         content_length: Optional[int],
-        charset: str = None,
-        content_type_extra: Dict[str, str] = None,
+        charset: Optional[str] = ...,
+        content_type_extra: Optional[Dict[str, str]] = ...,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> Optional[bytes]: ...
     def file_complete(self, file_size: int) -> Optional[UploadedFile]: ...
     def upload_complete(self) -> None: ...
 
 class TemporaryFileUploadHandler(FileUploadHandler):
-    def __init__(self, request: HttpRequest = None) -> None: ...
+    def __init__(self, request: Optional[HttpRequest] = ...) -> None: ...
     file = ...  # type: TemporaryUploadedFile
     def new_file(
         self,
@@ -49,8 +54,8 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         file_name: str,
         content_type: str,
         content_length: Optional[int],
-        charset: str = None,
-        content_type_extra: Dict[str, str] = None,
+        charset: Optional[str] = ...,
+        content_type_extra: Optional[Dict[str, str]] = ...,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> Optional[bytes]: ...
     def file_complete(self, file_size: int) -> Optional[UploadedFile]: ...
@@ -59,7 +64,12 @@ class MemoryFileUploadHandler(FileUploadHandler):
     activated = ...  # type: bool
     file = ...  # type: IO[bytes]
     def handle_raw_input(
-        self, input_data: IO[bytes], META: Dict[str, str], content_length: int, boundary: str, encoding: str = None
+        self,
+        input_data: IO[bytes],
+        META: Dict[str, str],
+        content_length: int,
+        boundary: str,
+        encoding: Optional[str] = ...,
     ) -> Optional[Tuple[QueryDict, MultiValueDict[str, UploadedFile]]]: ...
     def new_file(
         self,
@@ -67,8 +77,8 @@ class MemoryFileUploadHandler(FileUploadHandler):
         file_name: str,
         content_type: str,
         content_length: Optional[int],
-        charset: str = None,
-        content_type_extra: Dict[str, str] = None,
+        charset: Optional[str] = ...,
+        content_type_extra: Optional[Dict[str, str]] = ...,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> Optional[bytes]: ...
     def file_complete(self, file_size: int) -> Optional[UploadedFile]: ...
