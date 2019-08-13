@@ -11,5 +11,7 @@ indent_size = 2
 trim_trailing_whitespace = true
 
 [*.py]
-indent_style = space
+indent_size = 4
+
+[*.pyi]
 indent_size = 4
