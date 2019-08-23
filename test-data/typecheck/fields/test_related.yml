@@ -525,9 +525,9 @@
 -   case: test_related_fields_returned_as_descriptors_from_model_class
     main: |
         from myapp.models import Author, Blog, Publisher, Profile
-        reveal_type(Author.blogs)  # N: Revealed type is ''
+        reveal_type(Author.blogs)  # N: Revealed type is 'django.db.models.fields.related_descriptors.ManyToManyDescriptor'
         reveal_type(Blog.publisher)  # N: Revealed type is 'django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor'
-        reveal_type(Publisher.profile)  # N: Revealed type is ''
+        reveal_type(Publisher.profile)  # N: Revealed type is 'django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor'
     installed_apps:
         - myapp
     files:
