@@ -544,3 +544,31 @@
                 class Author(models.Model):
                     blogs = models.ManyToManyField(Blog)
                     file = models.FileField()
+
+
+-   case: test_foreign_key_from_superclass_inherits_correctly
+    main: |
+        from myapp.models import MyUser, Book, Article, LibraryEntity
+        reveal_type(Book().registered_by_user)  # N: Revealed type is 'myapp.models.MyUser*'
+        reveal_type(Article().registered_by_user)  # N: Revealed type is 'myapp.models.MyUser*'
+
+        user = MyUser()
+        reveal_type(user.book_set) # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Book]'
+        reveal_type(user.article_set) # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Article]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
+                class LibraryEntity(models.Model):
+                    class Meta:
+                        abstract = True
+                    registered_by_user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+                class Book(LibraryEntity):
+                    pass
+                class Article(LibraryEntity):
+                    pass
