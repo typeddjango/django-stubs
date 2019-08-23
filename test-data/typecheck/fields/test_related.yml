@@ -520,3 +520,27 @@
                     pass
                 class Article(Entry):
                     pass
+
+
+-   case: test_related_fields_returned_as_descriptors_from_model_class
+    main: |
+        from myapp.models import Author, Blog, Publisher, Profile
+        reveal_type(Author.blogs)  # N: Revealed type is ''
+        reveal_type(Blog.publisher)  # N: Revealed type is 'django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor'
+        reveal_type(Publisher.profile)  # N: Revealed type is ''
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Profile(models.Model):
+                    pass
+                class Publisher(models.Model):
+                    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+                class Blog(models.Model):
+                    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+                class Author(models.Model):
+                    blogs = models.ManyToManyField(Blog)
+                    file = models.FileField()

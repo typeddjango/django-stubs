@@ -1,4 +1,18 @@
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, TYPE_CHECKING, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    TYPE_CHECKING,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 from uuid import UUID
 
 from django.db.models.expressions import Combinable
@@ -25,7 +39,7 @@ if TYPE_CHECKING:
     from django.db.models.manager import RelatedManager
 
 _T = TypeVar("_T", bound=models.Model)
-
+_F = TypeVar("_F", bound=models.Field)
 _Choice = Tuple[Any, str]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
@@ -127,6 +141,15 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    # class access
+    @overload  # type: ignore
+    def __get__(self, instance: None, owner) -> ForwardManyToOneDescriptor: ...
+    # Model instance access
+    @overload
+    def __get__(self, instance: Model, owner) -> _GT: ...
+    # non-Model instances
+    @overload
+    def __get__(self: _F, instance, owner) -> _F: ...
 
 class OneToOneField(RelatedField[_ST, _GT]):
     _pyi_private_set_type: Union[Any, Combinable]
@@ -163,6 +186,15 @@ class OneToOneField(RelatedField[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    # class access
+    @overload  # type: ignore
+    def __get__(self, instance: None, owner) -> ForwardOneToOneDescriptor: ...
+    # Model instance access
+    @overload
+    def __get__(self, instance: Model, owner) -> _GT: ...
+    # non-Model instances
+    @overload
+    def __get__(self: _F, instance, owner) -> _F: ...
 
 class ManyToManyField(RelatedField[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any]
@@ -206,7 +238,15 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
-    def __get__(self, instance, owner) -> _GT: ...  # type: ignore
+    # class access
+    @overload  # type: ignore
+    def __get__(self, instance: None, owner) -> ManyToManyDescriptor: ...
+    # Model instance access
+    @overload
+    def __get__(self, instance: Model, owner) -> _GT: ...
+    # non-Model instances
+    @overload
+    def __get__(self: _F, instance, owner) -> _F: ...
     def get_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...
     def get_reverse_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...
     def contribute_to_related_class(self, cls: Type[Model], related: RelatedField) -> None: ...
