@@ -197,10 +197,10 @@
     main: |
         from myapp.models import UnrelatedModel, MyModel
         reveal_type(UnrelatedModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.UnrelatedModel]'
-        reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is 'myapp.models.UnrelatedModel*'
+        reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is 'Union[myapp.models.UnrelatedModel*, None]'
 
         reveal_type(MyModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
-        reveal_type(MyModel.objects.first()) # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(MyModel.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel*, None]'
     installed_apps:
         - myapp
     files:
@@ -218,10 +218,10 @@
     main: |
         from myapp.models import UnrelatedModel2, MyModel2
         reveal_type(UnrelatedModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.UnrelatedModel2]'
-        reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is 'myapp.models.UnrelatedModel2*'
+        reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is 'Union[myapp.models.UnrelatedModel2*, None]'
 
         reveal_type(MyModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel2]'
-        reveal_type(MyModel2.objects.first()) # N: Revealed type is 'myapp.models.MyModel2*'
+        reveal_type(MyModel2.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel2*, None]'
     installed_apps:
         - myapp
     files:
@@ -239,10 +239,10 @@
     main: |
         from myapp.models import ParentOfMyModel3, MyModel3
         reveal_type(ParentOfMyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.ParentOfMyModel3]'
-        reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is 'myapp.models.ParentOfMyModel3*'
+        reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is 'Union[myapp.models.ParentOfMyModel3*, None]'
 
         reveal_type(MyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel3]'
-        reveal_type(MyModel3.objects.first()) # N: Revealed type is 'myapp.models.MyModel3*'
+        reveal_type(MyModel3.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel3*, None]'
     installed_apps:
         - myapp
     files:
@@ -260,10 +260,10 @@
     main: |
         from myapp.models import ParentOfMyModel4, MyModel4
         reveal_type(ParentOfMyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.ParentOfMyModel4]'
-        reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is 'myapp.models.ParentOfMyModel4*'
+        reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is 'Union[myapp.models.ParentOfMyModel4*, None]'
 
         reveal_type(MyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel4]'
-        reveal_type(MyModel4.objects.first()) # N: Revealed type is 'myapp.models.MyModel4*'
+        reveal_type(MyModel4.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel4*, None]'
     installed_apps:
         - myapp
     files:
@@ -308,7 +308,7 @@
     main: |
         from myapp.models import User
         reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
-        reveal_type(User.objects.select_related())  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.User*, myapp.models.User*]'
+        reveal_type(User.objects.select_related())  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.User*]'
     installed_apps:
         - myapp
     files:

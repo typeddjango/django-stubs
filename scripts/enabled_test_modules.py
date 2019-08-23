@@ -28,7 +28,6 @@ IGNORED_ERRORS = {
         'Cannot assign to a type',
         '"HttpResponse" has no attribute',
         '"HttpResponseBase" has no attribute',
-        # '"HttpRequest" has no attribute',
         '"object" has no attribute',
         'defined in the current module',
         re.compile(r'"Callable\[(\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\]|\.\.\.), Any\]" '
@@ -73,6 +72,12 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Callable[',
         'SimpleLazyObject'
     ],
+    'aggregation': [
+        re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"')
+    ],
+    'annotations': [
+        'Incompatible type for "store" of "Employee" (got "Optional[Store]", expected "Union[Store, Combinable]")'
+    ],
     'apps': [
         'Incompatible types in assignment (expression has type "str", target has type "type")',
     ],
@@ -114,7 +119,8 @@ IGNORED_ERRORS = {
     'custom_managers': [
         'Unsupported dynamic base class',
         '"Book" has no attribute "favorite_avg"',
-        'Incompatible types in assignment (expression has type "CharField'
+        'Incompatible types in assignment (expression has type "CharField',
+        'Item "Book" of "Optional[Book]" has no attribute "favorite_avg"'
     ],
     'csrf_tests': [
         'Incompatible types in assignment (expression has type "property", ' +
@@ -135,6 +141,7 @@ IGNORED_ERRORS = {
     ],
     'db_functions': [
         '"FloatModel" has no attribute',
+        'Incompatible types in assignment (expression has type "Optional[Any]", variable has type "FloatModel")'
     ],
     'decorators': [
         '"Type[object]" has no attribute "method"'
@@ -164,9 +171,9 @@ IGNORED_ERRORS = {
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
-        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>, <nothing>]]"',
+        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
-        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>, <nothing>]]"',
+        + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
         'CustomClass'
     ],
     'generic_relations_regress': [
@@ -234,7 +241,9 @@ IGNORED_ERRORS = {
         '"Dimension" has no attribute "set_component_order"',
     ],
     'one_to_one': [
-        'expression has type "None", variable has type "UndergroundBar"'
+        'expression has type "None", variable has type "UndergroundBar"',
+        'Item "OneToOneField[Union[Place, Combinable], Place]" '
+        + 'of "Union[OneToOneField[Union[Place, Combinable], Place], Any]"',
     ],
     'postgres_tests': [
         'DummyArrayField',
@@ -255,9 +264,9 @@ IGNORED_ERRORS = {
         '"Person" has no attribute "houses_lst"',
         '"Book" has no attribute "first_authors"',
         '"Book" has no attribute "the_authors"',
-        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room, Room]")',
-        '"Room" has no attribute "main_room_of_attr"',
-        '"Room" has no attribute "house_attr"'
+        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room]")',
+        'Item "Room" of "Optional[Room]" has no attribute "house_attr"',
+        'Item "Room" of "Optional[Room]" has no attribute "main_room_of_attr"'
     ],
     'proxy_models': [
         'Incompatible types in assignment',
@@ -266,8 +275,8 @@ IGNORED_ERRORS = {
     'queries': [
         'Incompatible types in assignment (expression has type "None", variable has type "str")',
         'Invalid index type "Optional[str]" for "Dict[str, int]"; expected type "str"',
-        'Unsupported operand types for & ("QuerySet[Author, Author]" and "QuerySet[Tag, Tag]")',
-        'Unsupported operand types for | ("QuerySet[Author, Author]" and "QuerySet[Tag, Tag]")',
+        'Unsupported operand types for & ("QuerySet[Author]" and "QuerySet[Tag]")',
+        'Unsupported operand types for | ("QuerySet[Author]" and "QuerySet[Tag]")',
         'ObjectA',
         'ObjectB',
         'ObjectC',
@@ -292,6 +301,10 @@ IGNORED_ERRORS = {
         'base class "SessionTestsMixin" defined the type as "None")',
         'Incompatible types in assignment (expression has type "None", variable has type "int")',
         '"AbstractBaseSession" has no attribute'
+    ],
+    'select_related': [
+        'Item "ForeignKey[Union[Genus, Combinable], Genus]" '
+        + 'of "Union[ForeignKey[Union[Genus, Combinable], Genus], Any]"'
     ],
     'select_related_onetoone': [
         'Incompatible types in assignment (expression has type "Parent2", variable has type "Parent1")',
