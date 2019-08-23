@@ -1,6 +1,5 @@
-from typing import Any, Callable, List, Optional, Type, Union, Tuple, Iterable
+from typing import Any, Callable, List, Optional, Type, Union, Tuple, Iterable, overload, TypeVar
 
-from django.core.checks.messages import Error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import FileSystemStorage, Storage
@@ -34,6 +33,8 @@ class FileDescriptor:
     def __set__(self, instance: Model, value: Optional[Any]) -> None: ...
     def __get__(self, instance: Optional[Model], cls: Type[Model] = ...) -> Union[FieldFile, FileDescriptor]: ...
 
+_T = TypeVar("_T", bound="Field")
+
 class FileField(Field):
     storage: Any = ...
     upload_to: Union[str, Callable] = ...
@@ -63,6 +64,15 @@ class FileField(Field):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    # class access
+    @overload  # type: ignore
+    def __get__(self, instance: None, owner) -> FileDescriptor: ...
+    # Model instance access
+    @overload
+    def __get__(self, instance: Model, owner) -> Any: ...
+    # non-Model instances
+    @overload
+    def __get__(self: _T, instance, owner) -> _T: ...
     def generate_filename(self, instance: Optional[Model], filename: str) -> str: ...
 
 class ImageFileDescriptor(FileDescriptor):
@@ -82,4 +92,13 @@ class ImageField(FileField):
         height_field: Optional[str] = ...,
         **kwargs: Any
     ) -> None: ...
+    # class access
+    @overload  # type: ignore
+    def __get__(self, instance: None, owner) -> ImageFileDescriptor: ...
+    # Model instance access
+    @overload
+    def __get__(self, instance: Model, owner) -> Any: ...
+    # non-Model instances
+    @overload
+    def __get__(self: _T, instance, owner) -> _T: ...
     def update_dimension_fields(self, instance: Model, force: bool = ..., *args: Any, **kwargs: Any) -> None: ...
