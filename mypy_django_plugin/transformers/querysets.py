@@ -1,15 +1,12 @@
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Type, Union, cast
+from typing import List, Optional, Sequence, Type, Union
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
-from mypy.newsemanal.typeanal import TypeAnalyser
-from mypy.nodes import Expression, NameExpr, TypeInfo
-from mypy.plugin import AnalyzeTypeContext, FunctionContext, MethodContext
-from mypy.types import AnyType, Instance
-from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.nodes import Expression, NameExpr
+from mypy.plugin import FunctionContext, MethodContext
+from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
@@ -183,20 +180,3 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()))
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
-
-
-def set_first_generic_param_as_default_for_second(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
-    type_analyser_api = cast(TypeAnalyser, ctx.api)
-
-    info = helpers.lookup_fully_qualified_typeinfo(type_analyser_api.api, fullname)  # type: ignore
-    assert isinstance(info, TypeInfo)
-
-    if not ctx.type.args:
-        return Instance(info, [AnyType(TypeOfAny.explicit), AnyType(TypeOfAny.explicit)])
-
-    args = ctx.type.args
-    if len(args) == 1:
-        args = [args[0], args[0]]
-
-    analyzed_args = [type_analyser_api.analyze_type(arg) for arg in args]
-    return Instance(info, analyzed_args)
