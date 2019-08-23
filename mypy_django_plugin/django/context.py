@@ -1,20 +1,18 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
+from typing import Dict, Iterator, Optional, Set, TYPE_CHECKING, Tuple, Type
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
-from mypy.types import AnyType, Instance
-from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
 
+from django.db.models.fields import AutoField, CharField, Field
 from mypy_django_plugin.lib import helpers
 
 try:
@@ -170,20 +168,26 @@ class DjangoContext:
         self.settings = settings
 
     @cached_property
-    def model_modules(self) -> Dict[str, List[Type[Model]]]:
+    def model_modules(self) -> Dict[str, Set[Type[Model]]]:
         """ All modules that contain Django models. """
         if self.apps_registry is None:
             return {}
 
-        modules: Dict[str, List[Type[Model]]] = defaultdict(list)
-        for model_cls in self.apps_registry.get_models():
-            modules[model_cls.__module__].append(model_cls)
+        modules: Dict[str, Set[Type[Model]]] = defaultdict(set)
+        for concrete_model_cls in self.apps_registry.get_models():
+            modules[concrete_model_cls.__module__].add(concrete_model_cls)
+            # collect abstract=True models
+            for model_cls in concrete_model_cls.mro()[1:]:
+                if (issubclass(model_cls, Model)
+                        and hasattr(model_cls, '_meta')
+                        and model_cls._meta.abstract):
+                    modules[model_cls.__module__].add(model_cls)
         return modules
 
     def get_model_class_by_fullname(self, fullname: str) -> Optional[Type[Model]]:
         # Returns None if Model is abstract
         module, _, model_cls_name = fullname.rpartition('.')
-        for model_cls in self.model_modules.get(module, []):
+        for model_cls in self.model_modules.get(module, set()):
             if model_cls.__name__ == model_cls_name:
                 return model_cls
         return None
