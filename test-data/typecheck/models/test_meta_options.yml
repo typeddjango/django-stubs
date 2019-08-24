@@ -36,3 +36,23 @@
                     name = models.CharField(max_length=100)
                     age = models.IntegerField()
                     to_user = models.ForeignKey('self', on_delete=models.SET_NULL)
+
+-   case: get_field_with_abstract_inheritance
+    main: |
+        from myapp.models import AbstractModel
+        class MyModel(AbstractModel):
+            pass
+        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is 'Any'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.contrib.postgres.fields import ArrayField
+                class AbstractModel(models.Model):
+                    class Meta:
+                        abstract = True
+                class MyModel(AbstractModel):
+                    field = ArrayField(models.IntegerField(), default=[])

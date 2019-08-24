@@ -43,7 +43,9 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     try:
         field = model_cls._meta.get_field(field_name)
     except FieldDoesNotExist as exc:
-        ctx.api.fail(exc.args[0], ctx.context)
+        # if model is abstract, do not raise exception, skip false positives
+        if not model_cls._meta.abstract:
+            ctx.api.fail(exc.args[0], ctx.context)
         return AnyType(TypeOfAny.from_error)
 
     field_fullname = helpers.get_class_fullname(field.__class__)
