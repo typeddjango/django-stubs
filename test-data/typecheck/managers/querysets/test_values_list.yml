@@ -53,7 +53,7 @@
                     text = models.CharField(max_length=100)
                     blog = models.ForeignKey(to=Blog, on_delete=models.CASCADE)
 
--   case: values_list_flat_true
+-   case: values_list_flat_true_methods
     main: |
         from myapp.models import MyUser, MyUser2
         reveal_type(MyUser.objects.values_list('name', flat=True).get())  # N: Revealed type is 'builtins.str*'
@@ -194,6 +194,8 @@
         from myapp.models import Blog, Publisher
         reveal_type(Blog.objects.values_list('id', flat=True))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog, builtins.int]'
         reveal_type(Blog.objects.values_list('publisher_id', flat=True))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog, builtins.int]'
+        # is Iterable[int]
+        reveal_type(list(Blog.objects.values_list('id', flat=True)))  # N: Revealed type is 'builtins.list[builtins.int*]'
     installed_apps:
         - myapp
     files:

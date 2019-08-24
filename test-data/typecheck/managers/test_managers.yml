@@ -308,7 +308,7 @@
     main: |
         from myapp.models import User
         reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
-        reveal_type(User.objects.select_related())  # N: Revealed type is 'django.db.models.query.QuerySet[myapp.models.User*]'
+        reveal_type(User.objects.select_related())  # N: Revealed type is 'myapp.models.User_MyManager[myapp.models.User]'
     installed_apps:
         - myapp
     files:

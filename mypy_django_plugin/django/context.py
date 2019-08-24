@@ -135,7 +135,15 @@ class DjangoFieldsContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            related_model_cls = self.django_context.apps_registry.get_model(related_model_cls)
+            if related_model_cls == 'self':
+                # same model
+                related_model_cls = field.model
+            elif '.' not in related_model_cls:
+                # same file model
+                related_model_fullname = field.model.__module__ + '.' + related_model_cls
+                related_model_cls = self.django_context.get_model_class_by_fullname(related_model_fullname)
+            else:
+                related_model_cls = self.django_context.apps_registry.get_model(related_model_cls)
 
         return related_model_cls
 

@@ -95,7 +95,8 @@ IGNORED_ERRORS = {
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
         'Unexpected attribute "foo" for model "Article"',
-        'has no attribute "touched"'
+        'has no attribute "touched"',
+        'Incompatible types in assignment (expression has type "Type[CustomQuerySet]"'
     ],
     'backends': [
         '"DatabaseError" has no attribute "pgcode"'
@@ -127,7 +128,7 @@ IGNORED_ERRORS = {
         'base class "HttpRequest" defined the type as "QueryDict")'
     ],
     'dates': [
-        'Too few arguments for "dates" of "QuerySet"',
+        'Too few arguments for "dates" of',
     ],
     'defer': [
         'Too many arguments for "refresh_from_db" of "Model"'
@@ -188,7 +189,7 @@ IGNORED_ERRORS = {
         'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
     ],
     'lookup': [
-        'Unexpected keyword argument "headline__startswith" for "in_bulk" of "QuerySet"',
+        'Unexpected keyword argument "headline__startswith" for "in_bulk" of',
         'is called with more than one field'
     ],
     'messages_tests': [
@@ -264,9 +265,10 @@ IGNORED_ERRORS = {
         '"Person" has no attribute "houses_lst"',
         '"Book" has no attribute "first_authors"',
         '"Book" has no attribute "the_authors"',
-        'Incompatible types in assignment (expression has type "List[Room]", variable has type "QuerySet[Room]")',
+        'Incompatible types in assignment (expression has type "List[Room]", variable has type "Manager[Room]")',
         'Item "Room" of "Optional[Room]" has no attribute "house_attr"',
-        'Item "Room" of "Optional[Room]" has no attribute "main_room_of_attr"'
+        'Item "Room" of "Optional[Room]" has no attribute "main_room_of_attr"',
+        'Argument 2 to "Prefetch" has incompatible type "ValuesQuerySet'
     ],
     'proxy_models': [
         'Incompatible types in assignment',
@@ -275,12 +277,13 @@ IGNORED_ERRORS = {
     'queries': [
         'Incompatible types in assignment (expression has type "None", variable has type "str")',
         'Invalid index type "Optional[str]" for "Dict[str, int]"; expected type "str"',
-        'Unsupported operand types for & ("QuerySet[Author]" and "QuerySet[Tag]")',
-        'Unsupported operand types for | ("QuerySet[Author]" and "QuerySet[Tag]")',
+        'Unsupported operand types for & ("Manager[Author]" and "Manager[Tag]")',
+        'Unsupported operand types for | ("Manager[Author]" and "Manager[Tag]")',
         'ObjectA',
         'ObjectB',
         'ObjectC',
         "'flat' and 'named' can't be used together",
+        '"Collection[Any]" has no attribute "explain"'
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
@@ -293,6 +296,9 @@ IGNORED_ERRORS = {
     ],
     'signals': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]";'
+    ],
+    'sites_framework': [
+        'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"'
     ],
     'syndication_tests': [
         'List or tuple expected as variable arguments'
