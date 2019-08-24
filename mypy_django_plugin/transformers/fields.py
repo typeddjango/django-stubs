@@ -44,9 +44,12 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
 
     assert isinstance(current_field, RelatedField)
 
-    related_model = related_model_to_set = current_field.related_model
-    if related_model_to_set._meta.proxy_for_model:
-        related_model_to_set = related_model._meta.proxy_for_model
+    related_model_cls = django_context.fields_context.get_related_model_cls(current_field)
+
+    related_model = related_model_cls
+    related_model_to_set = related_model_cls
+    if related_model_to_set._meta.proxy_for_model is not None:
+        related_model_to_set = related_model_to_set._meta.proxy_for_model
 
     typechecker_api = helpers.get_typechecker_api(ctx)
 

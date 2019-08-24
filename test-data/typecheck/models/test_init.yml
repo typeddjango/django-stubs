@@ -233,3 +233,25 @@
                     name = models.CharField(primary_key=True, max_length=100)
                 class Book(models.Model):
                     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+
+
+-   case: init_in_abstract_model_classmethod_should_not_throw_error_for_valid_fields
+    main: |
+        from myapp.models import MyModel
+        MyModel.base_init()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class AbstractModel(models.Model):
+                    class Meta:
+                        abstract = True
+                    text = models.CharField(max_length=100)
+                    @classmethod
+                    def base_init(cls) -> 'AbstractModel':
+                        return cls(text='mytext')
+                class MyModel(AbstractModel):
+                    pass

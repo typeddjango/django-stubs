@@ -148,12 +148,14 @@ class NewSemanalDjangoPlugin(Plugin):
             # forward relations
             for field in self.django_context.get_model_fields(model_class):
                 if isinstance(field, RelatedField):
-                    related_model_module = field.related_model.__module__
+                    related_model_cls = self.django_context.fields_context.get_related_model_cls(field)
+                    related_model_module = related_model_cls.__module__
                     if related_model_module != file.fullname():
                         deps.add(self._new_dependency(related_model_module))
             # reverse relations
             for relation in model_class._meta.related_objects:
-                related_model_module = relation.related_model.__module__
+                related_model_cls = self.django_context.fields_context.get_related_model_cls(relation)
+                related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname():
                     deps.add(self._new_dependency(related_model_module))
         return list(deps)

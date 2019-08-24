@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import Dict, Iterator, Optional, Set, TYPE_CHECKING, Tuple, Type
+from typing import Dict, Iterator, Optional, Set, TYPE_CHECKING, Tuple, Type, Union
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
@@ -113,11 +113,13 @@ class DjangoFieldsContext:
 
         is_nullable = self.get_field_nullability(field, method)
         if isinstance(field, RelatedField):
+            related_model_cls = self.django_context.fields_context.get_related_model_cls(field)
+
             if method == 'values':
-                primary_key_field = self.django_context.get_primary_key_field(field.related_model)
+                primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
                 return self.get_field_get_type(api, primary_key_field, method=method)
 
-            model_info = helpers.lookup_class_typeinfo(api, field.related_model)
+            model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
             if model_info is None:
                 return AnyType(TypeOfAny.unannotated)
 
@@ -125,6 +127,17 @@ class DjangoFieldsContext:
         else:
             return helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
                                                        is_nullable=is_nullable)
+
+    def get_related_model_cls(self, field: Union[RelatedField, ForeignObjectRel]) -> Type[Model]:
+        if isinstance(field, RelatedField):
+            related_model_cls = field.remote_field.model
+        else:
+            related_model_cls = field.field.model
+
+        if isinstance(related_model_cls, str):
+            related_model_cls = self.django_context.apps_registry.get_model(related_model_cls)
+
+        return related_model_cls
 
 
 class DjangoLookupsContext:
@@ -144,12 +157,12 @@ class DjangoLookupsContext:
                 return self.django_context.get_primary_key_field(currently_observed_model)
 
             current_field = currently_observed_model._meta.get_field(field_part)
+            if not isinstance(current_field, (ForeignObjectRel, RelatedField)):
+                continue
+
+            currently_observed_model = self.django_context.fields_context.get_related_model_cls(current_field)
             if isinstance(current_field, ForeignObjectRel):
-                currently_observed_model = current_field.related_model
                 current_field = self.django_context.get_primary_key_field(currently_observed_model)
-            else:
-                if isinstance(current_field, RelatedField):
-                    currently_observed_model = current_field.related_model
 
         # if it is None, solve_lookup_type() will fail earlier
         assert current_field is not None
@@ -213,10 +226,11 @@ class DjangoContext:
         from django.contrib.contenttypes.fields import GenericForeignKey
 
         expected_types = {}
-        # add pk
-        primary_key_field = self.get_primary_key_field(model_cls)
-        field_set_type = self.fields_context.get_field_set_type(api, primary_key_field, method=method)
-        expected_types['pk'] = field_set_type
+        # add pk if not abstract=True
+        if not model_cls._meta.abstract:
+            primary_key_field = self.get_primary_key_field(model_cls)
+            field_set_type = self.fields_context.get_field_set_type(api, primary_key_field, method=method)
+            expected_types['pk'] = field_set_type
 
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
@@ -232,9 +246,9 @@ class DjangoContext:
                         expected_types[field_name] = AnyType(TypeOfAny.unannotated)
                         continue
 
-                    related_model = field.related_model
-                    if related_model._meta.proxy_for_model:
-                        related_model = field.related_model._meta.proxy_for_model
+                    related_model = self.fields_context.get_related_model_cls(field)
+                    if related_model._meta.proxy_for_model is not None:
+                        related_model = related_model._meta.proxy_for_model
 
                     related_model_info = helpers.lookup_class_typeinfo(api, related_model)
                     if related_model_info is None:

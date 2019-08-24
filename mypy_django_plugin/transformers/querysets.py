@@ -42,7 +42,8 @@ def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext
         return None
 
     if isinstance(lookup_field, RelatedField) and lookup_field.column == lookup:
-        lookup_field = django_context.get_primary_key_field(lookup_field.related_model)
+        related_model_cls = django_context.fields_context.get_related_model_cls(lookup_field)
+        lookup_field = django_context.get_primary_key_field(related_model_cls)
 
     field_get_type = django_context.fields_context.get_field_get_type(helpers.get_typechecker_api(ctx),
                                                                       lookup_field, method=method)
