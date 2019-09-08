@@ -14,7 +14,7 @@ Could be run on earlier versions of Django, but expect some missing imports warn
 
 ## Installation
 
-```
+```bash
 pip install django-stubs
 ```
 
@@ -24,7 +24,7 @@ pip install django-stubs
 
 To make mypy aware of the plugin, you need to add
 
-```
+```ini
 [mypy]
 plugins =
     mypy_django_plugin.main
@@ -33,7 +33,8 @@ plugins =
 in your `mypy.ini` file.
 
 Plugin requires Django settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified inside `mypy.ini` file.
-```
+
+```ini
 [mypy]
 strict_optional = True
 
@@ -41,6 +42,7 @@ strict_optional = True
 [mypy.plugins.django-stubs]
 django_settings_module = mysettings
 ```
+
 where `mysettings` is a value of `DJANGO_SETTINGS_MODULE` (with or without quotes)
 
 Do you have trouble with mypy / the django plugin not finding your settings module? Try adding the root path of your project to your PYTHONPATH environment variable. If you use pipenv you can add the following to an `.env` file in your project root which pipenv will run automatically before executing any commands.:
@@ -55,12 +57,14 @@ In other words, if your `manage.py runserver` crashes, mypy will crash too.
 ## Notes
 
 Implementation monkey-patches Django to add `__class_getitem__` to the `Manager` class. If you'd use Python3.7 and do that too in your code, you can make things like
-```
+
+```python
 class MyUserManager(models.Manager['MyUser']):
     pass
 class MyUser(models.Model):
     objects = UserManager()
 ```
+
 work, which should make a error messages a bit better. 
 
 Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, which will rewrite base manager as `models.Manager[User]` to make methods like `get_queryset()` and others return properly typed `QuerySet`. 
