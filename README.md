@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.org/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.org/typeddjango/django-stubs)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+[![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 
 This package contains type stubs and mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need to accompany the stubs with mypy plugins. The final goal is to be able to get precise types for most common patterns.
 
@@ -66,6 +67,6 @@ Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, w
 
 ## To get help
 
-We have Gitter here https://gitter.im/mypy-django/Lobby.
+We have Gitter here: <https://gitter.im/mypy-django/Lobby>
 
 If you think you have more generic typing issue, please refer to https://github.com/python/mypy and their Gitter.
