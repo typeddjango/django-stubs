@@ -109,16 +109,6 @@ from .manager import BaseManager as BaseManager, Manager as Manager
 
 from . import lookups as lookups
 
-from .aggregates import (
-    Avg as Avg,
-    Min as Min,
-    Max as Max,
-    Variance as Variance,
-    StdDev as StdDev,
-    Sum as Sum,
-    Aggregate as Aggregate,
-)
-
 from .indexes import Index as Index
 
 from . import signals as signals
