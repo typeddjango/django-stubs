@@ -47,7 +47,6 @@ if __name__ == '__main__':
     repo_directory = PROJECT_DIRECTORY / 'django-sources'
     mypy_cache_dir = Path(__file__).parent / '.mypy_cache'
     tests_root = repo_directory / 'tests'
-    global_rc = 0
 
     # copy django settings to the tests_root directory
     shutil.copy(PROJECT_DIRECTORY / 'scripts' / 'django_tests_settings.py', tests_root)
@@ -60,9 +59,18 @@ if __name__ == '__main__':
         import distutils.spawn
 
         mypy_executable = distutils.spawn.find_executable('mypy')
-        completed = subprocess.run([mypy_executable, *mypy_options], env={'PYTHONPATH': str(tests_root)},
-                                   stdout=subprocess.PIPE, cwd=str(tests_root))
-        sorted_lines = sorted(completed.stdout.decode().splitlines())
+        completed = subprocess.run(
+            [mypy_executable, *mypy_options],
+            env={'PYTHONPATH': str(tests_root)},
+            stdout=subprocess.PIPE,
+            cwd=str(tests_root)
+        )
+        stdout = completed.stdout.decode()
+        if completed.returncode != 0:
+            sys.stdout.write(stdout)
+            sys.exit(completed.returncode)
+
+        sorted_lines = sorted(stdout.splitlines())
         for line in sorted_lines:
             try:
                 module_name = line.split('/')[0]
@@ -75,7 +83,7 @@ if __name__ == '__main__':
                 else:
                     print(line)
 
-        sys.exit(global_rc)
+        sys.exit(0)
 
     except BaseException as exc:
         shutil.rmtree(mypy_cache_dir, ignore_errors=True)
