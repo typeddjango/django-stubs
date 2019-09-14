@@ -346,7 +346,7 @@ IGNORED_ERRORS = {
         'defined the type as "None"',
         'Argument 1 to "Path" has incompatible type "Optional[str]"'
     ],
-    # 'view_tests': [
-    #     "Module 'django.views.debug' has no attribute 'Path'"
-    # ]
+    'view_tests': [
+        "Module 'django.views.debug' has no attribute 'Path'"
+    ]
 }
