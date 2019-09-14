@@ -6,9 +6,7 @@ jobs:
   include:
     - name: Run plugin test suite with python 3.7
       python: 3.7
-      script: |
-        set -e
-        pytest
+      script: 'pytest'
 
     - name: Typecheck Django test suite with python 3.7
       python: 3.7
@@ -35,7 +33,6 @@ jobs:
       script: 'isort --check'
 
 before_install: |
-  # Upgrade pip, setuptools, and wheel
   pip install -U pip setuptools wheel
 install: |
   pip install -r ./dev-requirements.txt
