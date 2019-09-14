@@ -49,9 +49,6 @@ if __name__ == '__main__':
     tests_root = repo_directory / 'tests'
     global_rc = 0
 
-    # copy django settings to the tests_root directory
-    shutil.copy(PROJECT_DIRECTORY / 'scripts' / 'django_tests_settings.py', tests_root)
-
     try:
         mypy_options = ['--cache-dir', str(mypy_config_file.parent / '.mypy_cache'),
                         '--config-file', str(mypy_config_file)]
@@ -60,9 +57,28 @@ if __name__ == '__main__':
         import distutils.spawn
 
         mypy_executable = distutils.spawn.find_executable('mypy')
-        completed = subprocess.run([mypy_executable, *mypy_options], env={'PYTHONPATH': str(tests_root)},
-                                   stdout=subprocess.PIPE, cwd=str(tests_root))
-        sorted_lines = sorted(completed.stdout.decode().splitlines())
+        mypy_argv = [mypy_executable, *mypy_options]
+        completed = subprocess.run(
+            mypy_argv,
+            env={'PYTHONPATH': str(tests_root)},
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        rc = completed.returncode
+        stdout = completed.stdout.decode()
+        stderr = completed.stderr.decode()
+        if rc not in (0, 1) or stderr:
+            import shlex
+
+            cmd = " ".join(shlex.quote(s) for s in mypy_argv)
+            print("Failed to run {} (exitcode {})!".format(cmd, rc), file=sys.stderr)
+            if stderr:
+                print("=== Output on stderr: ===\n{}".format(stderr.rstrip("\n")))
+            if stdout:
+                print("=== Output on stdout: ===\n{}".format(stdout.rstrip("\n")))
+            sys.exit(rc or 1)
+
+        sorted_lines = sorted(stdout.splitlines())
         for line in sorted_lines:
             try:
                 module_name = line.split('/')[0]
