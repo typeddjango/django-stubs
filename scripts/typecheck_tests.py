@@ -49,9 +49,6 @@ if __name__ == '__main__':
     tests_root = repo_directory / 'tests'
     global_rc = 0
 
-    # copy django settings to the tests_root directory
-    shutil.copy(PROJECT_DIRECTORY / 'scripts' / 'django_tests_settings.py', tests_root)
-
     try:
         mypy_options = ['--cache-dir', str(mypy_config_file.parent / '.mypy_cache'),
                         '--config-file', str(mypy_config_file)]
@@ -66,7 +63,6 @@ if __name__ == '__main__':
             env={'PYTHONPATH': str(tests_root)},
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=str(tests_root)
         )
         rc = completed.returncode
         stdout = completed.stdout.decode()
