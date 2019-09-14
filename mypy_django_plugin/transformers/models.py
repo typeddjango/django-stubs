@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Type, cast
+from typing import Type
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
