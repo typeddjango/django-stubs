@@ -2,5 +2,5 @@ black
 pytest-mypy-plugins==1.0.3
 psycopg2
 flake8
-isort==4.3.4
+isort==4.3.21
 -e .
