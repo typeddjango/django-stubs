@@ -24,7 +24,7 @@ jobs:
 
     - name: Lint with black
       python: 3.7
-      script: 'black --check --line-length=120 django-stubs/'
+      script: 'black --check django-stubs/'
 
     - name: Lint plugin code with flake8
       python: 3.7
