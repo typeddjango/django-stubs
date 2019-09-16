@@ -67,12 +67,11 @@ if __name__ == '__main__':
             mypy_argv,
             env={'PYTHONPATH': str(tests_root)},
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
-        stdout = completed.stdout.decode()
-        stderr = completed.stderr.decode()
+        output = completed.stdout.decode()
 
-        sorted_lines = sorted((stdout + stderr).splitlines())
+        sorted_lines = sorted(output.splitlines())
         for line in sorted_lines:
             try:
                 path_to_error = line.split(':')[0]
