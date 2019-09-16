@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Type, cast
+from typing import Type
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
@@ -7,7 +7,6 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.newsemanal.semanal import NewSemanticAnalyzer
 from mypy.nodes import (
     ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var,
 )
@@ -23,7 +22,7 @@ from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
 class ModelClassInitializer:
     def __init__(self, ctx: ClassDefContext, django_context: DjangoContext):
-        self.api = cast(NewSemanticAnalyzer, ctx.api)
+        self.api = ctx.api
         self.model_classdef = ctx.cls
         self.django_context = django_context
         self.ctx = ctx

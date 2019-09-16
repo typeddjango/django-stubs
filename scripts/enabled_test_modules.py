@@ -18,13 +18,11 @@ IGNORED_ERRORS = {
     '__new_common__': [
         *MOCK_OBJECTS,
         *EXTERNAL_MODULES,
-        'SupportsFloat',
         'Need type annotation for',
         'has no attribute "getvalue"',
         'Cannot assign to a method',
         'Cannot infer type of lambda',
-        'already defined (possibly by an import)',
-        'already defined on line',
+        'already defined',
         'Cannot assign to a type',
         '"HttpResponse" has no attribute',
         '"HttpResponseBase" has no attribute',
@@ -53,7 +51,6 @@ IGNORED_ERRORS = {
         "No installed app with label 'missing'",
         'namedtuple',
         'Lookups not supported yet',
-        'Argument 1 to "loads" has incompatible type',
         # TODO: see test in managers/test_managers.yml
         "Cannot determine type of",
         'cache_clear',
@@ -63,7 +60,6 @@ IGNORED_ERRORS = {
         # TODO: not supported yet
         'GenericRelation',
         'RelatedObjectDoesNotExist',
-        # Rel's attributes are not accessible from `get_field()`
         re.compile(r'"Field\[Any, Any\]" has no attribute '
                    r'"(through|field_name|field|get_related_field|related_model|related_name'
                    r'|get_accessor_name|empty_strings_allowed|many_to_many)"'),

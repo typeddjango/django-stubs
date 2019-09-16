@@ -51,7 +51,12 @@ if __name__ == '__main__':
 
     try:
         mypy_options = ['--cache-dir', str(mypy_config_file.parent / '.mypy_cache'),
-                        '--config-file', str(mypy_config_file)]
+                        '--config-file', str(mypy_config_file),
+                        '--show-traceback',
+                        # '--no-error-summary',
+                        # '--no-pretty',
+                        '--hide-error-context'
+                        ]
         mypy_options += [str(tests_root)]
 
         import distutils.spawn
@@ -62,34 +67,21 @@ if __name__ == '__main__':
             mypy_argv,
             env={'PYTHONPATH': str(tests_root)},
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
-        rc = completed.returncode
-        stdout = completed.stdout.decode()
-        stderr = completed.stderr.decode()
-        if rc not in (0, 1) or stderr:
-            import shlex
+        output = completed.stdout.decode()
 
-            cmd = " ".join(shlex.quote(s) for s in mypy_argv)
-            print("Failed to run {} (exitcode {})!".format(cmd, rc), file=sys.stderr)
-            if stderr:
-                print("=== Output on stderr: ===\n{}".format(stderr.rstrip("\n")))
-            if stdout:
-                print("=== Output on stdout: ===\n{}".format(stdout.rstrip("\n")))
-            sys.exit(rc or 1)
-
-        sorted_lines = sorted(stdout.splitlines())
+        sorted_lines = sorted(output.splitlines())
         for line in sorted_lines:
             try:
-                module_name = line.split('/')[0]
+                path_to_error = line.split(':')[0]
+                test_folder_name = path_to_error.split('/')[2]
             except IndexError:
-                module_name = 'unknown'
+                test_folder_name = 'unknown'
 
-            if not is_ignored(line, module_name):
-                if line.startswith(module_name):
-                    print(replace_with_clickable_location(line, abs_test_folder=tests_root))
-                else:
-                    print(line)
+            if not is_ignored(line, test_folder_name):
+                global_rc = 1
+                print(line)
 
         sys.exit(global_rc)
 
