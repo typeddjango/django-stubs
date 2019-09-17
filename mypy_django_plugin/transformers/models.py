@@ -212,6 +212,18 @@ class AddMetaOptionsAttribute(ModelClassInitializer):
                                              ]))
 
 
+class RecordAllModelMixins(ModelClassInitializer):
+    def run(self) -> None:
+        basemodel_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MODEL_CLASS_FULLNAME)
+        basemodel_metadata = helpers.get_django_metadata(basemodel_info)
+        if 'model_mixins' not in basemodel_metadata:
+            basemodel_metadata['model_mixins'] = {}
+
+        for base_info in self.model_classdef.info.mro[1:]:
+            if base_info.fullname() != 'builtins.object':
+                basemodel_metadata['model_mixins'][base_info.fullname()] = 1
+
+
 def process_model_class(ctx: ClassDefContext,
                         django_context: DjangoContext) -> None:
     initializers = [
@@ -220,7 +232,8 @@ def process_model_class(ctx: ClassDefContext,
         AddRelatedModelsId,
         AddManagers,
         AddExtraFieldMethods,
-        AddMetaOptionsAttribute
+        AddMetaOptionsAttribute,
+        RecordAllModelMixins,
     ]
     for initializer_cls in initializers:
         try:

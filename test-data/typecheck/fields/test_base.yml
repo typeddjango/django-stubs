@@ -132,3 +132,19 @@
             myfield: models.IntegerField[int, int]
         reveal_type(MyClass.myfield)  # N: Revealed type is 'django.db.models.fields.IntegerField[builtins.int, builtins.int]'
         reveal_type(MyClass().myfield)  # N: Revealed type is 'django.db.models.fields.IntegerField[builtins.int, builtins.int]'
+
+-   case: fields_inside_mixins_used_in_model_subclasses_resolved_as_primitives
+    main: |
+        from myapp.models import MyModel, AuthMixin
+        reveal_type(MyModel().username)  # N: Revealed type is 'builtins.str*'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class AuthMixin:
+                    username = models.CharField(max_length=100)
+                class MyModel(AuthMixin, models.Model):
+                    pass

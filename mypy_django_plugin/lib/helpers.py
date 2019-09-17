@@ -11,6 +11,8 @@ from mypy.plugin import (
 )
 from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
 
+from mypy_django_plugin.lib import fullnames
+
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
 
@@ -247,3 +249,10 @@ def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionCont
     if not isinstance(ctx.api, TypeChecker):
         raise ValueError('Not a TypeChecker')
     return cast(TypeChecker, ctx.api)
+
+
+def get_all_model_mixins(api: TypeChecker) -> Set[str]:
+    basemodel_info = lookup_fully_qualified_typeinfo(api, fullnames.MODEL_CLASS_FULLNAME)
+    if basemodel_info is None:
+        return set()
+    return set(get_django_metadata(basemodel_info).get('model_mixins', dict).keys())
