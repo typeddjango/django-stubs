@@ -121,7 +121,7 @@ class AddManagers(ModelClassInitializer):
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
                 self.add_new_node_to_model_class(manager_name, manager_type)
             else:
-                # create new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
+                # creates new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
                 has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)
                 if has_manager_any_base:
                     custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
@@ -129,8 +129,8 @@ class AddManagers(ModelClassInitializer):
                     for original_base in manager_info.bases:
                         if self._is_manager_any(original_base):
                             if original_base.type is None:
-                                if not self.api.final_iteration:
-                                    self.api.defer()
+                                raise helpers.IncompleteDefnException()
+
                             original_base = helpers.reparametrize_instance(original_base,
                                                                            [Instance(self.model_classdef.info, [])])
                         bases.append(original_base)
@@ -142,6 +142,9 @@ class AddManagers(ModelClassInitializer):
                     custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
                     self.add_new_node_to_model_class(manager_name, custom_manager_type)
 
+
+class AddDefaultManagerAttribute(ModelClassInitializer):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         # add _default_manager
         if '_default_manager' not in self.model_classdef.info.names:
             default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
@@ -149,6 +152,9 @@ class AddManagers(ModelClassInitializer):
             default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
             self.add_new_node_to_model_class('_default_manager', default_manager)
 
+
+class AddRelatedManagers(ModelClassInitializer):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         # add related managers
         for relation in self.django_context.get_model_relations(model_cls):
             attname = relation.get_accessor_name()
@@ -231,6 +237,8 @@ def process_model_class(ctx: ClassDefContext,
         AddDefaultPrimaryKey,
         AddRelatedModelsId,
         AddManagers,
+        AddDefaultManagerAttribute,
+        AddRelatedManagers,
         AddExtraFieldMethods,
         AddMetaOptionsAttribute,
         RecordAllModelMixins,

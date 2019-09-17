@@ -572,3 +572,25 @@
                     pass
                 class Article(LibraryEntity):
                     pass
+
+
+-   case: foreign_key_relationship_for_models_with_custom_manager
+    main: |
+        from myapp.models import Transaction
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class TransactionQuerySet(models.QuerySet):
+                    pass
+                class Transaction(models.Model):
+                    objects = TransactionQuerySet.as_manager()
+                    def test(self) -> None:
+                        self.transactionlog_set
+                class TransactionLog(models.Model):
+                    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+
+                Transaction().test()
