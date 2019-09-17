@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, Iterable
 
 from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.forms.boundfield import BoundField
@@ -26,7 +26,7 @@ class AdminForm:
         form: AdminPasswordChangeForm,
         fieldsets: List[Tuple[None, Dict[str, List[str]]]],
         prepopulated_fields: Dict[Any, Any],
-        readonly_fields: Any = ...,
+        readonly_fields: Optional[Iterable[Any]] = ...,
         model_admin: Any = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[Fieldset]: ...
@@ -47,7 +47,7 @@ class Fieldset:
         self,
         form: Any,
         name: Optional[Any] = ...,
-        readonly_fields: Any = ...,
+        readonly_fields: Optional[Iterable[Any]] = ...,
         fields: Any = ...,
         classes: Any = ...,
         description: Optional[Any] = ...,
@@ -64,7 +64,7 @@ class Fieldline:
     model_admin: Any = ...
     readonly_fields: Any = ...
     def __init__(
-        self, form: Any, field: Any, readonly_fields: Optional[Any] = ..., model_admin: Optional[Any] = ...
+        self, form: Any, field: Any, readonly_fields: Optional[Iterable[Any]] = ..., model_admin: Optional[Any] = ...
     ) -> None: ...
     def __iter__(self) -> Iterator[Union[AdminField, AdminReadonlyField]]: ...
     def errors(self) -> SafeText: ...

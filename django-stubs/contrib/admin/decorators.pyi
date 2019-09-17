@@ -1,3 +1,5 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Type
 
-def register(*models: Any, site: Optional[Any] = ...) -> Callable: ...
+from django.db.models.base import Model
+
+def register(*models: Type[Model], site: Optional[Any] = ...) -> Callable: ...

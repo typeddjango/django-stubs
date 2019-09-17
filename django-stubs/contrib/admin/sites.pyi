@@ -1,11 +1,11 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from django.contrib.admin.options import ModelAdmin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
-from django.urls.resolvers import URLPattern, URLResolver
+from django.urls.resolvers import URLResolver
 from django.utils.functional import LazyObject
 
 all_sites: Any
@@ -31,11 +31,11 @@ class AdminSite:
     def check(self, app_configs: None) -> List[Any]: ...
     def register(
         self,
-        model_or_iterable: Union[List[Type[Model]], Tuple[Type[Model]], Type[Model]],
+        model_or_iterable: Union[Type[Model], Iterable[Type[Model]]],
         admin_class: Optional[Type[ModelAdmin]] = ...,
         **options: Any
     ) -> None: ...
-    def unregister(self, model_or_iterable: Type[Model]) -> None: ...
+    def unregister(self, model_or_iterable: Union[Type[Model], Iterable[Type[Model]]]) -> None: ...
     def is_registered(self, model: Type[Model]) -> bool: ...
     def add_action(self, action: Callable, name: None = ...) -> None: ...
     def disable_action(self, name: str) -> None: ...
