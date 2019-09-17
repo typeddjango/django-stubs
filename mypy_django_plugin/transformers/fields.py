@@ -116,7 +116,9 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+    if (outer_model_info is None
+            or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)
+            and outer_model_info.fullname() not in helpers.get_all_model_mixins(helpers.get_typechecker_api(ctx))):
         # not inside models.Model class
         return ctx.default_return_type
     assert isinstance(outer_model_info, TypeInfo)
