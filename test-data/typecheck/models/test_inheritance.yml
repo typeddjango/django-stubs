@@ -13,6 +13,21 @@
         class User(Mixin1, Mixin2):
             name = models.TextField()
 
+-   case: test_meta_nested_class_allows_subclassing_in_multiple_inheritance_gis_models
+    main: |
+        from typing import Any
+        from django.contrib.gis.db import models as gis_models
+        class Mixin1(gis_models.Model):
+            class Meta:
+                abstract = True
+        class Mixin2(gis_models.Model):
+            updated_at = models.DateTimeField(auto_now=True)
+
+            class Meta:
+                abstract = True
+        class User(Mixin1, Mixin2):
+            name = models.TextField()
+
 -   case: test_inheritance_from_abstract_model_does_not_fail_if_field_with_id_exists
     main: |
         from django.db import models
