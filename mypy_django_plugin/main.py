@@ -69,11 +69,35 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
     return django_settings_module
 
 
+def extract_django_configuration(config_file_path: Optional[str]) -> Optional[str]:
+    errors = Errors()
+    if config_file_path is None:
+        errors.report(0, None,
+                      "'django_settings_module' is not set: no mypy config file specified")
+        errors.raise_error()
+
+    parser = configparser.ConfigParser()
+    parser.read(config_file_path)  # type: ignore
+
+    if not parser.has_section('mypy.plugins.django-stubs'):
+        errors.report(0, None,
+                      "'django_configuration' is not set: no section [mypy.plugins.django-stubs]",
+                      file=config_file_path)
+        errors.raise_error()
+    if not parser.has_option('mypy.plugins.django-stubs', 'django_configuration'):
+        return None
+
+    django_configuration = parser.get('mypy.plugins.django-stubs',
+                                      'django_configuration').strip('\'"')
+    return django_configuration
+
+
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
         django_settings_module = extract_django_settings_module(options.config_file)
-        self.django_context = DjangoContext(django_settings_module)
+        django_configuration = extract_django_configuration(options.config_file)
+        self.django_context = DjangoContext(django_settings_module, django_configuration)
 
     def _get_current_queryset_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
