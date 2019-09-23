@@ -4,6 +4,7 @@
         import django.apps.config
         import django.apps.registry
         import django.conf.global_settings
+        import django.conf.locale
         import django.conf.urls
         import django.conf.urls.i18n
         import django.conf.urls.static
@@ -24,6 +25,7 @@
         import django.contrib.admin.templatetags.admin_urls
         import django.contrib.admin.templatetags.base
         import django.contrib.admin.templatetags.log
+        import django.contrib.admin.tests
         import django.contrib.admin.utils
         import django.contrib.admin.views
         import django.contrib.admin.views.autocomplete
@@ -32,6 +34,7 @@
         import django.contrib.admin.widgets
         import django.contrib.admindocs
         import django.contrib.admindocs.middleware
+        import django.contrib.admindocs.urls
         import django.contrib.admindocs.utils
         import django.contrib.admindocs.views
         import django.contrib.auth.admin
@@ -54,6 +57,7 @@
         import django.contrib.auth.password_validation
         import django.contrib.auth.signals
         import django.contrib.auth.tokens
+        import django.contrib.auth.urls
         import django.contrib.auth.validators
         import django.contrib.auth.views
         import django.contrib.contenttypes.admin
@@ -71,10 +75,14 @@
         import django.contrib.flatpages.sitemaps
         import django.contrib.flatpages.templatetags
         import django.contrib.flatpages.templatetags.flatpages
+        import django.contrib.flatpages.urls
         import django.contrib.flatpages.views
+        import django.contrib.gis.db.models
+        import django.contrib.gis.db.models.fields
         import django.contrib.humanize.templatetags
         import django.contrib.humanize.templatetags.humanize
         import django.contrib.messages.api
+        import django.contrib.messages.constants
         import django.contrib.messages.context_processors
         import django.contrib.messages.middleware
         import django.contrib.messages.storage
@@ -84,6 +92,10 @@
         import django.contrib.messages.storage.session
         import django.contrib.messages.utils
         import django.contrib.messages.views
+        import django.contrib.postgres.aggregates
+        import django.contrib.postgres.aggregates.general
+        import django.contrib.postgres.aggregates.mixins
+        import django.contrib.postgres.aggregates.statistics
         import django.contrib.postgres.fields
         import django.contrib.postgres.fields.array
         import django.contrib.postgres.fields.citext
@@ -91,7 +103,13 @@
         import django.contrib.postgres.fields.jsonb
         import django.contrib.postgres.fields.mixins
         import django.contrib.postgres.fields.ranges
+        import django.contrib.postgres.functions
+        import django.contrib.postgres.indexes
+        import django.contrib.postgres.lookups
         import django.contrib.postgres.operations
+        import django.contrib.postgres.search
+        import django.contrib.postgres.signals
+        import django.contrib.postgres.validators
         import django.contrib.redirects
         import django.contrib.redirects.middleware
         import django.contrib.redirects.models
@@ -103,6 +121,7 @@
         import django.contrib.sessions.backends.file
         import django.contrib.sessions.backends.signed_cookies
         import django.contrib.sessions.base_session
+        import django.contrib.sessions.exceptions
         import django.contrib.sessions.management.commands
         import django.contrib.sessions.management.commands.clearsessions
         import django.contrib.sessions.middleware
@@ -130,6 +149,7 @@
         import django.contrib.staticfiles.storage
         import django.contrib.staticfiles.templatetags
         import django.contrib.staticfiles.templatetags.staticfiles
+        import django.contrib.staticfiles.testing
         import django.contrib.staticfiles.urls
         import django.contrib.staticfiles.utils
         import django.contrib.staticfiles.views
@@ -141,6 +161,7 @@
         import django.core.cache.backends.dummy
         import django.core.cache.backends.filebased
         import django.core.cache.backends.locmem
+        import django.core.cache.backends.memcached
         import django.core.cache.utils
         import django.core.checks.caches
         import django.core.checks.database
@@ -152,6 +173,7 @@
         import django.core.checks.security.csrf
         import django.core.checks.security.sessions
         import django.core.checks.templates
+        import django.core.checks.translation
         import django.core.checks.urls
         import django.core.exceptions
         import django.core.files
@@ -168,12 +190,18 @@
         import django.core.handlers.base
         import django.core.handlers.exception
         import django.core.handlers.wsgi
-        import django.core.mail
+        import django.core.mail.backends
+        import django.core.mail.backends.base
         import django.core.mail.message
         import django.core.mail.utils
-        import django.core.management
         import django.core.management.base
         import django.core.management.color
+        import django.core.management.commands
+        import django.core.management.commands.dumpdata
+        import django.core.management.commands.loaddata
+        import django.core.management.commands.makemessages
+        import django.core.management.commands.runserver
+        import django.core.management.commands.testserver
         import django.core.management.sql
         import django.core.management.templates
         import django.core.management.utils
@@ -203,7 +231,11 @@
         import django.db.backends.mysql
         import django.db.backends.mysql.client
         import django.db.backends.postgresql
+        import django.db.backends.postgresql.base
         import django.db.backends.postgresql.client
+        import django.db.backends.postgresql.creation
+        import django.db.backends.postgresql.operations
+        import django.db.backends.signals
         import django.db.backends.sqlite3
         import django.db.backends.sqlite3.base
         import django.db.backends.sqlite3.creation
@@ -234,6 +266,7 @@
         import django.db.migrations.writer
         import django.db.models.aggregates
         import django.db.models.base
+        import django.db.models.constraints
         import django.db.models.deletion
         import django.db.models.expressions
         import django.db.models.fields
@@ -247,6 +280,8 @@
         import django.db.models.functions
         import django.db.models.functions.comparison
         import django.db.models.functions.datetime
+        import django.db.models.functions.math
+        import django.db.models.functions.mixins
         import django.db.models.functions.text
         import django.db.models.functions.window
         import django.db.models.indexes
@@ -357,6 +392,7 @@
         import django.utils.feedgenerator
         import django.utils.formats
         import django.utils.functional
+        import django.utils.hashable
         import django.utils.html
         import django.utils.http
         import django.utils.inspect
@@ -374,7 +410,9 @@
         import django.utils.text
         import django.utils.timesince
         import django.utils.timezone
+        import django.utils.topological_sort
         import django.utils.translation
+        import django.utils.translation.reloader
         import django.utils.translation.template
         import django.utils.translation.trans_null
         import django.utils.translation.trans_real
