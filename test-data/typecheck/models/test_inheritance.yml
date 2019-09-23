@@ -68,3 +68,48 @@
                 class B(models.Model):
                     b_attr = 1
                     pass
+
+
+-   case: fields_recognized_if_base_model_is_subclass_of_models_model
+    main: |
+        from myapp.models import User
+        reveal_type(User().username)  # N: Revealed type is 'builtins.str*'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from myapp.utils import MyBaseModel
+                class User(MyBaseModel):
+                    username = models.CharField(max_length=100)
+        -   path: myapp/utils.py
+            content: |
+                from django.db.models import Model
+                class MyBaseModel(Model):
+                    pass
+
+
+-   case: django_contrib_gis_base_model_mixin_inheritance
+    main: |
+        from myapp.models import User
+        reveal_type(User().name)  # N: Revealed type is 'builtins.str*'
+        reveal_type(User().updated_at)  # N: Revealed type is 'datetime.datetime*'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.contrib.gis.db import models as gis_models
+                class Mixin1(gis_models.Model):
+                    class Meta:
+                        abstract = True
+                class Mixin2(gis_models.Model):
+                    updated_at = models.DateTimeField(auto_now=True)
+                    class Meta:
+                        abstract = True
+                class User(Mixin1, Mixin2):
+                    name = models.TextField()
