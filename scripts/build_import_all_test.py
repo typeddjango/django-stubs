@@ -24,5 +24,5 @@ test_lines: List[str] = []
 for package in packages:
     test_lines.append('import ' + package)
 
-test_contents = '\n'.join(test_lines)
+test_contents = '\n'.join(sorted(test_lines))
 print(test_contents)
