@@ -67,7 +67,32 @@ class MyUser(models.Model):
 
 work, which should make a error messages a bit better. 
 
-Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, which will rewrite base manager as `models.Manager[User]` to make methods like `get_queryset()` and others return properly typed `QuerySet`. 
+Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, which will rewrite base manager as `models.Manager[User]` to make methods like `get_queryset()` and others return properly typed `QuerySet`.
+
+## FAQ
+
+### Custom base model
+
+If you want to subclass any other `Model` besides `models.Model` from the third-party library, 
+and it's not yet type annotated, mypy won't recognize as a `models.Model` subclass, 
+and you'll going to have all kinds of errors, like
+```
+error: Need type annotation for 'author'
+error: Need type annotation for 'short_description'
+error: Need type annotation for 'long_description'
+```
+(see https://github.com/typeddjango/django-stubs/issues/68 for examples).
+
+You can bypass this limitation by declaring your import as
+```
+if TYPE_CHECKING:
+    from third_party.models import BaseModel as _BaseModel
+
+    class BaseModel(_BaseModel, models.Model):
+        pass
+else:
+    from third_party.models import BaseModel
+```
 
 ## To get help
 
