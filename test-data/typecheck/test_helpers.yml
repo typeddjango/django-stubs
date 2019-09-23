@@ -40,3 +40,23 @@
         reveal_type(ClassWithAtomicMethod().atomic_method1) # N: Revealed type is 'def (abc: builtins.int) -> builtins.str'
         # Ensure that the method's type is preserved
         reveal_type(ClassWithAtomicMethod().atomic_method3) # N: Revealed type is 'def (myparam: builtins.str) -> builtins.int'
+
+
+-   case: mark_safe_decorator_and_function
+    main: |
+        from django.utils.safestring import mark_safe
+        s = 'hello'
+        reveal_type(mark_safe(s))  # N: Revealed type is 'django.utils.safestring.SafeText'
+        reveal_type(mark_safe(s) + mark_safe(s))  # N: Revealed type is 'django.utils.safestring.SafeText'
+        reveal_type(s + mark_safe(s))  # N: Revealed type is 'builtins.str'
+
+        s += mark_safe(s)
+        reveal_type(s)  # N: Revealed type is 'builtins.str'
+        ms = mark_safe(s)
+        ms += mark_safe(s)
+        reveal_type(ms)  # N: Revealed type is 'django.utils.safestring.SafeText'
+
+        @mark_safe
+        def func(s: str) -> str:
+            pass
+        reveal_type(func)  # N: Revealed type is 'def (s: builtins.str) -> builtins.str'
