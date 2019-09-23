@@ -6,7 +6,9 @@ from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers

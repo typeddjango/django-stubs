@@ -1,18 +1,22 @@
 import os
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import Dict, Iterator, Optional, Set, TYPE_CHECKING, Tuple, Type, Union
+from typing import (
+    TYPE_CHECKING, Dict, Iterator, Optional, Set, Tuple, Type, Union,
+)
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
+from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
-from mypy.types import AnyType, Instance, Type as MypyType, TypeOfAny
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
-from django.db.models.fields import AutoField, CharField, Field
 from mypy_django_plugin.lib import helpers
 
 try:

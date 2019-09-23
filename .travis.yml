@@ -30,7 +30,7 @@ jobs:
 
     - name: Lint plugin code with isort
       python: 3.7
-      script: 'isort --check'
+      script: 'isort --check --diff'
 
 before_install: |
   sudo apt update
