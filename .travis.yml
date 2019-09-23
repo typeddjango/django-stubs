@@ -33,7 +33,7 @@ jobs:
       script: 'isort --check'
 
 before_install: |
-  apt install binutils libproj-dev gdal-bin
+  sudo apt install binutils libproj-dev gdal-bin
   pip install -U pip setuptools wheel
 install: |
   pip install -r ./dev-requirements.txt
