@@ -1,12 +1,10 @@
-from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union, Mapping
+from typing import Any, Iterable, List, Mapping, Optional, Tuple, Type, Union
 
 from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.db.models.expressions import Combinable, Expression, Func
+from django.db.models.expressions import Expression, Func
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler
-from django.db.models.sql.query import Query
 from django.utils.datastructures import OrderedSet
 from django.utils.safestring import SafeText
 

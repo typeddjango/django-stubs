@@ -1,7 +1,6 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.contrib.admin.helpers import InlineAdminForm
-from django.contrib.admin.templatetags.base import InclusionAdminNode
 from django.template.base import Parser, Token
 from django.template.context import Context, RequestContext
 

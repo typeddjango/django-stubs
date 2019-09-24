@@ -1,6 +1,5 @@
 from sqlite3 import dbapi2 as Database
-from sqlite3 import dbapi2 as Database
-from typing import Any, Callable, Iterator
+from typing import Any, Callable
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 

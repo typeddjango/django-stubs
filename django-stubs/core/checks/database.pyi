@@ -1,3 +1,3 @@
-from typing import Any, List, Optional
+from typing import Any, List
 
 def check_database_backends(*args: Any, **kwargs: Any) -> List[Any]: ...

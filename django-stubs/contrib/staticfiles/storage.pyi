@@ -4,7 +4,6 @@ from typing import Any, Callable, Iterator, Optional, Tuple
 from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage
 from django.utils.functional import LazyObject
-from django.utils.safestring import SafeText
 
 class StaticFilesStorage(FileSystemStorage):
     base_location: Any = ...

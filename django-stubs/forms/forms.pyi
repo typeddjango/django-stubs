@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Type, Union, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Type, Union
 
 from django.core.exceptions import ValidationError as ValidationError
 from django.forms.boundfield import BoundField

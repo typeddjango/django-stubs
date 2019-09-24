@@ -1,16 +1,17 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import Any, List, Optional, Set, Tuple, Type, Union, Sequence
+from typing import Any, List, Optional, Sequence, Tuple, Type, Union
 
 from django.core.management.color import Style
-from django.db import DefaultConnectionProxy
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import Case, Expression
-from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler
+
+from django.db import DefaultConnectionProxy
+from django.db.models.fields import Field
 
 class BaseDatabaseOperations:
     compiler_module: str = ...

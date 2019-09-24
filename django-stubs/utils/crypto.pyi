@@ -1,5 +1,5 @@
 from hmac import HMAC
-from typing import Any, Callable, Optional, Union
+from typing import Callable, Optional, Union
 
 using_sysrandom: bool
 

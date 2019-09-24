@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, Tuple, Union, Set, Dict
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from django.db.migrations.migration import Migration, SwappableTuple
 from django.db.migrations.state import ProjectState

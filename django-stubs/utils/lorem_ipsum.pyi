@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, List
 
 COMMON_P: str
 WORDS: Any

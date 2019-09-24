@@ -1,12 +1,12 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.db.models.base import Model
-from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import ForeignKey, OneToOneField, RelatedField
 from django.db.models.lookups import BuiltinLookup, StartsWith
-from django.db.models.query_utils import FilteredRelation, PathInfo, Q
+from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 
+from django.db.models.fields import AutoField, Field
 from .mixins import FieldCacheMixin
 
 class ForeignObjectRel(FieldCacheMixin):

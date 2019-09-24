@@ -1,4 +1,4 @@
-from typing import Any, Dict, Type, Union, Protocol
+from typing import Any, Dict, Type, Union
 from uuid import UUID
 
 class IntConverter:

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.template.base import Parser, Token
 from django.templatetags.static import StaticNode

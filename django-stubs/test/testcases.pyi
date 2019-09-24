@@ -15,7 +15,7 @@ from django.template.base import Template
 from django.test.client import Client
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.safestring import SafeText
-from django.db import connections as connections
+from django.db import connections as connections  # noqa: F401
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
     test_case: SimpleTestCase = ...

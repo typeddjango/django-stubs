@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Type, List
+from typing import Any, List, Tuple
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import ProjectState

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 

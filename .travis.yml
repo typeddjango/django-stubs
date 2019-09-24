@@ -28,6 +28,10 @@ jobs:
       python: 3.7
       script: 'flake8'
 
+    - name: Lint stubs with flake8-pyi and check for unused imports
+      python: 3.7
+      script: 'flake8 --config flake8-pyi.ini'
+
     - name: Lint plugin code with isort
       python: 3.7
       script: 'isort --check --diff'

@@ -1,4 +1,4 @@
-import getpass as getpass
+import getpass as getpass  # noqa: F401
 from typing import Any
 
 from django.core.management.base import BaseCommand

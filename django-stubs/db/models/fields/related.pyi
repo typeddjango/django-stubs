@@ -1,42 +1,26 @@
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    TYPE_CHECKING,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
 from uuid import UUID
 
+from django.db import models
+from django.db.models.base import Model
+from django.db.models.fields import Field
+from django.db.models.query_utils import Q, PathInfo
+from django.db.models.manager import RelatedManager
 from django.db.models.expressions import Combinable
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.query_utils import PathInfo, Q
-
-from django.db import models
-from django.db.models import Field, Model
-from django.db.models.fields.related_descriptors import (
+from django.db.models.fields.related_descriptors import (  # noqa: F401
     ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
     ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
     ManyToManyDescriptor as ManyToManyDescriptor,
     ReverseOneToOneDescriptor as ReverseOneToOneDescriptor,
     ReverseManyToOneDescriptor as ReverseManyToOneDescriptor,
 )
-from django.db.models.fields.reverse_related import (
+from django.db.models.fields.reverse_related import (  # noqa: F401
     ForeignObjectRel as ForeignObjectRel,
     OneToOneRel as OneToOneRel,
     ManyToOneRel as ManyToOneRel,
     ManyToManyRel as ManyToManyRel,
 )
-
-if TYPE_CHECKING:
-    from django.db.models.manager import RelatedManager
 
 _T = TypeVar("_T", bound=models.Model)
 _F = TypeVar("_F", bound=models.Field)

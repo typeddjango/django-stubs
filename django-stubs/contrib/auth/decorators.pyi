@@ -1,6 +1,6 @@
-from typing import Any, Callable, List, Optional, Set, Union
+from typing import Callable, List, Optional, Set, Union
 
-from django.contrib.auth import REDIRECT_FIELD_NAME as REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME as REDIRECT_FIELD_NAME  # noqa: F401
 
 def user_passes_test(
     test_func: Callable, login_url: Optional[str] = ..., redirect_field_name: str = ...

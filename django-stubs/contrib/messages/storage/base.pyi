@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase

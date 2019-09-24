@@ -1,9 +1,7 @@
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, TypeVar, Union, ClassVar, Type
-
-from django.db.models.manager import Manager
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, TypeVar, Union
 
 from django.core.checks.messages import CheckMessage
-
+from django.db.models.manager import Manager
 from django.db.models.options import Options
 
 _Self = TypeVar("_Self", bound="Model")
