@@ -4,7 +4,7 @@ from typing import Any, Dict
 from wsgiref import simple_server
 
 from django.core.handlers.wsgi import WSGIRequest, WSGIHandler
-from django.core.wsgi import get_wsgi_application as get_wsgi_application
+from django.core.wsgi import get_wsgi_application as get_wsgi_application  # noqa: F401
 
 class WSGIServer(simple_server.WSGIServer):
     request_queue_size: int = ...

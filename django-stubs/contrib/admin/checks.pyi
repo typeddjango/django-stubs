@@ -1,6 +1,6 @@
 from typing import Any, List, Union
 
-from django.contrib.admin.options import BaseModelAdmin, InlineModelAdmin, ModelAdmin
+from django.contrib.admin.options import BaseModelAdmin
 from django.core.checks.messages import Error
 
 _CheckError = Union[str, Error]

@@ -1,5 +1,5 @@
 from os.path import abspath
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 abspathu = abspath
 

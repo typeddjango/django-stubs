@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 
 from django.core.checks.messages import CheckMessage, Error, Warning
 from django.urls.resolvers import URLPattern, URLResolver

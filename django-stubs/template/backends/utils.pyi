@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.http.request import HttpRequest
 from django.utils.safestring import SafeText

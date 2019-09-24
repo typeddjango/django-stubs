@@ -22,8 +22,7 @@ def render(
     using: Optional[str] = ...,
 ) -> HttpResponse: ...
 
-class SupportsGetAbsoluteUrl(Protocol):
-    pass
+class SupportsGetAbsoluteUrl(Protocol): ...
 
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool = ..., **kwargs: Any

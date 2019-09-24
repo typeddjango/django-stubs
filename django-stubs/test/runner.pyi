@@ -1,8 +1,8 @@
 import logging
 from argparse import ArgumentParser
 from io import StringIO
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, Sequence
-from unittest import TestCase, TextTestResult, TestSuite
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Type
+from unittest import TestCase, TestSuite, TextTestResult
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test.testcases import SimpleTestCase, TestCase

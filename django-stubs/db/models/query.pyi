@@ -1,7 +1,9 @@
 import datetime
 from typing import (
     Any,
+    Collection,
     Dict,
+    Generic,
     Iterable,
     Iterator,
     List,
@@ -14,18 +16,15 @@ from typing import (
     TypeVar,
     Union,
     overload,
-    Generic,
-    NamedTuple,
-    Collection,
 )
 
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable as Combinable, F as F
+from django.db.models.expressions import Combinable as Combinable, F as F  # noqa: F401
 from django.db.models.sql.query import Query, RawQuery
 
 from django.db import models
 from django.db.models import Manager
-from django.db.models.query_utils import Q as Q
+from django.db.models.query_utils import Q as Q  # noqa: F401
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 _QS = TypeVar("_QS", bound="_BaseQuerySet")
@@ -43,8 +42,7 @@ class _BaseQuerySet(Generic[_T], Sized):
     def as_manager(cls) -> Manager[Any]: ...
     def __len__(self) -> int: ...
     def __bool__(self) -> bool: ...
-    def __class_getitem__(cls, item: Type[_T]):
-        pass
+    def __class_getitem__(cls, item: Type[_T]): ...
     def __getstate__(self) -> Dict[str, Any]: ...
     # Technically, the other QuerySet must be of the same type _T, but _T is covariant
     def __and__(self: _QS, other: _BaseQuerySet[_T]) -> _QS: ...

@@ -7,7 +7,6 @@ from django.http.request import HttpRequest
 from django.template.base import Template
 from django.template.context import RequestContext
 from django.test.client import Client
-from django.utils.functional import SimpleLazyObject
 
 from django.http import HttpResponse
 

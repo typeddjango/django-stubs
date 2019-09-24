@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, Type, Union
+from typing import Tuple, Type, Union
 
 from django.db.models.base import Model
 

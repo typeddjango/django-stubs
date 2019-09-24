@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-from decimal import Decimal
-from typing import Any, Callable, List, Optional, Pattern, Sequence, Type, Union, Tuple, Iterable
+from typing import Any, Callable, Iterable, List, Optional, Pattern, Sequence, Tuple, Type, Union
 
 from django.core.validators import BaseValidator
 from django.forms.boundfield import BoundField

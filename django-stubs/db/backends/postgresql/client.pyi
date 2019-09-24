@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Dict
 
 from django.db.backends.base.client import BaseDatabaseClient
 

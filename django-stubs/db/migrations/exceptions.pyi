@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 
 from django.db.migrations.migration import Migration
 from django.db.utils import DatabaseError

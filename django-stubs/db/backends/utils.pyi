@@ -1,7 +1,7 @@
 import types
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Union, Type
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Type, Union
 from uuid import UUID
 
 logger: Any

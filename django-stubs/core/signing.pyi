@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Type, Union, Protocol
-
-from django.contrib.sessions.serializers import PickleSerializer
+from datetime import timedelta
+from typing import Any, Dict, Optional, Protocol, Type, Union
 
 class BadSignature(Exception): ...
 class SignatureExpired(BadSignature): ...

@@ -1,6 +1,7 @@
-from typing import Any, List, Optional
+from typing import Any, List
 
 from django.db.backends.base.base import BaseDatabaseWrapper
+
 from django.db.models.fields import Field
 
 class BaseDatabaseValidation:

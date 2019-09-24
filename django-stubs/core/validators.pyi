@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union, Pattern, Collection
 from uuid import UUID
 
 from django.core.files.base import File
-from django.core.exceptions import ValidationError as ValidationError
+from django.core.exceptions import ValidationError as ValidationError  # noqa: F401
 
 EMPTY_VALUES: Any
 

@@ -2,7 +2,7 @@ from datetime import date as _date, datetime, time as _time
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from django.utils.safestring import SafeText
-from django.utils.html import escape as escape
+from django.utils.html import escape as escape  # noqa: F401
 
 register: Any
 

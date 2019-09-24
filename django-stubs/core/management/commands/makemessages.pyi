@@ -1,13 +1,6 @@
-import os
-import re
-from typing import Any, Pattern, Type, Optional
+from typing import Any, Optional, Pattern, Type
 
 from django.core.management.base import BaseCommand
-from django.utils.functional import cached_property
-from django.utils.jslex import prepare_js_for_gettext
-
-from django.conf import settings
-from django.utils.translation import templatize
 
 plural_forms_re: Pattern = ...
 STATUS_OK: int = ...

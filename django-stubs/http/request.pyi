@@ -10,17 +10,16 @@ from typing import (
     Pattern,
     Set,
     Tuple,
+    Type,
+    TypeVar,
     Union,
     overload,
-    TypeVar,
-    Type,
 )
 
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
-from django.db.models.base import Model
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 
-from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 

@@ -1,7 +1,4 @@
-from typing import Any, Callable, List, Optional, Tuple, Type, Union
-
-from django.apps.config import AppConfig
-from django.db.models.base import Model
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 NONE_ID: Any
 NO_RECEIVERS: Any

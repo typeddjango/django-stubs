@@ -1,5 +1,3 @@
-from collections import Callable
-
 def supports_color() -> bool: ...
 
 class Style:

@@ -1,5 +1,3 @@
-from typing import Any, Optional
-
 from django.contrib.flatpages.models import FlatPage
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse

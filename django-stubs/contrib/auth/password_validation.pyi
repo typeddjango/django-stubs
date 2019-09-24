@@ -1,7 +1,6 @@
 from pathlib import Path, PosixPath
 from typing import Any, List, Mapping, Optional, Protocol, Sequence, Set, Union
 
-from django.contrib.auth.base_user import AbstractBaseUser
 from django.db.models.base import Model
 
 _UserModel = Model

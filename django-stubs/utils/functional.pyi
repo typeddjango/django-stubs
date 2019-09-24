@@ -1,5 +1,5 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
-from functools import wraps as wraps
+from functools import wraps as wraps  # noqa: F401
 
 from django.db.models.base import Model
 
