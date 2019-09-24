@@ -1,4 +1,7 @@
-from typing import Dict, List, Optional, Union, Iterable, Sequence, Protocol, Any
+from typing import (
+    Any, Dict, List, Optional, Union,
+    Iterable, Sequence, Protocol, Callable
+)
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
