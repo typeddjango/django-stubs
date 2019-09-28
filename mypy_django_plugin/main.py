@@ -174,7 +174,7 @@ class NewSemanalDjangoPlugin(Plugin):
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
-            if info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+            if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
         return None
 
@@ -213,7 +213,8 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
-        if fullname in self._get_current_model_bases():
+        if (fullname in self.django_context.model_base_classes
+                or fullname in self._get_current_model_bases()):
             return partial(transform_model_class, django_context=self.django_context)
 
         if fullname in self._get_current_manager_bases():

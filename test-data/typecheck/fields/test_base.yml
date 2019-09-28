@@ -144,7 +144,10 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                class AuthMixin:
+                class AuthMixin(models.Model):
+                    class Meta:
+                        abstract = True
                     username = models.CharField(max_length=100)
+
                 class MyModel(AuthMixin, models.Model):
                     pass
