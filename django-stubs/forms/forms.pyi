@@ -8,8 +8,7 @@ from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.safestring import SafeText
 
-class DeclarativeFieldsMetaclass(MediaDefiningClass):
-    def __new__(mcs, name: str, bases: Sequence[Type[BaseForm]], attrs: Dict[str, Any]) -> Type[BaseForm]: ...
+class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
 class BaseForm:
     class Meta:

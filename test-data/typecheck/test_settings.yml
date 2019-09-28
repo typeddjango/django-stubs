@@ -5,7 +5,7 @@
         # standard settings
         reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is 'builtins.str'
         reveal_type(settings.ROOT_DIR)  # N: Revealed type is 'builtins.str'
-        reveal_type(settings.APPS_DIR)  # N: Revealed type is 'pathlib.Path'
+        reveal_type(settings.APPS_DIR)  # N: Revealed type is 'pathlib.Path*'
         reveal_type(settings.NUMBERS)  # N: Revealed type is 'builtins.list[builtins.str*]'
         reveal_type(settings.DICT)  # N: Revealed type is 'builtins.dict[Any, Any]'
     custom_settings: |
@@ -40,7 +40,7 @@
         from settings.basic_settings import *
     main: |
         from django.conf import settings
-        reveal_type(settings.MEDIA_ROOT)  # N: Revealed type is 'pathlib.Path'
+        reveal_type(settings.MEDIA_ROOT)  # N: Revealed type is 'pathlib.Path*'
         reveal_type(settings.MEDIA_ROOT / 'part')  # N: Revealed type is 'pathlib.Path*'
     files:
         -   path: settings/__init__.py
