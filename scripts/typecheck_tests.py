@@ -2,29 +2,52 @@ import itertools
 import shutil
 import subprocess
 import sys
+from collections import defaultdict
 from pathlib import Path
-from typing import Pattern
+from typing import Dict, Pattern, Union
 
-from scripts.enabled_test_modules import IGNORED_ERRORS, IGNORED_MODULES
+from scripts.enabled_test_modules import (
+    EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS,
+)
 
 PROJECT_DIRECTORY = Path(__file__).parent.parent
 
 
-def is_ignored(line: str, test_folder_name: str) -> bool:
+def print_unused_ignores(ignored_message_freq):
+    for root_key, patterns in IGNORED_ERRORS.items():
+        for pattern in patterns:
+            if (ignored_message_freq[root_key][pattern] == 0
+                    and pattern not in itertools.chain(EXTERNAL_MODULES, MOCK_OBJECTS)):
+                print(f'{root_key}: {pattern}')
+
+
+def is_pattern_fits(pattern: Union[Pattern, str], line: str):
+    if isinstance(pattern, Pattern):
+        if pattern.search(line):
+            return True
+    else:
+        if pattern in line:
+            return True
+    return False
+
+
+def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[str, Dict[str, int]]) -> bool:
     if 'runtests' in line:
         return True
 
     if test_folder_name in IGNORED_MODULES:
         return True
 
-    for pattern in itertools.chain(IGNORED_ERRORS['__new_common__'],
-                                   IGNORED_ERRORS.get(test_folder_name, [])):
-        if isinstance(pattern, Pattern):
-            if pattern.search(line):
-                return True
-        else:
-            if pattern in line:
-                return True
+    for pattern in IGNORED_ERRORS['__new_common__']:
+        if is_pattern_fits(pattern, line):
+            ignored_message_freqs['__new_common__'][pattern] += 1
+            return True
+
+    for pattern in IGNORED_ERRORS.get(test_folder_name, []):
+        if is_pattern_fits(pattern, line):
+            ignored_message_freqs[test_folder_name][pattern] += 1
+            return True
+
     return False
 
 
@@ -71,6 +94,8 @@ if __name__ == '__main__':
         )
         output = completed.stdout.decode()
 
+        ignored_message_freqs = defaultdict(lambda: defaultdict(int))
+
         sorted_lines = sorted(output.splitlines())
         for line in sorted_lines:
             try:
@@ -79,10 +104,13 @@ if __name__ == '__main__':
             except IndexError:
                 test_folder_name = 'unknown'
 
-            if not is_ignored(line, test_folder_name):
+            if not is_ignored(line, test_folder_name,
+                              ignored_message_freqs=ignored_message_freqs):
                 global_rc = 1
                 print(line)
 
+        print('UNUSED IGNORES ------------------------------------------------')
+        print_unused_ignores(ignored_message_freqs)
         sys.exit(global_rc)
 
     except BaseException as exc:
