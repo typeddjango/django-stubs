@@ -20,11 +20,11 @@ pip install django-stubs
 
 ## Mypy compatibility
 
-| django-stubs | mypy version |
-| ------------ | ---- |
-| 1.2.0 | 0.730 |
-| 1.1.0 | 0.720 |
-| 0.12.x | old semantic analyzer (<0.711), dmypy support |
+| django-stubs | mypy version | django version |
+| ------------ | ---- | ---- |
+| 1.2.0 | 0.730 | 2.2.x
+| 1.1.0 | 0.720 | 2.2.x
+| 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x
 
 
 ### WARNING: All configuration from pre-1.0.0 versions is dropped, use one below.
