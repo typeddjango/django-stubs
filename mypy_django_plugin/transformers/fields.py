@@ -15,7 +15,7 @@ from mypy_django_plugin.lib import fullnames, helpers
 def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Field]:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if (outer_model_info is None
-            or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)):
+            or not helpers.is_model_subclass_info(outer_model_info, django_context)):
         return None
 
     field_name = None
@@ -117,10 +117,9 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if (outer_model_info is None
-            or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)
-            and outer_model_info.fullname() not in helpers.get_all_model_mixins(helpers.get_typechecker_api(ctx))):
-        # not inside models.Model class
+            or not helpers.is_model_subclass_info(outer_model_info, django_context)):
         return ctx.default_return_type
+
     assert isinstance(outer_model_info, TypeInfo)
 
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):

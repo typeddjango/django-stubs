@@ -255,8 +255,6 @@ def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionCont
     return cast(TypeChecker, ctx.api)
 
 
-def get_all_model_mixins(api: TypeChecker) -> Set[str]:
-    basemodel_info = lookup_fully_qualified_typeinfo(api, fullnames.MODEL_CLASS_FULLNAME)
-    if basemodel_info is None:
-        return set()
-    return set(get_django_metadata(basemodel_info).get('model_mixins', dict).keys())
+def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
+    return (info.fullname() in django_context.model_base_classes
+            or info.has_base(fullnames.MODEL_CLASS_FULLNAME))

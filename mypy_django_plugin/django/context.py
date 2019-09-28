@@ -6,6 +6,7 @@ from typing import (
 )
 
 from django.core.exceptions import FieldError
+from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
@@ -285,3 +286,15 @@ class DjangoContext:
                 expected_types[field_name] = gfk_set_type
 
         return expected_types
+
+    @cached_property
+    def model_base_classes(self) -> Set[str]:
+        model_classes = self.apps_registry.get_models()
+
+        all_model_bases = set()
+        for model_cls in model_classes:
+            for base_cls in model_cls.mro():
+                if issubclass(base_cls, models.Model):
+                    all_model_bases.add(helpers.get_class_fullname(base_cls))
+
+        return all_model_bases
