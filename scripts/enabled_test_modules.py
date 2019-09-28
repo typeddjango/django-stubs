@@ -230,6 +230,9 @@ IGNORED_ERRORS = {
         'Item "OneToOneField[Union[Place, Combinable], Place]" '
         + 'of "Union[OneToOneField[Union[Place, Combinable], Place], Any]"',
     ],
+    'pagination': [
+        '"int" not callable',
+    ],
     'postgres_tests': [
         'DummyArrayField',
         'DummyJSONField',
