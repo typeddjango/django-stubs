@@ -69,7 +69,8 @@ IGNORED_ERRORS = {
         'SimpleLazyObject'
     ],
     'aggregation': [
-        re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"')
+        re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"'),
+        'Argument 2 for "super" not an instance of argument 1',
     ],
     'annotations': [
         'Incompatible type for "store" of "Employee" (got "Optional[Store]", expected "Union[Store, Combinable]")'
@@ -151,7 +152,8 @@ IGNORED_ERRORS = {
     ],
     'file_uploads': [
         '"Iterable[Any]" has no attribute',
-        '"IO[Any]" has no attribute'
+        '"IO[Any]" has no attribute',
+        'has no attribute "content_type"',
     ],
     'file_storage': [
         'Incompatible types in assignment (expression has type "Callable"'

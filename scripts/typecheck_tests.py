@@ -76,8 +76,7 @@ if __name__ == '__main__':
         mypy_options = ['--cache-dir', str(mypy_config_file.parent / '.mypy_cache'),
                         '--config-file', str(mypy_config_file),
                         '--show-traceback',
-                        # '--no-error-summary',
-                        # '--no-pretty',
+                        '--no-error-summary',
                         '--hide-error-context'
                         ]
         mypy_options += [str(tests_root)]

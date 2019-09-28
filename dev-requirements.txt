@@ -1,5 +1,5 @@
 black
-pytest-mypy-plugins==1.0.3
+pytest-mypy-plugins==1.1.0
 psycopg2
 flake8==3.7.8
 flake8-pyi==19.3.0
