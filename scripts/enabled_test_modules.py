@@ -15,19 +15,16 @@ MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_arg
 EXTERNAL_MODULES = ['psycopg2', 'PIL', 'selenium', 'oracle', 'mysql', 'sqlite3', 'sqlparse', 'tblib', 'numpy',
                     'bcrypt', 'argon2', 'xml.dom']
 IGNORED_ERRORS = {
-    '__new_common__': [
+    '__common__': [
         *MOCK_OBJECTS,
         *EXTERNAL_MODULES,
         'Need type annotation for',
         'has no attribute "getvalue"',
         'Cannot assign to a method',
-        'Cannot infer type of lambda',
         'already defined',
         'Cannot assign to a type',
-        '"HttpResponse" has no attribute',
         '"HttpResponseBase" has no attribute',
         '"object" has no attribute',
-        'defined in the current module',
         re.compile(r'"Callable\[(\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\]|\.\.\.), Any\]" '
                    r'has no attribute'),
         'has no attribute "deconstruct"',
@@ -48,7 +45,6 @@ IGNORED_ERRORS = {
         'gets multiple values for keyword argument',
         '"Handler" has no attribute',
         'Module has no attribute',
-        "No installed app with label 'missing'",
         'namedtuple',
         'Lookups not supported yet',
         # TODO: see test in managers/test_managers.yml
@@ -116,7 +112,6 @@ IGNORED_ERRORS = {
     ],
     'custom_managers': [
         'Unsupported dynamic base class',
-        '"Book" has no attribute "favorite_avg"',
         'Incompatible types in assignment (expression has type "CharField',
         'Item "Book" of "Optional[Book]" has no attribute "favorite_avg"'
     ],
@@ -151,12 +146,7 @@ IGNORED_ERRORS = {
         'has incompatible type "str"'
     ],
     'file_uploads': [
-        '"Iterable[Any]" has no attribute',
-        '"IO[Any]" has no attribute',
         'has no attribute "content_type"',
-    ],
-    'file_storage': [
-        'Incompatible types in assignment (expression has type "Callable"'
     ],
     'files': [
         'Incompatible types in assignment (expression has type "IOBase", variable has type "File")',
@@ -196,9 +186,6 @@ IGNORED_ERRORS = {
     'middleware': [
         '"HttpRequest" has no attribute'
     ],
-    'managers_regress': [
-        '"Type[AbstractBase3]" has no attribute "objects"'
-    ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")',
         'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")'
@@ -208,7 +195,6 @@ IGNORED_ERRORS = {
     ],
     'model_fields': [
         'Item "Field[Any, Any]" of "Union[Field[Any, Any], ForeignObjectRel]" has no attribute',
-        'has no attribute "field"',
         'Incompatible types in assignment (expression has type "Type[Person',
         'base class "IntegerFieldTests"',
         'ImageFieldTestMixin',
@@ -252,9 +238,6 @@ IGNORED_ERRORS = {
         re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", '
                    r'base class "(UnaccentTest|TrigramTest)" defined the type as "Type\[CharFieldModel\]"\)'),
         '("None" and "SearchQuery")',
-        # TODO:
-        'django.contrib.postgres.forms',
-        'django.contrib.postgres.aggregates',
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
@@ -278,8 +261,6 @@ IGNORED_ERRORS = {
         'Unsupported operand types for & ("Manager[Author]" and "Manager[Tag]")',
         'Unsupported operand types for | ("Manager[Author]" and "Manager[Tag]")',
         'ObjectA',
-        'ObjectB',
-        'ObjectC',
         "'flat' and 'named' can't be used together",
         '"Collection[Any]" has no attribute "explain"'
     ],
@@ -337,7 +318,6 @@ IGNORED_ERRORS = {
         'Argument 1 to "get_callable" has incompatible type "int"'
     ],
     'utils_tests': [
-        'Too few arguments for "__init__"',
         'Argument 1 to "activate" has incompatible type "None"; expected "Union[tzinfo, str]"',
         'Incompatible types in assignment (expression has type "None", base class "object" defined the type as',
         'Class',
@@ -352,3 +332,19 @@ IGNORED_ERRORS = {
         "Module 'django.views.debug' has no attribute 'Path'"
     ]
 }
+
+
+def check_if_custom_ignores_are_covered_by_common() -> None:
+    from scripts.typecheck_tests import is_pattern_fits
+
+    common_ignore_patterns = IGNORED_ERRORS['__common__']
+    for module_name, patterns in IGNORED_ERRORS.items():
+        if module_name == '__common__':
+            continue
+        for pattern in patterns:
+            for common_pattern in common_ignore_patterns:
+                if isinstance(pattern, str) and is_pattern_fits(common_pattern, pattern):
+                    print(f'pattern "{module_name}: {pattern!r}" is covered by pattern {common_pattern!r}')
+
+
+check_if_custom_ignores_are_covered_by_common()
