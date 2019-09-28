@@ -4,7 +4,7 @@ import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, Pattern, Union
+from typing import Dict, List, Pattern, Union
 
 from scripts.enabled_test_modules import (
     EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS,
@@ -13,12 +13,14 @@ from scripts.enabled_test_modules import (
 PROJECT_DIRECTORY = Path(__file__).parent.parent
 
 
-def print_unused_ignores(ignored_message_freq):
+def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]) -> List[str]:
+    unused_ignores = []
     for root_key, patterns in IGNORED_ERRORS.items():
         for pattern in patterns:
             if (ignored_message_freq[root_key][pattern] == 0
                     and pattern not in itertools.chain(EXTERNAL_MODULES, MOCK_OBJECTS)):
-                print(f'{root_key}: {pattern}')
+                unused_ignores.append(f'{root_key}: {pattern}')
+    return unused_ignores
 
 
 def is_pattern_fits(pattern: Union[Pattern, str], line: str):
@@ -38,14 +40,14 @@ def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[
     if test_folder_name in IGNORED_MODULES:
         return True
 
-    for pattern in IGNORED_ERRORS['__new_common__']:
-        if is_pattern_fits(pattern, line):
-            ignored_message_freqs['__new_common__'][pattern] += 1
-            return True
-
     for pattern in IGNORED_ERRORS.get(test_folder_name, []):
         if is_pattern_fits(pattern, line):
             ignored_message_freqs[test_folder_name][pattern] += 1
+            return True
+
+    for pattern in IGNORED_ERRORS['__common__']:
+        if is_pattern_fits(pattern, line):
+            ignored_message_freqs['__common__'][pattern] += 1
             return True
 
     return False
@@ -108,8 +110,11 @@ if __name__ == '__main__':
                 global_rc = 1
                 print(line)
 
-        print('UNUSED IGNORES ------------------------------------------------')
-        print_unused_ignores(ignored_message_freqs)
+        unused_ignores = get_unused_ignores(ignored_message_freqs)
+        if unused_ignores:
+            print('UNUSED IGNORES ------------------------------------------------')
+            print('\n'.join(unused_ignores))
+
         sys.exit(global_rc)
 
     except BaseException as exc:
