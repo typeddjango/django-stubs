@@ -10,7 +10,9 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
-from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
+from mypy_django_plugin.django.context import (
+    DjangoContext, LookupsAreUnsupported,
+)
 from mypy_django_plugin.lib import fullnames, helpers
 
 

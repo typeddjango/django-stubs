@@ -1,19 +1,25 @@
 from collections import OrderedDict
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, TYPE_CHECKING, Union, cast
+from typing import (
+    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast,
+)
 
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
-from mypy.nodes import (Block, ClassDef, Expression, GDEF, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
-                        SymbolTable, SymbolTableNode, TypeInfo, Var)
+from mypy.nodes import (
+    GDEF, MDEF, Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable,
+    SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import (
     AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
 )
-from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
+from mypy.types import AnyType, Instance, NoneTyp, TupleType
+from mypy.types import Type as MypyType
+from mypy.types import TypedDictType, TypeOfAny, UnionType
 
-from django.db.models.fields import Field
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:

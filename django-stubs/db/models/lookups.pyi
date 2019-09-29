@@ -10,7 +10,7 @@ from django.utils.safestring import SafeText
 
 from django.db.models.fields import TextField, related_lookups
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 class Lookup(Generic[_T]):
     lookup_name: str = ...
