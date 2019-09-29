@@ -10,7 +10,7 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
-from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
 
 
@@ -38,10 +38,12 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
 def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model],
                                *, method: str, lookup: str) -> Optional[MypyType]:
     try:
-        lookup_field = django_context.lookups_context.resolve_lookup(model_cls, lookup)
+        lookup_field = django_context.lookups_context.resolve_lookup_info_field(model_cls, lookup)
     except FieldError as exc:
         ctx.api.fail(exc.args[0], ctx.context)
         return None
+    except LookupsAreUnsupported:
+        return AnyType(TypeOfAny.explicit)
 
     if isinstance(lookup_field, RelatedField) and lookup_field.column == lookup:
         related_model_cls = django_context.fields_context.get_related_model_cls(lookup_field)

@@ -145,8 +145,7 @@
         main:3: note: Revealed type is 'Any'
         main:4: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id
         main:4: note: Revealed type is 'Any'
-        main:5: error: Lookups not supported yet
-        main:5: note: Revealed type is 'Any'
+        main:5: note: Revealed type is 'Tuple[Any]'
     installed_apps:
         - myapp
     files:

@@ -43,6 +43,7 @@ _GT = TypeVar("_GT")
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
+    _pyi_lookup_exact_type: Any
 
     widget: Widget
     help_text: str
@@ -131,6 +132,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: int
+    _pyi_lookup_exact_type: int
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: Any): ...
@@ -143,10 +145,12 @@ class BigIntegerField(IntegerField[_ST, _GT]): ...
 class FloatField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: float
+    _pyi_lookup_exact_type: float
 
 class DecimalField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, float, decimal.Decimal, Combinable]
     _pyi_private_get_type: decimal.Decimal
+    _pyi_lookup_exact_type: Union[str, decimal.Decimal]
     # attributes
     max_digits: int = ...
     decimal_places: int = ...
@@ -176,10 +180,13 @@ class DecimalField(Field[_ST, _GT]):
 class AutoField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[Combinable, int, str]
     _pyi_private_get_type: int
+    _pyi_lookup_exact_type: int
 
 class CharField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, int, Combinable]
     _pyi_private_get_type: str
+    # objects are converted to string before comparison
+    _pyi_lookup_exact_type: Any
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -238,14 +245,18 @@ class URLField(CharField[_ST, _GT]): ...
 class TextField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, Combinable]
     _pyi_private_get_type: str
+    # objects are converted to string before comparison
+    _pyi_lookup_exact_type: Any
 
 class BooleanField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[bool, Combinable]
     _pyi_private_get_type: bool
+    _pyi_lookup_exact_type: bool
 
 class NullBooleanField(Field[_ST, _GT]):
     _pyi_private_set_type: Optional[Union[bool, Combinable]]
     _pyi_private_get_type: Optional[bool]
+    _pyi_lookup_exact_type: Optional[bool]
 
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, Combinable]
@@ -286,6 +297,7 @@ class DateTimeCheckMixin: ...
 class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, date, Combinable]
     _pyi_private_get_type: date
+    _pyi_lookup_exact_type: Union[str, date]
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -338,6 +350,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
 
 class DateTimeField(DateField[_ST, _GT]):
     _pyi_private_get_type: datetime
+    _pyi_lookup_exact_type: Union[str, datetime]
 
 class UUIDField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, uuid.UUID]
