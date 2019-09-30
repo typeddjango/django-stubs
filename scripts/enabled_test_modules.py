@@ -46,7 +46,6 @@ IGNORED_ERRORS = {
         '"Handler" has no attribute',
         'Module has no attribute',
         'namedtuple',
-        'Lookups not supported yet',
         # TODO: see test in managers/test_managers.yml
         "Cannot determine type of",
         'cache_clear',
@@ -107,6 +106,9 @@ IGNORED_ERRORS = {
     'custom_lookups': [
         'in base class "SQLFuncMixin"'
     ],
+    'custom_columns': [
+        "Cannot resolve keyword 'firstname' into field",
+    ],
     'custom_pk': [
         '"Employee" has no attribute "id"'
     ],
@@ -124,6 +126,9 @@ IGNORED_ERRORS = {
     ],
     'defer': [
         'Too many arguments for "refresh_from_db" of "Model"'
+    ],
+    'delete': [
+        'Incompatible type for lookup \'pk\': (got "Optional[int]", expected "int")',
     ],
     'dispatch': [
         'Item "str" of "Union[ValueError, str]" has no attribute "args"'
@@ -165,6 +170,9 @@ IGNORED_ERRORS = {
         + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
         'CustomClass'
     ],
+    'generic_relations': [
+        "Cannot resolve keyword 'vegetable' into field"
+    ],
     'generic_relations_regress': [
         '"Link" has no attribute'
     ],
@@ -178,7 +186,12 @@ IGNORED_ERRORS = {
     ],
     'lookup': [
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of',
-        'is called with more than one field'
+        'is called with more than one field',
+        "Cannot resolve keyword 'pub_date_year' into field",
+        "Cannot resolve keyword 'blahblah' into field",
+    ],
+    'm2m_regress': [
+        "Cannot resolve keyword 'porcupine' into field",
     ],
     'messages_tests': [
         'List item 0 has incompatible type "Dict[str, Message]"; expected "Message"'
@@ -208,7 +221,8 @@ IGNORED_ERRORS = {
         'base class "AbstractModel" defined',
         'Definition of "name" in base class "ConcreteParent"',
         ' Definition of "name" in base class "AbstractParent"',
-        'referent_references'
+        'referent_references',
+        "Cannot resolve keyword 'attached_comment_set' into field"
     ],
     'model_meta': [
         'List item 0 has incompatible type "str"; expected "Union[Field[Any, Any], ForeignObjectRel]"'
@@ -220,6 +234,9 @@ IGNORED_ERRORS = {
     ],
     'multiple_database': [
         'Unexpected attribute "extra_arg" for model "Book"'
+    ],
+    'null_queries': [
+        "Cannot resolve keyword 'foo' into field"
     ],
     'order_with_respect_to': [
         'BaseOrderWithRespectToTests',
@@ -265,13 +282,18 @@ IGNORED_ERRORS = {
         'Unsupported operand types for | ("Manager[Author]" and "Manager[Tag]")',
         'ObjectA',
         "'flat' and 'named' can't be used together",
-        '"Collection[Any]" has no attribute "explain"'
+        '"Collection[Any]" has no attribute "explain"',
+        "Cannot resolve keyword 'unknown_field' into field",
+        'Incompatible type for lookup \'tag\': (got "str", expected "Union[Tag, int, None]")',
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
     ],
     'responses': [
         'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"'
+    ],
+    'reverse_lookup': [
+        "Cannot resolve keyword 'choice' into field"
     ],
     'settings_tests': [
         'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'

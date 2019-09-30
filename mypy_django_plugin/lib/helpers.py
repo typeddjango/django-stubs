@@ -1,6 +1,11 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union, cast
+from typing import (
+    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast,
+)
 
+from django.db.models.fields import Field
+from django.db.models.fields.related import RelatedField
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
@@ -115,29 +120,50 @@ def parse_bool(expr: Expression) -> Optional[bool]:
     return None
 
 
-def has_any_of_bases(info: TypeInfo, bases: Set[str]) -> bool:
+def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
     for base_fullname in bases:
         if info.has_base(base_fullname):
             return True
     return False
 
 
+def iter_bases(info: TypeInfo) -> Iterator[Instance]:
+    for base in info.bases:
+        yield base
+        yield from iter_bases(base.type)
+
+
 def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
     """ Return declared type of type_info's private_field_name (used for private Field attributes)"""
     sym = type_info.get(private_field_name)
     if sym is None:
-        return AnyType(TypeOfAny.unannotated)
+        return AnyType(TypeOfAny.explicit)
 
     node = sym.node
     if isinstance(node, Var):
         descriptor_type = node.type
         if descriptor_type is None:
-            return AnyType(TypeOfAny.unannotated)
+            return AnyType(TypeOfAny.explicit)
 
         if is_nullable:
             descriptor_type = make_optional(descriptor_type)
         return descriptor_type
-    return AnyType(TypeOfAny.unannotated)
+    return AnyType(TypeOfAny.explicit)
+
+
+def get_field_lookup_exact_type(api: TypeChecker, field: Field) -> MypyType:
+    if isinstance(field, (RelatedField, ForeignObjectRel)):
+        lookup_type_class = field.related_model
+        rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
+        if rel_model_info is None:
+            return AnyType(TypeOfAny.from_error)
+        return make_optional(Instance(rel_model_info, []))
+
+    field_info = lookup_class_typeinfo(api, field.__class__)
+    if field_info is None:
+        return AnyType(TypeOfAny.explicit)
+    return get_private_descriptor_type(field_info, '_pyi_lookup_exact_type',
+                                       is_nullable=field.null)
 
 
 def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]:

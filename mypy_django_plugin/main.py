@@ -209,6 +209,8 @@ class NewSemanalDjangoPlugin(Plugin):
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+        if class_fullname in manager_classes and method_name in {'filter', 'get', 'exclude'}:
+            return partial(init_create.typecheck_queryset_filter, django_context=self.django_context)
         return None
 
     def get_base_class_hook(self, fullname: str
