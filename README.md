@@ -8,9 +8,8 @@
 
 This package contains type stubs and mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need to accompany the stubs with mypy plugins. The final goal is to be able to get precise types for most common patterns.
 
-Supports Python 3.6/3.7, and Django 2.1/2.2.
-
 Could be run on earlier versions of Django, but expect some missing imports warnings.
+
 
 ## Installation
 
@@ -18,18 +17,17 @@ Could be run on earlier versions of Django, but expect some missing imports warn
 pip install django-stubs
 ```
 
+
 ## Mypy compatibility
 
-| django-stubs | mypy version | django version |
-| ------------ | ---- | ---- |
-| 1.2.0 | 0.730 | 2.2.x
-| 1.1.0 | 0.720 | 2.2.x
-| 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x
+| django-stubs | mypy version | django version | python version
+| ------------ | ---- | ---- | ---- |
+| 1.2.0 | 0.730 | 2.2.x | ^3.6
+| 1.1.0 | 0.720 | 2.2.x | ^3.6
+| 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
 
 
-### WARNING: All configuration from pre-1.0.0 versions is dropped, use one below.
-
-### WARNING: 1.0.0 breaks `dmypy`, if you need it, stay on the 0.12.x series. 
+## Configuration
 
 To make mypy aware of the plugin, you need to add
 
@@ -39,37 +37,43 @@ plugins =
     mypy_django_plugin.main
 ```
 
-in your `mypy.ini` file.
+in your `mypy.ini` or `setup.cfg` [file](https://mypy.readthedocs.io/en/latest/config_file.html).
 
-Plugin requires Django settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified inside `mypy.ini` file.
+Plugin also requires Django settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified.
 
 ```ini
 [mypy]
 strict_optional = True
 
-; this one is new
+# This one is new:
 [mypy.plugins.django-stubs]
 django_settings_module = mysettings
 ```
 
-where `mysettings` is a value of `DJANGO_SETTINGS_MODULE` (with or without quotes)
+Where `mysettings` is a value of `DJANGO_SETTINGS_MODULE` (with or without quotes)
 
-Do you have trouble with mypy / the django plugin not finding your settings module? Try adding the root path of your project to your PYTHONPATH environment variable. If you use pipenv you can add the following to an `.env` file in your project root which pipenv will run automatically before executing any commands.:
-```
+You might also need to explicitly tweak your `PYTHONPATH` the very same way `django` does it internally in case you have troubles with mypy / django plugin not finding your settings module. Try adding the root path of your project to your `PYTHONPATH` environment variable like so:
+
+```bash
 PYTHONPATH=${PYTHONPATH}:${PWD}
 ```
 
-New implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
+Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too. 
 
+This fully working [typed boilerplate](https://github.com/wemake-services/wemake-django-template) can serve you as an example.
+
+
 ## Notes
 
-Implementation monkey-patches Django to add `__class_getitem__` to the `Manager` class. If you'd use Python3.7 and do that too in your code, you can make things like
+Type implementation monkey-patches Django to add `__class_getitem__` to the `Manager` class. 
+If you would use Python3.7 and do that too in your code, you can make things like
 
 ```python
 class MyUserManager(models.Manager['MyUser']):
     pass
+
 class MyUser(models.Model):
     objects = UserManager()
 ```
@@ -77,6 +81,7 @@ class MyUser(models.Model):
 work, which should make a error messages a bit better. 
 
 Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, which will rewrite base manager as `models.Manager[User]` to make methods like `get_queryset()` and others return properly typed `QuerySet`. 
+
 
 ## To get help
 
