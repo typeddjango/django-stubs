@@ -88,3 +88,18 @@ Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, w
 We have Gitter here: <https://gitter.im/mypy-django/Lobby>
 
 If you think you have more generic typing issue, please refer to https://github.com/python/mypy and their Gitter.
+
+
+### Django-configurations support
+
+When using <https://django-configurations.readthedocs.io> you will need to set `django_configuration` in the `[mypy.plugins.django-stubs]` section.
+
+```ini
+[mypy]
+strict_optional = True
+
+; this one is new
+[mypy.plugins.django-stubs]
+django_settings_module = mysettings
+django_configuration = ProductionConfiguration
+```
