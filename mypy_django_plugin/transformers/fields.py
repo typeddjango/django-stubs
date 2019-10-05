@@ -45,6 +45,8 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     assert isinstance(current_field, RelatedField)
 
     related_model_cls = django_context.get_field_related_model_cls(current_field)
+    if related_model_cls is None:
+        return AnyType(TypeOfAny.from_error)
 
     related_model = related_model_cls
     related_model_to_set = related_model_cls

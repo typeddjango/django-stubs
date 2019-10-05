@@ -387,21 +387,51 @@
                 class Book2(models.Model):
                     publisher = models.ForeignKey(to=Publisher2, on_delete=models.CASCADE)
 
--   case: if_model_is_defined_as_name_of_the_class_look_for_it_in_the_same_file
+-   case: if_model_is_defined_as_name_of_the_class_look_for_it_in_the_same_app
     main: |
         from myapp.models import Book
-        reveal_type(Book().publisher)  # N: Revealed type is 'myapp.models.Publisher*'
+        reveal_type(Book().publisher)  # N: Revealed type is 'myapp.models.publisher.Publisher*'
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
-        -   path: myapp/models.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from .publisher import Publisher
+                from .book import Book
+        -   path: myapp/models/publisher.py
             content: |
                 from django.db import models
                 class Publisher(models.Model):
                     pass
+        -   path: myapp/models/book.py
+            content: |
+                from django.db import models
                 class Book(models.Model):
                     publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)
+
+
+-   case: fail_if_no_model_in_the_same_app_models_init_py
+    main: |
+        from myapp.models import Book
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from .book import Book
+        -   path: myapp/models/publisher.py
+            content: |
+                from django.db import models
+                class Publisher(models.Model):
+                    pass
+        -   path: myapp/models/book.py
+            content: |
+                from django.db import models
+                class Book(models.Model):
+                    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)  # E: Cannot find model 'Publisher' referenced in field 'publisher'
+
 
 -   case: test_foreign_key_field_without_backwards_relation
     main: |

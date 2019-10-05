@@ -150,6 +150,8 @@ class NewSemanalDjangoPlugin(Plugin):
             for field in self.django_context.get_model_fields(model_class):
                 if isinstance(field, RelatedField):
                     related_model_cls = self.django_context.get_field_related_model_cls(field)
+                    if related_model_cls is None:
+                        continue
                     related_model_module = related_model_cls.__module__
                     if related_model_module != file.fullname():
                         deps.add(self._new_dependency(related_model_module))

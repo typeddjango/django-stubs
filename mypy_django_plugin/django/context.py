@@ -177,6 +177,10 @@ class DjangoContext:
                         continue
 
                     related_model = self.get_field_related_model_cls(field)
+                    if related_model is None:
+                        expected_types[field_name] = AnyType(TypeOfAny.from_error)
+                        continue
+
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
 
@@ -260,6 +264,8 @@ class DjangoContext:
         is_nullable = self.get_field_nullability(field, method)
         if isinstance(field, RelatedField):
             related_model_cls = self.get_field_related_model_cls(field)
+            if related_model_cls is None:
+                return AnyType(TypeOfAny.from_error)
 
             if method == 'values':
                 primary_key_field = self.get_primary_key_field(related_model_cls)
@@ -274,7 +280,7 @@ class DjangoContext:
             return helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
                                                        is_nullable=is_nullable)
 
-    def get_field_related_model_cls(self, field: Union[RelatedField, ForeignObjectRel]) -> Type[Model]:
+    def get_field_related_model_cls(self, field: Union[RelatedField, ForeignObjectRel]) -> Optional[Type[Model]]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:
