@@ -1,25 +1,19 @@
 from collections import OrderedDict
-from typing import (
-    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast,
-)
+from typing import (Any, Dict, Iterable, Iterator, List, Optional, Set, TYPE_CHECKING, Union, cast)
 
-from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
-from mypy.nodes import (
-    GDEF, MDEF, Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable,
-    SymbolTableNode, TypeInfo, Var,
-)
+from mypy.nodes import (Block, ClassDef, Expression, GDEF, MDEF, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
+                        SymbolTable, SymbolTableNode, TypeInfo, Var)
 from mypy.plugin import (
     AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
 )
-from mypy.types import AnyType, Instance, NoneTyp, TupleType
-from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, NoneTyp, TupleType, Type as MypyType, TypeOfAny, TypedDictType, UnionType
 
+from django.db.models.fields import Field
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
@@ -284,3 +278,11 @@ def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionCont
 def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
     return (info.fullname() in django_context.model_base_classes
             or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
+
+
+def check_types_compatible(ctx: Union[FunctionContext, MethodContext],
+                           *, expected_type: MypyType, actual_type: MypyType, error_message: str) -> None:
+    api = get_typechecker_api(ctx)
+    api.check_subtype(actual_type, expected_type,
+                      ctx.context, error_message,
+                      'got', 'expected')
