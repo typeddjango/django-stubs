@@ -8,11 +8,13 @@ from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
 from mypy.nodes import (
-    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var,
+    ARG_STAR2, MDEF, Argument, Context, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
-from mypy.types import AnyType, Instance, TypeOfAny
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
@@ -38,7 +40,7 @@ class ModelClassInitializer:
         field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
         return field_info
 
-    def create_new_var(self, name: str, typ: Instance) -> Var:
+    def create_new_var(self, name: str, typ: MypyType) -> Var:
         # type=: type of the variable itself
         var = Var(name=name, type=typ)
         # var.info: type of the object variable is bound to
@@ -48,7 +50,7 @@ class ModelClassInitializer:
         var.is_inferred = True
         return var
 
-    def add_new_node_to_model_class(self, name: str, typ: Instance) -> None:
+    def add_new_node_to_model_class(self, name: str, typ: MypyType) -> None:
         var = self.create_new_var(name, typ)
         self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
@@ -100,6 +102,18 @@ class AddRelatedModelsId(ModelClassInitializer):
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignKey):
                 related_model_cls = self.django_context.get_field_related_model_cls(field)
+                if related_model_cls is None:
+                    error_context: Context = self.ctx.cls
+                    field_sym = self.ctx.cls.info.get(field.name)
+                    if field_sym is not None and field_sym.node is not None:
+                        error_context = field_sym.node
+                    self.api.fail(f'Cannot find model {field.related_model!r} '
+                                  f'referenced in field {field.name!r} ',
+                                  ctx=error_context)
+                    self.add_new_node_to_model_class(field.attname,
+                                                     AnyType(TypeOfAny.explicit))
+                    continue
+
                 rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
                 field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
                 is_nullable = self.django_context.get_field_nullability(field, None)
@@ -163,8 +177,10 @@ class AddRelatedManagers(ModelClassInitializer):
                 continue
 
             related_model_cls = self.django_context.get_field_related_model_cls(relation)
-            related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
+            if related_model_cls is None:
+                continue
 
+            related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
             if isinstance(relation, OneToOneRel):
                 self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
                 continue
