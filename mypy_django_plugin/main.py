@@ -11,6 +11,7 @@ from mypy.plugin import (
 )
 from mypy.types import Type as MypyType
 
+import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
@@ -148,13 +149,13 @@ class NewSemanalDjangoPlugin(Plugin):
             # forward relations
             for field in self.django_context.get_model_fields(model_class):
                 if isinstance(field, RelatedField):
-                    related_model_cls = self.django_context.fields_context.get_related_model_cls(field)
+                    related_model_cls = self.django_context.get_field_related_model_cls(field)
                     related_model_module = related_model_cls.__module__
                     if related_model_module != file.fullname():
                         deps.add(self._new_dependency(related_model_module))
             # reverse relations
             for relation in model_class._meta.related_objects:
-                related_model_cls = self.django_context.fields_context.get_related_model_cls(relation)
+                related_model_cls = self.django_context.get_field_related_model_cls(relation)
                 related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname():
                     deps.add(self._new_dependency(related_model_module))
@@ -210,7 +211,8 @@ class NewSemanalDjangoPlugin(Plugin):
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
         if class_fullname in manager_classes and method_name in {'filter', 'get', 'exclude'}:
-            return partial(init_create.typecheck_queryset_filter, django_context=self.django_context)
+            return partial(mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
+                           django_context=self.django_context)
         return None
 
     def get_base_class_hook(self, fullname: str

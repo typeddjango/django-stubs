@@ -284,3 +284,11 @@ def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionCont
 def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
     return (info.fullname() in django_context.model_base_classes
             or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
+
+
+def check_types_compatible(ctx: Union[FunctionContext, MethodContext],
+                           *, expected_type: MypyType, actual_type: MypyType, error_message: str) -> None:
+    api = get_typechecker_api(ctx)
+    api.check_subtype(actual_type, expected_type,
+                      ctx.context, error_message,
+                      'got', 'expected')

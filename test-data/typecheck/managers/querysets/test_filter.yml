@@ -213,3 +213,44 @@
                     pass
                 class Profile(models.Model):
                     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+
+
+# TODO
+-   case: f_expression_simple_case
+    main: |
+        from myapp.models import User
+        from django.db import models
+        User.objects.filter(username=models.F('username2'))
+        User.objects.filter(username=models.F('age'))
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class User(models.Model):
+                    username = models.TextField()
+                    username2 = models.TextField()
+
+                    age = models.IntegerField()
+
+
+# TODO
+-   case: f_expression_with_expression_math_is_not_supported
+    main: |
+        from myapp.models import User
+        from django.db import models
+        User.objects.filter(username=models.F('username2') + 'hello')
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.TextField()
+                    username2 = models.TextField()
+                    age = models.IntegerField()

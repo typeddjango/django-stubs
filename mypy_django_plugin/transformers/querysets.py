@@ -40,7 +40,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
 def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model],
                                *, method: str, lookup: str) -> Optional[MypyType]:
     try:
-        lookup_field = django_context.lookups_context.resolve_lookup_info_field(model_cls, lookup)
+        lookup_field = django_context.resolve_lookup_into_field(model_cls, lookup)
     except FieldError as exc:
         ctx.api.fail(exc.args[0], ctx.context)
         return None
@@ -48,11 +48,11 @@ def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext
         return AnyType(TypeOfAny.explicit)
 
     if isinstance(lookup_field, RelatedField) and lookup_field.column == lookup:
-        related_model_cls = django_context.fields_context.get_related_model_cls(lookup_field)
+        related_model_cls = django_context.get_field_related_model_cls(lookup_field)
         lookup_field = django_context.get_primary_key_field(related_model_cls)
 
-    field_get_type = django_context.fields_context.get_field_get_type(helpers.get_typechecker_api(ctx),
-                                                                      lookup_field, method=method)
+    field_get_type = django_context.get_field_get_type(helpers.get_typechecker_api(ctx),
+                                                       lookup_field, method=method)
     return field_get_type
 
 
@@ -73,8 +73,8 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
         elif named:
             column_types: 'OrderedDict[str, MypyType]' = OrderedDict()
             for field in django_context.get_model_fields(model_cls):
-                column_type = django_context.fields_context.get_field_get_type(typechecker_api, field,
-                                                                               method='values_list')
+                column_type = django_context.get_field_get_type(typechecker_api, field,
+                                                                method='values_list')
                 column_types[field.attname] = column_type
             return helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
         else:
