@@ -219,7 +219,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str
                             ) -> Optional[Callable[[ClassDefContext], None]]:
-        if (fullname in self.django_context.model_base_classes
+        if (fullname in self.django_context.all_registered_model_class_fullnames
                 or fullname in self._get_current_model_bases()):
             return partial(transform_model_class, django_context=self.django_context)
 

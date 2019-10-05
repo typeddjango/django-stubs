@@ -282,7 +282,7 @@ def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionCont
 
 
 def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
-    return (info.fullname() in django_context.model_base_classes
+    return (info.fullname() in django_context.all_registered_model_class_fullnames
             or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
 
 
@@ -292,3 +292,15 @@ def check_types_compatible(ctx: Union[FunctionContext, MethodContext],
     api.check_subtype(actual_type, expected_type,
                       ctx.context, error_message,
                       'got', 'expected')
+
+
+def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> None:
+    # type=: type of the variable itself
+    var = Var(name=name, type=sym_type)
+    # var.info: type of the object variable is bound to
+    var.info = info
+    var._fullname = info.fullname() + '.' + name
+    var.is_initialized_in_class = True
+    var.is_inferred = True
+    info.names[name] = SymbolTableNode(MDEF, var,
+                                       plugin_generated=True)

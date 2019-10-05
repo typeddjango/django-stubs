@@ -209,16 +209,20 @@ class DjangoContext:
         return expected_types
 
     @cached_property
-    def model_base_classes(self) -> Set[str]:
+    def all_registered_model_classes(self) -> Set[Type[models.Model]]:
         model_classes = self.apps_registry.get_models()
 
         all_model_bases = set()
         for model_cls in model_classes:
             for base_cls in model_cls.mro():
                 if issubclass(base_cls, models.Model):
-                    all_model_bases.add(helpers.get_class_fullname(base_cls))
+                    all_model_bases.add(base_cls)
 
         return all_model_bases
+
+    @cached_property
+    def all_registered_model_class_fullnames(self) -> Set[str]:
+        return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
 
     def get_attname(self, field: Field) -> str:
         attname = field.attname

@@ -7,9 +7,7 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.nodes import (
-    ARG_STAR2, MDEF, Argument, Context, SymbolTableNode, TypeInfo, Var,
-)
+from mypy.nodes import ARG_STAR2, Argument, Context, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
 from mypy.types import AnyType, Instance
@@ -51,8 +49,9 @@ class ModelClassInitializer:
         return var
 
     def add_new_node_to_model_class(self, name: str, typ: MypyType) -> None:
-        var = self.create_new_var(name, typ)
-        self.model_classdef.info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
+        helpers.add_new_sym_for_info(self.model_classdef.info,
+                                     name=name,
+                                     sym_type=typ)
 
     def run(self) -> None:
         model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
@@ -112,6 +111,9 @@ class AddRelatedModelsId(ModelClassInitializer):
                                   ctx=error_context)
                     self.add_new_node_to_model_class(field.attname,
                                                      AnyType(TypeOfAny.explicit))
+                    continue
+
+                if related_model_cls._meta.abstract:
                     continue
 
                 rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
