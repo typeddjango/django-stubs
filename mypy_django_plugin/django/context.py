@@ -1,4 +1,5 @@
 import os
+import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from typing import (Dict, Iterable, Iterator, Optional, Set, TYPE_CHECKING, Tuple, Type, Union)
@@ -43,6 +44,9 @@ def temp_environ():
 def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
     with temp_environ():
         os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
+
+        # add current directory to sys.path
+        sys.path.append(os.getcwd())
 
         def noop_class_getitem(cls, key):
             return cls
