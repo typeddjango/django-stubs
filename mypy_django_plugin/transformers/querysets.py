@@ -52,7 +52,7 @@ def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext
         lookup_field = django_context.get_primary_key_field(related_model_cls)
 
     field_get_type = django_context.get_field_get_type(helpers.get_typechecker_api(ctx),
-                                                                      lookup_field, method=method)
+                                                       lookup_field, method=method)
     return field_get_type
 
 
@@ -74,7 +74,7 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
             column_types: 'OrderedDict[str, MypyType]' = OrderedDict()
             for field in django_context.get_model_fields(model_cls):
                 column_type = django_context.get_field_get_type(typechecker_api, field,
-                                                                               method='values_list')
+                                                                method='values_list')
                 column_types[field.attname] = column_type
             return helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
         else:
