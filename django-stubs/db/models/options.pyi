@@ -23,8 +23,8 @@ IMMUTABLE_WARNING: str
 DEFAULT_NAMES: Tuple[str, ...]
 
 def normalize_together(
-    option_together: Any
-) -> Union[List[Union[Tuple[str, str], int]], Set[Tuple[str, str]], Tuple, int, str]: ...
+    option_together: Union[Sequence[Tuple[str, str]], Tuple[str, str]]
+) -> Tuple[Tuple[str, str], ...]: ...
 def make_immutable_fields_list(
     name: str, data: Union[Iterator[Any], List[Union[ArrayField, CIText]], List[Union[Field, FieldCacheMixin]]]
 ) -> ImmutableList: ...

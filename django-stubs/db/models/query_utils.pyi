@@ -1,5 +1,5 @@
 from collections import OrderedDict, namedtuple
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, Sequence, Mapping, Collection
 
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
@@ -65,15 +65,11 @@ class RegisterLookupMixin:
 def select_related_descend(
     field: Field,
     restricted: bool,
-    requested: Optional[
-        Union[Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]]]]]], bool]
-    ],
-    load_fields: Optional[Set[str]],
+    requested: Optional[Mapping[str, Any]],
+    load_fields: Optional[Collection[str]],
     reverse: bool = ...,
 ) -> bool: ...
-def refs_expression(
-    lookup_parts: List[str], annotations: OrderedDict
-) -> Union[Tuple[bool, Tuple], Tuple[Expression, List[str]]]: ...
+def refs_expression(lookup_parts: Sequence[str], annotations: Mapping[str, bool]) -> Tuple[bool, Sequence[str]]: ...
 def check_rel_lookup_compatibility(model: Type[Model], target_opts: Any, field: FieldCacheMixin) -> bool: ...
 
 class FilteredRelation:
