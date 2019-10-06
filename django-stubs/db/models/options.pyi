@@ -1,5 +1,5 @@
 import collections
-from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps

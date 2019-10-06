@@ -2,7 +2,7 @@ import os
 from typing import Optional
 
 import libcst
-from libcst import FunctionDef, Annotation, Subscript, BaseExpression, Name
+from libcst import Annotation, BaseExpression, FunctionDef, Name, Subscript
 from libcst.metadata import SyntacticPositionProvider
 
 BASE_DIR = 'django-stubs'
@@ -86,5 +86,3 @@ for dirpath, dirnames, filenames in os.walk(BASE_DIR):
         tree = libcst.MetadataWrapper(libcst.parse_module(contents))
         analyzer = TypeAnnotationsAnalyzer(fpath)
         tree.visit(analyzer)
-
-

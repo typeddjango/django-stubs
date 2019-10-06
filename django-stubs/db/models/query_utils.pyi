@@ -1,13 +1,13 @@
-from collections import OrderedDict, namedtuple
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, Sequence, Mapping, Collection
+from collections import namedtuple
+from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.db.models.base import Model
-from django.db.models.expressions import Expression
-from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
+
+from django.db.models.fields import Field
 from django.utils import tree
 
 PathInfo = namedtuple("PathInfo", "from_opts to_opts target_fields join_field m2m direct filtered_relation")
