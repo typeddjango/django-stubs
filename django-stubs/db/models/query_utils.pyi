@@ -1,13 +1,13 @@
-from collections import OrderedDict, namedtuple
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
+from collections import namedtuple
+from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.db.models.base import Model
-from django.db.models.expressions import Expression
-from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
+
+from django.db.models.fields import Field
 from django.utils import tree
 
 PathInfo = namedtuple("PathInfo", "from_opts to_opts target_fields join_field m2m direct filtered_relation")
@@ -65,15 +65,11 @@ class RegisterLookupMixin:
 def select_related_descend(
     field: Field,
     restricted: bool,
-    requested: Optional[
-        Union[Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]]]]]], bool]
-    ],
-    load_fields: Optional[Set[str]],
+    requested: Optional[Mapping[str, Any]],
+    load_fields: Optional[Collection[str]],
     reverse: bool = ...,
 ) -> bool: ...
-def refs_expression(
-    lookup_parts: List[str], annotations: OrderedDict
-) -> Union[Tuple[bool, Tuple], Tuple[Expression, List[str]]]: ...
+def refs_expression(lookup_parts: Sequence[str], annotations: Mapping[str, bool]) -> Tuple[bool, Sequence[str]]: ...
 def check_rel_lookup_compatibility(model: Type[Model], target_opts: Any, field: FieldCacheMixin) -> bool: ...
 
 class FilteredRelation:
