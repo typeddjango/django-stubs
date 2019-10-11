@@ -1,6 +1,7 @@
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, TypeVar, Union, Collection
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, Collection
 
 from django.core.checks.messages import CheckMessage
+from django.core.exceptions import ValidationError
 from django.db.models.manager import Manager
 from django.db.models.options import Options
 
@@ -22,6 +23,9 @@ class Model(metaclass=ModelBase):
     def clean(self) -> None: ...
     def clean_fields(self, exclude: Optional[Collection[str]] = ...) -> None: ...
     def validate_unique(self, exclude: Optional[Collection[str]] = ...) -> None: ...
+    def unique_error_message(
+        self, model_class: Type[_Self], unique_check: Collection[Union[Callable, str]]
+    ) -> ValidationError: ...
     def save(
         self,
         force_insert: bool = ...,
