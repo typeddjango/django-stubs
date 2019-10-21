@@ -2,7 +2,7 @@
 
 # pep484 stubs for Django framework
 
-[![Build Status](https://travis-ci.org/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.org/typeddjango/django-stubs)
+[![Build Status](https://travis-ci.com/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.com/typeddjango/django-stubs)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 
