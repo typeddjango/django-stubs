@@ -25,9 +25,7 @@ from django.db.models.expressions import Combinable, Col
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
 
-class NOT_PROVIDED:
-    pass
-
+class NOT_PROVIDED: ...
 
 _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]

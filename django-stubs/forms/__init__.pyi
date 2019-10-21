@@ -2,11 +2,7 @@ from django.core.exceptions import ValidationError as ValidationError
 
 from .forms import Form as Form, BaseForm as BaseForm
 
-from .formsets import (
-    BaseFormSet as BaseFormSet,
-    all_valid as all_valid,
-    formset_factory as formset_factory,
-)
+from .formsets import BaseFormSet as BaseFormSet, all_valid as all_valid, formset_factory as formset_factory
 
 from .models import (
     ModelForm as ModelForm,

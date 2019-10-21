@@ -1,5 +1,3 @@
 from django.core.mail.backends.base import BaseEmailBackend
 
-
-class EmailBackend(BaseEmailBackend):
-    ...
+class EmailBackend(BaseEmailBackend): ...
