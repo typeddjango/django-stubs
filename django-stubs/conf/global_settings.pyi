@@ -390,8 +390,8 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 # upon login
 PASSWORD_HASHERS: List[str] = ...
 
-AUTH_PASSWORD_VALIDATORS: List[Dict[str, str]] = ...
-
+AUTH_PASSWORD_VALIDATORS: List[Dict[str, Union[str, Dict[str, Any]]]] = ...
+    
 ###########
 # SIGNING #
 ###########
