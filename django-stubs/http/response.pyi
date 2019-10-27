@@ -61,7 +61,7 @@ class HttpResponseBase(Iterable[Any]):
     def writelines(self, lines: Iterable[object]): ...
     def __iter__(self) -> Iterator[Any]: ...
 
-JSONType = Union[Dict[str, 'JSONType'], List['JSONType'], int, str]
+JSONType = Union[Dict[str, 'JSONType'], List['JSONType'], int, str, float]
 
 class HttpResponse(HttpResponseBase):
     client: Client
