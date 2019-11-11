@@ -11,7 +11,7 @@ IGNORED_MODULES = {'schema', 'gis_tests', 'admin_widgets', 'admin_filters', 'mig
                    'sites_tests', 'inline_formsets', 'foreign_object', 'cache', 'test_client', 'test_client_regress'}
 
 MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_args_list',
-                'call_args', 'MockUser', 'Xtemplate', 'DummyRequest', 'DummyUser', 'MinimalUser']
+                'call_args', 'MockUser', 'Xtemplate', 'DummyRequest', 'DummyUser', 'MinimalUser', 'DummyNode']
 EXTERNAL_MODULES = ['psycopg2', 'PIL', 'selenium', 'oracle', 'mysql', 'sqlite3', 'sqlparse', 'tblib', 'numpy',
                     'bcrypt', 'argon2', 'xml.dom']
 IGNORED_ERRORS = {
@@ -25,8 +25,7 @@ IGNORED_ERRORS = {
         'Cannot assign to a type',
         '"HttpResponseBase" has no attribute',
         '"object" has no attribute',
-        re.compile(r'"Callable\[(\[(Any(, )?)*((, )?VarArg\(Any\))?((, )?KwArg\(Any\))?\]|\.\.\.), Any\]" '
-                   r'has no attribute'),
+        re.compile(r'"Callable\[.+, Any\]" has no attribute'),
         'has no attribute "deconstruct"',
         # private members
         re.compile(r'has no attribute ("|\')_[a-zA-Z_]+("|\')'),
@@ -35,7 +34,7 @@ IGNORED_ERRORS = {
         re.compile(r"Expression of type '.*' is not supported"),
         'has incompatible type "object"',
         'undefined in superclass',
-        'Argument after ** must be a mapping, not "object"',
+        'Argument after ** must be a mapping',
         'note:',
         re.compile(r'Item "None" of "[a-zA-Z_ ,\[\]]+" has no attribute'),
         '"Optional[List[_Record]]"',
@@ -61,7 +60,12 @@ IGNORED_ERRORS = {
         # TODO: multitable inheritance
         'ptr',
         'Incompatible types in assignment (expression has type "Callable[',
-        'SimpleLazyObject'
+        'SimpleLazyObject',
+        'Test',
+        'Mixin" has no attribute',
+        'Incompatible types in string interpolation',
+        '"None" has no attribute',
+        'has no attribute "assert',
     ],
     'aggregation': [
         re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"'),
@@ -83,6 +87,8 @@ IGNORED_ERRORS = {
         'Unsupported left operand type for + ("Sequence[str]")',
         'AuthenticationFormWithInactiveUsersOkay',
         'Incompatible types in assignment (expression has type "Dict[str, Any]", variable has type "QueryDict")',
+        'No overload variant of "int" matches argument type "AnonymousUser"',
+        'expression has type "AnonymousUser", variable has type "User"',
     ],
     'basic': [
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
@@ -93,42 +99,50 @@ IGNORED_ERRORS = {
     'backends': [
         '"DatabaseError" has no attribute "pgcode"'
     ],
+    'builtin_server': [
+        '"ServerHandler" has no attribute',
+    ],
     'check_framework': [
         'base class "Model" defined the type as "Callable',
+        'Value of type "Collection[str]" is not indexable',
+        'Unsupported target for indexed assignment',
     ],
     'constraints': [
         'Argument "condition" to "UniqueConstraint" has incompatible type "str"; expected "Optional[Q]"'
     ],
     'contenttypes_tests': [
-        #     'Item "Model" of "Union[GenericForeignKey, Model, None]" has no attribute'
-        'base class "BaseOrderWithRespectToTests" defined the type as "None"'
+        '"FooWithBrokenAbsoluteUrl" has no attribute "unknown_field"',
     ],
     'custom_lookups': [
-        'in base class "SQLFuncMixin"'
+        'in base class "SQLFuncMixin"',
+        'has no attribute "name"',
     ],
     'custom_columns': [
         "Cannot resolve keyword 'firstname' into field",
     ],
     'custom_pk': [
-        '"Employee" has no attribute "id"'
+        '"Employee" has no attribute "id"',
     ],
     'custom_managers': [
         'Unsupported dynamic base class',
         'Incompatible types in assignment (expression has type "CharField',
-        'Item "Book" of "Optional[Book]" has no attribute "favorite_avg"'
+        'Item "Book" of "Optional[Book]" has no attribute "favorite_avg"',
     ],
     'csrf_tests': [
-        'Incompatible types in assignment (expression has type "property", ' +
-        'base class "HttpRequest" defined the type as "QueryDict")'
+        'expression has type "property", base class "HttpRequest" defined the type as "QueryDict"',
+        'expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase"',
     ],
     'dates': [
         'Too few arguments for "dates" of',
+    ],
+    'dbshell': [
+        'Incompatible types in assignment (expression has type "None"',
     ],
     'defer': [
         'Too many arguments for "refresh_from_db" of "Model"'
     ],
     'delete': [
-        'Incompatible type for lookup \'pk\': (got "Optional[int]", expected "int")',
+        'Incompatible type for lookup \'pk\': (got "Optional[int]", expected "Union[str, int]")',
     ],
     'dispatch': [
         'Item "str" of "Union[ValueError, str]" has no attribute "args"'
@@ -153,36 +167,48 @@ IGNORED_ERRORS = {
     'file_uploads': [
         'has no attribute "content_type"',
     ],
+    'file_storage': [
+        'Incompatible types in assignment (expression has type "None", variable has type "str")',
+        'Property "base_url" defined in "FileSystemStorage" is read-only',
+    ],
     'files': [
         'Incompatible types in assignment (expression has type "IOBase", variable has type "File")',
+        'Argument 1 to "write" of "SpooledTemporaryFile"',
+    ],
+    'filtered_relation': [
+        'has no attribute "name"',
     ],
     'fixtures': [
         'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")',
-        'Incompatible types in assignment (expression has type "SpyManager[Spy]"'
+        'Incompatible types in assignment (expression has type "SpyManager[Spy]"',
+    ],
+    'fixtures_regress': [
+        'Unsupported left operand type for + ("None")',
     ],
     'from_db_value': [
-        '"Cash" has no attribute'
+        '"Cash" has no attribute',
+        'Argument 1 to "__str__" of "Decimal"',
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
         + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
         'Argument 1 to "get_list_or_404" has incompatible type "List[Type[Article]]"; '
         + 'expected "Union[Type[<nothing>], QuerySet[<nothing>]]"',
-        'CustomClass'
+        'CustomClass',
     ],
     'generic_relations': [
-        "Cannot resolve keyword 'vegetable' into field"
+        "Cannot resolve keyword 'vegetable' into field",
     ],
     'generic_relations_regress': [
-        '"Link" has no attribute'
+        '"Link" has no attribute',
     ],
     'httpwrappers': [
         'Argument 2 to "appendlist" of "QueryDict"',
         'Incompatible types in assignment (expression has type "int", target has type "Union[str, List[str]]")',
-        'Argument 1 to "fromkeys" of "QueryDict" has incompatible type "int"'
+        'Argument 1 to "fromkeys" of "QueryDict" has incompatible type "int"',
     ],
     'humanize_tests': [
-        'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"'
+        'Argument 1 to "append" of "list" has incompatible type "None"; expected "str"',
     ],
     'lookup': [
         'Unexpected keyword argument "headline__startswith" for "in_bulk" of',
@@ -190,18 +216,29 @@ IGNORED_ERRORS = {
         "Cannot resolve keyword 'pub_date_year' into field",
         "Cannot resolve keyword 'blahblah' into field",
     ],
+    'logging_tests': [
+        re.compile(r'Argument [0-9] to "makeRecord" of "Logger"'),
+        '"LogRecord" has no attribute "request"',
+    ],
     'm2m_regress': [
         "Cannot resolve keyword 'porcupine' into field",
     ],
     'messages_tests': [
-        'List item 0 has incompatible type "Dict[str, Message]"; expected "Message"'
+        'List item 0 has incompatible type "Dict[str, Message]"; expected "Message"',
+        'Too many arguments',
+        'CustomRequest',
     ],
     'middleware': [
-        '"HttpRequest" has no attribute'
+        re.compile(r'"(HttpRequest|WSGIRequest)" has no attribute'),
+    ],
+    'many_to_many': [
+        '(expression has type "List[Article]", variable has type "RelatedManager[Article]"',
     ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")',
-        'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")'
+        'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")',
+        'expression has type "List[<nothing>]", variable has type "RelatedManager[Article]"',
+        '"Reporter" has no attribute "cached_query"',
     ],
     'middleware_exceptions': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
@@ -209,9 +246,9 @@ IGNORED_ERRORS = {
     'model_fields': [
         'Item "Field[Any, Any]" of "Union[Field[Any, Any], ForeignObjectRel]" has no attribute',
         'Incompatible types in assignment (expression has type "Type[Person',
-        'base class "IntegerFieldTests"',
-        'ImageFieldTestMixin',
         'Incompatible types in assignment (expression has type "FloatModel", variable has type',
+        'No overload variant of "bytes" matches argument type "Container[int]"',
+        '"ImageFile" has no attribute "was_opened"',
     ],
     'model_indexes': [
         'Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'
@@ -232,6 +269,12 @@ IGNORED_ERRORS = {
         '"PickledModel" has no attribute',
         '"Department" has no attribute "evaluate"',
     ],
+    'model_formsets_regress': [
+        'Incompatible types in assignment (expression has type "int", target has type "str")',
+    ],
+    'model_options': [
+        'expression has type "Dict[str, Type[Model]]", target has type "OrderedDict',
+    ],
     'multiple_database': [
         'Unexpected attribute "extra_arg" for model "Book"'
     ],
@@ -239,7 +282,6 @@ IGNORED_ERRORS = {
         "Cannot resolve keyword 'foo' into field"
     ],
     'order_with_respect_to': [
-        'BaseOrderWithRespectToTests',
         '"Dimension" has no attribute "set_component_order"',
     ],
     'one_to_one': [
@@ -255,8 +297,6 @@ IGNORED_ERRORS = {
         'DummyJSONField',
         'Incompatible types in assignment (expression has type "Type[Field[Any, Any]]',
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder";',
-        re.compile(r'Incompatible types in assignment \(expression has type "Type\[.+?\]", '
-                   r'base class "(UnaccentTest|TrigramTest)" defined the type as "Type\[CharFieldModel\]"\)'),
         '("None" and "SearchQuery")',
     ],
     'properties': [
@@ -308,9 +348,9 @@ IGNORED_ERRORS = {
         'List or tuple expected as variable arguments'
     ],
     'sessions_tests': [
-        'base class "SessionTestsMixin" defined the type as "None")',
         'Incompatible types in assignment (expression has type "None", variable has type "int")',
-        '"AbstractBaseSession" has no attribute'
+        '"AbstractBaseSession" has no attribute',
+        '"None" not callable',
     ],
     'select_related': [
         'Item "ForeignKey[Union[Genus, Combinable], Genus]" '
@@ -324,18 +364,28 @@ IGNORED_ERRORS = {
         re.compile('Argument [0-9] to "WSGIRequestHandler"'),
         '"HTTPResponse" has no attribute',
         '"type" has no attribute',
-        '"WSGIRequest" has no attribute "makefile"'
+        '"WSGIRequest" has no attribute "makefile"',
+        'LiveServerAddress',
+        '"Stub" has no attribute "makefile"',
     ],
     'serializers': [
-        '"SerializersTestBase" defined the type as "None"',
         '"Model" has no attribute "data"',
         '"Iterable[Any]" has no attribute "content"',
+        re.compile(r'Argument 1 to "(serialize|deserialize)" has incompatible type "None"; expected "str"')
+    ],
+    'string_lookup': [
+        '"Bar" has no attribute "place"',
+    ],
+    'test_utils': [
+        '"PossessedCar" has no attribute "color"',
+        'expression has type "None", variable has type "List[str]"',
     ],
     'transactions': [
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
     ],
     'urlpatterns': [
-        '"object" not callable'
+        '"object" not callable',
+        '"None" not callable',
     ],
     'urlpatterns_reverse': [
         'List or tuple expected as variable arguments',
@@ -344,6 +394,7 @@ IGNORED_ERRORS = {
     ],
     'utils_tests': [
         'Argument 1 to "activate" has incompatible type "None"; expected "Union[tzinfo, str]"',
+        'Argument 1 to "activate" has incompatible type "Optional[str]"; expected "str"',
         'Incompatible types in assignment (expression has type "None", base class "object" defined the type as',
         'Class',
         'has no attribute "cp"',
@@ -351,11 +402,22 @@ IGNORED_ERRORS = {
         'has no attribute "sort"',
         'Unsupported target for indexed assignment',
         'defined the type as "None"',
-        'Argument 1 to "Path" has incompatible type "Optional[str]"'
+        'Argument 1 to "Path" has incompatible type "Optional[str]"',
+        '"None" not callable',
+        '"WSGIRequest" has no attribute "process_response_content"',
+        'No overload variant of "join" matches argument types "str", "None"',
+        'Argument 1 to "Archive" has incompatible type "None"; expected "str"',
+
     ],
     'view_tests': [
-        "Module 'django.views.debug' has no attribute 'Path'"
-    ]
+        "Module 'django.views.debug' has no attribute 'Path'",
+        'Value of type "Optional[List[str]]" is not indexable',
+        'ExceptionUser',
+        'view_tests.tests.test_debug.User',
+    ],
+    'validation': [
+        'has no attribute "name"',
+    ],
 }
 
 
