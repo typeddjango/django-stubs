@@ -33,7 +33,7 @@
 -   case: filter_with_invalid_type
     main: |
         from myapp.models import User
-        User.objects.filter(age='hello')  # E: Incompatible type for lookup 'age': (got "str", expected "int")
+        User.objects.filter(age=User())  # E: Incompatible type for lookup 'age': (got "User", expected "Union[str, int]")
     installed_apps:
         - myapp
     files:
@@ -49,12 +49,12 @@
 -   case: filter_with_multiple_fields
     main: |
         from myapp.models import User
-        User.objects.filter(age='hello', gender='world')
+        User.objects.filter(age=User(), gender=User())
     installed_apps:
         - myapp
     out: |
-        main:2: error: Incompatible type for lookup 'age': (got "str", expected "int")
-        main:2: error: Incompatible type for lookup 'gender': (got "str", expected "int")
+        main:2: error: Incompatible type for lookup 'age': (got "User", expected "Union[str, int]")
+        main:2: error: Incompatible type for lookup 'gender': (got "User", expected "Union[str, int]")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -128,7 +128,7 @@
         Blog.objects.filter(publisher__id=1)
 
         Blog.objects.filter(publisher=blog)  # E: Incompatible type for lookup 'publisher': (got "Blog", expected "Union[Publisher, int, None]")
-        Blog.objects.filter(publisher_id='hello')  # E: Incompatible type for lookup 'publisher_id': (got "str", expected "int")
+        Blog.objects.filter(publisher_id=blog)  # E: Incompatible type for lookup 'publisher_id': (got "Blog", expected "Union[str, int]")
     installed_apps:
         - myapp
     files:
@@ -151,7 +151,7 @@
         Publisher.objects.filter(blogs__id=1)
 
         Publisher.objects.filter(blogs=publisher)  # E: Incompatible type for lookup 'blogs': (got "Publisher", expected "Union[Blog, int, None]")
-        Publisher.objects.filter(blogs__id=publisher)  # E: Incompatible type for lookup 'blogs__id': (got "Publisher", expected "int")
+        Publisher.objects.filter(blogs__id=publisher)  # E: Incompatible type for lookup 'blogs__id': (got "Publisher", expected "Union[str, int]")
     installed_apps:
         - myapp
     files:

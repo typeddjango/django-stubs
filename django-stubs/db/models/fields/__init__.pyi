@@ -64,6 +64,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     choices: Optional[_FieldChoices] = ...
     db_column: Optional[str]
     column: str
+    default: Any
     error_messages: _ErrorMessagesToOverride
     def __init__(
         self,
@@ -132,7 +133,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: int
-    _pyi_lookup_exact_type: int
+    _pyi_lookup_exact_type: Union[str, int]
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: Any): ...
@@ -180,7 +181,7 @@ class DecimalField(Field[_ST, _GT]):
 class AutoField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[Combinable, int, str]
     _pyi_private_get_type: int
-    _pyi_lookup_exact_type: int
+    _pyi_lookup_exact_type: Union[str, int]
 
 class CharField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, int, Combinable]
@@ -389,7 +390,8 @@ class FilePathField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class BinaryField(Field[_ST, _GT]): ...
+class BinaryField(Field[_ST, _GT]):
+    _pyi_private_get_type: bytes
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta

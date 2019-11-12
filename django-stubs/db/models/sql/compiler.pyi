@@ -25,7 +25,7 @@ class SQLCompiler:
     def setup_query(self) -> None: ...
     has_extra_select: Any = ...
     def pre_sql_setup(
-        self
+        self,
     ) -> Tuple[
         List[Tuple[Expression, Tuple[str, Union[List[Any], Tuple[str, str]]], None]],
         List[Tuple[Expression, Tuple[str, List[Union[int, str]], bool]]],
@@ -40,7 +40,7 @@ class SQLCompiler:
         self, expressions: List[Expression], having: Union[List[Expression], Tuple]
     ) -> List[Expression]: ...
     def get_select(
-        self
+        self,
     ) -> Tuple[
         List[Tuple[Expression, Tuple[str, List[Union[int, str]]], Optional[str]]],
         Optional[Dict[str, Any]],
