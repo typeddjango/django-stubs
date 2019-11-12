@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type, Union
+from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type
 
 from django.db.models.base import Model
 from django.db.models.fields.mixins import FieldCacheMixin
