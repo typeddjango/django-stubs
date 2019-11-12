@@ -1,7 +1,11 @@
 from typing import Any, Callable, Dict, List, Optional, Protocol, Sequence, Type, TypeVar, Union
 
 from django.db.models.base import Model
-from django.http.response import HttpResponse as HttpResponse, HttpResponseRedirect as HttpResponseRedirect
+from django.http.response import (
+    HttpResponse as HttpResponse,
+    HttpResponseRedirect as HttpResponseRedirect,
+    HttpResponsePermanentRedirect as HttpResponsePermanentRedirect,
+)
 
 from django.db.models import Manager, QuerySet
 from django.http import HttpRequest
@@ -26,7 +30,7 @@ class SupportsGetAbsoluteUrl(Protocol): ...
 
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool = ..., **kwargs: Any
-) -> HttpResponseRedirect: ...
+) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]: ...
 
 _T = TypeVar("_T", bound=Model)
 
