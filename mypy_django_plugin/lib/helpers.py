@@ -187,18 +187,12 @@ def add_new_class_for_module(module: MypyFile, name: str, bases: List[Instance],
     calculate_mro(new_typeinfo)
     new_typeinfo.calculate_metaclass_type()
 
-    def add_field_to_new_typeinfo(var: Var, is_initialized_in_class: bool = False,
-                                  is_property: bool = False) -> None:
-        var.info = new_typeinfo
-        var.is_initialized_in_class = is_initialized_in_class
-        var.is_property = is_property
-        var._fullname = new_typeinfo.fullname() + '.' + var.name()
-        new_typeinfo.names[var.name()] = SymbolTableNode(MDEF, var)
-
     # add fields
-    var_items = [Var(item, typ) for item, typ in fields.items()]
-    for var_item in var_items:
-        add_field_to_new_typeinfo(var_item, is_property=True)
+    for field_name, field_type in fields.items():
+        var = Var(field_name, type=field_type)
+        var.info = new_typeinfo
+        var._fullname = new_typeinfo.fullname() + '.' + field_name
+        new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
     classdef.info = new_typeinfo
     module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)

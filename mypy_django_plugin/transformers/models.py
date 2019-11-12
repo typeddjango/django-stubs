@@ -141,6 +141,7 @@ class AddManagers(ModelClassInitializer):
                 has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)
                 if has_manager_any_base:
                     custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
+
                     bases = []
                     for original_base in manager_info.bases:
                         if self._is_manager_any(original_base):
@@ -150,11 +151,22 @@ class AddManagers(ModelClassInitializer):
                             original_base = helpers.reparametrize_instance(original_base,
                                                                            [Instance(self.model_classdef.info, [])])
                         bases.append(original_base)
+
                     current_module = self.api.modules[self.model_classdef.info.module_name]
                     custom_manager_info = helpers.add_new_class_for_module(current_module,
                                                                            custom_model_manager_name,
                                                                            bases=bases,
                                                                            fields=OrderedDict())
+                    # copy fields to a new manager
+                    for name, sym in manager_info.names.items():
+                        new_sym = sym.copy()
+                        if isinstance(new_sym.node, Var):
+                            new_var = Var(name, type=sym.type)
+                            new_var.info = custom_manager_info
+                            new_var._fullname = custom_manager_info.fullname() + '.' + name
+                            new_sym.node = new_var
+                        custom_manager_info.names[name] = new_sym
+
                     custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
                     self.add_new_node_to_model_class(manager_name, custom_manager_type)
 
