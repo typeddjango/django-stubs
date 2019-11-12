@@ -29,3 +29,19 @@
 
                 class Blog(models.Model):
                     created_at = models.DateTimeField()
+
+
+-   case: queryset_missing_method
+    main: |
+        from myapp.models import User
+        reveal_type(User.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User]'
+        User.objects.not_existing_method()  # E: "Manager[User]" has no attribute "not_existing_method"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass

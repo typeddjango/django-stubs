@@ -309,6 +309,7 @@
         from myapp.models import User
         reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
         reveal_type(User.objects.select_related())  # N: Revealed type is 'myapp.models.User_MyManager[myapp.models.User]'
+        reveal_type(User.objects.get_instance())  # N: Revealed type is 'builtins.int'
     installed_apps:
         - myapp
     files:
@@ -317,6 +318,7 @@
             content: |
                 from django.db import models
                 class MyManager(models.Manager):
-                    pass
+                    def get_instance(self) -> int:
+                        pass
                 class User(models.Model):
                     objects = MyManager()

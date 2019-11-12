@@ -94,13 +94,18 @@ IGNORED_ERRORS = {
         'Unexpected keyword argument "unknown_kwarg" for "refresh_from_db" of "Model"',
         'Unexpected attribute "foo" for model "Article"',
         'has no attribute "touched"',
-        'Incompatible types in assignment (expression has type "Type[CustomQuerySet]"'
+        'Incompatible types in assignment (expression has type "Type[CustomQuerySet]"',
+        '"Manager[Article]" has no attribute "do_something"',
     ],
     'backends': [
         '"DatabaseError" has no attribute "pgcode"'
     ],
     'builtin_server': [
         '"ServerHandler" has no attribute',
+    ],
+    'bulk_create': [
+        'has incompatible type "List[Country]"; expected "Iterable[TwoFields]"',
+        'List item 1 has incompatible type "Country"; expected "ProxyCountry"',
     ],
     'check_framework': [
         'base class "Model" defined the type as "Callable',
@@ -112,6 +117,8 @@ IGNORED_ERRORS = {
     ],
     'contenttypes_tests': [
         '"FooWithBrokenAbsoluteUrl" has no attribute "unknown_field"',
+        'contenttypes_tests.models.Site',
+        'Argument 1 to "set" of "RelatedManager" has incompatible type "SiteManager[Site]"',
     ],
     'custom_lookups': [
         'in base class "SQLFuncMixin"',
@@ -222,6 +229,7 @@ IGNORED_ERRORS = {
     ],
     'm2m_regress': [
         "Cannot resolve keyword 'porcupine' into field",
+        'Argument 1 to "set" of "RelatedManager" has incompatible type "int"',
     ],
     'messages_tests': [
         'List item 0 has incompatible type "Dict[str, Message]"; expected "Message"',
@@ -233,12 +241,14 @@ IGNORED_ERRORS = {
     ],
     'many_to_many': [
         '(expression has type "List[Article]", variable has type "RelatedManager[Article]"',
+        '"add" of "RelatedManager" has incompatible type "Article"; expected "Union[Publication, int]"',
     ],
     'many_to_one': [
         'Incompatible type for "parent" of "Child" (got "None", expected "Union[Parent, Combinable]")',
         'Incompatible type for "parent" of "Child" (got "Child", expected "Union[Parent, Combinable]")',
         'expression has type "List[<nothing>]", variable has type "RelatedManager[Article]"',
         '"Reporter" has no attribute "cached_query"',
+        'to "add" of "RelatedManager" has incompatible type "Reporter"; expected "Union[Article, int]"',
     ],
     'middleware_exceptions': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'

@@ -10,20 +10,24 @@ from django.db import models
 
 def update_last_login(sender: Type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
 
-class PermissionManager(models.Manager):
+class PermissionManager(models.Manager["Permission"]):
     def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...
 
 class Permission(models.Model):
     content_type_id: int
+    objects: PermissionManager
+
     name = models.CharField(max_length=255)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     codename = models.CharField(max_length=100)
     def natural_key(self) -> Tuple[str, str, str]: ...
 
-class GroupManager(models.Manager):
+class GroupManager(models.Manager["Group"]):
     def get_by_natural_key(self, name: str) -> Group: ...
 
 class Group(models.Model):
+    objects: GroupManager
+
     name = models.CharField(max_length=150)
     permissions = models.ManyToManyField(Permission)
     def natural_key(self): ...
@@ -40,8 +44,8 @@ class UserManager(BaseUserManager[_T]):
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
-    groups: models.ManyToManyField = models.ManyToManyField(Group)
-    user_permissions: models.ManyToManyField = models.ManyToManyField(Permission)
+    groups = models.ManyToManyField(Group)
+    user_permissions = models.ManyToManyField(Permission)
     def get_group_permissions(self, obj: None = ...) -> Set[str]: ...
     def get_all_permissions(self, obj: Optional[str] = ...) -> Set[str]: ...
     def has_perm(self, perm: str, obj: Optional[str] = ...) -> bool: ...
