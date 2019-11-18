@@ -8,7 +8,7 @@ from django.db.models.manager import EmptyManager
 
 from django.db import models
 
-_AnyUser = Union[Model, 'AnonymousUser']
+_AnyUser = Union[Model, "AnonymousUser"]
 
 def update_last_login(sender: Type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
 
