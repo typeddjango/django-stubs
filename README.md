@@ -69,7 +69,7 @@ class MyUserManager(models.Manager['MyUser']):
     pass
 
 class MyUser(models.Model):
-    objects = UserManager()
+    objects = MyUserManager()
 ```
 
 work, which should make a error messages a bit better. 
