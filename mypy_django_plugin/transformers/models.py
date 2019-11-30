@@ -43,7 +43,7 @@ class ModelClassInitializer:
         var = Var(name=name, type=typ)
         # var.info: type of the object variable is bound to
         var.info = self.model_classdef.info
-        var._fullname = self.model_classdef.info.fullname() + '.' + name
+        var._fullname = self.model_classdef.info.fullname + '.' + name
         var.is_initialized_in_class = True
         var.is_inferred = True
         return var
@@ -126,7 +126,7 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 class AddManagers(ModelClassInitializer):
     def _is_manager_any(self, typ: Instance) -> bool:
-        return typ.type.fullname() == fullnames.MANAGER_CLASS_FULLNAME and type(typ.args[0]) == AnyType
+        return typ.type.fullname == fullnames.MANAGER_CLASS_FULLNAME and type(typ.args[0]) == AnyType
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
@@ -163,7 +163,7 @@ class AddManagers(ModelClassInitializer):
                         if isinstance(new_sym.node, Var):
                             new_var = Var(name, type=sym.type)
                             new_var.info = custom_manager_info
-                            new_var._fullname = custom_manager_info.fullname() + '.' + name
+                            new_var._fullname = custom_manager_info.fullname + '.' + name
                             new_sym.node = new_var
                         custom_manager_info.names[name] = new_sym
 

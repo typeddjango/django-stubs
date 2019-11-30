@@ -318,7 +318,7 @@
             content: |
                 from django.db import models
                 class MyManager(models.Manager):
-                    def get_instance(self) -> int:
+                    def get_instance(self: "models.Manager[User]") -> int:
                         pass
                 class User(models.Model):
                     objects = MyManager()

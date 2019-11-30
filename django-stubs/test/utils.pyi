@@ -1,9 +1,22 @@
 import decimal
-import warnings
 from contextlib import contextmanager
 from decimal import Decimal
 from io import StringIO
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+    ContextManager,
+)
 
 from django.apps.registry import Apps
 from django.core.checks.registry import CheckRegistry
@@ -86,7 +99,7 @@ class ignore_warnings(TestContextDecorator):
     ignore_kwargs: Dict[str, Any] = ...
     filter_func: Callable = ...
     def __init__(self, **kwargs: Any) -> None: ...
-    catch_warnings: warnings.catch_warnings = ...
+    catch_warnings: ContextManager[Optional[list]] = ...
 
 requires_tz_support: Any
 

@@ -29,7 +29,7 @@ def _get_current_field_from_assignment(ctx: FunctionContext, django_context: Dja
     if field_name is None:
         return None
 
-    model_cls = django_context.get_model_class_by_fullname(outer_model_info.fullname())
+    model_cls = django_context.get_model_class_by_fullname(outer_model_info.fullname)
     if model_cls is None:
         return None
 
