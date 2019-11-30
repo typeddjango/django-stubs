@@ -52,6 +52,8 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     auto_created: bool
     primary_key: bool
     remote_field: Field
+    is_relation: bool
+    related_model: Optional[Type[Model]]
     max_length: int
     model: Type[Model]
     name: str
