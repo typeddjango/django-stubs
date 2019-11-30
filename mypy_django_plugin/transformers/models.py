@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Type
+from typing import List, Tuple, Type
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
@@ -7,10 +7,11 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.nodes import ARG_STAR2, Argument, Context, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
-from mypy.types import AnyType, Instance
+from mypy.plugins.common import add_method
+from mypy.types import AnyType, CallableType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
@@ -158,7 +159,22 @@ class AddManagers(ModelClassInitializer):
                                                                            bases=bases,
                                                                            fields=OrderedDict())
                     # copy fields to a new manager
+                    new_cls_def_context = ClassDefContext(cls=custom_manager_info.defn,
+                                                          reason=self.ctx.reason,
+                                                          api=self.api)
+                    custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
+
                     for name, sym in manager_info.names.items():
+                        # replace self type with new class, if copying method
+                        if isinstance(sym.node, FuncDef):
+                            arguments, return_type = self.prepare_new_method_arguments(sym.node)
+                            add_method(new_cls_def_context,
+                                       name,
+                                       args=arguments,
+                                       return_type=return_type,
+                                       self_type=custom_manager_type)
+                            continue
+
                         new_sym = sym.copy()
                         if isinstance(new_sym.node, Var):
                             new_var = Var(name, type=sym.type)
@@ -167,8 +183,21 @@ class AddManagers(ModelClassInitializer):
                             new_sym.node = new_var
                         custom_manager_info.names[name] = new_sym
 
-                    custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
                     self.add_new_node_to_model_class(manager_name, custom_manager_type)
+
+    def prepare_new_method_arguments(self, node: FuncDef) -> Tuple[List[Argument], MypyType]:
+        arguments = []
+        for argument in node.arguments[1:]:
+            if argument.type_annotation is None:
+                argument.type_annotation = AnyType(TypeOfAny.unannotated)
+            arguments.append(argument)
+
+        if isinstance(node.type, CallableType):
+            return_type = node.type.ret_type
+        else:
+            return_type = AnyType(TypeOfAny.unannotated)
+
+        return arguments, return_type
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
