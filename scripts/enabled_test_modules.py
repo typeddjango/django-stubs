@@ -37,7 +37,6 @@ IGNORED_ERRORS = {
         'Argument after ** must be a mapping',
         'note:',
         re.compile(r'Item "None" of "[a-zA-Z_ ,\[\]]+" has no attribute'),
-        '"Optional[List[_Record]]"',
         '"Callable[..., None]" has no attribute',
         'does not return a value',
         'has no attribute "alternatives"',
@@ -257,7 +256,6 @@ IGNORED_ERRORS = {
         'Item "Field[Any, Any]" of "Union[Field[Any, Any], ForeignObjectRel]" has no attribute',
         'Incompatible types in assignment (expression has type "Type[Person',
         'Incompatible types in assignment (expression has type "FloatModel", variable has type',
-        'No overload variant of "bytes" matches argument type "Container[int]"',
         '"ImageFile" has no attribute "was_opened"',
     ],
     'model_indexes': [
@@ -278,6 +276,7 @@ IGNORED_ERRORS = {
         'Incompatible type for "department" of "Worker"',
         '"PickledModel" has no attribute',
         '"Department" has no attribute "evaluate"',
+        'Unsupported target for indexed assignment',
     ],
     'model_formsets_regress': [
         'Incompatible types in assignment (expression has type "int", target has type "str")',
@@ -352,7 +351,8 @@ IGNORED_ERRORS = {
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]";'
     ],
     'sites_framework': [
-        'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"'
+        'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"',
+        "Name 'Optional' is not defined",
     ],
     'syndication_tests': [
         'List or tuple expected as variable arguments'

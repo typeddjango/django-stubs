@@ -117,7 +117,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
+    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
         return ctx.default_return_type
 
@@ -166,7 +166,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
+    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
         return ctx.default_return_type
 

@@ -22,6 +22,7 @@ pip install django-stubs
 
 | django-stubs | mypy version | django version | python version
 | ------------ | ---- | ---- | ---- |
+| 1.3.0 | 0.750 | 2.2.x | ^3.6
 | 1.2.0 | 0.730 | 2.2.x | ^3.6
 | 1.1.0 | 0.720 | 2.2.x | ^3.6
 | 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6

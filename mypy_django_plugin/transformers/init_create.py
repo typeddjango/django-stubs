@@ -54,7 +54,7 @@ def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_co
 def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.default_return_type, Instance)
 
-    model_fullname = ctx.default_return_type.type.fullname()
+    model_fullname = ctx.default_return_type.type.fullname
     model_cls = django_context.get_model_class_by_fullname(model_fullname)
     if model_cls is None:
         return ctx.default_return_type
@@ -67,7 +67,7 @@ def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: Djan
         # only work with ctx.default_return_type = model Instance
         return ctx.default_return_type
 
-    model_fullname = ctx.default_return_type.type.fullname()
+    model_fullname = ctx.default_return_type.type.fullname
     model_cls = django_context.get_model_class_by_fullname(model_fullname)
     if model_cls is None:
         return ctx.default_return_type

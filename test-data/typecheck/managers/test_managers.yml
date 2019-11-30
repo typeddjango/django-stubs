@@ -307,9 +307,18 @@
 -   case: custom_manager_returns_proper_model_types
     main: |
         from myapp.models import User
-        reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
+        reveal_type(User.objects)  # N: Revealed type is 'myapp.models.User_MyManager[myapp.models.User]'
         reveal_type(User.objects.select_related())  # N: Revealed type is 'myapp.models.User_MyManager[myapp.models.User]'
+        reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
         reveal_type(User.objects.get_instance())  # N: Revealed type is 'builtins.int'
+        reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is 'Any'
+
+        from myapp.models import ChildUser
+        reveal_type(ChildUser.objects)  # N: Revealed type is 'myapp.models.ChildUser_MyManager[myapp.models.ChildUser]'
+        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is 'myapp.models.ChildUser_MyManager[myapp.models.ChildUser]'
+        reveal_type(ChildUser.objects.get())  # N: Revealed type is 'myapp.models.ChildUser*'
+        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is 'builtins.int'
+        reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is 'Any'
     installed_apps:
         - myapp
     files:
@@ -320,5 +329,9 @@
                 class MyManager(models.Manager):
                     def get_instance(self) -> int:
                         pass
+                    def get_instance_untyped(self, name):
+                        pass
                 class User(models.Model):
+                    objects = MyManager()
+                class ChildUser(models.Model):
                     objects = MyManager()
