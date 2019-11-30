@@ -164,9 +164,6 @@ IGNORED_ERRORS = {
     'decorators': [
         '"Type[object]" has no attribute "method"'
     ],
-    'expressions_case': [
-        'Item "Field[Any, Any]" of "Union[Field[Any, Any], ForeignObjectRel]" has no attribute "is_relation"'
-    ],
     'expressions_window': [
         'has incompatible type "str"'
     ],
