@@ -1,8 +1,10 @@
 from email._policybase import Policy  # type: ignore
+from email.message import Message
+from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, overload
 
 utf8_charset: Any
 utf8_charset_qp: Any
@@ -43,6 +45,11 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         self, _subtype: str = ..., boundary: None = ..., _subparts: None = ..., encoding: str = ..., **_params: Any
     ) -> None: ...
 
+_AttachmentContent = Union[bytes, EmailMessage, Message, SafeMIMEText, str]
+_AttachmentTuple = Union[
+    Tuple[str, _AttachmentContent], Tuple[Optional[str], _AttachmentContent, str], Tuple[str, _AttachmentContent, None]
+]
+
 class EmailMessage:
     content_subtype: str = ...
     mixed_subtype: str = ...
@@ -62,42 +69,42 @@ class EmailMessage:
         subject: str = ...,
         body: Optional[str] = ...,
         from_email: Optional[str] = ...,
-        to: Optional[Union[Sequence[str], str]] = ...,
-        bcc: Optional[Union[Sequence[str], str]] = ...,
+        to: Optional[Sequence[str]] = ...,
+        bcc: Optional[Sequence[str]] = ...,
         connection: Optional[Any] = ...,
-        attachments: Optional[Union[List[Tuple[str, Union[str, bytes], str]], List[MIMEText]]] = ...,
+        attachments: Optional[Sequence[Union[MIMEBase, _AttachmentTuple]]] = ...,
         headers: Optional[Dict[str, str]] = ...,
-        cc: Optional[Union[Sequence[str], str]] = ...,
-        reply_to: Optional[Union[List[Optional[str]], str]] = ...,
+        cc: Optional[Sequence[str]] = ...,
+        reply_to: Optional[Sequence[str]] = ...,
     ) -> None: ...
     def get_connection(self, fail_silently: bool = ...) -> Any: ...
     # TODO: when typeshed gets more types for email.Message, move it to MIMEMessage, now it has too many false-positives
     def message(self) -> Any: ...
     def recipients(self) -> List[str]: ...
     def send(self, fail_silently: bool = ...) -> int: ...
-    def attach(
-        self,
-        filename: Optional[Union[MIMEText, str]] = ...,
-        content: Optional[Union[bytes, EmailMessage, SafeMIMEText, str]] = ...,
-        mimetype: Optional[str] = ...,
-    ) -> None: ...
+    @overload
+    def attach(self, filename: MIMEText = ...) -> None: ...
+    @overload
+    def attach(self, filename: None = ..., content: _AttachmentContent = ..., mimetype: str = ...) -> None: ...
+    @overload
+    def attach(self, filename: str = ..., content: _AttachmentContent = ..., mimetype: Optional[str] = ...) -> None: ...
     def attach_file(self, path: str, mimetype: Optional[str] = ...) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
     alternative_subtype: str = ...
-    alternatives: Any = ...
+    alternatives: Sequence[Tuple[_AttachmentContent, str]] = ...
     def __init__(
         self,
         subject: str = ...,
         body: str = ...,
         from_email: Optional[str] = ...,
-        to: Optional[List[str]] = ...,
-        bcc: Optional[List[str]] = ...,
+        to: Optional[Sequence[str]] = ...,
+        bcc: Optional[Sequence[str]] = ...,
         connection: Optional[Any] = ...,
-        attachments: None = ...,
+        attachments: Optional[Sequence[Union[MIMEBase, _AttachmentTuple]]] = ...,
         headers: Optional[Dict[str, str]] = ...,
-        alternatives: Optional[List[Tuple[str, str]]] = ...,
-        cc: None = ...,
-        reply_to: None = ...,
+        alternatives: Optional[Sequence[Tuple[_AttachmentContent, str]]] = ...,
+        cc: Optional[Sequence[str]] = ...,
+        reply_to: Optional[Sequence[str]] = ...,
     ) -> None: ...
-    def attach_alternative(self, content: str, mimetype: str) -> None: ...
+    def attach_alternative(self, content: _AttachmentContent, mimetype: str) -> None: ...
