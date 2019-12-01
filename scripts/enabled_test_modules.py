@@ -229,7 +229,6 @@ IGNORED_ERRORS = {
     ],
     'mail': [
         'List item 1 has incompatible type "None"; expected "str"',
-        'Incompatible return value type (got "None", expected "bool")',
         'Argument 1 to "push" of "SMTPChannel" has incompatible type "str"; expected "bytes"',
         'Value of type "Union[List[Message], str, bytes, None]" is not indexable',
         'Incompatible types in assignment '
