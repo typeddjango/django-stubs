@@ -4,7 +4,7 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, overload
 
 utf8_charset: Any
 utf8_charset_qp: Any
@@ -46,7 +46,9 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     ) -> None: ...
 
 _AttachmentContent = Union[bytes, EmailMessage, Message, SafeMIMEText, str]
-_AttachmentTuple = Tuple[Optional[Union[MIMEText, str]], Optional[_AttachmentContent], Optional[str]]
+_AttachmentTuple = Union[
+    Tuple[str, _AttachmentContent], Tuple[Optional[str], _AttachmentContent, str], Tuple[str, _AttachmentContent, None]
+]
 
 class EmailMessage:
     content_subtype: str = ...
@@ -65,7 +67,7 @@ class EmailMessage:
     def __init__(
         self,
         subject: str = ...,
-        body: str = ...,
+        body: Optional[str] = ...,
         from_email: Optional[str] = ...,
         to: Optional[Sequence[str]] = ...,
         bcc: Optional[Sequence[str]] = ...,
@@ -80,12 +82,12 @@ class EmailMessage:
     def message(self) -> Any: ...
     def recipients(self) -> List[str]: ...
     def send(self, fail_silently: bool = ...) -> int: ...
-    def attach(
-        self,
-        filename: Optional[Union[MIMEText, str]] = ...,
-        content: Optional[_AttachmentContent] = ...,
-        mimetype: Optional[str] = ...,
-    ) -> None: ...
+    @overload
+    def attach(self, filename: MIMEText = ...) -> None: ...
+    @overload
+    def attach(self, filename: None = ..., content: _AttachmentContent = ..., mimetype: str = ...) -> None: ...
+    @overload
+    def attach(self, filename: str = ..., content: _AttachmentContent = ..., mimetype: Optional[str] = ...) -> None: ...
     def attach_file(self, path: str, mimetype: Optional[str] = ...) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
