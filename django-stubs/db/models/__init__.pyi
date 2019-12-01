@@ -40,6 +40,7 @@ from .fields import (
     DurationField as DurationField,
     BigAutoField as BigAutoField,
     CommaSeparatedIntegerField as CommaSeparatedIntegerField,
+    NOT_PROVIDED as NOT_PROVIDED,
 )
 
 from .fields.related import (

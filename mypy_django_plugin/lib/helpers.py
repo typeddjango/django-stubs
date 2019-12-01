@@ -179,26 +179,20 @@ def add_new_class_for_module(module: MypyFile, name: str, bases: List[Instance],
 
     # make new class expression
     classdef = ClassDef(new_class_unique_name, Block([]))
-    classdef.fullname = module.fullname() + '.' + new_class_unique_name
+    classdef.fullname = module.fullname + '.' + new_class_unique_name
 
     # make new TypeInfo
-    new_typeinfo = TypeInfo(SymbolTable(), classdef, module.fullname())
+    new_typeinfo = TypeInfo(SymbolTable(), classdef, module.fullname)
     new_typeinfo.bases = bases
     calculate_mro(new_typeinfo)
     new_typeinfo.calculate_metaclass_type()
 
-    def add_field_to_new_typeinfo(var: Var, is_initialized_in_class: bool = False,
-                                  is_property: bool = False) -> None:
-        var.info = new_typeinfo
-        var.is_initialized_in_class = is_initialized_in_class
-        var.is_property = is_property
-        var._fullname = new_typeinfo.fullname() + '.' + var.name()
-        new_typeinfo.names[var.name()] = SymbolTableNode(MDEF, var)
-
     # add fields
-    var_items = [Var(item, typ) for item, typ in fields.items()]
-    for var_item in var_items:
-        add_field_to_new_typeinfo(var_item, is_property=True)
+    for field_name, field_type in fields.items():
+        var = Var(field_name, type=field_type)
+        var.info = new_typeinfo
+        var._fullname = new_typeinfo.fullname + '.' + field_name
+        new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
     classdef.info = new_typeinfo
     module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
@@ -282,7 +276,7 @@ def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionCont
 
 
 def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
-    return (info.fullname() in django_context.all_registered_model_class_fullnames
+    return (info.fullname in django_context.all_registered_model_class_fullnames
             or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
 
 
@@ -299,7 +293,7 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> No
     var = Var(name=name, type=sym_type)
     # var.info: type of the object variable is bound to
     var.info = info
-    var._fullname = info.fullname() + '.' + name
+    var._fullname = info.fullname + '.' + name
     var.is_initialized_in_class = True
     var.is_inferred = True
     info.names[name] = SymbolTableNode(MDEF, var,

@@ -28,7 +28,7 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     if not isinstance(model_type, Instance):
         return ctx.default_return_type
 
-    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname())
+    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
         return ctx.default_return_type
 

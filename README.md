@@ -2,7 +2,7 @@
 
 # pep484 stubs for Django framework
 
-[![Build Status](https://travis-ci.org/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.org/typeddjango/django-stubs)
+[![Build Status](https://travis-ci.com/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.com/typeddjango/django-stubs)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 
@@ -22,6 +22,7 @@ pip install django-stubs
 
 | django-stubs | mypy version | django version | python version
 | ------------ | ---- | ---- | ---- |
+| 1.3.0 | 0.750 | 2.2.x | ^3.6
 | 1.2.0 | 0.730 | 2.2.x | ^3.6
 | 1.1.0 | 0.720 | 2.2.x | ^3.6
 | 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
@@ -69,7 +70,7 @@ class MyUserManager(models.Manager['MyUser']):
     pass
 
 class MyUser(models.Model):
-    objects = UserManager()
+    objects = MyUserManager()
 ```
 
 work, which should make a error messages a bit better. 

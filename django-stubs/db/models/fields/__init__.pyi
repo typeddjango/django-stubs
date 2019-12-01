@@ -25,7 +25,7 @@ from django.db.models.expressions import Combinable, Col
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
 
-from .mixins import NOT_PROVIDED as NOT_PROVIDED
+class NOT_PROVIDED: ...
 
 _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
@@ -52,6 +52,8 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     auto_created: bool
     primary_key: bool
     remote_field: Field
+    is_relation: bool
+    related_model: Optional[Type[Model]]
     max_length: int
     model: Type[Model]
     name: str
@@ -64,6 +66,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     choices: Optional[_FieldChoices] = ...
     db_column: Optional[str]
     column: str
+    default: Any
     error_messages: _ErrorMessagesToOverride
     def __init__(
         self,
@@ -128,11 +131,12 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     @property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
+    def get_attname(self) -> str: ...
 
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: int
-    _pyi_lookup_exact_type: int
+    _pyi_lookup_exact_type: Union[str, int]
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: Any): ...
@@ -180,7 +184,7 @@ class DecimalField(Field[_ST, _GT]):
 class AutoField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[Combinable, int, str]
     _pyi_private_get_type: int
-    _pyi_lookup_exact_type: int
+    _pyi_lookup_exact_type: Union[str, int]
 
 class CharField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, int, Combinable]
@@ -389,7 +393,8 @@ class FilePathField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class BinaryField(Field[_ST, _GT]): ...
+class BinaryField(Field[_ST, _GT]):
+    _pyi_private_get_type: bytes
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta

@@ -16,7 +16,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     if not ctx.type.args or not isinstance(ctx.type.args[0], Instance):
         return ctx.default_return_type
 
-    model_cls_fullname = ctx.type.args[0].type.fullname()
+    model_cls_fullname = ctx.type.args[0].type.fullname
     model_cls = django_context.get_model_class_by_fullname(model_cls_fullname)
     if model_cls is None:
         return ctx.default_return_type
@@ -44,7 +44,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
 
 
 def resolve_combinable_type(combinable_type: Instance, django_context: DjangoContext) -> MypyType:
-    if combinable_type.type.fullname() != fullnames.F_EXPRESSION_FULLNAME:
+    if combinable_type.type.fullname != fullnames.F_EXPRESSION_FULLNAME:
         # Combinables aside from F expressions are unsupported
         return AnyType(TypeOfAny.explicit)
 

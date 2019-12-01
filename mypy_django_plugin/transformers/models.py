@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Type
+from typing import List, Tuple, Type
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
@@ -7,10 +7,11 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.nodes import ARG_STAR2, Argument, Context, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
-from mypy.types import AnyType, Instance
+from mypy.plugins.common import add_method
+from mypy.types import AnyType, CallableType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
@@ -43,7 +44,7 @@ class ModelClassInitializer:
         var = Var(name=name, type=typ)
         # var.info: type of the object variable is bound to
         var.info = self.model_classdef.info
-        var._fullname = self.model_classdef.info.fullname() + '.' + name
+        var._fullname = self.model_classdef.info.fullname + '.' + name
         var.is_initialized_in_class = True
         var.is_inferred = True
         return var
@@ -126,7 +127,7 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 class AddManagers(ModelClassInitializer):
     def _is_manager_any(self, typ: Instance) -> bool:
-        return typ.type.fullname() == fullnames.MANAGER_CLASS_FULLNAME and type(typ.args[0]) == AnyType
+        return typ.type.fullname == fullnames.MANAGER_CLASS_FULLNAME and type(typ.args[0]) == AnyType
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
@@ -141,6 +142,7 @@ class AddManagers(ModelClassInitializer):
                 has_manager_any_base = any(self._is_manager_any(base) for base in manager_info.bases)
                 if has_manager_any_base:
                     custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
+
                     bases = []
                     for original_base in manager_info.bases:
                         if self._is_manager_any(original_base):
@@ -150,13 +152,52 @@ class AddManagers(ModelClassInitializer):
                             original_base = helpers.reparametrize_instance(original_base,
                                                                            [Instance(self.model_classdef.info, [])])
                         bases.append(original_base)
+
                     current_module = self.api.modules[self.model_classdef.info.module_name]
                     custom_manager_info = helpers.add_new_class_for_module(current_module,
                                                                            custom_model_manager_name,
                                                                            bases=bases,
                                                                            fields=OrderedDict())
+                    # copy fields to a new manager
+                    new_cls_def_context = ClassDefContext(cls=custom_manager_info.defn,
+                                                          reason=self.ctx.reason,
+                                                          api=self.api)
                     custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
+
+                    for name, sym in manager_info.names.items():
+                        # replace self type with new class, if copying method
+                        if isinstance(sym.node, FuncDef):
+                            arguments, return_type = self.prepare_new_method_arguments(sym.node)
+                            add_method(new_cls_def_context,
+                                       name,
+                                       args=arguments,
+                                       return_type=return_type,
+                                       self_type=custom_manager_type)
+                            continue
+
+                        new_sym = sym.copy()
+                        if isinstance(new_sym.node, Var):
+                            new_var = Var(name, type=sym.type)
+                            new_var.info = custom_manager_info
+                            new_var._fullname = custom_manager_info.fullname + '.' + name
+                            new_sym.node = new_var
+                        custom_manager_info.names[name] = new_sym
+
                     self.add_new_node_to_model_class(manager_name, custom_manager_type)
+
+    def prepare_new_method_arguments(self, node: FuncDef) -> Tuple[List[Argument], MypyType]:
+        arguments = []
+        for argument in node.arguments[1:]:
+            if argument.type_annotation is None:
+                argument.type_annotation = AnyType(TypeOfAny.unannotated)
+            arguments.append(argument)
+
+        if isinstance(node.type, CallableType):
+            return_type = node.type.ret_type
+        else:
+            return_type = AnyType(TypeOfAny.unannotated)
+
+        return arguments, return_type
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):

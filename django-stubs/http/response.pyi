@@ -63,7 +63,7 @@ class HttpResponseBase(Iterable[Any]):
 
 class HttpResponse(HttpResponseBase):
     client: Client
-    context: Optional[Context]
+    context: Context
     csrf_cookie_set: bool
     redirect_chain: List[Tuple[str, int]]
     request: Dict[str, Any]
