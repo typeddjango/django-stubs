@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Iterable, List, Optional, Tuple, Type, TypeVar, Union, overload
+from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, overload
 
 from django.core.files.base import File
 from django.core.files.images import ImageFile
@@ -7,8 +7,6 @@ from django.core.files.storage import FileSystemStorage, Storage
 from django.db.models.base import Model
 
 from django.db.models.fields import Field, _FieldChoices, _ValidatorCallable, _ErrorMessagesToOverride
-
-BLANK_CHOICE_DASH: List[Tuple[str, str]] = ...
 
 class FieldFile(File):
     instance: Model = ...

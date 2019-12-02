@@ -27,6 +27,8 @@ from django.forms import Field as FormField, Widget
 
 class NOT_PROVIDED: ...
 
+BLANK_CHOICE_DASH: List[Tuple[str, str]] = ...
+
 _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
