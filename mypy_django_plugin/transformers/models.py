@@ -118,7 +118,10 @@ class AddRelatedModelsId(ModelClassInitializer):
                     continue
 
                 rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
-                field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+                try:
+                    field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+                except helpers.IncompleteDefnException:
+                    continue
                 is_nullable = self.django_context.get_field_nullability(field, None)
                 set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
                 self.add_new_node_to_model_class(field.attname,
@@ -132,7 +135,10 @@ class AddManagers(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_fullname = helpers.get_class_fullname(manager.__class__)
-            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            try:
+                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            except helpers.IncompleteDefnException:
+                continue
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
@@ -223,7 +229,10 @@ class AddRelatedManagers(ModelClassInitializer):
             if related_model_cls is None:
                 continue
 
-            related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
+            try:
+                related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
+            except helpers.IncompleteDefnException:
+                continue
             if isinstance(relation, OneToOneRel):
                 self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
                 continue
