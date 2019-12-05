@@ -264,6 +264,8 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Person',
         'Incompatible types in assignment (expression has type "FloatModel", variable has type',
         '"ImageFile" has no attribute "was_opened"',
+        'Incompatible type for "size" of "FloatModel" (got "object", expected "Union[float, int, str, Combinable]")',
+        'Incompatible type for "value" of "IntegerModel" (got "object", expected',
     ],
     'model_indexes': [
         'Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'
@@ -290,6 +292,9 @@ IGNORED_ERRORS = {
     ],
     'model_options': [
         'expression has type "Dict[str, Type[Model]]", target has type "OrderedDict',
+    ],
+    'model_enums': [
+        "'bool' is not a valid base class",
     ],
     'multiple_database': [
         'Unexpected attribute "extra_arg" for model "Book"'
@@ -341,12 +346,14 @@ IGNORED_ERRORS = {
         '"Collection[Any]" has no attribute "explain"',
         "Cannot resolve keyword 'unknown_field' into field",
         'Incompatible type for lookup \'tag\': (got "str", expected "Union[Tag, int, None]")',
+        'No overload variant of "__getitem__" of "QuerySet" matches argument type "str"',
     ],
     'requests': [
         'Incompatible types in assignment (expression has type "Dict[str, str]", variable has type "QueryDict")'
     ],
     'responses': [
-        'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"'
+        'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"',
+        '"FileLike" has no attribute "closed"',
     ],
     'reverse_lookup': [
         "Cannot resolve keyword 'choice' into field"
@@ -424,6 +431,7 @@ IGNORED_ERRORS = {
         '"WSGIRequest" has no attribute "process_response_content"',
         'No overload variant of "join" matches argument types "str", "None"',
         'Argument 1 to "Archive" has incompatible type "None"; expected "str"',
+        'Argument 1 to "to_path" has incompatible type "int"; expected "Union[Path, str]"',
 
     ],
     'view_tests': [
@@ -431,9 +439,14 @@ IGNORED_ERRORS = {
         'Value of type "Optional[List[str]]" is not indexable',
         'ExceptionUser',
         'view_tests.tests.test_debug.User',
+        'Exception must be derived from BaseException',
+        "No binding for nonlocal 'tb_frames' found",
     ],
     'validation': [
         'has no attribute "name"',
+    ],
+    'wsgi': [
+        '"HttpResponse" has no attribute "block_size"',
     ],
 }
 

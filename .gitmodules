@@ -1,4 +1,0 @@
-[submodule "django-sources"]
-	path = django-sources
-	url = https://github.com/django/django.git
-	branch = stable/2.2.x

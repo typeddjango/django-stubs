@@ -2,15 +2,24 @@ import itertools
 import shutil
 import subprocess
 import sys
+from argparse import ArgumentParser
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Pattern, Union
+
+import importlib_metadata
+from git import Repo
 
 from scripts.enabled_test_modules import (
     EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS,
 )
 
+DJANGO_COMMIT_REFS = {
+    '2.2': 'e8b0903976077b951795938b260211214ed7fe41',
+    '3.0': '7ec5962638144cbf4c2e47ea7d8dc02d1ce44394'
+}
 PROJECT_DIRECTORY = Path(__file__).parent.parent
+DJANGO_SOURCE_DIRECTORY = PROJECT_DIRECTORY / 'django-sources'  # type: Path
 
 
 def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]) -> List[str]:
@@ -67,11 +76,37 @@ def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     return error.replace(raw_path, clickable_location)
 
 
+def get_installed_django_version() -> str:
+    return importlib_metadata.version('Django')
+
+
+def get_django_repo_object() -> Repo:
+    if not DJANGO_SOURCE_DIRECTORY.exists():
+        DJANGO_SOURCE_DIRECTORY.mkdir(exist_ok=True, parents=False)
+        return Repo.clone_from('https://github.com/django/django.git', DJANGO_SOURCE_DIRECTORY)
+    else:
+        repo = Repo(DJANGO_SOURCE_DIRECTORY)
+        return repo
+
+
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('--django_version', choices=['2.2', '3.0'], required=True)
+    args = parser.parse_args()
+
+    # installed_django_version = get_installed_django_version()
+    # if not installed_django_version.startswith(args.django_version):
+    #     raise ValueError(f'Install Django {args.django_version!r} to run script with this set of parameters.')
+
+    commit_sha = DJANGO_COMMIT_REFS[args.django_version]
+    repo = get_django_repo_object()
+    if repo.head.commit.hexsha != commit_sha:
+        repo.git.fetch('origin')
+        repo.git.checkout(commit_sha)
+
     mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()
-    repo_directory = PROJECT_DIRECTORY / 'django-sources'
     mypy_cache_dir = Path(__file__).parent / '.mypy_cache'
-    tests_root = repo_directory / 'tests'
+    tests_root = DJANGO_SOURCE_DIRECTORY / 'tests'
     global_rc = 0
 
     try:
