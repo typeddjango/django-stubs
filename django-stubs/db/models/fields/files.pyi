@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Callable, Iterable, List, Optional, Tuple, Type, TypeVar, Union, overload
 
 from django.core.files.base import File
@@ -39,11 +40,10 @@ class FileField(Field):
     upload_to: Union[str, Callable] = ...
     def __init__(
         self,
+        upload_to: Union[str, Callable, Path] = ...,
+        storage: Optional[Storage] = ...,
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
-        upload_to: Union[str, Callable] = ...,
-        storage: Optional[Storage] = ...,
-        primary_key: bool = ...,
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,

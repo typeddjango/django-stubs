@@ -8,13 +8,23 @@ jobs:
       python: 3.7
       script: 'pytest'
 
-    - name: Typecheck Django test suite with python 3.7
+    - name: Typecheck Django 3.0 test suite with python 3.7
       python: 3.7
-      script: 'python ./scripts/typecheck_tests.py'
+      script: |
+        pip install Django==3.0.*
+        python ./scripts/typecheck_tests.py --django_version=3.0
 
-    - name: Typecheck Django test suite with python 3.6
+    - name: Typecheck Django 3.0 test suite with python 3.6
       python: 3.6
-      script: 'python ./scripts/typecheck_tests.py'
+      script: |
+        pip install Django==3.0.*
+        python ./scripts/typecheck_tests.py --django_version=3.0
+
+    - name: Typecheck Django 2.2 test suite with python 3.7
+      python: 3.7
+      script: |
+        pip install Django==2.2.*
+        python ./scripts/typecheck_tests.py --django_version=2.2
 
     - name: Mypy for plugin code
       python: 3.7

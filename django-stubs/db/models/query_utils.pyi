@@ -42,6 +42,7 @@ class Q(tree.Node):
 
 class DeferredAttribute:
     field_name: str = ...
+    field: Field
     def __init__(self, field_name: str) -> None: ...
 
 class RegisterLookupMixin:
