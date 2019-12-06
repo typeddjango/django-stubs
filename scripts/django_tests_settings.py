@@ -1,3 +1,5 @@
+import django
+
 SECRET_KEY = '1'
 SITE_ID = 1
 
@@ -41,7 +43,6 @@ test_modules = [
     'bulk_create',
     'cache',
     'check_framework',
-    'choices',
     'conditional_processing',
     'constraints',
     'contenttypes_tests',
@@ -218,6 +219,9 @@ test_modules = [
     'view_tests',
     'wsgi',
 ]
+
+if django.VERSION[0] == 2:
+    test_modules += ['choices']
 
 invalid_apps = {
     'import_error_package',
