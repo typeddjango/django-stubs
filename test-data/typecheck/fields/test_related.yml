@@ -99,7 +99,7 @@
                 class User(models.Model):
                     pass
                 class Profile(models.Model):
-                    user = models.OneToOneField(to=User, on_delete=models)
+                    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
 -   case: test_circular_dependency_in_imports_with_foreign_key
     main: |
