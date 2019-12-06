@@ -7,7 +7,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Pattern, Union
 
-import importlib_metadata
 from git import Repo
 
 from scripts.enabled_test_modules import (
@@ -76,10 +75,6 @@ def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     return error.replace(raw_path, clickable_location)
 
 
-def get_installed_django_version() -> str:
-    return importlib_metadata.version('Django')
-
-
 def get_django_repo_object() -> Repo:
     if not DJANGO_SOURCE_DIRECTORY.exists():
         DJANGO_SOURCE_DIRECTORY.mkdir(exist_ok=True, parents=False)
@@ -93,10 +88,6 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--django_version', choices=['2.2', '3.0'], required=True)
     args = parser.parse_args()
-
-    # installed_django_version = get_installed_django_version()
-    # if not installed_django_version.startswith(args.django_version):
-    #     raise ValueError(f'Install Django {args.django_version!r} to run script with this set of parameters.')
 
     commit_sha = DJANGO_COMMIT_REFS[args.django_version]
     repo = get_django_repo_object()
