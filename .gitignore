@@ -11,3 +11,4 @@ pip-wheel-metadata/
 .pytest_cache/
 /.envrc
 /.direnv
+django-sources/
