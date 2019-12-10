@@ -1,7 +1,7 @@
 import threading
 import unittest
 from datetime import date
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, ClassVar
+from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, ClassVar, overload
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
@@ -146,9 +146,14 @@ class TransactionTestCase(SimpleTestCase):
         ordered: bool = ...,
         msg: Optional[str] = ...,
     ) -> None: ...
+    @overload
     def assertNumQueries(
-        self, num: int, func: Optional[Union[Callable, Type[list]]] = ..., *args: Any, using: Any = ..., **kwargs: Any
-    ) -> Optional[_AssertNumQueriesContext]: ...
+        self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any
+    ) -> None: ...
+    @overload
+    def assertNumQueries(
+        self, num: int, func: None = ..., *args: Any, using: str = ..., **kwargs: Any
+    ) -> _AssertNumQueriesContext: ...
 
 class TestCase(TransactionTestCase):
     @classmethod
