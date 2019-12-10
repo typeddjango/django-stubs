@@ -96,6 +96,7 @@
         import django.contrib.postgres.aggregates.general
         import django.contrib.postgres.aggregates.mixins
         import django.contrib.postgres.aggregates.statistics
+        import django.contrib.postgres.constraints
         import django.contrib.postgres.fields
         import django.contrib.postgres.fields.array
         import django.contrib.postgres.fields.citext

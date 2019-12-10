@@ -29,3 +29,15 @@ class DateTimeRangeField(RangeField):
 
 class DateRangeField(RangeField):
     def __get__(self, instance, owner) -> DateRange: ...
+
+class RangeOperators:
+    EQUAL: str
+    NOT_EQUAL: str
+    CONTAINS: str
+    CONTAINED_BY: str
+    OVERLAPS: str
+    FULLY_LT: str
+    FULLY_GT: str
+    NOT_LT: str
+    NOT_GT: str
+    ADJACENT_TO: str
