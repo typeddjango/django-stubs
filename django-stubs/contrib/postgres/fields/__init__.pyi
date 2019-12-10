@@ -8,6 +8,7 @@ from .ranges import (
     FloatRangeField as FloatRangeField,
     DateRangeField as DateRangeField,
     DateTimeRangeField as DateTimeRangeField,
+    RangeOperators as RangeOperators,
 )
 from .hstore import HStoreField as HStoreField
 from .citext import (
