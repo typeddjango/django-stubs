@@ -5,17 +5,17 @@ import sys
 from argparse import ArgumentParser
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Pattern, Union
+from typing import Dict, List, Pattern, Tuple, Union
 
-from git import Repo
+from git import RemoteProgress, Repo
 
 from scripts.enabled_test_modules import (
     EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS,
 )
 
-DJANGO_COMMIT_REFS = {
-    '2.2': 'e8b0903976077b951795938b260211214ed7fe41',
-    '3.0': '7ec5962638144cbf4c2e47ea7d8dc02d1ce44394'
+DJANGO_COMMIT_REFS: Dict[str, Tuple[str, str]] = {
+    '2.2': ('stable/2.2.x', 'e8b0903976077b951795938b260211214ed7fe41'),
+    '3.0': ('stable/3.0.x', '7ec5962638144cbf4c2e47ea7d8dc02d1ce44394')
 }
 PROJECT_DIRECTORY = Path(__file__).parent.parent
 DJANGO_SOURCE_DIRECTORY = PROJECT_DIRECTORY / 'django-sources'  # type: Path
@@ -75,10 +75,21 @@ def replace_with_clickable_location(error: str, abs_test_folder: Path) -> str:
     return error.replace(raw_path, clickable_location)
 
 
-def get_django_repo_object() -> Repo:
+class ProgressPrinter(RemoteProgress):
+    def line_dropped(self, line: str) -> None:
+        print(line)
+
+    def update(self, op_code, cur_count, max_count=None, message=''):
+        print(self._cur_line)
+
+
+def get_django_repo_object(branch: str) -> Repo:
     if not DJANGO_SOURCE_DIRECTORY.exists():
         DJANGO_SOURCE_DIRECTORY.mkdir(exist_ok=True, parents=False)
-        return Repo.clone_from('https://github.com/django/django.git', DJANGO_SOURCE_DIRECTORY)
+        return Repo.clone_from('https://github.com/django/django.git', DJANGO_SOURCE_DIRECTORY,
+                               progress=ProgressPrinter(),
+                               branch=branch,
+                               depth=100)
     else:
         repo = Repo(DJANGO_SOURCE_DIRECTORY)
         return repo
@@ -89,10 +100,13 @@ if __name__ == '__main__':
     parser.add_argument('--django_version', choices=['2.2', '3.0'], required=True)
     args = parser.parse_args()
 
-    commit_sha = DJANGO_COMMIT_REFS[args.django_version]
-    repo = get_django_repo_object()
+    # install proper Django version
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', f'Django=={args.django_version}.*'])
+
+    branch, commit_sha = DJANGO_COMMIT_REFS[args.django_version]
+    repo = get_django_repo_object(branch)
     if repo.head.commit.hexsha != commit_sha:
-        repo.git.fetch('origin')
+        repo.remote('origin').fetch(branch, progress=ProgressPrinter(), depth=100)
         repo.git.checkout(commit_sha)
 
     mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()
