@@ -1,5 +1,6 @@
 from typing import Any, Collection, Optional, Set, Tuple, Type, TypeVar, Union
 
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser, BaseUserManager as BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.models import ContentType
@@ -43,6 +44,14 @@ class UserManager(BaseUserManager[_T]):
     def create_superuser(
         self, username: str, email: Optional[str], password: Optional[str], **extra_fields: Any
     ) -> _T: ...
+    def with_perm(
+        self,
+        perm: Union[str, Permission],
+        is_active: bool = ...,
+        include_superusers: bool = ...,
+        backend: Optional[Union[Type[ModelBackend], str]] = ...,
+        obj: Optional[Model] = ...,
+    ): ...
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
