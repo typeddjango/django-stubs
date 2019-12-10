@@ -5,9 +5,9 @@ import sys
 from argparse import ArgumentParser
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Pattern, Union, Tuple
+from typing import Dict, List, Pattern, Tuple, Union
 
-from git import Repo, RemoteProgress
+from git import RemoteProgress, Repo
 
 from scripts.enabled_test_modules import (
     EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS,
