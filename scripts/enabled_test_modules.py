@@ -2,17 +2,17 @@
 # using this constant.
 import re
 
-IGNORED_MODULES = {'schema', 'gis_tests', 'admin_widgets', 'admin_filters', 'migrations',
+IGNORED_MODULES = {'schema', 'gis_tests', 'admin_widgets', 'admin_filters',
                    'sitemaps_tests', 'staticfiles_tests', 'modeladmin', 'model_forms',
                    'generic_views', 'forms_tests', 'flatpages_tests', 'admin_utils',
-                   'admin_ordering', 'admin_changelist', 'admin_views', 'redirects_tests',
-                   'invalid_models_tests', 'i18n', 'migrate_signals', 'model_formsets',
+                   'admin_ordering', 'admin_changelist', 'admin_views',
+                   'invalid_models_tests', 'i18n', 'model_formsets',
                    'template_tests', 'template_backends', 'test_runner', 'admin_scripts',
-                   'sites_tests', 'inline_formsets', 'foreign_object', 'cache', 'test_client', 'test_client_regress'}
+                   'sites_tests', 'inline_formsets', 'foreign_object', 'cache'}
 
 MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_args_list',
                 'call_args', 'MockUser', 'Xtemplate', 'DummyRequest', 'DummyUser', 'MinimalUser', 'DummyNode']
-EXTERNAL_MODULES = ['psycopg2', 'PIL', 'selenium', 'oracle', 'mysql', 'sqlite3', 'sqlparse', 'tblib', 'numpy',
+EXTERNAL_MODULES = ['psycopg2', 'PIL', 'selenium', 'oracle', 'mysql', 'sqlparse', 'tblib', 'numpy',
                     'bcrypt', 'argon2', 'xml.dom']
 IGNORED_ERRORS = {
     '__common__': [
@@ -65,6 +65,7 @@ IGNORED_ERRORS = {
         'Incompatible types in string interpolation',
         '"None" has no attribute',
         'has no attribute "assert',
+        'Unsupported dynamic base class'
     ],
     'aggregation': [
         re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"'),
@@ -130,7 +131,6 @@ IGNORED_ERRORS = {
         '"Employee" has no attribute "id"',
     ],
     'custom_managers': [
-        'Unsupported dynamic base class',
         'Incompatible types in assignment (expression has type "CharField',
         'Item "Book" of "Optional[Book]" has no attribute "favorite_avg"',
     ],
@@ -258,6 +258,20 @@ IGNORED_ERRORS = {
     ],
     'middleware_exceptions': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any]"; expected "str"'
+    ],
+    'migrate_signals': [
+        'Value of type "Optional[Any]" is not indexable',
+        'Argument 1 to "set" has incompatible type "Optional[Any]"; expected "Iterable[Any]"',
+    ],
+    'migrations': [
+        'FakeMigration',
+        'FakeLoader',
+        '"Manager[Any]" has no attribute "args"',
+        'Dict entry 0 has incompatible type "Any"',
+        'Argument 1 to "append" of "list" has incompatible type',
+        'base class "Model" defined the type as "Manager[Any]"',
+        'Argument 1 to "RunPython" has incompatible type "str"',
+
     ],
     'model_fields': [
         'Item "Field[Any, Any]" of "Union[Field[Any, Any], ForeignObjectRel]" has no attribute',
@@ -403,6 +417,13 @@ IGNORED_ERRORS = {
     'test_utils': [
         '"PossessedCar" has no attribute "color"',
         'expression has type "None", variable has type "List[str]"',
+    ],
+    'test_client': [
+        '(expression has type "HttpResponse", variable has type "StreamingHttpResponse")'
+    ],
+    'test_client_regress': [
+        '(expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")',
+        'Unsupported left operand type for + ("None")',
     ],
     'transactions': [
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
