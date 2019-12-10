@@ -14,9 +14,14 @@ from .text import (
     Trim as Trim,
     Ord as Ord,
     Repeat as Repeat,
+    SHA1 as SHA1,
+    SHA224 as SHA224,
+    SHA256 as SHA256,
+    SHA384 as SHA384,
+    SHA512 as SHA512,
     StrIndex as StrIndex,
-    Replace as Replace,
     Substr as Substr,
+    Replace as Replace,
     Reverse as Reverse,
 )
 
@@ -81,6 +86,7 @@ from .math import (
     Power as Power,
     Radians as Radians,
     Round as Round,
+    Sign as Sign,
     Sin as Sin,
     Sqrt as Sqrt,
     Tan as Tan,
