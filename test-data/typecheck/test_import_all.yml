@@ -270,6 +270,7 @@
         import django.db.models.constraints
         import django.db.models.deletion
         import django.db.models.expressions
+        import django.db.models.enums
         import django.db.models.fields
         import django.db.models.fields.files
         import django.db.models.fields.mixins

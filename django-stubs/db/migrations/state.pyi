@@ -1,21 +1,13 @@
-from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Sequence, Tuple, Type, Union, Set
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, Type, Union, Set
 
+from django.apps import AppConfig
 from django.apps.registry import Apps
 from django.db.models.base import Model
 from django.db.models.manager import Manager
 
 from django.db.models.fields import Field
 
-class AppConfigStub:
-    apps: None
-    label: str
-    models: None
-    models_module: None
-    module: None
-    name: str
-    verbose_name: str
-    def __init__(self, label: str) -> None: ...
-    def import_models(self) -> None: ...
+class AppConfigStub(AppConfig): ...
 
 class ModelState:
     name: str
@@ -66,13 +58,7 @@ class ProjectState:
     def remove_model(self, app_label: str, model_name: str) -> None: ...
 
 class StateApps(Apps):
-    all_models: DefaultDict
-    apps_ready: bool
-    loading: bool
-    models_ready: bool
-    ready: bool
     real_models: List[ModelState]
-    stored_app_configs: List[Any]
     def __init__(
         self, real_apps: List[str], models: Dict[Tuple[str, str], ModelState], ignore_swappable: bool = ...
     ) -> None: ...

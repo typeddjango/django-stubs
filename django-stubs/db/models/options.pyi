@@ -8,6 +8,7 @@ from django.contrib.postgres.fields.array import ArrayField
 from django.contrib.postgres.fields.citext import CIText
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
+from django.db.models.constraints import BaseConstraint
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ManyToManyField, OneToOneField
 from django.db.models.fields.reverse_related import ForeignObjectRel
@@ -34,6 +35,7 @@ _M = TypeVar("_M", bound=Model)
 class Options(Generic[_M]):
     base_manager: Manager
     concrete_fields: ImmutableList
+    constraints: List[BaseConstraint]
     default_manager: Manager
     fields: ImmutableList
     local_concrete_fields: ImmutableList
