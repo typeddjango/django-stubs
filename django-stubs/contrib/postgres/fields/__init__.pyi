@@ -9,6 +9,7 @@ from .ranges import (
     DateRangeField as DateRangeField,
     DateTimeRangeField as DateTimeRangeField,
     RangeOperators as RangeOperators,
+    RangeBoundary as RangeBoundary,
 )
 from .hstore import HStoreField as HStoreField
 from .citext import (

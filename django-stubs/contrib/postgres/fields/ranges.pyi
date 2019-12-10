@@ -41,3 +41,8 @@ class RangeOperators:
     NOT_LT: str
     NOT_GT: str
     ADJACENT_TO: str
+
+class RangeBoundary(models.Expression):
+    lower: str
+    upper: str
+    def __init__(self, inclusive_lower: bool = ..., inclusive_upper: bool = ...): ...
