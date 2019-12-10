@@ -86,6 +86,7 @@ from .math import (
     Power as Power,
     Radians as Radians,
     Round as Round,
+    Sign as Sign,
     Sin as Sin,
     Sqrt as Sqrt,
     Tan as Tan,
