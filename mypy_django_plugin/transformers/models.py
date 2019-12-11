@@ -1,20 +1,19 @@
 from collections import OrderedDict
-from typing import List, Tuple, Type
+from typing import Type, Optional
 
 from django.db.models.base import Model
-from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var, PlaceholderNode
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
-from mypy.plugins.common import add_method
-from mypy.types import AnyType, CallableType, Instance
+from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
+from django.db.models.fields import DateField, DateTimeField
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields
@@ -27,11 +26,22 @@ class ModelClassInitializer:
         self.model_classdef = ctx.cls
         self.django_context = django_context
         self.ctx = ctx
+        self.incomplete_defn_encountered = False
 
     def lookup_typeinfo_or_incomplete_defn_error(self, fullname: str) -> TypeInfo:
         sym = self.api.lookup_fully_qualified_or_none(fullname)
         if sym is None or not isinstance(sym.node, TypeInfo):
             raise helpers.IncompleteDefnException(f'No {fullname!r} found')
+        return sym.node
+
+    def lookup_typeinfo_or_mark_incomplete_defn(self, fullname: str) -> Optional[TypeInfo]:
+        sym = self.api.lookup_fully_qualified_or_none(fullname)
+        if (sym is None
+                or sym.node is None
+                or isinstance(sym.node, PlaceholderNode)):
+            self.incomplete_defn_encountered = True
+            return None
+            # raise helpers.IncompleteDefnException(f'No {fullname!r} found')
         return sym.node
 
     def lookup_class_typeinfo_or_incomplete_defn_error(self, klass: type) -> TypeInfo:
@@ -132,7 +142,9 @@ class AddManagers(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_fullname = helpers.get_class_fullname(manager.__class__)
-            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            manager_info = self.lookup_typeinfo_or_mark_incomplete_defn(manager_fullname)
+            if manager_info is None:
+                continue
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
@@ -143,15 +155,19 @@ class AddManagers(ModelClassInitializer):
                 if has_manager_any_base:
                     custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
 
-                    bases = []
-                    for original_base in manager_info.bases:
-                        if self._is_manager_any(original_base):
-                            if original_base.type is None:
-                                raise helpers.IncompleteDefnException()
+                    try:
+                        bases = []
+                        for original_base in manager_info.bases:
+                            if self._is_manager_any(original_base):
+                                if original_base.type is None:
+                                    raise helpers.IncompleteDefnException()
 
-                            original_base = helpers.reparametrize_instance(original_base,
-                                                                           [Instance(self.model_classdef.info, [])])
-                        bases.append(original_base)
+                                original_base = helpers.reparametrize_instance(original_base,
+                                                                               [Instance(self.model_classdef.info, [])])
+                            bases.append(original_base)
+                    except helpers.IncompleteDefnException:
+                        self.incomplete_defn_encountered = True
+                        continue
 
                     current_module = self.api.modules[self.model_classdef.info.module_name]
                     custom_manager_info = helpers.add_new_class_for_module(current_module,
@@ -167,12 +183,10 @@ class AddManagers(ModelClassInitializer):
                     for name, sym in manager_info.names.items():
                         # replace self type with new class, if copying method
                         if isinstance(sym.node, FuncDef):
-                            arguments, return_type = self.prepare_new_method_arguments(sym.node)
-                            add_method(new_cls_def_context,
-                                       name,
-                                       args=arguments,
-                                       return_type=return_type,
-                                       self_type=custom_manager_type)
+                            helpers.copy_method_to_another_class(new_cls_def_context,
+                                                                 self_type=custom_manager_type,
+                                                                 new_method_name=name,
+                                                                 method_node=sym.node)
                             continue
 
                         new_sym = sym.copy()
@@ -184,20 +198,6 @@ class AddManagers(ModelClassInitializer):
                         custom_manager_info.names[name] = new_sym
 
                     self.add_new_node_to_model_class(manager_name, custom_manager_type)
-
-    def prepare_new_method_arguments(self, node: FuncDef) -> Tuple[List[Argument], MypyType]:
-        arguments = []
-        for argument in node.arguments[1:]:
-            if argument.type_annotation is None:
-                argument.type_annotation = AnyType(TypeOfAny.unannotated)
-            arguments.append(argument)
-
-        if isinstance(node.type, CallableType):
-            return_type = node.type.ret_type
-        else:
-            return_type = AnyType(TypeOfAny.unannotated)
-
-        return arguments, return_type
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
@@ -290,8 +290,12 @@ def process_model_class(ctx: ClassDefContext,
         AddMetaOptionsAttribute,
     ]
     for initializer_cls in initializers:
+        initializer = initializer_cls(ctx, django_context)
         try:
-            initializer_cls(ctx, django_context).run()
+            initializer.run()
         except helpers.IncompleteDefnException:
             if not ctx.api.final_iteration:
                 ctx.api.defer()
+        if (initializer.incomplete_defn_encountered
+                and not ctx.api.final_iteration):
+            ctx.api.defer()
