@@ -13,7 +13,7 @@ DUMMY_SETTINGS_BASE_CLASS = 'django.conf._DjangoConfLazyObject'
 QUERYSET_CLASS_FULLNAME = 'django.db.models.query.QuerySet'
 BASE_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.BaseManager'
 MANAGER_CLASS_FULLNAME = 'django.db.models.manager.Manager'
-RELATED_MANAGER_CLASS_FULLNAME = 'django.db.models.manager.RelatedManager'
+RELATED_MANAGER_CLASS = 'django.db.models.manager.RelatedManager'
 
 BASEFORM_CLASS_FULLNAME = 'django.forms.forms.BaseForm'
 FORM_CLASS_FULLNAME = 'django.forms.forms.Form'
@@ -23,7 +23,7 @@ FORM_MIXIN_CLASS_FULLNAME = 'django.views.generic.edit.FormMixin'
 
 MANAGER_CLASSES = {
     MANAGER_CLASS_FULLNAME,
-    RELATED_MANAGER_CLASS_FULLNAME,
+    RELATED_MANAGER_CLASS,
     BASE_MANAGER_CLASS_FULLNAME,
     # QUERYSET_CLASS_FULLNAME
 }

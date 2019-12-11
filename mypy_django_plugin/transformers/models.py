@@ -258,7 +258,7 @@ class AddRelatedManagers(ModelClassInitializer):
 
             if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
                 try:
-                    manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS_FULLNAME)
+                    manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
                         raise exc
