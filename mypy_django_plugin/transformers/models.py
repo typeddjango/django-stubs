@@ -8,7 +8,7 @@ from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
 from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
-from mypy.plugin import ClassDefContext
+from mypy.plugin import ClassDefContext, SemanticAnalyzerPluginInterface
 from mypy.plugins import common
 from mypy.plugins.common import add_method
 from mypy.types import AnyType, CallableType, Instance
@@ -22,6 +22,8 @@ from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
 
 class ModelClassInitializer:
+    api: SemanticAnalyzerPluginInterface
+
     def __init__(self, ctx: ClassDefContext, django_context: DjangoContext):
         self.api = ctx.api
         self.model_classdef = ctx.cls
@@ -118,7 +120,14 @@ class AddRelatedModelsId(ModelClassInitializer):
                     continue
 
                 rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
-                field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+                try:
+                    field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+                except helpers.IncompleteDefnException as exc:
+                    if not self.api.final_iteration:
+                        raise exc
+                    else:
+                        continue
+
                 is_nullable = self.django_context.get_field_nullability(field, None)
                 set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
                 self.add_new_node_to_model_class(field.attname,
@@ -132,7 +141,13 @@ class AddManagers(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_fullname = helpers.get_class_fullname(manager.__class__)
-            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            try:
+                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            except helpers.IncompleteDefnException as exc:
+                if not self.api.final_iteration:
+                    raise exc
+                else:
+                    continue
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
@@ -143,15 +158,21 @@ class AddManagers(ModelClassInitializer):
                 if has_manager_any_base:
                     custom_model_manager_name = manager.model.__name__ + '_' + manager.__class__.__name__
 
-                    bases = []
-                    for original_base in manager_info.bases:
-                        if self._is_manager_any(original_base):
-                            if original_base.type is None:
-                                raise helpers.IncompleteDefnException()
+                    try:
+                        bases = []
+                        for original_base in manager_info.bases:
+                            if self._is_manager_any(original_base):
+                                if original_base.type is None:
+                                    raise helpers.IncompleteDefnException()
 
-                            original_base = helpers.reparametrize_instance(original_base,
-                                                                           [Instance(self.model_classdef.info, [])])
-                        bases.append(original_base)
+                                original_base = helpers.reparametrize_instance(original_base,
+                                                                               [Instance(self.model_classdef.info, [])])
+                            bases.append(original_base)
+                    except helpers.IncompleteDefnException as exc:
+                        if not self.api.final_iteration:
+                            raise exc
+                        else:
+                            continue
 
                     current_module = self.api.modules[self.model_classdef.info.module_name]
                     custom_manager_info = helpers.add_new_class_for_module(current_module,
@@ -223,13 +244,26 @@ class AddRelatedManagers(ModelClassInitializer):
             if related_model_cls is None:
                 continue
 
-            related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
+            try:
+                related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
+            except helpers.IncompleteDefnException as exc:
+                if not self.api.final_iteration:
+                    raise exc
+                else:
+                    continue
+
             if isinstance(relation, OneToOneRel):
                 self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
                 continue
 
             if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
-                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS_FULLNAME)
+                try:
+                    manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
+                except helpers.IncompleteDefnException as exc:
+                    if not self.api.final_iteration:
+                        raise exc
+                    else:
+                        continue
                 self.add_new_node_to_model_class(attname,
                                                  Instance(manager_info, [Instance(related_model_info, [])]))
                 continue
