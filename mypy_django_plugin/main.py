@@ -7,7 +7,7 @@ from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
-    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
+    AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext, Plugin,
 )
 from mypy.types import Type as MypyType
 
@@ -16,6 +16,9 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
     fields, forms, init_create, meta, querysets, request, settings,
+)
+from mypy_django_plugin.transformers.managers import (
+    create_new_manager_class_from_from_queryset_method,
 )
 from mypy_django_plugin.transformers.models import process_model_class
 
@@ -240,6 +243,16 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(class_name)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
+        return None
+
+    def get_dynamic_class_hook(self, fullname: str
+                               ) -> Optional[Callable[[DynamicClassDefContext], None]]:
+        if fullname.endswith('from_queryset'):
+            class_name, _, _ = fullname.rpartition('.')
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return partial(create_new_manager_class_from_from_queryset_method,
+                               django_context=self.django_context)
         return None
 
 

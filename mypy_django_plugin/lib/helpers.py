@@ -1,25 +1,27 @@
 from collections import OrderedDict
 from typing import (
-    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast,
+    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union,
 )
 
-from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    GDEF, MDEF, Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable,
-    SymbolTableNode, TypeInfo, Var,
+    GDEF, MDEF, Argument, Block, ClassDef, Expression, FuncDef, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
+    SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
-    AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
+    AttributeContext, CheckerPluginInterface, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
 )
-from mypy.types import AnyType, Instance, NoneTyp, TupleType
+from mypy.plugins.common import add_method
+from mypy.semanal import SemanticAnalyzer
+from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
+from django.db.models.fields import Field
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
@@ -55,7 +57,7 @@ def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) 
     return sym.node
 
 
-def lookup_fully_qualified_typeinfo(api: TypeChecker, fullname: str) -> Optional[TypeInfo]:
+def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], fullname: str) -> Optional[TypeInfo]:
     node = lookup_fully_qualified_generic(fullname, api.modules)
     if not isinstance(node, TypeInfo):
         return None
@@ -173,8 +175,11 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
-def add_new_class_for_module(module: MypyFile, name: str, bases: List[Instance],
-                             fields: 'OrderedDict[str, MypyType]') -> TypeInfo:
+def add_new_class_for_module(module: MypyFile,
+                             name: str,
+                             bases: List[Instance],
+                             fields: Optional[Dict[str, MypyType]] = None
+                             ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
 
     # make new class expression
@@ -188,11 +193,12 @@ def add_new_class_for_module(module: MypyFile, name: str, bases: List[Instance],
     new_typeinfo.calculate_metaclass_type()
 
     # add fields
-    for field_name, field_type in fields.items():
-        var = Var(field_name, type=field_type)
-        var.info = new_typeinfo
-        var._fullname = new_typeinfo.fullname + '.' + field_name
-        new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
+    if fields:
+        for field_name, field_type in fields.items():
+            var = Var(field_name, type=field_type)
+            var.info = new_typeinfo
+            var._fullname = new_typeinfo.fullname + '.' + field_name
+            new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
     classdef.info = new_typeinfo
     module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
@@ -269,10 +275,16 @@ def resolve_string_attribute_value(attr_expr: Expression, ctx: Union[FunctionCon
     return None
 
 
+def get_semanal_api(ctx: Union[ClassDefContext, DynamicClassDefContext]) -> SemanticAnalyzer:
+    if not isinstance(ctx.api, SemanticAnalyzer):
+        raise ValueError('Not a SemanticAnalyzer')
+    return ctx.api
+
+
 def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionContext]) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
         raise ValueError('Not a TypeChecker')
-    return cast(TypeChecker, ctx.api)
+    return ctx.api
 
 
 def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
@@ -298,3 +310,28 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> No
     var.is_inferred = True
     info.names[name] = SymbolTableNode(MDEF, var,
                                        plugin_generated=True)
+
+
+def _prepare_new_method_arguments(node: FuncDef) -> Tuple[List[Argument], MypyType]:
+    arguments = []
+    for argument in node.arguments[1:]:
+        if argument.type_annotation is None:
+            argument.type_annotation = AnyType(TypeOfAny.unannotated)
+        arguments.append(argument)
+
+    if isinstance(node.type, CallableType):
+        return_type = node.type.ret_type
+    else:
+        return_type = AnyType(TypeOfAny.unannotated)
+
+    return arguments, return_type
+
+
+def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
+                                 new_method_name: str, method_node: FuncDef) -> None:
+    arguments, return_type = _prepare_new_method_arguments(method_node)
+    add_method(ctx,
+               new_method_name,
+               args=arguments,
+               return_type=return_type,
+               self_type=self_type)
