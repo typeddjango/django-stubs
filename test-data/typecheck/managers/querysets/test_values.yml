@@ -107,3 +107,20 @@
                 class Blog(models.Model):
                     name = models.CharField(max_length=100)
                     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+
+-   case: values_of_many_to_many_field
+    main: |
+        from myapp.models import Author, Book
+        reveal_type(Book.objects.values('authors'))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Book, TypedDict({'authors': builtins.int})]'
+        reveal_type(Author.objects.values('books'))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Author, TypedDict({'books': builtins.int})]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Author(models.Model):
+                    pass
+                class Book(models.Model):
+                    authors = models.ManyToManyField(Author, related_name='books')

@@ -124,7 +124,7 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 yield field
 
-    def get_field_lookup_exact_type(self, api: TypeChecker, field: Field) -> MypyType:
+    def get_field_lookup_exact_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel]) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
             related_model_cls = field.related_model
             primary_key_field = self.get_primary_key_field(related_model_cls)
@@ -134,10 +134,8 @@ class DjangoContext:
             if rel_model_info is None:
                 return AnyType(TypeOfAny.explicit)
 
-            model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []),
-                                                               primary_key_type])
+            model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
             return helpers.make_optional(model_and_primary_key_type)
-            # return helpers.make_optional(Instance(rel_model_info, []))
 
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
@@ -228,21 +226,22 @@ class DjangoContext:
         attname = field.attname
         return attname
 
-    def get_field_nullability(self, field: Field, method: Optional[str]) -> bool:
+    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str]) -> bool:
         nullable = field.null
         if not nullable and isinstance(field, CharField) and field.blank:
             return True
         if method == '__init__':
-            if field.primary_key or isinstance(field, ForeignKey):
+            if ((isinstance(field, Field) and field.primary_key)
+                    or isinstance(field, ForeignKey)):
                 return True
         if method == 'create':
             if isinstance(field, AutoField):
                 return True
-        if field.has_default():
+        if isinstance(field, Field) and field.has_default():
             return True
         return nullable
 
-    def get_field_set_type(self, api: TypeChecker, field: Field, *, method: str) -> MypyType:
+    def get_field_set_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
         """ Get a type of __set__ for this specific Django field. """
         target_field = field
         if isinstance(field, ForeignKey):
@@ -259,7 +258,7 @@ class DjangoContext:
             field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
         return field_set_type
 
-    def get_field_get_type(self, api: TypeChecker, field: Field, *, method: str) -> MypyType:
+    def get_field_get_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
         """ Get a type of __get__ for this specific Django field. """
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
@@ -303,7 +302,10 @@ class DjangoContext:
 
         return related_model_cls
 
-    def _resolve_field_from_parts(self, field_parts: Iterable[str], model_cls: Type[Model]) -> Field:
+    def _resolve_field_from_parts(self,
+                                  field_parts: Iterable[str],
+                                  model_cls: Type[Model]
+                                  ) -> Union[Field, ForeignObjectRel]:
         currently_observed_model = model_cls
         field = None
         for field_part in field_parts:
@@ -325,7 +327,7 @@ class DjangoContext:
         assert field is not None
         return field
 
-    def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Field:
+    def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Union[Field, ForeignObjectRel]:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
         if lookup_parts:

@@ -224,3 +224,20 @@
                     pass
                 class Transaction(models.Model):
                     total = models.IntegerField()
+
+-   case: values_list_of_many_to_many_field
+    main: |
+        from myapp.models import Author, Book
+        reveal_type(Book.objects.values_list('authors'))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Book, Tuple[builtins.int]]'
+        reveal_type(Author.objects.values_list('books'))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Author, Tuple[builtins.int]]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Author(models.Model):
+                    pass
+                class Book(models.Model):
+                    authors = models.ManyToManyField(Author, related_name='books')
