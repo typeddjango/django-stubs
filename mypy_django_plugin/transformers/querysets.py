@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Type, Union
+from typing import List, Optional, Sequence, Type
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
