@@ -1,11 +1,13 @@
-from typing import Any, List, Union
+from typing import Any, List, Union, Iterable, Optional
 
 from django.contrib.admin.options import BaseModelAdmin
 from django.core.checks.messages import Error
 
+from django.apps.config import AppConfig
+
 _CheckError = Union[str, Error]
 
-def check_admin_app(app_configs: None, **kwargs: Any) -> List[_CheckError]: ...
+def check_admin_app(app_configs: Optional[Iterable[AppConfig]], **kwargs: Any) -> List[_CheckError]: ...
 def check_dependencies(**kwargs: Any) -> List[_CheckError]: ...
 
 class BaseModelAdminChecks:
