@@ -3,6 +3,7 @@ from typing import (
     TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union,
 )
 
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
@@ -21,7 +22,6 @@ from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
-from django.db.models.fields import Field
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:

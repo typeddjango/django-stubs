@@ -4,17 +4,11 @@ from mypy.nodes import (
 from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny
 
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
 
 
-def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext,
-                                                       django_context: DjangoContext) -> None:
+def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext) -> None:
     semanal_api = helpers.get_semanal_api(ctx)
-    # current_module = api.cur_mod_node
-    # remove variable with name
-    # if ctx.name in current_module.names:
-    #     del current_module.names[ctx.name]
 
     assert isinstance(ctx.call.callee, MemberExpr)
     assert isinstance(ctx.call.callee.expr, NameExpr)

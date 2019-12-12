@@ -251,8 +251,7 @@ class NewSemanalDjangoPlugin(Plugin):
             class_name, _, _ = fullname.rpartition('.')
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-                return partial(create_new_manager_class_from_from_queryset_method,
-                               django_context=self.django_context)
+                return create_new_manager_class_from_from_queryset_method
         return None
 
 
