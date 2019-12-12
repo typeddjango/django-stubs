@@ -31,7 +31,6 @@ IGNORED_ERRORS = {
         re.compile(r'has no attribute ("|\')_[a-zA-Z_]+("|\')'),
         "'Settings' object has no attribute",
         '**Dict',
-        re.compile(r"Expression of type '.*' is not supported"),
         'has incompatible type "object"',
         'undefined in superclass',
         'Argument after ** must be a mapping',
