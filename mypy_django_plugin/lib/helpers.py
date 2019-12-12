@@ -259,8 +259,7 @@ def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, MypyTy
     return typed_dict_type
 
 
-def resolve_string_attribute_value(attr_expr: Expression, ctx: Union[FunctionContext, MethodContext],
-                                   django_context: 'DjangoContext') -> Optional[str]:
+def resolve_string_attribute_value(attr_expr: Expression, django_context: 'DjangoContext') -> Optional[str]:
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
@@ -270,8 +269,6 @@ def resolve_string_attribute_value(attr_expr: Expression, ctx: Union[FunctionCon
         if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == 'django.conf.settings':
             if hasattr(django_context.settings, member_name):
                 return getattr(django_context.settings, member_name)
-
-    ctx.api.fail(f'Expression of type {type(attr_expr).__name__!r} is not supported', ctx.context)
     return None
 
 

@@ -36,7 +36,7 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     if field_name_expr is None:
         return ctx.default_return_type
 
-    field_name = helpers.resolve_string_attribute_value(field_name_expr, ctx, django_context)
+    field_name = helpers.resolve_string_attribute_value(field_name_expr, django_context)
     if field_name is None:
         return ctx.default_return_type
 

@@ -60,7 +60,7 @@ def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext
 
 def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model],
                              flat: bool, named: bool) -> MypyType:
-    field_lookups = resolve_field_lookups(ctx.args[0], ctx, django_context)
+    field_lookups = resolve_field_lookups(ctx.args[0], django_context)
     if field_lookups is None:
         return AnyType(TypeOfAny.from_error)
 
@@ -146,11 +146,10 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
 
 
-def resolve_field_lookups(lookup_exprs: Sequence[Expression], ctx: Union[FunctionContext, MethodContext],
-                          django_context: DjangoContext) -> Optional[List[str]]:
+def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[List[str]]:
     field_lookups = []
     for field_lookup_expr in lookup_exprs:
-        field_lookup = helpers.resolve_string_attribute_value(field_lookup_expr, ctx, django_context)
+        field_lookup = helpers.resolve_string_attribute_value(field_lookup_expr, django_context)
         if field_lookup is None:
             return None
         field_lookups.append(field_lookup)
@@ -170,7 +169,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if model_cls is None:
         return ctx.default_return_type
 
-    field_lookups = resolve_field_lookups(ctx.args[0], ctx, django_context)
+    field_lookups = resolve_field_lookups(ctx.args[0], django_context)
     if field_lookups is None:
         return AnyType(TypeOfAny.from_error)
 
