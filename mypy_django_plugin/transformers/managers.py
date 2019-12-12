@@ -1,5 +1,5 @@
 from mypy.nodes import (
-    GDEF, FuncDef, MemberExpr, NameExpr, SymbolTableNode, TypeInfo,
+    GDEF, FuncDef, MemberExpr, NameExpr, StrExpr, SymbolTableNode, TypeInfo,
 )
 from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny
@@ -33,6 +33,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     assert isinstance(passed_queryset, NameExpr)
 
     derived_queryset_fullname = passed_queryset.fullname
+    assert derived_queryset_fullname is not None
+
     sym = semanal_api.lookup_fully_qualified_or_none(derived_queryset_fullname)
     assert sym is not None
     if sym.node is None:
@@ -47,7 +49,9 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     assert isinstance(derived_queryset_info, TypeInfo)
 
     if len(ctx.call.args) > 1:
-        custom_manager_generated_name = ctx.call.args[1].value
+        expr = ctx.call.args[1]
+        assert isinstance(expr, StrExpr)
+        custom_manager_generated_name = expr.value
     else:
         custom_manager_generated_name = base_manager_info.name + 'From' + derived_queryset_info.name
 
