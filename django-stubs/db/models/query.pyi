@@ -31,6 +31,7 @@ _T = TypeVar("_T", bound=models.Model, covariant=True)
 _QS = TypeVar("_QS", bound="_BaseQuerySet")
 
 class _BaseQuerySet(Generic[_T], Sized):
+    model: Type[_T]
     query: Query
     def __init__(
         self,
