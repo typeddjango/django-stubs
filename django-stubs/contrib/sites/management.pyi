@@ -1,10 +1,10 @@
 from typing import Any
 
+from django.apps.config import AppConfig
 from django.apps.registry import Apps
-from django.contrib.sites.apps import SitesConfig
 
 def create_default_site(
-    app_config: SitesConfig,
+    app_config: AppConfig,
     verbosity: int = ...,
     interactive: bool = ...,
     using: str = ...,

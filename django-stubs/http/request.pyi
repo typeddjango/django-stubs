@@ -18,6 +18,7 @@ from typing import (
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
+from django.contrib.sites.models import Site
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 
 from django.core.files import uploadedfile, uploadhandler
@@ -51,6 +52,7 @@ class HttpRequest(BytesIO):
     content_type: Optional[str] = ...
     content_params: Optional[Dict[str, str]] = ...
     user: AbstractBaseUser
+    site: Site
     session: SessionBase
     encoding: Optional[str] = ...
     upload_handlers: UploadHandlerList = ...

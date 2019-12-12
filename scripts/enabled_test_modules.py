@@ -4,13 +4,13 @@ import re
 
 IGNORED_MODULES = {'schema', 'gis_tests', 'admin_widgets', 'admin_filters',
                    'sitemaps_tests', 'staticfiles_tests', 'modeladmin', 'model_forms',
-                   'generic_views', 'forms_tests', 'flatpages_tests', 'admin_utils',
+                   'generic_views', 'forms_tests', 'flatpages_tests',
                    'admin_ordering', 'admin_changelist', 'admin_views',
                    'invalid_models_tests', 'i18n', 'model_formsets',
                    'template_tests', 'template_backends', 'test_runner', 'admin_scripts',
-                   'sites_tests', 'inline_formsets', 'foreign_object', 'cache'}
+                   'inline_formsets', 'foreign_object', 'cache'}
 
-MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'modelz', 'call_count', 'call_args_list',
+MOCK_OBJECTS = ['MockRequest', 'MockCompiler', 'MockModelAdmin', 'modelz', 'call_count', 'call_args_list',
                 'call_args', 'MockUser', 'Xtemplate', 'DummyRequest', 'DummyUser', 'MinimalUser', 'DummyNode']
 EXTERNAL_MODULES = ['psycopg2', 'PIL', 'selenium', 'oracle', 'mysql', 'sqlparse', 'tblib', 'numpy',
                     'bcrypt', 'argon2', 'xml.dom']
@@ -66,6 +66,9 @@ IGNORED_ERRORS = {
         '"None" has no attribute',
         'has no attribute "assert',
         'Unsupported dynamic base class'
+    ],
+    'admin_utils': [
+        '"Article" has no attribute "non_field"',
     ],
     'aggregation': [
         re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"'),
@@ -381,6 +384,9 @@ IGNORED_ERRORS = {
     'sites_framework': [
         'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"',
         "Name 'Optional' is not defined",
+    ],
+    'sites_tests': [
+        '"RequestSite" of "Union[Site, RequestSite]" has no attribute "id"',
     ],
     'syndication_tests': [
         'List or tuple expected as variable arguments'

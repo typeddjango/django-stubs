@@ -16,6 +16,7 @@ from typing import (
     TypeVar,
     Union,
     overload,
+    Reversible,
 )
 
 from django.db.models.base import Model
@@ -121,13 +122,14 @@ class _BaseQuerySet(Generic[_T], Sized):
     def db(self) -> str: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
 
-class QuerySet(_BaseQuerySet[_T], Collection[_T], Sized):
+class QuerySet(_BaseQuerySet[_T], Collection[_T], Reversible[_T], Sized):
     def __iter__(self) -> Iterator[_T]: ...
     def __contains__(self, x: object) -> bool: ...
     @overload
     def __getitem__(self, i: int) -> _T: ...
     @overload
     def __getitem__(self: _QS, s: slice) -> _QS: ...
+    def __reversed__(self) -> Iterator[_T]: ...
 
 _Row = TypeVar("_Row", covariant=True)
 

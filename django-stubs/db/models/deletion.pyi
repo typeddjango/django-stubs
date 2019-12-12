@@ -1,4 +1,4 @@
-from typing import Any, Callable, Iterable, Optional, Union
+from typing import Any, Callable, Iterable, Optional, Union, Collection, Type
 
 from django.db.models.base import Model
 
@@ -18,4 +18,11 @@ class ProtectedError(IntegrityError): ...
 
 class Collector:
     def __init__(self, using: str) -> None: ...
+    def collect(
+        self,
+        objs: Collection[Optional[Model]],
+        source: Optional[Type[Model]] = ...,
+        source_attr: Optional[str] = ...,
+        **kwargs: Any
+    ) -> None: ...
     def can_fast_delete(self, objs: Union[Model, Iterable[Model]], from_field: Optional[Field] = ...) -> bool: ...
