@@ -4,6 +4,7 @@ from typing import List, Optional, Sequence, Type, Union
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance
@@ -47,7 +48,8 @@ def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext
     except LookupsAreUnsupported:
         return AnyType(TypeOfAny.explicit)
 
-    if isinstance(lookup_field, RelatedField) and lookup_field.column == lookup:
+    if ((isinstance(lookup_field, RelatedField) and lookup_field.column == lookup)
+            or isinstance(lookup_field, ForeignObjectRel)):
         related_model_cls = django_context.get_field_related_model_cls(lookup_field)
         if related_model_cls is None:
             return AnyType(TypeOfAny.from_error)
