@@ -271,7 +271,7 @@ IGNORED_ERRORS = {
         '"Manager[Any]" has no attribute "args"',
         'Dict entry 0 has incompatible type "Any"',
         'Argument 1 to "append" of "list" has incompatible type',
-        'base class "Model" defined the type as "Manager[Any]"',
+        'base class "Model" defined the type as "BaseManager[Any]"',
         'Argument 1 to "RunPython" has incompatible type "str"',
 
     ],
