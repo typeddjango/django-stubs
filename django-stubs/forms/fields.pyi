@@ -205,10 +205,9 @@ class CallableChoiceIterator:
     def __iter__(self) -> None: ...
 
 class ChoiceField(Field):
-    choices: Any = ...
     def __init__(
         self,
-        choices: Any = ...,
+        choices: _FieldChoices = ...,
         required: bool = ...,
         widget: Optional[Union[Widget, Type[Widget]]] = ...,
         label: Optional[Any] = ...,

@@ -1,10 +1,11 @@
 from typing import Any, Callable, Dict, Optional, Sequence, Type, Union
 
 from django.forms.forms import BaseForm
-from django.http import HttpRequest, HttpResponse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
 from typing_extensions import Literal
+
+from django.http import HttpRequest, HttpResponse
 
 class FormMixin(ContextMixin):
     initial: Dict[str, Any] = ...
