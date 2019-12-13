@@ -3,7 +3,7 @@
 import re
 
 IGNORED_MODULES = {'schema', 'gis_tests', 'admin_widgets', 'admin_filters',
-                   'sitemaps_tests', 'staticfiles_tests', 'modeladmin', 'model_forms',
+                   'sitemaps_tests', 'staticfiles_tests', 'modeladmin',
                    'generic_views', 'forms_tests', 'flatpages_tests',
                    'admin_ordering', 'admin_changelist', 'admin_views',
                    'invalid_models_tests', 'i18n', 'model_formsets',
@@ -282,6 +282,14 @@ IGNORED_ERRORS = {
         '"ImageFile" has no attribute "was_opened"',
         'Incompatible type for "size" of "FloatModel" (got "object", expected "Union[float, int, str, Combinable]")',
         'Incompatible type for "value" of "IntegerModel" (got "object", expected',
+    ],
+    'model_forms': [
+        '"render" of "Widget"',
+        "Module 'django.core.validators' has no attribute 'ValidationError'",
+        'Incompatible types in assignment',
+        'NewForm',
+        '"type" has no attribute "base_fields"',
+        'Argument "instance" to "InvalidModelForm" has incompatible type "Type[Category]"',
     ],
     'model_indexes': [
         'Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'

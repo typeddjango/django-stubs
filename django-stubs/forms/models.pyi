@@ -1,5 +1,21 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, Iterator, List, Mapping, MutableMapping, Optional, Sequence, Tuple, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    ClassVar,
+    Container,
+    TypeVar,
+)
 from unittest.mock import MagicMock
 from uuid import UUID
 
@@ -24,6 +40,11 @@ _Fields = Union[List[Union[Callable, str]], Sequence[str], Literal["__all__"]]
 _Labels = Dict[str, str]
 _ErrorMessages = Dict[str, Dict[str, str]]
 
+_M = TypeVar("_M", bound=Model)
+
+def construct_instance(
+    form: BaseForm, instance: _M, fields: Optional[Container[str]] = ..., exclude: Optional[Container[str]] = ...
+) -> _M: ...
 def model_to_dict(
     instance: Model, fields: Optional[_Fields] = ..., exclude: Optional[_Fields] = ...
 ) -> Dict[str, Any]: ...
@@ -76,7 +97,8 @@ class BaseModelForm(BaseForm):
     save_m2m: Any = ...
     def save(self, commit: bool = ...) -> Any: ...
 
-class ModelForm(BaseModelForm): ...
+class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
+    base_fields: ClassVar[Dict[str, Field]] = ...
 
 def modelform_factory(
     model: Type[Model],

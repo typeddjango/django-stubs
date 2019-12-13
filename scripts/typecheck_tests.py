@@ -14,8 +14,8 @@ from scripts.enabled_test_modules import (
 )
 
 DJANGO_COMMIT_REFS: Dict[str, Tuple[str, str]] = {
-    '2.2': ('stable/2.2.x', 'e8b0903976077b951795938b260211214ed7fe41'),
-    '3.0': ('stable/3.0.x', '7ec5962638144cbf4c2e47ea7d8dc02d1ce44394')
+    '2.2': ('stable/2.2.x', '86befcc172c23170a720b3e0c06db51a99b3da59'),
+    '3.0': ('stable/3.0.x', '6cb30414bc0f83b49afc4cae76d4af5656effe9a')
 }
 PROJECT_DIRECTORY = Path(__file__).parent.parent
 DJANGO_SOURCE_DIRECTORY = PROJECT_DIRECTORY / 'django-sources'  # type: Path
