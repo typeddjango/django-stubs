@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Ty
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import ValidationError
-from django.db.models.manager import Manager
+from django.db.models.manager import BaseManager
 from django.db.models.options import Options
 
 _Self = TypeVar("_Self", bound="Model")
@@ -13,9 +13,9 @@ class Model(metaclass=ModelBase):
     class DoesNotExist(Exception): ...
     class MultipleObjectsReturned(Exception): ...
     class Meta: ...
-    _default_manager: Manager[Model]
     _meta: Options[Any]
-    objects: Manager[Any]
+    _default_manager: BaseManager[Model]
+    objects: BaseManager[Any]
     pk: Any = ...
     def __init__(self: _Self, *args, **kwargs) -> None: ...
     def delete(self, using: Any = ..., keep_parents: bool = ...) -> Tuple[int, Dict[str, int]]: ...

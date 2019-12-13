@@ -1,5 +1,5 @@
 from mypy.nodes import (
-    GDEF, FuncDef, MemberExpr, NameExpr, StrExpr, SymbolTableNode, TypeInfo,
+    GDEF, FuncDef, MemberExpr, NameExpr, RefExpr, StrExpr, SymbolTableNode, TypeInfo,
 )
 from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny
@@ -10,9 +10,11 @@ from mypy_django_plugin.lib import helpers
 def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext) -> None:
     semanal_api = helpers.get_semanal_api(ctx)
 
-    assert isinstance(ctx.call.callee, MemberExpr)
-    assert isinstance(ctx.call.callee.expr, NameExpr)
-    base_manager_info = ctx.call.callee.expr.node
+    callee = ctx.call.callee
+    assert isinstance(callee, MemberExpr)
+    assert isinstance(callee.expr, RefExpr)
+
+    base_manager_info = callee.expr.node
     if base_manager_info is None:
         if not semanal_api.final_iteration:
             semanal_api.defer()

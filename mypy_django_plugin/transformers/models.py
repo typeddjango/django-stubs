@@ -144,7 +144,7 @@ class AddManagers(ModelClassInitializer):
         return False
 
     def is_any_parametrized_manager(self, typ: Instance) -> bool:
-        return typ.type.fullname == fullnames.MANAGER_CLASS_FULLNAME and isinstance(typ.args[0], AnyType)
+        return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
 
     def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
         base_manager_info = self.lookup_typeinfo(base_manager_fullname)
