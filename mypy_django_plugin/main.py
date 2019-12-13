@@ -212,6 +212,9 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
+        if method_name == 'as_manager':
+            return partial(querysets.create_new_class_from_as_manager_method, django_context=self.django_context)
+
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)

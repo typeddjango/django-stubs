@@ -7,7 +7,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance
+from mypy.types import AnyType, Instance, CallableType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
@@ -190,3 +190,44 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()))
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
+
+
+def create_new_class_from_as_manager_method(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    assert isinstance(ctx.type, CallableType)
+    callee_type = ctx.type.bound_args[0]
+    if (not isinstance(callee_type, Instance)
+            or not callee_type.type.has_base(fullnames.QUERYSET_CLASS_FULLNAME)):
+        return ctx.default_return_type
+
+    callee_type_info = callee_type.type
+    manager_info = helpers.lookup_fully_qualified_typeinfo(ctx.api,
+                                                           fullnames.MANAGER_CLASS_FULLNAME)
+    if manager_info is None:
+        return ctx.default_return_type
+
+    new_manager_name = f'{callee_type_info.name}_AsManager'
+    base_class = Instance(manager_info, [AnyType(TypeOfAny.unannotated)])
+    helpers.get_typechecker_api(ctx.api).mod
+    helpers.add_new_class_for_module()
+    new_manager_info = helpers.basic_new_typeinfo(new_manager_name,
+                                                  basetype_or_fallback=base_class)
+    new_manager_info.line = ctx.context.line
+    new_manager_info.defn.line = ctx.context.line
+    new_manager_info.metaclass_type = new_manager_info.calculate_metaclass_type()
+
+    current_module = semanal_api.cur_mod_node
+    current_module.names[ctx.name] = SymbolTableNode(GDEF, new_manager_info,
+                                                     plugin_generated=True)
+
+    # helpers._add_method()
+    # class_def_context = ClassDefContext(cls=new_manager_info.defn,
+    #                                     reason=ctx.call, api=semanal_api)
+    # self_type = Instance(new_manager_info, [])
+    # for name, sym in derived_queryset_info.names.items():
+    #     if isinstance(sym.node, FuncDef):
+    #         helpers.copy_method_to_another_class(class_def_context,
+    #                                              self_type,
+    #                                              new_method_name=name,
+    #                                              method_node=sym.node)
+
+    print()

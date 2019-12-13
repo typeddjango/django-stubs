@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from typing import (
-    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union,
-)
+    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union)
+
+from typing_extensions import Protocol
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -324,6 +325,59 @@ def _prepare_new_method_arguments(node: FuncDef) -> Tuple[List[Argument], MypyTy
     return arguments, return_type
 
 
+class SupportsNamedType(Protocol):
+    def named_type(self, qualified_name: str, args: Optional[List[MypyType]] = None) -> Instance:
+        pass
+
+
+class FakeClassDefContext:
+    def __init__(self, cls: ClassDef, api: SupportsNamedType):
+        self.cls = cls
+        self.api = api
+
+
+def _add_method(
+        info: TypeInfo,
+        api: SupportsNamedType,
+        old_method_node: FuncDef,
+        name: str,
+        self_type: Optional[MypyType] = None
+) -> None:
+    fake_ctx = FakeClassDefContext(info.defn, api=api)
+    arguments, return_type = _prepare_new_method_arguments(old_method_node)
+    add_method(fake_ctx,
+               name,
+               args=arguments,
+               return_type=return_type,
+               self_type=self_type)
+
+
+def basic_new_typeinfo(self, name: str, basetype_or_fallback: Instance) -> TypeInfo:
+    class_def = ClassDef(name, Block([]))
+    if self.is_func_scope() and not self.type:
+        # Full names of generated classes should always be prefixed with the module names
+        # even if they are nested in a function, since these classes will be (de-)serialized.
+        # (Note that the caller should append @line to the name to avoid collisions.)
+        # TODO: clean this up, see #6422.
+        class_def.fullname = self.cur_mod_id + '.' + self.qualified_name(name)
+    else:
+        class_def.fullname = self.qualified_name(name)
+
+    info = TypeInfo(SymbolTable(), class_def, self.cur_mod_id)
+    class_def.info = info
+    mro = basetype_or_fallback.type.mro
+    if not mro:
+        # Forward reference, MRO should be recalculated in third pass.
+        mro = [basetype_or_fallback.type, self.object_type().type]
+    info.mro = [info] + mro
+    info.bases = [basetype_or_fallback]
+    return info
+
+
+# def copy_methods_to_another_class(source_info: TypeInfo, dest_type: Instance):
+#     pass
+
+
 def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                                  new_method_name: str, method_node: FuncDef) -> None:
     arguments, return_type = _prepare_new_method_arguments(method_node)
@@ -332,3 +386,5 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                args=arguments,
                return_type=return_type,
                self_type=self_type)
+
+
