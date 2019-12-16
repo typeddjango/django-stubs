@@ -65,8 +65,11 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     class_def_context = ClassDefContext(cls=new_manager_info.defn,
                                         reason=ctx.call, api=semanal_api)
     self_type = Instance(new_manager_info, [])
-    for cls_mro_info in derived_queryset_info.mro:
-        for name, sym in cls_mro_info.names.items():
+    # we need to copy all methods in MRO before django.db.models.query.QuerySet
+    for class_mro_info in derived_queryset_info.mro:
+        if class_mro_info.fullname == 'django.db.models.query.QuerySet':
+            break
+        for name, sym in class_mro_info.names.items():
             if isinstance(sym.node, FuncDef):
                 helpers.copy_method_to_another_class(class_def_context,
                                                      self_type,
