@@ -4,7 +4,7 @@ from mypy.nodes import (
 from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny
 
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import fullnames, helpers
 
 
 def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext) -> None:
@@ -67,7 +67,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     self_type = Instance(new_manager_info, [])
     # we need to copy all methods in MRO before django.db.models.query.QuerySet
     for class_mro_info in derived_queryset_info.mro:
-        if class_mro_info.fullname == 'django.db.models.query.QuerySet':
+        if class_mro_info.fullname == fullnames.QUERYSET_CLASS_FULLNAME:
             break
         for name, sym in class_mro_info.names.items():
             if isinstance(sym.node, FuncDef):
