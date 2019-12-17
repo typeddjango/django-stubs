@@ -1,6 +1,7 @@
-from typing import Dict, Optional, Type, cast, List
+from typing import Dict, List, Optional, Type, cast
 
 from django.db.models.base import Model
+from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
@@ -13,7 +14,6 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
-from django.db.models.fields import DateField, DateTimeField
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields
