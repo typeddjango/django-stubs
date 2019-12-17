@@ -331,9 +331,14 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
     semanal_api = get_semanal_api(ctx)
     for argument in arguments:
         if argument.type_annotation is not None:
-            argument.type_annotation = semanal_api.anal_type(argument.type_annotation)
+            argument.type_annotation = semanal_api.anal_type(argument.type_annotation,
+                                                             allow_placeholder=True)
+
     if return_type is not None:
-        return_type = semanal_api.anal_type(return_type) or AnyType(TypeOfAny.unannotated)
+        ret = semanal_api.anal_type(return_type,
+                                    allow_placeholder=True)
+        assert ret is not None
+        return_type = ret
 
     add_method(ctx,
                new_method_name,
