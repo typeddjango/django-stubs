@@ -648,3 +648,27 @@
                         abstract = True
                 class User(AbstractUser):
                     pass
+
+
+-   case: related_manager_is_a_subclass_of_default_manager
+    main: |
+        from myapp.models import User
+        reveal_type(User().orders)  # N: Revealed type is 'myapp.models.Order_RelatedManager'
+        reveal_type(User().orders.get())  # N: Revealed type is 'myapp.models.Order*'
+        reveal_type(User().orders.manager_method())  # N: Revealed type is 'builtins.int'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+                class OrderManager(models.Manager):
+                    def manager_method(self) -> int:
+                        pass
+                class Order(models.Model):
+                    objects = OrderManager()
+                    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='orders')
+
