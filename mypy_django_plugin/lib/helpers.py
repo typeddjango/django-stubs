@@ -327,10 +327,14 @@ def _prepare_new_method_arguments(node: FuncDef) -> Tuple[List[Argument], MypyTy
 def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                                  new_method_name: str, method_node: FuncDef) -> None:
     arguments, return_type = _prepare_new_method_arguments(method_node)
+
     semanal_api = get_semanal_api(ctx)
     for argument in arguments:
-        argument.type_annotation = semanal_api.anal_type(argument.type_annotation)
-    return_type = semanal_api.anal_type(return_type)
+        if argument.type_annotation is not None:
+            argument.type_annotation = semanal_api.anal_type(argument.type_annotation)
+    if return_type is not None:
+        return_type = semanal_api.anal_type(return_type) or AnyType(TypeOfAny.unannotated)
+
     add_method(ctx,
                new_method_name,
                args=arguments,
