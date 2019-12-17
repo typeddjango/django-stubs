@@ -132,16 +132,13 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from myapp.managers.mymodel import NewManager
+                from myapp.managers import NewManager
 
                 class MyModel(models.Model):
                     objects = NewManager()
-        -   path: myapp/managers/__init__.py
-        -   path: myapp/managers/mymodel.py
+        -   path: myapp/managers.py
             content: |
-                import uuid
                 from typing import Optional
-
                 from django.db import models
 
                 class ModelQuerySet(models.QuerySet):
