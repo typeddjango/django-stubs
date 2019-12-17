@@ -117,3 +117,32 @@
               NewManager = BaseManager.from_queryset(ModelQuerySet)
               class MyModel(models.Model):
                   objects = NewManager()
+
+-   case: from_queryset_with_manager_in_another_directory_and_imports
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel().objects)  # N: Revealed type is 'myapp.models.MyModel_NewManager[myapp.models.MyModel]'
+        reveal_type(MyModel().objects.get())  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is 'def (param: Union[builtins.str, None] =) -> Union[builtins.str, None]'
+        reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is 'Union[builtins.str, None]'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from myapp.managers import NewManager
+
+                class MyModel(models.Model):
+                    objects = NewManager()
+        -   path: myapp/managers.py
+            content: |
+                from typing import Optional
+                from django.db import models
+
+                class ModelQuerySet(models.QuerySet):
+                    def queryset_method(self, param: Optional[str] = None) -> Optional[str]:
+                        return param
+
+                NewManager = models.Manager.from_queryset(ModelQuerySet)
