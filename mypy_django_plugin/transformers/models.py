@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type, cast
+from typing import Dict, List, Optional, Type, cast
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
@@ -57,6 +57,12 @@ class ModelClassInitializer:
         helpers.add_new_sym_for_info(self.model_classdef.info,
                                      name=name,
                                      sym_type=typ)
+
+    def add_new_class_for_current_module(self, name: str, bases: List[Instance]) -> TypeInfo:
+        current_module = self.api.modules[self.model_classdef.info.module_name]
+        new_class_info = helpers.add_new_class_for_module(current_module,
+                                                          name=name, bases=bases)
+        return new_class_info
 
     def run(self) -> None:
         model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
@@ -164,14 +170,12 @@ class AddManagers(ModelClassInitializer):
                                                                [Instance(self.model_classdef.info, [])])
             bases.append(original_base)
 
-        current_module = self.api.modules[self.model_classdef.info.module_name]
-        custom_manager_info = helpers.add_new_class_for_module(current_module,
-                                                               name=name, bases=bases)
+        new_manager_info = self.add_new_class_for_current_module(name, bases)
         # copy fields to a new manager
-        new_cls_def_context = ClassDefContext(cls=custom_manager_info.defn,
+        new_cls_def_context = ClassDefContext(cls=new_manager_info.defn,
                                               reason=self.ctx.reason,
                                               api=self.api)
-        custom_manager_type = Instance(custom_manager_info, [Instance(self.model_classdef.info, [])])
+        custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
 
         for name, sym in base_manager_info.names.items():
             # replace self type with new class, if copying method
@@ -185,10 +189,10 @@ class AddManagers(ModelClassInitializer):
             new_sym = sym.copy()
             if isinstance(new_sym.node, Var):
                 new_var = Var(name, type=sym.type)
-                new_var.info = custom_manager_info
-                new_var._fullname = custom_manager_info.fullname + '.' + name
+                new_var.info = new_manager_info
+                new_var._fullname = new_manager_info.fullname + '.' + name
                 new_sym.node = new_var
-            custom_manager_info.names[name] = new_sym
+            new_manager_info.names[name] = new_sym
 
         return custom_manager_type
 
@@ -268,15 +272,30 @@ class AddRelatedManagers(ModelClassInitializer):
 
             if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
                 try:
-                    manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
+                    related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)  # noqa: E501
+                    if 'objects' not in related_model_info.names:
+                        raise helpers.IncompleteDefnException()
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
                         raise exc
                     else:
                         continue
-                self.add_new_node_to_model_class(attname,
-                                                 Instance(manager_info, [Instance(related_model_info, [])]))
-                continue
+
+                # create new RelatedManager subclass
+                parametrized_related_manager_type = Instance(related_manager_info,
+                                                             [Instance(related_model_info, [])])
+                default_manager_type = related_model_info.names['objects'].type
+                if (default_manager_type is None
+                        or not isinstance(default_manager_type, Instance)
+                        or default_manager_type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME):
+                    self.add_new_node_to_model_class(attname, parametrized_related_manager_type)
+                    continue
+
+                name = related_model_cls.__name__ + '_' + 'RelatedManager'
+                bases = [parametrized_related_manager_type, default_manager_type]
+                new_related_manager_info = self.add_new_class_for_current_module(name, bases)
+
+                self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []))
 
 
 class AddExtraFieldMethods(ModelClassInitializer):

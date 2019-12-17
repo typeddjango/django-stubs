@@ -248,7 +248,7 @@ IGNORED_ERRORS = {
         re.compile(r'"(HttpRequest|WSGIRequest)" has no attribute'),
     ],
     'many_to_many': [
-        '(expression has type "List[Article]", variable has type "RelatedManager[Article]"',
+        '(expression has type "List[Article]", variable has type "Article_RelatedManager2',
         '"add" of "RelatedManager" has incompatible type "Article"; expected "Union[Publication, int]"',
     ],
     'many_to_one': [
