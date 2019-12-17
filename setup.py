@@ -21,14 +21,14 @@ with open('README.md', 'r') as f:
     readme = f.read()
 
 dependencies = [
-    'mypy>=0.750,<0.760',
+    'mypy>=0.760,<0.770',
     'typing-extensions',
     'django',
 ]
 
 setup(
     name="django-stubs",
-    version="1.3.3",
+    version="1.4.0",
     description='Mypy stubs for Django',
     long_description=readme,
     long_description_content_type='text/markdown',

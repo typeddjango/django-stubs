@@ -178,7 +178,6 @@ IGNORED_ERRORS = {
     ],
     'files': [
         'Incompatible types in assignment (expression has type "IOBase", variable has type "File")',
-        'Argument 1 to "write" of "SpooledTemporaryFile"',
     ],
     'filtered_relation': [
         'has no attribute "name"',
@@ -231,13 +230,8 @@ IGNORED_ERRORS = {
     ],
     'mail': [
         'List item 1 has incompatible type "None"; expected "str"',
-        'Argument 1 to "push" of "SMTPChannel" has incompatible type "str"; expected "bytes"',
-        'Value of type "Union[List[Message], str, bytes, None]" is not indexable',
         'Incompatible types in assignment '
         + '(expression has type "bool", variable has type "Union[SMTP_SSL, SMTP, None]")',
-        re.compile(
-            r'Item "(int|str)" of "Union\[Message, str, int, Any\]" has no attribute "(get_content_type|get_filename)"'
-        )
     ],
     'messages_tests': [
         'List item 0 has incompatible type "Dict[str, Message]"; expected "Message"',
@@ -319,9 +313,6 @@ IGNORED_ERRORS = {
     ],
     'model_enums': [
         "'bool' is not a valid base class",
-    ],
-    'multiple_database': [
-        'Unexpected attribute "extra_arg" for model "Book"'
     ],
     'null_queries': [
         "Cannot resolve keyword 'foo' into field"
