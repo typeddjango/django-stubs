@@ -18,7 +18,9 @@ from mypy.plugin import (
 )
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
+from mypy.types import (
+    AnyType, CallableType, Instance, NoneTyp, ProperType, TupleType,
+)
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
@@ -309,36 +311,55 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> No
                                        plugin_generated=True)
 
 
-def _prepare_new_method_arguments(node: FuncDef) -> Tuple[List[Argument], MypyType]:
-    arguments = []
-    for argument in node.arguments[1:]:
-        if argument.type_annotation is None:
-            argument.type_annotation = AnyType(TypeOfAny.unannotated)
-        arguments.append(argument)
-
-    if isinstance(node.type, CallableType):
-        return_type = node.type.ret_type
-    else:
-        return_type = AnyType(TypeOfAny.unannotated)
-
-    return arguments, return_type
+def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
+    prepared_arguments = []
+    for argument in method_node.arguments[1:]:
+        argument.type_annotation = AnyType(TypeOfAny.unannotated)
+        prepared_arguments.append(argument)
+    return_type = AnyType(TypeOfAny.unannotated)
+    return prepared_arguments, return_type
 
 
 def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                                  new_method_name: str, method_node: FuncDef) -> None:
-    arguments, return_type = _prepare_new_method_arguments(method_node)
-
     semanal_api = get_semanal_api(ctx)
-    for argument in arguments:
-        if argument.type_annotation is not None:
-            argument.type_annotation = semanal_api.anal_type(argument.type_annotation,
-                                                             allow_placeholder=True)
+    if method_node.type is None:
+        if not semanal_api.final_iteration:
+            semanal_api.defer()
+            return
 
-    if return_type is not None:
-        ret = semanal_api.anal_type(return_type,
-                                    allow_placeholder=True)
-        assert ret is not None
-        return_type = ret
+        arguments, return_type = build_unannotated_method_args(method_node)
+        add_method(ctx,
+                   new_method_name,
+                   args=arguments,
+                   return_type=return_type,
+                   self_type=self_type)
+        return
+
+    method_type = semanal_api.anal_type(method_node.type, allow_placeholder=True)
+    assert method_type is not None and isinstance(method_type, ProperType)
+
+    method_node.type = method_type
+    if not isinstance(method_type, CallableType):
+        if not semanal_api.final_iteration:
+            semanal_api.defer()
+        return
+
+    arguments = []
+    return_type = method_type.ret_type
+    for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
+                                                     method_type.arg_types[1:],
+                                                     method_node.arguments[1:]):
+        var = Var(name=original_argument.variable.name,
+                  type=arg_type)
+        var.line = original_argument.variable.line
+        var.column = original_argument.variable.column
+        argument = Argument(variable=var,
+                            type_annotation=arg_type,
+                            initializer=original_argument.initializer,
+                            kind=original_argument.kind)
+        argument.set_line(original_argument)
+        arguments.append(argument)
 
     add_method(ctx,
                new_method_name,
