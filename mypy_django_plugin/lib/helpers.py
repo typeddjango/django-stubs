@@ -346,12 +346,15 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
         return
 
     arguments = []
-    return_type = method_type.ret_type
+    return_type = semanal_api.anal_type(method_type.ret_type,
+                                        allow_placeholder=True)
     for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
                                                      method_type.arg_types[1:],
                                                      method_node.arguments[1:]):
-        arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
-        if isinstance(arg_type, PlaceholderNode):
+        bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
+        assert bound_arg_type is not None
+
+        if isinstance(bound_arg_type, PlaceholderNode):
             return
 
         var = Var(name=original_argument.variable.name,
@@ -359,7 +362,7 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
         var.line = original_argument.variable.line
         var.column = original_argument.variable.column
         argument = Argument(variable=var,
-                            type_annotation=arg_type,
+                            type_annotation=bound_arg_type,
                             initializer=original_argument.initializer,
                             kind=original_argument.kind)
         argument.set_line(original_argument)
