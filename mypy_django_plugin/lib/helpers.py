@@ -12,7 +12,7 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF, MDEF, Argument, Block, ClassDef, Expression, FuncDef, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
     SymbolTable, SymbolTableNode, TypeInfo, Var,
-)
+    PlaceholderNode)
 from mypy.plugin import (
     AttributeContext, CheckerPluginInterface, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
 )
@@ -336,10 +336,10 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                    self_type=self_type)
         return
 
-    method_type = semanal_api.anal_type(method_node.type, allow_placeholder=True)
-    assert method_type is not None and isinstance(method_type, ProperType)
+    # method_type = semanal_api.anal_type(method_node.type, allow_placeholder=True)
+    # assert method_type is not None and isinstance(method_type, ProperType)
 
-    method_node.type = method_type
+    method_type = method_node.type
     if not isinstance(method_type, CallableType):
         if not semanal_api.final_iteration:
             semanal_api.defer()
@@ -350,6 +350,10 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
     for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
                                                      method_type.arg_types[1:],
                                                      method_node.arguments[1:]):
+        arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
+        if isinstance(arg_type, PlaceholderNode):
+            return
+
         var = Var(name=original_argument.variable.name,
                   type=arg_type)
         var.line = original_argument.variable.line

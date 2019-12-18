@@ -148,6 +148,7 @@
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
 
 -   case: from_queryset_with_inherited_manager_and_typing_no_return
+    disable_cache: true
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is 'myapp.models.MyModel_NewManager[myapp.models.MyModel]'
