@@ -10,17 +10,15 @@ from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    GDEF, MDEF, Argument, Block, ClassDef, Expression, FuncDef, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
-    SymbolTable, SymbolTableNode, TypeInfo, Var,
-    PlaceholderNode)
+    GDEF, MDEF, Argument, Block, ClassDef, Expression, FuncDef, MemberExpr, MypyFile, NameExpr, PlaceholderNode,
+    StrExpr, SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import (
     AttributeContext, CheckerPluginInterface, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
 )
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import (
-    AnyType, CallableType, Instance, NoneTyp, ProperType, TupleType,
-)
+from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
@@ -346,8 +344,13 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
         return
 
     arguments = []
-    return_type = semanal_api.anal_type(method_type.ret_type,
-                                        allow_placeholder=True)
+    bound_return_type = semanal_api.anal_type(method_type.ret_type,
+                                              allow_placeholder=True)
+    assert bound_return_type is not None
+
+    if isinstance(bound_return_type, PlaceholderNode):
+        return
+
     for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
                                                      method_type.arg_types[1:],
                                                      method_node.arguments[1:]):
@@ -371,5 +374,5 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
     add_method(ctx,
                new_method_name,
                args=arguments,
-               return_type=return_type,
+               return_type=bound_return_type,
                self_type=self_type)
