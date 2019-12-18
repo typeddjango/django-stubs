@@ -334,9 +334,6 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                    self_type=self_type)
         return
 
-    # method_type = semanal_api.anal_type(method_node.type, allow_placeholder=True)
-    # assert method_type is not None and isinstance(method_type, ProperType)
-
     method_type = method_node.type
     if not isinstance(method_type, CallableType):
         if not semanal_api.final_iteration:
