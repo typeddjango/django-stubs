@@ -41,7 +41,7 @@ _ST = TypeVar("_ST")
 # __get__ return type
 _GT = TypeVar("_GT")
 
-_ValidatorCallable = Callable[[_GT], None]
+_ValidatorCallable = Callable[..., None]
 
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
