@@ -43,7 +43,6 @@ _GT = TypeVar("_GT")
 
 _ValidatorCallable = Callable[..., None]
 
-
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
