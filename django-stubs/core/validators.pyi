@@ -1,6 +1,6 @@
 from decimal import Decimal
 from re import RegexFlag
-from typing import Any, Callable, Collection, Dict, List, Optional, Pattern, Tuple, Sized, Union
+from typing import Any, Callable, Collection, Dict, List, Optional, Pattern, Tuple, Union
 
 from django.core.files.base import File
 
