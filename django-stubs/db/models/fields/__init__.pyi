@@ -33,6 +33,7 @@ _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 
+_ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
 _T = TypeVar("_T", bound="Field")
@@ -40,8 +41,6 @@ _T = TypeVar("_T", bound="Field")
 _ST = TypeVar("_ST")
 # __get__ return type
 _GT = TypeVar("_GT")
-
-_ValidatorCallable = Callable[..., None]
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     _pyi_private_set_type: Any
