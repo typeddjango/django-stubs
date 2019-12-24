@@ -179,14 +179,21 @@
                 class BaseQuerySet(models.QuerySet):
                     def base_queryset_method(self, param: Union[int, str]) -> NoReturn:
                         raise ValueError
+
+
 -   case: from_queryset_with_inherited_manager_and_fk_to_auth_contrib
     disable_cache: true
     main: |
+        from myapp.base_queryset import BaseQuerySet
+        reveal_type(BaseQuerySet().base_queryset_method)  # N: Revealed type is 'def (param: builtins.dict[builtins.str, Union[builtins.int, builtins.str]]) -> Union[builtins.int, builtins.str]'
+
+        from django.contrib.auth.models import Permission
+        reveal_type(Permission().another_models)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.AnotherModelInProjectWithContribAuthM2M]'
+
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is 'myapp.models.MyModel_NewManager[myapp.models.MyModel]'
         reveal_type(MyModel().objects.get())  # N: Revealed type is 'myapp.models.MyModel*'
-        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is 'def (param: Union[builtins.int, builtins.str]) -> Union[builtins.int, builtins.str]'
-        reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is 'Union[builtins.int, builtins.str]'
+        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is 'def (param: builtins.dict[builtins.str, Union[builtins.int, builtins.str]]) -> Union[builtins.int, builtins.str]'
     installed_apps:
         - myapp
         - django.contrib.auth
@@ -205,6 +212,7 @@
                     permissions = models.ForeignKey(
                         Permission,
                         on_delete=models.PROTECT,
+                        related_name='another_models'
                     )
         -   path: myapp/managers.py
             content: |
@@ -215,8 +223,8 @@
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
         -   path: myapp/base_queryset.py
             content: |
-                from typing import  Union
+                from typing import Union, Dict
                 from django.db import models
                 class BaseQuerySet(models.QuerySet):
-                    def base_queryset_method(self, param: Union[int, str]) -> Union[int, str]:
-                        return param
+                    def base_queryset_method(self, param: Dict[str, Union[int, str]]) -> Union[int, str]:
+                        return param["hello"]
