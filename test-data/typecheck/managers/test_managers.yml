@@ -336,7 +336,7 @@
                 class ChildUser(models.Model):
                     objects = MyManager()
 
--   case: custom_manager_annotate_method_before_type_declaration 
+-   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
         reveal_type(ModelA.objects)  # N: Revealed type is 'myapp.models.ModelA_ManagerA1[myapp.models.ModelA]'
@@ -344,16 +344,34 @@
     installed_apps:
         - myapp
     files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.db import models
+              class ManagerA(models.Manager):
+                    def do_something(self, other_obj: "ModelB") -> str:
+                        return 'test'
+              class ModelA(models.Model):
+                    title = models.TextField()
+                    objects = ManagerA()
+              class ModelB(models.Model):
+                    movie = models.TextField()
+
+-   case: manager_defined_in_the_nested_class
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is 'myapp.models.MyModel_MyManager[myapp.models.MyModel]'
+        reveal_type(MyModel.objects.get())  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(MyModel.objects.mymethod())  # N: Revealed type is 'builtins.int'
+    installed_apps:
+        - myapp
+    files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                class ManagerA(models.Manager):
-                    def do_something(self, other_obj: "ModelB") -> str:
-                        return 'test'
-                class ModelA(models.Model):
-                    title = models.TextField()
-                    objects = ManagerA()
-                class ModelB(models.Model):
-                    movie = models.TextField()
-
+                class MyModel(models.Model):
+                    class MyManager(models.Manager):
+                        def mymethod(self) -> int:
+                            pass
+                    objects = MyManager()

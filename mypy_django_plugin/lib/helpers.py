@@ -31,15 +31,30 @@ def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
     if '.' not in fullname:
         return None
-    module, cls_name = fullname.rsplit('.', 1)
 
-    module_file = all_modules.get(module)
+    module_file = None
+    parts = fullname.split('.')
+    for i in range(len(parts), 0, -1):
+        possible_module_name = '.'.join(parts[:i])
+        if possible_module_name in all_modules:
+            module_file = all_modules[possible_module_name]
+            break
+
     if module_file is None:
         return None
-    sym = module_file.names.get(cls_name)
-    if sym is None:
-        return None
-    return sym
+
+    cls_name = fullname.replace(module_file.fullname, '').lstrip('.')
+    sym_table = module_file.names
+    if '.' in cls_name:
+        parent_cls_name, _, cls_name = cls_name.rpartition('.')
+        # nested class
+        for parent_cls_name in parent_cls_name.split('.'):
+            sym = sym_table.get(parent_cls_name)
+            if sym is None:
+                return None
+            sym_table = sym.node.names
+
+    return sym_table.get(cls_name)
 
 
 def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolNode]:
