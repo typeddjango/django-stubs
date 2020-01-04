@@ -9,6 +9,7 @@ from mypy.options import Options
 from mypy.plugin import (
     AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext, Plugin,
 )
+from mypy.semanal import dummy_context
 from mypy.types import Type as MypyType
 
 import mypy_django_plugin.transformers.orm_lookups
@@ -30,7 +31,7 @@ def transform_model_class(ctx: ClassDefContext,
     if sym is not None and isinstance(sym.node, TypeInfo):
         helpers.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
     else:
-        if not ctx.api.final_iteration:
+        if not ctx.api.final_iteration and not ctx.api.deferred:
             ctx.api.defer()
             return
 
@@ -180,7 +181,7 @@ class NewSemanalDjangoPlugin(Plugin):
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
-            if helpers.is_model_subclass_info(info, self.django_context):
+            if helpers.is_subclass_of_model(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
         return None
 

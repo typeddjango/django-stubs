@@ -5,12 +5,12 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import helpers, chk_helpers
 
 
 def _get_field_instance(ctx: MethodContext, field_fullname: str) -> MypyType:
-    field_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx),
-                                                         field_fullname)
+    api = chk_helpers.get_typechecker_api(ctx)
+    field_info = helpers.lookup_fully_qualified_typeinfo(api, field_fullname)
     if field_info is None:
         return AnyType(TypeOfAny.unannotated)
     return Instance(field_info, [AnyType(TypeOfAny.explicit), AnyType(TypeOfAny.explicit)])
@@ -32,7 +32,7 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     if model_cls is None:
         return ctx.default_return_type
 
-    field_name_expr = helpers.get_call_argument_by_name(ctx, 'field_name')
+    field_name_expr = chk_helpers.get_call_argument_by_name(ctx, 'field_name')
     if field_name_expr is None:
         return ctx.default_return_type
 
