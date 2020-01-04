@@ -14,7 +14,7 @@ from mypy.types import TypeOfAny
 from mypy_django_plugin.django.context import (
     DjangoContext, LookupsAreUnsupported,
 )
-from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers
 
 
 def _extract_model_type_from_queryset(queryset_type: Instance) -> Optional[Instance]:

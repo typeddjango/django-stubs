@@ -5,7 +5,7 @@ from mypy.types import CallableType, Instance, NoneTyp
 from mypy.types import Type as MypyType
 from mypy.types import TypeType
 
-from mypy_django_plugin.lib import sem_helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, sem_helpers
 
 
 def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:

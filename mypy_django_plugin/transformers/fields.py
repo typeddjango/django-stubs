@@ -9,7 +9,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers
 
 
 def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Field]:

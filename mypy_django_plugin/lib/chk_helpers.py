@@ -1,10 +1,16 @@
-from typing import OrderedDict, List, Optional, Dict, Set, Union
+from typing import Dict, List, Optional, Set, Union
 
 from mypy import checker
 from mypy.checker import TypeChecker
-from mypy.nodes import MypyFile, TypeInfo, Var, MDEF, SymbolTableNode, GDEF, Expression
-from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext, AttributeContext
-from mypy.types import Type as MypyType, Instance, TupleType, TypeOfAny, AnyType, TypedDictType
+from mypy.nodes import (
+    GDEF, MDEF, Expression, MypyFile, SymbolTableNode, TypeInfo, Var,
+)
+from mypy.plugin import (
+    AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
+)
+from mypy.types import AnyType, Instance, TupleType
+from mypy.types import Type as MypyType
+from mypy.types import TypedDictType, TypeOfAny
 
 from mypy_django_plugin.lib import helpers
 
@@ -49,10 +55,12 @@ def make_tuple(api: 'TypeChecker', fields: List[MypyType]) -> TupleType:
     return TupleType(fields, fallback=fallback)
 
 
-def make_oneoff_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, MypyType]',
+def make_oneoff_typeddict(api: CheckerPluginInterface, fields: 'Dict[str, MypyType]',
                           required_keys: Set[str]) -> TypedDictType:
     object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
-    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
+    typed_dict_type = TypedDictType(fields,  # type: ignore
+                                    required_keys=required_keys,
+                                    fallback=object_type)
     return typed_dict_type
 
 
