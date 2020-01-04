@@ -2,20 +2,20 @@ from typing import (
     TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Union,
 )
 
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode,
-    SymbolTable, SymbolTableNode, TypeInfo, Var,
+    Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolNode, SymbolTable, SymbolTableNode,
+    TypeInfo, Var,
 )
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance, NoneTyp
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
-from django.db.models.fields import Field
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
@@ -50,7 +50,8 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) 
         # nested class
         for parent_cls_name in parent_cls_name.split('.'):
             sym = sym_table.get(parent_cls_name)
-            if sym is None:
+            if (sym is None or sym.node is None
+                    or not isinstance(sym.node, TypeInfo)):
                 return None
             sym_table = sym.node.names
 

@@ -4,7 +4,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers
 
 
 def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
