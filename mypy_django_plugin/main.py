@@ -20,7 +20,7 @@ from mypy_django_plugin.transformers import (
 )
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
-)
+    create_manager_class_from_as_manager_method, instantiate_anonymous_queryset_from_as_manager)
 from mypy_django_plugin.transformers.models import process_model_class
 
 
@@ -124,6 +124,10 @@ class NewSemanalDjangoPlugin(Plugin):
         return 10, module, -1
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
+        # load QuerySet and Manager together (for as_manager)
+        if file.fullname == 'django.db.models.query':
+            return [self._new_dependency('django.db.models.manager')]
+
         # for settings
         if file.fullname == 'django.conf' and self.django_context.django_settings_module:
             return [self._new_dependency(self.django_context.django_settings_module)]
@@ -213,6 +217,11 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
+        if method_name == 'as_manager':
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+                return instantiate_anonymous_queryset_from_as_manager
+
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
@@ -253,6 +262,12 @@ class NewSemanalDjangoPlugin(Plugin):
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return create_new_manager_class_from_from_queryset_method
+        if fullname.endswith('as_manager'):
+            class_name, _, _ = fullname.rpartition('.')
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+                return create_manager_class_from_as_manager_method
+
         return None
 
 
