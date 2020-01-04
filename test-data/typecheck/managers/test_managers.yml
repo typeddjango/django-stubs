@@ -335,3 +335,23 @@
                     objects = MyManager()
                 class ChildUser(models.Model):
                     objects = MyManager()
+
+
+-   case: manager_defined_in_the_nested_class
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is 'myapp.models.MyModel_MyManager[myapp.models.MyModel]'
+        reveal_type(MyModel.objects.get())  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(MyModel.objects.mymethod())  # N: Revealed type is 'builtins.int'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    class MyManager(models.Manager):
+                        def mymethod(self) -> int:
+                            pass
+                    objects = MyManager()

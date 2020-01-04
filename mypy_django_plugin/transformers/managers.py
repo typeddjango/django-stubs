@@ -310,4 +310,4 @@ def instantiate_anonymous_queryset_from_as_manager(ctx: MethodContext) -> MypyTy
     assert module_name == current_module.fullname
 
     generated_manager_info = current_module.names[class_name].node
-    return fill_typevars(generated_manager_info)
+    return Instance(generated_manager_info, [])

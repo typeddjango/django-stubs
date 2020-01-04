@@ -314,6 +314,9 @@ IGNORED_ERRORS = {
     'model_enums': [
         "'bool' is not a valid base class",
     ],
+    'multiple_database': [
+        'Unexpected attribute "extra_arg" for model "Book"',
+    ],
     'null_queries': [
         "Cannot resolve keyword 'foo' into field"
     ],
