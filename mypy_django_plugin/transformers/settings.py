@@ -5,7 +5,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, TypeType
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import helpers, chk_helpers
 
 
 def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
@@ -13,7 +13,7 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
     model_cls = django_context.apps_registry.get_model(auth_user_model)
     model_cls_fullname = helpers.get_class_fullname(model_cls)
 
-    model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx),
+    model_info = helpers.lookup_fully_qualified_typeinfo(chk_helpers.get_typechecker_api(ctx),
                                                          model_cls_fullname)
     if model_info is None:
         return AnyType(TypeOfAny.unannotated)
@@ -28,7 +28,7 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
         ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)
         return ctx.default_attr_type
 
-    typechecker_api = helpers.get_typechecker_api(ctx)
+    typechecker_api = chk_helpers.get_typechecker_api(ctx)
 
     # first look for the setting in the project settings file, then global settings
     settings_module = typechecker_api.modules.get(django_context.django_settings_module)

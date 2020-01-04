@@ -4,7 +4,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
 
 
 def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -35,10 +35,10 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
                                                                   fullnames.QUERYSET_CLASS_FULLNAME))):
             return ctx.default_return_type
 
-        helpers.check_types_compatible(ctx,
-                                       expected_type=lookup_type,
-                                       actual_type=provided_type,
-                                       error_message=f'Incompatible type for lookup {lookup_kwarg!r}:')
+        chk_helpers.check_types_compatible(ctx,
+                                           expected_type=lookup_type,
+                                           actual_type=provided_type,
+                                           error_message=f'Incompatible type for lookup {lookup_kwarg!r}:')
 
     return ctx.default_return_type
 

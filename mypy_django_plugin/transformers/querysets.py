@@ -14,7 +14,7 @@ from mypy.types import TypeOfAny
 from mypy_django_plugin.django.context import (
     DjangoContext, LookupsAreUnsupported,
 )
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
 
 
 def _extract_model_type_from_queryset(queryset_type: Instance) -> Optional[Instance]:
@@ -30,7 +30,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     default_return_type = ctx.default_return_type
     assert isinstance(default_return_type, Instance)
 
-    outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
+    outer_model_info = chk_helpers.get_typechecker_api(ctx).scope.active_class()
     if (outer_model_info is None
             or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)):
         return default_return_type
@@ -55,7 +55,7 @@ def get_field_type_from_lookup(ctx: MethodContext, django_context: DjangoContext
             return AnyType(TypeOfAny.from_error)
         lookup_field = django_context.get_primary_key_field(related_model_cls)
 
-    field_get_type = django_context.get_field_get_type(helpers.get_typechecker_api(ctx),
+    field_get_type = django_context.get_field_get_type(chk_helpers.get_typechecker_api(ctx),
                                                        lookup_field, method=method)
     return field_get_type
 
@@ -66,7 +66,7 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
     if field_lookups is None:
         return AnyType(TypeOfAny.from_error)
 
-    typechecker_api = helpers.get_typechecker_api(ctx)
+    typechecker_api = chk_helpers.get_typechecker_api(ctx)
     if len(field_lookups) == 0:
         if flat:
             primary_key_field = django_context.get_primary_key_field(model_cls)
@@ -80,7 +80,7 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
                 column_type = django_context.get_field_get_type(typechecker_api, field,
                                                                 method='values_list')
                 column_types[field.attname] = column_type
-            return helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
+            return chk_helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
         else:
             # flat=False, named=False, all fields
             field_lookups = []
@@ -103,9 +103,9 @@ def get_values_list_row_type(ctx: MethodContext, django_context: DjangoContext, 
         assert len(column_types) == 1
         row_type = next(iter(column_types.values()))
     elif named:
-        row_type = helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
+        row_type = chk_helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
     else:
-        row_type = helpers.make_tuple(typechecker_api, list(column_types.values()))
+        row_type = chk_helpers.make_tuple(typechecker_api, list(column_types.values()))
 
     return row_type
 
@@ -123,13 +123,13 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     if model_cls is None:
         return ctx.default_return_type
 
-    flat_expr = helpers.get_call_argument_by_name(ctx, 'flat')
+    flat_expr = chk_helpers.get_call_argument_by_name(ctx, 'flat')
     if flat_expr is not None and isinstance(flat_expr, NameExpr):
         flat = helpers.parse_bool(flat_expr)
     else:
         flat = False
 
-    named_expr = helpers.get_call_argument_by_name(ctx, 'named')
+    named_expr = chk_helpers.get_call_argument_by_name(ctx, 'named')
     if named_expr is not None and isinstance(named_expr, NameExpr):
         named = helpers.parse_bool(named_expr)
     else:
@@ -188,5 +188,5 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
         column_types[field_lookup] = field_lookup_type
 
-    row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()))
+    row_type = chk_helpers.make_oneoff_typeddict(ctx.api, column_types, set(column_types.keys()))
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])

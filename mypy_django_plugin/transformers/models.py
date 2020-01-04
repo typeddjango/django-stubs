@@ -1,21 +1,21 @@
-from typing import Dict, List, Optional, Type, cast
+from typing import List, Optional, Type, cast
 
 from django.db.models.base import Model
-from django.db.models.fields import DateField, DateTimeField
-from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, FuncDef, TypeInfo, Var, SymbolTableNode, MDEF, GDEF
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
-from mypy.semanal import SemanticAnalyzer
+from mypy.semanal import SemanticAnalyzer, dummy_context
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
+from django.db.models.fields import DateField, DateTimeField
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
@@ -35,7 +35,7 @@ class ModelClassInitializer:
     def lookup_typeinfo_or_incomplete_defn_error(self, fullname: str) -> TypeInfo:
         info = self.lookup_typeinfo(fullname)
         if info is None:
-            raise helpers.IncompleteDefnException(f'No {fullname!r} found')
+            raise sem_helpers.IncompleteDefnException(f'No {fullname!r} found')
         return info
 
     def lookup_class_typeinfo_or_incomplete_defn_error(self, klass: type) -> TypeInfo:
@@ -43,26 +43,74 @@ class ModelClassInitializer:
         field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
         return field_info
 
-    def create_new_var(self, name: str, typ: MypyType) -> Var:
-        # type=: type of the variable itself
-        var = Var(name=name, type=typ)
-        # var.info: type of the object variable is bound to
+    def model_class_has_attribute_defined(self, name: str, traverse_mro: bool = True) -> bool:
+        if not traverse_mro:
+            sym = self.model_classdef.info.names.get(name)
+        else:
+            sym = self.model_classdef.info.get(name)
+        return sym is not None
+
+    def resolve_manager_fullname(self, manager_fullname: str) -> str:
+        base_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
+        if (base_manager_info is None
+                or 'from_queryset_managers' not in base_manager_info.metadata):
+            return manager_fullname
+
+        metadata = base_manager_info.metadata['from_queryset_managers']
+        return metadata.get(manager_fullname, manager_fullname)
+
+    def add_new_node_to_model_class(self, name: str, typ: MypyType,
+                                    force_replace_existing: bool = False) -> None:
+        if not force_replace_existing and name in self.model_classdef.info.names:
+            raise ValueError(f'Member {name!r} already defined at model {self.model_classdef.info.fullname!r}.')
+
+        var = Var(name, type=typ)
+        # TypeInfo of the object variable is bound to
         var.info = self.model_classdef.info
-        var._fullname = self.model_classdef.info.fullname + '.' + name
+        var._fullname = self.api.qualified_name(name)
         var.is_initialized_in_class = True
-        var.is_inferred = True
-        return var
 
-    def add_new_node_to_model_class(self, name: str, typ: MypyType) -> None:
-        helpers.add_new_sym_for_info(self.model_classdef.info,
-                                     name=name,
-                                     sym_type=typ)
+        sym = SymbolTableNode(MDEF, var, plugin_generated=True)
+        context = dummy_context()
+        if force_replace_existing:
+            context = None
+        self.api.add_symbol_table_node(name, sym, context=context)
 
-    def add_new_class_for_current_module(self, name: str, bases: List[Instance]) -> TypeInfo:
-        current_module = self.api.modules[self.model_classdef.info.module_name]
-        new_class_info = helpers.add_new_class_for_module(current_module,
-                                                          name=name, bases=bases)
-        return new_class_info
+    def add_new_class_for_current_module(self, name: str, bases: List[Instance],
+                                         force_replace_existing: bool = False) -> Optional[TypeInfo]:
+        current_module = self.api.cur_mod_node
+        if not force_replace_existing and name in current_module:
+            raise ValueError(f'Class {name!r} already defined for module {current_module.fullname!r}')
+
+        new_typeinfo = helpers.new_typeinfo(name,
+                                            bases=bases,
+                                            module_name=current_module.fullname)
+        # sym = SymbolTableNode(GDEF, new_typeinfo,
+        #                       plugin_generated=True)
+        # context = dummy_context()
+        # if force_replace_existing:
+        #     context = None
+
+        if name in current_module.names:
+            del current_module.names[name]
+        current_module.names[name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
+        # current_module.defs.append(new_typeinfo.defn)
+        # self.api.cur_mod_node.
+        # self.api.leave_class()
+        # added = self.api.add_symbol_table_node(name, sym, context=context)
+        # self.api.enter_class(self.model_classdef.info)
+        #
+        # self.api.cur_mod_node.defs.append(new_typeinfo.defn)
+
+        # if not added and force_replace_existing:
+        #     return None
+        return new_typeinfo
+
+        # current_module = self.api.modules[self.model_classdef.info.module_name]
+        # context =
+        # new_class_info = helpers.add_new_class_for_module(current_module,
+        #                                                   name=name, bases=bases)
+        # return new_class_info
 
     def run(self) -> None:
         model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
@@ -88,58 +136,90 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     """
 
     def run(self) -> None:
-        meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
+        meta_node = sem_helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             return None
         meta_node.fallback_to_any = True
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
+    """
+    Adds default primary key to models which does not define their own.
+    ```
+        class User(models.Model):
+            name = models.TextField()
+    ```
+    """
+
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         auto_field = model_cls._meta.auto_field
-        if auto_field and not self.model_classdef.info.has_readable_member(auto_field.attname):
-            # autogenerated field
-            auto_field_fullname = helpers.get_class_fullname(auto_field.__class__)
-            auto_field_info = self.lookup_typeinfo_or_incomplete_defn_error(auto_field_fullname)
+        if auto_field is None:
+            return
 
-            set_type, get_type = fields.get_field_descriptor_types(auto_field_info, is_nullable=False)
-            self.add_new_node_to_model_class(auto_field.attname, Instance(auto_field_info,
-                                                                          [set_type, get_type]))
+        primary_key_attrname = auto_field.attname
+        if self.model_class_has_attribute_defined(primary_key_attrname):
+            return
+
+        auto_field_class_fullname = helpers.get_class_fullname(auto_field.__class__)
+        auto_field_info = self.lookup_typeinfo_or_incomplete_defn_error(auto_field_class_fullname)
+
+        set_type, get_type = fields.get_field_descriptor_types(auto_field_info, is_nullable=False)
+        self.add_new_node_to_model_class(primary_key_attrname, Instance(auto_field_info,
+                                                                        [set_type, get_type]))
 
 
 class AddRelatedModelsId(ModelClassInitializer):
+    """
+    Adds `FIELDNAME_id` attributes to models.
+    ```
+        class User(models.Model):
+            pass
+        class Blog(models.Model):
+            user = models.ForeignKey(User)
+    ```
+
+     `user_id` will be added to `Blog`.
+    """
+
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for field in model_cls._meta.get_fields():
-            if isinstance(field, ForeignKey):
-                related_model_cls = self.django_context.get_field_related_model_cls(field)
-                if related_model_cls is None:
-                    error_context: Context = self.ctx.cls
-                    field_sym = self.ctx.cls.info.get(field.name)
-                    if field_sym is not None and field_sym.node is not None:
-                        error_context = field_sym.node
-                    self.api.fail(f'Cannot find model {field.related_model!r} '
-                                  f'referenced in field {field.name!r} ',
-                                  ctx=error_context)
-                    self.add_new_node_to_model_class(field.attname,
-                                                     AnyType(TypeOfAny.explicit))
+            if not isinstance(field, (OneToOneField, ForeignKey)):
+                continue
+            related_id_attr_name = field.attname
+            if self.model_class_has_attribute_defined(related_id_attr_name):
+                continue
+            # if self.get_model_class_attr(related_id_attr_name) is not None:
+            #     continue
+
+            related_model_cls = self.django_context.get_field_related_model_cls(field)
+            if related_model_cls is None:
+                error_context = self.ctx.cls
+                field_sym = self.ctx.cls.info.get(field.name)
+                if field_sym is not None and field_sym.node is not None:
+                    error_context = field_sym.node
+                self.api.fail(f'Cannot find model {field.related_model!r} '
+                              f'referenced in field {field.name!r} ',
+                              ctx=error_context)
+                self.add_new_node_to_model_class(related_id_attr_name,
+                                                 AnyType(TypeOfAny.explicit))
+                continue
+
+            if related_model_cls._meta.abstract:
+                continue
+
+            rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
+            try:
+                field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+            except sem_helpers.IncompleteDefnException as exc:
+                if not self.api.final_iteration:
+                    raise exc
+                else:
                     continue
 
-                if related_model_cls._meta.abstract:
-                    continue
-
-                rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
-                try:
-                    field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
-                except helpers.IncompleteDefnException as exc:
-                    if not self.api.final_iteration:
-                        raise exc
-                    else:
-                        continue
-
-                is_nullable = self.django_context.get_field_nullability(field, None)
-                set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
-                self.add_new_node_to_model_class(field.attname,
-                                                 Instance(field_info, [set_type, get_type]))
+            is_nullable = self.django_context.get_field_nullability(field, None)
+            set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
+            self.add_new_node_to_model_class(related_id_attr_name,
+                                             Instance(field_info, [set_type, get_type]))
 
 
 class AddManagers(ModelClassInitializer):
@@ -152,25 +232,15 @@ class AddManagers(ModelClassInitializer):
     def is_any_parametrized_manager(self, typ: Instance) -> bool:
         return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
 
-    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
-        base_manager_info = self.lookup_typeinfo(base_manager_fullname)
-        if (base_manager_info is None
-                or 'from_queryset_managers' not in base_manager_info.metadata):
-            return {}
-        return base_manager_info.metadata['from_queryset_managers']
-
     def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
         bases = []
         for original_base in base_manager_info.bases:
             if self.is_any_parametrized_manager(original_base):
-                if original_base.type is None:
-                    raise helpers.IncompleteDefnException()
-
                 original_base = helpers.reparametrize_instance(original_base,
                                                                [Instance(self.model_classdef.info, [])])
             bases.append(original_base)
 
-        new_manager_info = self.add_new_class_for_current_module(name, bases)
+        new_manager_info = self.add_new_class_for_current_module(name, bases, force_replace_existing=True)
         # copy fields to a new manager
         new_cls_def_context = ClassDefContext(cls=new_manager_info.defn,
                                               reason=self.ctx.reason,
@@ -178,12 +248,15 @@ class AddManagers(ModelClassInitializer):
         custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
 
         for name, sym in base_manager_info.names.items():
+            if name in new_manager_info.names:
+                raise ValueError(f'Name {name!r} already exists on newly-created {new_manager_info.fullname!r} class.')
+
             # replace self type with new class, if copying method
             if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(new_cls_def_context,
-                                                     self_type=custom_manager_type,
-                                                     new_method_name=name,
-                                                     method_node=sym.node)
+                sem_helpers.copy_method_or_incomplete_defn_exception(new_cls_def_context,
+                                                                     self_type=custom_manager_type,
+                                                                     new_method_name=name,
+                                                                     method_node=sym.node)
                 continue
 
             new_sym = sym.copy()
@@ -192,32 +265,36 @@ class AddManagers(ModelClassInitializer):
                 new_var.info = new_manager_info
                 new_var._fullname = new_manager_info.fullname + '.' + name
                 new_sym.node = new_var
+
             new_manager_info.names[name] = new_sym
 
         return custom_manager_type
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for manager_name, manager in model_cls._meta.managers_map.items():
-            manager_class_name = manager.__class__.__name__
-            manager_fullname = helpers.get_class_fullname(manager.__class__)
-            try:
-                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
-            except helpers.IncompleteDefnException as exc:
-                if not self.api.final_iteration:
-                    raise exc
-                else:
-                    base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                    generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
-                    if manager_fullname not in generated_managers:
-                        # not a generated manager, continue with the loop
-                        continue
-                    real_manager_fullname = generated_managers[manager_fullname]
-                    manager_info = self.lookup_typeinfo(real_manager_fullname)  # type: ignore
-                    if manager_info is None:
-                        continue
-                    manager_class_name = real_manager_fullname.rsplit('.', maxsplit=1)[1]
+            if self.model_class_has_attribute_defined(manager_name, traverse_mro=False):
+                sym = self.model_classdef.info.names.get(manager_name)
+                assert sym is not None
+
+                if (sym.type is not None
+                        and isinstance(sym.type, Instance)
+                        and sym.type.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+                        and not self.has_any_parametrized_manager_as_base(sym.type.type)):
+                    # already defined and parametrized properly
+                    continue
+
+            if getattr(manager, '_built_with_as_manager', False):
+                # as_manager is not supported yet
+                if not self.model_class_has_attribute_defined(manager_name, traverse_mro=True):
+                    self.add_new_node_to_model_class(manager_name, AnyType(TypeOfAny.explicit))
+                continue
+
+            manager_fullname = self.resolve_manager_fullname(helpers.get_class_fullname(manager.__class__))
+            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
+            manager_class_name = manager_fullname.rsplit('.', maxsplit=1)[1]
 
             if manager_name not in self.model_classdef.info.names:
+                # manager not yet defined, just add models.Manager[ModelName]
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
                 self.add_new_node_to_model_class(manager_name, manager_type)
             else:
@@ -226,32 +303,42 @@ class AddManagers(ModelClassInitializer):
                     continue
 
                 custom_model_manager_name = manager.model.__name__ + '_' + manager_class_name
-                try:
-                    custom_manager_type = self.create_new_model_parametrized_manager(custom_model_manager_name,
-                                                                                     base_manager_info=manager_info)
-                except helpers.IncompleteDefnException:
-                    continue
+                custom_manager_type = self.create_new_model_parametrized_manager(custom_model_manager_name,
+                                                                                 base_manager_info=manager_info)
 
-                self.add_new_node_to_model_class(manager_name, custom_manager_type)
+                self.add_new_node_to_model_class(manager_name, custom_manager_type,
+                                                 force_replace_existing=True)
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
-        # add _default_manager
-        if '_default_manager' not in self.model_classdef.info.names:
-            default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
-            default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
-            default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
-            self.add_new_node_to_model_class('_default_manager', default_manager)
+        if self.model_class_has_attribute_defined('_default_manager', traverse_mro=False):
+            return
+        if model_cls._meta.default_manager is None:
+            return
+        if getattr(model_cls._meta.default_manager, '_built_with_as_manager', False):
+            self.add_new_node_to_model_class('_default_manager',
+                                             AnyType(TypeOfAny.explicit))
+            return
+
+        default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
+        resolved_default_manager_fullname = self.resolve_manager_fullname(default_manager_fullname)
+
+        default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(resolved_default_manager_fullname)
+        default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+        self.add_new_node_to_model_class('_default_manager', default_manager)
 
 
 class AddRelatedManagers(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         # add related managers
         for relation in self.django_context.get_model_relations(model_cls):
-            attname = relation.get_accessor_name()
-            if attname is None:
+            related_manager_attr_name = relation.get_accessor_name()
+            if related_manager_attr_name is None:
                 # no reverse accessor
+                continue
+
+            if self.model_class_has_attribute_defined(related_manager_attr_name, traverse_mro=False):
                 continue
 
             related_model_cls = self.django_context.get_field_related_model_cls(relation)
@@ -260,22 +347,23 @@ class AddRelatedManagers(ModelClassInitializer):
 
             try:
                 related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
-            except helpers.IncompleteDefnException as exc:
+            except sem_helpers.IncompleteDefnException as exc:
                 if not self.api.final_iteration:
                     raise exc
                 else:
                     continue
 
             if isinstance(relation, OneToOneRel):
-                self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
+                self.add_new_node_to_model_class(related_manager_attr_name, Instance(related_model_info, []))
                 continue
 
             if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
                 try:
-                    related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)  # noqa: E501
+                    related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
+                        fullnames.RELATED_MANAGER_CLASS)  # noqa: E501
                     if 'objects' not in related_model_info.names:
-                        raise helpers.IncompleteDefnException()
-                except helpers.IncompleteDefnException as exc:
+                        raise sem_helpers.IncompleteDefnException()
+                except sem_helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
                         raise exc
                     else:
@@ -288,14 +376,20 @@ class AddRelatedManagers(ModelClassInitializer):
                 if (default_manager_type is None
                         or not isinstance(default_manager_type, Instance)
                         or default_manager_type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME):
-                    self.add_new_node_to_model_class(attname, parametrized_related_manager_type)
+                    self.add_new_node_to_model_class(related_manager_attr_name, parametrized_related_manager_type)
                     continue
 
                 name = related_model_cls.__name__ + '_' + 'RelatedManager'
                 bases = [parametrized_related_manager_type, default_manager_type]
-                new_related_manager_info = self.add_new_class_for_current_module(name, bases)
+                new_related_manager_info = self.add_new_class_for_current_module(name, bases,
+                                                                                 force_replace_existing=True)
+                if new_related_manager_info is None:
+                    # wasn't added for some reason, defer
+                    if not self.api.final_iteration:
+                        self.api.defer()
+                        continue
 
-                self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []))
+                self.add_new_node_to_model_class(related_manager_attr_name, Instance(new_related_manager_info, []))
 
 
 class AddExtraFieldMethods(ModelClassInitializer):
@@ -355,6 +449,8 @@ def process_model_class(ctx: ClassDefContext,
     for initializer_cls in initializers:
         try:
             initializer_cls(ctx, django_context).run()
-        except helpers.IncompleteDefnException:
+        except sem_helpers.IncompleteDefnException as exc:
             if not ctx.api.final_iteration:
                 ctx.api.defer()
+                continue
+            raise exc

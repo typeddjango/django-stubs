@@ -21,7 +21,7 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
 
 try:
     from django.contrib.postgres.fields import ArrayField
@@ -356,11 +356,11 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
         if lookup_cls is None or isinstance(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            return self.get_field_lookup_exact_type(chk_helpers.get_typechecker_api(ctx), field)
 
         assert lookup_cls is not None
 
-        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
+        lookup_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), lookup_cls)
         if lookup_info is None:
             return AnyType(TypeOfAny.explicit)
 
@@ -370,7 +370,7 @@ class DjangoContext:
                 # if it's Field, consider lookup_type a __get__ of current field
                 if (isinstance(lookup_type, Instance)
                         and lookup_type.type.fullname == fullnames.FIELD_FULLNAME):
-                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
+                    field_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), field.__class__)
                     if field_info is None:
                         return AnyType(TypeOfAny.explicit)
                     lookup_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',

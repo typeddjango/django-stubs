@@ -6,7 +6,7 @@ from mypy.types import Instance
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import chk_helpers
 
 
 def get_actual_types(ctx: Union[MethodContext, FunctionContext],
@@ -32,7 +32,7 @@ def get_actual_types(ctx: Union[MethodContext, FunctionContext],
 
 def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext,
                            model_cls: Type[Model], method: str) -> MypyType:
-    typechecker_api = helpers.get_typechecker_api(ctx)
+    typechecker_api = chk_helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
     expected_keys = [key for key in expected_types.keys() if key != 'pk']
 
@@ -42,11 +42,11 @@ def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_co
                                                                            model_cls.__name__),
                          ctx.context)
             continue
-        helpers.check_types_compatible(ctx,
-                                       expected_type=expected_types[actual_name],
-                                       actual_type=actual_type,
-                                       error_message='Incompatible type for "{}" of "{}"'.format(actual_name,
-                                                                                                 model_cls.__name__))
+        error_message = 'Incompatible type for "{}" of "{}"'.format(actual_name, model_cls.__name__)
+        chk_helpers.check_types_compatible(ctx,
+                                           expected_type=expected_types[actual_name],
+                                           actual_type=actual_type,
+                                           error_message=error_message)
 
     return ctx.default_return_type
 
