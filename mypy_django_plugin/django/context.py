@@ -21,7 +21,7 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
-from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers
 
 try:
     from django.contrib.postgres.fields import ArrayField

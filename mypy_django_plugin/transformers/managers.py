@@ -1,16 +1,16 @@
-from typing import Iterator, Tuple, Optional, Any, Dict
+from typing import Any, Dict, Iterator, Optional, Tuple
 
 from mypy.nodes import (
-    FuncDef, MemberExpr, NameExpr, RefExpr, StrExpr, TypeInfo,
-    PlaceholderNode, SymbolTableNode, GDEF,
-    CallExpr, Context, Decorator, OverloadedFuncDef, SymbolTable)
+    GDEF, CallExpr, Context, Decorator, FuncDef, MemberExpr, NameExpr, OverloadedFuncDef, PlaceholderNode, RefExpr,
+    StrExpr, SymbolTable, SymbolTableNode, TypeInfo,
+)
 from mypy.plugin import ClassDefContext, DynamicClassDefContext, MethodContext
-from mypy.semanal import SemanticAnalyzer, is_valid_replacement, is_same_symbol
-from mypy.types import AnyType, Instance, TypeOfAny, CallableType
+from mypy.semanal import SemanticAnalyzer, is_same_symbol, is_valid_replacement
+from mypy.types import AnyType, CallableType, Instance
 from mypy.types import Type as MypyType
-from mypy.typevars import fill_typevars
+from mypy.types import TypeOfAny
 
-from mypy_django_plugin.lib import fullnames, sem_helpers, helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers, sem_helpers
 
 
 def iter_all_custom_queryset_methods(derived_queryset_info: TypeInfo) -> Iterator[Tuple[str, FuncDef]]:
@@ -26,7 +26,7 @@ def generate_from_queryset_name(base_manager_info: TypeInfo, queryset_info: Type
     return base_manager_info.name + 'From' + queryset_info.name
 
 
-def resolve_callee_info_or_exception(ctx: DynamicClassDefContext) -> Optional[TypeInfo]:
+def resolve_callee_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
     callee = ctx.call.callee
     assert isinstance(callee, MemberExpr)
     assert isinstance(callee.expr, RefExpr)
@@ -34,14 +34,14 @@ def resolve_callee_info_or_exception(ctx: DynamicClassDefContext) -> Optional[Ty
     callee_info = callee.expr.node
     if (callee_info is None
             or isinstance(callee_info, PlaceholderNode)):
-        raise sem_helpers.IncompleteDefnException(f'Definition of base manager {callee_info.fullname} '
+        raise sem_helpers.IncompleteDefnException(f'Definition of base manager {callee.fullname!r} '
                                                   f'is incomplete.')
 
     assert isinstance(callee_info, TypeInfo)
     return callee_info
 
 
-def resolve_passed_queryset_info_or_exception(ctx: DynamicClassDefContext) -> Optional[TypeInfo]:
+def resolve_passed_queryset_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
     api = sem_helpers.get_semanal_api(ctx)
 
     passed_queryset_name_expr = ctx.call.args[0]
@@ -51,13 +51,14 @@ def resolve_passed_queryset_info_or_exception(ctx: DynamicClassDefContext) -> Op
     if (sym is None
             or sym.node is None
             or isinstance(sym.node, PlaceholderNode)):
-        raise sem_helpers.BoundNameNotFound(passed_queryset_name_expr.fullname)
+        bound_name = passed_queryset_name_expr.fullname or passed_queryset_name_expr.name
+        raise sem_helpers.BoundNameNotFound(bound_name)
 
     assert isinstance(sym.node, TypeInfo)
     return sym.node
 
 
-def resolve_django_manager_info_or_exception(ctx: DynamicClassDefContext) -> Optional[TypeInfo]:
+def resolve_django_manager_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
     api = sem_helpers.get_semanal_api(ctx)
 
     sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
@@ -132,7 +133,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
     class_def_context = ClassDefContext(cls=new_manager_info.defn,
                                         reason=ctx.call, api=semanal_api)
-    self_type = fill_typevars(new_manager_info)
+    self_type = Instance(new_manager_info, [AnyType(TypeOfAny.explicit)])
 
     try:
         for name, method_node in iter_all_custom_queryset_methods(queryset_info):
@@ -219,7 +220,6 @@ def add_symbol_table_node(api: SemanticAnalyzer,
     return False
 
 
-
 def create_manager_class_from_as_manager_method(ctx: DynamicClassDefContext) -> None:
     semanal_api = sem_helpers.get_semanal_api(ctx)
     try:
@@ -232,7 +232,7 @@ def create_manager_class_from_as_manager_method(ctx: DynamicClassDefContext) -> 
         else:
             raise
 
-    generic_param = AnyType(TypeOfAny.explicit)
+    generic_param: MypyType = AnyType(TypeOfAny.explicit)
     generic_param_name = 'Any'
     if (semanal_api.scope.classes
             and semanal_api.scope.classes[-1].has_base(fullnames.MODEL_CLASS_FULLNAME)):
@@ -254,7 +254,7 @@ def create_manager_class_from_as_manager_method(ctx: DynamicClassDefContext) -> 
 
     class_def_context = ClassDefContext(cls=new_manager_info.defn,
                                         reason=ctx.call, api=semanal_api)
-    self_type = fill_typevars(new_manager_info)
+    self_type = Instance(new_manager_info, [AnyType(TypeOfAny.explicit)])
 
     try:
         for name, method_node in iter_all_custom_queryset_methods(queryset_info):
@@ -298,16 +298,18 @@ def instantiate_anonymous_queryset_from_as_manager(ctx: MethodContext) -> MypyTy
     assert isinstance(ctx.type.ret_type, Instance)
     queryset_info = ctx.type.ret_type.type
 
-    fullname = get_generated_manager_fullname(ctx.context,
-                                              base_manager_info=django_manager_info,
-                                              queryset_info=queryset_info)
-    metadata = get_generated_managers_metadata(django_manager_info)
-    if fullname not in metadata:
-        raise ValueError(f'{fullname!r} is not present in generated managers list')
+    gen_name = django_manager_info.name + 'From' + queryset_info.name
+    gen_fullname = 'django.db.models.manager' + '.' + gen_name
 
-    module_name, _, class_name = metadata[fullname].rpartition('.')
+    metadata = get_generated_managers_metadata(django_manager_info)
+    if gen_fullname not in metadata:
+        raise ValueError(f'{gen_fullname!r} is not present in generated managers list')
+
+    module_name, _, class_name = metadata[gen_fullname].rpartition('.')
     current_module = helpers.get_current_module(api)
     assert module_name == current_module.fullname
 
     generated_manager_info = current_module.names[class_name].node
+    assert isinstance(generated_manager_info, TypeInfo)
+
     return Instance(generated_manager_info, [])

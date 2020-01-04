@@ -8,7 +8,6 @@ from mypy.options import Options
 from mypy.plugin import (
     AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext, Plugin,
 )
-from mypy.semanal import dummy_context
 from mypy.types import Type as MypyType
 
 import mypy_django_plugin.transformers.orm_lookups
@@ -18,8 +17,9 @@ from mypy_django_plugin.transformers import (
     fields, forms, init_create, meta, querysets, request, settings,
 )
 from mypy_django_plugin.transformers.managers import (
-    create_new_manager_class_from_from_queryset_method,
-    create_manager_class_from_as_manager_method, instantiate_anonymous_queryset_from_as_manager)
+    create_manager_class_from_as_manager_method, create_new_manager_class_from_from_queryset_method,
+    instantiate_anonymous_queryset_from_as_manager,
+)
 from mypy_django_plugin.transformers.models import process_model_class
 
 
@@ -30,7 +30,7 @@ def transform_model_class(ctx: ClassDefContext,
     if sym is not None and isinstance(sym.node, TypeInfo):
         helpers.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
     else:
-        if not ctx.api.final_iteration and not ctx.api.deferred:
+        if not ctx.api.final_iteration:
             ctx.api.defer()
             return
 

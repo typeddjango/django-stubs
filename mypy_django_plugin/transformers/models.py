@@ -1,11 +1,14 @@
 from typing import List, Optional, Type, cast
 
 from django.db.models.base import Model
+from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.db.models.fields.reverse_related import (
     ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
-from mypy.nodes import ARG_STAR2, Argument, FuncDef, TypeInfo, Var, SymbolTableNode, MDEF, GDEF
+from mypy.nodes import (
+    ARG_STAR2, GDEF, MDEF, Argument, Context, FuncDef, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer, dummy_context
@@ -13,7 +16,6 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
-from django.db.models.fields import DateField, DateTimeField
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
 from mypy_django_plugin.transformers import fields
@@ -71,46 +73,24 @@ class ModelClassInitializer:
         var.is_initialized_in_class = True
 
         sym = SymbolTableNode(MDEF, var, plugin_generated=True)
-        context = dummy_context()
+        context: Optional[Context] = dummy_context()
         if force_replace_existing:
             context = None
         self.api.add_symbol_table_node(name, sym, context=context)
 
     def add_new_class_for_current_module(self, name: str, bases: List[Instance],
-                                         force_replace_existing: bool = False) -> Optional[TypeInfo]:
+                                         force_replace_existing: bool = False) -> TypeInfo:
         current_module = self.api.cur_mod_node
-        if not force_replace_existing and name in current_module:
+        if not force_replace_existing and name in current_module.names:
             raise ValueError(f'Class {name!r} already defined for module {current_module.fullname!r}')
 
         new_typeinfo = helpers.new_typeinfo(name,
                                             bases=bases,
                                             module_name=current_module.fullname)
-        # sym = SymbolTableNode(GDEF, new_typeinfo,
-        #                       plugin_generated=True)
-        # context = dummy_context()
-        # if force_replace_existing:
-        #     context = None
-
         if name in current_module.names:
             del current_module.names[name]
         current_module.names[name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
-        # current_module.defs.append(new_typeinfo.defn)
-        # self.api.cur_mod_node.
-        # self.api.leave_class()
-        # added = self.api.add_symbol_table_node(name, sym, context=context)
-        # self.api.enter_class(self.model_classdef.info)
-        #
-        # self.api.cur_mod_node.defs.append(new_typeinfo.defn)
-
-        # if not added and force_replace_existing:
-        #     return None
         return new_typeinfo
-
-        # current_module = self.api.modules[self.model_classdef.info.module_name]
-        # context =
-        # new_class_info = helpers.add_new_class_for_module(current_module,
-        #                                                   name=name, bases=bases)
-        # return new_class_info
 
     def run(self) -> None:
         model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
@@ -193,7 +173,7 @@ class AddRelatedModelsId(ModelClassInitializer):
 
             related_model_cls = self.django_context.get_field_related_model_cls(field)
             if related_model_cls is None:
-                error_context = self.ctx.cls
+                error_context: Context = self.ctx.cls
                 field_sym = self.ctx.cls.info.get(field.name)
                 if field_sym is not None and field_sym.node is not None:
                     error_context = field_sym.node
@@ -383,13 +363,8 @@ class AddRelatedManagers(ModelClassInitializer):
                 bases = [parametrized_related_manager_type, default_manager_type]
                 new_related_manager_info = self.add_new_class_for_current_module(name, bases,
                                                                                  force_replace_existing=True)
-                if new_related_manager_info is None:
-                    # wasn't added for some reason, defer
-                    if not self.api.final_iteration:
-                        self.api.defer()
-                        continue
-
-                self.add_new_node_to_model_class(related_manager_attr_name, Instance(new_related_manager_info, []))
+                self.add_new_node_to_model_class(related_manager_attr_name,
+                                                 Instance(new_related_manager_info, []))
 
 
 class AddExtraFieldMethods(ModelClassInitializer):

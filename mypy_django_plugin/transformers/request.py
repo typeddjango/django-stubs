@@ -4,7 +4,7 @@ from mypy.types import Type as MypyType
 from mypy.types import UnionType
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, helpers
 
 
 def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:

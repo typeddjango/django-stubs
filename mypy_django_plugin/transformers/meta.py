@@ -5,7 +5,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, helpers
 
 
 def _get_field_instance(ctx: MethodContext, field_fullname: str) -> MypyType:
