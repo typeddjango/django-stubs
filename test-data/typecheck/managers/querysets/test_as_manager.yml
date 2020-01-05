@@ -20,6 +20,34 @@
                     objects = MyQuerySet.as_manager()
 
 
+-   case: two_invocations_parametrized_with_different_models
+    main: |
+        from myapp.models import User, Blog
+        reveal_type(User.objects)  # N: Revealed type is 'myapp.models.MyQuerySet_AsManager_User'
+        reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
+        reveal_type(User.objects.queryset_method)  # N: Revealed type is 'def () -> builtins.int'
+        reveal_type(User.objects.queryset_method())  # N: Revealed type is 'builtins.int'
+
+        reveal_type(Blog.objects)  # N: Revealed type is 'myapp.models.MyQuerySet_AsManager_Blog'
+        reveal_type(Blog.objects.get())  # N: Revealed type is 'myapp.models.Blog*'
+        reveal_type(Blog.objects.queryset_method)  # N: Revealed type is 'def () -> builtins.int'
+        reveal_type(Blog.objects.queryset_method())  # N: Revealed type is 'builtins.int'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyQuerySet(models.QuerySet):
+                    def queryset_method(self) -> int:
+                        pass
+                class User(models.Model):
+                    objects = MyQuerySet.as_manager()
+                class Blog(models.Model):
+                    objects = MyQuerySet.as_manager()
+
+
 -   case: as_manager_outside_model_parametrized_with_any
     main: |
         from myapp.models import NotModel, outside_objects
@@ -40,3 +68,28 @@
                 outside_objects = MyQuerySet.as_manager()
                 class NotModel:
                     objects = MyQuerySet.as_manager()
+
+-   case: test_as_manager_without_name_to_bind_in_different_files
+    main: |
+        from myapp.models import MyQuerySet
+        reveal_type(MyQuerySet.as_manager())  # N: Revealed type is 'Any'
+        reveal_type(MyQuerySet.as_manager().get())  # N: Revealed type is 'Any'
+        reveal_type(MyQuerySet.as_manager().mymethod())  # N: Revealed type is 'Any'
+
+        from myapp import helpers
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyQuerySet(models.QuerySet):
+                    def mymethod(self) -> int:
+                        pass
+                class MyModel(models.Model):
+                    objects = MyQuerySet.as_manager()
+        -   path: myapp/helpers.py
+            content: |
+                from myapp.models import MyQuerySet
+                MyQuerySet.as_manager()
