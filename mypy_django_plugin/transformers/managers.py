@@ -60,15 +60,11 @@ def resolve_passed_queryset_info_or_exception(ctx: DynamicClassDefContext) -> Ty
 
 def resolve_django_manager_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
     api = sem_helpers.get_semanal_api(ctx)
-
-    sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
-    if (sym is None
-            or sym.node is None
-            or isinstance(sym.node, PlaceholderNode)):
+    info = helpers.lookup_fully_qualified_typeinfo(api, fullnames.MANAGER_CLASS_FULLNAME)
+    if info is None:
         raise sem_helpers.BoundNameNotFound(fullnames.MANAGER_CLASS_FULLNAME)
 
-    assert isinstance(sym.node, TypeInfo)
-    return sym.node
+    return info
 
 
 def new_manager_typeinfo(ctx: DynamicClassDefContext, callee_manager_info: TypeInfo) -> TypeInfo:
