@@ -4,9 +4,9 @@ from mypy.nodes import Argument, FuncDef, TypeInfo, Var
 from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, CallableType, Instance
+from mypy.types import AnyType, CallableType, Instance, PlaceholderType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import TypeOfAny, get_proper_type
 
 
 class IncompleteDefnException(Exception):
@@ -54,8 +54,9 @@ def analyze_callable_signature(api: SemanticAnalyzer, method_node: FuncDef) -> S
     for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
                                                      method_type.arg_types[1:],
                                                      method_node.arguments[1:]):
-        analyzed_arg_type = api.anal_type(arg_type)
-        if analyzed_arg_type is None:
+        analyzed_arg_type = api.anal_type(get_proper_type(arg_type), allow_placeholder=True)
+        assert analyzed_arg_type is not None
+        if isinstance(analyzed_arg_type, PlaceholderType):
             unbound = True
 
         var = Var(name=original_argument.variable.name,
@@ -63,14 +64,15 @@ def analyze_callable_signature(api: SemanticAnalyzer, method_node: FuncDef) -> S
         var.set_line(original_argument.variable)
 
         argument = Argument(variable=var,
-                            type_annotation=arg_type,
+                            type_annotation=analyzed_arg_type,
                             initializer=original_argument.initializer,
                             kind=original_argument.kind)
         argument.set_line(original_argument)
         arguments.append(argument)
 
-    analyzed_ret_type = api.anal_type(method_type.ret_type)
-    if analyzed_ret_type is None:
+    analyzed_ret_type = api.anal_type(get_proper_type(method_type.ret_type), allow_placeholder=True)
+    assert analyzed_ret_type is not None
+    if isinstance(analyzed_ret_type, PlaceholderType):
         unbound = True
     return SignatureTuple(arguments, analyzed_ret_type, unbound)
 
