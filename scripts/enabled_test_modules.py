@@ -334,6 +334,9 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Type[Field[Any, Any]]',
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder";',
         '("None" and "SearchQuery")',
+        'Too few arguments for "get_context" of "Widget"',
+        'Incompatible types in assignment (expression has type "Type[Input]", base class '
+        '"Field" defined the type as "Widget")',
     ],
     'properties': [
         re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
