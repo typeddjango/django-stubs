@@ -457,7 +457,7 @@ IGNORED_ERRORS = {
         'No overload variant of "join" matches argument types "str", "None"',
         'Argument 1 to "Archive" has incompatible type "None"; expected "str"',
         'Argument 1 to "to_path" has incompatible type "int"; expected "Union[Path, str]"',
-
+        'Cannot infer type argument 1 of "cached_property"',
     ],
     'view_tests': [
         "Module 'django.views.debug' has no attribute 'Path'",
