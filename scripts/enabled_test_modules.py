@@ -170,7 +170,8 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "Optional[Any]", variable has type "FloatModel")'
     ],
     'decorators': [
-        '"Type[object]" has no attribute "method"'
+        '"Type[object]" has no attribute "method"',
+        'Value of type variable "_T" of function cannot be "descriptor_wrapper"'
     ],
     'expressions_window': [
         'has incompatible type "str"'
