@@ -604,6 +604,37 @@
                     pass
 
 
+-   case: test_foreign_key_from_subclass_gets_set_up_correctly
+    main: |
+        from myapp import models
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from __future__ import annotations
+                from django.db import models
+
+                class BaseInvoice(models.Model):
+                    class Meta:
+                        abstract = True
+                        ordering = ['-created_at']
+
+                    def process(self, invoice: Invoice):
+                        reveal_type(invoice.invoicerow_set)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.InvoiceRow]'
+
+                class Invoice(BaseInvoice):
+                    pass
+
+                class BaseRow(models.Model):
+                    class Meta:
+                        abstract = True
+                        ordering = ['-created_at']
+
+                class InvoiceRow(BaseRow):
+                    invoice = models.ForeignKey(Invoice, null=False, on_delete=models.CASCADE)
+
 -   case: foreign_key_relationship_for_models_with_custom_manager
     main: |
         from myapp.models import Transaction
