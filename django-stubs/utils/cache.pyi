@@ -1,7 +1,6 @@
 from typing import Any, Optional, Tuple
 
 from django.core.cache.backends.base import BaseCache
-from django.core.cache.backends.locmem import LocMemCache
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse, HttpResponseBase
 
@@ -28,5 +27,5 @@ def learn_cache_key(
     response: HttpResponse,
     cache_timeout: Optional[float] = ...,
     key_prefix: Optional[str] = ...,
-    cache: Optional[LocMemCache] = ...,
+    cache: Optional[BaseCache] = ...,
 ) -> str: ...
