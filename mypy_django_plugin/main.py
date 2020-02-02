@@ -17,10 +17,10 @@ from mypy_django_plugin.transformers import (
     fields, forms, init_create, meta, querysets, request, settings,
 )
 from mypy_django_plugin.transformers.managers import (
-    create_manager_class_from_as_manager_method, create_new_manager_class_from_from_queryset_method,
-    instantiate_anonymous_queryset_from_as_manager,
-)
+    create_manager_class_from_as_manager_method, instantiate_anonymous_queryset_from_as_manager)
 from mypy_django_plugin.transformers.models import process_model_class
+from mypy_django_plugin.transformers2.dynamic_managers import CreateNewManagerClassFrom_FromQuerySet
+from mypy_django_plugin.transformers2.models import ModelCallback
 
 
 def transform_model_class(ctx: ClassDefContext,
@@ -190,9 +190,9 @@ class NewSemanalDjangoPlugin(Plugin):
         if fullname == 'django.contrib.auth.get_user_model':
             return partial(settings.get_user_model_hook, django_context=self.django_context)
 
-        manager_bases = self._get_current_manager_bases()
-        if fullname in manager_bases:
-            return querysets.determine_proper_manager_type
+        # manager_bases = self._get_current_manager_bases()
+        # if fullname in manager_bases:
+        #     return querysets.determine_proper_manager_type
 
         info = self._get_typeinfo_or_none(fullname)
         if info:
@@ -248,7 +248,7 @@ class NewSemanalDjangoPlugin(Plugin):
                             ) -> Optional[Callable[[ClassDefContext], None]]:
         if (fullname in self.django_context.all_registered_model_class_fullnames
                 or fullname in self._get_current_model_bases()):
-            return partial(transform_model_class, django_context=self.django_context)
+            return ModelCallback(self)
 
         if fullname in self._get_current_manager_bases():
             return add_new_manager_base
@@ -275,7 +275,8 @@ class NewSemanalDjangoPlugin(Plugin):
             class_name, _, _ = fullname.rpartition('.')
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-                return create_new_manager_class_from_from_queryset_method
+                return CreateNewManagerClassFrom_FromQuerySet(self)
+
         if fullname.endswith('as_manager'):
             class_name, _, _ = fullname.rpartition('.')
             info = self._get_typeinfo_or_none(class_name)

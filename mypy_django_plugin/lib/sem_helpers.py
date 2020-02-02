@@ -9,12 +9,12 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, get_proper_type
 
 
-class IncompleteDefnException(Exception):
+class IncompleteDefnError(Exception):
     def __init__(self, error_message: str = '') -> None:
         super().__init__(error_message)
 
 
-class BoundNameNotFound(IncompleteDefnException):
+class BoundNameNotFound(IncompleteDefnError):
     def __init__(self, fullname: str) -> None:
         super().__init__(f'No {fullname!r} found')
 
@@ -85,7 +85,7 @@ def copy_method_or_incomplete_defn_exception(ctx: ClassDefContext,
 
     if method_node.type is None:
         if not semanal_api.final_iteration:
-            raise IncompleteDefnException(f'Unannotated method {method_node.fullname!r}')
+            raise IncompleteDefnError(f'Unannotated method {method_node.fullname!r}')
 
         arguments, return_type = prepare_unannotated_method_signature(method_node)
         add_method(ctx,
@@ -107,7 +107,7 @@ def copy_method_or_incomplete_defn_exception(ctx: ClassDefContext,
     arguments, analyzed_return_type, unbound = analyze_callable_signature(semanal_api, method_node)
     assert len(arguments) + 1 == len(method_node.arguments)
     if unbound:
-        raise IncompleteDefnException(f'Signature of method {method_node.fullname!r} is not ready')
+        raise IncompleteDefnError(f'Signature of method {method_node.fullname!r} is not ready')
 
     assert analyzed_return_type is not None
 

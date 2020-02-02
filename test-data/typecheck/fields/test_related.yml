@@ -36,7 +36,7 @@
                     pass
                 class Book(models.Model):
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
-                    owner = models.ForeignKey(db_column='model_id', to='auth.User', on_delete=models.CASCADE)
+                    owner = models.ForeignKey(to='auth.User', on_delete=models.CASCADE)
 
 -   case: foreign_key_field_different_order_of_params
     main: |
@@ -653,7 +653,7 @@
 -   case: related_manager_is_a_subclass_of_default_manager
     main: |
         from myapp.models import User
-        reveal_type(User().orders)  # N: Revealed type is 'myapp.models.Order_RelatedManager'
+        reveal_type(User().orders)  # N: Revealed type is 'myapp.models.User.Order_RelatedManager'
         reveal_type(User().orders.get())  # N: Revealed type is 'myapp.models.Order*'
         reveal_type(User().orders.manager_method())  # N: Revealed type is 'builtins.int'
     installed_apps:
@@ -663,9 +663,12 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                from mypy_django_plugin.lib import generics
+                generics.make_classes_generic(models.Manager)
+
                 class User(models.Model):
                     pass
-                class OrderManager(models.Manager):
+                class OrderManager(models.Manager['Order']):
                     def manager_method(self) -> int:
                         pass
                 class Order(models.Model):

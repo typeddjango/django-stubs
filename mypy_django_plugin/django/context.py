@@ -55,10 +55,10 @@ def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
         def noop_class_getitem(cls, key):
             return cls
 
-        from django.db import models
+        # from django.db import models
 
-        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
-        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
+        # models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
+        # models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
 
         from django.conf import settings
         from django.apps import apps
@@ -226,7 +226,7 @@ class DjangoContext:
         attname = field.attname
         return attname
 
-    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str]) -> bool:
+    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str] = None) -> bool:
         nullable = field.null
         if not nullable and isinstance(field, CharField) and field.blank:
             return True
