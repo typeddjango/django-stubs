@@ -110,6 +110,11 @@ def get_field_descriptor_types(field_info: TypeInfo, is_nullable: bool) -> Tuple
     return set_type, get_type
 
 
+def get_field_type(field_info: TypeInfo, is_nullable: bool) -> Instance:
+    set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
+    return Instance(field_info, [set_type, get_type])
+
+
 def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
 

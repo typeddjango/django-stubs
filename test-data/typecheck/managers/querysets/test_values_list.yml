@@ -220,6 +220,9 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                from mypy_django_plugin.lib import generics
+                generics.make_classes_generic(models.QuerySet)
+
                 class TransactionQuerySet(models.QuerySet['Transaction']):
                     pass
                 class Transaction(models.Model):

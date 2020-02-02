@@ -1,12 +1,13 @@
 from typing import Any, Dict, Iterator, Optional, Tuple
 
+from mypy.checker import gen_unique_name
 from mypy.nodes import (
     GDEF, CallExpr, Context, Decorator, FuncDef, MemberExpr, NameExpr, OverloadedFuncDef, PlaceholderNode, RefExpr,
     StrExpr, SymbolTable, SymbolTableNode, TypeInfo,
-)
+    MypyFile)
 from mypy.plugin import ClassDefContext, DynamicClassDefContext, MethodContext
 from mypy.semanal import SemanticAnalyzer, is_same_symbol, is_valid_replacement
-from mypy.types import AnyType, CallableType, Instance
+from mypy.types import AnyType, CallableType, Instance, TypeVarType, TypeVarDef
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
@@ -26,28 +27,43 @@ def generate_from_queryset_name(base_manager_info: TypeInfo, queryset_info: Type
     return base_manager_info.name + 'From' + queryset_info.name
 
 
-def resolve_callee_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
-    callee = ctx.call.callee
+#
+# def cb_resolve_callee_info_or_exception(cb: ) -> TypeInfo:
+#     callee = ctx.call.callee
+#     assert isinstance(callee, MemberExpr)
+#     assert isinstance(callee.expr, RefExpr)
+#
+#     callee_info = callee.expr.node
+#     if (callee_info is None
+#             or isinstance(callee_info, PlaceholderNode)):
+#         raise sem_helpers.IncompleteDefnError(f'Definition of base manager {callee.fullname!r} '
+#                                                   f'is incomplete.')
+#
+#     assert isinstance(callee_info, TypeInfo)
+#     return callee_info
+
+
+def resolve_callee_info_or_exception(callback: helpers.DynamicClassPluginCallback) -> TypeInfo:
+    callee = callback.call_expr.callee
     assert isinstance(callee, MemberExpr)
     assert isinstance(callee.expr, RefExpr)
 
     callee_info = callee.expr.node
     if (callee_info is None
             or isinstance(callee_info, PlaceholderNode)):
-        raise sem_helpers.IncompleteDefnException(f'Definition of base manager {callee.fullname!r} '
-                                                  f'is incomplete.')
+        raise sem_helpers.IncompleteDefnError(f'Definition of base manager {callee.fullname!r} '
+                                              f'is incomplete.')
 
     assert isinstance(callee_info, TypeInfo)
     return callee_info
 
 
-def resolve_passed_queryset_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
-    api = sem_helpers.get_semanal_api(ctx)
-
-    passed_queryset_name_expr = ctx.call.args[0]
+def resolve_passed_queryset_info_or_exception(callback: helpers.DynamicClassPluginCallback) -> TypeInfo:
+    passed_queryset_name_expr = callback.call_expr.args[0]
     assert isinstance(passed_queryset_name_expr, NameExpr)
 
-    sym = api.lookup_qualified(passed_queryset_name_expr.name, ctx=ctx.call)
+    # lookup in the same module
+    sym = callback.semanal_api.lookup_qualified(passed_queryset_name_expr.name, ctx=callback.call_expr)
     if (sym is None
             or sym.node is None
             or isinstance(sym.node, PlaceholderNode)):
@@ -58,9 +74,8 @@ def resolve_passed_queryset_info_or_exception(ctx: DynamicClassDefContext) -> Ty
     return sym.node
 
 
-def resolve_django_manager_info_or_exception(ctx: DynamicClassDefContext) -> TypeInfo:
-    api = sem_helpers.get_semanal_api(ctx)
-    info = helpers.lookup_fully_qualified_typeinfo(api, fullnames.MANAGER_CLASS_FULLNAME)
+def resolve_django_manager_info_or_exception(callback: helpers.DynamicClassPluginCallback) -> TypeInfo:
+    info = callback.lookup_typeinfo_or_defer(fullnames.MANAGER_CLASS_FULLNAME)
     if info is None:
         raise sem_helpers.BoundNameNotFound(fullnames.MANAGER_CLASS_FULLNAME)
 
@@ -113,7 +128,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
         callee_manager_info = resolve_callee_info_or_exception(ctx)
         queryset_info = resolve_passed_queryset_info_or_exception(ctx)
         django_manager_info = resolve_django_manager_info_or_exception(ctx)
-    except sem_helpers.IncompleteDefnException:
+    except sem_helpers.IncompleteDefnError:
         if not semanal_api.final_iteration:
             semanal_api.defer()
             return
@@ -137,7 +152,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
                                                                  self_type,
                                                                  new_method_name=name,
                                                                  method_node=method_node)
-    except sem_helpers.IncompleteDefnException:
+    except sem_helpers.IncompleteDefnError:
         if not semanal_api.final_iteration:
             semanal_api.defer()
             return
@@ -216,12 +231,17 @@ def add_symbol_table_node(api: SemanticAnalyzer,
     return False
 
 
+class CreateNewManagerClassFrom_AsManager(helpers.DynamicClassPluginCallback):
+    def create_new_dynamic_class(self) -> None:
+        pass
+
+
 def create_manager_class_from_as_manager_method(ctx: DynamicClassDefContext) -> None:
     semanal_api = sem_helpers.get_semanal_api(ctx)
     try:
         queryset_info = resolve_callee_info_or_exception(ctx)
         django_manager_info = resolve_django_manager_info_or_exception(ctx)
-    except sem_helpers.IncompleteDefnException:
+    except sem_helpers.IncompleteDefnError:
         if not semanal_api.final_iteration:
             semanal_api.defer()
             return
@@ -258,7 +278,7 @@ def create_manager_class_from_as_manager_method(ctx: DynamicClassDefContext) -> 
                                                                  self_type,
                                                                  new_method_name=name,
                                                                  method_node=method_node)
-    except sem_helpers.IncompleteDefnException:
+    except sem_helpers.IncompleteDefnError:
         if not semanal_api.final_iteration:
             semanal_api.defer()
             return
