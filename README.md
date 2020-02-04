@@ -61,7 +61,7 @@ No, it is not. We are indendepent from Django at the moment.
 There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
 You show your support by linking the PR.
 
-> Is is safe to use this in production?
+> Is it safe to use this in production?
 
 Yes, it is! This project does not affect your runtime at all.
 It only affects `mypy` type checking process.
