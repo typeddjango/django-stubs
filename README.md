@@ -66,11 +66,11 @@ You show your support by linking the PR.
 Yes, it is! This project does not affect your runtime at all.
 It only affects `mypy` type checking process.
 
-But, it does not make sense to use this project without `mypy`.
+But, it does not make any sense to use this project without `mypy`.
 
 ### mypy crashes when I run it with this plugin installed
 
-Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
+Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too. 
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
@@ -83,7 +83,7 @@ when you will try to use `QuerySet[MyModel]` or `Manager[MyModel]`.
 
 This happens because Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method.
 
-There are several things you can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
+You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
 Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
 
