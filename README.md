@@ -55,20 +55,20 @@ We rely on different `django` and `mypy` versions:
 
 ## FAQ
 
-> Is this an official Django project?
+### Is this an official Django project?
 
 No, it is not. We are indendepent from Django at the moment.
 There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
 You show your support by linking the PR.
 
-> Is it safe to use this in production?
+### Is it safe to use this in production?
 
 Yes, it is! This project does not affect your runtime at all.
 It only affects `mypy` type checking process.
 
 But, it does not make sense to use this project without `mypy`.
 
-> mypy crashes when I run it with this plugin installed
+### mypy crashes when I run it with this plugin installed
 
 Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
 
@@ -76,7 +76,7 @@ In other words, if your `manage.py runserver` crashes, mypy will crash too.
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
 option to get extra information about the error.
 
-> I cannot use QuerySet or Manager with type annotations
+### I cannot use QuerySet or Manager with type annotations
 
 You can get a `TypeError: 'type' object is not subscriptable` 
 when you will try to use `QuerySet[MyModel]` or `Manager[MyModel]`.
@@ -87,7 +87,7 @@ There are several things you can use strings instead: `'QuerySet[MyModel]'` and 
 
 Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
 
-> How can I use HttpRequest with custom user model?
+### How can I use HttpRequest with custom user model?
 
 You can subclass standard request like so:
 
