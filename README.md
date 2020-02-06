@@ -87,6 +87,20 @@ There are several things you can use strings instead: `'QuerySet[MyModel]'` and 
 
 Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
 
+> How can I use HttpRequest with custom user model?
+
+You can subclass standard request like so:
+
+```python
+from django.http import HttpRequest
+from my_user_app.models import MyUser
+
+class MyRequest(HttpRequest):
+    user: MyUser
+```
+
+And then use `MyRequest` instead of standard `HttpRequest` inside your project.
+
 
 ## Related projects
 
