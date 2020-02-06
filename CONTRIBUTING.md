@@ -25,13 +25,11 @@ TODO
 
 We use `pip` to manage the dependencies.
 
-To install them you would need to run `install` command:
+To install them you would need to activate your `virtualenv` and run `install` command:
 
 ```bash
 pip install -r ./dev-requirements.txt
 ```
-
-Then, activate your `virtualenv`.
 
 
 ## Tests and linters
