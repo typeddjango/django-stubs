@@ -1,14 +1,12 @@
 <img src="http://mypy-lang.org/static/mypy_light.svg" alt="mypy logo" width="300px"/>
 
-# pep484 stubs for Django framework
+# Typesafe Django Framework
 
 [![Build Status](https://travis-ci.com/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.com/typeddjango/django-stubs)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 
-This package contains type stubs and mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need to accompany the stubs with mypy plugins. The final goal is to be able to get precise types for most common patterns.
-
-Could be run on earlier versions of Django, but expect some missing imports warnings.
+This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
 
 
 ## Installation
@@ -17,8 +15,35 @@ Could be run on earlier versions of Django, but expect some missing imports warn
 pip install django-stubs
 ```
 
+See [Configutation](#configuration) section to get started.
 
-## Mypy compatibility
+
+## Configuration
+
+To make `mypy` happy, you will need to add:
+
+```ini
+[mypy]
+plugins =
+    mypy_django_plugin.main
+    
+[mypy.plugins.django-stubs]
+django_settings_module = "myproject.settings"
+```
+
+in your `mypy.ini` or `setup.cfg` [file](https://mypy.readthedocs.io/en/latest/config_file.html).
+
+Two things happeining here:
+
+1. We need to explicitly list our plugin to be loaded by `mypy`
+2. Our plugin also requires `django` settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified
+
+This fully working [typed boilerplate](https://github.com/wemake-services/wemake-django-template) can serve you as an example.
+
+
+## Version compatibility
+
+We rely on different `django` and `mypy` versions:
 
 | django-stubs | mypy version | django version | python version
 | ------------ | ---- | ---- | ---- |
@@ -28,58 +53,66 @@ pip install django-stubs
 | 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
 
 
-## Configuration
+## FAQ
 
-To make mypy aware of the plugin, you need to add
+> Is this an official Django project?
 
-```ini
-[mypy]
-plugins =
-    mypy_django_plugin.main
-```
+No, it is not. We are indendepent from Django at the moment.
+There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
+You show your support by linking the PR.
 
-in your `mypy.ini` or `setup.cfg` [file](https://mypy.readthedocs.io/en/latest/config_file.html).
+> Is it safe to use this in production?
 
-Plugin also requires Django settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified.
+Yes, it is! This project does not affect your runtime at all.
+It only affects `mypy` type checking process.
 
-```ini
-[mypy]
-strict_optional = True
+But, it does not make sense to use this project without `mypy`.
 
-# This one is new:
-[mypy.plugins.django-stubs]
-django_settings_module = mysettings
-```
-
-Where `mysettings` is a value of `DJANGO_SETTINGS_MODULE` (with or without quotes)
+> mypy crashes when I run it with this plugin installed
 
 Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too. 
+You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
+option to get extra information about the error.
 
-This fully working [typed boilerplate](https://github.com/wemake-services/wemake-django-template) can serve you as an example.
+> I cannot use QuerySet or Manager with type annotations
 
+You can get a `TypeError: 'type' object is not subscriptable` 
+when you will try to use `QuerySet[MyModel]` or `Manager[MyModel]`.
 
-## Notes
+This happens because Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method.
 
-Type implementation monkey-patches Django to add `__class_getitem__` to the `Manager` class. 
-If you would use Python3.7 and do that too in your code, you can make things like
+There are several things you can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
+
+Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
+
+> How can I use HttpRequest with custom user model?
+
+You can subclass standard request like so:
 
 ```python
-class MyUserManager(models.Manager['MyUser']):
-    pass
+from django.http import HttpRequest
+from my_user_app.models import MyUser
 
-class MyUser(models.Model):
-    objects = MyUserManager()
+class MyRequest(HttpRequest):
+    user: MyUser
 ```
 
-work, which should make a error messages a bit better. 
+And then use `MyRequest` instead of standard `HttpRequest` inside your project.
 
-Otherwise, custom type will be created in mypy, named `MyUser__MyUserManager`, which will rewrite base manager as `models.Manager[User]` to make methods like `get_queryset()` and others return properly typed `QuerySet`. 
+
+## Related projects
+
+- [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
+- [`djangorestframework-stubs`](https://github.com/typeddjango/djangorestframework-stubs) - Stubs for Django REST Framework.
+- [`pytest-mypy-plugins`](https://github.com/typeddjango/pytest-mypy-plugins) - `pytest` plugin that we use for testing `mypy` stubs and plugins.
+- [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template) - Create new typed Django projects in seconds.
+
 
 
 ## To get help
 
 We have Gitter here: <https://gitter.im/mypy-django/Lobby>
 
-If you think you have more generic typing issue, please refer to https://github.com/python/mypy and their Gitter.
+If you think you have more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
