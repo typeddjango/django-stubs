@@ -64,7 +64,12 @@ IGNORED_ERRORS = {
         'Incompatible types in string interpolation',
         '"None" has no attribute',
         'has no attribute "assert',
-        'Unsupported dynamic base class'
+        'Unsupported dynamic base class',
+        'error: "HttpResponse" has no attribute "streaming_content"',
+        'error: "HttpResponse" has no attribute "context_data"',
+    ],
+    'admin_inlines': [
+        'error: "HttpResponse" has no attribute "rendered_content"',
     ],
     'admin_utils': [
         '"Article" has no attribute "non_field"',
@@ -240,6 +245,7 @@ IGNORED_ERRORS = {
     ],
     'middleware': [
         re.compile(r'"(HttpRequest|WSGIRequest)" has no attribute'),
+        'Incompatible types in assignment (expression has type "HttpResponseBase", variable has type "HttpResponse")',
     ],
     'many_to_many': [
         '(expression has type "List[Article]", variable has type "Article_RelatedManager2',
@@ -376,6 +382,9 @@ IGNORED_ERRORS = {
     'settings_tests': [
         'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'
     ],
+    'shortcuts': [
+        'error: "Context" has no attribute "request"',
+    ],
     'signals': [
         'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]";'
     ],
@@ -428,6 +437,7 @@ IGNORED_ERRORS = {
     'test_client_regress': [
         '(expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")',
         'Unsupported left operand type for + ("None")',
+        'Argument 1 to "len" has incompatible type "Context"; expected "Sized"',
     ],
     'transactions': [
         'Incompatible types in assignment (expression has type "Thread", variable has type "Callable[[], Any]")'
