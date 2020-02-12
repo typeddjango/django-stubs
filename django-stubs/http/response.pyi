@@ -62,25 +62,27 @@ class HttpResponseBase(Iterable[Any]):
     def __iter__(self) -> Iterator[Any]: ...
 
 class HttpResponse(HttpResponseBase):
-    client: Client
-    context: Context
     content: Any
     csrf_cookie_set: bool
     redirect_chain: List[Tuple[str, int]]
-    request: Dict[str, Any]
-    resolver_match: ResolverMatch
     sameorigin: bool
-    templates: List[Template]
     test_server_port: str
     test_was_secure_request: bool
-    wsgi_request: WSGIRequest
     xframe_options_exempt: bool
     streaming: bool = ...
     def __init__(self, content: object = ..., *args: Any, **kwargs: Any) -> None: ...
     def serialize(self) -> bytes: ...
     @property
     def url(self) -> str: ...
-    def json(self) -> Dict[str, Any]: ...
+    # Attributes assigned by monkey-patching in test client ClientHandler.__call__()
+    wsgi_request: WSGIRequest
+    # Attributes assigned by monkey-patching in test client Client.request()
+    client: Client
+    request: Dict[str, Any]
+    templates: List[Template]
+    context: Context
+    resolver_match: ResolverMatch
+    def json(self) -> Any: ...
 
 class StreamingHttpResponse(HttpResponseBase):
     content: Any
