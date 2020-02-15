@@ -15,7 +15,7 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 pip install django-stubs
 ```
 
-See [Configutation](#configuration) section to get started.
+See [Configuration](#configuration) section to get started.
 
 
 ## Configuration
