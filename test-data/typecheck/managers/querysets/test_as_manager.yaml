@@ -1,0 +1,18 @@
+-   case: as_manager_with_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel().objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
+        reveal_type(MyModel().objects.get())  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is 'builtins.str'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class ModelQuerySet(models.QuerySet):
+                    def queryset_method(self) -> str:
+                        return 'hello'
+                class MyModel(models.Model):
+                    objects = ModelQuerySet.as_manager()
