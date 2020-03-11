@@ -109,6 +109,7 @@ IGNORED_ERRORS = {
     ],
     'builtin_server': [
         '"ServerHandler" has no attribute',
+        'Incompatible types in assignment (expression has type "Tuple[BytesIO, BytesIO]"',
     ],
     'bulk_create': [
         'has incompatible type "List[Country]"; expected "Iterable[TwoFields]"',
@@ -282,6 +283,7 @@ IGNORED_ERRORS = {
         '"ImageFile" has no attribute "was_opened"',
         'Incompatible type for "size" of "FloatModel" (got "object", expected "Union[float, int, str, Combinable]")',
         'Incompatible type for "value" of "IntegerModel" (got "object", expected',
+        '"Child" has no attribute "get_foo_display"',
     ],
     'model_forms': [
         '"render" of "Widget"',
