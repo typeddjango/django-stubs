@@ -198,7 +198,7 @@ IGNORED_ERRORS = {
     ],
     'from_db_value': [
         '"Cash" has no attribute',
-        'Argument 1 to "__str__" of "Decimal"',
+        '"__str__" of "Decimal"',
     ],
     'get_object_or_404': [
         'Argument 1 to "get_object_or_404" has incompatible type "str"; '
@@ -399,7 +399,7 @@ IGNORED_ERRORS = {
         '"RequestSite" of "Union[Site, RequestSite]" has no attribute "id"',
     ],
     'syndication_tests': [
-        'List or tuple expected as variable arguments'
+        'Argument 1 to "add_domain" has incompatible type "*Tuple[object, ...]"',
     ],
     'sessions_tests': [
         'Incompatible types in assignment (expression has type "None", variable has type "int")',
