@@ -22,5 +22,9 @@ class NameNotFound(IncompleteDefnError):
         super().__init__(f'Could not find {name!r} in the current activated namespaces')
 
 
+class SymbolAdditionNotPossible(Exception):
+    pass
+
+
 def get_class_fullname(klass: type) -> str:
     return klass.__module__ + '.' + klass.__qualname__

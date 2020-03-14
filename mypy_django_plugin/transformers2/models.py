@@ -3,16 +3,16 @@ from typing import Type, Optional
 
 from django.db.models.base import Model
 from django.db.models.fields.related import OneToOneField, ForeignKey
-from django.db.models.fields.reverse_related import OneToOneRel, ManyToManyRel, ManyToOneRel
-from mypy.checker import gen_unique_name
-from mypy.nodes import TypeInfo, Var, SymbolTableNode, MDEF
+from mypy.nodes import TypeInfo, Var, SymbolTableNode, MDEF, Argument, ARG_STAR2
 from mypy.plugin import ClassDefContext
+from mypy.plugins import common
 from mypy.semanal import dummy_context
 from mypy.types import Instance, TypeOfAny, AnyType
 from mypy.types import Type as MypyType
 
 from django.db import models
-from mypy_django_plugin.lib import helpers, fullnames
+from django.db.models.fields import DateField, DateTimeField
+from mypy_django_plugin.lib import helpers, fullnames, sem_helpers
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_type
 from mypy_django_plugin.transformers2 import new_helpers
@@ -116,76 +116,77 @@ class AddPrimaryKeyIfDoesNotExist(TransformModelClassCallback):
 
 class AddRelatedManagersCallback(TransformModelClassCallback):
     def modify_model_class_defn(self, runtime_model_cls: Type[Model]) -> None:
-        for relation in self.django_context.get_model_relations(runtime_model_cls):
-            reverse_manager_name = relation.get_accessor_name()
+        for reverse_manager_name, relation in self.django_context.get_model_relations(runtime_model_cls):
             if (reverse_manager_name is None
                     or reverse_manager_name in self.class_defn.info.names):
                 continue
 
-            related_model_cls = self.django_context.get_field_related_model_cls(relation)
-            if related_model_cls is None:
-                # could not find a referenced model (maybe invalid to= value, or GenericForeignKey)
-                continue
-
-            related_model_info = self.lookup_typeinfo_for_class_or_defer(related_model_cls)
-            if related_model_info is None:
-                continue
-
-            if isinstance(relation, OneToOneRel):
-                self.add_new_model_attribute(reverse_manager_name,
-                                             Instance(related_model_info, []))
-            elif isinstance(relation, (ManyToOneRel, ManyToManyRel)):
-                related_manager_info = self.lookup_typeinfo_or_defer(fullnames.RELATED_MANAGER_CLASS)
-                if related_manager_info is None:
-                    if not self.defer_till_next_iteration(self.class_defn,
-                                                          reason=f'{fullnames.RELATED_MANAGER_CLASS!r} is not available for lookup'):
-                        raise TypeInfoNotFound(fullnames.RELATED_MANAGER_CLASS)
-                    continue
-
-                # get type of default_manager for model
-                default_manager_fullname = helpers.get_class_fullname(related_model_cls._meta.default_manager.__class__)
-                reason_for_defer = (f'Trying to lookup default_manager {default_manager_fullname!r} '
-                                    f'of model {helpers.get_class_fullname(related_model_cls)!r}')
-                default_manager_info = self.lookup_typeinfo_or_defer(default_manager_fullname,
-                                                                     reason_for_defer=reason_for_defer)
-                if default_manager_info is None:
-                    continue
-
-                default_manager_type = Instance(default_manager_info, [Instance(related_model_info, [])])
-
-                # related_model_cls._meta.default_manager.__class__
-                # # we're making a subclass of 'objects', need to have it defined
-                # if 'objects' not in related_model_info.names:
-                #     if not self.defer_till_next_iteration(self.class_defn,
-                #                                           reason=f"'objects' manager is not yet defined on {related_model_info.fullname!r}"):
-                #         raise AttributeNotFound(self.class_defn.info, 'objects')
-                #     continue
-
-                related_manager_type = Instance(related_manager_info,
-                                                [Instance(related_model_info, [])])
-                #
-                # objects_sym = related_model_info.names['objects']
-                # default_manager_type = objects_sym.type
-                # if default_manager_type is None:
-                #     # dynamic base class, extract from django_context
-                #     default_manager_cls = related_model_cls._meta.default_manager.__class__
-                #     default_manager_info = self.lookup_typeinfo_for_class_or_defer(default_manager_cls)
-                #     if default_manager_info is None:
-                #         continue
-                #     default_manager_type = Instance(default_manager_info, [Instance(related_model_info, [])])
-
-                if (not isinstance(default_manager_type, Instance)
-                        or default_manager_type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME):
-                    # if not defined or trivial -> just return RelatedManager[Model]
-                    self.add_new_model_attribute(reverse_manager_name, related_manager_type)
-                    continue
-
-                # make anonymous class
-                name = gen_unique_name(related_model_cls.__name__ + '_' + 'RelatedManager',
-                                       self.semanal_api.current_symbol_table())
-                bases = [related_manager_type, default_manager_type]
-                new_manager_info = self.new_typeinfo(name, bases)
-                self.add_new_model_attribute(reverse_manager_name, Instance(new_manager_info, []))
+            self.add_new_model_attribute(reverse_manager_name, AnyType(TypeOfAny.implementation_artifact))
+            #
+            # related_model_cls = self.django_context.get_field_related_model_cls(relation)
+            # if related_model_cls is None:
+            #     # could not find a referenced model (maybe invalid to= value, or GenericForeignKey)
+            #     continue
+            #
+            # related_model_info = self.lookup_typeinfo_for_class_or_defer(related_model_cls)
+            # if related_model_info is None:
+            #     continue
+            #
+            # if isinstance(relation, OneToOneRel):
+            #     self.add_new_model_attribute(reverse_manager_name,
+            #                                  Instance(related_model_info, []))
+            # elif isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+            #     related_manager_info = self.lookup_typeinfo_or_defer(fullnames.RELATED_MANAGER_CLASS)
+            #     if related_manager_info is None:
+            #         if not self.defer_till_next_iteration(self.class_defn,
+            #                                               reason=f'{fullnames.RELATED_MANAGER_CLASS!r} is not available for lookup'):
+            #             raise TypeInfoNotFound(fullnames.RELATED_MANAGER_CLASS)
+            #         continue
+            #
+            #     # get type of default_manager for model
+            #     default_manager_fullname = helpers.get_class_fullname(related_model_cls._meta.default_manager.__class__)
+            #     reason_for_defer = (f'Trying to lookup default_manager {default_manager_fullname!r} '
+            #                         f'of model {helpers.get_class_fullname(related_model_cls)!r}')
+            #     default_manager_info = self.lookup_typeinfo_or_defer(default_manager_fullname,
+            #                                                          reason_for_defer=reason_for_defer)
+            #     if default_manager_info is None:
+            #         continue
+            #
+            #     default_manager_type = Instance(default_manager_info, [Instance(related_model_info, [])])
+            #
+            #     # related_model_cls._meta.default_manager.__class__
+            #     # # we're making a subclass of 'objects', need to have it defined
+            #     # if 'objects' not in related_model_info.names:
+            #     #     if not self.defer_till_next_iteration(self.class_defn,
+            #     #                                           reason=f"'objects' manager is not yet defined on {related_model_info.fullname!r}"):
+            #     #         raise AttributeNotFound(self.class_defn.info, 'objects')
+            #     #     continue
+            #
+            #     related_manager_type = Instance(related_manager_info,
+            #                                     [Instance(related_model_info, [])])
+            #     #
+            #     # objects_sym = related_model_info.names['objects']
+            #     # default_manager_type = objects_sym.type
+            #     # if default_manager_type is None:
+            #     #     # dynamic base class, extract from django_context
+            #     #     default_manager_cls = related_model_cls._meta.default_manager.__class__
+            #     #     default_manager_info = self.lookup_typeinfo_for_class_or_defer(default_manager_cls)
+            #     #     if default_manager_info is None:
+            #     #         continue
+            #     #     default_manager_type = Instance(default_manager_info, [Instance(related_model_info, [])])
+            #
+            #     if (not isinstance(default_manager_type, Instance)
+            #             or default_manager_type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME):
+            #         # if not defined or trivial -> just return RelatedManager[Model]
+            #         self.add_new_model_attribute(reverse_manager_name, related_manager_type)
+            #         continue
+            #
+            #     # make anonymous class
+            #     name = gen_unique_name(related_model_cls.__name__ + '_' + 'RelatedManager',
+            #                            self.semanal_api.current_symbol_table())
+            #     bases = [related_manager_type, default_manager_type]
+            #     new_manager_info = self.new_typeinfo(name, bases)
+            #     self.add_new_model_attribute(reverse_manager_name, Instance(new_manager_info, []))
 
 
 class AddForeignPrimaryKeys(TransformModelClassCallback):
@@ -222,6 +223,69 @@ class AddForeignPrimaryKeys(TransformModelClassCallback):
             self.add_new_model_attribute(rel_pk_field_name, field_type)
 
 
+class InjectAnyAsBaseForNestedMeta(TransformModelClassCallback):
+    """
+    Replaces
+        class MyModel(models.Model):
+            class Meta:
+                pass
+    with
+        class MyModel(models.Model):
+            class Meta(Any):
+                pass
+    to get around incompatible Meta inner classes for different models.
+    """
+
+    def modify_class_defn(self) -> None:
+        meta_node = sem_helpers.get_nested_meta_node_for_current_class(self.class_defn.info)
+        if meta_node is None:
+            return None
+        meta_node.fallback_to_any = True
+
+
+class AddMetaOptionsAttribute(TransformModelClassCallback):
+    def modify_model_class_defn(self, runtime_model_cls: Type[Model]) -> None:
+        if '_meta' not in self.class_defn.info.names:
+            options_info = self.lookup_typeinfo_or_defer(fullnames.OPTIONS_CLASS_FULLNAME)
+            if options_info is not None:
+                self.add_new_model_attribute('_meta',
+                                             Instance(options_info, [
+                                                 Instance(self.class_defn.info, [])
+                                             ]))
+
+
+class AddExtraFieldMethods(TransformModelClassCallback):
+    def modify_model_class_defn(self, runtime_model_cls: Type[Model]) -> None:
+        # get_FOO_display for choices
+        for field in self.django_context.get_model_fields(runtime_model_cls):
+            if field.choices:
+                info = self.lookup_typeinfo_or_defer('builtins.str')
+                return_type = Instance(info, [])
+                common.add_method(self.ctx,
+                                  name='get_{}_display'.format(field.attname),
+                                  args=[],
+                                  return_type=return_type)
+
+        # get_next_by, get_previous_by for Date, DateTime
+        for field in self.django_context.get_model_fields(runtime_model_cls):
+            if isinstance(field, (DateField, DateTimeField)) and not field.null:
+                return_type = Instance(self.class_defn.info, [])
+                common.add_method(self.ctx,
+                                  name='get_next_by_{}'.format(field.attname),
+                                  args=[Argument(Var('kwargs', AnyType(TypeOfAny.explicit)),
+                                                 AnyType(TypeOfAny.explicit),
+                                                 initializer=None,
+                                                 kind=ARG_STAR2)],
+                                  return_type=return_type)
+                common.add_method(self.ctx,
+                                  name='get_previous_by_{}'.format(field.attname),
+                                  args=[Argument(Var('kwargs', AnyType(TypeOfAny.explicit)),
+                                                 AnyType(TypeOfAny.explicit),
+                                                 initializer=None,
+                                                 kind=ARG_STAR2)],
+                                  return_type=return_type)
+
+
 class ModelCallback(helpers.ClassDefPluginCallback):
     def __call__(self, ctx: ClassDefContext) -> None:
         callback_classes = [
@@ -230,6 +294,9 @@ class ModelCallback(helpers.ClassDefPluginCallback):
             AddForeignPrimaryKeys,
             AddDefaultManagerCallback,
             AddRelatedManagersCallback,
+            InjectAnyAsBaseForNestedMeta,
+            AddMetaOptionsAttribute,
+            AddExtraFieldMethods,
         ]
         for callback_cls in callback_classes:
             callback = callback_cls(self.plugin)

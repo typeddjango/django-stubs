@@ -17,11 +17,15 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import TypeVar
                 from django.db import models
                 from django.db.models.manager import BaseManager, Manager
                 from mypy_django_plugin.lib import generics
 
-                class ModelQuerySet(models.QuerySet):
+                generics.make_classes_generic(models.QuerySet)
+                _M = TypeVar('_M', bound=models.Model)
+
+                class ModelQuerySet(models.QuerySet[_M]):
                     def queryset_method(self) -> str:
                         return 'hello'
 

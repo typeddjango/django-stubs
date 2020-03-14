@@ -1,0 +1,13 @@
+digraph "mfile.py" {
+	graph [fontcolor=blue labelloc=t margin=0]
+	node [fontcolor="#00008b"]
+	__builtins__
+	"django.db.models"
+	"django.db.models.fields"
+	"django.db.models" -> "django.db.models.fields"
+	"django.db.models" -> __builtins__
+	"django.db.models.fields" -> __builtins__
+	mymodule
+	mymodule -> "django.db.models"
+	mymodule -> __builtins__
+}
