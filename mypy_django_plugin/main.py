@@ -16,11 +16,10 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
     fields, forms, init_create, meta, querysets, request, settings,
 )
-from mypy_django_plugin.transformers.managers import (
-    create_manager_class_from_as_manager_method, instantiate_anonymous_queryset_from_as_manager)
 from mypy_django_plugin.transformers.models import process_model_class
 from mypy_django_plugin.transformers2.dynamic_managers import CreateNewManagerClassFrom_FromQuerySet
 from mypy_django_plugin.transformers2.models import ModelCallback
+from mypy_django_plugin.transformers2.related_managers import GetRelatedManagerCallback
 
 
 def transform_model_class(ctx: ClassDefContext,
@@ -190,10 +189,6 @@ class NewSemanalDjangoPlugin(Plugin):
         if fullname == 'django.contrib.auth.get_user_model':
             return partial(settings.get_user_model_hook, django_context=self.django_context)
 
-        # manager_bases = self._get_current_manager_bases()
-        # if fullname in manager_bases:
-        #     return querysets.determine_proper_manager_type
-
         info = self._get_typeinfo_or_none(fullname)
         if info:
             if info.has_base(fullnames.FIELD_FULLNAME):
@@ -231,11 +226,6 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
-        if method_name == 'as_manager':
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return instantiate_anonymous_queryset_from_as_manager
-
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
@@ -267,6 +257,10 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(class_name)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
+
+        if info and info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+            return GetRelatedManagerCallback(self)
+
         return None
 
     def get_dynamic_class_hook(self, fullname: str
@@ -276,12 +270,6 @@ class NewSemanalDjangoPlugin(Plugin):
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return CreateNewManagerClassFrom_FromQuerySet(self)
-
-        if fullname.endswith('as_manager'):
-            class_name, _, _ = fullname.rpartition('.')
-            info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return create_manager_class_from_as_manager_method
 
         return None
 

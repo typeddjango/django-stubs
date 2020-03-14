@@ -11,7 +11,7 @@ from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
-from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, ManyToManyRel, OneToOneRel
 from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
@@ -119,10 +119,10 @@ class DjangoContext:
             if isinstance(field, Field):
                 yield field
 
-    def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
-        for field in model_cls._meta.get_fields():
-            if isinstance(field, ForeignObjectRel):
-                yield field
+    def get_model_relations(self, model_cls: Type[Model]) -> Iterator[Tuple[Optional[str], ForeignObjectRel]]:
+        for relation in model_cls._meta.get_fields():
+            if isinstance(relation, ForeignObjectRel):
+                yield relation.get_accessor_name(), relation
 
     def get_field_lookup_exact_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel]) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):

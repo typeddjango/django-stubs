@@ -10,11 +10,11 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolTable, SymbolTableNode,
     TypeInfo, Var,
-    CallExpr, Context, PlaceholderNode, FuncDef, FakeInfo)
-from mypy.plugin import DynamicClassDefContext, ClassDefContext
+    CallExpr, Context, PlaceholderNode, FuncDef, FakeInfo, OverloadedFuncDef, Decorator)
+from mypy.plugin import DynamicClassDefContext, ClassDefContext, AttributeContext, MethodContext
 from mypy.plugins.common import add_method
-from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, NoneTyp, TypeType
+from mypy.semanal import SemanticAnalyzer, is_valid_replacement, is_same_symbol
+from mypy.types import AnyType, Instance, NoneTyp, TypeType, ProperType, CallableType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 from mypy.typetraverser import TypeTraverserVisitor
@@ -38,8 +38,25 @@ class DjangoPluginCallback:
         self.plugin = plugin
         self.django_context = plugin.django_context
 
-    # def lookup_fully_qualified(self, fullname: str) -> Optional[SymbolTableNode]:
-    #     return self.plugin.lookup_fully_qualified(fullname)
+    def new_typeinfo(self, name: str, bases: List[Instance]) -> TypeInfo:
+        class_def = ClassDef(name, Block([]))
+        class_def.fullname = self.qualified_name(name)
+
+        info = TypeInfo(SymbolTable(), class_def, self.get_current_module().fullname)
+        info.bases = bases
+        calculate_mro(info)
+        info.metaclass_type = info.calculate_metaclass_type()
+
+        class_def.info = info
+        return info
+
+    @abstractmethod
+    def get_current_module(self) -> MypyFile:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def qualified_name(self, name: str) -> str:
+        raise NotImplementedError()
 
 
 class SemanalPluginCallback(DjangoPluginCallback):
@@ -58,6 +75,12 @@ class SemanalPluginCallback(DjangoPluginCallback):
         print(f'LOG: defer: {self.build_defer_error_message(reason)}')
         return True
 
+    def get_current_module(self) -> MypyFile:
+        return self.semanal_api.cur_mod_node
+
+    def qualified_name(self, name: str) -> str:
+        return self.semanal_api.qualified_name(name)
+
     def lookup_typeinfo_or_defer(self, fullname: str, *,
                                  deferral_context: Optional[Context] = None,
                                  reason_for_defer: Optional[str] = None) -> Optional[TypeInfo]:
@@ -74,17 +97,55 @@ class SemanalPluginCallback(DjangoPluginCallback):
 
         return sym.node
 
-    def new_typeinfo(self, name: str, bases: List[Instance]) -> TypeInfo:
+    def new_typeinfo(self, name: str, bases: List[Instance], module_fullname: Optional[str] = None) -> TypeInfo:
         class_def = ClassDef(name, Block([]))
         class_def.fullname = self.semanal_api.qualified_name(name)
 
-        info = TypeInfo(SymbolTable(), class_def, self.semanal_api.cur_mod_id)
+        info = TypeInfo(SymbolTable(), class_def,
+                        module_fullname or self.get_current_module().fullname)
         info.bases = bases
         calculate_mro(info)
         info.metaclass_type = info.calculate_metaclass_type()
 
         class_def.info = info
         return info
+
+    def add_symbol_table_node(self,
+                              name: str,
+                              symbol: SymbolTableNode,
+                              symbol_table: Optional[SymbolTable] = None,
+                              context: Optional[Context] = None,
+                              can_defer: bool = True,
+                              escape_comprehensions: bool = False) -> None:
+        """ Patched copy of SemanticAnalyzer.add_symbol_table_node(). """
+        names = symbol_table or self.semanal_api.current_symbol_table(escape_comprehensions=escape_comprehensions)
+        existing = names.get(name)
+        if isinstance(symbol.node, PlaceholderNode) and can_defer:
+            self.semanal_api.defer(context)
+            return None
+        if (existing is not None
+                and context is not None
+                and not is_valid_replacement(existing, symbol)):
+            # There is an existing node, so this may be a redefinition.
+            # If the new node points to the same node as the old one,
+            # or if both old and new nodes are placeholders, we don't
+            # need to do anything.
+            old = existing.node
+            new = symbol.node
+            if isinstance(new, PlaceholderNode):
+                # We don't know whether this is okay. Let's wait until the next iteration.
+                return False
+            if not is_same_symbol(old, new):
+                if isinstance(new, (FuncDef, Decorator, OverloadedFuncDef, TypeInfo)):
+                    self.semanal_api.add_redefinition(names, name, symbol)
+                if not (isinstance(new, (FuncDef, Decorator))
+                        and self.semanal_api.set_original_def(old, new)):
+                    self.semanal_api.name_already_defined(name, context, existing)
+        elif name not in self.semanal_api.missing_names and '*' not in self.semanal_api.missing_names:
+            names[name] = symbol
+            self.progress = True
+            return None
+        raise new_helpers.SymbolAdditionNotPossible()
 
     # def add_symbol_table_node_or_defer(self, name: str, sym: SymbolTableNode) -> bool:
     #     return self.semanal_api.add_symbol_table_node(name, sym,
@@ -119,20 +180,6 @@ class SemanalPluginCallback(DjangoPluginCallback):
             self.semanal_api.add_imported_symbol(name, sym, context=self.semanal_api.cur_mod_node)
 
         class UnimportedTypesVisitor(TypeTraverserVisitor):
-            def visit_union_type(self, t: UnionType) -> None:
-                super().visit_union_type(t)
-                union_sym = currently_imported_symbols.get('Union')
-                if union_sym is None:
-                    # TODO: check if it's exactly typing.Union
-                    import_symbol_from_source('Union')
-
-            def visit_type_type(self, t: TypeType) -> None:
-                super().visit_type_type(t)
-                type_sym = currently_imported_symbols.get('Union')
-                if type_sym is None:
-                    # TODO: check if it's exactly typing.Type
-                    import_symbol_from_source('Type')
-
             def visit_instance(self, t: Instance) -> None:
                 super().visit_instance(t)
                 if isinstance(t.type, FakeInfo):
@@ -140,7 +187,6 @@ class SemanalPluginCallback(DjangoPluginCallback):
                 type_name = t.type.name
                 sym = currently_imported_symbols.get(type_name)
                 if sym is None:
-                    # TODO: check if it's exactly typing.Type
                     import_symbol_from_source(type_name)
 
         signature_node.type.accept(UnimportedTypesVisitor())
@@ -202,16 +248,76 @@ class DynamicClassPluginCallback(SemanalPluginCallback):
 class ClassDefPluginCallback(SemanalPluginCallback):
     reason: Expression
     class_defn: ClassDef
+    ctx: ClassDefContext
 
     def __call__(self, ctx: ClassDefContext) -> None:
         self.reason = ctx.reason
         self.class_defn = ctx.cls
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
+        self.ctx = ctx
         self.modify_class_defn()
 
     @abstractmethod
     def modify_class_defn(self) -> None:
         raise NotImplementedError
+
+
+class TypeCheckerPluginCallback(DjangoPluginCallback):
+    type_checker: TypeChecker
+
+    def get_current_module(self) -> MypyFile:
+        current_module = None
+        for item in reversed(self.type_checker.scope.stack):
+            if isinstance(item, MypyFile):
+                current_module = item
+                break
+        assert current_module is not None
+        return current_module
+
+    def qualified_name(self, name: str) -> str:
+        return self.type_checker.scope.stack[-1].fullname + '.' + name
+
+    def lookup_typeinfo(self, fullname: str) -> Optional[TypeInfo]:
+        sym = self.plugin.lookup_fully_qualified(fullname)
+        if sym is None or sym.node is None:
+            return None
+        if not isinstance(sym.node, TypeInfo):
+            raise ValueError(f'{fullname!r} does not correspond to TypeInfo')
+        return sym.node
+
+
+class GetMethodPluginCallback(TypeCheckerPluginCallback):
+    callee_type: Instance
+    ctx: MethodContext
+
+    def __call__(self, ctx: MethodContext) -> MypyType:
+        self.type_checker = ctx.api
+
+        assert isinstance(ctx.type, CallableType)
+        self.callee_type = ctx.type.ret_type
+        self.ctx = ctx
+        return self.get_method_return_type()
+
+    @abstractmethod
+    def get_method_return_type(self) -> MypyType:
+        raise NotImplementedError
+
+
+class GetAttributeCallback(TypeCheckerPluginCallback):
+    obj_type: ProperType
+    default_attr_type: MypyType
+    error_context: MemberExpr
+    name: str
+
+    def __call__(self, ctx: AttributeContext) -> MypyType:
+        self.ctx = ctx
+        self.type_checker = ctx.api
+        self.obj_type = ctx.type
+        self.default_attr_type = ctx.default_attr_type
+        self.error_context = ctx.context
+        assert isinstance(self.error_context, MemberExpr)
+        self.name = self.error_context.name
+        return self.default_attr_type
 
 
 def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:

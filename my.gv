@@ -1,0 +1,9 @@
+digraph AST {
+	File
+	ClassDef
+	ClassDef -> File
+	FuncDef
+	FuncDef -> ClassDef
+	ExpressionStmt
+	ExpressionStmt -> File
+}
