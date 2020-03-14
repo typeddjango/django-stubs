@@ -28,7 +28,7 @@ dependencies = [
 
 setup(
     name="django-stubs",
-    version="1.4.0",
+    version="1.5.0",
     description='Mypy stubs for Django',
     long_description=readme,
     long_description_content_type='text/markdown',
