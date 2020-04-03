@@ -68,6 +68,9 @@ from .deletion import (
     DO_NOTHING as DO_NOTHING,
     PROTECT as PROTECT,
     SET as SET,
+    RESTRICT as RESTRICT,
+    ProtectedError as ProtectedError,
+    RestrictedError as RestrictedError,
 )
 
 from .query import (
