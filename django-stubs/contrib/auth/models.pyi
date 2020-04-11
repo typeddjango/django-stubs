@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Collection, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.contrib.auth.backends import ModelBackend
@@ -8,6 +9,11 @@ from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 
 from django.db import models
+
+if sys.version_info[1] < 8:
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 _AnyUser = Union[Model, "AnonymousUser"]
 
@@ -84,6 +90,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):  # type: ignore
 class User(AbstractUser): ...
 
 class AnonymousUser:
+    tag: Literal["anonymous_user"]
     id: Any = ...
     pk: Any = ...
     username: str = ...
