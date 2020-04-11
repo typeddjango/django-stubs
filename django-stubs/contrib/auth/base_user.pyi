@@ -1,8 +1,14 @@
+import sys
 from typing import Any, Optional, Tuple, List, overload, TypeVar
 
 from django.db.models.base import Model
 
 from django.db import models
+
+if sys.version_info[1] < 8:
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 _T = TypeVar("_T", bound=Model)
 
@@ -15,6 +21,7 @@ class BaseUserManager(models.Manager[_T]):
 class AbstractBaseUser(models.Model):
     REQUIRED_FIELDS: List[str] = ...
 
+    tag: Literal["abstract_base_user"]
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     def get_username(self) -> str: ...
