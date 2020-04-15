@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, Iterable
 
-from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.forms.boundfield import BoundField
+from django.forms.forms import BaseForm
 from django.forms.utils import ErrorDict
 from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeText
@@ -23,7 +23,7 @@ class AdminForm:
     readonly_fields: Any = ...
     def __init__(
         self,
-        form: AdminPasswordChangeForm,
+        form: BaseForm,
         fieldsets: List[Tuple[None, Dict[str, List[str]]]],
         prepopulated_fields: Dict[Any, Any],
         readonly_fields: Optional[Iterable[Any]] = ...,
