@@ -35,9 +35,7 @@ class Group(models.Model):
     permissions = models.ManyToManyField(Permission)
     def natural_key(self): ...
 
-_T = TypeVar("_T", bound=Model)
-
-class UserManager(BaseUserManager[_T]):
+class UserManager(BaseUserManager):
     def create_user(
         self, username: str, email: Optional[str] = ..., password: Optional[str] = ..., **extra_fields: Any
     ) -> _T: ...
