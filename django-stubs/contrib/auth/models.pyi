@@ -2,11 +2,11 @@ from typing import Any, Collection, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser, BaseUserManager as BaseUserManager
+from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
-
 from django.db import models
 
 _AnyUser = Union[Model, "AnonymousUser"]
@@ -38,10 +38,10 @@ class Group(models.Model):
 class UserManager(BaseUserManager):
     def create_user(
         self, username: str, email: Optional[str] = ..., password: Optional[str] = ..., **extra_fields: Any
-    ) -> _T: ...
+    ) -> User: ...
     def create_superuser(
         self, username: str, email: Optional[str], password: Optional[str], **extra_fields: Any
-    ) -> _T: ...
+    ) -> User: ...
     def with_perm(
         self,
         perm: Union[str, Permission],
