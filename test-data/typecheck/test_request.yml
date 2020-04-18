@@ -15,3 +15,7 @@
                 from django.db import models
                 class MyUser(models.Model):
                     pass
+-  case: request_object_user_type
+   main: |
+       from django.http.request import HttpRequest
+       reveal_type(HttpRequest().user)  # N: Revealed type is 'Union[django.contrib.auth.base_user.AbstractBaseUser, django.contrib.auth.models.AnonymousUser]'
