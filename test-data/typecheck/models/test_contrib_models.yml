@@ -10,6 +10,10 @@
         reveal_type(User().is_active)  # N: Revealed type is 'builtins.bool*'
         reveal_type(User().date_joined)  # N: Revealed type is 'datetime.datetime*'
         reveal_type(User().last_login)  # N: Revealed type is 'Union[datetime.datetime, None]'
+        reveal_type(User().tag)  # N: Revealed type is 'Literal['abstract_base_user']'
+
+        from django.contrib.auth.models import AnonymousUser
+        reveal_type(AnonymousUser().tag)  # N: Revealed type is 'Literal['anonymous_user']'
 
         from django.contrib.auth.models import Permission
         reveal_type(Permission().name)  # N: Revealed type is 'builtins.str*'
