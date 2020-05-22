@@ -9,10 +9,11 @@ from django.http.response import (
 
 from django.db.models import Manager, QuerySet
 from django.http import HttpRequest
+from django.template.context import Context
 
 def render_to_response(
     template_name: Union[str, Sequence[str]],
-    context: Optional[Dict[str, Any]] = ...,
+    context: Optional[Union[Context, Dict[str, Any]]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,
@@ -20,7 +21,7 @@ def render_to_response(
 def render(
     request: HttpRequest,
     template_name: Union[str, Sequence[str]],
-    context: Optional[Dict[str, Any]] = ...,
+    context: Optional[Union[Context, Dict[str, Any]]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,
