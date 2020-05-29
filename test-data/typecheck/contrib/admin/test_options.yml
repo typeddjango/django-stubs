@@ -70,7 +70,12 @@
           actions_on_bottom = False
           actions_selection_counter = True
           admin_site = AdminSite()
--   case: test_complex_fieldset_configs
+# This test is here to make sure we're not running into a mypy issue which is
+# worked around using a somewhat complicated _ListOrTuple union type. Once the
+# issue is solved upstream this test should pass even with the workaround
+# replaced by a simpler Sequence type.
+# https://github.com/python/mypy/issues/8921
+-   case: test_fieldset_workaround_regression
     main: |
       from django.contrib import admin
 
