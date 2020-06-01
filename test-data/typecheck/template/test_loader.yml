@@ -1,0 +1,15 @@
+-   case: loader_render_to_string_accepts_context
+    main: |
+        from django.http.request import HttpRequest
+        from django.shortcuts import render, render_to_response
+        from django.template.loader import render_to_string
+        from django.template import Context, RequestContext
+
+        request = HttpRequest()
+        request_context = RequestContext(request, {'foo': 'bar'})
+
+        render_to_string('foobar', {'foo': 'bar'})
+        render_to_string('foobar', Context({'foo': 'bar'}))
+        render_to_string('foobar', request_context)
+        render(request, '403.html', request_context, status=403)
+        render_to_response('403.html', request_context)
