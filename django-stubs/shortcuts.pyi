@@ -20,7 +20,7 @@ def render_to_response(
 def render(
     request: HttpRequest,
     template_name: Union[str, Sequence[str]],
-    context: Optional[ Mapping[str, Any]] = ...,
+    context: Optional[Mapping[str, Any]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,
