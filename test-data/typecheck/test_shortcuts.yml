@@ -36,3 +36,16 @@
                 from django.db import models
                 class MyUser(models.Model):
                     pass
+
+-   case: check_render_function_arguments_annotations
+    main: |
+        from typing import Any
+        from typing_extensions import TypedDict
+        from django.shortcuts import render
+        from django.http.request import HttpRequest
+
+        TestContext = TypedDict("TestContext", {"user": Any})
+        test_context: TestContext = {"user": "test"}
+        reveal_type(test_context) # N: Revealed type is 'TypedDict('main.TestContext', {'user': Any})'
+        reveal_type(render(HttpRequest(), '', test_context)) # N: Revealed type is 'django.http.response.HttpResponse'
+

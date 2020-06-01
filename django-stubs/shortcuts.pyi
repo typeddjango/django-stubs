@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Protocol, Sequence, Type, TypeVar, Union
+from typing import Any, Callable, List, Mapping, Optional, Protocol, Sequence, Type, TypeVar, Union
 
 from django.db.models.base import Model
 from django.http.response import (
@@ -12,7 +12,7 @@ from django.http import HttpRequest
 
 def render_to_response(
     template_name: Union[str, Sequence[str]],
-    context: Optional[Dict[str, Any]] = ...,
+    context: Optional[Union[Context, Mapping[str, Any]]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,
@@ -20,7 +20,7 @@ def render_to_response(
 def render(
     request: HttpRequest,
     template_name: Union[str, Sequence[str]],
-    context: Optional[Dict[str, Any]] = ...,
+    context: Optional[Union[Context, Mapping[str, Any]]] = ...,
     content_type: Optional[str] = ...,
     status: Optional[int] = ...,
     using: Optional[str] = ...,
