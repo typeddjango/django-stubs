@@ -15,7 +15,15 @@
                 from django.db import models
                 class MyUser(models.Model):
                     pass
--   case: request_object_user_type
+-   case: request_object_user_can_be_descriminated
     main: |
         from django.http.request import HttpRequest
-        reveal_type(HttpRequest.user.tag)  # N: Revealed type is 'Union[Literal['abstract_base_user'], Literal['anonymous_user']]'
+        request = HttpRequest()
+        if request.user.is_anonymous:
+            reveal_type(request.user) # N: Revealed type is 'AnonymousUser'
+        else:
+            reveal_type(request.user) # N: Revealed type is 'AbstractBaseUser'
+        if request.user.is_authenticated:
+            reveal_type(request.user) # N: Revealed type is 'AbstractBaseUser'
+        else:
+            reveal_type(request.user) # N: Revealed type is 'AnonymousUser'
