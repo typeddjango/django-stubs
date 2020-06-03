@@ -8,13 +8,13 @@ class InvalidPage(Exception): ...
 class PageNotAnInteger(InvalidPage): ...
 class EmptyPage(InvalidPage): ...
 
-class SupportsLen(Protocol):
+class _SupportsLen(Protocol):
     def __len__(self) -> int: ...
 
-class SupportsCount(Protocol):
+class _SupportsCount(Protocol):
     def count(self) -> int: ...
 
-class SupportsOrdered(Protocol):
+class _SupportsOrdered(Protocol):
     ordered: bool = ...
 
 class Paginator:
@@ -24,7 +24,7 @@ class Paginator:
     allow_empty_first_page: bool = ...
     def __init__(
         self,
-        object_list: Union[SupportsLen, SupportsCount, SupportsOrdered],
+        object_list: Union[_SupportsLen, _SupportsCount, _SupportsOrdered],
         per_page: Union[int, str],
         orphans: int = ...,
         allow_empty_first_page: bool = ...,

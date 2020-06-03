@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Collection, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.contrib.auth.backends import ModelBackend
@@ -8,6 +9,11 @@ from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 
 from django.db import models
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 _AnyUser = Union[Model, "AnonymousUser"]
 
@@ -105,7 +111,7 @@ class AnonymousUser:
     def has_perms(self, perm_list: Collection[str], obj: Optional[_AnyUser] = ...) -> bool: ...
     def has_module_perms(self, module: str) -> bool: ...
     @property
-    def is_anonymous(self) -> bool: ...
+    def is_anonymous(self) -> Literal[True]: ...
     @property
-    def is_authenticated(self) -> bool: ...
+    def is_authenticated(self) -> Literal[False]: ...
     def get_username(self) -> str: ...
