@@ -23,7 +23,6 @@ def render_to_response(
     status: Optional[int] = ...,
     using: Optional[str] = ...,
 ) -> HttpResponse: ...
-
 def render(
     request: HttpRequest,
     template_name: Union[str, Sequence[str]],
@@ -39,12 +38,10 @@ class SupportsGetAbsoluteUrl(Protocol): ...
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True], **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
-
 @overload
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[False], **kwargs: Any
 ) -> HttpResponseRedirect: ...
-
 @overload
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool = ..., **kwargs: Any
