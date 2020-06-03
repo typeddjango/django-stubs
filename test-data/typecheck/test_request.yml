@@ -16,15 +16,16 @@
                 class MyUser(models.Model):
                     pass
 -   case: request_object_user_can_be_descriminated
+    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
         if request.user.is_anonymous:
             reveal_type(request.user) # N: Revealed type is 'AnonymousUser'
         else:
-            reveal_type(request.user) # N: Revealed type is 'AbstractBaseUser'
+            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
         if request.user.is_authenticated:
-            reveal_type(request.user) # N: Revealed type is 'AbstractBaseUser'
+            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
         else:
             reveal_type(request.user) # N: Revealed type is 'AnonymousUser'
     custom_settings: |
