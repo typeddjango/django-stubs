@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Callable, Dict, List, Mapping, Optional, overload, Protocol, Sequence, Type, TypeVar, Union
+from typing import Any, Callable, List, Mapping, Optional, overload, Protocol, Sequence, Type, TypeVar, Union
 
 from django.db.models.base import Model
 from django.http.response import (
@@ -16,7 +16,6 @@ if sys.version_info < (3, 8):
 else:
     from typing import Literal
 
-
 def render_to_response(
     template_name: Union[str, Sequence[str]],
     context: Optional[Mapping[str, Any]] = ...,
@@ -24,6 +23,7 @@ def render_to_response(
     status: Optional[int] = ...,
     using: Optional[str] = ...,
 ) -> HttpResponse: ...
+
 def render(
     request: HttpRequest,
     template_name: Union[str, Sequence[str]],
