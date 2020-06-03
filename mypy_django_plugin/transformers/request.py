@@ -19,5 +19,8 @@ def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_c
     from django.contrib.auth.models import AnonymousUser
 
     anonymous_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AnonymousUser)
+    if anonymous_user_info is None:
+        # This shouldn't be able to happen, as we managed to import the model above...
+        return Instance(user_info, []) 
 
     return UnionType([Instance(user_info, []), Instance(anonymous_user_info, [])])
