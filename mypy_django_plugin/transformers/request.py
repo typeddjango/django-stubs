@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
 from mypy.plugin import AttributeContext
-from mypy.types import Instance, UnionType
+from mypy.types import Instance
 from mypy.types import Type as MypyType
+from mypy.types import UnionType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
