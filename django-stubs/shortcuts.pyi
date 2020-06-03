@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import sys
-from typing import Any, Callable, Dict, List, Optional, overload, Protocol, Sequence, Type, TypeVar, Union
-=======
-from typing import Any, Callable, List, Mapping, Optional, Protocol, Sequence, Type, TypeVar, Union
->>>>>>> 8d26001... Issue 355 (#376)
+from typing import Any, Callable, Dict, List, Mapping, Optional, overload, Protocol, Sequence, Type, TypeVar, Union
 
 from django.db.models.base import Model
 from django.http.response import (

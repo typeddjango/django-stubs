@@ -57,4 +57,3 @@
 
         var = True
         reveal_type(redirect(to = '', permanent = var)) # N: Revealed type is 'Union[django.http.response.HttpResponseRedirect, django.http.response.HttpResponsePermanentRedirect]'
-
