@@ -1,4 +1,5 @@
-from typing import Any, Callable, List, Mapping, Optional, Protocol, Sequence, Type, TypeVar, Union
+import sys
+from typing import Any, Callable, List, Mapping, Optional, overload, Protocol, Sequence, Type, TypeVar, Union
 
 from django.db.models.base import Model
 from django.http.response import (
@@ -9,6 +10,11 @@ from django.http.response import (
 
 from django.db.models import Manager, QuerySet
 from django.http import HttpRequest
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 def render_to_response(
     template_name: Union[str, Sequence[str]],
@@ -28,6 +34,15 @@ def render(
 
 class SupportsGetAbsoluteUrl(Protocol): ...
 
+@overload
+def redirect(
+    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True], **kwargs: Any
+) -> HttpResponsePermanentRedirect: ...
+@overload
+def redirect(
+    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[False], **kwargs: Any
+) -> HttpResponseRedirect: ...
+@overload
 def redirect(
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool = ..., **kwargs: Any
 ) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]: ...
