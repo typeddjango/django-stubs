@@ -27,3 +27,5 @@
             reveal_type(request.user) # N: Revealed type is 'AbstractBaseUser'
         else:
             reveal_type(request.user) # N: Revealed type is 'AnonymousUser'
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
