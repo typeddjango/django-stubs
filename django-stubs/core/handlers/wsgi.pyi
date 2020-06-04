@@ -1,12 +1,10 @@
 from io import BytesIO
 from typing import Any, Callable, Dict, Optional, Union
 
-from django.contrib.auth.models import AbstractUser
 from django.contrib.sessions.backends.base import SessionBase
-from django.http.response import HttpResponse
-
 from django.core.handlers import base
 from django.http import HttpRequest
+from django.http.response import HttpResponse
 
 _Stream = Union[BytesIO, str]
 _WSGIEnviron = Dict[str, Any]
@@ -22,7 +20,6 @@ class LimitedStream:
 
 class WSGIRequest(HttpRequest):
     environ: _WSGIEnviron = ...
-    user: AbstractUser
     session: SessionBase
     encoding: Any = ...
     def __init__(self, environ: _WSGIEnviron) -> None: ...
