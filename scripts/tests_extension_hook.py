@@ -1,5 +1,5 @@
-from pytest_mypy.collect import File
-from pytest_mypy.item import YamlTestItem
+from pytest_mypy_plugins.collect import File
+from pytest_mypy_plugins.item import YamlTestItem
 
 
 def django_plugin_hook(test_item: YamlTestItem) -> None:
