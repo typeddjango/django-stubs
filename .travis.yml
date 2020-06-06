@@ -4,9 +4,18 @@ dist: xenial
 sudo: required
 jobs:
   include:
+    - name: Run plugin test suite with python 3.8
+      python: 3.8
+      script: 'pytest'
+
     - name: Run plugin test suite with python 3.7
       python: 3.7
       script: 'pytest'
+
+    - name: Typecheck Django 3.0 test suite with python 3.8
+      python: 3.8
+      script: |
+        python ./scripts/typecheck_tests.py --django_version=3.0
 
     - name: Typecheck Django 3.0 test suite with python 3.7
       python: 3.7
