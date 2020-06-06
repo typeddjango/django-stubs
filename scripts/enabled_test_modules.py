@@ -185,6 +185,8 @@ IGNORED_ERRORS = {
     ],
     'files': [
         'Incompatible types in assignment (expression has type "IOBase", variable has type "File")',
+        'Argument 1 to "TextIOWrapper" has incompatible type "File"; expected "BinaryIO"',
+        'Incompatible types in assignment (expression has type "BinaryIO", variable has type "File")',
     ],
     'filtered_relation': [
         'has no attribute "name"',
@@ -378,6 +380,7 @@ IGNORED_ERRORS = {
     'responses': [
         'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "IO[bytes]"',
         '"FileLike" has no attribute "closed"',
+        'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "BinaryIO"',
     ],
     'reverse_lookup': [
         "Cannot resolve keyword 'choice' into field"
