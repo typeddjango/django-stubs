@@ -1,4 +1,4 @@
-from typing import Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
+from typing import Any, ClassVar, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
@@ -29,7 +29,7 @@ class Model(metaclass=ModelBase):
     @classproperty
     @classmethod
     def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...
-    objects: BaseManager[Any]
+    objects: ClassVar[BaseManager[Any]]
     pk: Any = ...
     _state: ModelState
     def __init__(self: _Self, *args: Any, **kwargs: Any) -> None: ...
