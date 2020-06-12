@@ -46,6 +46,18 @@
                 reveal_type(self.get_form(form_class))  # N: Revealed type is 'main.MyForm'
                 reveal_type(self.get_form(MyForm2))  # N: Revealed type is 'main.MyForm2'
 
+-   case: updateview_form_valid_has_form_save
+    main: |
+        from django import forms
+        from django.views.generic.edit import UpdateView
+
+        class MyForm(forms.ModelForm):
+            pass
+        class MyView(UpdateView):
+            form_class = MyForm
+            def form_valid(self, form: forms.BaseModelForm):
+                reveal_type(form.save)  # N: Revealed type is 'def (commit: builtins.bool =) -> Any'
+
 -   case: successmessagemixin_compatible_with_formmixin
     main: |
         from django.views.generic.edit import FormMixin
