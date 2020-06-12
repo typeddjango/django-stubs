@@ -41,6 +41,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames
+from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
@@ -189,6 +190,10 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
         return metaclass_sym.node
     return None
+
+
+def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
+    return model_cls_fullname.endswith(ANNOTATED_SUFFIX)
 
 
 def add_new_class_for_module(

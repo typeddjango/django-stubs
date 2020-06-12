@@ -20,6 +20,8 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
+from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
 
 try:
     from django.contrib.postgres.fields import ArrayField
@@ -106,7 +108,10 @@ class DjangoContext:
 
     def get_model_class_by_fullname(self, fullname: str) -> Optional[Type[Model]]:
         # Returns None if Model is abstract
-        module, _, model_cls_name = fullname.rpartition(".")
+        # Strip suffix which is present if the model came from QuerySet.annotate
+        if is_annotated_model_fullname(fullname):
+            fullname, _, _ = fullname.rpartition(ANNOTATED_SUFFIX)
+        module, _, model_cls_name = fullname.rpartition('.')
         for model_cls in self.model_modules.get(module, set()):
             if model_cls.__name__ == model_cls_name:
                 return model_cls

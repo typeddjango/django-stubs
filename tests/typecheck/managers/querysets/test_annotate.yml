@@ -1,0 +1,91 @@
+-   case: annotate_basic
+    main: |
+        from myapp.models import User, Animal
+        from django.db.models.expressions import Value
+        qs = User.objects.annotate(foo=Value('XYZ'))
+        reveal_type(qs) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User (annotated)]'
+        annotated = qs.get()
+        reveal_type(annotated) # N: Revealed type is 'myapp.models.User (annotated)*'
+        reveal_type(annotated.foo) # N: Revealed type is 'Any'
+        reveal_type(annotated.username) # N: Revealed type is 'builtins.str*'
+
+        def not_allowed(param: Animal):
+            pass
+
+        # Make sure that even though attr access falls back to Any, the type is still checked
+        not_allowed(annotated) # E: Argument 1 to "not_allowed" has incompatible type "User (annotated)"; expected "Animal"
+
+        def allowed(param: User):
+            # This is still using the original User type, so any attr access is not allowed
+            param.foo  # E: "User" has no attribute "foo"
+
+        # Make sure it's still a valid instance of the original type
+        allowed(annotated)
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+                class Animal(models.Model):
+                    barks = models.BooleanField()
+-   case: annotate_twice_works
+    main: |
+        from myapp.models import User, Animal
+        from django.db.models.expressions import Value
+        qs = User.objects.annotate(foo=Value('XYZ'))
+        qs = qs.annotate(bar=Value("ZYX"))
+        annotated = qs.get()
+        reveal_type(annotated.foo) # N: Revealed type is 'Any'
+        reveal_type(annotated.username) # N: Revealed type is 'builtins.str*'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+                class Animal(models.Model):
+                    barks = models.BooleanField()
+
+-   case: annotate_allows_non_existant_field
+    main: |
+        from myapp.models import User
+        # TODO: Would be nice to store annotated names and use it to check for valid lookups in filter.
+        User.objects.annotate(abc=123).filter(unknown_field=True).values_list()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+
+-   case: annotate_values_values_list
+    main: |
+        from myapp.models import Blog
+        from django.db.models.expressions import Value
+        # TODO: Would be nice to extract the kwargs from annotate and add it to the TypedDict.
+        values = Blog.objects.annotate(foo=Value('XYZ')).values('foo', 'num_posts', 'text').get()
+        reveal_type(values)  # N: Revealed type is 'builtins.dict*[builtins.str, Any]'
+
+        values_list = Blog.objects.annotate(foo=Value('XYZ')).values_list('foo', 'num_posts', 'text').get()
+        reveal_type(values_list)  # N: Revealed type is 'Any'
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    num_posts = models.IntegerField()
+                    text = models.CharField(max_length=100)

@@ -13,6 +13,10 @@ from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
+from mypy_django_plugin.lib.helpers import (
+    add_new_class_for_module, is_annotated_model_fullname,
+)
 
 
 def _extract_model_type_from_queryset(queryset_type: Instance) -> Optional[Instance]:
@@ -141,12 +145,31 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
         return helpers.reparametrize_instance(ctx.default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
+    if is_annotated_model_fullname(model_type.type.fullname):
+        return ctx.default_return_type
+
     # account for possible None
     flat = flat or False
     named = named or False
 
     row_type = get_values_list_row_type(ctx, django_context, model_cls, flat=flat, named=named)
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
+
+
+def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    # called on the Instance, returns QuerySet of something
+    assert isinstance(ctx.type, Instance)
+    assert isinstance(ctx.default_return_type, Instance)
+
+    model_type = _extract_model_type_from_queryset(ctx.type)
+    if model_type is None:
+        return AnyType(TypeOfAny.from_omitted_generics)
+
+    model_module_name = ctx.api.modules[model_type.type.module_name]  # type: ignore
+    any_attr_allowed_type = ctx.api.named_generic_type('django._AnyAttrAllowed', [])
+    row_type = add_new_class_for_module(model_module_name, model_type.type.name + ANNOTATED_SUFFIX,
+                                        bases=[model_type, any_attr_allowed_type],)
+    return helpers.reparametrize_instance(ctx.default_return_type, [Instance(row_type, [])])
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[List[str]]:
@@ -170,6 +193,9 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
+        return ctx.default_return_type
+
+    if is_annotated_model_fullname(model_type.type.fullname):
         return ctx.default_return_type
 
     field_lookups = resolve_field_lookups(ctx.args[0], django_context)
