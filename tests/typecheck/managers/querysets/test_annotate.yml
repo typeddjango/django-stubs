@@ -2,6 +2,8 @@
     main: |
         from myapp.models import User, Animal
         from django.db.models.expressions import Value
+        list(User.objects.annotate(foo=Value('XYZ')).select_related('foobar'))
+
         qs = User.objects.annotate(foo=Value('XYZ'))
         reveal_type(qs) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User (annotated)]'
         annotated = qs.get()
