@@ -1,10 +1,11 @@
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Type
+from typing import List, Optional, Sequence, Type, cast
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from mypy.checker import TypeChecker
 from mypy.nodes import Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance
@@ -169,7 +170,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     type_name = model_type.type.name + ANNOTATED_SUFFIX
 
     # If already existing annotated type for model exists, reuse it
-    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(ctx.api, model_module_name + "." + type_name)
+    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(cast(TypeChecker, ctx.api), model_module_name + "." + type_name)
     if annotated_typeinfo is None:
         model_module_file = ctx.api.modules[model_module_name]  # type: ignore
         any_attr_allowed_type = ctx.api.named_generic_type('django._AnyAttrAllowed', [])
