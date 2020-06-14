@@ -44,12 +44,14 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
 
 
 def get_field_type_from_lookup(
-    ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model], *, method: str, lookup: str
+    ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model], *, method: str, lookup: str,
+    silent_on_error: bool = False
 ) -> Optional[MypyType]:
     try:
         lookup_field = django_context.resolve_lookup_into_field(model_cls, lookup)
     except FieldError as exc:
-        ctx.api.fail(exc.args[0], ctx.context)
+        if not silent_on_error:
+            ctx.api.fail(exc.args[0], ctx.context)
         return None
     except LookupsAreUnsupported:
         return AnyType(TypeOfAny.explicit)
@@ -67,7 +69,7 @@ def get_field_type_from_lookup(
 
 
 def get_values_list_row_type(
-    ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model], flat: bool, named: bool
+    ctx: MethodContext, django_context: DjangoContext, model_cls: Type[Model], is_annotated: bool, flat: bool, named: bool
 ) -> MypyType:
     field_lookups = resolve_field_lookups(ctx.args[0], django_context)
     if field_lookups is None:
@@ -84,6 +86,8 @@ def get_values_list_row_type(
             return lookup_type
         elif named:
             column_types: "OrderedDict[str, MypyType]" = OrderedDict()
+            if is_annotated:
+                return helpers.make_oneoff_named_tuple(typechecker_api, 'Row', column_types)
             for field in django_context.get_model_fields(model_cls):
                 column_type = django_context.get_field_get_type(typechecker_api, field, method="values_list")
                 column_types[field.attname] = column_type
@@ -91,8 +95,9 @@ def get_values_list_row_type(
         else:
             # flat=False, named=False, all fields
             field_lookups = []
-            for field in django_context.get_model_fields(model_cls):
-                field_lookups.append(field.attname)
+            if not is_annotated:
+                for field in django_context.get_model_fields(model_cls):
+                    field_lookups.append(field.attname)
 
     if len(field_lookups) > 1 and flat:
         typechecker_api.fail("'flat' is not valid when 'values_list' is called with more than one field", ctx.context)
@@ -101,10 +106,14 @@ def get_values_list_row_type(
     column_types = OrderedDict()
     for field_lookup in field_lookups:
         lookup_field_type = get_field_type_from_lookup(
-            ctx, django_context, model_cls, lookup=field_lookup, method="values_list"
+            ctx, django_context, model_cls, lookup=field_lookup, method="values_list",
+            silent_on_error=is_annotated
         )
         if lookup_field_type is None:
-            return AnyType(TypeOfAny.from_error)
+            if is_annotated:
+                lookup_field_type = AnyType(TypeOfAny.from_omitted_generics)
+            else:
+                return AnyType(TypeOfAny.from_error)
         column_types[field_lookup] = lookup_field_type
 
     if flat:
@@ -147,14 +156,13 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
         return helpers.reparametrize_instance(ctx.default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
-    if is_annotated_model_fullname(model_type.type.fullname):
-        return ctx.default_return_type
-
     # account for possible None
     flat = flat or False
     named = named or False
 
-    row_type = get_values_list_row_type(ctx, django_context, model_cls, flat=flat, named=named)
+    is_annotated = is_annotated_model_fullname(model_type.type.fullname)
+    row_type = get_values_list_row_type(ctx, django_context, model_cls, is_annotated=is_annotated,
+                                        flat=flat, named=named)
     return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
 
 

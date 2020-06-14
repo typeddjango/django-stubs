@@ -1,28 +1,43 @@
 -   case: annotate_basic
     main: |
-        from myapp.models import User, Animal
-        from django.db.models.expressions import Value
-        list(User.objects.annotate(foo=Value('XYZ')).select_related('foobar'))
+        from myapp.models import User
+        from django.db.models.expressions import F
 
-        qs = User.objects.annotate(foo=Value('XYZ'))
+        qs = User.objects.annotate(foo=F('id'))
         reveal_type(qs) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User (annotated)]'
+
         annotated = qs.get()
         reveal_type(annotated) # N: Revealed type is 'myapp.models.User (annotated)*'
         reveal_type(annotated.foo) # N: Revealed type is 'Any'
         reveal_type(annotated.username) # N: Revealed type is 'builtins.str*'
 
-        def not_allowed(param: Animal):
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+-   case: annotate_model_usage_across_methods
+    main: |
+        from myapp.models import User, Animal
+        from django.db.models.expressions import F
+        qs = User.objects.annotate(foo=F('id'))
+        annotated_user = qs.get()
+
+        def animals_only(param: Animal):
             pass
-
         # Make sure that even though attr access falls back to Any, the type is still checked
-        not_allowed(annotated) # E: Argument 1 to "not_allowed" has incompatible type "User (annotated)"; expected "Animal"
+        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User (annotated)"; expected "Animal"
 
-        def allowed(param: User):
-            # This is still using the original User type, so any attr access is not allowed
+        def users_allowed(param: User):
+            # But this function accepts only the original User type, so any attr access is not allowed within this function
             param.foo  # E: "User" has no attribute "foo"
-
-        # Make sure it's still a valid instance of the original type
-        allowed(annotated)
+        # Passing in the annotated User to a function taking a (unannotated) User is OK
+        users_allowed(annotated_user)
 
     installed_apps:
         - myapp
@@ -35,12 +50,16 @@
                     username = models.CharField(max_length=100)
                 class Animal(models.Model):
                     barks = models.BooleanField()
+
 -   case: annotate_twice_works
     main: |
         from myapp.models import User
-        from django.db.models.expressions import Value
-        qs = User.objects.annotate(foo=Value('XYZ'))
-        qs = qs.annotate(bar=Value("ZYX"))
+        from django.db.models.expressions import F
+
+        # This is just to prevent regressions due to a plugin implementation detail:
+        # Since the annotated class is generated, this ensures it's not generated twice under conflicting names
+        qs = User.objects.annotate(foo=F('id'))
+        qs = qs.annotate(bar=F('id'))
         annotated = qs.get()
         reveal_type(annotated.foo) # N: Revealed type is 'Any'
         reveal_type(annotated.username) # N: Revealed type is 'builtins.str*'
@@ -54,11 +73,44 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
 
--   case: annotate_allows_non_existant_field
+-   case: annotate_using_queryset_across_methods
     main: |
         from myapp.models import User
-        # TODO: Would be nice to store annotated names and use it to check for valid lookups in filter.
-        User.objects.annotate(abc=123).filter(unknown_field=True).values_list()
+        from django.db.models import QuerySet
+        from django.db.models.expressions import F
+
+        # Annotating as QuerySet[User], otherwise mypy infers Manager[User], which is overly precise
+        qs: QuerySet[User] = User.objects.filter(id=1)
+
+        # There is currently no way to say this returns an "annotated" QuerySet[User]
+        def add_annotation(qs: QuerySet[User]) -> QuerySet[User]:
+          return qs.annotate(foo=F('id'))
+
+        qs = add_annotation(qs)
+        # Hack: So that we can turn this is into an annotated QuerySet, we have to call .annotate.
+        qs = qs.annotate()
+        qs.get().foo
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+
+-   case: annotate_currently_allows_non_existant_field
+    main: |
+        from myapp.models import User
+        from django.db.models.expressions import F
+        User.objects.annotate(abc=F('id')).filter(abc=1).values_list()
+
+        # Invalid lookups are currently allowed after calling .annotate.
+        # It would be nice to in the future store the annotated names and use it when checking for valid lookups.
+        User.objects.annotate(abc=F('id')).filter(unknown_field=1).values_list()
     installed_apps:
         - myapp
     files:
@@ -69,27 +121,54 @@
                 class User(models.Model):
                     pass
 
--   case: annotate_values_values_list
+-   case: annotate_values_or_values_list_before_or_after_annotate_broadens_type
     main: |
         from myapp.models import Blog
-        from django.db.models.expressions import Value
-        # TODO: Would be nice to extract the kwargs from annotate and add it to the TypedDict.
-        values = Blog.objects.annotate(foo=Value('XYZ')).values('foo', 'num_posts', 'text').get()
+        from django.db.models.expressions import F
+
+        # .values/.values_list AFTER .annotate
+
+        # It would be nice to extract the kwargs from annotate and add it to the TypedDict.
+        values = Blog.objects.annotate(foo=F('id')).values('foo', 'text').get()
+        # For now, since we are not doing anything fancy, we have to assume we don't know any of the dict values
         reveal_type(values)  # N: Revealed type is 'builtins.dict*[builtins.str, Any]'
 
-        # .values/.values_list before .annotate
+        values_list = Blog.objects.annotate(foo=F('id')).values_list('foo', 'text').get()
+        reveal_type(values_list)  # N: Revealed type is 'Tuple[Any, builtins.str]'
+
+        values_list_named = Blog.objects.annotate(foo=F('id')).values_list('foo', 'text', named=True).get()
+        # We have to assume we don't know any of the tuple member types.
+        reveal_type(values_list_named)  # N: Revealed type is 'Tuple[Any, builtins.str, fallback=main.Row]'
+        values_list_named.unknown # E: "Row" has no attribute "unknown"
+        reveal_type(values_list_named.foo) # N: Revealed type is 'Any'
+        reveal_type(values_list_named.text) # N: Revealed type is 'builtins.str'
+
+        values_list_flat_known = Blog.objects.annotate(foo=F('id')).values_list('text', flat=True).get()
+        # Even though it's annotated, we still know the lookup's type.
+        reveal_type(values_list_flat_known)  # N: Revealed type is 'builtins.str*'
+        values_list_flat_unknown = Blog.objects.annotate(foo=F('id')).values_list('foo', flat=True).get()
+        # We don't know the type of an unknown lookup
+        reveal_type(values_list_flat_unknown)  # N: Revealed type is 'Any'
+
+        # .values/.values_list BEFORE .annotate
+
         # The following should happen to the TypeVars:
         #  1st typevar (Model): Blog => Blog (annotated)
         #  2nd typevar (Row): Should assume that we don't know what is in the row anymore (due to the annotation)
         # Since we can't trust that only 'text' is in the row type anymore.
-        qs1 = Blog.objects.values('text').annotate(foo=Value('XYZ'))
+
+        # It's possible to provide more precise types than than this, but without inspecting the
+        # arguments to .annotate, these are the best types we can infer.
+        qs1 = Blog.objects.values('text').annotate(foo=F('id'))
         reveal_type(qs1) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), builtins.dict[builtins.str, Any]]'
-        qs2 = Blog.objects.values_list('text').annotate(foo=Value('XYZ'))
+        qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
         reveal_type(qs2) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), builtins.tuple[Any]]'
-        qs3 = Blog.objects.values_list('text', named=True).annotate(foo=Value('XYZ'))
+        qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
         reveal_type(qs3) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), builtins.tuple[Any]]'
-        qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=Value('XYZ'))
+        qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=F('id'))
         reveal_type(qs4) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), Any]'
+
+        # TODO: Test .values() and .values_list() with no params, both BEFORE / AFTER annotate
     installed_apps:
         - myapp
     files:
