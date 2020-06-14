@@ -37,7 +37,7 @@
                     barks = models.BooleanField()
 -   case: annotate_twice_works
     main: |
-        from myapp.models import User, Animal
+        from myapp.models import User
         from django.db.models.expressions import Value
         qs = User.objects.annotate(foo=Value('XYZ'))
         qs = qs.annotate(bar=Value("ZYX"))
@@ -53,8 +53,6 @@
                 from django.db import models
                 class User(models.Model):
                     username = models.CharField(max_length=100)
-                class Animal(models.Model):
-                    barks = models.BooleanField()
 
 -   case: annotate_allows_non_existant_field
     main: |
@@ -79,8 +77,19 @@
         values = Blog.objects.annotate(foo=Value('XYZ')).values('foo', 'num_posts', 'text').get()
         reveal_type(values)  # N: Revealed type is 'builtins.dict*[builtins.str, Any]'
 
-        values_list = Blog.objects.annotate(foo=Value('XYZ')).values_list('foo', 'num_posts', 'text').get()
-        reveal_type(values_list)  # N: Revealed type is 'Any'
+        # .values/.values_list before .annotate
+        # The following should happen to the TypeVars:
+        #  1st typevar (Model): Blog => Blog (annotated)
+        #  2nd typevar (Row): Should assume that we don't know what is in the row anymore (due to the annotation)
+        # Since we can't trust that only 'text' is in the row type anymore.
+        qs1 = Blog.objects.values('text').annotate(foo=Value('XYZ'))
+        reveal_type(qs1) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), builtins.dict[builtins.str, Any]]'
+        qs2 = Blog.objects.values_list('text').annotate(foo=Value('XYZ'))
+        reveal_type(qs2) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), builtins.tuple[Any]]'
+        qs3 = Blog.objects.values_list('text', named=True).annotate(foo=Value('XYZ'))
+        reveal_type(qs3) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), builtins.tuple[Any]]'
+        qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=Value('XYZ'))
+        reveal_type(qs4) # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Blog (annotated), Any]'
     installed_apps:
         - myapp
     files:

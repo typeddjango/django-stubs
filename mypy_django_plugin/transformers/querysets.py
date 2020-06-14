@@ -7,14 +7,15 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.nodes import Expression, NameExpr
-from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance
+from mypy.plugin import FunctionContext, MethodContext, CheckerPluginInterface
+from mypy.types import AnyType, Instance, TypedDictType, TupleType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
+from mypy_django_plugin.lib.fullnames import VALUES_QUERYSET_CLASS_FULLNAME
 from mypy_django_plugin.lib.helpers import (
     add_new_class_for_module, is_annotated_model_fullname,
 )
@@ -170,11 +171,12 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     type_name = model_type.type.name + ANNOTATED_SUFFIX
 
     # If already existing annotated type for model exists, reuse it
-    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(cast(TypeChecker, ctx.api),
+    api: CheckerPluginInterface = ctx.api
+    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(cast(TypeChecker, api),
                                                                  model_module_name + "." + type_name)
     if annotated_typeinfo is None:
-        model_module_file = ctx.api.modules[model_module_name]  # type: ignore
-        any_attr_allowed_type = ctx.api.named_generic_type('django._AnyAttrAllowed', [])
+        model_module_file = api.modules[model_module_name]  # type: ignore
+        any_attr_allowed_type = api.named_generic_type('django._AnyAttrAllowed', [])
 
         # Create a new class in the same module as the model, with the same name as the model but with a suffix
         # The class inherits from the model and an internal class which allows get/set of any attribute.
@@ -182,7 +184,18 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         annotated_typeinfo = add_new_class_for_module(model_module_file, type_name,
                                                       bases=[model_type, any_attr_allowed_type, ], )
     annotated_type = Instance(annotated_typeinfo, [])
-    return helpers.reparametrize_instance(ctx.default_return_type, [annotated_type])
+    if ctx.type.type.has_base(VALUES_QUERYSET_CLASS_FULLNAME):
+        original_row_type: MypyType = ctx.default_return_type.args[1]
+        row_type = AnyType(TypeOfAny.from_omitted_generics)
+        if isinstance(original_row_type, TypedDictType):
+            row_type = api.named_generic_type('builtins.dict', [api.named_generic_type('builtins.str', []),
+                                                                AnyType(TypeOfAny.from_omitted_generics)])
+        elif isinstance(original_row_type, TupleType):
+            row_type = api.named_generic_type('builtins.tuple', [AnyType(TypeOfAny.from_omitted_generics)])
+        return helpers.reparametrize_instance(ctx.default_return_type,
+                                              [annotated_type, row_type])
+    else:
+        return helpers.reparametrize_instance(ctx.default_return_type, [annotated_type])
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[List[str]]:
