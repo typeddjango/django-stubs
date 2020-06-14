@@ -7,10 +7,10 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.nodes import Expression, NameExpr
-from mypy.plugin import FunctionContext, MethodContext, CheckerPluginInterface
-from mypy.types import AnyType, Instance, TypedDictType, TupleType
+from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
+from mypy.types import AnyType, Instance, TupleType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import TypedDictType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
@@ -186,7 +186,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     annotated_type = Instance(annotated_typeinfo, [])
     if ctx.type.type.has_base(VALUES_QUERYSET_CLASS_FULLNAME):
         original_row_type: MypyType = ctx.default_return_type.args[1]
-        row_type = AnyType(TypeOfAny.from_omitted_generics)
+        row_type: MypyType = AnyType(TypeOfAny.from_omitted_generics)
         if isinstance(original_row_type, TypedDictType):
             row_type = api.named_generic_type('builtins.dict', [api.named_generic_type('builtins.str', []),
                                                                 AnyType(TypeOfAny.from_omitted_generics)])
