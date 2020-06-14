@@ -170,7 +170,8 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     type_name = model_type.type.name + ANNOTATED_SUFFIX
 
     # If already existing annotated type for model exists, reuse it
-    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(cast(TypeChecker, ctx.api), model_module_name + "." + type_name)
+    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(cast(TypeChecker, ctx.api),
+                                                                 model_module_name + "." + type_name)
     if annotated_typeinfo is None:
         model_module_file = ctx.api.modules[model_module_name]  # type: ignore
         any_attr_allowed_type = ctx.api.named_generic_type('django._AnyAttrAllowed', [])
@@ -179,7 +180,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         # The class inherits from the model and an internal class which allows get/set of any attribute.
         # Essentially, this is a way of making an "intersection" type between the two types.
         annotated_typeinfo = add_new_class_for_module(model_module_file, type_name,
-                                            bases=[model_type, any_attr_allowed_type, ], )
+                                                      bases=[model_type, any_attr_allowed_type, ], )
     annotated_type = Instance(annotated_typeinfo, [])
     return helpers.reparametrize_instance(ctx.default_return_type, [annotated_type])
 
