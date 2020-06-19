@@ -15,7 +15,7 @@ import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
-    fields, forms, init_create, meta, querysets,
+    fields, init_create, meta, querysets,
 )
 from mypy_django_plugin.transformers2.forms import FormCallback, GetFormClassCallback, GetFormCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
