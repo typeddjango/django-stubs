@@ -4,12 +4,12 @@ from mypy.types import CallableType, Instance, NoneTyp
 from mypy.types import Type as MypyType
 from mypy.types import TypeType
 
-from mypy_django_plugin.lib import chk_helpers, helpers, sem_helpers
+from mypy_django_plugin.lib import chk_helpers, helpers
 
 
 class FormCallback(helpers.ClassDefPluginCallback):
     def modify_class_defn(self) -> None:
-        meta_node = sem_helpers.get_nested_meta_node_for_current_class(self.class_defn.info)
+        meta_node = helpers.get_nested_meta_node_for_current_class(self.class_defn.info)
         if meta_node is None:
             return None
         meta_node.fallback_to_any = True

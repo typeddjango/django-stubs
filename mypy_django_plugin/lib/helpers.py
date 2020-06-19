@@ -3,9 +3,6 @@ from typing import (
     TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union, cast,
 )
 
-from django.db.models.fields import Field
-from django.db.models.fields.related import RelatedField
-from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
@@ -120,22 +117,6 @@ class DynamicClassPluginCallback(SemanalPluginCallback):
         self.call_expr = ctx.call
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
         self.create_new_dynamic_class()
-
-    def get_callee(self) -> MemberExpr:
-        callee = self.call_expr.callee
-        assert isinstance(callee, MemberExpr)
-        return callee
-
-    def lookup_same_module_or_defer(self, name: str, *,
-                                    deferral_context: Optional[Context] = None) -> Optional[SymbolTableNode]:
-        sym = self.semanal_api.lookup_qualified(name, self.call_expr)
-        if sym is None or sym.node is None or isinstance(sym.node, PlaceholderNode):
-            deferral_context = deferral_context or self.call_expr
-            if not self.defer_till_next_iteration(deferral_context,
-                                                  reason=f'{self.semanal_api.cur_mod_id}.{name} does not exist'):
-                raise new_helpers.NameNotFound(name)
-            return None
-        return sym
 
     @abstractmethod
     def create_new_dynamic_class(self) -> None:
@@ -343,21 +324,6 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.explicit)
 
 
-def get_field_lookup_exact_type(api: AnyPluginAPI, field: Field) -> MypyType:
-    if isinstance(field, (RelatedField, ForeignObjectRel)):
-        lookup_type_class = field.related_model
-        rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
-        if rel_model_info is None:
-            return AnyType(TypeOfAny.from_error)
-        return make_optional(Instance(rel_model_info, []))
-
-    field_info = lookup_class_typeinfo(api, field.__class__)
-    if field_info is None:
-        return AnyType(TypeOfAny.explicit)
-    return get_private_descriptor_type(field_info, '_pyi_lookup_exact_type',
-                                       is_nullable=field.null)
-
-
 def get_current_module(api: AnyPluginAPI) -> MypyFile:
     if isinstance(api, SemanticAnalyzer):
         return api.cur_mod_node
@@ -423,3 +389,10 @@ def new_typeinfo(name: str,
 
     class_def.info = info
     return info
+
+
+def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]:
+    metaclass_sym = info.names.get('Meta')
+    if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
+        return metaclass_sym.node
+    return None
