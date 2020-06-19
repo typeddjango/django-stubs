@@ -185,11 +185,13 @@ class TypeCheckerPluginCallback(DjangoPluginCallback):
 
 class GetMethodCallback(TypeCheckerPluginCallback):
     ctx: MethodContext
+    callee_type: Instance
     default_return_type: MypyType
 
     def __call__(self, ctx: MethodContext) -> MypyType:
         self.type_checker = cast(TypeChecker, ctx.api)
         self.ctx = ctx
+        self.callee_type = cast(Instance, ctx.type)
         self.default_return_type = self.ctx.default_return_type
         return self.get_method_return_type()
 

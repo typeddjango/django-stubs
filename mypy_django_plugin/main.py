@@ -13,11 +13,12 @@ from mypy.types import Type as MypyType
 import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import init_create, meta, querysets
+from mypy_django_plugin.transformers import init_create, querysets
 from mypy_django_plugin.transformers2.fields import FieldContructorCallback
 from mypy_django_plugin.transformers2.forms import (
     FormCallback, GetFormCallback, GetFormClassCallback,
 )
+from mypy_django_plugin.transformers2.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.related_managers import (
     GetRelatedManagerCallback,
@@ -212,7 +213,7 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == 'get_field':
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
-                return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
+                return MetaGetFieldCallback(self)
 
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':

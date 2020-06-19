@@ -16,8 +16,8 @@ class FormCallback(helpers.ClassDefPluginCallback):
 
 
 class FormMethodCallback(helpers.GetMethodCallback):
-    def get_specified_form_class(self, object_type: Instance) -> Optional[TypeType]:
-        form_class_sym = object_type.type.get('form_class')
+    def get_specified_form_class(self) -> Optional[TypeType]:
+        form_class_sym = self.callee_type.type.get('form_class')
         if form_class_sym and isinstance(form_class_sym.type, CallableType):
             return TypeType(form_class_sym.type.ret_type)
         return None
@@ -25,12 +25,9 @@ class FormMethodCallback(helpers.GetMethodCallback):
 
 class GetFormCallback(FormMethodCallback):
     def get_method_return_type(self) -> MypyType:
-        object_type = self.ctx.type
-        assert isinstance(object_type, Instance)
-
         form_class_type = chk_helpers.get_call_argument_type_by_name(self.ctx, 'form_class')
         if form_class_type is None or isinstance(form_class_type, NoneTyp):
-            form_class_type = self.get_specified_form_class(object_type)
+            form_class_type = self.get_specified_form_class()
 
         if isinstance(form_class_type, TypeType) and isinstance(form_class_type.item, Instance):
             return form_class_type.item
@@ -43,10 +40,7 @@ class GetFormCallback(FormMethodCallback):
 
 class GetFormClassCallback(FormMethodCallback):
     def get_method_return_type(self) -> MypyType:
-        object_type = self.ctx.type
-        assert isinstance(object_type, Instance)
-
-        form_class_type = self.get_specified_form_class(object_type)
+        form_class_type = self.get_specified_form_class()
         if form_class_type is None:
             return self.default_return_type
 
