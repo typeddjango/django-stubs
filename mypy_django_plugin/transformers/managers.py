@@ -1,17 +1,14 @@
 from typing import Any, Dict, Iterator, Optional, Tuple
 
-from mypy.checker import gen_unique_name
 from mypy.nodes import (
     GDEF, CallExpr, Context, Decorator, FuncDef, MemberExpr, NameExpr, OverloadedFuncDef, PlaceholderNode, RefExpr,
-    StrExpr, SymbolTable, SymbolTableNode, TypeInfo,
-    MypyFile)
-from mypy.plugin import ClassDefContext, DynamicClassDefContext, MethodContext
+    StrExpr, SymbolTable, SymbolTableNode, TypeInfo)
+from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer, is_same_symbol, is_valid_replacement
-from mypy.types import AnyType, CallableType, Instance, TypeVarType, TypeVarDef
-from mypy.types import Type as MypyType
+from mypy.types import AnyType, Instance
 from mypy.types import TypeOfAny
 
-from mypy_django_plugin.lib import chk_helpers, fullnames, helpers, sem_helpers
+from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
 
 
 def iter_all_custom_queryset_methods(derived_queryset_info: TypeInfo) -> Iterator[Tuple[str, FuncDef]]:
@@ -229,4 +226,3 @@ def add_symbol_table_node(api: SemanticAnalyzer,
         api.progress = True
         return True
     return False
-
