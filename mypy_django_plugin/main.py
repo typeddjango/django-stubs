@@ -7,7 +7,7 @@ from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
-    AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext, Plugin,
+    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
 )
 from mypy.types import Type as MypyType
 
@@ -17,37 +17,9 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
     fields, forms, init_create, meta, querysets, request, settings,
 )
-from mypy_django_plugin.transformers.models import process_model_class
+from mypy_django_plugin.transformers2.forms import FormCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.related_managers import GetRelatedManagerCallback
-
-
-def transform_model_class(ctx: ClassDefContext,
-                          django_context: DjangoContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MODEL_CLASS_FULLNAME)
-
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        helpers.get_django_metadata(sym.node)['model_bases'][ctx.cls.fullname] = 1
-    else:
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-            return
-
-    process_model_class(ctx, django_context)
-
-
-def transform_form_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        helpers.get_django_metadata(sym.node)['baseform_bases'][ctx.cls.fullname] = 1
-
-    forms.make_meta_nested_class_inherit_from_any(ctx)
-
-
-def add_new_manager_base(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        helpers.get_django_metadata(sym.node)['manager_bases'][ctx.cls.fullname] = 1
 
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:
@@ -120,6 +92,16 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def _new_dependency(self, module: str) -> Tuple[int, str, int]:
         return 10, module, -1
+
+    def _add_new_manager_base(self, fullname: str) -> None:
+        sym = self.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME)
+        if sym is not None and isinstance(sym.node, TypeInfo):
+            helpers.get_django_metadata(sym.node)['manager_bases'][fullname] = 1
+
+    def _add_new_form_base(self, fullname: str) -> None:
+        sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
+        if sym is not None and isinstance(sym.node, TypeInfo):
+            helpers.get_django_metadata(sym.node)['baseform_bases'][fullname] = 1
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # load QuerySet and Manager together (for as_manager)
@@ -226,10 +208,13 @@ class NewSemanalDjangoPlugin(Plugin):
             return ModelCallback(self)
 
         if fullname in self._get_current_manager_bases():
-            return add_new_manager_base
+            self._add_new_manager_base(fullname)
+            return None
 
         if fullname in self._get_current_form_bases():
-            return transform_form_class
+            self._add_new_form_base(fullname)
+            return FormCallback(self)
+
         return None
 
     def get_attribute_hook(self, fullname: str

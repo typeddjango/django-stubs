@@ -1,20 +1,11 @@
 from typing import Optional
 
-from mypy.plugin import ClassDefContext, MethodContext
+from mypy.plugin import MethodContext
 from mypy.types import CallableType, Instance, NoneTyp
 from mypy.types import Type as MypyType
 from mypy.types import TypeType
 
-from mypy_django_plugin.lib import chk_helpers, sem_helpers
-
-
-def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:
-    meta_node = sem_helpers.get_nested_meta_node_for_current_class(ctx.cls.info)
-    if meta_node is None:
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-    else:
-        meta_node.fallback_to_any = True
+from mypy_django_plugin.lib import chk_helpers
 
 
 def get_specified_form_class(object_type: Instance) -> Optional[TypeType]:
