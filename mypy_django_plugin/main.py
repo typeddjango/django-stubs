@@ -20,6 +20,7 @@ from mypy_django_plugin.transformers import (
 from mypy_django_plugin.transformers2.forms import FormCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.related_managers import GetRelatedManagerCallback
+from mypy_django_plugin.transformers2.settings import GetUserModel
 
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:
@@ -154,7 +155,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], MypyType]]:
         if fullname == 'django.contrib.auth.get_user_model':
-            return partial(settings.get_user_model_hook, django_context=self.django_context)
+            return GetUserModel(self)
 
         info = self._get_typeinfo_or_none(fullname)
         if info:
