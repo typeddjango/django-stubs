@@ -190,15 +190,13 @@ class TypeCheckerPluginCallback(DjangoPluginCallback):
 
 
 class GetMethodCallback(TypeCheckerPluginCallback):
-    callee_type: Instance
     ctx: MethodContext
+    default_return_type: MypyType
 
     def __call__(self, ctx: MethodContext) -> MypyType:
         self.type_checker = ctx.api
-
-        assert isinstance(ctx.type, CallableType)
-        self.callee_type = ctx.type.ret_type
         self.ctx = ctx
+        self.default_return_type = self.ctx.default_return_type
         return self.get_method_return_type()
 
     @abstractmethod
@@ -233,7 +231,11 @@ class GetAttributeCallback(TypeCheckerPluginCallback):
         self.error_context = ctx.context
         assert isinstance(self.error_context, MemberExpr)
         self.name = self.error_context.name
-        return self.default_attr_type
+        return self.get_attribute_type()
+
+    @abstractmethod
+    def get_attribute_type(self) -> MypyType:
+        raise NotImplementedError()
 
 
 def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:

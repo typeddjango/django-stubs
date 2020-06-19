@@ -7,10 +7,9 @@ from mypy.types import Instance
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.helpers import GetAttributeCallback
 
 
-class GetRelatedManagerCallback(GetAttributeCallback):
+class GetRelatedManagerCallback(helpers.GetAttributeCallback):
     obj_type: Instance
 
     def get_related_manager_type(self, relation: ForeignObjectRel) -> MypyType:
@@ -55,8 +54,7 @@ class GetRelatedManagerCallback(GetAttributeCallback):
             new_manager_info = self.new_typeinfo(name, bases)
             return Instance(new_manager_info, [])
 
-    def __call__(self, ctx: AttributeContext) -> MypyType:
-        super().__call__(ctx)
+    def get_attribute_type(self) -> MypyType:
         if not isinstance(self.obj_type, Instance):
             # it's probably a UnionType, do nothing for now
             return self.default_attr_type
@@ -71,3 +69,4 @@ class GetRelatedManagerCallback(GetAttributeCallback):
                 return self.get_related_manager_type(relation)
 
         return self.default_attr_type
+
