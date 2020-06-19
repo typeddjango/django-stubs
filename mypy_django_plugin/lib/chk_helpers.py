@@ -24,9 +24,6 @@ def add_new_class_for_current_module(current_module: MypyFile,
     new_typeinfo = helpers.new_typeinfo(new_class_unique_name,
                                         bases=bases,
                                         module_name=current_module.fullname)
-    # new_typeinfo = helpers.make_new_typeinfo_in_current_module(new_class_unique_name,
-    #                                                            bases=bases,
-    #                                                            current_module_fullname=current_module.fullname)
     # add fields
     if fields:
         for field_name, field_type in fields.items():
