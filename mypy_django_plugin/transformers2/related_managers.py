@@ -2,7 +2,6 @@ from django.db.models.fields.reverse_related import (
     ForeignObjectRel, ManyToManyRel, ManyToOneRel, OneToOneRel,
 )
 from mypy.checker import gen_unique_name
-from mypy.plugin import AttributeContext
 from mypy.types import Instance
 from mypy.types import Type as MypyType
 
@@ -54,6 +53,8 @@ class GetRelatedManagerCallback(helpers.GetAttributeCallback):
             new_manager_info = self.new_typeinfo(name, bases)
             return Instance(new_manager_info, [])
 
+        return self.default_attr_type
+
     def get_attribute_type(self) -> MypyType:
         if not isinstance(self.obj_type, Instance):
             # it's probably a UnionType, do nothing for now
@@ -69,4 +70,3 @@ class GetRelatedManagerCallback(helpers.GetAttributeCallback):
                 return self.get_related_manager_type(relation)
 
         return self.default_attr_type
-

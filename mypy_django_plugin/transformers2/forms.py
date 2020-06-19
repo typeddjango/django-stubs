@@ -1,8 +1,10 @@
 from typing import Optional
 
-from mypy.types import Type as MypyType, Instance, TypeType, CallableType, NoneTyp
+from mypy.types import CallableType, Instance, NoneTyp
+from mypy.types import Type as MypyType
+from mypy.types import TypeType
 
-from mypy_django_plugin.lib import sem_helpers, helpers, chk_helpers
+from mypy_django_plugin.lib import chk_helpers, helpers, sem_helpers
 
 
 class FormCallback(helpers.ClassDefPluginCallback):
