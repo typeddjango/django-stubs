@@ -1,5 +1,4 @@
 import configparser
-from functools import partial
 from typing import Callable, Dict, List, Optional, Tuple
 
 from django.db.models.fields.related import RelatedField
@@ -13,7 +12,6 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import querysets
 from mypy_django_plugin.transformers2.fields import FieldContructorCallback
 from mypy_django_plugin.transformers2.forms import (
     FormCallback, GetFormCallback, GetFormClassCallback,
@@ -25,6 +23,9 @@ from mypy_django_plugin.transformers2.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.orm_lookups import (
     QuerySetFilterTypecheckCallback,
+)
+from mypy_django_plugin.transformers2.querysets import (
+    QuerySetValuesCallback, QuerySetValuesListCallback,
 )
 from mypy_django_plugin.transformers2.related_managers import (
     GetRelatedManagerCallback,
@@ -176,7 +177,6 @@ class NewSemanalDjangoPlugin(Plugin):
 
             if self.django_context.is_model_subclass(info):
                 return ModelInitCallback(self)
-                # return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
         return None
 
     def get_method_hook(self, fullname: str
@@ -195,12 +195,14 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == 'values':
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
+                return QuerySetValuesCallback(self)
+                # return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
 
         if method_name == 'values_list':
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
+                return QuerySetValuesListCallback(self)
+                # return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
 
         if method_name == 'get_field':
             info = self._get_typeinfo_or_none(class_fullname)
