@@ -16,9 +16,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
-from mypy_django_plugin.transformers import fields
-from mypy_django_plugin.transformers2 import new_helpers
-from mypy_django_plugin.transformers.fields import get_field_type
+from mypy_django_plugin.transformers2 import fields, new_helpers
 
 
 class TransformModelClassCallback(helpers.ClassDefPluginCallback):
@@ -161,8 +159,8 @@ class AddForeignPrimaryKeys(TransformModelClassCallback):
             if rel_pk_field_info is None:
                 continue
 
-            field_type = get_field_type(rel_pk_field_info,
-                                        is_nullable=self.django_context.get_field_nullability(field))
+            field_type = fields.get_field_type(rel_pk_field_info,
+                                               is_nullable=self.django_context.get_field_nullability(field))
             self.add_new_model_attribute(rel_pk_field_name, field_type)
 
 

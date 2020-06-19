@@ -16,6 +16,7 @@ from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
+from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
@@ -213,6 +214,10 @@ class DjangoContext:
     @cached_property
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
+
+    def is_model_subclass(self, info: TypeInfo) -> bool:
+        return (info.fullname in self.all_registered_model_class_fullnames
+                or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
 
     def get_attname(self, field: Field) -> str:
         attname = field.attname
