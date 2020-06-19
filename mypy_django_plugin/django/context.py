@@ -52,14 +52,6 @@ def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
         # add current directory to sys.path
         sys.path.append(os.getcwd())
 
-        def noop_class_getitem(cls, key):
-            return cls
-
-        # from django.db import models
-
-        # models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
-        # models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
-
         from django.conf import settings
         from django.apps import apps
 
