@@ -72,7 +72,9 @@ class SemanalPluginCallback(DjangoPluginCallback):
         if self.semanal_api.final_iteration:
             return False
         self.semanal_api.defer(deferral_context)
-        print(f'LOG: defer: {self.build_defer_error_message(reason)}')
+        # when pytest-mypy-plugins changes to incorporate verbose mypy logging,
+        # uncomment following line to allow better feedback from users on issues
+        # print(f'LOG: defer: {self.build_defer_error_message(reason)}')
         return True
 
     def get_current_module(self) -> MypyFile:
