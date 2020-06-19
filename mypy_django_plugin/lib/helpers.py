@@ -11,7 +11,7 @@ from mypy.nodes import (
     Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolTable, SymbolTableNode,
     TypeInfo, Var,
     CallExpr, Context, PlaceholderNode, FuncDef, FakeInfo, OverloadedFuncDef, Decorator)
-from mypy.plugin import DynamicClassDefContext, ClassDefContext, AttributeContext, MethodContext
+from mypy.plugin import DynamicClassDefContext, ClassDefContext, AttributeContext, MethodContext, FunctionContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer, is_valid_replacement, is_same_symbol
 from mypy.types import AnyType, Instance, NoneTyp, TypeType, ProperType, CallableType
@@ -288,7 +288,7 @@ class TypeCheckerPluginCallback(DjangoPluginCallback):
         return sym.node
 
 
-class GetMethodPluginCallback(TypeCheckerPluginCallback):
+class GetMethodCallback(TypeCheckerPluginCallback):
     callee_type: Instance
     ctx: MethodContext
 
@@ -302,6 +302,19 @@ class GetMethodPluginCallback(TypeCheckerPluginCallback):
 
     @abstractmethod
     def get_method_return_type(self) -> MypyType:
+        raise NotImplementedError
+
+
+class GetFunctionCallback(TypeCheckerPluginCallback):
+    ctx: FunctionContext
+
+    def __call__(self, ctx: FunctionContext) -> MypyType:
+        self.type_checker = ctx.api
+        self.ctx = ctx
+        return self.get_function_return_type()
+
+    @abstractmethod
+    def get_function_return_type(self) -> MypyType:
         raise NotImplementedError
 
 
