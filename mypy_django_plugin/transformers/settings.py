@@ -3,7 +3,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, TypeType
 
 from mypy_django_plugin.lib import helpers
-from mypy_django_plugin.transformers2 import new_helpers
+from mypy_django_plugin.transformers import new_helpers
 
 
 class GetUserModelCallback(helpers.GetFunctionCallback):

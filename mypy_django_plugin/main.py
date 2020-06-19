@@ -12,26 +12,26 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers2.fields import FieldContructorCallback
-from mypy_django_plugin.transformers2.forms import (
+from mypy_django_plugin.transformers.fields import FieldContructorCallback
+from mypy_django_plugin.transformers.forms import (
     FormCallback, GetFormCallback, GetFormClassCallback,
 )
-from mypy_django_plugin.transformers2.init_create import (
+from mypy_django_plugin.transformers.init_create import (
     ModelCreateCallback, ModelInitCallback,
 )
-from mypy_django_plugin.transformers2.meta import MetaGetFieldCallback
-from mypy_django_plugin.transformers2.models import ModelCallback
-from mypy_django_plugin.transformers2.orm_lookups import (
+from mypy_django_plugin.transformers.meta import MetaGetFieldCallback
+from mypy_django_plugin.transformers.models import ModelCallback
+from mypy_django_plugin.transformers.orm_lookups import (
     QuerySetFilterTypecheckCallback,
 )
-from mypy_django_plugin.transformers2.querysets import (
+from mypy_django_plugin.transformers.querysets import (
     QuerySetValuesCallback, QuerySetValuesListCallback,
 )
-from mypy_django_plugin.transformers2.related_managers import (
+from mypy_django_plugin.transformers.related_managers import (
     GetRelatedManagerCallback,
 )
-from mypy_django_plugin.transformers2.request import RequestUserModelCallback
-from mypy_django_plugin.transformers2.settings import (
+from mypy_django_plugin.transformers.request import RequestUserModelCallback
+from mypy_django_plugin.transformers.settings import (
     GetTypeOfSettingsAttributeCallback, GetUserModelCallback,
 )
 
