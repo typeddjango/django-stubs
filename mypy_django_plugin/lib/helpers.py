@@ -14,7 +14,7 @@ from mypy.nodes import (
 from mypy.plugin import DynamicClassDefContext, ClassDefContext, AttributeContext, MethodContext, FunctionContext
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer, is_valid_replacement, is_same_symbol
-from mypy.types import AnyType, Instance, NoneTyp, TypeType, ProperType, CallableType
+from mypy.types import AnyType, Instance, NoneTyp, ProperType, CallableType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 from mypy.typetraverser import TypeTraverserVisitor
