@@ -54,14 +54,17 @@ class GetRelatedManagerCallback(GetAttributeCallback):
             new_manager_info = self.new_typeinfo(name, bases)
             return Instance(new_manager_info, [])
 
-    def __call__(self, ctx: AttributeContext):
+    def __call__(self, ctx: AttributeContext) -> MypyType:
         super().__call__(ctx)
-        assert isinstance(self.obj_type, Instance)
+        if not isinstance(self.obj_type, Instance):
+            # it's probably a UnionType, do nothing for now
+            return self.default_attr_type
 
         model_fullname = self.obj_type.type.fullname
         model_cls = self.django_context.get_model_class_by_fullname(model_fullname)
         if model_cls is None:
             return self.default_attr_type
+
         for reverse_manager_name, relation in self.django_context.get_model_relations(model_cls):
             if reverse_manager_name == self.name:
                 return self.get_related_manager_type(relation)
