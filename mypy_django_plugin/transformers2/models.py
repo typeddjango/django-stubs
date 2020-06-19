@@ -1,21 +1,24 @@
 from abc import abstractmethod
-from typing import Type, Optional
+from typing import Optional, Type
 
+from django.db import models
 from django.db.models.base import Model
-from django.db.models.fields.related import OneToOneField, ForeignKey
-from mypy.nodes import TypeInfo, Var, SymbolTableNode, MDEF, Argument, ARG_STAR2
+from django.db.models.fields import DateField, DateTimeField
+from django.db.models.fields.related import ForeignKey, OneToOneField
+from mypy.nodes import (
+    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var,
+)
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import dummy_context
-from mypy.types import Instance, TypeOfAny, AnyType
+from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
-from django.db import models
-from django.db.models.fields import DateField, DateTimeField
-from mypy_django_plugin.lib import helpers, fullnames, sem_helpers
+from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
 from mypy_django_plugin.transformers import fields
-from mypy_django_plugin.transformers.fields import get_field_type
 from mypy_django_plugin.transformers2 import new_helpers
+from mypy_django_plugin.transformers.fields import get_field_type
 
 
 class TransformModelClassCallback(helpers.ClassDefPluginCallback):

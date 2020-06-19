@@ -1,4 +1,6 @@
-from mypy.types import Type as MypyType, AnyType, TypeOfAny, Instance, TypeType
+from mypy.types import AnyType, Instance
+from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny, TypeType
 
 from mypy_django_plugin.lib import helpers
 from mypy_django_plugin.transformers2 import new_helpers

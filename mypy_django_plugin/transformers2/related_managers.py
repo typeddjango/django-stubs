@@ -1,11 +1,12 @@
+from django.db.models.fields.reverse_related import (
+    ForeignObjectRel, ManyToManyRel, ManyToOneRel, OneToOneRel,
+)
 from mypy.checker import gen_unique_name
 from mypy.plugin import AttributeContext
 from mypy.types import Instance
 from mypy.types import Type as MypyType
 
-from django.db.models.fields.reverse_related import ForeignObjectRel, OneToOneRel, ManyToOneRel, ManyToManyRel
-
-from mypy_django_plugin.lib import helpers, fullnames
+from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.helpers import GetAttributeCallback
 
 
