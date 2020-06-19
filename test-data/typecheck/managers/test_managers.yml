@@ -69,8 +69,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class CustomManager(models.Manager['MyModel']):
                     pass
@@ -89,9 +87,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class Manager1(models.Manager['MyModel']):
                     pass
@@ -121,9 +116,6 @@
             content: |
                 from typing import TypeVar
                 from django.db import models
-
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class MyManager(models.Manager):
                     pass
@@ -175,9 +167,6 @@
             content: |
                 from django.db import models
 
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
-
                 class AbstractPerson(models.Model):
                     abstract_persons = models.Manager['AbstractPerson']()
                 class PublishedBookManager(models.Manager['Book']):
@@ -199,8 +188,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class CustomManager1(models.Manager['AbstractBase1']):
                     pass
@@ -236,8 +223,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class UnrelatedModel(models.Model):
                     objects = models.Manager['UnrelatedModel']()
@@ -261,8 +246,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class ParentOfMyModel4(models.Model):
                     objects = models.Manager()  # E: Need type annotation for 'objects'
@@ -284,8 +267,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(models.Manager)
 
                 class MyModel(models.Model):
                     class MyManager(models.Manager['MyModel']):

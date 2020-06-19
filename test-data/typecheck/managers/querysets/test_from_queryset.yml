@@ -20,9 +20,7 @@
                 from typing import TypeVar
                 from django.db import models
                 from django.db.models.manager import BaseManager, Manager
-                from mypy_django_plugin.lib import generics
 
-                generics.make_classes_generic(models.QuerySet)
                 _M = TypeVar('_M', bound=models.Model)
 
                 class ModelQuerySet(models.QuerySet[_M]):
@@ -31,8 +29,6 @@
 
                 NewBaseManager = BaseManager.from_queryset(ModelQuerySet)
                 NewManager = Manager.from_queryset(ModelQuerySet)
-
-                generics.make_classes_generic(NewBaseManager, NewManager)
 
                 class MyModel(models.Model):
                     objects = NewBaseManager['MyModel']()
@@ -49,7 +45,6 @@
             content: |
                 from django.db import models
                 from django.db.models.manager import BaseManager, Manager
-                from mypy_django_plugin.lib import generics
 
                 class ModelQuerySet(models.QuerySet):
                     def queryset_method(self) -> str:
@@ -57,8 +52,6 @@
 
                 NewBaseManager = BaseManager.from_queryset(ModelQuerySet)
                 NewManager = Manager.from_queryset(ModelQuerySet)
-
-                generics.make_classes_generic(NewBaseManager, NewManager)
 
                 class MyModel(models.Model):
                     objects = NewBaseManager()  # E: Need type annotation for 'objects'
@@ -79,7 +72,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
 
                 class ModelBaseManager(models.Manager):
                     def manager_only_method(self) -> int:
@@ -89,7 +81,6 @@
                         return 'hello'
 
                 NewManager = ModelBaseManager.from_queryset(ModelQuerySet)
-                generics.make_classes_generic(NewManager)
 
                 class MyModel(models.Model):
                     objects = NewManager['MyModel']()
@@ -110,7 +101,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from mypy_django_plugin.lib import generics
 
                 class ModelBaseManager(models.Manager):
                     def manager_only_method(self) -> int:
@@ -120,8 +110,6 @@
                         return 'hello'
 
                 NewManager = ModelBaseManager.from_queryset(ModelQuerySet, class_name='NewManager')
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(NewManager)
 
                 class MyModel(models.Model):
                     objects = NewManager['MyModel']()
@@ -148,9 +136,6 @@
 
                 NewManager = BaseManager.from_queryset(ModelQuerySet)
 
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(NewManager)
-
                 class MyModel(models.Model):
                     objects = NewManager['MyModel']()
 
@@ -169,9 +154,6 @@
             content: |
                 from django.db import models
                 from myapp.managers import NewManager
-
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(NewManager)
 
                 class MyModel(models.Model):
                     objects = NewManager['MyModel']()
@@ -202,9 +184,6 @@
             content: |
                 from django.db import models
                 from myapp.managers import NewManager
-
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(NewManager)
 
                 class MyModel(models.Model):
                     objects = NewManager['MyModel']()
@@ -251,9 +230,6 @@
                 from django.db import models
                 from myapp.managers import NewManager
                 from django.contrib.auth.models import Permission
-
-                from mypy_django_plugin.lib import generics
-                generics.make_classes_generic(NewManager)
 
                 class MyModel(models.Model):
                     objects = NewManager['MyModel']()
