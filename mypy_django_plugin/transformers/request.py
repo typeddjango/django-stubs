@@ -9,15 +9,16 @@ from mypy_django_plugin.lib import chk_helpers, helpers
 
 def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
     auth_user_model = django_context.settings.AUTH_USER_MODEL
-    model_cls = django_context.apps_registry.get_model(auth_user_model)
-    model_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), model_cls)
-    if model_info is None:
+    user_cls = django_context.apps_registry.get_model(auth_user_model)
+    user_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), user_cls)
+
+    if user_info is None:
         return ctx.default_attr_type
 
     # Imported here because django isn't properly loaded yet when module is loaded
     from django.contrib.auth.models import AnonymousUser
 
-    anonymous_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AnonymousUser)
+    anonymous_user_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), AnonymousUser)
     if anonymous_user_info is None:
         # This shouldn't be able to happen, as we managed to import the model above...
         return Instance(user_info, [])
