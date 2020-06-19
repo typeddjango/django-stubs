@@ -16,7 +16,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
 from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
-from mypy_django_plugin.transformers2 import fields, new_helpers
+from mypy_django_plugin.transformers import fields, new_helpers
 
 
 class TransformModelClassCallback(helpers.ClassDefPluginCallback):

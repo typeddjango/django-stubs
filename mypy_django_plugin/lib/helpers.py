@@ -20,7 +20,7 @@ from mypy.types import AnyType, Instance, NoneTyp, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
-from mypy_django_plugin.transformers2 import new_helpers
+from mypy_django_plugin.transformers import new_helpers
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
