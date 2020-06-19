@@ -1,27 +1,31 @@
 from abc import abstractmethod
 from typing import (
-    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union,
-    cast)
+    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union, cast,
+)
 
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    Block, ClassDef, Expression, MemberExpr, MypyFile, NameExpr, StrExpr, SymbolTable, SymbolTableNode,
-    TypeInfo, Var,
-    CallExpr, Context, PlaceholderNode, FuncDef, FakeInfo, OverloadedFuncDef, Decorator)
-from mypy.plugin import DynamicClassDefContext, ClassDefContext, AttributeContext, MethodContext, FunctionContext
+    Block, CallExpr, ClassDef, Context, Decorator, Expression, FakeInfo, FuncDef, MemberExpr, MypyFile, NameExpr,
+    OverloadedFuncDef, PlaceholderNode, StrExpr, SymbolTable, SymbolTableNode, TypeInfo, Var,
+)
+from mypy.plugin import (
+    AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
+)
 from mypy.plugins.common import add_method
-from mypy.semanal import SemanticAnalyzer, is_valid_replacement, is_same_symbol
-from mypy.types import AnyType, Instance, NoneTyp, ProperType, CallableType
+from mypy.semanal import SemanticAnalyzer, is_same_symbol, is_valid_replacement
+from mypy.types import AnyType, CallableType, Instance, NoneTyp, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 from mypy.typetraverser import TypeTraverserVisitor
 
-from django.db.models.fields import Field
 from mypy_django_plugin.lib import fullnames
-from mypy_django_plugin.lib.sem_helpers import prepare_unannotated_method_signature, analyze_callable_signature
+from mypy_django_plugin.lib.sem_helpers import (
+    analyze_callable_signature, prepare_unannotated_method_signature,
+)
 from mypy_django_plugin.transformers2 import new_helpers
 
 if TYPE_CHECKING:
@@ -111,109 +115,6 @@ class SemanalPluginCallback(DjangoPluginCallback):
 
         class_def.info = info
         return info
-
-    def add_symbol_table_node(self,
-                              name: str,
-                              symbol: SymbolTableNode,
-                              symbol_table: Optional[SymbolTable] = None,
-                              context: Optional[Context] = None,
-                              can_defer: bool = True,
-                              escape_comprehensions: bool = False) -> None:
-        """ Patched copy of SemanticAnalyzer.add_symbol_table_node(). """
-        names = symbol_table or self.semanal_api.current_symbol_table(escape_comprehensions=escape_comprehensions)
-        existing = names.get(name)
-        if isinstance(symbol.node, PlaceholderNode) and can_defer:
-            self.semanal_api.defer(context)
-            return None
-        if (existing is not None
-                and context is not None
-                and not is_valid_replacement(existing, symbol)):
-            # There is an existing node, so this may be a redefinition.
-            # If the new node points to the same node as the old one,
-            # or if both old and new nodes are placeholders, we don't
-            # need to do anything.
-            old = existing.node
-            new = symbol.node
-            if isinstance(new, PlaceholderNode):
-                # We don't know whether this is okay. Let's wait until the next iteration.
-                return False
-            if not is_same_symbol(old, new):
-                if isinstance(new, (FuncDef, Decorator, OverloadedFuncDef, TypeInfo)):
-                    self.semanal_api.add_redefinition(names, name, symbol)
-                if not (isinstance(new, (FuncDef, Decorator))
-                        and self.semanal_api.set_original_def(old, new)):
-                    self.semanal_api.name_already_defined(name, context, existing)
-        elif name not in self.semanal_api.missing_names and '*' not in self.semanal_api.missing_names:
-            names[name] = symbol
-            self.progress = True
-            return None
-        raise new_helpers.SymbolAdditionNotPossible()
-
-    # def add_symbol_table_node_or_defer(self, name: str, sym: SymbolTableNode) -> bool:
-    #     return self.semanal_api.add_symbol_table_node(name, sym,
-    #                                                   context=self.semanal_api.cur_mod_node)
-
-    def add_method_from_signature(self,
-                                  signature_node: FuncDef,
-                                  new_method_name: str,
-                                  new_self_type: Instance,
-                                  class_defn: ClassDef) -> bool:
-        if signature_node.type is None:
-            if self.defer_till_next_iteration(reason=signature_node.fullname):
-                return False
-
-            arguments, return_type = prepare_unannotated_method_signature(signature_node)
-            ctx = ClassDefContext(class_defn, signature_node, self.semanal_api)
-            add_method(ctx,
-                       new_method_name,
-                       self_type=new_self_type,
-                       args=arguments,
-                       return_type=return_type)
-            return True
-
-        # add imported objects from method signature to the current module, if not present
-        source_symbols = self.semanal_api.modules[signature_node.info.module_name].names
-        currently_imported_symbols = self.semanal_api.cur_mod_node.names
-
-        def import_symbol_from_source(name: str) -> None:
-            if name in source_symbols['__builtins__'].node.names:
-                return
-            sym = source_symbols[name].copy()
-            self.semanal_api.add_imported_symbol(name, sym, context=self.semanal_api.cur_mod_node)
-
-        class UnimportedTypesVisitor(TypeTraverserVisitor):
-            def visit_instance(self, t: Instance) -> None:
-                super().visit_instance(t)
-                if isinstance(t.type, FakeInfo):
-                    return
-                type_name = t.type.name
-                sym = currently_imported_symbols.get(type_name)
-                if sym is None:
-                    import_symbol_from_source(type_name)
-
-        signature_node.type.accept(UnimportedTypesVisitor())
-
-        # # copy global SymbolTableNode objects from original class to the current node, if not present
-        # original_module = semanal_api.modules[method_node.info.module_name]
-        # for name, sym in original_module.names.items():
-        #     if (not sym.plugin_generated
-        #             and name not in semanal_api.cur_mod_node.names):
-        #         semanal_api.add_imported_symbol(name, sym, context=semanal_api.cur_mod_node)
-
-        arguments, analyzed_return_type, unbound = analyze_callable_signature(self.semanal_api, signature_node)
-        if unbound:
-            raise new_helpers.IncompleteDefnError(f'Signature of method {signature_node.fullname!r} is not ready')
-
-        assert len(arguments) + 1 == len(signature_node.arguments)
-        assert analyzed_return_type is not None
-
-        ctx = ClassDefContext(class_defn, signature_node, self.semanal_api)
-        add_method(ctx,
-                   new_method_name,
-                   self_type=new_self_type,
-                   args=arguments,
-                   return_type=analyzed_return_type)
-        return True
 
 
 class DynamicClassPluginCallback(SemanalPluginCallback):

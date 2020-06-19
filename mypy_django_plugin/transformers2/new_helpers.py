@@ -1,6 +1,6 @@
 from typing import Union
 
-from mypy.nodes import TypeInfo, MypyFile
+from mypy.nodes import MypyFile, TypeInfo
 
 
 class IncompleteDefnError(Exception):

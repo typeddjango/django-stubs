@@ -18,7 +18,9 @@ from mypy_django_plugin.transformers import (
 )
 from mypy_django_plugin.transformers2.forms import FormCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
-from mypy_django_plugin.transformers2.related_managers import GetRelatedManagerCallback
+from mypy_django_plugin.transformers2.related_managers import (
+    GetRelatedManagerCallback,
+)
 from mypy_django_plugin.transformers2.settings import GetUserModel
 
 
