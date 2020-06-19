@@ -18,7 +18,6 @@ from mypy_django_plugin.transformers import (
     fields, forms, init_create, meta, querysets, request, settings,
 )
 from mypy_django_plugin.transformers.models import process_model_class
-from mypy_django_plugin.transformers2.dynamic_managers import CreateNewManagerClassFrom_FromQuerySet
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.related_managers import GetRelatedManagerCallback
 
@@ -246,16 +245,6 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if info and info.has_base(fullnames.MODEL_CLASS_FULLNAME):
             return GetRelatedManagerCallback(self)
-
-        return None
-
-    def get_dynamic_class_hook(self, fullname: str
-                               ) -> Optional[Callable[[DynamicClassDefContext], None]]:
-        if fullname.endswith('from_queryset'):
-            class_name, _, _ = fullname.rpartition('.')
-            info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-                return CreateNewManagerClassFrom_FromQuerySet(self)
 
         return None
 
