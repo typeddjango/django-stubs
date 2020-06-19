@@ -15,14 +15,15 @@ import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
-    fields, forms, init_create, meta, querysets, request, settings,
+    fields, forms, init_create, meta, querysets,
 )
-from mypy_django_plugin.transformers2.forms import FormCallback
+from mypy_django_plugin.transformers2.forms import FormCallback, GetFormClassCallback, GetFormCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.related_managers import (
     GetRelatedManagerCallback,
 )
-from mypy_django_plugin.transformers2.settings import GetUserModel
+from mypy_django_plugin.transformers2.request import RequestUserModelCallback
+from mypy_django_plugin.transformers2.settings import GetUserModelCallback, GetTypeOfSettingsAttributeCallback
 
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:
@@ -157,7 +158,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def get_function_hook(self, fullname: str
                           ) -> Optional[Callable[[FunctionContext], MypyType]]:
         if fullname == 'django.contrib.auth.get_user_model':
-            return GetUserModel(self)
+            return GetUserModelCallback(self)
 
         info = self._get_typeinfo_or_none(fullname)
         if info:
@@ -174,12 +175,12 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == 'get_form_class':
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-                return forms.extract_proper_type_for_get_form_class
+                return GetFormClassCallback(self)
 
         if method_name == 'get_form':
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-                return forms.extract_proper_type_for_get_form
+                return GetFormCallback(self)
 
         if method_name == 'values':
             info = self._get_typeinfo_or_none(class_fullname)
@@ -224,12 +225,11 @@ class NewSemanalDjangoPlugin(Plugin):
                            ) -> Optional[Callable[[AttributeContext], MypyType]]:
         class_name, _, attr_name = fullname.rpartition('.')
         if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-            return partial(settings.get_type_of_settings_attribute,
-                           django_context=self.django_context)
+            return GetTypeOfSettingsAttributeCallback(self)
 
         info = self._get_typeinfo_or_none(class_name)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == 'user':
-            return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
+            return RequestUserModelCallback(self)
 
         if info and info.has_base(fullnames.MODEL_CLASS_FULLNAME):
             return GetRelatedManagerCallback(self)
