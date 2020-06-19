@@ -10,7 +10,6 @@ from mypy.plugin import (
 )
 from mypy.types import Type as MypyType
 
-import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import init_create, querysets
@@ -20,6 +19,9 @@ from mypy_django_plugin.transformers2.forms import (
 )
 from mypy_django_plugin.transformers2.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
+from mypy_django_plugin.transformers2.orm_lookups import (
+    QuerySetFilterTypecheckCallback,
+)
 from mypy_django_plugin.transformers2.related_managers import (
     GetRelatedManagerCallback,
 )
@@ -218,9 +220,10 @@ class NewSemanalDjangoPlugin(Plugin):
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+
         if class_fullname in manager_classes and method_name in {'filter', 'get', 'exclude'}:
-            return partial(mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
-                           django_context=self.django_context)
+            return QuerySetFilterTypecheckCallback(self)
+
         return None
 
     def get_base_class_hook(self, fullname: str
