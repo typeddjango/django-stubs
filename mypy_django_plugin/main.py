@@ -13,10 +13,13 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import init_create, querysets
+from mypy_django_plugin.transformers import querysets
 from mypy_django_plugin.transformers2.fields import FieldContructorCallback
 from mypy_django_plugin.transformers2.forms import (
     FormCallback, GetFormCallback, GetFormClassCallback,
+)
+from mypy_django_plugin.transformers2.init_create import (
+    ModelCreateCallback, ModelInitCallback,
 )
 from mypy_django_plugin.transformers2.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers2.models import ModelCallback
@@ -172,7 +175,8 @@ class NewSemanalDjangoPlugin(Plugin):
                 return FieldContructorCallback(self)
 
             if self.django_context.is_model_subclass(info):
-                return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+                return ModelInitCallback(self)
+                # return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
         return None
 
     def get_method_hook(self, fullname: str
@@ -205,7 +209,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == 'create':
-            return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+            return ModelCreateCallback(self)
 
         if class_fullname in manager_classes and method_name in {'filter', 'get', 'exclude'}:
             return QuerySetFilterTypecheckCallback(self)
