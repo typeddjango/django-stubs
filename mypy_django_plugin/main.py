@@ -16,13 +16,17 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
     fields, init_create, meta, querysets,
 )
-from mypy_django_plugin.transformers2.forms import FormCallback, GetFormClassCallback, GetFormCallback
+from mypy_django_plugin.transformers2.forms import (
+    FormCallback, GetFormCallback, GetFormClassCallback,
+)
 from mypy_django_plugin.transformers2.models import ModelCallback
 from mypy_django_plugin.transformers2.related_managers import (
     GetRelatedManagerCallback,
 )
 from mypy_django_plugin.transformers2.request import RequestUserModelCallback
-from mypy_django_plugin.transformers2.settings import GetUserModelCallback, GetTypeOfSettingsAttributeCallback
+from mypy_django_plugin.transformers2.settings import (
+    GetTypeOfSettingsAttributeCallback, GetUserModelCallback,
+)
 
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:

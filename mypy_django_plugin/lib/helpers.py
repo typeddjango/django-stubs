@@ -9,23 +9,18 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    Block, CallExpr, ClassDef, Context, Decorator, Expression, FakeInfo, FuncDef, MemberExpr, MypyFile, NameExpr,
-    OverloadedFuncDef, PlaceholderNode, StrExpr, SymbolTable, SymbolTableNode, TypeInfo, Var,
+    Block, CallExpr, ClassDef, Context, Expression, MemberExpr, MypyFile, NameExpr, PlaceholderNode, StrExpr,
+    SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
     AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
 )
-from mypy.plugins.common import add_method
-from mypy.semanal import SemanticAnalyzer, is_same_symbol, is_valid_replacement
-from mypy.types import AnyType, CallableType, Instance, NoneTyp, ProperType
+from mypy.semanal import SemanticAnalyzer
+from mypy.types import AnyType, Instance, NoneTyp, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
-from mypy.typetraverser import TypeTraverserVisitor
 
 from mypy_django_plugin.lib import fullnames
-from mypy_django_plugin.lib.sem_helpers import (
-    analyze_callable_signature, prepare_unannotated_method_signature,
-)
 from mypy_django_plugin.transformers2 import new_helpers
 
 if TYPE_CHECKING:
@@ -194,7 +189,7 @@ class GetMethodCallback(TypeCheckerPluginCallback):
     default_return_type: MypyType
 
     def __call__(self, ctx: MethodContext) -> MypyType:
-        self.type_checker = ctx.api
+        self.type_checker = cast(TypeChecker, ctx.api)
         self.ctx = ctx
         self.default_return_type = self.ctx.default_return_type
         return self.get_method_return_type()
@@ -208,7 +203,7 @@ class GetFunctionCallback(TypeCheckerPluginCallback):
     ctx: FunctionContext
 
     def __call__(self, ctx: FunctionContext) -> MypyType:
-        self.type_checker = ctx.api
+        self.type_checker = cast(TypeChecker, ctx.api)
         self.ctx = ctx
         return self.get_function_return_type()
 
@@ -225,12 +220,14 @@ class GetAttributeCallback(TypeCheckerPluginCallback):
 
     def __call__(self, ctx: AttributeContext) -> MypyType:
         self.ctx = ctx
-        self.type_checker = ctx.api
+        self.type_checker = cast(TypeChecker, ctx.api)
         self.obj_type = ctx.type
         self.default_attr_type = ctx.default_attr_type
+
+        assert isinstance(ctx.context, MemberExpr)
         self.error_context = ctx.context
-        assert isinstance(self.error_context, MemberExpr)
-        self.name = self.error_context.name
+        self.name = ctx.context.name
+
         return self.get_attribute_type()
 
     @abstractmethod

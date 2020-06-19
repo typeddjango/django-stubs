@@ -1,4 +1,6 @@
-from mypy.types import Type as MypyType, Instance, UnionType
+from mypy.types import Instance
+from mypy.types import Type as MypyType
+from mypy.types import UnionType
 
 from mypy_django_plugin.lib import helpers
 

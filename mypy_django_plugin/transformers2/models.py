@@ -24,7 +24,8 @@ from mypy_django_plugin.transformers.fields import get_field_type
 class TransformModelClassCallback(helpers.ClassDefPluginCallback):
     def get_real_manager_fullname(self, manager_fullname: str) -> str:
         model_info = self.lookup_typeinfo_or_defer(fullnames.MODEL_CLASS_FULLNAME)
-        real_manager_fullname: str = model_info.metadata.get('managers', {}).get(manager_fullname, manager_fullname)
+        assert model_info is not None
+        real_manager_fullname = model_info.metadata.get('managers', {}).get(manager_fullname, manager_fullname)
         return real_manager_fullname
 
     def modify_class_defn(self) -> None:
@@ -146,7 +147,7 @@ class AddForeignPrimaryKeys(TransformModelClassCallback):
                 if field_sym is not None and field_sym.node is not None:
                     error_context = field_sym.node
                 else:
-                    error_context = self.class_defn
+                    error_context = self.class_defn  # type: ignore
                 self.semanal_api.fail(f'Cannot find model {field.related_model!r} '
                                       f'referenced in field {field.name!r} ',
                                       ctx=error_context)
@@ -202,6 +203,7 @@ class AddExtraFieldMethods(TransformModelClassCallback):
         for field in self.django_context.get_model_fields(runtime_model_cls):
             if field.choices:
                 info = self.lookup_typeinfo_or_defer('builtins.str')
+                assert info is not None
                 return_type = Instance(info, [])
                 common.add_method(self.ctx,
                                   name='get_{}_display'.format(field.attname),
@@ -241,5 +243,8 @@ class ModelCallback(helpers.ClassDefPluginCallback):
             AddExtraFieldMethods,
         ]
         for callback_cls in callback_classes:
-            callback = callback_cls(self.plugin)
+            callback = callback_cls(self.plugin)  # type: ignore
             callback.__call__(ctx)
+
+    def modify_class_defn(self) -> None:
+        raise NotImplementedError()
