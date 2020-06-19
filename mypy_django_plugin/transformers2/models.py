@@ -21,7 +21,7 @@ from mypy_django_plugin.transformers2 import new_helpers
 class TransformModelClassCallback(helpers.ClassDefPluginCallback):
     def get_real_manager_fullname(self, manager_fullname: str) -> str:
         model_info = self.lookup_typeinfo_or_defer(fullnames.MODEL_CLASS_FULLNAME)
-        real_manager_fullname = model_info.metadata.get('managers', {}).get(manager_fullname, manager_fullname)
+        real_manager_fullname: str = model_info.metadata.get('managers', {}).get(manager_fullname, manager_fullname)
         return real_manager_fullname
 
     def modify_class_defn(self) -> None:
@@ -68,6 +68,10 @@ class AddDefaultManagerCallback(TransformModelClassCallback):
 
         default_manager_info = self.lookup_typeinfo_or_defer(manager_cls_fullname)
         if default_manager_info is None:
+            if getattr(runtime_model_cls._meta.default_manager, '_built_with_as_manager', False):
+                # it's a Model.as_manager() class and will cause TypeNotFound exception without proper support
+                # fallback to Any for now to avoid false positives
+                self.add_new_model_attribute('_default_manager', AnyType(TypeOfAny.implementation_artifact))
             return
 
         self.add_new_model_attribute('_default_manager',
