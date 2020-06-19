@@ -13,9 +13,8 @@ from mypy.types import Type as MypyType
 import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import (
-    fields, init_create, meta, querysets,
-)
+from mypy_django_plugin.transformers import init_create, meta, querysets
+from mypy_django_plugin.transformers2.fields import FieldContructorCallback
 from mypy_django_plugin.transformers2.forms import (
     FormCallback, GetFormCallback, GetFormClassCallback,
 )
@@ -181,9 +180,9 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(fullname)
         if info:
             if info.has_base(fullnames.FIELD_FULLNAME):
-                return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
+                return FieldContructorCallback(self)
 
-            if helpers.is_subclass_of_model(info, self.django_context):
+            if self.django_context.is_model_subclass(info):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
         return None
 

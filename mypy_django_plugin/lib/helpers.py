@@ -20,7 +20,6 @@ from mypy.types import AnyType, Instance, NoneTyp, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
-from mypy_django_plugin.lib import fullnames
 from mypy_django_plugin.transformers2 import new_helpers
 
 if TYPE_CHECKING:
@@ -201,10 +200,12 @@ class GetMethodCallback(TypeCheckerPluginCallback):
 
 class GetFunctionCallback(TypeCheckerPluginCallback):
     ctx: FunctionContext
+    default_return_type: MypyType
 
     def __call__(self, ctx: FunctionContext) -> MypyType:
         self.type_checker = cast(TypeChecker, ctx.api)
         self.ctx = ctx
+        self.default_return_type = ctx.default_return_type
         return self.get_function_return_type()
 
     @abstractmethod
@@ -401,11 +402,6 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: 'Djang
             if hasattr(django_context.settings, member_name):
                 return getattr(django_context.settings, member_name)
     return None
-
-
-def is_subclass_of_model(info: TypeInfo, django_context: 'DjangoContext') -> bool:
-    return (info.fullname in django_context.all_registered_model_class_fullnames
-            or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
 
 
 def new_typeinfo(name: str,
