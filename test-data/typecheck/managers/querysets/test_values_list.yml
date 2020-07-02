@@ -220,6 +220,7 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+
                 class TransactionQuerySet(models.QuerySet['Transaction']):
                     pass
                 class Transaction(models.Model):
