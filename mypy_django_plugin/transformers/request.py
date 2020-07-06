@@ -15,6 +15,10 @@ def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_c
     abstract_base_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AbstractBaseUser)
     anonymous_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AnonymousUser)
 
+    # This shouldn't be able to happen, as we managed to import the models above.
+    assert abstract_base_user_info is not None
+    assert anonymous_user_info is not None
+
     if ctx.default_attr_type != UnionType([Instance(abstract_base_user_info, []), Instance(anonymous_user_info, [])]):
         # Type has been changed from the default in django-stubs.
         # I.e. HttpRequest has been subclassed and user-type overridden, so let's leave it as is.
@@ -26,9 +30,5 @@ def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_c
 
     if user_info is None:
         return ctx.default_attr_type
-
-    if anonymous_user_info is None:
-        # This shouldn't be able to happen, as we managed to import the model above...
-        return Instance(user_info, [])
 
     return UnionType([Instance(user_info, []), Instance(anonymous_user_info, [])])
