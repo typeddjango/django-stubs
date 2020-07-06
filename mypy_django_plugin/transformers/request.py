@@ -8,6 +8,18 @@ from mypy_django_plugin.lib import helpers
 
 
 def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
+    # Imported here because django isn't properly loaded yet when module is loaded
+    from django.contrib.auth.base_user import AbstractBaseUser
+    from django.contrib.auth.models import AnonymousUser
+
+    abstract_base_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AbstractBaseUser)
+    anonymous_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AnonymousUser)
+
+    if ctx.default_attr_type != UnionType([Instance(abstract_base_user_info, []), Instance(anonymous_user_info, [])]):
+        # Type has been changed from the default in django-stubs.
+        # I.e. HttpRequest has been subclassed and user-type overridden, so let's leave it as is.
+        return ctx.default_attr_type
+
     auth_user_model = django_context.settings.AUTH_USER_MODEL
     user_cls = django_context.apps_registry.get_model(auth_user_model)
     user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), user_cls)
@@ -15,10 +27,6 @@ def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_c
     if user_info is None:
         return ctx.default_attr_type
 
-    # Imported here because django isn't properly loaded yet when module is loaded
-    from django.contrib.auth.models import AnonymousUser
-
-    anonymous_user_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), AnonymousUser)
     if anonymous_user_info is None:
         # This shouldn't be able to happen, as we managed to import the model above...
         return Instance(user_info, [])
