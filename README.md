@@ -90,19 +90,24 @@ You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, thi
 
 Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
 
-### How can I use HttpRequest with custom user model?
+### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
-You can subclass standard request like so:
+Django's built in `HttpRequest` has the attribute `user` that resolves to the type
+```python
+Union[User, AnonymousUser]
+```
+where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
+If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
 ```python
 from django.http import HttpRequest
 from my_user_app.models import MyUser
 
-class MyRequest(HttpRequest):
+class AuthenticatedHttpRequest(HttpRequest):
     user: MyUser
 ```
 
-And then use `MyRequest` instead of standard `HttpRequest` inside your project.
+And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
 
 
 ## Related projects
