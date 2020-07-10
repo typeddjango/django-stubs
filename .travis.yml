@@ -12,6 +12,10 @@ jobs:
       python: 3.7
       script: 'pytest'
 
+    - name: Run plugin test suite with python 3.6
+      python: 3.6
+      script: 'pytest'
+
     - name: Typecheck Django 3.0 test suite with python 3.8
       python: 3.8
       script: |
@@ -29,6 +33,11 @@ jobs:
 
     - name: Typecheck Django 2.2 test suite with python 3.7
       python: 3.7
+      script: |
+        python ./scripts/typecheck_tests.py --django_version=2.2
+
+    - name: Typecheck Django 2.2 test suite with python 3.6
+      python: 3.6
       script: |
         python ./scripts/typecheck_tests.py --django_version=2.2
 
