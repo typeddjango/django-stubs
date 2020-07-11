@@ -83,6 +83,7 @@ class HttpResponse(HttpResponseBase):
     context: Context
     resolver_match: ResolverMatch
     def json(self) -> Any: ...
+    def getvalue(self) -> bytes: ...
 
 class StreamingHttpResponse(HttpResponseBase):
     content: Any
