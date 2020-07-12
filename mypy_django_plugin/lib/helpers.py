@@ -343,6 +343,7 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
     arguments = []
     bound_return_type = semanal_api.anal_type(method_type.ret_type,
                                               allow_placeholder=True)
+
     assert bound_return_type is not None
 
     if isinstance(bound_return_type, PlaceholderNode):
@@ -352,8 +353,13 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
                                                      method_type.arg_types[1:],
                                                      method_node.arguments[1:]):
         bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
-        assert bound_arg_type is not None
+       
+        if bound_arg_type is None and not semanal_api.final_iteration:
+            semanal_api.defer()
+            return
 
+        assert bound_arg_type is not None
+        
         if isinstance(bound_arg_type, PlaceholderNode):
             return
 
