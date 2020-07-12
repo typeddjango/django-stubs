@@ -352,7 +352,7 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
     for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
                                                      method_type.arg_types[1:],
                                                      method_node.arguments[1:]):
-        bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)       
+        bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True) 
         if bound_arg_type is None and not semanal_api.final_iteration:
             semanal_api.defer()
             return
