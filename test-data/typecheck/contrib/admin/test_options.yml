@@ -65,11 +65,15 @@
           delete_selected_confirmation_template = "template"
           object_history_template = "template"
           popup_response_template = "template"
-          actions = (an_action,)
+          actions = (an_action, "a_method_action")
           actions_on_top = True
           actions_on_bottom = False
           actions_selection_counter = True
           admin_site = AdminSite()
+
+          def a_method_action(self, request, queryset):
+              pass
+
 # This test is here to make sure we're not running into a mypy issue which is
 # worked around using a somewhat complicated _ListOrTuple union type. Once the
 # issue is solved upstream this test should pass even with the workaround
@@ -123,4 +127,4 @@
           pass
 
       class A(admin.ModelAdmin):
-          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Callable[[ModelAdmin, HttpRequest, QuerySet[Any]], None]"
+          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[ModelAdmin, HttpRequest, QuerySet[Any]], None], str]"
