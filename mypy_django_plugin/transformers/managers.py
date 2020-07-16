@@ -77,7 +77,7 @@ class ManagerFromQuerySetCallback(helpers.DynamicClassPluginCallback):
                 break
             for name, sym in class_mro_info.names.items():
                 if isinstance(sym.node, FuncDef):
-                    helpers.copy_method_to_another_class(
+                    sem_helpers.copy_method_to_another_class(
                             class_def_context,
                             self_type,
                             new_method_name=name,

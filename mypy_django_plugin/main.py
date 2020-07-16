@@ -19,6 +19,7 @@ from mypy_django_plugin.transformers.forms import (
 from mypy_django_plugin.transformers.init_create import (
     ModelCreateCallback, ModelInitCallback,
 )
+from mypy_django_plugin.transformes.managers import ManagerFromQuerySetCallback
 from mypy_django_plugin.transformers.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers.models import ModelCallback
 from mypy_django_plugin.transformers.orm_lookups import (
@@ -270,7 +271,7 @@ class NewSemanalDjangoPlugin(Plugin):
             class_name, _, _ = fullname.rpartition('.')
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-                return create_new_manager_class_from_from_queryset_method
+                return ManagerFromQuerySetCallback(self)
         return None
 
 def plugin(version):
