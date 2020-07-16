@@ -249,6 +249,14 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
+    def get_dynamic_class_hook(self, fullname: str
+                               ) -> Optional[Callable[[DynamicClassDefContext], None]]:
+        if fullname.endswith('from_queryset'):
+            class_name, _, _ = fullname.rpartition('.')
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return create_new_manager_class_from_from_queryset_method
+        return None
 
 def plugin(version):
     return NewSemanalDjangoPlugin
