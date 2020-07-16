@@ -6,7 +6,7 @@ from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
-    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
+    AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext, Plugin,
 )
 from mypy.types import Type as MypyType
 
@@ -19,7 +19,7 @@ from mypy_django_plugin.transformers.forms import (
 from mypy_django_plugin.transformers.init_create import (
     ModelCreateCallback, ModelInitCallback,
 )
-from mypy_django_plugin.transformes.managers import ManagerFromQuerySetCallback
+from mypy_django_plugin.transformers.managers import ManagerFromQuerySetCallback
 from mypy_django_plugin.transformers.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers.models import ModelCallback
 from mypy_django_plugin.transformers.orm_lookups import (

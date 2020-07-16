@@ -4,7 +4,7 @@ from mypy.nodes import (
 from mypy.plugin import ClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny
 
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
 
 
 class ManagerFromQuerySetCallback(helpers.DynamicClassPluginCallback):
@@ -77,7 +77,7 @@ class ManagerFromQuerySetCallback(helpers.DynamicClassPluginCallback):
                 break
             for name, sym in class_mro_info.names.items():
                 if isinstance(sym.node, FuncDef):
-                    sem_helpers.copy_method_to_another_class(
+                    sem_helpers.copy_method_or_incomplete_defn_exception(
                             class_def_context,
                             self_type,
                             new_method_name=name,
