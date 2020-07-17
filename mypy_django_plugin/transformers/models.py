@@ -86,7 +86,6 @@ class AddManagersCallback(TransformModelClassCallback):
             if manager_name in self.class_defn.info.names:
                 # already defined on the current model class, in file or at a previous iteration
                 continue
-
             manager_info = self.lookup_typeinfo_for_class_or_defer(manager.__class__)
             if manager_info is None:
                 continue
