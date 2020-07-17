@@ -1,13 +1,103 @@
+from typing import Tuple, List
+
 from mypy.nodes import (
-    GDEF, FuncDef, MemberExpr, NameExpr, RefExpr, StrExpr, SymbolTableNode, TypeInfo,
+    GDEF, Argument, FuncDef, MemberExpr, RefExpr, NameExpr, PlaceholderNode,
+    StrExpr, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import ClassDefContext
-from mypy.types import AnyType, Instance, TypeOfAny
+from mypy.types import AnyType, CallableType, Instance, TypeOfAny
 
 from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
+from mypy.plugins.common import add_method_to_class
+
+from mypy.types import Type as MypyType
 
 
-class ManagerFromQuerySetCallback(helpers.DynamicClassPluginCallback):
+def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
+    prepared_arguments = []
+    for argument in method_node.arguments[1:]:
+        argument.type_annotation = AnyType(TypeOfAny.unannotated)
+        prepared_arguments.append(argument)
+    return_type = AnyType(TypeOfAny.unannotated)
+    return prepared_arguments, return_type
+
+
+class ManagerCallback(helpers.DynamicClassPluginCallback):
+
+    def copy_method_to_another_class(
+            self,
+            ctx: ClassDefContext,
+            self_type: Instance,
+            new_method_name: str,
+            method_node: FuncDef) -> None:
+        if method_node.type is None:
+            if not self.semanal_api.final_iteration:
+                self.semanal_api.defer()
+                return
+
+            arguments, return_type = build_unannotated_method_args(method_node)
+            add_method_to_class(
+                    ctx.api,
+                    ctx.cls,
+                    new_method_name,
+                    args=arguments,
+                    return_type=return_type,
+                    self_type=self_type)
+            return
+
+        method_type = method_node.type
+        if not isinstance(method_type, CallableType):
+            if not self.semanal_api.final_iteration:
+                self.semanal_api.defer()
+            return
+
+        arguments = []
+        bound_return_type = self.semanal_api.anal_type(
+                method_type.ret_type,
+                allow_placeholder=True)
+
+        assert bound_return_type is not None
+
+        if isinstance(bound_return_type, PlaceholderNode):
+            return
+
+        for arg_name, arg_type, original_argument in zip(
+                method_type.arg_names[1:],
+                method_type.arg_types[1:],
+                method_node.arguments[1:]):
+            bound_arg_type = self.semanal_api.anal_type(arg_type, allow_placeholder=True)
+            if bound_arg_type is None and not self.semanal_api.final_iteration:
+                self.semanal_api.defer()
+                return
+
+            assert bound_arg_type is not None
+
+            if isinstance(bound_arg_type, PlaceholderNode):
+                return
+
+            var = Var(
+                    name=original_argument.variable.name,
+                    type=arg_type)
+            var.line = original_argument.variable.line
+            var.column = original_argument.variable.column
+            argument = Argument(
+                    variable=var,
+                    type_annotation=bound_arg_type,
+                    initializer=original_argument.initializer,
+                    kind=original_argument.kind)
+            argument.set_line(original_argument)
+            arguments.append(argument)
+
+        add_method_to_class(
+                ctx.api,
+                ctx.cls,
+                new_method_name,
+                args=arguments,
+                return_type=bound_return_type,
+                self_type=self_type)
+
+
+class ManagerFromQuerySetCallback(ManagerCallback):
     def create_new_dynamic_class(self) -> None:
         callee = self.call_expr.callee
 
@@ -77,8 +167,17 @@ class ManagerFromQuerySetCallback(helpers.DynamicClassPluginCallback):
                 break
             for name, sym in class_mro_info.names.items():
                 if isinstance(sym.node, FuncDef):
+                    # self.copy_method_to_another_class(
+                    #        class_def_context,
+                    #        self_type,
+                    #        new_method_name=name,
+                    #        method_node=sym.node)
+
+                    # both versions do not work at the moment
+
+
                     sem_helpers.copy_method_or_incomplete_defn_exception(
                             class_def_context,
                             self_type,
-                            new_method_name=name,
-                            method_node=sym.node)
+                            name,
+                            sym.node)
