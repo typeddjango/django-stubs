@@ -52,30 +52,37 @@ def add_new_manager_base(ctx: ClassDefContext) -> None:
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:
 
-    def raise_error(error_type: int) -> NoReturn:
-        # Considering that the startup time is at least double as long as mypy's, this tries to not make it worse.
-        # The function can possibly run just once and it kills the execution, so it's safe to import and define
-        # the dependencies locally.
+    def exit(error_type: int) -> NoReturn:
+        """Using mypy's argument parser, raise `SystemExit` to fail hard if validation fails.
+
+        Considering that the plugin's startup duration is around double as long as mypy's, this aims to
+        import and construct objects only when that's required - which happens once and terminates the
+        run. Considering that most of the runs are successful, there's no need for this to linger in the
+        global scope.
+        """
         from mypy.main import CapturableArgumentParser
-        usage = "\n".join(["(config)",
-                           "[mypy.plugins.django_stubs]",
-                           "\t(required) django_settings_module: str"])
+
+        usage = '\n'.join(['(config)',
+                           '...',
+                           '[mypy.plugins.django_stubs]',
+                           '\tdjango_settings_module: str (required)',
+                           '...']).expandtabs(4)
         handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=usage)
-        message = {1: "'django_settings_module' is not set: mypy config file is not specified or found",
-                   2: "'django_settings_module' is not set: no section [mypy.plugins.django-stubs]",
-                   3: "'django_settings_module' is not set: setting is not provided"}[error_type]
-        handler.error(message)
+        messages = {1: "'django_settings_module' is not set: mypy config file is not specified or found",
+                    2: "'django_settings_module' is not set: no section [mypy.plugins.django-stubs]",
+                    3: "'django_settings_module' is not set: the setting is not provided"}
+        handler.error(messages[error_type])
 
     parser = configparser.ConfigParser()
     try:
-        parser.read_file(open(cast(str, config_file_path), "r"), source=config_file_path)
-    except OSError:
-        raise_error(1)
+        parser.read_file(open(cast(str, config_file_path), 'r'), source=config_file_path)
+    except (IsADirectoryError, OSError):
+        exit(1)
 
     section = 'mypy.plugins.django-stubs'
     if not parser.has_section(section):
-        raise_error(2)
-    settings = parser.get(section, 'django_settings_module', fallback=None) or raise_error(3)
+        exit(2)
+    settings = parser.get(section, 'django_settings_module', fallback=None) or exit(3)
     return cast(str, settings).strip('\'"')
 
 
