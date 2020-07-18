@@ -42,7 +42,7 @@ TEMPLATE = """usage: (config)
 )
 def test_misconfiguration_handling(capsys, config_file_contents, message_part):
     #  type: (typing.Any, typing.List[str], str) -> None
-    '''Invalid configuration raises `SystemExit` with a precise error message.'''
+    """Invalid configuration raises `SystemExit` with a precise error message."""
     with tempfile.NamedTemporaryFile(mode='w+') as config_file:
         if not config_file_contents:
             config_file.close()
@@ -58,7 +58,7 @@ def test_misconfiguration_handling(capsys, config_file_contents, message_part):
 
 
 def test_correct_configuration() -> None:
-    '''Django settings module gets extracted given valid configuration.'''
+    """Django settings module gets extracted given valid configuration."""
     config_file_contents = [
         '[mypy.plugins.django-stubs]',
         '\tsome_other_setting = setting',
