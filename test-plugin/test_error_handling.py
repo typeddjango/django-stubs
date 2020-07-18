@@ -5,7 +5,6 @@ import pytest
 
 from mypy_django_plugin.main import extract_django_settings_module
 
-
 TEMPLATE = """usage: (config)
 ...
 [mypy.plugins.django_stubs]
