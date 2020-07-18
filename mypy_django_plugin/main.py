@@ -62,16 +62,17 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
         """
         from mypy.main import CapturableArgumentParser
 
-        usage = '\n'.join(['(config)',
-                           '...',
-                           '[mypy.plugins.django_stubs]',
-                           '\tdjango_settings_module: str (required)',
-                           '...']).expandtabs(4)
-        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=usage)
-        messages = {1: "'django_settings_module' is not set: mypy config file is not specified or found",
-                    2: "'django_settings_module' is not set: no section [mypy.plugins.django-stubs]",
-                    3: "'django_settings_module' is not set: the setting is not provided"}
-        handler.error(messages[error_type])
+        usage = """(config)
+        ...
+        [mypy.plugins.django_stubs]
+            django_settings_module: str (required)
+        ...
+        """.replace("\n" + 8 * " ", "\n")
+        handler = CapturableArgumentParser(prog='(django-stubs) mypy', usage=usage)
+        messages = {1: 'mypy config file is not specified or found',
+                    2: 'no section [mypy.plugins.django-stubs]',
+                    3: 'the setting is not provided'}
+        handler.error("'django_settings_module' is not set: " + messages[error_type])
 
     parser = configparser.ConfigParser()
     try:
