@@ -6,7 +6,7 @@ from typing import (
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    Block, CallExpr, ClassDef, Context, Expression, MemberExpr, MypyFile, NameExpr, PlaceholderNode, StrExpr,
+    GDEF, Block, CallExpr, ClassDef, Context, Expression, MemberExpr, MypyFile, NameExpr, PlaceholderNode, StrExpr,
     SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
@@ -118,9 +118,36 @@ class DynamicClassPluginCallback(SemanalPluginCallback):
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
         self.create_new_dynamic_class()
 
+    def generate_manager_info_and_module(self, base_manager_info: TypeInfo) -> Tuple[TypeInfo, MypyFile]:
+        new_manager_info = self.semanal_api.basic_new_typeinfo(
+            self.class_name,
+            basetype_or_fallback=Instance(
+                base_manager_info,
+                [AnyType(TypeOfAny.unannotated)])
+        )
+        new_manager_info.line = self.call_expr.line
+        new_manager_info.defn.line = self.call_expr.line
+        new_manager_info.metaclass_type = new_manager_info.calculate_metaclass_type()
+
+        current_module = self.semanal_api.cur_mod_node
+        current_module.names[self.class_name] = SymbolTableNode(
+            GDEF,
+            new_manager_info,
+            plugin_generated=True)
+        return new_manager_info, current_module
+
     @abstractmethod
     def create_new_dynamic_class(self) -> None:
         raise NotImplementedError
+
+class DynamicClassFromMethodCallback(DynamicClassPluginCallback):
+
+    def __call__(self, ctx: DynamicClassDefContext) -> None:
+        self.class_name = ctx.name
+        self.call_expr = ctx.call
+        self.callee = ctx.call.callee
+        self.semanal_api = cast(SemanticAnalyzer, ctx.api)
+        self.create_new_dynamic_class()
 
 
 class ClassDefPluginCallback(SemanalPluginCallback):
