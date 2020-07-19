@@ -7,7 +7,7 @@ from mypy.nodes import (
 from mypy.plugin import ClassDefContext
 from mypy.types import AnyType, CallableType, Instance, TypeOfAny
 
-from mypy_django_plugin.lib import fullnames, helpers, sem_helpers
+from mypy_django_plugin.lib import fullnames, helpers
 from mypy.plugins.common import add_method_to_class
 
 from mypy.types import Type as MypyType
@@ -22,7 +22,7 @@ def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument],
     return prepared_arguments, return_type
 
 
-class ManagerCallback(helpers.DynamicClassPluginCallback):
+class ManagerCallback(helpers.DynamicClassFromMethodCallback):
 
     def copy_method_to_another_class(
             self,
@@ -31,8 +31,7 @@ class ManagerCallback(helpers.DynamicClassPluginCallback):
             new_method_name: str,
             method_node: FuncDef) -> None:
         if method_node.type is None:
-            if not self.semanal_api.final_iteration:
-                self.semanal_api.defer()
+            if self.defer_till_next_iteration():
                 return
 
             arguments, return_type = build_unannotated_method_args(method_node)
@@ -99,36 +98,16 @@ class ManagerCallback(helpers.DynamicClassPluginCallback):
 
 class ManagerFromQuerySetCallback(ManagerCallback):
     def create_new_dynamic_class(self) -> None:
-        callee = self.call_expr.callee
 
-        assert isinstance(callee, MemberExpr)
-        assert isinstance(callee.expr, RefExpr)
-
-        # not sure if lookup_typeinfo_or_defer(self.calss_name) could be used here
-
-        base_manager_info = callee.expr.node
+        base_manager_info = self.callee.expr.node
 
         if base_manager_info is None:
-            self.defer_till_next_interation()
+            self.defer_till_next_iteration()
             return
 
         assert isinstance(base_manager_info, TypeInfo)
 
-        new_manager_info = self.semanal_api.basic_new_typeinfo(
-                self.class_name,
-                basetype_or_fallback=Instance(
-                    base_manager_info,
-                    [AnyType(TypeOfAny.unannotated)])
-                )
-        new_manager_info.line = self.call_expr.line
-        new_manager_info.defn.line = self.call_expr.line
-        new_manager_info.metaclass_type = new_manager_info.calculate_metaclass_type()
-
-        current_module = self.semanal_api.cur_mod_node
-        current_module.names[self.class_name] = SymbolTableNode(
-                GDEF,
-                new_manager_info,
-                plugin_generated=True)
+        new_manager_info, current_module = self.generate_manager_info_and_module(base_manager_info)
 
         passed_queryset = self.call_expr.args[0]
         assert isinstance(passed_queryset, NameExpr)
@@ -167,17 +146,8 @@ class ManagerFromQuerySetCallback(ManagerCallback):
                 break
             for name, sym in class_mro_info.names.items():
                 if isinstance(sym.node, FuncDef):
-                    # self.copy_method_to_another_class(
-                    #        class_def_context,
-                    #        self_type,
-                    #        new_method_name=name,
-                    #        method_node=sym.node)
-
-                    # both versions do not work at the moment
-
-
-                    sem_helpers.copy_method_or_incomplete_defn_exception(
-                            class_def_context,
-                            self_type,
-                            name,
-                            sym.node)
+                    self.copy_method_to_another_class(
+                           class_def_context,
+                           self_type,
+                           new_method_name=name,
+                           method_node=sym.node)
