@@ -141,11 +141,18 @@ class DynamicClassPluginCallback(SemanalPluginCallback):
         raise NotImplementedError
 
 class DynamicClassFromMethodCallback(DynamicClassPluginCallback):
+    callee: MemberExpr
 
     def __call__(self, ctx: DynamicClassDefContext) -> None:
         self.class_name = ctx.name
         self.call_expr = ctx.call
+
+        assert ctx.call.callee is not None
+        if not isinstance(ctx.call.callee, MemberExpr):
+            # throw error?
+            return
         self.callee = ctx.call.callee
+
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
         self.create_new_dynamic_class()
 
