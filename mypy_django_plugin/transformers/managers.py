@@ -12,6 +12,8 @@ from mypy.plugins.common import add_method_to_class
 
 from mypy.types import Type as MypyType
 
+from mypy_django_plugin.transformers import new_helpers
+
 
 def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
     prepared_arguments = []
@@ -31,8 +33,8 @@ class ManagerCallback(helpers.DynamicClassFromMethodCallback):
             new_method_name: str,
             method_node: FuncDef) -> None:
         if method_node.type is None:
-            if self.defer_till_next_iteration():
-                return
+            if not self.defer_till_next_iteration(reason='method_node.type is None'):
+                raise new_helpers.TypeInfoNotFound(method_node.fullname)
 
             arguments, return_type = build_unannotated_method_args(method_node)
             add_method_to_class(
@@ -45,10 +47,8 @@ class ManagerCallback(helpers.DynamicClassFromMethodCallback):
             return
 
         method_type = method_node.type
-        if not isinstance(method_type, CallableType):
-            if not self.semanal_api.final_iteration:
-                self.semanal_api.defer()
-            return
+        if not isinstance(method_type, CallableType) and not self.defer_till_next_iteration(reason='method_node.type is not CallableType'):
+            raise new_helpers.TypeInfoNotFound(method_node.fullname)
 
         arguments = []
         bound_return_type = self.semanal_api.anal_type(
@@ -58,21 +58,20 @@ class ManagerCallback(helpers.DynamicClassFromMethodCallback):
         assert bound_return_type is not None
 
         if isinstance(bound_return_type, PlaceholderNode):
-            return
+            raise new_helpers.TypeInfoNotFound('return type '+method_node.fullname)
 
         for arg_name, arg_type, original_argument in zip(
                 method_type.arg_names[1:],
                 method_type.arg_types[1:],
                 method_node.arguments[1:]):
             bound_arg_type = self.semanal_api.anal_type(arg_type, allow_placeholder=True)
-            if bound_arg_type is None and not self.semanal_api.final_iteration:
-                self.semanal_api.defer()
-                return
+            if bound_arg_type is None and not self.defer_till_next_iteration(reason='bound_arg_type is None'):
+                raise new_helpers.TypeInfoNotFound('of '+arg_name+' argument of '+method_node.fullname)
 
             assert bound_arg_type is not None
 
-            if isinstance(bound_arg_type, PlaceholderNode):
-                return
+            if isinstance(bound_arg_type, PlaceholderNode) and self.defer_till_next_iteration('bound_arg_type is None'):
+                raise new_helpers.TypeInfoNotFound('of ' + arg_name + ' argument of ' + method_node.fullname)
 
             var = Var(
                     name=original_argument.variable.name,
@@ -101,8 +100,8 @@ class ManagerFromQuerySetCallback(ManagerCallback):
 
         base_manager_info = self.callee.expr.node
 
-        if base_manager_info is None:
-            self.defer_till_next_iteration()
+        if base_manager_info is None and not self.defer_till_next_iteration(reason='base_manager_info is None'):
+            # what exception should be thrown here?
             return
 
         assert isinstance(base_manager_info, TypeInfo)
@@ -117,7 +116,7 @@ class ManagerFromQuerySetCallback(ManagerCallback):
 
         sym = self.semanal_api.lookup_fully_qualified_or_none(derived_queryset_fullname)
         assert sym is not None
-        if sym.node is None and not self.defer_till_next_iteration():
+        if sym.node is None and not self.defer_till_next_iteration(reason='sym.node is None'):
             # inherit from Any to prevent false-positives, if queryset class cannot be resolved
             new_manager_info.fallback_to_any = True
             return
