@@ -311,7 +311,11 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> No
 
 def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
     prepared_arguments = []
-    for argument in method_node.arguments[1:]:
+    try:
+        arguments = method_node.arguments[1:]
+    except AttributeError:
+        arguments = []
+    for argument in arguments:
         argument.type_annotation = AnyType(TypeOfAny.unannotated)
         prepared_arguments.append(argument)
     return_type = AnyType(TypeOfAny.unannotated)
