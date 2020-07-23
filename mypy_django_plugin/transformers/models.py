@@ -68,7 +68,11 @@ class AddDefaultManagerCallback(TransformModelClassCallback):
         runtime_manager_cls_fullname = new_helpers.get_class_fullname(runtime_default_manager_class)
         manager_cls_fullname = self.get_real_manager_fullname(runtime_manager_cls_fullname)
 
-        default_manager_info = self.lookup_typeinfo_or_defer(manager_cls_fullname)
+        try:
+            default_manager_info = self.lookup_typeinfo_or_defer(manager_cls_fullname)
+        except new_helpers.TypeInfoNotFound:
+            default_manager_info = None
+
         if default_manager_info is None:
             if getattr(runtime_model_cls._meta.default_manager, '_built_with_as_manager', False):
                 # it's a Model.as_manager() class and will cause TypeNotFound exception without proper support
