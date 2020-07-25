@@ -112,7 +112,6 @@ class AddManagersCallback(TransformModelClassCallback):
             if self.is_any_parametrized_manager(original_base):
                 if original_base.type is None:
                     raise new_helpers.TypeInfoNotFound()
-                print(original_base)
                 original_base = helpers.reparametrize_instance(original_base,
                                                                [Instance(self.class_defn.info, [])])
             bases.append(original_base)
