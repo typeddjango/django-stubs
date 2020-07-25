@@ -274,5 +274,6 @@ class NewSemanalDjangoPlugin(Plugin):
                 return ManagerFromQuerySetCallback(self)
         return None
 
+
 def plugin(version):
     return NewSemanalDjangoPlugin

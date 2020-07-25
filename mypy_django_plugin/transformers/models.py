@@ -14,7 +14,6 @@ from mypy.semanal import dummy_context
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
-
 from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
 from mypy_django_plugin.transformers import fields, new_helpers
 
@@ -146,8 +145,8 @@ class AddManagersCallback(TransformModelClassCallback):
     def modify_model_class_defn(self, runtime_model_cls: Type[models.Model]) -> None:
         for manager_name, manager in runtime_model_cls._meta.managers_map.items():
 
-            #if manager_name in self.class_defn.info.names:
-                # already defined on the current model class, in file or at a previous iteration
+            # if manager_name in self.class_defn.info.names:
+            # already defined on the current model class, in file or at a previous iteration
             #    continue
             try:
                 manager_info = self.lookup_typeinfo_for_class_or_defer(manager.__class__)
@@ -177,8 +176,8 @@ class AddManagersCallback(TransformModelClassCallback):
             if manager_name not in self.class_defn.info.names:
                 manager_type = Instance(manager_info, [Instance(self.class_defn.info, [])])
                 chk_helpers.add_new_sym_for_info(self.class_defn.info,
-                                             name=manager_name,
-                                             sym_type=manager_type)
+                                                 name=manager_name,
+                                                 sym_type=manager_type)
             else:
                 if not self.has_any_parametrized_manager_as_base(manager_info):
                     continue

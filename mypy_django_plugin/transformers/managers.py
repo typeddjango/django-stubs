@@ -1,18 +1,11 @@
 from typing import Tuple, List
 
 from mypy.nodes import (
-    GDEF, Argument, FuncDef, MemberExpr, RefExpr, NameExpr, PlaceholderNode,
-    StrExpr, SymbolTableNode, TypeInfo, Var,
-)
+    Argument, FuncDef, NameExpr, StrExpr, TypeInfo, )
 from mypy.plugin import ClassDefContext
-from mypy.types import AnyType, CallableType, Instance, TypeOfAny
-
-from mypy_django_plugin.lib import fullnames, helpers
-from mypy.plugins.common import add_method_to_class
-
+from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
-
-from mypy_django_plugin.transformers import new_helpers
+from mypy_django_plugin.lib import fullnames, helpers
 
 
 def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
@@ -63,10 +56,11 @@ class ManagerFromQuerySetCallback(helpers.DynamicClassFromMethodCallback):
         custom_manager_generated_fullname = '.'.join(['django.db.models.manager', custom_manager_generated_name])
         if 'from_queryset_managers' not in base_manager_info.metadata:
             base_manager_info.metadata['from_queryset_managers'] = {}
-        base_manager_info.metadata['from_queryset_managers'][custom_manager_generated_fullname] = new_manager_info.fullname
+        base_manager_info.metadata['from_queryset_managers'][
+            custom_manager_generated_fullname] = new_manager_info.fullname
         class_def_context = ClassDefContext(
-                cls=new_manager_info.defn,
-                reason=self.call_expr, api=self.semanal_api)
+            cls=new_manager_info.defn,
+            reason=self.call_expr, api=self.semanal_api)
         self_type = Instance(new_manager_info, [])
         # we need to copy all methods in MRO before django.db.models.query.QuerySet
         for class_mro_info in derived_queryset_info.mro:
@@ -75,7 +69,7 @@ class ManagerFromQuerySetCallback(helpers.DynamicClassFromMethodCallback):
             for name, sym in class_mro_info.names.items():
                 if isinstance(sym.node, FuncDef):
                     self.copy_method_to_another_class(
-                           class_def_context,
-                           self_type,
-                           new_method_name=name,
-                           method_node=sym.node)
+                        class_def_context,
+                        self_type,
+                        new_method_name=name,
+                        method_node=sym.node)
