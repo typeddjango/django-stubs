@@ -1,12 +1,12 @@
 from abc import abstractmethod
-from typing import Optional, Type
+from typing import Optional, Type, Dict
 
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from mypy.nodes import (
-    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var,
+    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var, FuncDef,
 )
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
@@ -15,7 +15,7 @@ from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
 from mypy_django_plugin.transformers import fields, new_helpers
 
 
@@ -85,17 +85,112 @@ class AddDefaultManagerCallback(TransformModelClassCallback):
 
 
 class AddManagersCallback(TransformModelClassCallback):
-    def modify_model_class_defn(self, runtime_model_cls: Type[models.Model]) -> None:
-        for manager_name, manager in runtime_model_cls._meta.managers_map.items():
-            if manager_name in self.class_defn.info.names:
-                # already defined on the current model class, in file or at a previous iteration
-                continue
-            manager_info = self.lookup_typeinfo_for_class_or_defer(manager.__class__)
-            if manager_info is None:
+
+    def is_any_parametrized_manager(self, typ: Instance) -> bool:
+        return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
+
+    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
+        try:
+            base_manager_info = self.lookup_typeinfo_or_defer(base_manager_fullname)
+        except new_helpers.TypeInfoNotFound:
+            base_manager_info = None
+
+        if (base_manager_info is None
+                or 'from_queryset_managers' not in base_manager_info.metadata):
+            return {}
+        return base_manager_info.metadata['from_queryset_managers']
+
+    def has_any_parametrized_manager_as_base(self, info: TypeInfo) -> bool:
+        for base in helpers.iter_bases(info):
+            if self.is_any_parametrized_manager(base):
+                return True
+        return False
+
+    def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
+        bases = []
+        for original_base in base_manager_info.bases:
+            if self.is_any_parametrized_manager(original_base):
+                if original_base.type is None:
+                    raise new_helpers.TypeInfoNotFound()
+                print(original_base)
+                original_base = helpers.reparametrize_instance(original_base,
+                                                               [Instance(self.class_defn.info, [])])
+            bases.append(original_base)
+
+        current_module = self.semanal_api.modules[self.class_defn.info.module_name]
+        new_manager_info = chk_helpers.add_new_class_for_current_module(current_module, name, bases)
+
+        # copy fields to a new manager
+        new_cls_def_context = ClassDefContext(cls=new_manager_info.defn,
+                                              reason=self.ctx.reason,
+                                              api=self.semanal_api)
+        custom_manager_type = Instance(new_manager_info, [Instance(self.class_defn.info, [])])
+
+        for name, sym in base_manager_info.names.items():
+            # replace self type with new class, if copying method
+            if isinstance(sym.node, FuncDef):
+                self.copy_method_to_another_class(new_cls_def_context,
+                                                  self_type=custom_manager_type,
+                                                  new_method_name=name,
+                                                  method_node=sym.node)
                 continue
 
-            manager_type = Instance(manager_info, [Instance(self.class_defn.info, [])])
-            self.add_new_model_attribute(manager_name, manager_type)
+            new_sym = sym.copy()
+            if isinstance(new_sym.node, Var):
+                new_var = Var(name, type=sym.type)
+                new_var.info = new_manager_info
+                new_var._fullname = new_manager_info.fullname + '.' + name
+                new_sym.node = new_var
+            new_manager_info.names[name] = new_sym
+        return custom_manager_type
+
+    def modify_model_class_defn(self, runtime_model_cls: Type[models.Model]) -> None:
+        for manager_name, manager in runtime_model_cls._meta.managers_map.items():
+
+            #if manager_name in self.class_defn.info.names:
+                # already defined on the current model class, in file or at a previous iteration
+            #    continue
+            try:
+                manager_info = self.lookup_typeinfo_for_class_or_defer(manager.__class__)
+            except new_helpers.TypeInfoNotFound:
+                manager_info = None
+
+            if manager_info is None:
+                manager_class_name = manager.__class__.__name__
+                manager_fullname = helpers.get_class_fullname(manager.__class__)
+                base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
+                generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
+
+                if manager_fullname not in generated_managers:
+                    continue
+
+                real_manager_fullname = generated_managers[manager_fullname]
+                try:
+                    manager_info = self.lookup_typeinfo_or_defer(real_manager_fullname)
+                except new_helpers.TypeInfoNotFound:
+                    manager_info = None
+
+                if manager_info is None:
+                    continue
+
+                manager_class_name = real_manager_fullname.rsplit('.', maxsplit=1)[1]
+
+            if manager_name not in self.class_defn.info.names:
+                manager_type = Instance(manager_info, [Instance(self.class_defn.info, [])])
+                chk_helpers.add_new_sym_for_info(self.class_defn.info,
+                                             name=manager_name,
+                                             sym_type=manager_type)
+            else:
+                if not self.has_any_parametrized_manager_as_base(manager_info):
+                    continue
+                custom_model_manager_name = manager.model.__name__ + '_' + manager_class_name
+                try:
+                    custom_manager_type = self.create_new_model_parametrized_manager(custom_model_manager_name,
+                                                                                     base_manager_info=manager_info)
+                except new_helpers.TypeInfoNotFound:
+                    continue
+
+                chk_helpers.add_new_sym_for_info(self.class_defn.info, name=manager_name, sym_type=custom_manager_type)
 
 
 class AddPrimaryKeyIfDoesNotExist(TransformModelClassCallback):
