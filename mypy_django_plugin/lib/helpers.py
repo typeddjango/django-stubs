@@ -6,14 +6,15 @@ from typing import (
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    GDEF, Block, CallExpr, ClassDef, Context, Expression, MemberExpr, MypyFile, NameExpr, PlaceholderNode, StrExpr,
+    GDEF, MDEF, Argument, Block, CallExpr, ClassDef, Context, Expression, FuncDef, MemberExpr, MypyFile, NameExpr, PlaceholderNode, StrExpr,
     SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
     AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
 )
+from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, NoneTyp, ProperType
+from mypy.types import AnyType, Instance, NoneTyp, ProperType, CallableType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
@@ -94,6 +95,74 @@ class SemanalPluginCallback(DjangoPluginCallback):
 
         return sym.node
 
+    def copy_method_to_another_class(
+            self,
+            ctx: ClassDefContext,
+            self_type: Instance,
+            new_method_name: str,
+            method_node: FuncDef) -> None:
+        if method_node.type is None:
+            if not self.defer_till_next_iteration(reason='method_node.type is None'):
+                raise new_helpers.TypeInfoNotFound(method_node.fullname)
+
+            arguments, return_type = build_unannotated_method_args(method_node)
+            add_method_to_class(
+                    ctx.api,
+                    ctx.cls,
+                    new_method_name,
+                    args=arguments,
+                    return_type=return_type,
+                    self_type=self_type)
+            return
+
+        method_type = method_node.type
+        if not isinstance(method_type, CallableType) and not self.defer_till_next_iteration(reason='method_node.type is not CallableType'):
+            raise new_helpers.TypeInfoNotFound(method_node.fullname)
+
+        arguments = []
+        bound_return_type = self.semanal_api.anal_type(
+                method_type.ret_type,
+                allow_placeholder=True)
+
+        assert bound_return_type is not None
+
+        if isinstance(bound_return_type, PlaceholderNode):
+            raise new_helpers.TypeInfoNotFound('return type '+method_node.fullname)
+
+        for arg_name, arg_type, original_argument in zip(
+                method_type.arg_names[1:],
+                method_type.arg_types[1:],
+                method_node.arguments[1:]):
+            bound_arg_type = self.semanal_api.anal_type(arg_type, allow_placeholder=True)
+            if bound_arg_type is None and not self.defer_till_next_iteration(reason='bound_arg_type is None'):
+                raise new_helpers.TypeInfoNotFound('of '+arg_name+' argument of '+method_node.fullname)
+
+            assert bound_arg_type is not None
+
+            if isinstance(bound_arg_type, PlaceholderNode) and self.defer_till_next_iteration(reason='bound_arg_type is None'):
+                raise new_helpers.TypeInfoNotFound('of ' + arg_name + ' argument of ' + method_node.fullname)
+
+            var = Var(
+                    name=original_argument.variable.name,
+                    type=arg_type)
+            var.line = original_argument.variable.line
+            var.column = original_argument.variable.column
+            argument = Argument(
+                    variable=var,
+                    type_annotation=bound_arg_type,
+                    initializer=original_argument.initializer,
+                    kind=original_argument.kind)
+            argument.set_line(original_argument)
+            arguments.append(argument)
+
+        add_method_to_class(
+                ctx.api,
+                ctx.cls,
+                new_method_name,
+                args=arguments,
+                return_type=bound_return_type,
+                self_type=self_type)
+
     def new_typeinfo(self, name: str, bases: List[Instance], module_fullname: Optional[str] = None) -> TypeInfo:
         class_def = ClassDef(name, Block([]))
         class_def.fullname = self.semanal_api.qualified_name(name)
@@ -139,6 +208,7 @@ class DynamicClassPluginCallback(SemanalPluginCallback):
     @abstractmethod
     def create_new_dynamic_class(self) -> None:
         raise NotImplementedError
+
 
 class DynamicClassFromMethodCallback(DynamicClassPluginCallback):
     callee: MemberExpr
@@ -430,3 +500,12 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
         return metaclass_sym.node
     return None
+
+
+def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
+    prepared_arguments = []
+    for argument in method_node.arguments[1:]:
+        argument.type_annotation = AnyType(TypeOfAny.unannotated)
+        prepared_arguments.append(argument)
+    return_type = AnyType(TypeOfAny.unannotated)
+    return prepared_arguments, return_type
