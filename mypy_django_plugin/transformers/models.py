@@ -150,9 +150,12 @@ class AddManagersCallback(TransformModelClassCallback):
             #    continue
             try:
                 manager_info = self.lookup_typeinfo_for_class_or_defer(manager.__class__)
+                if manager_info is None:
+                    continue
             except new_helpers.TypeInfoNotFound:
                 manager_info = None
 
+            # creating custom manager class only if there's none in lookup and it's final iteration
             if manager_info is None:
                 manager_class_name = manager.__class__.__name__
                 manager_fullname = helpers.get_class_fullname(manager.__class__)
