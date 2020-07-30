@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, Collection
+from typing import Any, Callable, Collection, Dict, Iterable, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import ValidationError
@@ -43,7 +43,7 @@ class Model(metaclass=ModelBase):
         force_insert: bool = ...,
         force_update: bool = ...,
         using: Optional[str] = ...,
-        update_fields: Optional[Union[Sequence[str], str]] = ...,
+        update_fields: Optional[Iterable[str]] = ...,
     ) -> None: ...
     def save_base(
         self,
@@ -51,7 +51,7 @@ class Model(metaclass=ModelBase):
         force_insert: bool = ...,
         force_update: bool = ...,
         using: Optional[str] = ...,
-        update_fields: Optional[Union[Sequence[str], str]] = ...,
+        update_fields: Optional[Iterable[str]] = ...,
     ): ...
     def refresh_from_db(self: _Self, using: Optional[str] = ..., fields: Optional[List[str]] = ...) -> None: ...
     def get_deferred_fields(self) -> Set[str]: ...
