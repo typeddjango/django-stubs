@@ -19,7 +19,9 @@ from mypy_django_plugin.transformers.forms import (
 from mypy_django_plugin.transformers.init_create import (
     ModelCreateCallback, ModelInitCallback,
 )
-from mypy_django_plugin.transformers.managers import ManagerFromQuerySetCallback
+from mypy_django_plugin.transformers.managers import (
+    ManagerFromQuerySetCallback,
+)
 from mypy_django_plugin.transformers.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers.models import ModelCallback
 from mypy_django_plugin.transformers.orm_lookups import (

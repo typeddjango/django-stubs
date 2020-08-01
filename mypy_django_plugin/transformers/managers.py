@@ -1,10 +1,11 @@
-from typing import Tuple, List
+from typing import List, Tuple
 
-from mypy.nodes import (
-    Argument, FuncDef, NameExpr, StrExpr, TypeInfo, )
+from mypy.nodes import Argument, FuncDef, NameExpr, StrExpr, TypeInfo
 from mypy.plugin import ClassDefContext
-from mypy.types import AnyType, Instance, TypeOfAny
+from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
+
 from mypy_django_plugin.lib import fullnames, helpers
 
 
