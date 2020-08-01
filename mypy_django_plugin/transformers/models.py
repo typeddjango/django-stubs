@@ -144,10 +144,7 @@ class AddManagersCallback(TransformModelClassCallback):
 
     def modify_model_class_defn(self, runtime_model_cls: Type[models.Model]) -> None:
         for manager_name, manager in runtime_model_cls._meta.managers_map.items():
-
-            # if manager_name in self.class_defn.info.names:
-            # already defined on the current model class, in file or at a previous iteration
-            #    continue
+            manager_class_name = manager.__class__.__name__
             try:
                 manager_info = self.lookup_typeinfo_for_class_or_defer(manager.__class__)
                 if manager_info is None:
@@ -157,7 +154,6 @@ class AddManagersCallback(TransformModelClassCallback):
 
             # creating custom manager class only if there's none in lookup and it's final iteration
             if manager_info is None:
-                manager_class_name = manager.__class__.__name__
                 manager_fullname = helpers.get_class_fullname(manager.__class__)
                 base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
                 generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
