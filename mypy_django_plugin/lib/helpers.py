@@ -7,17 +7,17 @@ from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF, Argument, Block, CallExpr, ClassDef, Context, Expression, FuncDef, MemberExpr, MypyFile, NameExpr,
-    PlaceholderNode, StrExpr,
-    SymbolTable, SymbolTableNode, TypeInfo, Var,
+    PlaceholderNode, StrExpr, SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
     AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
 )
 from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, NoneTyp, ProperType, CallableType
+from mypy.types import AnyType, CallableType, Instance, NoneTyp, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
+
 from mypy_django_plugin.transformers import new_helpers
 
 if TYPE_CHECKING:

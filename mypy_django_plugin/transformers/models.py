@@ -1,12 +1,12 @@
 from abc import abstractmethod
-from typing import Optional, Type, Dict
+from typing import Dict, Optional, Type
 
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from mypy.nodes import (
-    ARG_STAR2, MDEF, Argument, SymbolTableNode, TypeInfo, Var, FuncDef,
+    ARG_STAR2, MDEF, Argument, FuncDef, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import ClassDefContext
 from mypy.plugins import common
@@ -14,7 +14,8 @@ from mypy.semanal import dummy_context
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
-from mypy_django_plugin.lib import fullnames, helpers, chk_helpers
+
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers
 from mypy_django_plugin.transformers import fields, new_helpers
 
 

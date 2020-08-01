@@ -4,7 +4,7 @@ from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    GDEF, MDEF, Expression, MypyFile, SymbolTableNode, TypeInfo, Var, ClassDef, SymbolTable, Block,
+    GDEF, MDEF, Block, ClassDef, Expression, MypyFile, SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
     AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
