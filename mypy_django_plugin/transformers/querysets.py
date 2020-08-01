@@ -242,7 +242,6 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if model_cls is None:
         return ctx.default_return_type
 
-    model_type.type
     if is_annotated_model_fullname(model_type.type.fullname):
         return ctx.default_return_type
 
