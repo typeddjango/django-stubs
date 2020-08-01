@@ -223,6 +223,7 @@
             content: |
                 from django.db import models
                 from myapp.base_queryset import BaseQuerySet
+                from typing import Union, Dict
                 class ModelQuerySet(BaseQuerySet):
                     pass
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
