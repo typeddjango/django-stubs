@@ -102,8 +102,8 @@
 -   case: manager_requires_type_annotation_to_be_set_if_generic_is_not_specified
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is 'myapp.models.MyManager'
-        reveal_type(MyModel.objects.get())  # N: Revealed type is 'Any'
+        reveal_type(MyModel.objects)  # N: Revealed type is 'myapp.models.MyModel_MyManager[myapp.models.MyModel]'
+        reveal_type(MyModel.objects.get())  # N: Revealed type is 'myapp.models.MyModel*'
         reveal_type(MyModel.objects2)  # N: Revealed type is 'myapp.models.MyGenericManager[Any]'
         reveal_type(MyModel.objects2.get())  # N: Revealed type is 'Any'
         reveal_type(MyModel.objects3)  # N: Revealed type is 'myapp.models.MyGenericManager[myapp.models.MyModel]'
