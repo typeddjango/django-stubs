@@ -223,7 +223,7 @@ class DynamicClassFromMethodCallback(DynamicClassPluginCallback):
         if not isinstance(ctx.call.callee, MemberExpr):
             # throw error?
             return
-        self.callee = ctx.call.callee
+        self.callee: MemberExpr = ctx.call.callee
 
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
         self.create_new_dynamic_class()
