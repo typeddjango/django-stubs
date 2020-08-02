@@ -115,7 +115,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
                 self_type=self_type)
             return
 
-        method_type = method_node.type
+        method_type: CallableType = method_node.type
         if not isinstance(method_type, CallableType) and not self.defer_till_next_iteration(
                 reason='method_node.type is not CallableType'):
             raise new_helpers.TypeInfoNotFound(method_node.fullname)
@@ -223,7 +223,7 @@ class DynamicClassFromMethodCallback(DynamicClassPluginCallback):
         if not isinstance(ctx.call.callee, MemberExpr):
             # throw error?
             return
-        self.callee: MemberExpr = ctx.call.callee
+        self.callee = ctx.call.callee
 
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
         self.create_new_dynamic_class()
