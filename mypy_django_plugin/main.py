@@ -1,4 +1,5 @@
 import configparser
+import os
 from functools import partial
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -52,6 +53,8 @@ def add_new_manager_base(ctx: ClassDefContext) -> None:
 
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:
+    if 'DJANGO_SETTINGS_MODULE' in os.environ:
+        return os.environ['DJANGO_SETTINGS_MODULE']
     errors = Errors()
     if config_file_path is None:
         errors.report(0, None, "'django_settings_module' is not set: no mypy config file specified")
