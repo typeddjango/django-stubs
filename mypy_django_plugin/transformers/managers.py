@@ -21,7 +21,7 @@ def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument],
 class ManagerFromQuerySetCallback(helpers.DynamicClassFromMethodCallback):
     def create_new_dynamic_class(self) -> None:
 
-        base_manager_info = self.callee.expr.node
+        base_manager_info = self.callee.expr.node # type: ignore
 
         if base_manager_info is None and not self.defer_till_next_iteration(reason='base_manager_info is None'):
             # what exception should be thrown here?
