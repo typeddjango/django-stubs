@@ -115,7 +115,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
                 self_type=self_type)
             return
 
-        method_type: CallableType = method_node.type
+        method_type: CallableType = method_node.type # type: ignore
         if not isinstance(method_type, CallableType) and not self.defer_till_next_iteration(
                 reason='method_node.type is not CallableType'):
             raise new_helpers.TypeInfoNotFound(method_node.fullname)
@@ -136,7 +136,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
                 method_node.arguments[1:]):
             bound_arg_type = self.semanal_api.anal_type(arg_type, allow_placeholder=True)
             if bound_arg_type is None and not self.defer_till_next_iteration(reason='bound_arg_type is None'):
-                raise new_helpers.TypeInfoNotFound('of ' + arg_name + ' argument of ' + method_node.fullname)
+                raise new_helpers.TypeInfoNotFound('of ' + arg_name + ' argument of ' + method_node.fullname) # type: ignore
 
             assert bound_arg_type is not None
 
