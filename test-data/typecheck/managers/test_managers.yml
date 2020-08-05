@@ -278,7 +278,7 @@
 -   case: manager_method_is_forward_reference
     main: |
         from myapp.models import ModelA
-        reveal_type(ModelA.objects.do_something())  # N: Revealed type is 'test_app.models.ModelB'
+        reveal_type(ModelA.objects.do_something())  # N: Revealed type is 'myapp.models.ModelB'
     installed_apps:
         - myapp
     files:
