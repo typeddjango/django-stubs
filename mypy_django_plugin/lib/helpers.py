@@ -115,7 +115,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
                 self_type=self_type)
             return
 
-        method_type: CallableType = method_node.type  # type: ignore
+        method_type = cast(CallableType, method_node.type)
         if not isinstance(method_type, CallableType) and not self.defer_till_next_iteration(
                 reason='method_node.type is not CallableType'):
             raise new_helpers.TypeInfoNotFound(method_node.fullname)
