@@ -125,7 +125,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
             method_type.ret_type,
             allow_placeholder=True)
 
-        if bound_return_type is None and not self.defer_till_next_iteration():
+        if bound_return_type is None and self.defer_till_next_iteration():
             raise new_helpers.TypeInfoNotFound(method_node.fullname + ' return type')
 
         assert bound_return_type is not None
