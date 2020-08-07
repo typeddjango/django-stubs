@@ -6,7 +6,7 @@ from mypy.errors import Errors
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
-    AttributeContext, ClassDefContext, FunctionContext, MethodContext, Plugin,
+    AttributeContext, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext, Plugin,
 )
 from mypy.types import Type as MypyType
 
@@ -18,6 +18,9 @@ from mypy_django_plugin.transformers.forms import (
 )
 from mypy_django_plugin.transformers.init_create import (
     ModelCreateCallback, ModelInitCallback,
+)
+from mypy_django_plugin.transformers.managers import (
+    ManagerFromQuerySetCallback,
 )
 from mypy_django_plugin.transformers.meta import MetaGetFieldCallback
 from mypy_django_plugin.transformers.models import ModelCallback
@@ -247,6 +250,15 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.MODEL_CLASS_FULLNAME):
             return GetRelatedManagerCallback(self)
 
+        return None
+
+    def get_dynamic_class_hook(self, fullname: str
+                               ) -> Optional[Callable[[DynamicClassDefContext], None]]:
+        if fullname.endswith('from_queryset'):
+            class_name, _, _ = fullname.rpartition('.')
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return ManagerFromQuerySetCallback(self)
         return None
 
 

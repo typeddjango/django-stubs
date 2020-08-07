@@ -2,8 +2,9 @@ from typing import Dict, List, Optional, Set, Union
 
 from mypy import checker
 from mypy.checker import TypeChecker
+from mypy.mro import calculate_mro
 from mypy.nodes import (
-    GDEF, MDEF, Expression, MypyFile, SymbolTableNode, TypeInfo, Var,
+    GDEF, MDEF, Block, ClassDef, Expression, MypyFile, SymbolTable, SymbolTableNode, TypeInfo, Var,
 )
 from mypy.plugin import (
     AttributeContext, CheckerPluginInterface, FunctionContext, MethodContext,
@@ -21,9 +22,17 @@ def add_new_class_for_current_module(current_module: MypyFile,
                                      fields: Optional[Dict[str, MypyType]] = None
                                      ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, current_module.names)
-    new_typeinfo = helpers.new_typeinfo(new_class_unique_name,
-                                        bases=bases,
-                                        module_name=current_module.fullname)
+
+    # make new class expression
+    classdef = ClassDef(new_class_unique_name, Block([]))
+    classdef.fullname = current_module.fullname + '.' + new_class_unique_name
+
+    # make new TypeInfo
+    new_typeinfo = TypeInfo(SymbolTable(), classdef, current_module.fullname)
+    new_typeinfo.bases = bases
+    calculate_mro(new_typeinfo)
+    new_typeinfo.calculate_metaclass_type()
+
     # add fields
     if fields:
         for field_name, field_type in fields.items():
@@ -32,8 +41,8 @@ def add_new_class_for_current_module(current_module: MypyFile,
             var._fullname = new_typeinfo.fullname + '.' + field_name
             new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
+    classdef.info = new_typeinfo
     current_module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
-    current_module.defs.append(new_typeinfo.defn)
     return new_typeinfo
 
 

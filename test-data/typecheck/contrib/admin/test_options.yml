@@ -123,4 +123,4 @@
           pass
 
       class A(admin.ModelAdmin):
-          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Callable[[ModelAdmin, HttpRequest, QuerySet[Any]], None]"
+          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[ModelAdmin, HttpRequest, QuerySet[Any]], None], str]"
