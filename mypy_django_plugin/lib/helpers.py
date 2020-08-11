@@ -224,9 +224,8 @@ class DynamicClassFromMethodCallback(DynamicClassPluginCallback):
         self.call_expr = ctx.call
 
         assert ctx.call.callee is not None
-        if not isinstance(ctx.call.callee, MemberExpr):
-            # throw error?
-            return
+        assert isinstance(ctx.call.callee, MemberExpr)
+
         self.callee = ctx.call.callee
 
         self.semanal_api = cast(SemanticAnalyzer, ctx.api)
