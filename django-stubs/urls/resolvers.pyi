@@ -22,6 +22,7 @@ class ResolverMatch:
         url_name: Optional[str] = ...,
         app_names: Optional[List[Optional[str]]] = ...,
         namespaces: Optional[List[Optional[str]]] = ...,
+        route: Optional[str] = ...,
     ) -> None: ...
     def __getitem__(self, index: int) -> Any: ...
     # for tuple unpacking
