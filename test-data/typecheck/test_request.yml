@@ -23,9 +23,9 @@
         request = HttpRequest()
         reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
         if not request.user.is_anonymous:
-            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+            reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
         if request.user.is_authenticated:
-            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+            reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 -   case: subclass_request_not_changed_user_type
@@ -49,7 +49,7 @@
             user: User # Override the type of user
 
         request = MyRequest()
-        reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+        reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 
