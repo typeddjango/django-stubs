@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Pattern, Tuple, Union
 
 from git import RemoteProgress, Repo
+
 from scripts.enabled_test_modules import (
     EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS,
 )
