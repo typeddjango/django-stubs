@@ -1,6 +1,5 @@
 import configparser
-
-from typing import Callable, Dict, List, Optional, Tuple, NoReturn, cast
+from typing import Callable, Dict, List, NoReturn, Optional, Tuple, cast
 
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import MypyFile, TypeInfo
