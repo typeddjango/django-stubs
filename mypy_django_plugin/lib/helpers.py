@@ -102,7 +102,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
             new_method_name: str,
             method_node: FuncDef) -> None:
         if method_node.type is None:
-            if not self.defer_till_next_iteration(reason='method_node.type is None'):
+            if self.defer_till_next_iteration(reason='method_node.type is None'):
                 raise new_helpers.TypeInfoNotFound(method_node.fullname)
 
             arguments, return_type = build_unannotated_method_args(method_node)
