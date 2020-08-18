@@ -138,7 +138,7 @@ class SemanalPluginCallback(DjangoPluginCallback):
                 method_type.arg_types[1:],
                 method_node.arguments[1:]):
             bound_arg_type = self.semanal_api.anal_type(arg_type, allow_placeholder=True)
-            if bound_arg_type is None and not self.defer_till_next_iteration(reason='bound_arg_type is None'):
+            if bound_arg_type is None and self.defer_till_next_iteration(reason='bound_arg_type is None'):
                 error_msg = 'of {} argument of {}'.format(arg_name, method_node.fullname)
                 raise new_helpers.TypeInfoNotFound(error_msg)
 
