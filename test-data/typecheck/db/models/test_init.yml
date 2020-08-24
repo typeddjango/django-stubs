@@ -1,0 +1,26 @@
+-   case: field_to_many_and_to_one_attrs_bool_or_none_in_field_base_class
+    main: |
+        from django.db.models import Field
+
+        field: Field
+        my_bool: bool
+
+        my_bool = field.one_to_many
+        my_bool = field.one_to_one
+        my_bool = field.many_to_many
+        my_bool = field.many_to_one
+
+        # Narrowing the types should give us bool
+        assert field.one_to_many is not None
+        my_bool = field.one_to_many
+        assert field.one_to_one is not None
+        my_bool = field.one_to_one
+        assert field.many_to_many is not None
+        my_bool = field.many_to_many
+        assert field.many_to_one is not None
+        my_bool = field.many_to_one
+    out: |
+        main:6: error: Incompatible types in assignment (expression has type "Optional[bool]", variable has type "bool")
+        main:7: error: Incompatible types in assignment (expression has type "Optional[bool]", variable has type "bool")
+        main:8: error: Incompatible types in assignment (expression has type "Optional[bool]", variable has type "bool")
+        main:9: error: Incompatible types in assignment (expression has type "Optional[bool]", variable has type "bool")
