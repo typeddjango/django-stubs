@@ -1,6 +1,16 @@
 from functools import wraps as wraps  # noqa: F401
 from typing import (
-    Any, Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union, overload,
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
 )
 
 import django
