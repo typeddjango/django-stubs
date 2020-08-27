@@ -1,6 +1,9 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, TypeVar, Generic, overload
 from functools import wraps as wraps  # noqa: F401
+from typing import (
+    Any, Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union, overload,
+)
 
+import django
 from django.db.models.base import Model
 
 def curry(_curried_func: Any, *args: Any, **kwargs: Any): ...
@@ -61,3 +64,10 @@ _PartitionMember = TypeVar("_PartitionMember")
 def partition(
     predicate: Callable, values: List[_PartitionMember]
 ) -> Tuple[List[_PartitionMember], List[_PartitionMember]]: ...
+
+if django.VERSION >= (3, 1):
+    class classproperty:
+        fget: Optional[Callable] = ...
+        def __init__(self, method: Optional[Callable] = ...) -> None: ...
+        def __get__(self, instance: Any, cls: Optional[type] = ...) -> Any: ...
+        def getter(self, method: Callable) -> classproperty: ...
