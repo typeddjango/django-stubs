@@ -70,7 +70,12 @@ class BaseForm:
     def visible_fields(self): ...
     def get_initial_for_field(self, field: Field, field_name: str) -> Any: ...
     def _html_output(
-        self, normal_row: str, error_row: str, row_ender: str, help_text_html: str, errors_on_separate_row: bool,
+        self,
+        normal_row: str,
+        error_row: str,
+        row_ender: str,
+        help_text_html: str,
+        errors_on_separate_row: bool,
     ) -> SafeText: ...
 
 class Form(BaseForm):
