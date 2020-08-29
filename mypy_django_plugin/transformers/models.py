@@ -273,13 +273,16 @@ class AddRelatedManagers(ModelClassInitializer):
             if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
                 try:
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)  # noqa: E501
-                    if 'objects' not in related_model_info.names:
-                        raise helpers.IncompleteDefnException()
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
                         raise exc
                     else:
                         continue
+
+                if 'objects' not in related_model_info.names:
+                    self.add_new_node_to_model_class(
+                        attname, Instance(related_manager_info, [Instance(related_model_info, [])]))
+                    continue
 
                 # create new RelatedManager subclass
                 parametrized_related_manager_type = Instance(related_manager_info,
