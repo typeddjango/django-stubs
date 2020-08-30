@@ -230,4 +230,4 @@ invalid_apps = {
 for app in invalid_apps:
     test_modules.remove(app)
 
-INSTALLED_APPS += test_modules
+# INSTALLED_APPS += test_modules
