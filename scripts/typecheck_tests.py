@@ -104,10 +104,10 @@ if __name__ == '__main__':
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', f'Django=={args.django_version}.*'])
 
     branch, commit_sha = DJANGO_COMMIT_REFS[args.django_version]
-    # repo = get_django_repo_object(branch)
-    # if repo.head.commit.hexsha != commit_sha:
-    #     repo.remote('origin').fetch(branch, progress=ProgressPrinter(), depth=100)
-    #     repo.git.checkout(commit_sha)
+    repo = get_django_repo_object(branch)
+    if repo.head.commit.hexsha != commit_sha:
+        repo.remote('origin').fetch(branch, progress=ProgressPrinter(), depth=100)
+        repo.git.checkout(commit_sha)
 
     mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()
     mypy_cache_dir = Path(__file__).parent / '.mypy_cache'

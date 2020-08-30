@@ -194,7 +194,8 @@ IGNORED_ERRORS = {
     'fixtures': [
         'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")',
         'Incompatible types in assignment (expression has type "SpyManager[Spy]"',
-        'Incompatible types in assignment (expression has type "SpyManager", base class "Person" defined the type as "Person_PersonManager3[Person]")',
+        'Incompatible types in assignment (expression has type "SpyManager", base class "Person" defined the type as '
+        '"Person_PersonManager3[Person]")',
     ],
     'fixtures_regress': [
         'Unsupported left operand type for + ("None")',
