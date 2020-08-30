@@ -402,6 +402,8 @@ IGNORED_ERRORS = {
     'sites_framework': [
         'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"',
         "Name 'Optional' is not defined",
+        'Incompatible types in assignment (expression has type "CurrentSiteManager", base class "AbstractArticle" '
+        'defined the type as "AbstractArticle_CurrentSiteManager[AbstractArticle]"',
     ],
     'sites_tests': [
         '"RequestSite" of "Union[Site, RequestSite]" has no attribute "id"',
