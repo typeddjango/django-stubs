@@ -81,6 +81,7 @@ from .fields import (
     SlugField as SlugField,
     TypedChoiceField as TypedChoiceField,
     TypedMultipleChoiceField as TypedMultipleChoiceField,
+    JSONField as JSONField,
 )
 
 from .boundfield import BoundField as BoundField, BoundWidget as BoundWidget
