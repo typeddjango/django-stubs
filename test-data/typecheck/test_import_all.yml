@@ -77,8 +77,131 @@
         import django.contrib.flatpages.templatetags.flatpages
         import django.contrib.flatpages.urls
         import django.contrib.flatpages.views
+        import django.contrib.gis.geos.linestring
+        import django.contrib.gis.geos.base
+        import django.contrib.gis.geos.prepared
+        import django.contrib.gis.geos.libgeos
+        import django.contrib.gis.geos.error
+        import django.contrib.gis.geos.coordseq
+        import django.contrib.gis.geos
+        import django.contrib.gis.geos.collections
+        import django.contrib.gis.geos.geometry
+        import django.contrib.gis.geos.prototypes.prepared
+        import django.contrib.gis.geos.prototypes.coordseq
+        import django.contrib.gis.geos.prototypes
+        import django.contrib.gis.geos.prototypes.errcheck
+        import django.contrib.gis.geos.prototypes.misc
+        import django.contrib.gis.geos.prototypes.threadsafe
+        import django.contrib.gis.geos.prototypes.geom
+        import django.contrib.gis.geos.prototypes.topology
+        import django.contrib.gis.geos.prototypes.predicates
+        import django.contrib.gis.geos.prototypes.io
+        import django.contrib.gis.geos.factory
+        import django.contrib.gis.geos.point
+        import django.contrib.gis.geos.polygon
+        import django.contrib.gis.geos.mutable_list
+        import django.contrib.gis.geos.io
+        import django.contrib.gis.forms
+        import django.contrib.gis.forms.fields
+        import django.contrib.gis.forms.widgets
+        import django.contrib.gis.gdal.base
+        import django.contrib.gis.gdal.error
+        import django.contrib.gis.gdal.layer
+        import django.contrib.gis.gdal
+        import django.contrib.gis.gdal.geomtype
+        import django.contrib.gis.gdal.libgdal
+        import django.contrib.gis.gdal.datasource
+        import django.contrib.gis.gdal.feature
+        import django.contrib.gis.gdal.envelope
+        import django.contrib.gis.gdal.prototypes.ds
+        import django.contrib.gis.gdal.prototypes
+        import django.contrib.gis.gdal.prototypes.errcheck
+        import django.contrib.gis.gdal.prototypes.geom
+        import django.contrib.gis.gdal.prototypes.srs
+        import django.contrib.gis.gdal.prototypes.raster
+        import django.contrib.gis.gdal.prototypes.generation
+        import django.contrib.gis.gdal.driver
+        import django.contrib.gis.gdal.raster.base
+        import django.contrib.gis.gdal.raster
+        import django.contrib.gis.gdal.raster.source
+        import django.contrib.gis.gdal.raster.band
+        import django.contrib.gis.gdal.raster.const
+        import django.contrib.gis.gdal.field
+        import django.contrib.gis.gdal.srs
+        import django.contrib.gis.gdal.geometries
+        import django.contrib.gis
+        import django.contrib.gis.feeds
+        import django.contrib.gis.admin.options
+        import django.contrib.gis.admin
+        import django.contrib.gis.admin.widgets
+        import django.contrib.gis.shortcuts
+        import django.contrib.gis.utils.layermapping
+        import django.contrib.gis.utils
+        import django.contrib.gis.utils.ogrinfo
+        import django.contrib.gis.utils.srs
+        import django.contrib.gis.utils.ogrinspect
+        import django.contrib.gis.measure
+        import django.contrib.gis.geometry
+        import django.contrib.gis.serializers
+        import django.contrib.gis.serializers.geojson
+        import django.contrib.gis.apps
+        import django.contrib.gis.sitemaps.kml
+        import django.contrib.gis.sitemaps
+        import django.contrib.gis.sitemaps.views
+        import django.contrib.gis.db
+        import django.contrib.gis.db.backends
+        import django.contrib.gis.db.backends.oracle.operations
+        import django.contrib.gis.db.backends.oracle.base
+        import django.contrib.gis.db.backends.oracle.adapter
+        import django.contrib.gis.db.backends.oracle
+        import django.contrib.gis.db.backends.oracle.schema
+        import django.contrib.gis.db.backends.oracle.models
+        import django.contrib.gis.db.backends.oracle.features
+        import django.contrib.gis.db.backends.oracle.introspection
+        import django.contrib.gis.db.backends.utils
+        import django.contrib.gis.db.backends.postgis.operations
+        import django.contrib.gis.db.backends.postgis.base
+        import django.contrib.gis.db.backends.postgis.adapter
+        import django.contrib.gis.db.backends.postgis
+        import django.contrib.gis.db.backends.postgis.pgraster
+        import django.contrib.gis.db.backends.postgis.schema
+        import django.contrib.gis.db.backends.postgis.const
+        import django.contrib.gis.db.backends.postgis.models
+        import django.contrib.gis.db.backends.postgis.features
+        import django.contrib.gis.db.backends.postgis.introspection
+        import django.contrib.gis.db.backends.mysql.operations
+        import django.contrib.gis.db.backends.mysql.base
+        import django.contrib.gis.db.backends.mysql
+        import django.contrib.gis.db.backends.mysql.schema
+        import django.contrib.gis.db.backends.mysql.features
+        import django.contrib.gis.db.backends.mysql.introspection
+        import django.contrib.gis.db.backends.spatialite.operations
+        import django.contrib.gis.db.backends.spatialite.base
+        import django.contrib.gis.db.backends.spatialite.adapter
+        import django.contrib.gis.db.backends.spatialite
+        import django.contrib.gis.db.backends.spatialite.client
+        import django.contrib.gis.db.backends.spatialite.schema
+        import django.contrib.gis.db.backends.spatialite.models
+        import django.contrib.gis.db.backends.spatialite.features
+        import django.contrib.gis.db.backends.spatialite.introspection
+        import django.contrib.gis.db.backends.base.operations
+        import django.contrib.gis.db.backends.base.adapter
+        import django.contrib.gis.db.backends.base
+        import django.contrib.gis.db.backends.base.models
+        import django.contrib.gis.db.backends.base.features
+        import django.contrib.gis.db.models.proxy
+        import django.contrib.gis.db.models.aggregates
         import django.contrib.gis.db.models
+        import django.contrib.gis.db.models.lookups
         import django.contrib.gis.db.models.fields
+        import django.contrib.gis.db.models.functions
+        import django.contrib.gis.db.models.sql
+        import django.contrib.gis.db.models.sql.conversion
+        import django.contrib.gis.ptr
+        import django.contrib.gis.geoip2.resources
+        import django.contrib.gis.geoip2.base
+        import django.contrib.gis.geoip2
+        import django.contrib.gis.views
         import django.contrib.humanize.templatetags
         import django.contrib.humanize.templatetags.humanize
         import django.contrib.messages.api
@@ -226,20 +349,43 @@
         import django.db.backends.base.operations
         import django.db.backends.base.schema
         import django.db.backends.base.validation
+        import django.db.backends.oracle
+        import django.db.backends.oracle.base
+        import django.db.backends.oracle.client
+        import django.db.backends.oracle.creation
+        import django.db.backends.oracle.features
+        import django.db.backends.oracle.functions
+        import django.db.backends.oracle.introspection
+        import django.db.backends.oracle.operations
+        import django.db.backends.oracle.utils
+        import django.db.backends.oracle.schema
+        import django.db.backends.oracle.validation
         import django.db.backends.ddl_references
         import django.db.backends.dummy
         import django.db.backends.dummy.base
         import django.db.backends.mysql
+        import django.db.backends.mysql.base
         import django.db.backends.mysql.client
+        import django.db.backends.mysql.compiler
+        import django.db.backends.mysql.creation
+        import django.db.backends.mysql.features
+        import django.db.backends.mysql.introspection
+        import django.db.backends.mysql.operations
+        import django.db.backends.mysql.schema
+        import django.db.backends.mysql.validation
         import django.db.backends.postgresql
         import django.db.backends.postgresql.base
         import django.db.backends.postgresql.client
         import django.db.backends.postgresql.creation
+        import django.db.backends.postgresql.features
+        import django.db.backends.postgresql.introspection
         import django.db.backends.postgresql.operations
+        import django.db.backends.postgresql.schema
         import django.db.backends.signals
         import django.db.backends.sqlite3
         import django.db.backends.sqlite3.base
         import django.db.backends.sqlite3.creation
+        import django.db.backends.sqlite3.client
         import django.db.backends.sqlite3.features
         import django.db.backends.sqlite3.introspection
         import django.db.backends.sqlite3.operations
