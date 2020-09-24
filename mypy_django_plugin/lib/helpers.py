@@ -318,7 +318,8 @@ class GetAttributeCallback(TypeCheckerPluginCallback):
         self.obj_type = ctx.type
         self.default_attr_type = ctx.default_attr_type
 
-        assert isinstance(ctx.context, MemberExpr)
+        if not isinstance(ctx.context, (MemberExpr, NameExpr)):
+            return self.default_attr_type
         self.error_context = ctx.context
         self.name = ctx.context.name
 
