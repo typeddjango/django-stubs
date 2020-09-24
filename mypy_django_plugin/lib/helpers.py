@@ -309,7 +309,7 @@ class GetFunctionCallback(TypeCheckerPluginCallback):
 class GetAttributeCallback(TypeCheckerPluginCallback):
     obj_type: ProperType
     default_attr_type: MypyType
-    error_context: MemberExpr
+    error_context: Union[MemberExpr, NameExpr]
     name: str
 
     def __call__(self, ctx: AttributeContext) -> MypyType:
