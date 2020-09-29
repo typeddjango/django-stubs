@@ -15,7 +15,8 @@ from scripts.enabled_test_modules import (
 
 DJANGO_COMMIT_REFS: Dict[str, Tuple[str, str]] = {
     '2.2': ('stable/2.2.x', '8093aaa8ff9dd7386a069c6eb49fcc1c5980c033'),
-    '3.0': ('stable/3.0.x', '44da7abda848f05caaed74f6a749038c87dedfda')
+    '3.0': ('stable/3.0.x', '44da7abda848f05caaed74f6a749038c87dedfda'),
+    '3.1': ('stable/3.1.x', '356efa90b5984eee25359959a20f672273199720'),
 }
 PROJECT_DIRECTORY = Path(__file__).parent.parent
 DJANGO_SOURCE_DIRECTORY = PROJECT_DIRECTORY / 'django-sources'  # type: Path
@@ -97,7 +98,7 @@ def get_django_repo_object(branch: str) -> Repo:
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--django_version', choices=['2.2', '3.0'], required=True)
+    parser.add_argument('--django_version', choices=['2.2', '3.0', '3.1'], required=True)
     args = parser.parse_args()
 
     # install proper Django version
