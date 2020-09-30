@@ -6,7 +6,7 @@ from mypy.types import Instance
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import chk_helpers, helpers
 
 
 def get_actual_types(ctx: Union[MethodContext, FunctionContext],
@@ -32,7 +32,7 @@ def get_actual_types(ctx: Union[MethodContext, FunctionContext],
 
 def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext,
                            model_cls: Type[Model], method: str) -> MypyType:
-    typechecker_api = helpers.get_typechecker_api(ctx)
+    typechecker_api = chk_helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
     expected_keys = [key for key in expected_types.keys() if key != 'pk']
 
@@ -42,34 +42,36 @@ def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_co
                                                                            model_cls.__name__),
                          ctx.context)
             continue
-        helpers.check_types_compatible(ctx,
-                                       expected_type=expected_types[actual_name],
-                                       actual_type=actual_type,
-                                       error_message='Incompatible type for "{}" of "{}"'.format(actual_name,
-                                                                                                 model_cls.__name__))
+        error_message = 'Incompatible type for "{}" of "{}"'.format(actual_name, model_cls.__name__)
+        chk_helpers.check_types_compatible(ctx,
+                                           expected_type=expected_types[actual_name],
+                                           actual_type=actual_type,
+                                           error_message=error_message)
 
     return ctx.default_return_type
 
 
-def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    assert isinstance(ctx.default_return_type, Instance)
+class ModelInitCallback(helpers.GetFunctionCallback):
+    def get_function_return_type(self) -> MypyType:
+        assert isinstance(self.default_return_type, Instance)
 
-    model_fullname = ctx.default_return_type.type.fullname
-    model_cls = django_context.get_model_class_by_fullname(model_fullname)
-    if model_cls is None:
-        return ctx.default_return_type
+        model_fullname = self.default_return_type.type.fullname
+        model_cls = self.django_context.get_model_class_by_fullname(model_fullname)
+        if model_cls is None:
+            return self.default_return_type
 
-    return typecheck_model_method(ctx, django_context, model_cls, '__init__')
+        return typecheck_model_method(self.ctx, self.django_context, model_cls, '__init__')
 
 
-def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    if not isinstance(ctx.default_return_type, Instance):
-        # only work with ctx.default_return_type = model Instance
-        return ctx.default_return_type
+class ModelCreateCallback(helpers.GetMethodCallback):
+    def get_method_return_type(self) -> MypyType:
+        if not isinstance(self.default_return_type, Instance):
+            # only work with ctx.default_return_type = model Instance
+            return self.default_return_type
 
-    model_fullname = ctx.default_return_type.type.fullname
-    model_cls = django_context.get_model_class_by_fullname(model_fullname)
-    if model_cls is None:
-        return ctx.default_return_type
+        model_fullname = self.default_return_type.type.fullname
+        model_cls = self.django_context.get_model_class_by_fullname(model_fullname)
+        if model_cls is None:
+            return self.default_return_type
 
-    return typecheck_model_method(ctx, django_context, model_cls, 'create')
+        return typecheck_model_method(self.ctx, self.django_context, model_cls, 'create')

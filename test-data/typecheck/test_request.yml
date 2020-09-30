@@ -15,7 +15,8 @@
                 from django.db import models
                 class MyUser(models.Model):
                     pass
--   case: request_object_user_can_be_descriminated
+
+-   case: request_object_user_can_be_discriminated
     disable_cache: true
     main: |
         from django.http.request import HttpRequest
@@ -48,7 +49,7 @@
             user: User # Override the type of user
 
         request = MyRequest()
-        reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+        reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 

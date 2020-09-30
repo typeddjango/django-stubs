@@ -150,10 +150,10 @@ if __name__ == '__main__':
                 global_rc = 1
                 print(line)
 
-        unused_ignores = get_unused_ignores(ignored_message_freqs)
-        if unused_ignores:
-            print('UNUSED IGNORES ------------------------------------------------')
-            print('\n'.join(unused_ignores))
+        # unused_ignores = get_unused_ignores(ignored_message_freqs)
+        # if unused_ignores:
+        #     print('UNUSED IGNORES ------------------------------------------------')
+        #     print('\n'.join(unused_ignores))
 
         sys.exit(global_rc)
 

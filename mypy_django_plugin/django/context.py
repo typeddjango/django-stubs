@@ -16,12 +16,13 @@ from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
+from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
 
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import chk_helpers, fullnames, helpers
 
 try:
     from django.contrib.postgres.fields import ArrayField
@@ -51,14 +52,6 @@ def initialize_django(settings_module: str) -> Tuple['Apps', 'LazySettings']:
 
         # add current directory to sys.path
         sys.path.append(os.getcwd())
-
-        def noop_class_getitem(cls, key):
-            return cls
-
-        from django.db import models
-
-        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
-        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
 
         from django.conf import settings
         from django.apps import apps
@@ -119,10 +112,10 @@ class DjangoContext:
             if isinstance(field, Field):
                 yield field
 
-    def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
-        for field in model_cls._meta.get_fields():
-            if isinstance(field, ForeignObjectRel):
-                yield field
+    def get_model_relations(self, model_cls: Type[Model]) -> Iterator[Tuple[Optional[str], ForeignObjectRel]]:
+        for relation in model_cls._meta.get_fields():
+            if isinstance(relation, ForeignObjectRel):
+                yield relation.get_accessor_name(), relation
 
     def get_field_lookup_exact_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel]) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
@@ -222,11 +215,15 @@ class DjangoContext:
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
 
+    def is_model_subclass(self, info: TypeInfo) -> bool:
+        return (info.fullname in self.all_registered_model_class_fullnames
+                or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
+
     def get_attname(self, field: Field) -> str:
         attname = field.attname
         return attname
 
-    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str]) -> bool:
+    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str] = None) -> bool:
         nullable = field.null
         if not nullable and isinstance(field, CharField) and field.blank:
             return True
@@ -356,11 +353,11 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
         if lookup_cls is None or isinstance(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            return self.get_field_lookup_exact_type(chk_helpers.get_typechecker_api(ctx), field)
 
         assert lookup_cls is not None
 
-        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
+        lookup_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), lookup_cls)
         if lookup_info is None:
             return AnyType(TypeOfAny.explicit)
 
@@ -370,7 +367,7 @@ class DjangoContext:
                 # if it's Field, consider lookup_type a __get__ of current field
                 if (isinstance(lookup_type, Instance)
                         and lookup_type.type.fullname == fullnames.FIELD_FULLNAME):
-                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
+                    field_info = helpers.lookup_class_typeinfo(chk_helpers.get_typechecker_api(ctx), field.__class__)
                     if field_info is None:
                         return AnyType(TypeOfAny.explicit)
                     lookup_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',

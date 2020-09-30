@@ -194,6 +194,8 @@ IGNORED_ERRORS = {
     'fixtures': [
         'Incompatible types in assignment (expression has type "int", target has type "Iterable[str]")',
         'Incompatible types in assignment (expression has type "SpyManager[Spy]"',
+        'Incompatible types in assignment (expression has type "SpyManager", base class "Person" defined the type as '
+        '"Person_PersonManager3[Person]")',
     ],
     'fixtures_regress': [
         'Unsupported left operand type for + ("None")',
@@ -325,6 +327,9 @@ IGNORED_ERRORS = {
     'model_enums': [
         "'bool' is not a valid base class",
     ],
+    'multiple_database': [
+        'Unexpected attribute "extra_arg" for model "Book"',
+    ],
     'null_queries': [
         "Cannot resolve keyword 'foo' into field"
     ],
@@ -397,6 +402,8 @@ IGNORED_ERRORS = {
     'sites_framework': [
         'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"',
         "Name 'Optional' is not defined",
+        'Incompatible types in assignment (expression has type "CurrentSiteManager", base class "AbstractArticle" '
+        'defined the type as "AbstractArticle_CurrentSiteManager[AbstractArticle]"',
     ],
     'sites_tests': [
         '"RequestSite" of "Union[Site, RequestSite]" has no attribute "id"',
@@ -490,6 +497,9 @@ IGNORED_ERRORS = {
     ],
     'wsgi': [
         '"HttpResponse" has no attribute "block_size"',
+    ],
+    'test_abstract_inheritance': [
+        'Definition of "Meta" in base class "DescendantOne" is incompatible with definition in base class "DescendantTwo"',
     ],
 }
 

@@ -23,7 +23,7 @@ with open('README.md', 'r') as f:
 dependencies = [
     'mypy>=0.782,<0.790',
     'typing-extensions',
-    'django',
+    'django==3.1b1',
 ]
 
 setup(
