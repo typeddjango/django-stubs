@@ -1,4 +1,3 @@
-
 from django.core.serializers import base as base
 from typing import Any
 from xml.sax.expatreader import ExpatParser as _ExpatParser  # type: ignore
