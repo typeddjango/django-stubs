@@ -9,13 +9,14 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
 
 
-def get_actual_types(ctx: Union[MethodContext, FunctionContext],
-                     expected_keys: List[str]) -> List[Tuple[str, MypyType]]:
+def get_actual_types(
+    ctx: Union[MethodContext, FunctionContext], expected_keys: List[str]
+) -> List[Tuple[str, MypyType]]:
     actual_types = []
     # positionals
     for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
         if actual_name is None:
-            if ctx.callee_arg_names[0] == 'kwargs':
+            if ctx.callee_arg_names[0] == "kwargs":
                 # unpacked dict as kwargs is not supported
                 continue
             actual_name = expected_keys[pos]
@@ -30,23 +31,23 @@ def get_actual_types(ctx: Union[MethodContext, FunctionContext],
     return actual_types
 
 
-def typecheck_model_method(ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext,
-                           model_cls: Type[Model], method: str) -> MypyType:
+def typecheck_model_method(
+    ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext, model_cls: Type[Model], method: str
+) -> MypyType:
     typechecker_api = helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
-    expected_keys = [key for key in expected_types.keys() if key != 'pk']
+    expected_keys = [key for key in expected_types.keys() if key != "pk"]
 
     for actual_name, actual_type in get_actual_types(ctx, expected_keys):
         if actual_name not in expected_types:
-            ctx.api.fail('Unexpected attribute "{}" for model "{}"'.format(actual_name,
-                                                                           model_cls.__name__),
-                         ctx.context)
+            ctx.api.fail(f'Unexpected attribute "{actual_name}" for model "{model_cls.__name__}"', ctx.context)
             continue
-        helpers.check_types_compatible(ctx,
-                                       expected_type=expected_types[actual_name],
-                                       actual_type=actual_type,
-                                       error_message='Incompatible type for "{}" of "{}"'.format(actual_name,
-                                                                                                 model_cls.__name__))
+        helpers.check_types_compatible(
+            ctx,
+            expected_type=expected_types[actual_name],
+            actual_type=actual_type,
+            error_message=f'Incompatible type for "{actual_name}" of "{model_cls.__name__}"',
+        )
 
     return ctx.default_return_type
 
@@ -59,7 +60,7 @@ def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: Djan
     if model_cls is None:
         return ctx.default_return_type
 
-    return typecheck_model_method(ctx, django_context, model_cls, '__init__')
+    return typecheck_model_method(ctx, django_context, model_cls, "__init__")
 
 
 def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -72,4 +73,4 @@ def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: Djan
     if model_cls is None:
         return ctx.default_return_type
 
-    return typecheck_model_method(ctx, django_context, model_cls, 'create')
+    return typecheck_model_method(ctx, django_context, model_cls, "create")

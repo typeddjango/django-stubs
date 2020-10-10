@@ -1,10 +1,11 @@
 <img src="http://mypy-lang.org/static/mypy_light.svg" alt="mypy logo" width="300px"/>
 
-# Typesafe Django Framework
+# pep484 stubs for Django
 
 [![Build Status](https://travis-ci.com/typeddjango/django-stubs.svg?branch=master)](https://travis-ci.com/typeddjango/django-stubs)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
+
 
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
 
@@ -15,18 +16,13 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 pip install django-stubs
 ```
 
-See [Configuration](#configuration) section to get started.
-
-
-## Configuration
-
-To make `mypy` happy, you will need to add:
+To make mypy aware of the plugin, you need to add
 
 ```ini
 [mypy]
 plugins =
     mypy_django_plugin.main
-    
+
 [mypy.plugins.django-stubs]
 django_settings_module = "myproject.settings"
 ```
@@ -39,7 +35,6 @@ Two things happeining here:
 2. Our plugin also requires `django` settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified
 
 This fully working [typed boilerplate](https://github.com/wemake-services/wemake-django-template) can serve you as an example.
-
 
 ## Version compatibility
 
@@ -73,15 +68,15 @@ But, it does not make any sense to use this project without `mypy`.
 
 ### mypy crashes when I run it with this plugin installed
 
-Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
+Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`.
 
-In other words, if your `manage.py runserver` crashes, mypy will crash too. 
+In other words, if your `manage.py runserver` crashes, mypy will crash too.
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
 option to get extra information about the error.
 
 ### I cannot use QuerySet or Manager with type annotations
 
-You can get a `TypeError: 'type' object is not subscriptable` 
+You can get a `TypeError: 'type' object is not subscriptable`
 when you will try to use `QuerySet[MyModel]` or `Manager[MyModel]`.
 
 This happens because Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method.
@@ -122,5 +117,14 @@ And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` fo
 ## To get help
 
 We have Gitter here: <https://gitter.im/mypy-django/Lobby>
-
 If you think you have more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
+
+## Contributing
+
+This project is open source and community driven. As such we encourage contributions big and small. You can contribute by doing any of the following:
+
+1. Contribute code (e.g. improve stubs, add plugin capabilities, write tests etc) - to do so please follow the [contribution guide](./CONTRIBUTING.md).
+2. Assist in code reviews and discussions in issues.
+3. Identify bugs and issues and report these
+
+You can always also reach out in gitter to discuss your contributions!
