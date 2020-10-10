@@ -84,13 +84,13 @@ The stubs are based on auto-generated code created by Mypy's stubgen tool (see: 
 To make life easier we have a helper script that auto generates these stubs. To use it you can run:
 
 ```bash
-python ./scripts/stubgen-django.py
+python ./scripts/stubgen-django.py --django_version 3.1
 ```
 
-You can also pass an optional version tag, e.g.
+You can also pass an optional commit hash as a second kwarg to checkout a specific commit, e.g.
 
 ```bash
-python ./scripts/stubgen-django.py --django_version 3.12.1
+python ./scripts/stubgen-django.py --django_version 3.1 --commit_sha <commit_sha>
 ```
 
 The output for this is a gitignored folder called "stubgen" in the repo's root.

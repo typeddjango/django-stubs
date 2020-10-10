@@ -5,19 +5,16 @@ import sys
 from argparse import ArgumentParser
 from collections import defaultdict
 from distutils import spawn
-from pathlib import Path
-from typing import Dict, List, Optional, Pattern, Union
-
-from git import RemoteProgress, Repo
+from typing import Dict, List, Pattern, Union
 
 from scripts.enabled_test_modules import EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS
+from scripts.git_helpers import checkout_django_branch
+from scripts.paths import DJANGO_SOURCE_DIRECTORY, PROJECT_DIRECTORY
 
 DJANGO_COMMIT_REFS: Dict[str, str] = {
     "2.2": "8093aaa8ff9dd7386a069c6eb49fcc1c5980c033",
     "3.0": "44da7abda848f05caaed74f6a749038c87dedfda",
 }
-PROJECT_DIRECTORY = Path(__file__).parent.parent
-DJANGO_SOURCE_DIRECTORY = PROJECT_DIRECTORY / "django-source"  # type: Path
 
 
 def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]) -> List[str]:
@@ -61,37 +58,11 @@ def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[
     return False
 
 
-class ProgressPrinter(RemoteProgress):
-    def line_dropped(self, line: str) -> None:
-        print(line)
-
-    def update(self, op_code, cur_count, max_count=None, message=""):
-        print(self._cur_line)
-
-
-def checkout_django_branch(django_version: str, commit_sha: Optional[str]) -> Repo:
-    branch = f"stable/{django_version}.x"
-    if DJANGO_SOURCE_DIRECTORY.exists():
-        shutil.rmtree(DJANGO_SOURCE_DIRECTORY)
-    DJANGO_SOURCE_DIRECTORY.mkdir(exist_ok=True, parents=False)
-    repo = Repo.clone_from(
-        "https://github.com/django/django.git",
-        DJANGO_SOURCE_DIRECTORY,
-        progress=ProgressPrinter(),
-        branch=branch,
-        depth=100,
-    )
-    if commit_sha and repo.head.commit.hexsha != commit_sha:
-        repo.remote("origin").fetch(branch, progress=ProgressPrinter(), depth=100)
-        repo.git.checkout(commit_sha)
-
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--django_version", default="3.0")
     django_version = parser.parse_args().django_version
     commit_sha = DJANGO_COMMIT_REFS[django_version]
-
     repo = checkout_django_branch(django_version, commit_sha)
     mypy_config_file = (PROJECT_DIRECTORY / "mypy.ini").absolute()
     mypy_cache_dir = PROJECT_DIRECTORY / ".mypy_cache"
