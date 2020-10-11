@@ -1,23 +1,51 @@
 language: python
 cache: pip
 dist: xenial
-sudo: false
-
-python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
-
-before_install: |
-  pip install -U pip setuptools wheel
-install: |
-  pip install tox
+sudo: required
 
 jobs:
   include:
+    - name: Typecheck Django 3.0 test suite with python 3.8
+      python: 3.8
+      script: |
+        python ./scripts/typecheck_tests.py --django_version=3.0
+
+    - name: Typecheck Django 3.0 test suite with python 3.7
+      python: 3.7
+      script: |
+        python ./scripts/typecheck_tests.py --django_version=3.0
+
+    - name: Typecheck Django 3.0 test suite with python 3.6
+      python: 3.6
+      script: |
+        python ./scripts/typecheck_tests.py --django_version=3.0
+
+    - name: Typecheck Django 2.2 test suite with python 3.7
+      python: 3.7
+      script: |
+        python ./scripts/typecheck_tests.py --django_version=2.2
+
     - name: Lint using pre-commit
       python: 3.8
       script:
         - pre-commit install && pre-commit run --all-files
-    - name: tox - typecheck Django tests and execute test suite
-      script: tox
+
+    - name: Run plugin test suite with python 3.8
+      python: 3.8
+      script: pytest
+
+    - name: Run plugin test suite with python 3.7
+      python: 3.7
+      script: pytest
+
+    - name: Run plugin test suite with python 3.6
+      python: 3.6
+      script: pytest
+
+before_install: |
+  sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
+  sudo apt-get update
+  sudo apt-get install -y binutils libproj-dev gdal-bin
+  pip install -U pip setuptools wheel psycopg2-binary
+install: |
+  pip install -r ./dev-requirements.txt
