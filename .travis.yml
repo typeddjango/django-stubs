@@ -2,16 +2,9 @@ language: python
 cache: pip
 dist: xenial
 sudo: required
+
 jobs:
   include:
-    - name: Run plugin test suite with python 3.8
-      python: 3.8
-      script: 'pytest'
-
-    - name: Run plugin test suite with python 3.7
-      python: 3.7
-      script: 'pytest'
-
     - name: Typecheck Django 3.0 test suite with python 3.8
       python: 3.8
       script: |
@@ -32,25 +25,22 @@ jobs:
       script: |
         python ./scripts/typecheck_tests.py --django_version=2.2
 
-    - name: Mypy for plugin code
-      python: 3.7
-      script: 'mypy ./mypy_django_plugin'
+    - name: Lint using pre-commit
+      python: 3.8
+      script:
+        - pre-commit install && pre-commit run --all-files
 
-    - name: Lint with black
-      python: 3.7
-      script: 'black --check django-stubs/ setup.py'
+    - name: Run plugin test suite with python 3.8
+      python: 3.8
+      script: pytest
 
-    - name: Lint plugin code with flake8
+    - name: Run plugin test suite with python 3.7
       python: 3.7
-      script: 'flake8'
+      script: pytest
 
-    - name: Lint stubs with flake8-pyi and check for unused imports
-      python: 3.7
-      script: 'flake8 --config flake8-pyi.ini'
-
-    - name: Lint plugin code with isort
-      python: 3.7
-      script: 'isort --check --diff'
+    - name: Run plugin test suite with python 3.6
+      python: 3.6
+      script: pytest
 
 before_install: |
   sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y

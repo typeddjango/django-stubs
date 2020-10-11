@@ -336,7 +336,7 @@
                 class ChildUser(models.Model):
                     objects = MyManager()
 
--   case: custom_manager_annotate_method_before_type_declaration 
+-   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
         reveal_type(ModelA.objects)  # N: Revealed type is 'myapp.models.ModelA_ManagerA1[myapp.models.ModelA]'

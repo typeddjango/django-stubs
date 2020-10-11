@@ -1,8 +1,6 @@
-# noqa: F401
 from django.db.models import *
-from django.contrib.gis.db.models.aggregates import *
-from django.contrib.gis.db.models.fields import (
-    GeometryCollectionField as GeometryCollectionField,
+
+from .fields import (
     GeometryField as GeometryField,
     LineStringField as LineStringField,
     MultiLineStringField as MultiLineStringField,
@@ -10,5 +8,6 @@ from django.contrib.gis.db.models.fields import (
     MultiPolygonField as MultiPolygonField,
     PointField as PointField,
     PolygonField as PolygonField,
+    GeometryCollectionField as GeometryCollectionField,
     RasterField as RasterField,
 )
