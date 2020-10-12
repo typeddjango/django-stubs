@@ -1,0 +1,6 @@
+from django.apps import AppConfig as AppConfig
+from typing import Any
+
+class FlatPagesConfig(AppConfig):
+    name: str = ...
+    verbose_name: Any = ...

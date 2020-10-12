@@ -451,9 +451,11 @@ IGNORED_ERRORS = {
     'urlpatterns': [
         '"object" not callable',
         '"None" not callable',
+        'Argument 2 to "path" has incompatible type "Callable[[Any], None]"',
+        'Incompatible return value type (got "None", expected "HttpResponseBase")',
     ],
     'urlpatterns_reverse': [
-        'List or tuple expected as variable arguments',
+        'No overload variant of "path" matches argument types "str", "None"',
         'No overload variant of "zip" matches argument types "Any", "object"',
         'Argument 1 to "get_callable" has incompatible type "int"'
     ],
