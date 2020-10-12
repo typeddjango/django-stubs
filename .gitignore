@@ -12,3 +12,4 @@ pip-wheel-metadata/
 /.envrc
 /.direnv
 django-sources/
+.venv/

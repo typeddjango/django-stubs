@@ -1,0 +1,6 @@
+from django.db.backends.oracle.introspection import DatabaseIntrospection as DatabaseIntrospection
+from typing import Any
+
+class OracleIntrospection(DatabaseIntrospection):
+    def data_types_reverse(self): ...
+    def get_geometry_type(self, table_name: Any, description: Any): ...
