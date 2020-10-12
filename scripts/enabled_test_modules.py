@@ -497,7 +497,8 @@ IGNORED_ERRORS = {
         '"HttpResponse" has no attribute "block_size"',
     ],
     'test_abstract_inheritance': [
-        'Definition of "Meta" in base class "DescendantOne" is incompatible with definition in base class "DescendantTwo"',
+        'Definition of "Meta" in base class "DescendantOne" is incompatible with definition in base class '
+        '"DescendantTwo"',
     ],
 }
 
