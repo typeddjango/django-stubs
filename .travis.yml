@@ -38,7 +38,7 @@ jobs:
 
     - name: Lint with black
       python: 3.7
-      script: 'black --check django-stubs/'
+      script: 'black --check django-stubs/ setupy.py'
 
     - name: Lint plugin code with flake8
       python: 3.7
