@@ -425,6 +425,7 @@ IGNORED_ERRORS = {
         '"AbstractBaseSession" has no attribute',
         '"None" not callable',
     ],
+    "select_for_update": ['"Thread" has no attribute "isAlive"'],
     "select_related": [
         'Item "ForeignKey[Union[Genus, Combinable], Genus]" '
         + 'of "Union[ForeignKey[Union[Genus, Combinable], Genus], Any]"'
