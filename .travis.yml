@@ -47,15 +47,6 @@ jobs:
     - name: Run plugin test suite with python 3.9-dev
       python: 3.9-dev
       script: pytest
-    - name: Run plugin test suite with python 3.8
-      python: 3.8
-      script: pytest
-    - name: Run plugin test suite with python 3.7
-      python: 3.7
-      script: pytest
-    - name: Run plugin test suite with python 3.6
-      python: 3.6
-      script: pytest
 
 before_install: |
   sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
