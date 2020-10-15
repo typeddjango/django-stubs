@@ -60,7 +60,7 @@ We rely on different `django` and `mypy` versions:
 
 ### Is this an official Django project?
 
-No, it is not. We are indendepent from Django at the moment.
+No, it is not. We are independent from Django at the moment.
 There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
 You show your support by linking the PR.
 
@@ -73,11 +73,11 @@ But, it does not make any sense to use this project without `mypy`.
 
 ### mypy crashes when I run it with this plugin installed
 
-Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
+The current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`. 
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too. 
-You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
-option to get extra information about the error.
+You can also run `mypy` with the [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
+option to get extra information about errors.
 
 ### I cannot use QuerySet or Manager with type annotations
 
@@ -123,4 +123,4 @@ And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` fo
 
 We have Gitter here: <https://gitter.im/mypy-django/Lobby>
 
-If you think you have more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
+If you think you have a more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
