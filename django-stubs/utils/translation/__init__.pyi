@@ -1,8 +1,10 @@
 import functools
 from contextlib import ContextDecorator
-from typing import Any, Optional, Callable
+from typing import Any, Callable, Optional
 
 from django.core.handlers.wsgi import WSGIRequest
+
+from . import trans_real as trans_real
 
 LANGUAGE_SESSION_KEY: str
 
@@ -68,5 +70,3 @@ def templatize(src: str, **kwargs: Any) -> str: ...
 def deactivate_all() -> None: ...
 def get_supported_language_variant(lang_code: str, strict: bool = ...) -> str: ...
 def get_language_info(lang_code: str) -> Any: ...
-
-from . import trans_real as trans_real
