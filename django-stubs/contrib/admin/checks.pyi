@@ -1,7 +1,7 @@
 from typing import Any, List, Union, Iterable, Optional
 
 from django.contrib.admin.options import BaseModelAdmin
-from django.core.checks.messages import Error
+from django.core.checks.messages import CheckMessage, Error
 
 from django.apps.config import AppConfig
 
@@ -11,7 +11,7 @@ def check_admin_app(app_configs: Optional[Iterable[AppConfig]], **kwargs: Any) -
 def check_dependencies(**kwargs: Any) -> List[_CheckError]: ...
 
 class BaseModelAdminChecks:
-    def check(self, admin_obj: BaseModelAdmin, **kwargs: Any) -> List[_CheckError]: ...
+    def check(self, admin_obj: BaseModelAdmin, **kwargs: Any) -> List[CheckMessage]: ...
 
 class ModelAdminChecks(BaseModelAdminChecks): ...
 class InlineModelAdminChecks(BaseModelAdminChecks): ...
