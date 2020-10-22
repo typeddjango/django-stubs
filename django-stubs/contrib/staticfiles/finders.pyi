@@ -1,13 +1,13 @@
 from typing import Any, Iterable, Iterator, List, Mapping, Optional, Union, overload
 
-from django.core.checks.messages import Error
+from django.core.checks.messages import CheckMessage
 from django.core.files.storage import Storage
 from typing_extensions import Literal
 
 searched_locations: Any
 
 class BaseFinder:
-    def check(self, **kwargs: Any) -> List[Error]: ...
+    def check(self, **kwargs: Any) -> List[CheckMessage]: ...
     def find(self, path: str, all: bool = ...) -> Optional[Any]: ...
     def list(self, ignore_patterns: Any) -> Iterable[Any]: ...
 

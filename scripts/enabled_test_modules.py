@@ -68,6 +68,9 @@ IGNORED_ERRORS = {
         'error: "HttpResponse" has no attribute "streaming_content"',
         'error: "HttpResponse" has no attribute "context_data"',
     ],
+    'admin_checks': [
+        'Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'
+    ],
     'admin_inlines': [
         'error: "HttpResponse" has no attribute "rendered_content"',
     ],
