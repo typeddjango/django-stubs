@@ -1,8 +1,10 @@
 import configparser
+import sys
 from functools import partial
 from typing import Callable, Dict, List, NoReturn, Optional, Tuple, cast
 
 from django.db.models.fields.related import RelatedField
+from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
@@ -91,6 +93,10 @@ class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
         django_settings_module = extract_django_settings_module(options.config_file)
+        # Add paths from MYPYPATH env var
+        sys.path.extend(mypy_path())
+        # Add paths from mypy_path config option
+        sys.path.extend(options.mypy_path)
         self.django_context = DjangoContext(django_settings_module)
 
     def _get_current_queryset_bases(self) -> Dict[str, int]:
