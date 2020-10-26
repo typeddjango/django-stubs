@@ -2,7 +2,7 @@ from typing import Any, Tuple, Sequence, Optional
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import ProjectState
-from django.db.mifrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation
 
 class Migration:
     operations: Sequence[Operation] = ...
