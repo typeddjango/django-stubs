@@ -14,7 +14,10 @@
       def an_action(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
           pass
 
-      class A(admin.ModelAdmin):
+      class TestModel(models.Model):
+          pass
+
+      class A(admin.ModelAdmin[TestModel]):
           # BaseModelAdmin
           autocomplete_fields = ("strs",)
           raw_id_fields = ["strs"]
@@ -70,6 +73,11 @@
           actions_on_bottom = False
           actions_selection_counter = True
           admin_site = AdminSite()
+
+          # test generic ModelAdmin
+          # https://github.com/typeddjango/django-stubs/pull/504
+          # this will fail if `model` has a type other than the generic specified in the class declaration
+          model = TestModel
 
           def a_method_action(self, request, queryset):
               pass
