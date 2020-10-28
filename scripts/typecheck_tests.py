@@ -106,7 +106,7 @@ if __name__ == '__main__':
     branch, commit_sha = DJANGO_COMMIT_REFS[args.django_version]
     repo = get_django_repo_object(branch)
     if repo.head.commit.hexsha != commit_sha:
-        repo.remote('origin').fetch(branch, progress=ProgressPrinter(), depth=100)
+        repo.remote('origin').fetch(commit_sha, progress=ProgressPrinter(), depth=1)
         repo.git.checkout(commit_sha)
 
     mypy_config_file = (PROJECT_DIRECTORY / 'scripts' / 'mypy.ini').absolute()

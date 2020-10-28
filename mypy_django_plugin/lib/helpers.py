@@ -23,6 +23,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames
+from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
@@ -175,6 +176,10 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
+def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
+    return model_cls_fullname.endswith(ANNOTATED_SUFFIX)
+
+
 def add_new_class_for_module(module: MypyFile,
                              name: str,
                              bases: List[Instance],
@@ -215,10 +220,13 @@ def get_current_module(api: TypeChecker) -> MypyFile:
     return current_module
 
 
-def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: 'OrderedDict[str, MypyType]') -> TupleType:
+def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: 'OrderedDict[str, MypyType]',
+                            extra_bases: Optional[List[Instance]] = None) -> TupleType:
     current_module = get_current_module(api)
+    if extra_bases is None:
+        extra_bases = []
     namedtuple_info = add_new_class_for_module(current_module, name,
-                                               bases=[api.named_generic_type('typing.NamedTuple', [])],
+                                               bases=[api.named_generic_type('typing.NamedTuple', [])] + extra_bases,
                                                fields=fields)
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 

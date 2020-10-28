@@ -35,7 +35,7 @@ IGNORED_ERRORS = {
         'undefined in superclass',
         'Argument after ** must be a mapping',
         'note:',
-        re.compile(r'Item "None" of "[a-zA-Z_ ,\[\]]+" has no attribute'),
+        re.compile(r'Item "None" of "[a-zA-Z_ ,()\[\]]+" has no attribute'),
         '"Callable[..., None]" has no attribute',
         'does not return a value',
         'has no attribute "alternatives"',
@@ -170,7 +170,11 @@ IGNORED_ERRORS = {
     ],
     'db_functions': [
         '"FloatModel" has no attribute',
-        'Incompatible types in assignment (expression has type "Optional[Any]", variable has type "FloatModel")'
+        'Incompatible types in assignment (expression has type "Optional[FloatModel (annotated)]", variable has type '
+        + '"FloatModel")',
+        re.compile(r'Argument \d to "\w+" has incompatible type "Union\[.+?Field\[.+?\], .+?\], Any]";'
+                   + r' expected "(SupportsFloat|float)"'),
+        re.compile(r'Unsupported left operand type for \*\* \(".+?Field.+?"\)')
     ],
     'decorators': [
         '"Type[object]" has no attribute "method"',
