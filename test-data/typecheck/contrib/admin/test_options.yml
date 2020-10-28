@@ -136,3 +136,13 @@
 
       class A(admin.ModelAdmin):
           actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[ModelAdmin[Any], HttpRequest, QuerySet[Any]], None], str]"
+-   case: errors_for_invalid_model_admin_generic
+    main: |
+      from django.contrib.admin import ModelAdmin
+      from django.db.models import Model
+
+      class TestModel(Model):
+          pass
+
+      class A(ModelAdmin[TestModel]):
+          model = int  # E: Incompatible types in assignment (expression has type "Type[int]", base class "ModelAdmin" defined the type as "Type[TestModel]")
