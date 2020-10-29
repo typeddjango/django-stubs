@@ -24,21 +24,24 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     for lookup_kwarg, provided_type in zip(lookup_kwargs, provided_lookup_types):
         if lookup_kwarg is None:
             continue
-        if (isinstance(provided_type, Instance)
-                and provided_type.type.has_base('django.db.models.expressions.Combinable')):
+        if isinstance(provided_type, Instance) and provided_type.type.has_base(
+            "django.db.models.expressions.Combinable"
+        ):
             provided_type = resolve_combinable_type(provided_type, django_context)
 
         lookup_type = django_context.resolve_lookup_expected_type(ctx, model_cls, lookup_kwarg)
         # Managers as provided_type is not supported yet
-        if (isinstance(provided_type, Instance)
-                and helpers.has_any_of_bases(provided_type.type, (fullnames.MANAGER_CLASS_FULLNAME,
-                                                                  fullnames.QUERYSET_CLASS_FULLNAME))):
+        if isinstance(provided_type, Instance) and helpers.has_any_of_bases(
+            provided_type.type, (fullnames.MANAGER_CLASS_FULLNAME, fullnames.QUERYSET_CLASS_FULLNAME)
+        ):
             return ctx.default_return_type
 
-        helpers.check_types_compatible(ctx,
-                                       expected_type=lookup_type,
-                                       actual_type=provided_type,
-                                       error_message=f'Incompatible type for lookup {lookup_kwarg!r}:')
+        helpers.check_types_compatible(
+            ctx,
+            expected_type=lookup_type,
+            actual_type=provided_type,
+            error_message=f"Incompatible type for lookup {lookup_kwarg!r}:",
+        )
 
     return ctx.default_return_type
 

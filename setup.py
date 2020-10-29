@@ -17,7 +17,7 @@ def find_stub_files(name: str) -> List[str]:
     return result
 
 
-with open("README.md", "r") as f:
+with open("README.md") as f:
     readme = f.read()
 
 dependencies = [
@@ -42,15 +42,17 @@ setup(
     packages=["django-stubs", *find_packages(exclude=["scripts"])],
     package_data={"django-stubs": find_stub_files("django-stubs")},
     classifiers=[
-        "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Typing :: Typed",
         "Framework :: Django",
         "Framework :: Django :: 2.2",
         "Framework :: Django :: 3.0",
-        "Typing :: Typed",
+        "Framework :: Django :: 3.1",
     ],
     project_urls={
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",

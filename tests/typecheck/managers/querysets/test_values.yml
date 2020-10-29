@@ -19,7 +19,7 @@
                 class Blog(models.Model):
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100)
-                
+
 -   case: queryset_values_all_values
     main: |
         from myapp.models import Blog

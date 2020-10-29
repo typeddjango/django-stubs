@@ -1,111 +1,106 @@
-# How to contribute
+# Contribution Guide
+
+This project is open source and community driven. As such we encourage code contributions of all kinds. Some areas you can contribute in:
+
+1. Improve the stubs
+2. Sync stubs with the latest version of Django
+3. Improve plugin code and extend its capabilities
+4. Write tests
+5. Update dependencies
 
 ## Tutorials
 
-If you want to start working on this project,
-you will need to get familiar with these projects:
+If you want to start working on this project, you will need to get familiar with python typings.
+The Mypy documentation offers an excellent resource for this, as well as the python official documentation:
 
-- [Django docs](https://docs.djangoproject.com/en/dev/)
-- [Typing in Python](https://inventwithpython.com/blog/2019/11/24/type-hints-for-busy-python-programmers/)
+- [Mypy typing documentation](https://mypy.readthedocs.io/en/stable/#overview-type-system-reference)
+- [Python official typing documentation](https://docs.python.org/3/library/typing.html)
+- [Typing in Python](https://inventwithpython.com/blog/2019/11/24/type-hints-for-busy-python-programmers/) article
+
+Additionally, the following resources might be useful:
+
 - [How to write custom mypy plugins](https://mypy.readthedocs.io/en/stable/extending_mypy.html)
 - [Typechecking Django and DRF](https://sobolevn.me/2019/08/typechecking-django-and-drf) guide
 - [Testing mypy stubs, plugins, and types](https://sobolevn.me/2019/08/testing-mypy-types) guide
+- [Awesome Python Typing](https://github.com/typeddjango/awesome-python-typing) list
 
-It is also recommended to take a look at these resources:
+## Dev setup
 
-- [Awesome Python Typing](https://github.com/typeddjango/awesome-python-typing)
+### Repository Setup
 
+As a first step you will need to fork this repository and clone your fork locally.
+In order to be able to continously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
-## Dev documentation
+### Dependency Setup
 
-TODO
+After your repository is setup you will then need to create and activate a git ignored virtual env, e.g.:
 
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-## Dependencies
-
-We use `pip` to manage the dependencies.
-
-To install them you would need to activate your `virtualenv` and run `install` command:
+Then install the dev requirements:
 
 ```bash
 pip install -r ./dev-requirements.txt
 ```
 
-
-## Tests and linters
-
-We use `mypy`, `pytest`, `flake8`, and `black` for quality control.
-Here's [how we run our CI](https://github.com/typeddjango/django-stubs/blob/master/.travis.yml).
-
-### Typechecking
-
-To run typechecking use:
+Finally, install the pre-commit hooks:
 
 ```bash
-mypy ./mypy_django_plugin
+pre-commit install
 ```
 
-### Testing
+### Testing and Linting
 
-There are unit tests and type-related tests.
+We use `mypy`, `pytest`, `flake8`, and `black` for quality control. All tools except pytest are executed using pre-commit when you make a commit.
+To ensure there are not formatting or typing issues in the entire repository you can run:
 
-To run unit tests:
+```bash
+pre-commit run --all-files
+```
+
+NOTE: This command will not only lint but also modify files - so make sure to commit whatever changes you've made before hand.
+You can also run pre-commit per file or for a specific path, simply replace "--all-files" with a target (see [this guide](https://codeburst.io/tool-your-django-project-pre-commit-hooks-e1799d84551f) for more info).
+
+To execute the unit tests, simply run:
 
 ```bash
 pytest
 ```
 
-Type-related tests ensure that different Django versions do work correctly.
-To run type-related tests:
+We also test the stubs against the Django's own test suite. This is done in CI but you can also do this locally.
+To execute the script run:
 
 ```bash
-python ./scripts/typecheck_tests.py --django_version=2.2
-python ./scripts/typecheck_tests.py --django_version=3.0
-```
-
-Currently we only support two Django versions.
-
-### Linting
-
-To run auto-formatting:
-
-```bash
-isort -rc .
-black django-stubs/
-```
-
-To run linting:
-
-```bash
-flake8
-flake8 --config flake8-pyi.ini
+python ./scripts/typecheck_tests.py --django_version 3.0
 ```
 
 
-## Submitting your code
+### Generating Stubs using Stubgen
 
-We use [trunk based](https://trunkbaseddevelopment.com/)
-development (we also sometimes call it `wemake-git-flow`).
+The stubs are based on auto-generated code created by Mypy's stubgen tool (see: [the stubgen docs](https://mypy.readthedocs.io/en/stable/stubgen.html)).
+To make life easier we have a helper script that auto generates these stubs. To use it you can run:
 
-What the point of this method?
+```bash
+python ./scripts/stubgen-django.py --django_version 3.1
+```
 
-1. We use protected `master` branch,
-   so the only way to push your code is via pull request
-2. We use issue branches: to implement a new feature or to fix a bug
-   create a new branch named `issue-$TASKNUMBER`
-3. Then create a pull request to `master` branch
-4. We use `git tag`s to make releases, so we can track what has changed
-   since the latest release
+You can also pass an optional commit hash as a second kwarg to checkout a specific commit, e.g.
 
-So, this way we achieve an easy and scalable development process
-which frees us from merging hell and long-living branches.
+```bash
+python ./scripts/stubgen-django.py --django_version 3.1 --commit_sha <commit_sha>
+```
 
-In this method, the latest version of the app is always in the `master` branch.
+The output for this is a gitignored folder called "stubgen" in the repo's root.
 
+## Submission Guidelines
 
-## Other help
+The workflow for contributions is fairly simple:
 
-You can contribute by spreading a word about this library.
-It would also be a huge contribution to write
-a short article on how you are using this project.
-You can also share your best practices with us.
+1. fork and setup the repository as in the previous step.
+2. create a local branch.
+3. make whatever changes you want to contribute.
+4. ensure your contribution does not introduce linting issues or breaks the tests by linting and testing the code.
+5. make a pull request with an adequate description.
