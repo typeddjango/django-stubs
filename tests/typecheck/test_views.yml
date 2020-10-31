@@ -1,0 +1,12 @@
+-   case: login_form_form_valid_typechecks
+    main: |
+        from django.contrib.auth.views import LoginView
+        from django.contrib.auth import login as auth_login
+        from django.http import HttpResponseRedirect
+        from django.contrib.auth.forms import AuthenticationForm
+
+        class MyLoginView(LoginView):
+            def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect:
+                """Ensure that form can have type AuthenticationForm."""
+                form.get_user()
+                return HttpResponseRedirect(self.get_success_url())
