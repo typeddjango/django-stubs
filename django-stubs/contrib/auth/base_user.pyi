@@ -23,6 +23,7 @@ class AbstractBaseUser(models.Model):
 
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
+    is_active = True
     def get_username(self) -> str: ...
     def natural_key(self) -> Tuple[str]: ...
     @property
