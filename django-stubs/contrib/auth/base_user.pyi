@@ -1,8 +1,9 @@
 import sys
-from typing import Any, Optional, Tuple, List, overload, TypeVar
+from typing import Any, Optional, Tuple, List, overload, TypeVar, Union
 
 from django.db.models.base import Model
-
+from django.db.models.expressions import Combinable
+from django.db.models.fields import BooleanField
 from django.db import models
 
 if sys.version_info < (3, 8):
@@ -23,6 +24,7 @@ class AbstractBaseUser(models.Model):
 
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
+    is_active: Union[bool, BooleanField[Union[bool, Combinable], bool]] = ...
     def get_username(self) -> str: ...
     def natural_key(self) -> Tuple[str]: ...
     @property
