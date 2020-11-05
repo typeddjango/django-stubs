@@ -81,7 +81,8 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
 
     parser = configparser.ConfigParser()
     try:
-        parser.read_file(open(cast(str, config_file_path)), source=config_file_path)
+        with open(cast(str, config_file_path)) as handle:
+            parser.read_file(handle, source=config_file_path)
     except (IsADirectoryError, OSError):
         exit(1)
 
