@@ -1,0 +1,15 @@
+-   case: test_request_session
+    main: |
+      from django.contrib.auth import get_user
+      from django.contrib.sessions.middleware import SessionMiddleware
+      from django.http import HttpRequest
+
+      request = HttpRequest()
+      SessionMiddleware().process_request(request)
+      get_user(request)
+-   case: test_client_session
+    main: |
+        from django.contrib.auth import get_user
+        from django.test import Client
+
+        get_user(Client())
