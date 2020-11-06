@@ -1,6 +1,6 @@
 import functools
 from contextlib import ContextDecorator
-from typing import Any, Optional, Callable
+from typing import Any, Optional, Callable, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 
@@ -42,9 +42,12 @@ def npgettext(context: str, singular: str, plural: str, number: int) -> str: ...
 gettext_lazy = gettext
 ugettext_lazy = ugettext
 pgettext_lazy = pgettext
-ngettext_lazy = ngettext
-ungettext_lazy = ungettext
-npgettext_lazy = npgettext
+
+def ngettext_lazy(singular: str, plural: str, number: Union[int, str, None]) -> str: ...
+
+ungettext_lazy = ngettext_lazy
+
+def npgettext_lazy(context: str, singular: str, plural: str, number: Union[int, str, None]) -> str: ...
 
 def activate(language: str) -> None: ...
 def deactivate() -> None: ...
