@@ -3,12 +3,11 @@ from typing import Any, List, Optional, Type, Union
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.options import Options
 from django.http.request import HttpRequest
-from django.test import Client
+from django.test.client import Client
 
 from .signals import user_logged_in as user_logged_in
 from .signals import user_logged_out as user_logged_out
