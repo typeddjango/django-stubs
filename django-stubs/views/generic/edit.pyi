@@ -8,7 +8,7 @@ from typing_extensions import Literal
 
 from django.http import HttpRequest, HttpResponse
 
-_FormT = TypeVar('_FormT', bound=BaseForm)
+_FormT = TypeVar("_FormT", bound=BaseForm)
 
 class AbstractFormMixin(ContextMixin):
     initial: Dict[str, Any] = ...
