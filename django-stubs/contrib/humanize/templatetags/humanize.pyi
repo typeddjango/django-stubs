@@ -1,5 +1,5 @@
 from datetime import date, datetime as datetime
-from typing import Any, Callable, Dict, Optional, SupportsInt, Tuple, Union
+from typing import Any, Callable, Dict, Optional, SupportsInt, Tuple, Type, Union
 from django import template
 
 register: template.Library
@@ -20,4 +20,4 @@ class NaturalTimeFormatter:
     future_substrings: Dict[str, str]
 
     @classmethod
-    def string_for(cls: NaturalTimeFormatter, value: Any) -> Any: ...
+    def string_for(cls: Type[NaturalTimeFormatter], value: Any) -> Any: ...
