@@ -18,6 +18,5 @@ class NaturalTimeFormatter:
     time_strings: Dict[str, str]
     past_substrings: Dict[str, str]
     future_substrings: Dict[str, str]
-
     @classmethod
     def string_for(cls: Type[NaturalTimeFormatter], value: Any) -> Any: ...
