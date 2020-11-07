@@ -7,12 +7,11 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.options import Options
 from django.http.request import HttpRequest
+from django.test.client import Client
 
-from .signals import (
-    user_logged_in as user_logged_in,
-    user_logged_out as user_logged_out,
-    user_login_failed as user_login_failed,
-)
+from .signals import user_logged_in as user_logged_in
+from .signals import user_logged_out as user_logged_out
+from .signals import user_login_failed as user_login_failed
 
 SESSION_KEY: str
 BACKEND_SESSION_KEY: str
@@ -27,7 +26,7 @@ def login(
 ) -> None: ...
 def logout(request: HttpRequest) -> None: ...
 def get_user_model() -> Type[Model]: ...
-def get_user(request: HttpRequest) -> Union[AbstractBaseUser, AnonymousUser]: ...
+def get_user(request: Union[HttpRequest, Client]) -> Union[AbstractBaseUser, AnonymousUser]: ...
 def get_permission_codename(action: str, opts: Options) -> str: ...
 def update_session_auth_hash(request: HttpRequest, user: AbstractBaseUser) -> None: ...
 
