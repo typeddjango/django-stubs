@@ -7,7 +7,8 @@ import django_stubs
 
 django_stubs.monkeypatch()
 
-settings.configure(global_settings, INSTALLED_APPS=["thing"])
+# important: if you change the filename, you need to change the INSTALLED_APPS
+settings.configure(global_settings, INSTALLED_APPS=["test_monkey_patching"])
 
 django.setup()
 
