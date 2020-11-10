@@ -43,7 +43,7 @@ source .venv/bin/activate
 Then install the dev requirements:
 
 ```bash
-pip install -e ./django_stubs_ext -r ./dev-requirements.txt
+pip install -r ./dev-requirements.txt
 ```
 
 Finally, install the pre-commit hooks:
