@@ -3,9 +3,9 @@ from django.conf import global_settings, settings
 from django.contrib import admin
 from django.db import models
 
-import django_stubs
+import django_stubs_ext
 
-django_stubs.monkeypatch()
+django_stubs_ext.monkeypatch()
 
 # important: if you change the filename, you need to change the INSTALLED_APPS
 settings.configure(global_settings, INSTALLED_APPS=["test_monkey_patching"])
