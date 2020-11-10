@@ -7,7 +7,6 @@ with open("README.md") as f:
 
 dependencies = [
     "django",
-    "django-stubs",
 ]
 
 setup(
@@ -18,8 +17,8 @@ setup(
     long_description_content_type="text/markdown",
     license="MIT",
     url="https://github.com/typeddjango/django-stubs",
-    author="Maksim Kurnikov",
-    author_email="maxim.kurnikov@gmail.com",
+    author="Simula Proxy",
+    author_email="3nki.nam.shub@gmail.com",
     py_modules=[],
     python_requires=">=3.6",
     install_requires=dependencies,

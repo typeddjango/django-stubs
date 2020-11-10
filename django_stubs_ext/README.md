@@ -27,7 +27,13 @@ This only needs to be called once, so the call to `monkeypatch` should be placed
 
 ## Version compatibility
 
-Since django-stubs supports multiple Django versions, this package takes care to only monkey-patch the features needed by your django version, and decides which features to patch at runtime.
+Since django-stubs supports multiple Django versions, this package takes care to only monkey-patch the features needed by your django version, and decides which features to patch at runtime. This is completely safe, as (currently) we only add a `__class_getitem__` method that does nothing:
+
+```py
+@classmethod
+def __class_getitem__(cls, *args, **kwargs):
+    return cls
+```
 
 ## To get help
 

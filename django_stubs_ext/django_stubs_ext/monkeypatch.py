@@ -28,7 +28,7 @@ class MPGeneric(Generic[_T]):
 # certain django classes need to be generic, but lack the __class_getitem__ dunder needed to
 # annotate them: https://github.com/typeddjango/django-stubs/issues/507
 # this list stores them so `monkeypatch` can fix them when called
-__need_generic: List[MPGeneric] = [
+_need_generic: List[MPGeneric] = [
     MPGeneric(ModelAdmin),
 ]
 
@@ -36,7 +36,7 @@ __need_generic: List[MPGeneric] = [
 # currently just adds the __class_getitem__ dunder. if more monkeypatching is needed, add it here
 def monkeypatch() -> None:
     """Monkey patch django as necessary to work properly with mypy."""
-    for el in filter(lambda x: django.VERSION[0] == x.version or x.version is None, __need_generic):
+    for el in filter(lambda x: django.VERSION[0] == x.version or x.version is None, _need_generic):
         el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
 
 

@@ -24,6 +24,7 @@ dependencies = [
     "mypy>=0.790",
     "typing-extensions",
     "django",
+    "django-stubs-ext",
 ]
 
 setup(

@@ -54,4 +54,4 @@ before_install: |
   sudo apt-get install -y binutils libproj-dev gdal-bin
   pip install -U pip setuptools wheel
 install: |
-  pip install -r ./dev-requirements.txt -r ./requirements.txt
+  pip install -r ./dev-requirements.txt
