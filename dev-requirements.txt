@@ -9,4 +9,3 @@ pytest==6.1.1
 pytest-mypy-plugins==1.6.1
 psycopg2-binary
 -e .
--e ./django_stubs_ext
