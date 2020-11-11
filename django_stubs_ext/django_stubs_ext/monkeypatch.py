@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, Type, TypeVar
+from typing import Any, Generic, List, Optional, Type, TypeVar
 
 import django
 from django.contrib.admin import ModelAdmin
@@ -21,7 +21,7 @@ class MPGeneric(Generic[_T]):
     version: Optional[int]
     cls: Type[_T]
 
-    def __init__(self, cls: Type[_T], version: Optional[int] = None) -> None:
+    def __init__(self, cls: Type[_T], version: Optional[int] = None):
         """Set the data fields, basic constructor."""
         self.version = version
         self.cls = cls
@@ -30,7 +30,7 @@ class MPGeneric(Generic[_T]):
 # certain django classes need to be generic, but lack the __class_getitem__ dunder needed to
 # annotate them: https://github.com/typeddjango/django-stubs/issues/507
 # this list stores them so `monkeypatch` can fix them when called
-_need_generic: List[MPGeneric] = [
+_need_generic: List[MPGeneric[Any]] = [
     MPGeneric(ModelAdmin),
     MPGeneric(FormMixin),
     MPGeneric(BaseModelAdmin),
