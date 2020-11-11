@@ -35,5 +35,12 @@ repos:
         entry: mypy
         language: system
         types: [ python ]
-        exclude: "scripts/*"
+        exclude: "scripts/|django_stubs_ext/"
         args: [ "--cache-dir=/dev/null", "--no-incremental" ]
+      - id: mypy
+        name: mypy (django_stubs_ext)
+        entry: mypy
+        language: system
+        types: [ python ]
+        files: "django_stubs_ext/|django_stubs_ext/tests/"
+        args: [ "--cache-dir=/dev/null", "--no-incremental", "--strict" ]

@@ -1,47 +1,28 @@
-import os
 from distutils.core import setup
-from typing import List
 
 from setuptools import find_packages
-
-
-def find_stub_files(name: str) -> List[str]:
-    result = []
-    for root, dirs, files in os.walk(name):
-        for file in files:
-            if file.endswith(".pyi"):
-                if os.path.sep in root:
-                    sub_root = root.split(os.path.sep, 1)[-1]
-                    file = os.path.join(sub_root, file)
-                result.append(file)
-    return result
-
 
 with open("README.md") as f:
     readme = f.read()
 
 dependencies = [
-    "mypy>=0.790",
-    "typing-extensions",
     "django",
-    "django-stubs-ext",
 ]
 
 setup(
-    name="django-stubs",
-    version="1.7.0",
-    description="Mypy stubs for Django",
+    name="django-stubs-ext",
+    version="0.1.0",
+    description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
     license="MIT",
     url="https://github.com/typeddjango/django-stubs",
-    author="Maksim Kurnikov",
-    author_email="maxim.kurnikov@gmail.com",
+    author="Simula Proxy",
+    author_email="3nki.nam.shub@gmail.com",
     py_modules=[],
     python_requires=">=3.6",
     install_requires=dependencies,
-    packages=["django-stubs", *find_packages(exclude=["scripts"])],
-    package_data={"django-stubs": find_stub_files("django-stubs")},
+    packages=["django_stubs_ext", *find_packages(exclude=["scripts"])],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
