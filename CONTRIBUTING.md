@@ -104,3 +104,9 @@ The workflow for contributions is fairly simple:
 3. make whatever changes you want to contribute.
 4. ensure your contribution does not introduce linting issues or breaks the tests by linting and testing the code.
 5. make a pull request with an adequate description.
+
+## A Note About Generics
+
+As Django uses a lot of the more dynamic features of Python (i.e. metaobjects), statically typing it requires heavy use of generics. Unfortunately, the syntax for generics is also valid python syntax. For instance, the statement `class SomeClass(SuperType[int])` implicitly translates to `class SomeClass(SuperType.__class_getitem__(int))`. If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code typechecks.
+
+When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error. If it does, please add the new generic class to the `_need_generic` list in the [django_stubs_ext monkeypatch function](https://github.com/typeddjango/django-stubs/tree/master/django_stubs_ext/django_stubs_ext/monkeypatch.py)
