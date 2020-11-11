@@ -2,6 +2,8 @@ from typing import Generic, List, Optional, Type, TypeVar
 
 import django
 from django.contrib.admin import ModelAdmin
+from django.contrib.admin.options import BaseModelAdmin
+from django.views.generic.edit import FormMixin
 
 _T = TypeVar("_T")
 
@@ -30,6 +32,8 @@ class MPGeneric(Generic[_T]):
 # this list stores them so `monkeypatch` can fix them when called
 _need_generic: List[MPGeneric] = [
     MPGeneric(ModelAdmin),
+    MPGeneric(FormMixin),
+    MPGeneric(BaseModelAdmin),
 ]
 
 

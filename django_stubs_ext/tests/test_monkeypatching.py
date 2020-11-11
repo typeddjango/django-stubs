@@ -8,4 +8,4 @@ def test_patched_generics():
     """Test that the generics actually get patched."""
     for el in _need_generic:
         # This only throws an exception if the monkeypatch failed
-        el.cls[int]  # doesn't need to be int, can be any class
+        assert el.cls[type] == el.cls  # `type` is arbitrary
