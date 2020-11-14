@@ -1,5 +1,9 @@
 import os
-from django.core.management.base import BaseCommand as BaseCommand, CommandError as CommandError, CommandParser as CommandParser
+from django.core.management.base import (
+    BaseCommand as BaseCommand,
+    CommandError as CommandError,
+    CommandParser as CommandParser,
+)
 from django.core.management.utils import find_command as find_command, popen_wrapper as popen_wrapper
 from typing import List, Tuple, Union
 

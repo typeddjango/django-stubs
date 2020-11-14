@@ -42,6 +42,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs | mypy version | django version | python version
 | ------------ | ---- | ---- | ---- |
+| 1.7.0 | 0.790 | 2.2.x \|\| 3.x | ^3.6
 | 1.6.0 | 0.780 | 2.2.x \|\| 3.x | ^3.6
 | 1.5.0 | 0.770 | 2.2.x \|\| 3.x | ^3.6
 | 1.4.0 | 0.760 | 2.2.x \|\| 3.x | ^3.6
@@ -77,11 +78,13 @@ option to get extra information about the error.
 ### I cannot use QuerySet or Manager with type annotations
 
 You can get a `TypeError: 'type' object is not subscriptable`
-when you will try to use `QuerySet[MyModel]` or `Manager[MyModel]`.
+when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other Django-based Generic types.
 
-This happens because Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method.
+This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
 
-You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
+1. You can go with our
+
+2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
 Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
 

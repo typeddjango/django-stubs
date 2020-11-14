@@ -1,11 +1,14 @@
-from typing import Any, Generic, List, Optional, Type, TypeVar
+from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
 import django
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
 from django.views.generic.edit import FormMixin
 
 _T = TypeVar("_T")
+_VersionSpec = Tuple[int, int]
 
 
 class MPGeneric(Generic[_T]):
@@ -21,10 +24,14 @@ class MPGeneric(Generic[_T]):
     version: Optional[int]
     cls: Type[_T]
 
-    def __init__(self, cls: Type[_T], version: Optional[int] = None):
+    def __init__(self, cls: Type[_T], version: Optional[_VersionSpec] = None):
         """Set the data fields, basic constructor."""
         self.version = version
         self.cls = cls
+
+    def __repr__(self) -> str:
+        """Better representation in tests and debug."""
+        return "<MPGeneric: {0}, versions={1}>".format(self.cls, self.version or "all")
 
 
 # certain django classes need to be generic, but lack the __class_getitem__ dunder needed to
@@ -34,13 +41,20 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(ModelAdmin),
     MPGeneric(FormMixin),
     MPGeneric(BaseModelAdmin),
+    # These types do have native `__class_getitem__` method since django 3.1:
+    MPGeneric(QuerySet, (3, 1)),
+    MPGeneric(BaseManager, (3, 1)),
 ]
 
 
 # currently just adds the __class_getitem__ dunder. if more monkeypatching is needed, add it here
 def monkeypatch() -> None:
     """Monkey patch django as necessary to work properly with mypy."""
-    for el in filter(lambda x: django.VERSION[0] == x.version or x.version is None, _need_generic):
+    suited_for_this_version = filter(
+        spec.version is None or django.VERSION[:2] <= spec.version,
+        _need_generic,
+    )
+    for el in suited_for_this_version:
         el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
 
 

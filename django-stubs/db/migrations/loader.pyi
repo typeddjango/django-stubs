@@ -3,7 +3,12 @@ from typing import Any, Dict, Optional, Sequence, Set, Tuple, Union
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 
-from .exceptions import AmbiguityError as AmbiguityError, BadMigrationError as BadMigrationError, InconsistentMigrationHistory as InconsistentMigrationHistory, NodeNotFoundError as NodeNotFoundError
+from .exceptions import (
+    AmbiguityError as AmbiguityError,
+    BadMigrationError as BadMigrationError,
+    InconsistentMigrationHistory as InconsistentMigrationHistory,
+    NodeNotFoundError as NodeNotFoundError,
+)
 
 MIGRATIONS_MODULE_NAME: str
 

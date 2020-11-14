@@ -1,6 +1,13 @@
 from django.apps import apps as apps
-from django.core.management.base import BaseCommand as BaseCommand, CommandError as CommandError, no_translations as no_translations
-from django.core.management.sql import emit_post_migrate_signal as emit_post_migrate_signal, emit_pre_migrate_signal as emit_pre_migrate_signal
+from django.core.management.base import (
+    BaseCommand as BaseCommand,
+    CommandError as CommandError,
+    no_translations as no_translations,
+)
+from django.core.management.sql import (
+    emit_post_migrate_signal as emit_post_migrate_signal,
+    emit_pre_migrate_signal as emit_pre_migrate_signal,
+)
 from django.db import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS, connections as connections, router as router
 from django.db.migrations.autodetector import MigrationAutodetector as MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor as MigrationExecutor
