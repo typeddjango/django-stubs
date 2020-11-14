@@ -11,8 +11,6 @@ jobs:
         python-version: ['3.9']
     steps:
       - uses: actions/checkout@v2
-      - name: Setup system dependencies
-        run: sudo apt-get install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
