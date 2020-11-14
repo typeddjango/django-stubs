@@ -9,3 +9,4 @@ django-source/
 out/
 pip-wheel-metadata/
 stubgen/
+build/
