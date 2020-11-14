@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: ['3.9']
     steps:
       - uses: actions/checkout@v2
       - name: Setup system dependencies
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: ['3.7']
     steps:
       - uses: actions/checkout@v2
       - name: Setup system dependencies
@@ -50,8 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        django-version: [2.2, 3.0]
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+        django-version: ['2.2', '3.0']
     steps:
       - uses: actions/checkout@v2
       - name: Setup system dependencies
@@ -66,4 +66,4 @@ jobs:
           pip install -r ./dev-requirements.txt
 
       - name: Run tests
-        run: python ./scripts/typecheck_tests.py --django_version=${{ matrix.django-version }}
+        run: python ./scripts/typecheck_tests.py --django_version="${{ matrix.django-version }}"
