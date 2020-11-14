@@ -1,6 +1,6 @@
 from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
-import django
+from django import VERSION as VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
 from django.db.models.manager import BaseManager
@@ -21,9 +21,6 @@ class MPGeneric(Generic[_T]):
     possible issues we may run into with this method.
     """
 
-    version: Optional[int]
-    cls: Type[_T]
-
     def __init__(self, cls: Type[_T], version: Optional[_VersionSpec] = None):
         """Set the data fields, basic constructor."""
         self.version = version
@@ -31,7 +28,7 @@ class MPGeneric(Generic[_T]):
 
     def __repr__(self) -> str:
         """Better representation in tests and debug."""
-        return "<MPGeneric: {0}, versions={1}>".format(self.cls, self.version or "all")
+        return "<MPGeneric: {}, versions={}>".format(self.cls, self.version or "all")
 
 
 # certain django classes need to be generic, but lack the __class_getitem__ dunder needed to
@@ -51,7 +48,7 @@ _need_generic: List[MPGeneric[Any]] = [
 def monkeypatch() -> None:
     """Monkey patch django as necessary to work properly with mypy."""
     suited_for_this_version = filter(
-        spec.version is None or django.VERSION[:2] <= spec.version,
+        lambda spec: spec.version is None or VERSION[:2] <= spec.version,
         _need_generic,
     )
     for el in suited_for_this_version:

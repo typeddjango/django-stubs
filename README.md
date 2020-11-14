@@ -58,7 +58,7 @@ We rely on different `django` and `mypy` versions:
 
 No, it is not. We are independent from Django at the moment.
 There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
-You show your support by linking the PR.
+You can show your support by liking the PR.
 
 ### Is it safe to use this in production?
 
@@ -82,11 +82,23 @@ when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other D
 
 This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
 
-1. You can go with our
+1. You can go with our [`django_stubs_ext`](https://github.com/typeddjango/django-stubs/tree/master/django_stubs_ext) helper, that patches all the types we use as Generic in django.
+
+Install it:
+
+```bash
+pip install django-stubs-ext  # as a production dependency
+```
+
+And then place in your `manage.py`, `wsgi.py`, and `asgi.py` files:
+
+```python
+import django_stubs_ext
+
+django_stubs_ext.monkeypath()
+```
 
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
-
-Currently we [are working](https://github.com/django/django/pull/12405) on providing `__class_getitem__` to the classes where we need them.
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 

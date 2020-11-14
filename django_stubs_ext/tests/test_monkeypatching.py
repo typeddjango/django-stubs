@@ -1,25 +1,43 @@
+from contextlib import suppress
+from typing import Optional
+
 import pytest
+from _pytest.fixtures import FixtureRequest
+from _pytest.monkeypatch import MonkeyPatch
+from typing_extensions import Protocol
 
 import django_stubs_ext
-from django_stubs_ext.monkeypatch import _need_generic, _VersionSpec, django
+from django_stubs_ext import patch
+from django_stubs_ext.patch import _need_generic, _VersionSpec
+
+
+class _MakeGenericClasses(Protocol):
+    """Used to represent a type of ``make_generic_classes`` fixture."""
+
+    def __call__(self, django_version: Optional[_VersionSpec] = None) -> None:
+        ...
 
 
 @pytest.fixture(scope="function")
-def make_generic_classes(request, monkeypatch):
-    def fin():
+def make_generic_classes(
+    request: FixtureRequest,
+    monkeypatch: MonkeyPatch,
+) -> _MakeGenericClasses:
+    def fin() -> None:
         for el in _need_generic:
-            delattr(el.cls, "__class_getitem__")
+            with suppress(AttributeError):
+                delattr(el.cls, "__class_getitem__")
 
-    def factory(django_version=None):
+    def factory(django_version: Optional[_VersionSpec] = None) -> None:
         if django_version is not None:
-            monkeypatch.setattr(django, "VERSION", django_version)
+            monkeypatch.setattr(patch, "VERSION", django_version)
         django_stubs_ext.monkeypatch()
 
     request.addfinalizer(fin)
     return factory
 
 
-def test_patched_generics(make_generic_classes) -> None:
+def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
     """Test that the generics actually get patched."""
     make_generic_classes()
 
@@ -39,11 +57,11 @@ def test_patched_generics(make_generic_classes) -> None:
 )
 def test_patched_version_specific(
     django_version: _VersionSpec,
-    make_generic_classes,
+    make_generic_classes: _MakeGenericClasses,
 ) -> None:
     """Test version speicific types."""
     make_generic_classes(django_version)
 
     for el in _need_generic:
-        if el.version is not None and el.version[:2] <= django_version:
+        if el.version is not None and django_version <= el.version:
             assert el.cls[int] is el.cls
