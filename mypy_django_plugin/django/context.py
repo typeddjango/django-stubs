@@ -148,7 +148,9 @@ class DjangoContext:
         raise ValueError("No primary key defined")
 
     def get_expected_types(self, api: TypeChecker, model_cls: Type[Model], *, method: str) -> Dict[str, MypyType]:
-        from django.contrib.contenttypes.fields import GenericForeignKey
+        contenttypes_in_apps = self.apps_registry.is_installed("django.contrib.contenttypes")
+        if contenttypes_in_apps:
+            from django.contrib.contenttypes.fields import GenericForeignKey
 
         expected_types = {}
         # add pk if not abstract=True
@@ -192,7 +194,7 @@ class DjangoContext:
 
                     expected_types[field_name] = model_set_type
 
-            elif isinstance(field, GenericForeignKey):
+            elif contenttypes_in_apps and isinstance(field, GenericForeignKey):
                 # it's generic, so cannot set specific model
                 field_name = field.name
                 gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
