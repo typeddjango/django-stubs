@@ -361,8 +361,13 @@ def copy_method_to_another_class(
     if isinstance(bound_return_type, PlaceholderNode):
         return
 
+    try:
+        original_arguments = method_node.arguments[1:]
+    except AttributeError:
+        original_arguments = []
+
     for arg_name, arg_type, original_argument in zip(
-        method_type.arg_names[1:], method_type.arg_types[1:], method_node.arguments[1:]
+        method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
     ):
         bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
         if bound_arg_type is None and not semanal_api.final_iteration:
