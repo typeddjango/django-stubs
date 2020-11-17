@@ -360,7 +360,7 @@ def copy_method_to_another_class(
 
     if isinstance(bound_return_type, PlaceholderNode):
         return
-    
+
     try:
         original_arguments = method_node.arguments[1:]
     except AttributeError:
