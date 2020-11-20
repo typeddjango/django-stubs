@@ -17,6 +17,7 @@ from .fields import (
     IntegerField as IntegerField,
     PositiveIntegerField as PositiveIntegerField,
     PositiveSmallIntegerField as PositiveSmallIntegerField,
+    PositiveBigIntegerField as PositiveBigIntegerField,
     SmallIntegerField as SmallIntegerField,
     BigIntegerField as BigIntegerField,
     FloatField as FloatField,
