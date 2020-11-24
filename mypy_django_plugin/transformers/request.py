@@ -8,6 +8,9 @@ from mypy_django_plugin.lib import helpers
 
 
 def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
+    if not django_context.apps_registry.is_installed("django.contrib.auth"):
+        return ctx.default_attr_type
+
     # Imported here because django isn't properly loaded yet when module is loaded
     from django.contrib.auth.base_user import AbstractBaseUser
     from django.contrib.auth.models import AnonymousUser
