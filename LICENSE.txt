@@ -1,3 +1,4 @@
+Copyright (c) Steve Dignam
 Copyright (c) Maxim Kurnikov.
 All rights reserved.
 
