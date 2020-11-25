@@ -21,6 +21,7 @@ from django.db.models.fields.reverse_related import (  # noqa: F401
     ManyToOneRel as ManyToOneRel,
     ManyToManyRel as ManyToManyRel,
 )
+from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=models.Model)
 _F = TypeVar("_F", bound=models.Field)
@@ -56,10 +57,12 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     @property
     def target_field(self) -> Field: ...
 
-class ForeignObject(RelatedField[_ST, _GT]):
+_M = TypeVar("_M", bound=Model)
+
+class ForeignObject(RelatedField[_M, _M]):
     def __init__(
         self,
-        to: Union[Type[Model], str],
+        to: Union[Type[_M], str],
         on_delete: Callable[..., None],
         from_fields: Sequence[str],
         to_fields: Sequence[str],
@@ -89,12 +92,11 @@ class ForeignObject(RelatedField[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class ForeignKey(ForeignObject[_ST, _GT]):
-    _pyi_private_set_type: Union[Any, Combinable]
-    _pyi_private_get_type: Any
+class ForeignKey(Generic[_M], ForeignObject[_M, _M]):
+    @overload
     def __init__(
-        self,
-        to: Union[Type[Model], str],
+        self: ForeignKey[_M],
+        to: Union[Type[_M], str],
         on_delete: Callable[..., None],
         to_field: Optional[str] = ...,
         related_name: Optional[str] = ...,
@@ -108,7 +110,40 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    @overload
+    def __init__(
+        self: ForeignKey[Optional[_M]],
+        to: Union[Type[_M], str],
+        on_delete: Callable[..., None],
+        to_field: Optional[str] = ...,
+        related_name: Optional[str] = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        parent_link: bool = ...,
+        db_constraint: bool = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -129,7 +164,11 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     def __get__(self, instance: None, owner) -> ForwardManyToOneDescriptor: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(
+        self: ForeignKey[Optional[_M]], instance: Any, owner: Any
+    ) -> Optional[_M]: ...
+    @overload
+    def __get__(self: ForeignKey[_M], instance: Any, owner: Any) -> _M: ...
     # non-Model instances
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...

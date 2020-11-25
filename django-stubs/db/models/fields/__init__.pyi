@@ -24,6 +24,7 @@ from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.db.models.expressions import Combinable, Col
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
+from typing_extensions import Literal
 
 class NOT_PROVIDED: ...
 
@@ -43,9 +44,6 @@ _ST = TypeVar("_ST")
 _GT = TypeVar("_GT")
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
-    _pyi_lookup_exact_type: Any
 
     widget: Widget
     help_text: str
@@ -143,28 +141,18 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_from_object(self, obj: Model) -> _GT: ...
     def get_attname(self) -> str: ...
 
-class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[float, int, str, Combinable]
-    _pyi_private_get_type: int
-    _pyi_lookup_exact_type: Union[str, int]
+class IntegerField(Field[Union[float, int, str, Combinable], int]): ...
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: Any): ...
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
-class SmallIntegerField(IntegerField[_ST, _GT]): ...
-class BigIntegerField(IntegerField[_ST, _GT]): ...
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
+class SmallIntegerField(IntegerField): ...
+class BigIntegerField(IntegerField): ...
+class FloatField(Field[Union[float, int, str, Combinable], float]): ...
 
-class FloatField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[float, int, str, Combinable]
-    _pyi_private_get_type: float
-    _pyi_lookup_exact_type: float
-
-class DecimalField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, float, decimal.Decimal, Combinable]
-    _pyi_private_get_type: decimal.Decimal
-    _pyi_lookup_exact_type: Union[str, decimal.Decimal]
+class DecimalField(Field[Union[str, float, decimal.Decimal, Combinable], decimal.Decimal]):
     # attributes
     max_digits: int = ...
     decimal_places: int = ...
@@ -191,25 +179,21 @@ class DecimalField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class AutoField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[Combinable, int, str]
-    _pyi_private_get_type: int
-    _pyi_lookup_exact_type: Union[str, int]
+class AutoField(Field[Union[Combinable, int, str], int]): ...
 
-class CharField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, int, Combinable]
-    _pyi_private_get_type: str
-    # objects are converted to string before comparison
-    _pyi_lookup_exact_type: Any
+_C = TypeVar("_C", bound=Optional[str])
+
+class CharField(Generic[_C], Field[str, str]):
+    @overload
     def __init__(
-        self,
+        self: CharField[str],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -224,9 +208,36 @@ class CharField(Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: CharField[Optional[str]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self: CharField[_C], instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
 
-class SlugField(CharField[_ST, _GT]):
+class SlugField(CharField):
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -253,32 +264,68 @@ class SlugField(CharField[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class EmailField(CharField[_ST, _GT]): ...
-class URLField(CharField[_ST, _GT]): ...
+class EmailField(CharField): ...
+class URLField(CharField): ...
 
-class TextField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, Combinable]
-    _pyi_private_get_type: str
-    # objects are converted to string before comparison
-    _pyi_lookup_exact_type: Any
+class TextField(Generic[_C], Field[str, str]):
+    @overload
+    def __init__(
+        self: TextField[Optional[str]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: TextField[str],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self: TextField[_C], instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
 
-class BooleanField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[bool, Combinable]
-    _pyi_private_get_type: bool
-    _pyi_lookup_exact_type: bool
+class BooleanField(Field[Union[bool, Combinable], bool]): ...
+class NullBooleanField(Field[Optional[Union[bool, Combinable]], Optional[bool]]): ...
+class IPAddressField(Field[Union[str, Combinable], str]): ...
 
-class NullBooleanField(Field[_ST, _GT]):
-    _pyi_private_set_type: Optional[Union[bool, Combinable]]
-    _pyi_private_get_type: Optional[bool]
-    _pyi_lookup_exact_type: Optional[bool]
-
-class IPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, Combinable]
-    _pyi_private_get_type: str
-
-class GenericIPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, int, Callable[..., Any], Combinable]
-    _pyi_private_get_type: str
+class GenericIPAddressField(Field[Union[str, int, Callable[..., Any], Combinable], str]):
 
     default_error_messages: Any = ...
     unpack_ipv4: Any = ...
@@ -308,10 +355,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
 
 class DateTimeCheckMixin: ...
 
-class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, date, Combinable]
-    _pyi_private_get_type: date
-    _pyi_lookup_exact_type: Union[str, date]
+class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -336,9 +380,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, time, datetime, Combinable]
-    _pyi_private_get_type: time
+class TimeField(DateTimeCheckMixin, Field[Union[str, time, datetime, Combinable], time]):
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -362,15 +404,63 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class DateTimeField(DateField[_ST, _GT]):
-    _pyi_private_get_type: datetime
-    _pyi_lookup_exact_type: Union[str, datetime]
+_DT = TypeVar("_DT", bound=Optional[datetime])
 
-class UUIDField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, uuid.UUID]
-    _pyi_private_get_type: uuid.UUID
+class DateTimeField(Generic[_DT], DateTimeCheckMixin, Field[Union[str, datetime], datetime]):
+    @overload
+    def __init__(
+        self: DateTimeField[datetime],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DateTimeField[Optional[datetime]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _DT: ...
+    def __set__(self, instance: Any, value: _DT) -> None: ...
 
-class FilePathField(Field[_ST, _GT]):
+class UUIDField(Field[Union[str, uuid.UUID], uuid.UUID]): ...
+
+class FilePathField(Field[str, str]):
     path: Any = ...
     match: Optional[str] = ...
     recursive: bool = ...
@@ -403,11 +493,7 @@ class FilePathField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class BinaryField(Field[_ST, _GT]):
-    _pyi_private_get_type: bytes
-
-class DurationField(Field[_ST, _GT]):
-    _pyi_private_get_type: timedelta
-
-class BigAutoField(AutoField[_ST, _GT]): ...
-class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
+class BinaryField(Field[Union[bytes, bytearray, memoryview], bytes]): ...
+class DurationField(Field[timedelta, timedelta]): ...
+class BigAutoField(AutoField): ...
+class CommaSeparatedIntegerField(CharField): ...

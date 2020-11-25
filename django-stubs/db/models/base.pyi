@@ -26,7 +26,9 @@ class Model(metaclass=ModelBase):
     class Meta: ...
     _meta: Options[Any]
     _default_manager: BaseManager[Model]
-    objects: BaseManager[Any]
+    # NOTE(sbdchd): we don't include the objects property since we want
+    # to force subclasses to specify the property with an explicit type.
+    # objects: BaseManager[Any]
     pk: Any = ...
     _state: ModelState
     def __init__(self: _Self, *args, **kwargs) -> None: ...

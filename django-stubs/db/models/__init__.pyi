@@ -1,5 +1,7 @@
 from .base import Model as Model
 
+from django.db.models import functions as functions
+
 from .aggregates import (
     Aggregate as Aggregate,
     Avg as Avg,
