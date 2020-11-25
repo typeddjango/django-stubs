@@ -1,8 +1,34 @@
+[tool.poetry]
+name = "django-types"
+version = "0.1.0"
+description = "Type subs for Django"
+repository = "https://github.com/sbdchd/django-types"
+readme = "README.md"
+authors = ["Steve Dignam <steve@dignam.xyz>"]
+license = "MIT"
+keywords = ["django", "types", "mypy", "stubs"]
+
+packages = [
+  { include = "django-stubs" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+black = {version = "20.8b1",allows-prereleases = true}
+pytest = "^6.1"
+wheel = "^0.35.1"
+mypy = "^0.790.0"
+isort = "^5.6"
+
 [tool.black]
-line-length = 120
+line-length = 88
 include = '\.pyi?$'
 
 [tool.isort]
-line_length = 120
-multi_line_output = 3
-include_trailing_comma = true
+profile="black"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

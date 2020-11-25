@@ -1,145 +1,122 @@
-<img src="http://mypy-lang.org/static/mypy_light.svg" alt="mypy logo" width="300px"/>
+# django-types
 
-# pep484 stubs for Django
+Type stubs for [Django](https://www.djangoproject.com).
 
-[![Build status](https://github.com/typeddjango/django-stubs/workflows/test/badge.svg?branch=master&event=push)](https://github.com/typeddjango/django-stubs/actions?query=workflow%3Atest)
-[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
-[![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
+> Note: this project was forked from
+> <https://github.com/typeddjango/django-stubs> with the goal of removing the
+> [`mypy`](https://github.com/python/mypy) plugin dependency so that `mypy`
+> can't [crash due to Django
+> config](https://github.com/typeddjango/django-stubs/issues/318), and that
+> non-`mypy` type checkers like
+> [`pyright`](https://github.com/microsoft/pyright) will work better with
+> Django.
 
-
-This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
-
-
-## Installation
-
-```bash
-pip install django-stubs
-```
-
-To make mypy aware of the plugin, you need to add
-
-```ini
-[mypy]
-plugins =
-    mypy_django_plugin.main
-
-[mypy.plugins.django-stubs]
-django_settings_module = "myproject.settings"
-```
-
-in your `mypy.ini` or `setup.cfg` [file](https://mypy.readthedocs.io/en/latest/config_file.html).
-
-Two things happeining here:
-
-1. We need to explicitly list our plugin to be loaded by `mypy`
-2. Our plugin also requires `django` settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified
-
-This fully working [typed boilerplate](https://github.com/wemake-services/wemake-django-template) can serve you as an example.
-
-## Version compatibility
-
-We rely on different `django` and `mypy` versions:
-
-| django-stubs | mypy version | django version | python version
-| ------------ | ---- | ---- | ---- |
-| 1.7.0 | 0.790 | 2.2.x \|\| 3.x | ^3.6
-| 1.6.0 | 0.780 | 2.2.x \|\| 3.x | ^3.6
-| 1.5.0 | 0.770 | 2.2.x \|\| 3.x | ^3.6
-| 1.4.0 | 0.760 | 2.2.x \|\| 3.x | ^3.6
-| 1.3.0 | 0.750 | 2.2.x \|\| 3.x | ^3.6
-| 1.2.0 | 0.730 | 2.2.x | ^3.6
-| 1.1.0 | 0.720 | 2.2.x | ^3.6
-| 0.12.x | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
-
-
-## FAQ
-
-### Is this an official Django project?
-
-No, it is not. We are independent from Django at the moment.
-There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
-You can show your support by liking the PR.
-
-### Is it safe to use this in production?
-
-Yes, it is! This project does not affect your runtime at all.
-It only affects `mypy` type checking process.
-
-But, it does not make any sense to use this project without `mypy`.
-
-### mypy crashes when I run it with this plugin installed
-
-Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`.
-
-In other words, if your `manage.py runserver` crashes, mypy will crash too.
-You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
-option to get extra information about the error.
-
-### I cannot use QuerySet or Manager with type annotations
-
-You can get a `TypeError: 'type' object is not subscriptable`
-when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other Django-based Generic types.
-
-This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
-
-1. You can go with our [`django_stubs_ext`](https://github.com/typeddjango/django-stubs/tree/master/django_stubs_ext) helper, that patches all the types we use as Generic in django.
-
-Install it:
+## install
 
 ```bash
-pip install django-stubs-ext  # as a production dependency
+pip install django-types
 ```
 
-And then place in your `manage.py`, `wsgi.py`, and `asgi.py` files:
+If you're on a Django version < 3.1, you'll need to monkey patch Django's
+`QuerySet` and `Manager` classes so we can index into them with a generic
+argument. You can either use [`django-stubs-ext`](https://pypi.org/project/django-stubs-ext/`) or do this yourself manually:
 
 ```python
-import django_stubs_ext
+import types
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
 
-django_stubs_ext.monkeypath()
+def no_op(self, x):
+    return self
+
+QuerySet.__class_getitem__ = types.MethodType(no_op, QuerySet)
+BaseManager.__class_getitem__ = types.MethodType(no_op, BaseManager)
 ```
 
-2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
+## usage
 
-### How can I create a HttpRequest that's guaranteed to have an authenticated user?
+### getting `objects` to work
 
-Django's built in `HttpRequest` has the attribute `user` that resolves to the type
+By default the base `Model` class doesn't have `objects` defined, so you'll
+have to explicitly type the property.
+
 ```python
-Union[User, AnonymousUser]
-```
-where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
+from django.db import connection, models
+from django.db.models.manager import Manager
 
-If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
+class User(models.Model):
+    title = models.CharField(max_length=255)
+
+    objects = Manager["User"]()
+
+reveal_type(User.objects.all().first())
+# note: Revealed type is 'Optional[User]'
+```
+
+### `HttpRequest`'s `user` property
+
+The `HttpRequest`'s `user` property has a type of `Union[AbstractBaseUser, AnonymousUser]`,
+but for most of your views you'll probably want either an authed user or an
+`AnonymousUser`.
+
+So we can define a subclass for each case:
+
 ```python
-from django.http import HttpRequest
-from my_user_app.models import MyUser
-
-class AuthenticatedHttpRequest(HttpRequest):
-    user: MyUser
+class AuthedHttpRequest(HttpRequest):
+    user: User  # type: ignore [assignment]
 ```
 
-And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
+And then you can use it in your views:
+
+```python
+@auth.login_required
+def activity(request: AuthedHttpRequest, team_id: str) -> HttpResponse:
+    ...
+```
+
+You can also get more strict with your `login_required` decorator so that the
+first argument of the fuction it is decorating is `AuthedHttpRequest`:
+
+```python
+from typing import Any, Union, TypeVar, cast
+from django.http import HttpRequest, HttpResponse
+from typing_extensions import Protocol
+from functools import wraps
+
+class RequestHandler1(Protocol):
+    def __call__(self, request: AuthedHttpRequest) -> HttpResponse:
+        ...
 
 
-## Related projects
-
-- [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
-- [`djangorestframework-stubs`](https://github.com/typeddjango/djangorestframework-stubs) - Stubs for Django REST Framework.
-- [`pytest-mypy-plugins`](https://github.com/typeddjango/pytest-mypy-plugins) - `pytest` plugin that we use for testing `mypy` stubs and plugins.
-- [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template) - Create new typed Django projects in seconds.
+class RequestHandler2(Protocol):
+    def __call__(self, request: AuthedHttpRequest, __arg1: Any) -> HttpResponse:
+        ...
 
 
+RequestHandler = Union[RequestHandler1, RequestHandler2]
 
-## To get help
 
-We have Gitter here: <https://gitter.im/mypy-django/Lobby>
-If you think you have more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
+# Verbose bound arg due to limitations of Python typing.
+# see: https://github.com/python/mypy/issues/5876
+_F = TypeVar("_F", bound=RequestHandler)
 
-## Contributing
 
-This project is open source and community driven. As such we encourage contributions big and small. You can contribute by doing any of the following:
+def login_required(view_func: _F) -> _F:
+    @wraps(view_func)
+    def wrapped_view(
+        request: AuthedHttpRequest, *args: object, **kwargs: object
+    ) -> HttpResponse:
+        if request.user.is_authenticated:
+            return view_func(request, *args, **kwargs)  # type: ignore [call-arg]
+        raise AuthenticationRequired
 
-1. Contribute code (e.g. improve stubs, add plugin capabilities, write tests etc) - to do so please follow the [contribution guide](./CONTRIBUTING.md).
-2. Assist in code reviews and discussions in issues.
-3. Identify bugs and issues and report these
+    return cast(_F, wrapped_view)
+```
 
-You can always also reach out in gitter to discuss your contributions!
+Then the following will type error:
+
+```python
+@auth.login_required
+def activity(request: HttpRequest, team_id: str) -> HttpResponse:
+    ...
+```
