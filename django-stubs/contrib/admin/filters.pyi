@@ -1,19 +1,22 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Iterator
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type
 
 from django.contrib.admin.options import ModelAdmin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
-
-from django.db.models.fields import Field
 
 class ListFilter:
     title: Any = ...
     template: str = ...
     used_parameters: Any = ...
     def __init__(
-        self, request: WSGIRequest, params: Dict[str, str], model: Type[Model], model_admin: ModelAdmin
+        self,
+        request: WSGIRequest,
+        params: Dict[str, str],
+        model: Type[Model],
+        model_admin: ModelAdmin,
     ) -> None: ...
     def has_output(self) -> bool: ...
     def choices(self, changelist: Any) -> Optional[Iterator[Dict[str, Any]]]: ...
@@ -40,7 +43,12 @@ class FieldListFilter(ListFilter):
         field_path: str,
     ) -> None: ...
     @classmethod
-    def register(cls, test: Callable, list_filter_class: Type[FieldListFilter], take_priority: bool = ...) -> None: ...
+    def register(
+        cls,
+        test: Callable,
+        list_filter_class: Type[FieldListFilter],
+        take_priority: bool = ...,
+    ) -> None: ...
     @classmethod
     def create(
         cls,

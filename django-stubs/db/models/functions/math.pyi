@@ -1,5 +1,8 @@
 from django.db.models.expressions import Func
-from django.db.models.functions.mixins import FixDecimalInputMixin, NumericOutputFieldMixin
+from django.db.models.functions.mixins import (
+    FixDecimalInputMixin,
+    NumericOutputFieldMixin,
+)
 from django.db.models.lookups import Transform
 
 class Abs(Transform): ...

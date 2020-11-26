@@ -2,12 +2,13 @@ from datetime import datetime
 from typing import Any, Dict, Optional, Type
 
 from django.contrib.sessions.backends.base import SessionBase
-
 from django.db import models
 
 class BaseSessionManager(models.Manager):
     def encode(self, session_dict: Dict[str, int]) -> str: ...
-    def save(self, session_key: str, session_dict: Dict[str, int], expire_date: datetime) -> AbstractBaseSession: ...
+    def save(
+        self, session_key: str, session_dict: Dict[str, int], expire_date: datetime
+    ) -> AbstractBaseSession: ...
 
 class AbstractBaseSession(models.Model):
     expire_date: datetime

@@ -1,9 +1,14 @@
 from typing import Any, Dict, Optional, TypeVar, Union
 
-from django.db.models.expressions import Combinable, CombinedExpression, Func, Value, _OutputField
-from django.db.models.lookups import Lookup
-
 from django.db.models import Field
+from django.db.models.expressions import (
+    Combinable,
+    CombinedExpression,
+    Func,
+    Value,
+    _OutputField,
+)
+from django.db.models.lookups import Lookup
 
 _Expression = Union[str, Combinable, "SearchQueryCombinable"]
 
@@ -20,7 +25,12 @@ class SearchVector(SearchVectorCombinable, Func):
 
 class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
     def __init__(
-        self, lhs, connector, rhs, config: Optional[_Expression] = ..., output_field: Optional[_OutputField] = ...
+        self,
+        lhs,
+        connector,
+        rhs,
+        config: Optional[_Expression] = ...,
+        output_field: Optional[_OutputField] = ...,
     ): ...
 
 _T = TypeVar("_T", bound="SearchQueryCombinable")
@@ -48,12 +58,20 @@ class SearchQuery(SearchQueryCombinable, Value):  # type: ignore
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: ignore
     def __init__(
-        self, lhs, connector, rhs, config: Optional[_Expression] = ..., output_field: Optional[_OutputField] = ...
+        self,
+        lhs,
+        connector,
+        rhs,
+        config: Optional[_Expression] = ...,
+        output_field: Optional[_OutputField] = ...,
     ) -> None: ...
 
 class SearchRank(Func):
     def __init__(
-        self, vector: Union[SearchVector, _Expression], query: Union[SearchQuery, _Expression], **extra: Any
+        self,
+        vector: Union[SearchVector, _Expression],
+        query: Union[SearchQuery, _Expression],
+        **extra: Any
     ) -> None: ...
 
 class TrigramBase(Func):

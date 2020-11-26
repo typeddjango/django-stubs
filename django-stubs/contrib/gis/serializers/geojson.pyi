@@ -1,5 +1,6 @@
-from django.core.serializers.json import Serializer as JSONSerializer
 from typing import Any
+
+from django.core.serializers.json import Serializer as JSONSerializer
 
 class Serializer(JSONSerializer):
     def start_serialization(self) -> None: ...

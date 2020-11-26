@@ -1,5 +1,9 @@
-from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures as BaseSpatialFeatures
-from django.db.backends.oracle.features import DatabaseFeatures as OracleDatabaseFeatures
+from django.contrib.gis.db.backends.base.features import (
+    BaseSpatialFeatures as BaseSpatialFeatures,
+)
+from django.db.backends.oracle.features import (
+    DatabaseFeatures as OracleDatabaseFeatures,
+)
 
 class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
     supports_add_srs_entry: bool = ...

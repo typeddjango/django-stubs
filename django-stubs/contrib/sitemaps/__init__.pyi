@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, Protocol
+from typing import Any, Dict, List, Optional, Protocol, Union
 
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
@@ -30,7 +30,10 @@ class Sitemap:
     @property
     def paginator(self) -> Paginator: ...
     def get_urls(
-        self, page: Union[int, str] = ..., site: Optional[Union[Site, RequestSite]] = ..., protocol: Optional[str] = ...
+        self,
+        page: Union[int, str] = ...,
+        site: Optional[Union[Site, RequestSite]] = ...,
+        protocol: Optional[str] = ...,
     ) -> List[Dict[str, Any]]: ...
 
 class GenericSitemap(Sitemap):

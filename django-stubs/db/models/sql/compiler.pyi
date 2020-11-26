@@ -1,12 +1,22 @@
 from datetime import date, datetime
 from decimal import Decimal
 from itertools import chain
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 from uuid import UUID
 
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression
-
 from django.db.models.sql.query import Query, RawQuery
 
 FORCE: Any
@@ -20,7 +30,9 @@ class SQLCompiler:
     annotation_col_map: Any = ...
     klass_info: Any = ...
     ordering_parts: Any = ...
-    def __init__(self, query: Union[Query, RawQuery], connection: Any, using: Optional[str]) -> None: ...
+    def __init__(
+        self, query: Union[Query, RawQuery], connection: Any, using: Optional[str]
+    ) -> None: ...
     col_count: Any = ...
     def setup_query(self) -> None: ...
     has_extra_select: Any = ...
@@ -56,10 +68,15 @@ class SQLCompiler:
     def compile(
         self, node: Any, select_format: Any = ...
     ) -> Tuple[str, Union[List[Optional[int]], Tuple[int, int]]]: ...
-    def get_combinator_sql(self, combinator: str, all: bool) -> Tuple[List[str], Union[List[int], List[str]]]: ...
+    def get_combinator_sql(
+        self, combinator: str, all: bool
+    ) -> Tuple[List[str], Union[List[int], List[str]]]: ...
     def as_sql(self, with_limits: bool = ..., with_col_aliases: bool = ...) -> Any: ...
     def get_default_columns(
-        self, start_alias: Optional[str] = ..., opts: Optional[Any] = ..., from_parent: Optional[Type[Model]] = ...
+        self,
+        start_alias: Optional[str] = ...,
+        opts: Optional[Any] = ...,
+        from_parent: Optional[Type[Model]] = ...,
     ) -> List[Expression]: ...
     def get_distinct(self) -> Tuple[List[Any], List[Any]]: ...
     def find_ordering_name(
@@ -68,7 +85,9 @@ class SQLCompiler:
         opts: Any,
         alias: Optional[str] = ...,
         default_order: str = ...,
-        already_seen: Optional[Set[Tuple[Optional[Tuple[Tuple[str, str]]], Tuple[Tuple[str, str]]]]] = ...,
+        already_seen: Optional[
+            Set[Tuple[Optional[Tuple[Tuple[str, str]]], Tuple[Tuple[str, str]]]]
+        ] = ...,
     ) -> List[Tuple[Expression, bool]]: ...
     def get_from_clause(self) -> Tuple[List[str], List[Union[int, str]]]: ...
     def get_related_selections(
@@ -77,12 +96,16 @@ class SQLCompiler:
         opts: Optional[Any] = ...,
         root_alias: Optional[str] = ...,
         cur_depth: int = ...,
-        requested: Optional[Union[Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]], bool]] = ...,
+        requested: Optional[
+            Union[Dict[str, Dict[str, Dict[str, Dict[Any, Any]]]], bool]
+        ] = ...,
         restricted: Optional[bool] = ...,
     ) -> List[Dict[str, Any]]: ...
     def get_select_for_update_of_arguments(self): ...
     def deferred_to_columns(self) -> Dict[Type[Model], Set[str]]: ...
-    def get_converters(self, expressions: List[Expression]) -> Dict[int, Tuple[List[Callable], Expression]]: ...
+    def get_converters(
+        self, expressions: List[Expression]
+    ) -> Dict[int, Tuple[List[Callable], Expression]]: ...
     def apply_converters(
         self, rows: chain, converters: Dict[int, Tuple[List[Callable], Expression]]
     ) -> Iterator[
@@ -94,7 +117,9 @@ class SQLCompiler:
     ]: ...
     def results_iter(
         self,
-        results: Optional[Union[Iterator[Any], List[List[Tuple[Union[int, str]]]]]] = ...,
+        results: Optional[
+            Union[Iterator[Any], List[List[Tuple[Union[int, str]]]]]
+        ] = ...,
         tuple_expected: bool = ...,
         chunked_fetch: bool = ...,
         chunk_size: int = ...,
@@ -103,7 +128,9 @@ class SQLCompiler:
     def execute_sql(
         self, result_type: str = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> Optional[Any]: ...
-    def as_subquery_condition(self, alias: str, columns: List[str], compiler: SQLCompiler) -> Tuple[str, Tuple]: ...
+    def as_subquery_condition(
+        self, alias: str, columns: List[str], compiler: SQLCompiler
+    ) -> Tuple[str, Tuple]: ...
     def explain_query(self) -> Iterator[str]: ...
 
 class SQLInsertCompiler(SQLCompiler):
@@ -126,4 +153,6 @@ class SQLAggregateCompiler(SQLCompiler):
     col_count: Any = ...
     def as_sql(self): ...
 
-def cursor_iter(cursor: Any, sentinel: Any, col_count: Optional[int], itersize: int) -> Iterator[Any]: ...
+def cursor_iter(
+    cursor: Any, sentinel: Any, col_count: Optional[int], itersize: int
+) -> Iterator[Any]: ...

@@ -1,5 +1,11 @@
-from typing import Any, Iterable, NamedTuple, Optional, TypeVar, Union, Tuple
-from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
+from typing import Any, Iterable, NamedTuple, Optional, Tuple, TypeVar, Union
+
+from django.db.models.fields import (
+    Field,
+    _ErrorMessagesToOverride,
+    _FieldChoices,
+    _ValidatorCallable,
+)
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -49,7 +55,9 @@ class BaseSpatialField(Field[_ST, _GT]):
     def geodetic(self, connection: Any): ...
     def get_placeholder(self, value: Any, compiler: Any, connection: Any): ...
     def get_srid(self, obj: Any): ...
-    def get_db_prep_value(self, value: Any, connection: Any, *args: Any, **kwargs: Any): ...
+    def get_db_prep_value(
+        self, value: Any, connection: Any, *args: Any, **kwargs: Any
+    ): ...
     def get_raster_prep_value(self, value: Any, is_candidate: Any): ...
     def get_prep_value(self, value: Any): ...
 

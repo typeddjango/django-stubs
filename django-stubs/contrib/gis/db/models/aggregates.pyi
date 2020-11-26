@@ -1,11 +1,18 @@
-from django.db.models import Aggregate
 from typing import Any, Optional
+
+from django.db.models import Aggregate
 
 class GeoAggregate(Aggregate):
     function: Any = ...
     is_extent: bool = ...
     def output_field(self): ...
-    def as_sql(self, compiler: Any, connection: Any, function: Optional[Any] = ..., **extra_context: Any): ...
+    def as_sql(
+        self,
+        compiler: Any,
+        connection: Any,
+        function: Optional[Any] = ...,
+        **extra_context: Any
+    ): ...
     def as_oracle(self, compiler: Any, connection: Any, **extra_context: Any): ...
     def resolve_expression(
         self,

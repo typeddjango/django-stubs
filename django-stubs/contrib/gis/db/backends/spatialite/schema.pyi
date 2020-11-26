@@ -1,5 +1,8 @@
-from django.db.backends.sqlite3.schema import DatabaseSchemaEditor as DatabaseSchemaEditor
 from typing import Any
+
+from django.db.backends.sqlite3.schema import (
+    DatabaseSchemaEditor as DatabaseSchemaEditor,
+)
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     sql_add_geometry_column: str = ...
@@ -20,5 +23,9 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     def add_field(self, model: Any, field: Any) -> None: ...
     def remove_field(self, model: Any, field: Any) -> None: ...
     def alter_db_table(
-        self, model: Any, old_db_table: Any, new_db_table: Any, disable_constraints: bool = ...
+        self,
+        model: Any,
+        old_db_table: Any,
+        new_db_table: Any,
+        disable_constraints: bool = ...,
     ) -> None: ...

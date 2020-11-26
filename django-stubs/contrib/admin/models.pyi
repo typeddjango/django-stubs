@@ -2,9 +2,8 @@ from typing import Any, Optional, Union
 from uuid import UUID
 
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.base import Model
-
 from django.db import models
+from django.db.models.base import Model
 
 ADDITION: int
 CHANGE: int
@@ -25,7 +24,9 @@ class LogEntryManager(models.Manager["LogEntry"]):
 class LogEntry(models.Model):
     action_time: models.DateTimeField = ...
     user: models.ForeignKey = ...
-    content_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_type: models.ForeignKey = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE
+    )
     object_id: models.TextField = ...
     object_repr: models.CharField = ...
     action_flag: models.PositiveSmallIntegerField = ...

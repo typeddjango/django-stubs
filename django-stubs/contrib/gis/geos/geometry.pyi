@@ -1,11 +1,10 @@
-from django.contrib.gis.geometry import (  # noqa: F401
-    hex_regex as hex_regex,
-    json_regex as json_regex,
-    wkt_regex as wkt_regex,
-)
+from typing import Any, Optional
+
+from django.contrib.gis.geometry import hex_regex as hex_regex  # noqa: F401
+from django.contrib.gis.geometry import json_regex as json_regex
+from django.contrib.gis.geometry import wkt_regex as wkt_regex
 from django.contrib.gis.geos.base import GEOSBase as GEOSBase
 from django.contrib.gis.geos.mutable_list import ListMixin as ListMixin
-from typing import Any, Optional
 
 class GEOSGeometryBase(GEOSBase):
     ptr_type: Any = ...
@@ -98,7 +97,12 @@ class GEOSGeometryBase(GEOSBase):
     def boundary(self): ...
     def buffer(self, width: Any, quadsegs: int = ...): ...
     def buffer_with_style(
-        self, width: Any, quadsegs: int = ..., end_cap_style: int = ..., join_style: int = ..., mitre_limit: float = ...
+        self,
+        width: Any,
+        quadsegs: int = ...,
+        end_cap_style: int = ...,
+        join_style: int = ...,
+        mitre_limit: float = ...,
     ): ...
     @property
     def centroid(self): ...

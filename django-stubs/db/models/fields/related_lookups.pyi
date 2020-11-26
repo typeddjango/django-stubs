@@ -1,7 +1,8 @@
 from collections import OrderedDict
-from typing import Any, List, Tuple, Type, Iterable
+from typing import Any, Iterable, List, Tuple, Type
 
 from django.db.models.expressions import Expression
+from django.db.models.fields import Field
 from django.db.models.lookups import (
     BuiltinLookup,
     Exact,
@@ -13,8 +14,6 @@ from django.db.models.lookups import (
     LessThanOrEqual,
 )
 
-from django.db.models.fields import Field
-
 class MultiColSource:
     alias: str
     field: Field
@@ -23,7 +22,11 @@ class MultiColSource:
     contains_aggregate: bool = ...
     output_field: Field = ...
     def __init__(
-        self, alias: str, targets: Tuple[Field, Field], sources: Tuple[Field, Field], field: Field
+        self,
+        alias: str,
+        targets: Tuple[Field, Field],
+        sources: Tuple[Field, Field],
+        field: Field,
     ) -> None: ...
     def relabeled_clone(self, relabels: OrderedDict) -> MultiColSource: ...
     def get_lookup(self, lookup: str) -> Type[BuiltinLookup]: ...

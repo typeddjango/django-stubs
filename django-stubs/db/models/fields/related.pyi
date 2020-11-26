@@ -1,26 +1,48 @@
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 from uuid import UUID
 
 from django.db import models
 from django.db.models.base import Model
-from django.db.models.fields import Field
-from django.db.models.query_utils import Q, PathInfo
-from django.db.models.manager import RelatedManager
 from django.db.models.expressions import Combinable
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
+)
 from django.db.models.fields.related_descriptors import (  # noqa: F401
     ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
-    ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
+)
+from django.db.models.fields.related_descriptors import (
     ManyToManyDescriptor as ManyToManyDescriptor,
-    ReverseOneToOneDescriptor as ReverseOneToOneDescriptor,
+)
+from django.db.models.fields.related_descriptors import (
     ReverseManyToOneDescriptor as ReverseManyToOneDescriptor,
+)
+from django.db.models.fields.related_descriptors import (
+    ReverseOneToOneDescriptor as ReverseOneToOneDescriptor,
 )
 from django.db.models.fields.reverse_related import (  # noqa: F401
     ForeignObjectRel as ForeignObjectRel,
-    OneToOneRel as OneToOneRel,
-    ManyToOneRel as ManyToOneRel,
-    ManyToManyRel as ManyToManyRel,
 )
+from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyRel
+from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
+from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
+from django.db.models.manager import RelatedManager
+from django.db.models.query_utils import PathInfo, Q
 from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=models.Model)
@@ -270,8 +292,12 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...
     def get_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...
-    def get_reverse_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...
-    def contribute_to_related_class(self, cls: Type[Model], related: RelatedField) -> None: ...
+    def get_reverse_path_info(
+        self, filtered_relation: None = ...
+    ) -> List[PathInfo]: ...
+    def contribute_to_related_class(
+        self, cls: Type[Model], related: RelatedField
+    ) -> None: ...
     def m2m_db_table(self) -> str: ...
     def m2m_column_name(self) -> str: ...
     def m2m_reverse_name(self) -> str: ...
@@ -279,4 +305,6 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     def m2m_target_field_name(self) -> str: ...
     def m2m_reverse_target_field_name(self) -> str: ...
 
-def create_many_to_many_intermediary_model(field: Type[Field], klass: Type[Model]) -> Type[Model]: ...
+def create_many_to_many_intermediary_model(
+    field: Type[Field], klass: Type[Model]
+) -> Type[Model]: ...

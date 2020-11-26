@@ -1,12 +1,25 @@
-from typing import Any, Callable, Dict, Generic, Optional, Sequence, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from django.forms.forms import BaseForm
 from django.forms.models import BaseModelForm
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
-from django.views.generic.detail import BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
-from typing_extensions import Literal
-
 from django.http import HttpRequest, HttpResponse
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.detail import (
+    BaseDetailView,
+    SingleObjectMixin,
+    SingleObjectTemplateResponseMixin,
+)
+from typing_extensions import Literal
 
 _FormT = TypeVar("_FormT", bound=BaseForm)
 
@@ -29,7 +42,9 @@ class FormMixin(Generic[_FormT], AbstractFormMixin):
 class ModelFormMixin(AbstractFormMixin, SingleObjectMixin):
     fields: Optional[Union[Sequence[str], Literal["__all__"]]] = ...
     def get_form_class(self) -> Type[BaseModelForm]: ...
-    def get_form(self, form_class: Optional[Type[BaseModelForm]] = ...) -> BaseModelForm: ...
+    def get_form(
+        self, form_class: Optional[Type[BaseModelForm]] = ...
+    ) -> BaseModelForm: ...
     def form_valid(self, form: BaseModelForm) -> HttpResponse: ...
     def form_invalid(self, form: BaseModelForm) -> HttpResponse: ...
 
@@ -48,7 +63,9 @@ class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView): ...
 class DeletionMixin:
     success_url: Optional[str] = ...
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse: ...
-    def delete(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse: ...
+    def delete(
+        self, request: HttpRequest, *args: str, **kwargs: Any
+    ) -> HttpResponse: ...
     def get_success_url(self) -> str: ...
 
 class BaseDeleteView(DeletionMixin, BaseDetailView): ...

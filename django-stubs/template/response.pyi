@@ -3,12 +3,11 @@ from http.cookies import SimpleCookie
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
+from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.template.base import Template
 from django.template.context import RequestContext
 from django.test.client import Client
-
-from django.http import HttpResponse
 
 class ContentNotRenderedError(Exception): ...
 
@@ -30,8 +29,12 @@ class SimpleTemplateResponse(HttpResponse):
         charset: Optional[str] = ...,
         using: Optional[str] = ...,
     ) -> None: ...
-    def resolve_template(self, template: Union[Sequence[str], Template, str]) -> Template: ...
-    def resolve_context(self, context: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]: ...
+    def resolve_template(
+        self, template: Union[Sequence[str], Template, str]
+    ) -> Template: ...
+    def resolve_context(
+        self, context: Optional[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...

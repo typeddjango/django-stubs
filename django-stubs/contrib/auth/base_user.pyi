@@ -1,10 +1,10 @@
 import sys
-from typing import Any, Optional, Tuple, List, overload, TypeVar, Union
+from typing import Any, List, Optional, Tuple, TypeVar, Union, overload
 
+from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import BooleanField
-from django.db import models
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
@@ -16,7 +16,9 @@ _T = TypeVar("_T", bound=Model)
 class BaseUserManager(models.Manager[_T]):
     @classmethod
     def normalize_email(cls, email: Optional[str]) -> str: ...
-    def make_random_password(self, length: int = ..., allowed_chars: str = ...) -> str: ...
+    def make_random_password(
+        self, length: int = ..., allowed_chars: str = ...
+    ) -> str: ...
     def get_by_natural_key(self, username: Optional[str]) -> _T: ...
 
 class AbstractBaseUser(models.Model):

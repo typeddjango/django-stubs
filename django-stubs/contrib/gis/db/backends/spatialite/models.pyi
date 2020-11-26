@@ -1,6 +1,9 @@
-from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin as SpatialRefSysMixin
-from django.db import models as models
 from typing import Any
+
+from django.contrib.gis.db.backends.base.models import (
+    SpatialRefSysMixin as SpatialRefSysMixin,
+)
+from django.db import models as models
 
 class SpatialiteGeometryColumns(models.Model):
     f_table_name: Any = ...

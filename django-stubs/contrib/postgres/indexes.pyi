@@ -1,8 +1,7 @@
 from typing import Optional, Sequence
 
-from django.db.models.query_utils import Q
-
 from django.db.models import Index
+from django.db.models.query_utils import Q
 
 class PostgresIndex(Index): ...
 

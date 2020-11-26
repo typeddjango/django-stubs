@@ -1,11 +1,25 @@
 import threading
 import unittest
 from datetime import date
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, ClassVar, overload
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+    overload,
+)
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
+from django.db import connections as connections  # noqa: F401
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
@@ -15,7 +29,6 @@ from django.template.base import Template
 from django.test.client import Client
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.safestring import SafeText
-from django.db import connections as connections  # noqa: F401
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
     test_case: SimpleTestCase = ...
@@ -29,7 +42,9 @@ class _AssertTemplateUsedContext:
     rendered_template_names: List[str] = ...
     context: ContextList = ...
     def __init__(self, test_case: Any, template_name: Any) -> None: ...
-    def on_template_render(self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any) -> None: ...
+    def on_template_render(
+        self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any
+    ) -> None: ...
     def test(self): ...
     def message(self): ...
     def __enter__(self): ...
@@ -103,13 +118,24 @@ class SimpleTestCase(unittest.TestCase):
         count: Optional[int] = ...,
     ) -> Optional[_AssertTemplateUsedContext]: ...
     def assertTemplateNotUsed(
-        self, response: Union[HttpResponse, str] = ..., template_name: Optional[str] = ..., msg_prefix: str = ...
+        self,
+        response: Union[HttpResponse, str] = ...,
+        template_name: Optional[str] = ...,
+        msg_prefix: str = ...,
     ) -> Optional[_AssertTemplateNotUsedContext]: ...
     def assertRaisesMessage(
-        self, expected_exception: Type[Exception], expected_message: str, *args: Any, **kwargs: Any
+        self,
+        expected_exception: Type[Exception],
+        expected_message: str,
+        *args: Any,
+        **kwargs: Any
     ) -> Any: ...
     def assertWarnsMessage(
-        self, expected_warning: Type[Exception], expected_message: str, *args: Any, **kwargs: Any
+        self,
+        expected_warning: Type[Exception],
+        expected_message: str,
+        *args: Any,
+        **kwargs: Any
     ) -> Any: ...
     def assertFieldOutput(
         self,
@@ -120,10 +146,18 @@ class SimpleTestCase(unittest.TestCase):
         field_kwargs: None = ...,
         empty_value: str = ...,
     ) -> Any: ...
-    def assertHTMLEqual(self, html1: str, html2: str, msg: Optional[str] = ...) -> None: ...
-    def assertHTMLNotEqual(self, html1: str, html2: str, msg: Optional[str] = ...) -> None: ...
+    def assertHTMLEqual(
+        self, html1: str, html2: str, msg: Optional[str] = ...
+    ) -> None: ...
+    def assertHTMLNotEqual(
+        self, html1: str, html2: str, msg: Optional[str] = ...
+    ) -> None: ...
     def assertInHTML(
-        self, needle: str, haystack: SafeText, count: Optional[int] = ..., msg_prefix: str = ...
+        self,
+        needle: str,
+        haystack: SafeText,
+        count: Optional[int] = ...,
+        msg_prefix: str = ...,
     ) -> None: ...
     def assertJSONEqual(
         self,
@@ -137,8 +171,12 @@ class SimpleTestCase(unittest.TestCase):
         expected_data: Union[Dict[str, Any], List[Any], str, int, float, bool, None],
         msg: Optional[str] = ...,
     ) -> None: ...
-    def assertXMLEqual(self, xml1: str, xml2: str, msg: Optional[str] = ...) -> None: ...
-    def assertXMLNotEqual(self, xml1: str, xml2: str, msg: Optional[str] = ...) -> None: ...
+    def assertXMLEqual(
+        self, xml1: str, xml2: str, msg: Optional[str] = ...
+    ) -> None: ...
+    def assertXMLNotEqual(
+        self, xml1: str, xml2: str, msg: Optional[str] = ...
+    ) -> None: ...
 
 class TransactionTestCase(SimpleTestCase):
     reset_sequences: bool = ...
@@ -149,14 +187,27 @@ class TransactionTestCase(SimpleTestCase):
     def assertQuerysetEqual(
         self,
         qs: Union[Iterator[Any], List[Model], QuerySet, RawQuerySet],
-        values: Union[List[None], List[Tuple[str, str]], List[date], List[int], List[str], Set[str], QuerySet],
+        values: Union[
+            List[None],
+            List[Tuple[str, str]],
+            List[date],
+            List[int],
+            List[str],
+            Set[str],
+            QuerySet,
+        ],
         transform: Union[Callable, Type[str]] = ...,
         ordered: bool = ...,
         msg: Optional[str] = ...,
     ) -> None: ...
     @overload
     def assertNumQueries(
-        self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any
+        self,
+        num: int,
+        func: Callable[..., Any],
+        *args: Any,
+        using: str = ...,
+        **kwargs: Any
     ) -> None: ...
     @overload
     def assertNumQueries(

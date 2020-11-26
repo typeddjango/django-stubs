@@ -1,8 +1,7 @@
-from typing import Any, Callable, Iterable, Optional, Union, Collection, Type
-
-from django.db.models.base import Model
+from typing import Any, Callable, Collection, Iterable, Optional, Type, Union
 
 from django.db import IntegrityError
+from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.options import Options
 
@@ -27,4 +26,6 @@ class Collector:
         source_attr: Optional[str] = ...,
         **kwargs: Any
     ) -> None: ...
-    def can_fast_delete(self, objs: Union[Model, Iterable[Model]], from_field: Optional[Field] = ...) -> bool: ...
+    def can_fast_delete(
+        self, objs: Union[Model, Iterable[Model]], from_field: Optional[Field] = ...
+    ) -> bool: ...

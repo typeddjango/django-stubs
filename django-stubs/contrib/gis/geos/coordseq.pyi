@@ -1,5 +1,6 @@
-from django.contrib.gis.geos.base import GEOSBase as GEOSBase
 from typing import Any
+
+from django.contrib.gis.geos.base import GEOSBase as GEOSBase
 
 class GEOSCoordSeq(GEOSBase):
     ptr_type: Any = ...

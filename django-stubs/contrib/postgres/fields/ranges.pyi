@@ -1,7 +1,6 @@
 from typing import Any
 
 from django.db import models
-
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange  # type: ignore
 
 class RangeField(models.Field):

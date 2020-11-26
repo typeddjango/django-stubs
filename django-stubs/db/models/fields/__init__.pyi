@@ -7,23 +7,23 @@ from typing import (
     Dict,
     Generic,
     Iterable,
+    List,
     Optional,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
     Union,
-    Sequence,
-    List,
     overload,
 )
 
 from django.core.checks import CheckMessage
-
-from django.db.models import Model
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
-from django.db.models.expressions import Combinable, Col
+from django.db.models import Model
+from django.db.models.expressions import Col, Combinable
 from django.db.models.query_utils import RegisterLookupMixin
-from django.forms import Field as FormField, Widget
+from django.forms import Field as FormField
+from django.forms import Widget
 from typing_extensions import Literal
 
 class NOT_PROVIDED: ...
@@ -118,7 +118,9 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     # TODO: plugin support
     def formfield(self, **kwargs) -> Any: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
-    def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
+    def contribute_to_class(
+        self, cls: Type[Model], name: str, private_only: bool = ...
+    ) -> None: ...
     def to_python(self, value: Any) -> Any: ...
     def clean(self, value: Any, model_instance: Optional[Model]) -> Any: ...
     def get_choices(
@@ -152,7 +154,9 @@ class SmallIntegerField(IntegerField): ...
 class BigIntegerField(IntegerField): ...
 class FloatField(Field[Union[float, int, str, Combinable], float]): ...
 
-class DecimalField(Field[Union[str, float, decimal.Decimal, Combinable], decimal.Decimal]):
+class DecimalField(
+    Field[Union[str, float, decimal.Decimal, Combinable], decimal.Decimal]
+):
     # attributes
     max_digits: int = ...
     decimal_places: int = ...
@@ -325,7 +329,9 @@ class BooleanField(Field[Union[bool, Combinable], bool]): ...
 class NullBooleanField(Field[Optional[Union[bool, Combinable]], Optional[bool]]): ...
 class IPAddressField(Field[Union[str, Combinable], str]): ...
 
-class GenericIPAddressField(Field[Union[str, int, Callable[..., Any], Combinable], str]):
+class GenericIPAddressField(
+    Field[Union[str, int, Callable[..., Any], Combinable], str]
+):
 
     default_error_messages: Any = ...
     unpack_ipv4: Any = ...
@@ -380,7 +386,9 @@ class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
 
-class TimeField(DateTimeCheckMixin, Field[Union[str, time, datetime, Combinable], time]):
+class TimeField(
+    DateTimeCheckMixin, Field[Union[str, time, datetime, Combinable], time]
+):
     def __init__(
         self,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -406,7 +414,9 @@ class TimeField(DateTimeCheckMixin, Field[Union[str, time, datetime, Combinable]
 
 _DT = TypeVar("_DT", bound=Optional[datetime])
 
-class DateTimeField(Generic[_DT], DateTimeCheckMixin, Field[Union[str, datetime], datetime]):
+class DateTimeField(
+    Generic[_DT], DateTimeCheckMixin, Field[Union[str, datetime], datetime]
+):
     @overload
     def __init__(
         self: DateTimeField[datetime],

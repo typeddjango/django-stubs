@@ -1,5 +1,6 @@
-from django.contrib import admin as admin
 from typing import Any
+
+from django.contrib import admin as admin
 
 class RedirectAdmin(admin.ModelAdmin):
     list_display: Any = ...

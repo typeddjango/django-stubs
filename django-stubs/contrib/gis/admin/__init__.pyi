@@ -1,12 +1,11 @@
-from django.contrib.admin import (
-    AdminSite as AdminSite,
-    HORIZONTAL as HORIZONTAL,
-    ModelAdmin as ModelAdmin,
-    StackedInline as StackedInline,
-    TabularInline as TabularInline,
-    VERTICAL as VERTICAL,
-    autodiscover as autodiscover,
-    register as register,
-    site as site,
-)
-from django.contrib.gis.admin.options import GeoModelAdmin as GeoModelAdmin, OSMGeoAdmin as OSMGeoAdmin
+from django.contrib.admin import HORIZONTAL as HORIZONTAL
+from django.contrib.admin import VERTICAL as VERTICAL
+from django.contrib.admin import AdminSite as AdminSite
+from django.contrib.admin import ModelAdmin as ModelAdmin
+from django.contrib.admin import StackedInline as StackedInline
+from django.contrib.admin import TabularInline as TabularInline
+from django.contrib.admin import autodiscover as autodiscover
+from django.contrib.admin import register as register
+from django.contrib.admin import site as site
+from django.contrib.gis.admin.options import GeoModelAdmin as GeoModelAdmin
+from django.contrib.gis.admin.options import OSMGeoAdmin as OSMGeoAdmin

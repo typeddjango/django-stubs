@@ -7,4 +7,6 @@ from django.utils.deprecation import MiddlewareMixin
 re_accepts_gzip: Any
 
 class GZipMiddleware(MiddlewareMixin):
-    def process_response(self, request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
+    def process_response(
+        self, request: HttpRequest, response: HttpResponseBase
+    ) -> HttpResponseBase: ...

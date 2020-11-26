@@ -1,8 +1,7 @@
 from typing import Any, Dict, List
 
-from django.db.models.deletion import Collector
-
 from django.core.management import BaseCommand
+from django.db.models.deletion import Collector
 
 class Command(BaseCommand): ...
 

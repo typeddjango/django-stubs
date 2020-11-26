@@ -1,10 +1,13 @@
+from typing import Any
+
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator as SpatialOperator
 from django.db.backends.sqlite3.operations import DatabaseOperations
-from typing import Any
 
 class SpatialiteNullCheckOperator(SpatialOperator):
-    def as_sql(self, connection: Any, lookup: Any, template_params: Any, sql_params: Any): ...
+    def as_sql(
+        self, connection: Any, lookup: Any, template_params: Any, sql_params: Any
+    ): ...
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     name: str = ...

@@ -1,8 +1,7 @@
-from django.core.handlers import base as base
-from django.http import (
-    HttpRequest as HttpRequest,
-)
 from typing import Any
+
+from django.core.handlers import base as base
+from django.http import HttpRequest as HttpRequest
 
 logger: Any
 

@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import (
     Any,
     Callable,
+    ClassVar,
+    Container,
     Dict,
     Iterator,
     List,
@@ -11,15 +13,15 @@ from typing import (
     Sequence,
     Tuple,
     Type,
-    Union,
-    ClassVar,
-    Container,
     TypeVar,
+    Union,
 )
 from unittest.mock import MagicMock
 from uuid import UUID
 
 from django.core.files.base import File
+from django.db import models
+from django.db.models import ForeignKey
 from django.db.models.base import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet, _BaseQuerySet
@@ -31,9 +33,6 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import Input, Widget
 from typing_extensions import Literal
 
-from django.db import models
-from django.db.models import ForeignKey
-
 ALL_FIELDS: str
 
 _Fields = Union[List[Union[Callable, str]], Sequence[str], Literal["__all__"]]
@@ -43,7 +42,10 @@ _ErrorMessages = Dict[str, Dict[str, str]]
 _M = TypeVar("_M", bound=Model)
 
 def construct_instance(
-    form: BaseForm, instance: _M, fields: Optional[Container[str]] = ..., exclude: Optional[Container[str]] = ...
+    form: BaseForm,
+    instance: _M,
+    fields: Optional[Container[str]] = ...,
+    exclude: Optional[Container[str]] = ...,
 ) -> _M: ...
 def model_to_dict(
     instance: Model, fields: Optional[_Fields] = ..., exclude: Optional[_Fields] = ...
@@ -228,7 +230,12 @@ class InlineForeignKeyField(Field):
     pk_field: bool = ...
     to_field: Optional[str] = ...
     def __init__(
-        self, parent_instance: Model, *args: Any, pk_field: bool = ..., to_field: Optional[Any] = ..., **kwargs: Any
+        self,
+        parent_instance: Model,
+        *args: Any,
+        pk_field: bool = ...,
+        to_field: Optional[Any] = ...,
+        **kwargs: Any
     ) -> None: ...
 
 class ModelChoiceIterator:
@@ -267,11 +274,17 @@ class ModelChoiceField(ChoiceField):
         limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
         **kwargs: Any
     ) -> None: ...
-    def get_limit_choices_to(self) -> Optional[Union[Dict[str, datetime], Q, MagicMock]]: ...
+    def get_limit_choices_to(
+        self,
+    ) -> Optional[Union[Dict[str, datetime], Q, MagicMock]]: ...
     def label_from_instance(self, obj: Model) -> str: ...
     choices: Any = ...
     def validate(self, value: Optional[Model]) -> None: ...
-    def has_changed(self, initial: Optional[Union[Model, int, str, UUID]], data: Optional[Union[int, str]]) -> bool: ...
+    def has_changed(
+        self,
+        initial: Optional[Union[Model, int, str, UUID]],
+        data: Optional[Union[int, str]],
+    ) -> bool: ...
 
 class ModelMultipleChoiceField(ModelChoiceField):
     disabled: bool
@@ -285,5 +298,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
     def __init__(self, queryset: _BaseQuerySet, **kwargs: Any) -> None: ...
 
 def _get_foreign_key(
-    parent_model: Type[Model], model: Type[Model], fk_name: Optional[str] = ..., can_fail: bool = ...
+    parent_model: Type[Model],
+    model: Type[Model],
+    fk_name: Optional[str] = ...,
+    can_fail: bool = ...,
 ) -> ForeignKey: ...

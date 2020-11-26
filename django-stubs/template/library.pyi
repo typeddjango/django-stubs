@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-from django.template.base import FilterExpression, Parser, Origin, Token
+from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeText
 
@@ -13,7 +13,9 @@ class Library:
     tags: Dict[str, Callable] = ...
     def __init__(self) -> None: ...
     def tag(
-        self, name: Optional[Union[Callable, str]] = ..., compile_function: Optional[Union[Callable, str]] = ...
+        self,
+        name: Optional[Union[Callable, str]] = ...,
+        compile_function: Optional[Union[Callable, str]] = ...,
     ) -> Callable: ...
     def tag_function(self, func: Callable) -> Callable: ...
     def filter(
@@ -24,7 +26,10 @@ class Library:
     ) -> Callable: ...
     def filter_function(self, func: Callable, **flags: Any) -> Callable: ...
     def simple_tag(
-        self, func: Optional[Union[Callable, str]] = ..., takes_context: Optional[bool] = ..., name: Optional[str] = ...
+        self,
+        func: Optional[Union[Callable, str]] = ...,
+        takes_context: Optional[bool] = ...,
+        name: Optional[str] = ...,
     ) -> Callable: ...
     def inclusion_tag(
         self,
@@ -46,7 +51,9 @@ class TagHelperNode(Node):
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],
     ) -> None: ...
-    def get_resolved_arguments(self, context: Context) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
+    def get_resolved_arguments(
+        self, context: Context
+    ) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
 
 class SimpleNode(TagHelperNode):
     args: List[FilterExpression]

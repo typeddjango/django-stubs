@@ -1,20 +1,36 @@
 from collections import namedtuple
-from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type
+from typing import (
+    Any,
+    Collection,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+)
 
 from django.db.models.base import Model
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
-
-from django.db.models.fields import Field
 from django.utils import tree
 
-PathInfo = namedtuple("PathInfo", "from_opts to_opts target_fields join_field m2m direct filtered_relation")
+PathInfo = namedtuple(
+    "PathInfo",
+    "from_opts to_opts target_fields join_field m2m direct filtered_relation",
+)
 
 class InvalidQuery(Exception): ...
 
-def subclasses(cls: Type[RegisterLookupMixin]) -> Iterator[Type[RegisterLookupMixin]]: ...
+def subclasses(
+    cls: Type[RegisterLookupMixin],
+) -> Iterator[Type[RegisterLookupMixin]]: ...
 
 class QueryWrapper:
     contains_aggregate: bool = ...
@@ -54,7 +70,9 @@ class RegisterLookupMixin:
     @staticmethod
     def merge_dicts(dicts: List[Dict[str, Any]]) -> Dict[str, Any]: ...
     @classmethod
-    def register_lookup(cls, lookup: Any, lookup_name: Optional[str] = ...) -> Type[Any]: ...
+    def register_lookup(
+        cls, lookup: Any, lookup_name: Optional[str] = ...
+    ) -> Type[Any]: ...
     @classmethod
     def _unregister_lookup(cls, lookup: Any, lookup_name: Optional[str] = ...): ...
 
@@ -65,8 +83,12 @@ def select_related_descend(
     load_fields: Optional[Collection[str]],
     reverse: bool = ...,
 ) -> bool: ...
-def refs_expression(lookup_parts: Sequence[str], annotations: Mapping[str, bool]) -> Tuple[bool, Sequence[str]]: ...
-def check_rel_lookup_compatibility(model: Type[Model], target_opts: Any, field: FieldCacheMixin) -> bool: ...
+def refs_expression(
+    lookup_parts: Sequence[str], annotations: Mapping[str, bool]
+) -> Tuple[bool, Sequence[str]]: ...
+def check_rel_lookup_compatibility(
+    model: Type[Model], target_opts: Any, field: FieldCacheMixin
+) -> bool: ...
 
 class FilteredRelation:
     relation_name: str = ...

@@ -1,5 +1,18 @@
 import collections
-from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -9,14 +22,13 @@ from django.contrib.postgres.fields.citext import CIText
 from django.db.backends.sqlite3.base import DatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.constraints import BaseConstraint
+from django.db.models.fields import AutoField, Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ManyToManyField, OneToOneField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList
-
-from django.db.models.fields import AutoField, Field
 
 PROXY_PARENTS: Any
 EMPTY_RELATION_TREE: Any
@@ -27,7 +39,12 @@ def normalize_together(
     option_together: Union[Sequence[Tuple[str, str]], Tuple[str, str]]
 ) -> Tuple[Tuple[str, str], ...]: ...
 def make_immutable_fields_list(
-    name: str, data: Union[Iterator[Any], List[Union[ArrayField, CIText]], List[Union[Field, FieldCacheMixin]]]
+    name: str,
+    data: Union[
+        Iterator[Any],
+        List[Union[ArrayField, CIText]],
+        List[Union[Field, FieldCacheMixin]],
+    ],
 ) -> ImmutableList: ...
 
 _M = TypeVar("_M", bound=Model)
@@ -83,7 +100,9 @@ class Options(Generic[_M]):
     default_related_name: Optional[str] = ...
     model: Type[Model] = ...
     original_attrs: Dict[str, Any] = ...
-    def __init__(self, meta: Optional[type], app_label: Optional[str] = ...) -> None: ...
+    def __init__(
+        self, meta: Optional[type], app_label: Optional[str] = ...
+    ) -> None: ...
     @property
     def label(self) -> str: ...
     @property
@@ -94,7 +113,9 @@ class Options(Generic[_M]):
     def installed(self): ...
     def contribute_to_class(self, cls: Type[Model], name: str) -> None: ...
     def add_manager(self, manager: Manager) -> None: ...
-    def add_field(self, field: Union[GenericForeignKey, Field], private: bool = ...) -> None: ...
+    def add_field(
+        self, field: Union[GenericForeignKey, Field], private: bool = ...
+    ) -> None: ...
     def setup_pk(self, field: Field) -> None: ...
     def setup_proxy(self, target: Type[Model]) -> None: ...
     def can_migrate(self, connection: Union[DatabaseWrapper, str]) -> bool: ...

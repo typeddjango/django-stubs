@@ -1,5 +1,17 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, TypeVar, Generic, overload
 from functools import wraps as wraps  # noqa: F401
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from django.db.models.base import Model
 
@@ -13,7 +25,9 @@ class cached_property(Generic[_T]):
     name: str = ...
     def __init__(self, func: Callable[..., _T], name: Optional[str] = ...): ...
     @overload
-    def __get__(self, instance: None, cls: Type[Any] = ...) -> "cached_property[_T]": ...
+    def __get__(
+        self, instance: None, cls: Type[Any] = ...
+    ) -> "cached_property[_T]": ...
     @overload
     def __get__(self, instance: object, cls: Type[Any] = ...) -> _T: ...
 

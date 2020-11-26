@@ -1,5 +1,8 @@
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor as BaseDatabaseSchemaEditor
 from typing import Any
+
+from django.db.backends.base.schema import (
+    BaseDatabaseSchemaEditor as BaseDatabaseSchemaEditor,
+)
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_rename_table: str = ...

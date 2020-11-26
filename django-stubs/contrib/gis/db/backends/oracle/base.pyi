@@ -1,5 +1,6 @@
-from django.db.backends.oracle.base import DatabaseWrapper as OracleDatabaseWrapper
 from typing import Any
+
+from django.db.backends.oracle.base import DatabaseWrapper as OracleDatabaseWrapper
 
 class DatabaseWrapper(OracleDatabaseWrapper):
     SchemaEditorClass: Any = ...

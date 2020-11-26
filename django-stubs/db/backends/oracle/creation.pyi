@@ -1,5 +1,8 @@
-from django.db.backends.base.creation import BaseDatabaseCreation as BaseDatabaseCreation
 from typing import Any
+
+from django.db.backends.base.creation import (
+    BaseDatabaseCreation as BaseDatabaseCreation,
+)
 
 TEST_DATABASE_PREFIX: str
 

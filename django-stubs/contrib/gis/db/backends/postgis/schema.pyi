@@ -1,5 +1,6 @@
-from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 from typing import Any
+
+from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 
 class PostGISSchemaEditor(DatabaseSchemaEditor):
     geom_index_type: str = ...

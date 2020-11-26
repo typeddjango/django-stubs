@@ -1,16 +1,21 @@
+from typing import Any
+
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func
-from typing import Any
 
 BILATERAL: str
 
 class PostGISOperator(SpatialOperator):
     geography: Any = ...
     raster: Any = ...
-    def __init__(self, geography: bool = ..., raster: bool = ..., **kwargs: Any) -> None: ...
-    def as_sql(self, connection: Any, lookup: Any, template_params: Any, *args: Any): ...
+    def __init__(
+        self, geography: bool = ..., raster: bool = ..., **kwargs: Any
+    ) -> None: ...
+    def as_sql(
+        self, connection: Any, lookup: Any, template_params: Any, *args: Any
+    ): ...
     def check_raster(self, lookup: Any, template_params: Any): ...
 
 class ST_Polygon(Func):

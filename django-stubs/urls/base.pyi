@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, Type, Union, Sequence
+from typing import Any, Callable, Dict, Optional, Sequence, Type, Union
 
 from django.urls.resolvers import ResolverMatch
 

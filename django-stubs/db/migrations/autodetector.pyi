@@ -13,7 +13,10 @@ class MigrationAutodetector:
     questioner: MigrationQuestioner = ...
     existing_apps: Set[Any] = ...
     def __init__(
-        self, from_state: ProjectState, to_state: ProjectState, questioner: Optional[MigrationQuestioner] = ...
+        self,
+        from_state: ProjectState,
+        to_state: ProjectState,
+        questioner: Optional[MigrationQuestioner] = ...,
     ) -> None: ...
     def changes(
         self,
@@ -27,13 +30,17 @@ class MigrationAutodetector:
         self, fields: List[Tuple[str, Field]]
     ) -> List[Tuple[str, List[Any], Dict[str, Union[Callable, int, str]]]]: ...
     def check_dependency(
-        self, operation: Operation, dependency: Tuple[str, str, Optional[str], Union[bool, str]]
+        self,
+        operation: Operation,
+        dependency: Tuple[str, str, Optional[str], Union[bool, str]],
     ) -> bool: ...
     def add_operation(
         self,
         app_label: str,
         operation: Operation,
-        dependencies: Optional[List[Tuple[str, str, Optional[str], Union[bool, str]]]] = ...,
+        dependencies: Optional[
+            List[Tuple[str, str, Optional[str], Union[bool, str]]]
+        ] = ...,
         beginning: bool = ...,
     ) -> None: ...
     def swappable_first_key(self, item: Tuple[str, str]) -> Tuple[str, str]: ...
@@ -59,7 +66,10 @@ class MigrationAutodetector:
     def generate_altered_order_with_respect_to(self) -> None: ...
     def generate_altered_managers(self) -> None: ...
     def arrange_for_graph(
-        self, changes: Dict[str, List[Migration]], graph: MigrationGraph, migration_name: Optional[str] = ...
+        self,
+        changes: Dict[str, List[Migration]],
+        graph: MigrationGraph,
+        migration_name: Optional[str] = ...,
     ) -> Dict[str, List[Migration]]: ...
     @classmethod
     def suggest_name(cls, ops: List[Operation]) -> str: ...

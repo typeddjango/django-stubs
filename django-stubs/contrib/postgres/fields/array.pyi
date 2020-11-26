@@ -1,7 +1,12 @@
 from typing import Any, Iterable, List, Optional, Sequence, TypeVar, Union
 
 from django.db.models.expressions import Combinable
-from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
+from django.db.models.fields import (
+    Field,
+    _ErrorMessagesToOverride,
+    _FieldChoices,
+    _ValidatorCallable,
+)
 
 from .mixins import CheckFieldDefaultMixin
 

@@ -1,12 +1,11 @@
 from typing import Any, Dict, Iterator, Optional
 
+from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
-
-from django import forms
 
 UserModel: Any
 
@@ -72,7 +71,9 @@ class SetPasswordForm(forms.Form):
     new_password1: Any = ...
     new_password2: Any = ...
     user: User = ...
-    def __init__(self, user: Optional[AbstractBaseUser], *args: Any, **kwargs: Any) -> None: ...
+    def __init__(
+        self, user: Optional[AbstractBaseUser], *args: Any, **kwargs: Any
+    ) -> None: ...
     def clean_new_password2(self) -> str: ...
     def save(self, commit: bool = ...) -> AbstractBaseUser: ...
 

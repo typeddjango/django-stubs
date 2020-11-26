@@ -12,14 +12,18 @@ class TranslatableFile:
     dirpath: str
     file_name: str
     locale_dir: str
-    def __init__(self, dirpath: str, file_name: str, locale_dir: Optional[str]) -> None: ...
+    def __init__(
+        self, dirpath: str, file_name: str, locale_dir: Optional[str]
+    ) -> None: ...
 
 class BuildFile:
     """
     Represent the state of a translatable file during the build process.
     """
 
-    def __init__(self, command: BaseCommand, domain: str, translatable: TranslatableFile) -> None: ...
+    def __init__(
+        self, command: BaseCommand, domain: str, translatable: TranslatableFile
+    ) -> None: ...
     @property
     def is_templatized(self) -> bool: ...
     @property

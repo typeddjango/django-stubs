@@ -15,7 +15,9 @@ class BadHeaderError(ValueError): ...
 
 ADDRESS_HEADERS: Any
 
-def forbid_multi_line_headers(name: str, val: str, encoding: str) -> Tuple[str, str]: ...
+def forbid_multi_line_headers(
+    name: str, val: str, encoding: str
+) -> Tuple[str, str]: ...
 def split_addr(addr: str, encoding: str) -> Tuple[str, str]: ...
 def sanitize_address(addr: Union[Tuple[str, str], str], encoding: str) -> str: ...
 
@@ -33,7 +35,9 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     policy: Policy
     preamble: None
     encoding: str = ...
-    def __init__(self, _text: str, _subtype: str = ..., _charset: str = ...) -> None: ...
+    def __init__(
+        self, _text: str, _subtype: str = ..., _charset: str = ...
+    ) -> None: ...
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     defects: List[Any]
@@ -42,12 +46,19 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     preamble: None
     encoding: str = ...
     def __init__(
-        self, _subtype: str = ..., boundary: None = ..., _subparts: None = ..., encoding: str = ..., **_params: Any
+        self,
+        _subtype: str = ...,
+        boundary: None = ...,
+        _subparts: None = ...,
+        encoding: str = ...,
+        **_params: Any
     ) -> None: ...
 
 _AttachmentContent = Union[bytes, EmailMessage, Message, SafeMIMEText, str]
 _AttachmentTuple = Union[
-    Tuple[str, _AttachmentContent], Tuple[Optional[str], _AttachmentContent, str], Tuple[str, _AttachmentContent, None]
+    Tuple[str, _AttachmentContent],
+    Tuple[Optional[str], _AttachmentContent, str],
+    Tuple[str, _AttachmentContent, None],
 ]
 
 class EmailMessage:
@@ -85,9 +96,19 @@ class EmailMessage:
     @overload
     def attach(self, filename: MIMEText = ...) -> None: ...
     @overload
-    def attach(self, filename: None = ..., content: _AttachmentContent = ..., mimetype: str = ...) -> None: ...
+    def attach(
+        self,
+        filename: None = ...,
+        content: _AttachmentContent = ...,
+        mimetype: str = ...,
+    ) -> None: ...
     @overload
-    def attach(self, filename: str = ..., content: _AttachmentContent = ..., mimetype: Optional[str] = ...) -> None: ...
+    def attach(
+        self,
+        filename: str = ...,
+        content: _AttachmentContent = ...,
+        mimetype: Optional[str] = ...,
+    ) -> None: ...
     def attach_file(self, path: str, mimetype: Optional[str] = ...) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
@@ -107,4 +128,6 @@ class EmailMultiAlternatives(EmailMessage):
         cc: Optional[Sequence[str]] = ...,
         reply_to: Optional[Sequence[str]] = ...,
     ) -> None: ...
-    def attach_alternative(self, content: _AttachmentContent, mimetype: str) -> None: ...
+    def attach_alternative(
+        self, content: _AttachmentContent, mimetype: str
+    ) -> None: ...

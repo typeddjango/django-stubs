@@ -1,8 +1,7 @@
 from typing import Any, List
 
-from django.template.base import Parser, Token
-
 from django.template import Node
+from django.template.base import Parser, Token
 
 register: Any
 

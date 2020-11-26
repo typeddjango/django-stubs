@@ -1,5 +1,6 @@
-from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
 from typing import Any, Optional
+
+from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
 
 def wrap_oracle_errors() -> None: ...
 

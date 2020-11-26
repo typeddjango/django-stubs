@@ -1,6 +1,9 @@
-from django.contrib.gis.db import models as models
-from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin as SpatialRefSysMixin
 from typing import Any
+
+from django.contrib.gis.db import models as models
+from django.contrib.gis.db.backends.base.models import (
+    SpatialRefSysMixin as SpatialRefSysMixin,
+)
 
 class OracleGeometryColumns(models.Model):
     table_name: Any = ...
