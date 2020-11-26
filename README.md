@@ -22,15 +22,12 @@ If you're on a Django version < 3.1, you'll need to monkey patch Django's
 argument. You can either use [`django-stubs-ext`](https://pypi.org/project/django-stubs-ext/`) or do this yourself manually:
 
 ```python
-import types
+# in settings.py
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 
-def no_op(self, x):
-    return self
-
-QuerySet.__class_getitem__ = types.MethodType(no_op, QuerySet)
-BaseManager.__class_getitem__ = types.MethodType(no_op, BaseManager)
+for cls in (QuerySet, BaseManager):
+    cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore [attr-defined]
 ```
 
 ## usage
