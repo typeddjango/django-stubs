@@ -1,4 +1,4 @@
-# django-types
+# django-types [![PyPI](https://img.shields.io/pypi/v/django-types.svg)](https://pypi.org/project/django-types/)
 
 Type stubs for [Django](https://www.djangoproject.com).
 
