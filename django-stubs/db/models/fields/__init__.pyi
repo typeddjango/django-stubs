@@ -16,6 +16,7 @@ from typing import (
     Union,
     overload,
 )
+from uuid import UUID
 
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -143,25 +144,354 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_from_object(self, obj: Model) -> _GT: ...
     def get_attname(self) -> str: ...
 
-class IntegerField(Field[Union[float, int, str, Combinable], int]): ...
+class IntegerField(Generic[_C], Field[Union[float, int, str, Combinable], int]):
+    @overload
+    def __init__(
+        self: IntegerField[int],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: IntegerField[Optional[int]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, int, Combinable, _C]
+    ) -> None: ...
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: Any): ...
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField): ...
-class SmallIntegerField(IntegerField): ...
-class BigIntegerField(IntegerField): ...
-class FloatField(Field[Union[float, int, str, Combinable], float]): ...
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_C]):
+    @overload
+    def __init__(
+        self: PositiveIntegerField[int],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveIntegerField[Optional[int]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, int, Combinable, _C]
+    ) -> None: ...
+
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_C]):
+    @overload
+    def __init__(
+        self: PositiveSmallIntegerField[int],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveSmallIntegerField[Optional[int]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, int, Combinable, _C]
+    ) -> None: ...
+
+class SmallIntegerField(IntegerField[_C]):
+    @overload
+    def __init__(
+        self: SmallIntegerField[int],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: SmallIntegerField[Optional[int]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, int, Combinable, _C]
+    ) -> None: ...
+
+class BigIntegerField(IntegerField[_C]):
+    @overload
+    def __init__(
+        self: BigIntegerField[int],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BigIntegerField[Optional[int]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, int, Combinable, _C]
+    ) -> None: ...
+
+class FloatField(Generic[_C], Field[Union[float, int, str, Combinable], float]):
+    @overload
+    def __init__(
+        self: FloatField[float],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: FloatField[Optional[float]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, int, Combinable, _C]
+    ) -> None: ...
 
 class DecimalField(
-    Field[Union[str, float, decimal.Decimal, Combinable], decimal.Decimal]
+    Generic[_C], Field[Union[str, float, decimal.Decimal, Combinable], decimal.Decimal]
 ):
     # attributes
     max_digits: int = ...
     decimal_places: int = ...
+    @overload
     def __init__(
-        self,
+        self: DecimalField[decimal.Decimal],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         max_digits: Optional[int] = ...,
@@ -169,7 +499,7 @@ class DecimalField(
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -182,10 +512,37 @@ class DecimalField(
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    @overload
+    def __init__(
+        self: DecimalField[Optional[decimal.Decimal]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        max_digits: Optional[int] = ...,
+        decimal_places: Optional[int] = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(
+        self, instance: Any, value: Union[str, float, Combinable, _C]
+    ) -> None: ...
 
-class AutoField(Field[Union[Combinable, int, str], int]): ...
+class AutoField(Field[Union[Combinable, int, str, None], int]): ...
 
-_C = TypeVar("_C", bound=Optional[str])
+_C = TypeVar("_C")
 
 class CharField(Generic[_C], Field[str, str]):
     @overload
@@ -238,12 +595,13 @@ class CharField(Generic[_C], Field[str, str]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
-    def __get__(self: CharField[_C], instance: Any, owner: Any) -> _C: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
     def __set__(self, instance: Any, value: _C) -> None: ...
 
-class SlugField(CharField):
+class SlugField(CharField[_C]):
+    @overload
     def __init__(
-        self,
+        self: SlugField[str],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
@@ -251,7 +609,7 @@ class SlugField(CharField):
         allow_unicode: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -267,18 +625,14 @@ class SlugField(CharField):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
-
-class EmailField(CharField): ...
-class URLField(CharField): ...
-
-class TextField(Generic[_C], Field[str, str]):
     @overload
     def __init__(
-        self: TextField[Optional[str]],
+        self: SlugField[Optional[str]],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
+        allow_unicode: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: Literal[True] = ...,
@@ -296,10 +650,14 @@ class TextField(Generic[_C], Field[str, str]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> None: ...
+    ): ...
+    def __get__(self: SlugField[_C], instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
+
+class EmailField(CharField[_C]):
     @overload
     def __init__(
-        self: TextField[str],
+        self: EmailField[str],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
@@ -322,22 +680,261 @@ class TextField(Generic[_C], Field[str, str]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
+    @overload
+    def __init__(
+        self: EmailField[Optional[str]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
+
+class URLField(CharField[_C]):
+    @overload
+    def __init__(
+        self: URLField[str],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: URLField[Optional[str]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
+
+class TextField(Generic[_C], Field[str, str]):
+    @overload
+    def __init__(
+        self: TextField[str],
+        *,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: TextField[Optional[str]],
+        *,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
     def __get__(self: TextField[_C], instance: Any, owner: Any) -> _C: ...
     def __set__(self, instance: Any, value: _C) -> None: ...
 
-class BooleanField(Field[Union[bool, Combinable], bool]): ...
-class NullBooleanField(Field[Optional[Union[bool, Combinable]], Optional[bool]]): ...
-class IPAddressField(Field[Union[str, Combinable], str]): ...
+class BooleanField(Generic[_C], Field[Union[bool, Combinable], bool]):
+    @overload
+    def __init__(
+        self: BooleanField[bool],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    @overload
+    def __init__(
+        self: BooleanField[Optional[bool]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
+
+class IPAddressField(Generic[_C], Field[Union[str, Combinable], str]):
+    @overload
+    def __init__(
+        self: IPAddressField[str],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    @overload
+    def __init__(
+        self: IPAddressField[Optional[str]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
 
 class GenericIPAddressField(
-    Field[Union[str, int, Callable[..., Any], Combinable], str]
+    Generic[_C], Field[Union[str, int, Callable[..., Any], Combinable], str]
 ):
 
     default_error_messages: Any = ...
     unpack_ipv4: Any = ...
     protocol: Any = ...
+    @overload
     def __init__(
-        self,
+        self: GenericIPAddressField[str],
         verbose_name: Optional[Any] = ...,
         name: Optional[Any] = ...,
         protocol: str = ...,
@@ -345,7 +942,7 @@ class GenericIPAddressField(
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -358,6 +955,31 @@ class GenericIPAddressField(
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
+    @overload
+    def __init__(
+        self: GenericIPAddressField[Optional[str]],
+        verbose_name: Optional[Any] = ...,
+        name: Optional[Any] = ...,
+        protocol: str = ...,
+        unpack_ipv4: bool = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
 
 class DateTimeCheckMixin: ...
 
@@ -387,10 +1009,13 @@ class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
     ): ...
 
 class TimeField(
-    DateTimeCheckMixin, Field[Union[str, time, datetime, Combinable], time]
+    Generic[_C],
+    DateTimeCheckMixin,
+    Field[Union[str, time, datetime, Combinable], time],
 ):
+    @overload
     def __init__(
-        self,
+        self: TimeField[time],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         auto_now: bool = ...,
@@ -398,7 +1023,7 @@ class TimeField(
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -411,6 +1036,31 @@ class TimeField(
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    @overload
+    def __init__(
+        self: TimeField[Optional[time]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
 
 _DT = TypeVar("_DT", bound=Optional[datetime])
 
@@ -468,16 +1118,69 @@ class DateTimeField(
     def __get__(self, instance: Any, owner: Any) -> _DT: ...
     def __set__(self, instance: Any, value: _DT) -> None: ...
 
-class UUIDField(Field[Union[str, uuid.UUID], uuid.UUID]): ...
+class UUIDField(Generic[_C], Field[Union[str, uuid.UUID], uuid.UUID]):
+    @overload
+    def __init__(
+        self: UUIDField[uuid.UUID],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: UUIDField[Optional[uuid.UUID]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: Union[str, _C]) -> None: ...
 
-class FilePathField(Field[str, str]):
+class FilePathField(Generic[_C], Field[str, str]):
     path: Any = ...
     match: Optional[str] = ...
     recursive: bool = ...
     allow_files: bool = ...
     allow_folders: bool = ...
+    @overload
     def __init__(
-        self,
+        self: FilePathField[str],
         path: Union[str, Callable[..., str]] = ...,
         match: Optional[str] = ...,
         recursive: bool = ...,
@@ -489,7 +1192,7 @@ class FilePathField(Field[str, str]):
         max_length: int = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -502,8 +1205,142 @@ class FilePathField(Field[str, str]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ): ...
+    @overload
+    def __init__(
+        self: FilePathField[Optional[str]],
+        path: Union[str, Callable[..., str]] = ...,
+        match: Optional[str] = ...,
+        recursive: bool = ...,
+        allow_files: bool = ...,
+        allow_folders: bool = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: int = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
 
-class BinaryField(Field[Union[bytes, bytearray, memoryview], bytes]): ...
-class DurationField(Field[timedelta, timedelta]): ...
+class BinaryField(Generic[_C], Field[Union[bytes, bytearray, memoryview], bytes]):
+    @overload
+    def __init__(
+        self: BinaryField[bytes],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    @overload
+    def __init__(
+        self: BinaryField[Optional[bytes]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
+
+class DurationField(Generic[_C], Field[timedelta, timedelta]):
+    @overload
+    def __init__(
+        self: DurationField[timedelta],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    @overload
+    def __init__(
+        self: DurationField[Optional[timedelta]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    def __get__(self, instance: Any, owner: Any) -> _C: ...
+    def __set__(self, instance: Any, value: _C) -> None: ...
+
 class BigAutoField(AutoField): ...
-class CommaSeparatedIntegerField(CharField): ...

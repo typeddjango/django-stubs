@@ -186,21 +186,20 @@ class ForeignKey(Generic[_M], ForeignObject[_M, _M]):
     def __get__(self, instance: None, owner) -> ForwardManyToOneDescriptor: ...
     # Model instance access
     @overload
+    def __get__(self: ForeignKey[_M], instance: Any, owner: Any) -> _M: ...
+    @overload
     def __get__(
         self: ForeignKey[Optional[_M]], instance: Any, owner: Any
     ) -> Optional[_M]: ...
-    @overload
-    def __get__(self: ForeignKey[_M], instance: Any, owner: Any) -> _M: ...
     # non-Model instances
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...
 
-class OneToOneField(RelatedField[_ST, _GT]):
-    _pyi_private_set_type: Union[Any, Combinable]
-    _pyi_private_get_type: Any
+class OneToOneField(Generic[_M], RelatedField[_M, _M]):
+    @overload
     def __init__(
-        self,
-        to: Union[Type[Model], str],
+        self: OneToOneField[_M],
+        to: Union[Type[_M], str],
         on_delete: Any,
         to_field: Optional[str] = ...,
         related_name: Optional[str] = ...,
@@ -214,7 +213,40 @@ class OneToOneField(RelatedField[_ST, _GT]):
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ): ...
+    @overload
+    def __init__(
+        self: OneToOneField[Optional[_M]],
+        to: Union[Type[_M], str],
+        on_delete: Any,
+        to_field: Optional[str] = ...,
+        related_name: Optional[str] = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        parent_link: bool = ...,
+        db_constraint: bool = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -235,14 +267,16 @@ class OneToOneField(RelatedField[_ST, _GT]):
     def __get__(self, instance: None, owner) -> ForwardOneToOneDescriptor: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(self: OneToOneField[_M], instance: Any, owner: Any) -> _M: ...
+    @overload
+    def __get__(
+        self: OneToOneField[Optional[_M]], instance: Any, owner: Any
+    ) -> Optional[_M]: ...
     # non-Model instances
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...
 
-class ManyToManyField(RelatedField[_ST, _GT]):
-    _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: RelatedManager[Any]
+class ManyToManyField(RelatedField[Sequence[Any], RelatedManager[Any]]):
 
     rel_class: Any = ...
     description: Any = ...
@@ -287,7 +321,7 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     def __get__(self, instance: None, owner) -> ManyToManyDescriptor: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(self, instance: Model, owner) -> RelatedManager[Any]: ...
     # non-Model instances
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...

@@ -1,4 +1,14 @@
-from typing import Any, Iterable, List, Optional, Sequence, TypeVar, Union
+from typing import (
+    Any,
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from django.db.models.expressions import Combinable
 from django.db.models.fields import (
@@ -7,17 +17,17 @@ from django.db.models.fields import (
     _FieldChoices,
     _ValidatorCallable,
 )
+from typing_extensions import Literal
 
 from .mixins import CheckFieldDefaultMixin
 
-# __set__ value type
-_ST = TypeVar("_ST")
-# __get__ return type
-_GT = TypeVar("_GT")
+_T = TypeVar("_T")
 
-class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[Sequence[Any], Combinable]
-    _pyi_private_get_type: List[Any]
+class ArrayField(
+    Generic[_T],
+    CheckFieldDefaultMixin,
+    Field[Union[Sequence[Any], Combinable], List[Any]],
+):
 
     empty_strings_allowed: bool = ...
     default_error_messages: Any = ...
@@ -25,8 +35,9 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     size: Any = ...
     default_validators: Any = ...
     from_db_value: Any = ...
+    @overload
     def __init__(
-        self,
+        self: ArrayField[List[Any]],
         base_field: Field,
         size: Optional[int] = ...,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -35,7 +46,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -51,6 +62,35 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
+    @overload
+    def __init__(
+        self: ArrayField[Optional[List[Any]]],
+        base_field: Field,
+        size: Optional[int] = ...,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self: ArrayField[_T], instance: Any, owner: Any) -> _T: ...
+    def __set__(self: ArrayField[_T], instance: Any, value: _T) -> None: ...
     @property
     def description(self): ...
     def get_transform(self, name: Any): ...
