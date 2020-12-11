@@ -773,6 +773,7 @@ class TextField(Generic[_C], Field[str, str]):
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,

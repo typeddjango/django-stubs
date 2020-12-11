@@ -60,6 +60,13 @@ class Comment(models.Model):
 
     text = models.TextField()
     text_nullable = models.TextField(null=True)
+    test_with_explicit_null_false = models.TextField(
+        db_index=True,
+        unique=True,
+        null=False,
+        blank=False,
+        help_text="",
+    )
 
     integer = models.IntegerField()
     integer_nullable = models.IntegerField(null=True)
