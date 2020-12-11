@@ -81,6 +81,23 @@ sqlparse = ">=0.2.2"
 
 [[package]]
 category = "dev"
+description = "the modular source code checker: pep8 pyflakes and co"
+name = "flake8"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
+version = "3.8.4"
+
+[package.dependencies]
+mccabe = ">=0.6.0,<0.7.0"
+pycodestyle = ">=2.6.0a1,<2.7.0"
+pyflakes = ">=2.2.0,<2.3.0"
+
+[package.dependencies.importlib-metadata]
+python = "<3.8"
+version = "*"
+
+[[package]]
+category = "dev"
 description = "Read metadata from Python packages"
 marker = "python_version < \"3.8\""
 name = "importlib-metadata"
@@ -106,6 +123,14 @@ name = "isort"
 optional = false
 python-versions = ">=3.6,<4.0"
 version = "5.6.4"
+
+[[package]]
+category = "dev"
+description = "McCabe checker, plugin for flake8"
+name = "mccabe"
+optional = false
+python-versions = "*"
+version = "0.6.1"
 
 [[package]]
 category = "dev"
@@ -168,6 +193,22 @@ name = "py"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.9.0"
+
+[[package]]
+category = "dev"
+description = "Python style guide checker"
+name = "pycodestyle"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "2.6.0"
+
+[[package]]
+category = "dev"
+description = "passive checker of Python programs"
+name = "pyflakes"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "2.2.0"
 
 [[package]]
 category = "dev"
@@ -273,7 +314,7 @@ python-versions = ">=3.6"
 version = "3.4.0"
 
 [metadata]
-content-hash = "e216165fb6aebd39a38bf388b375a421609d2b42c96843ceb37ccdc261fddb88"
+content-hash = "7aff51acdb55e93b2fdaedb6010af2ceced541985adc145ec99faee5e66c67f9"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -285,15 +326,19 @@ black = ["1c02557aa099101b9d21496f8a914e9ed2222ef70336404eeeac8edba836fbea"]
 click = ["d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a", "dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"]
 colorama = ["5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b", "9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"]
 django = ["14a4b7cd77297fba516fc0d92444cc2e2e388aa9de32d7a68d4a83d58f5a4927", "14b87775ffedab2ef6299b73343d1b4b41e5d4e2aa58c6581f114dbec01e3f8f"]
+flake8 = ["749dbbd6bfd0cf1318af27bf97a14e28e5ff548ef8e5b1566ccfb25a11e7c839", "aadae8761ec651813c24be05c6f7b4680857ef6afaae4651a4eccaef97ce6c3b"]
 importlib-metadata = ["590690d61efdd716ff82c39ca9a9d4209252adfe288a4b5721181050acbd4175", "d9b8a46a0885337627a6430db287176970fff18ad421becec1d64cfc763c2099"]
 iniconfig = ["011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3", "bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"]
 isort = ["dcab1d98b469a12a1a624ead220584391648790275560e1a43e54c5dceae65e7", "dcaeec1b5f0eca77faea2a35ab790b4f3680ff75590bfcb7145986905aab2f58"]
+mccabe = ["ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42", "dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"]
 mypy = ["0a0d102247c16ce93c97066443d11e2d36e6cc2a32d8ccc1f705268970479324", "0d34d6b122597d48a36d6c59e35341f410d4abfa771d96d04ae2c468dd201abc", "2170492030f6faa537647d29945786d297e4862765f0b4ac5930ff62e300d802", "2842d4fbd1b12ab422346376aad03ff5d0805b706102e475e962370f874a5122", "2b21ba45ad9ef2e2eb88ce4aeadd0112d0f5026418324176fd494a6824b74975", "72060bf64f290fb629bd4a67c707a66fd88ca26e413a91384b18db3876e57ed7", "af4e9ff1834e565f1baa74ccf7ae2564ae38c8df2a85b057af1dbbc958eb6666", "bd03b3cf666bff8d710d633d1c56ab7facbdc204d567715cb3b9f85c6e94f669", "c614194e01c85bb2e551c421397e49afb2872c88b5830e3554f0519f9fb1c178", "cf4e7bf7f1214826cf7333627cb2547c0db7e3078723227820d0a2490f117a01", "da56dedcd7cd502ccd3c5dddc656cb36113dd793ad466e894574125945653cea", "e86bdace26c5fe9cf8cb735e7cedfe7850ad92b327ac5d797c656717d2ca66de", "e97e9c13d67fbe524be17e4d8025d51a7dca38f90de2e462243ab8ed8a9178d1", "eea260feb1830a627fb526d22fbb426b750d9f5a47b624e8d5e7e004359b219c"]
 mypy-extensions = ["090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d", "2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"]
 packaging = ["4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8", "998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"]
 pathspec = ["86379d6b86d75816baba717e64b1a3a3469deb93bb76d613c9ce79edc5cb68fd", "aa0cb481c4041bf52ffa7b0d8fa6cd3e88a2ca4879c533c9153882ee2556790d"]
 pluggy = ["15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0", "966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"]
 py = ["366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2", "9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342"]
+pycodestyle = ["2295e7b2f6b5bd100585ebcb1f616591b652db8a741695b3d8f5d28bdc934367", "c58a7d2815e0e8d7972bf1803331fb0152f867bd89adf8a01dfd55085434192e"]
+pyflakes = ["0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92", "35b2d75ee967ea93b55750aa9edbbf72813e06a66ba54438df2cfac9e3c27fc8"]
 pyparsing = ["c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1", "ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"]
 pytest = ["4288fed0d9153d9646bfcdf0c0428197dba1ecb27a33bb6e031d002fa88653fe", "c0a7e94a8cdbc5422a51ccdad8e6f1024795939cc89159a0ae7f0b316ad3823e"]
 pytz = ["3e6b7dd2d1e0a59084bcee14a17af60c5c562cdc16d828e8eba2e683d3a7e268", "5c55e189b682d420be27c6995ba6edce0c0a77dd67bfbe2ae6607134d5851ffd"]
