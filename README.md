@@ -50,6 +50,27 @@ reveal_type(User.objects.all().first())
 # note: Revealed type is 'Optional[User]'
 ```
 
+### ForeignKey ids as properties in ORM models
+
+When defining a Django ORM model with a foreign key, like so:
+
+```python
+class User(models.Model):
+    team = models.ForeignKey("Team", null=True, on_delete=models.SET_NULL)
+```
+
+two properties are created, `team` as expected, and `team_id`. In order for
+mypy to know about the id property we need to define it manually as follows:
+
+```python
+from typing import TYPE_CHECKING
+
+class User(models.Model):
+    team = models.ForeignKey("Team", null=True, on_delete=models.SET_NULL)
+    if TYPE_CHECKING:
+        team_id: int
+```
+
 ### `HttpRequest`'s `user` property
 
 The `HttpRequest`'s `user` property has a type of `Union[AbstractBaseUser, AnonymousUser]`,
