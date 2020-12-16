@@ -22,7 +22,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.managers import create_new_manager_class_from_from_queryset_method
-from mypy_django_plugin.transformers.models import process_model_class
+from mypy_django_plugin.transformers.models import process_model_class, set_auth_user_model_boolean_fields
 
 
 def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
@@ -270,8 +270,12 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(settings.get_type_of_settings_attribute, django_context=self.django_context)
 
         info = self._get_typeinfo_or_none(class_name)
+        if info and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
+            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == "user":
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
+        if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
+            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
         return None
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
