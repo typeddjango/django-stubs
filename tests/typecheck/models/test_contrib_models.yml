@@ -6,8 +6,8 @@
         reveal_type(User().first_name)  # N: Revealed type is 'builtins.str*'
         reveal_type(User().last_name)  # N: Revealed type is 'builtins.str*'
         reveal_type(User().email)  # N: Revealed type is 'builtins.str*'
-        reveal_type(User().is_staff)  # N: Revealed type is 'builtins.bool*'
-        reveal_type(User().is_active)  # N: Revealed type is 'builtins.bool*'
+        reveal_type(User().is_staff)  # N: Revealed type is 'builtins.bool'
+        reveal_type(User().is_active)  # N: Revealed type is 'builtins.bool'
         reveal_type(User().date_joined)  # N: Revealed type is 'datetime.datetime*'
         reveal_type(User().last_login)  # N: Revealed type is 'Union[datetime.datetime, None]'
         reveal_type(User().is_authenticated)  # N: Revealed type is 'Literal[True]'
@@ -22,7 +22,7 @@
         reveal_type(Permission().codename)  # N: Revealed type is 'builtins.str*'
 
         from django.contrib.auth.models import PermissionsMixin
-        reveal_type(PermissionsMixin().is_superuser)  # N: Revealed type is 'builtins.bool*'
+        reveal_type(PermissionsMixin().is_superuser)  # N: Revealed type is 'builtins.bool'
 
         from django.contrib.auth.models import Group
         reveal_type(Group().name)  # N: Revealed type is 'builtins.str*'

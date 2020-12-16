@@ -5,7 +5,7 @@ from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
-from mypy.plugin import ClassDefContext
+from mypy.plugin import AttributeContext, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
@@ -355,3 +355,9 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
         except helpers.IncompleteDefnException:
             if not ctx.api.final_iteration:
                 ctx.api.defer()
+
+
+def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
+    boolinfo = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), bool)
+    assert boolinfo is not None
+    return Instance(boolinfo, [])
