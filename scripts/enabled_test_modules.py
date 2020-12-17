@@ -113,8 +113,14 @@ IGNORED_ERRORS = {
         'error: "HttpResponse" has no attribute "context_data"',
     ],
     "admin_checks": ['Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'],
+    "admin_default_site": [
+        'Incompatible types in assignment (expression has type "DefaultAdminSite", variable has type "AdminSite")'
+    ],
     "admin_inlines": [
         'error: "HttpResponse" has no attribute "rendered_content"',
+    ],
+    "admin_registration": [
+        'Argument "site" to "register" has incompatible type "Type[Traveler]"; expected "Optional[AdminSite]"',
     ],
     "admin_utils": [
         '"Article" has no attribute "non_field"',
