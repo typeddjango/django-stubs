@@ -90,12 +90,12 @@ Install it:
 pip install django-stubs-ext  # as a production dependency
 ```
 
-And then place in your `manage.py`, `wsgi.py`, and `asgi.py` files:
+And then place in your top-level settings:
 
 ```python
 import django_stubs_ext
 
-django_stubs_ext.monkeypath()
+django_stubs_ext.monkeypatch()
 ```
 
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
