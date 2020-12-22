@@ -3,6 +3,7 @@ from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 from django import VERSION as VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
+from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 from django.views.generic.edit import FormMixin
@@ -38,6 +39,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(ModelAdmin),
     MPGeneric(FormMixin),
     MPGeneric(BaseModelAdmin),
+    MPGeneric(Field),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
