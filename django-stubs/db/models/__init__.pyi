@@ -59,6 +59,8 @@ from .fields.files import (
     FieldFile as FieldFile,
     FileDescriptor as FileDescriptor,
 )
+# https://github.com/typeddjango/django-stubs/pull/443/files
+from .fields.json import JSONField as JSONField
 from .fields.proxy import OrderWrt as OrderWrt
 
 from .deletion import (
