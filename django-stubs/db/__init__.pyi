@@ -1,5 +1,7 @@
 from typing import Any
 
+from django.db.backends.utils import CursorWrapper
+
 from . import migrations
 from .utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
 from .utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
@@ -15,11 +17,12 @@ from .utils import NotSupportedError as NotSupportedError
 from .utils import OperationalError as OperationalError
 from .utils import ProgrammingError as ProgrammingError
 
-connections: Any
+connections: ConnectionHandler
 router: Any
-connection: Any
+connection: DefaultConnectionProxy
 
 class DefaultConnectionProxy:
+    def cursor(self) -> CursorWrapper: ...
     def __getattr__(self, item: str) -> Any: ...
     def __setattr__(self, name: str, value: Any) -> None: ...
     def __delattr__(self, name: str) -> None: ...

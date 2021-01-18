@@ -10,6 +10,7 @@ keywords = ["django", "types", "mypy", "stubs"]
 
 packages = [
   { include = "django-stubs" },
+  { include = "psycopg2-stubs" },
 ]
 
 [tool.poetry.dependencies]
@@ -23,6 +24,8 @@ mypy = "^0.790.0"
 isort = "^5.6"
 django = "^3.1"
 flake8 = "^3.8"
+psycopg2 = "^2.8"
+ipython = "^7.19"
 
 [tool.black]
 line-length = 88

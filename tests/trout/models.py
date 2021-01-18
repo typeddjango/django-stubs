@@ -1,8 +1,12 @@
+import sys
+from collections import namedtuple
 from datetime import time, timedelta
 from decimal import Decimal
-from typing import Dict, List, Optional, Union
+from io import StringIO
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
 from uuid import UUID
 
+import psycopg2
 from django.contrib.postgres.fields import (
     ArrayField,
     CICharField,
@@ -11,8 +15,11 @@ from django.contrib.postgres.fields import (
     HStoreField,
     JSONField,
 )
-from django.db import models
+from django.db import connection, connections, models
+from django.db.backends.utils import CursorWrapper
 from django.db.models.manager import RelatedManager
+from psycopg2 import ProgrammingError
+from psycopg2.extensions import parse_dsn
 
 
 class User(models.Model):
@@ -501,3 +508,180 @@ def main() -> None:
         print(comment.null_str_specified)
     if comment.null_str_specified is not None:
         print(comment.null_str_specified)
+
+
+def raw_database_queries() -> None:
+
+    with connection.cursor() as cursor:
+        cursor.execute("select 1;")
+        results = cursor.fetchall()
+        for r in results:
+            print(r)
+
+        baz = "baz"
+
+        cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [baz])
+        cursor.execute("SELECT foo FROM bar WHERE baz = %(baz)s", {"baz": baz})
+        row = cursor.fetchone()
+        print(row)
+
+        cursor.executemany("select 1;", [])
+
+        cursor.executemany(
+            "INSERT INTO table (id, name) VALUES (%s, %s)",
+            ((1, "a"), (2, "b"), (3, "c")),
+        )
+
+        cursor.executemany(
+            "INSERT INTO table (id, name) VALUES (%s, %s)",
+            [(1, "a"), (2, "b"), (3, "c")],
+        )
+
+        cursor.execute("SELECT id, parent_id FROM test LIMIT 2")
+        results = namedtuplefetchall(cursor)
+        print(results)
+
+        cursor.execute("SELECT id, parent_id FROM test LIMIT 2")
+        results_2 = dictfetchall(cursor)
+        print(results_2)
+
+    with connections["my_db_alias"].cursor() as cursor:
+        cursor.execute("select 1;")
+
+    with connection.cursor() as cursor:
+        cursor.callproc("test_procedure", [1, "test"])
+
+        cursor.execute("SELECT * FROM test;")
+        for record in cursor:
+            print(record)
+
+
+def test_psycopg2() -> None:
+    with connection.cursor() as cursor:
+        cur = cursor.cursor
+        cur.execute("SELECT * FROM test;")
+        for record in cur:
+            print(record)
+
+        cur.execute("SELECT * FROM test WHERE id = %s", (3,))
+        assert cur.fetchone() == (3, 42, "bar")
+
+        cur.execute("SELECT * FROM test;")
+        assert cur.fetchmany(2) == [(1, 100, "abc'def"), (2, None, "dada")]
+        assert cur.fetchmany(2) == [(3, 42, "bar")]
+        assert cur.fetchmany(2) == []
+
+        cur.execute("SELECT * FROM test;")
+        assert cur.fetchall() == [
+            (1, 100, "abc'def"),
+            (2, None, "dada"),
+            (3, 42, "bar"),
+        ]
+
+        try:
+            cur.scroll(1000 * 1000)
+        except (ProgrammingError, IndexError) as exc:
+            print(exc)
+
+        cur.arraysize = 10
+        cur.itersize = 100
+
+        try:
+            cur.execute("SELECT * FROM barf")
+        except psycopg2.Error as e:
+            assert e.pgcode == "42P01"
+            assert e.pgerror == (
+                """
+ERROR:  relation "barf" does not exist
+LINE 1: SELECT * FROM barf
+"""
+            )
+
+        f = StringIO("42\tfoo\n74\tbar\n")
+        cur.copy_from(f, "test", columns=("num", "data"))
+        cur.execute("select * from test where id > 5;")
+        cur.fetchall()
+        cur.copy_from(f, '"TABLE"')
+        cur.copy_to(sys.stdout, "test", sep="|")
+
+        cur.copy_expert("COPY test TO STDOUT WITH CSV HEADER", sys.stdout)
+
+    conn = psycopg2.connect("dbname=test user=postgres password=secret")
+    conn = psycopg2.connect(dbname="test", user="postgres", password="secret")
+
+    print(conn.isolation_level)
+
+    with conn:
+        with conn.cursor() as curs:
+            curs.execute("select 1")
+
+    with conn:
+        with conn.cursor() as curs:
+            curs.execute("select 2")
+    conn.close()
+
+    assert parse_dsn("dbname=test user=postgres password=secret") == {
+        "password": "secret",
+        "user": "postgres",
+        "dbname": "test",
+    }
+    assert parse_dsn("postgresql://someone@example.com/somedb?connect_timeout=10") == {
+        "host": "example.com",
+        "user": "someone",
+        "dbname": "somedb",
+        "connect_timeout": "10",
+    }
+
+    for name in connections:
+        cursor = connections[name].cursor()
+        cursor.execute("SELECT 1;")
+        assert cursor.fetchone() is not None
+
+
+def test_psycopg_top_level_exports() -> None:
+    psycopg2.BINARY
+    psycopg2.Binary
+    psycopg2.DATETIME
+    psycopg2.DataError
+    psycopg2.DatabaseError
+    psycopg2.Date
+    psycopg2.DateFromTicks
+    psycopg2.Error
+    psycopg2.IntegrityError
+    psycopg2.InterfaceError
+    psycopg2.InternalError
+    psycopg2.NUMBER
+    psycopg2.NotSupportedError
+    psycopg2.OperationalError
+    psycopg2.ProgrammingError
+    psycopg2.ROWID
+    psycopg2.STRING
+    psycopg2.Time
+    psycopg2.TimeFromTicks
+    psycopg2.Timestamp
+    psycopg2.TimestampFromTicks
+    psycopg2.Warning
+    psycopg2.connect
+    psycopg2.errors
+    psycopg2.extensions
+    psycopg2.paramstyle
+    psycopg2.threadsafety
+    psycopg2.tz
+
+
+def namedtuplefetchall(cursor: CursorWrapper) -> List[Tuple[Any, ...]]:
+    "Return all rows from a cursor as a namedtuple"
+    desc = cursor.description
+    assert desc is not None
+    nt_result = namedtuple("Result", [col[0] for col in desc])  # type: ignore [misc]
+    return [nt_result(*row) for row in cursor.fetchall()]
+
+
+def dictfetchall(cursor: CursorWrapper) -> List[Dict[str, Any]]:
+    "Return all rows from a cursor as a dict"
+    assert cursor.description is not None
+    columns = []
+    for col in cursor.description:
+        if col.name is not None:
+            columns.append(col.name)
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
