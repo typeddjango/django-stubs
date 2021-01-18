@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-types"
-version = "0.2.1"
+version = "0.3.0"
 description = "Type stubs for Django"
 repository = "https://github.com/sbdchd/django-types"
 readme = "README.md"
