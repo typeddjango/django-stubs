@@ -60,6 +60,7 @@ from .fields.files import (
     FileDescriptor as FileDescriptor,
 )
 from .fields.proxy import OrderWrt as OrderWrt
+from .fields.json import JSONField as JSONField
 
 from .deletion import (
     CASCADE as CASCADE,
