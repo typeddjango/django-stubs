@@ -51,7 +51,9 @@ TRANSACTION_STATUS_UNKNOWN: Literal[4]
 
 _TransactionStatus = Literal[0, 1, 2, 3, 4]
 
-_SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
+_Mixed = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
+_SQLType = Union[_Mixed, Sequence[_Mixed], Mapping[str, _Mixed]]
+
 
 class cursor:
     def __init__(self, conn: _connection) -> None: ...
@@ -79,7 +81,7 @@ class cursor:
     def callproc(
         self,
         procname: str,
-        parameters: Union[Iterable[_SQLType], Mapping[str, _SQLType]] = ...,
+        parameters: Union[Sequence[_SQLType], Mapping[str, _SQLType]] = ...,
     ) -> None: ...
     def mogrify(
         self,

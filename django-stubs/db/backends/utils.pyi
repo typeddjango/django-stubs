@@ -25,7 +25,8 @@ from typing_extensions import Literal
 logger: Any
 
 # Python types that can be adapted to SQL.
-_SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
+_Mixed = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
+_SQLType = Union[_Mixed, Sequence[_Mixed], Mapping[str, _Mixed]]
 
 class CursorWrapper:
     cursor: psycopg2.extensions.cursor = ...
@@ -46,7 +47,7 @@ class CursorWrapper:
     def callproc(
         self,
         procname: str,
-        params: Optional[List[_SQLType]] = ...,
+        params: Optional[Sequence[_SQLType]] = ...,
         kparams: Optional[Mapping[str, int]] = ...,
     ) -> None: ...
     def execute(

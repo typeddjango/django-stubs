@@ -3,7 +3,7 @@ from collections import namedtuple
 from datetime import time, timedelta
 from decimal import Decimal
 from io import StringIO
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
 from uuid import UUID
 
 import psycopg2
@@ -554,6 +554,45 @@ def raw_database_queries() -> None:
         cursor.execute("SELECT * FROM test;")
         for record in cursor:
             print(record)
+
+    other_field_values = ["id-1", "id-2"]
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT id, name
+            FROM
+                table
+            WHERE
+                field = %s AND other_field = ANY(%s);
+            """,
+            ["foo", list(other_field_values)],
+        )
+        cursor.execute(
+            """
+        SELECT id, name
+        FROM table
+        WHERE
+            id = %(foo)s
+            and name = ANY(%(bar)s)
+            and address = ANY(%(buzz)s)
+        """,
+            dict(foo="foo", bar=["id-1", "id-2"], buzz=[1, 2, 3]),
+        )
+        cursor.execute("", {"foo_ids": ("foo", "bar")})
+
+        cursor.execute("", ["id-foo", ["foo", "bar", "buzz"]])
+
+
+def get_data() -> Dict[str, Dict[str, str]]:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            select id, json_object_agg("name", "value") from table
+            """
+        )
+        # Argument 1 to "dict" has incompatible type "List[Tuple[Any, ...]]"; expected "Iterable[Tuple[str, Dict[str, str]]]"
+        return dict(cursor.fetchall())  # type: ignore [arg-type]
 
 
 def test_psycopg2() -> None:
