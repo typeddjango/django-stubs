@@ -132,6 +132,7 @@ from . import signals as signals
 from .constraints import (
     BaseConstraint as BaseConstraint,
     CheckConstraint as CheckConstraint,
+    Deferrable as Deferrable,
     UniqueConstraint as UniqueConstraint,
 )
 
