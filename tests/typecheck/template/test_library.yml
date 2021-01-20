@@ -1,0 +1,96 @@
+-   case: register_filter_unnamed
+    main: |
+        from django import template
+        register = template.Library()
+
+        @register.filter
+        def lower(value: str) -> str:
+            return value.lower()
+
+        reveal_type(lower) # N: Revealed type is 'def (value: builtins.str) -> builtins.str'
+
+-   case: register_filter_named
+    main: |
+        from django import template
+        register = template.Library()
+
+        @register.filter(name="tolower")
+        def lower(value: str) -> str:
+            return value.lower()
+
+        reveal_type(lower) # N: Revealed type is 'def (value: builtins.str) -> builtins.str'
+
+-   case: register_simple_tag_no_args
+    main: |
+        import datetime
+        from django import template
+        register = template.Library()
+
+        @register.simple_tag
+        def current_time(format_string: str) -> str:
+            return datetime.datetime.now().strftime(format_string)
+
+        reveal_type(current_time) # N: Revealed type is 'def (format_string: builtins.str) -> builtins.str'
+
+-   case: register_simple_tag_context
+    main: |
+        from django import template
+        from typing import Dict, Any
+        register = template.Library()
+
+        @register.simple_tag(takes_context=True)
+        def current_time(context: Dict[str, Any], format_string: str) -> str:
+            timezone = context['timezone']
+            return "test"
+
+        reveal_type(current_time) # N: Revealed type is 'def (context: builtins.dict[builtins.str, Any], format_string: builtins.str) -> builtins.str'
+
+-   case: register_simple_tag_named
+    main: |
+        from django import template
+        from typing import Dict, Any
+        register = template.Library()
+
+        @register.simple_tag(name='minustwo')
+        def some_function(value: int) -> int:
+            return value - 2
+
+        reveal_type(some_function) # N: Revealed type is 'def (value: builtins.int) -> builtins.int'
+
+-   case: register_tag_no_args
+    main: |
+        from django import template
+        from django.template.base import Parser, Token
+        from django.template.defaulttags import CycleNode
+        register = template.Library()
+
+        @register.tag
+        def cycle(parser: Parser, token: Token) -> CycleNode:
+            return CycleNode([])
+
+        reveal_type(cycle) # N: Revealed type is 'def (parser: django.template.base.Parser, token: django.template.base.Token) -> django.template.defaulttags.CycleNode'
+
+-   case: register_tag_named
+    main: |
+        from django import template
+        from django.template.base import Parser, Token
+        from django.template.defaulttags import CycleNode
+        register = template.Library()
+
+        @register.tag(name="cycle")
+        def cycle_impl(parser: Parser, token: Token) -> CycleNode:
+            return CycleNode([])
+
+        reveal_type(cycle_impl) # N: Revealed type is 'def (parser: django.template.base.Parser, token: django.template.base.Token) -> django.template.defaulttags.CycleNode'
+
+-   case: register_inclusion_tag
+    main: |
+        from django import template
+        from typing import List
+        register = template.Library()
+
+        @register.inclusion_tag('results.html')
+        def format_results(results: List[str]) -> str:
+            return ', '.join(results)
+
+        reveal_type(format_results) # N: Revealed type is 'def (results: builtins.list[builtins.str]) -> builtins.str'
