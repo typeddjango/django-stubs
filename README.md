@@ -130,9 +130,10 @@ Example:
 
 ```python
 from django.db import models
+
 class MyModelQuerySet(models.QuerySet):
   pass
-  
+
 class MyModel(models.Model):
   bar = models.IntegerField()
   objects = MyModelQuerySet.as_manager()
@@ -148,6 +149,7 @@ Example:
 
 ```python
 from django.db import models
+
 class MyModelQuerySet(models.QuerySet):
   pass
 
