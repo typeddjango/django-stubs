@@ -120,6 +120,49 @@ class AuthenticatedHttpRequest(HttpRequest):
 And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
 
 
+### My QuerySet methods are returning Any rather than my Model
+
+`QuerySet.as_manager()` is not currently supported.
+
+If you are using `MyQuerySet.as_manager()`, then your `Manager`/`QuerySet` methods will all not be linked to your model.
+
+Example:
+
+```python
+from django.db import models
+class MyModelQuerySet(models.QuerySet):
+  pass
+  
+class MyModel(models.Model):
+  bar = models.IntegerField()
+  objects = MyModelQuerySet.as_manager()
+
+def use_my_model():
+  foo = MyModel.objects.get(id=1) # This is `Any` but it should be `MyModel`
+  return foo.xyz # No error, but there should be
+```
+
+There is a workaround: use `Manager.from_queryset` instead.
+
+Example:
+
+```python
+from django.db import models
+class MyModelQuerySet(models.QuerySet):
+  pass
+
+MyModelManager = models.Manager.from_queryset(MyModelQuerySet)
+
+class MyModel(models.Model):
+  bar = models.IntegerField()
+  objects = MyModelManager()
+
+def use_my_model():
+  foo = MyModel.objects.get(id=1)
+  return foo.xyz # Gives an error
+```
+
+
 ## Related projects
 
 - [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
