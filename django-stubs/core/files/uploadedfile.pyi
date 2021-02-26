@@ -8,7 +8,7 @@ class UploadedFile(File):
     content_type_extra: Optional[Dict[str, str]] = ...
     def __init__(
         self,
-        file: Optional[IO] = ...,
+        file: Optional[IO[Any]] = ...,
         name: Optional[str] = ...,
         content_type: Optional[str] = ...,
         size: Optional[int] = ...,
@@ -31,7 +31,7 @@ class InMemoryUploadedFile(UploadedFile):
     field_name: Optional[str] = ...
     def __init__(
         self,
-        file: IO,
+        file: IO[Any],
         field_name: Optional[str],
         name: Optional[str],
         content_type: Optional[str],

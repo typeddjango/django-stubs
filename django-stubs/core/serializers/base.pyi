@@ -81,12 +81,12 @@ class Deserializer:
 class DeserializedObject:
     object: Any = ...
     m2m_data: Dict[str, List[int]] = ...
-    deferred_fields: Mapping[Field, Any]
+    deferred_fields: Mapping[Field[Any, Any], Any]
     def __init__(
         self,
         obj: Model,
         m2m_data: Optional[Dict[str, List[int]]] = ...,
-        deferred_fields: Optional[Mapping[Field, Any]] = ...,
+        deferred_fields: Optional[Mapping[Field[Any, Any], Any]] = ...,
     ) -> None: ...
     def save(
         self, save_m2m: bool = ..., using: Optional[str] = ..., **kwargs: Any
@@ -99,4 +99,6 @@ def build_instance(
 def deserialize_m2m_values(
     field: ManyToManyField, field_value: Any, using: str
 ) -> List[Any]: ...
-def deserialize_fk_value(field: ForeignKey, field_value: Any, using: str) -> Any: ...
+def deserialize_fk_value(
+    field: ForeignKey[Any], field_value: Any, using: str
+) -> Any: ...

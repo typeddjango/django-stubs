@@ -43,7 +43,7 @@ class Group(models.Model):
 
     name = models.CharField(max_length=150)
     permissions = models.ManyToManyField(Permission)
-    def natural_key(self): ...
+    def natural_key(self) -> Any: ...
 
 _T = TypeVar("_T", bound=Model)
 
@@ -69,7 +69,7 @@ class UserManager(BaseUserManager[_T]):
         include_superusers: bool = ...,
         backend: Optional[Union[Type[ModelBackend], str]] = ...,
         obj: Optional[Model] = ...,
-    ): ...
+    ) -> Any: ...
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
@@ -84,7 +84,7 @@ class PermissionsMixin(models.Model):
     ) -> bool: ...
     def has_module_perms(self, app_label: str) -> bool: ...
 
-class AbstractUser(AbstractBaseUser, PermissionsMixin):  # type: ignore
+class AbstractUser(AbstractBaseUser, PermissionsMixin):
     username_validator: UnicodeUsernameValidator = ...
 
     username = models.CharField(max_length=150)

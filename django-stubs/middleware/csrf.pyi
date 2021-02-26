@@ -24,8 +24,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
     def process_view(
         self,
         request: HttpRequest,
-        callback: Optional[Callable],
-        callback_args: Tuple,
+        callback: Optional[Callable[..., Any]],
+        callback_args: Tuple[Any, ...],
         callback_kwargs: Dict[str, Any],
     ) -> Optional[HttpResponseForbidden]: ...
     def process_response(

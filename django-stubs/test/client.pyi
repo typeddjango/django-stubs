@@ -13,8 +13,8 @@ from django.http.response import HttpResponse, HttpResponseBase
 
 BOUNDARY: str = ...
 MULTIPART_CONTENT: str = ...
-CONTENT_TYPE_RE: Pattern = ...
-JSON_CONTENT_TYPE_RE: Pattern = ...
+CONTENT_TYPE_RE: Pattern[str] = ...
+JSON_CONTENT_TYPE_RE: Pattern[str] = ...
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase = ...
@@ -41,7 +41,7 @@ def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
 class RequestFactory:
     json_encoder: Type[JSONEncoder]
     defaults: Dict[str, str]
-    cookies: SimpleCookie
+    cookies: SimpleCookie  # type: ignore [no-any-unimported]
     errors: BytesIO
     def __init__(
         self, *, json_encoder: Type[JSONEncoder] = ..., **defaults: Any
@@ -126,7 +126,7 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def post(  # type: ignore
         self,
         path: str,
@@ -135,7 +135,7 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def head(  # type: ignore
         self,
         path: str,
@@ -143,10 +143,10 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def trace(  # type: ignore
         self, path: str, follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def options(  # type: ignore
         self,
         path: str,
@@ -155,7 +155,7 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def put(  # type: ignore
         self,
         path: str,
@@ -164,7 +164,7 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def patch(  # type: ignore
         self,
         path: str,
@@ -173,7 +173,7 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def delete(  # type: ignore
         self,
         path: str,
@@ -182,7 +182,7 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def store_exc_info(self, **kwargs: Any) -> None: ...
     @property
     def session(self) -> SessionBase: ...

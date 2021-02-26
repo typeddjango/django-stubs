@@ -9,35 +9,37 @@ from .base import Node, Template
 class InvalidTemplateLibrary(Exception): ...
 
 class Library:
-    filters: Dict[str, Callable] = ...
-    tags: Dict[str, Callable] = ...
+    filters: Dict[str, Callable[..., Any]] = ...
+    tags: Dict[str, Callable[..., Any]] = ...
     def __init__(self) -> None: ...
     def tag(
         self,
-        name: Optional[Union[Callable, str]] = ...,
-        compile_function: Optional[Union[Callable, str]] = ...,
-    ) -> Callable: ...
-    def tag_function(self, func: Callable) -> Callable: ...
+        name: Optional[Union[Callable[..., Any], str]] = ...,
+        compile_function: Optional[Union[Callable[..., Any], str]] = ...,
+    ) -> Callable[..., Any]: ...
+    def tag_function(self, func: Callable[..., Any]) -> Callable[..., Any]: ...
     def filter(
         self,
-        name: Optional[Union[Callable, str]] = ...,
-        filter_func: Optional[Union[Callable, str]] = ...,
+        name: Optional[Union[Callable[..., Any], str]] = ...,
+        filter_func: Optional[Union[Callable[..., Any], str]] = ...,
         **flags: Any
-    ) -> Callable: ...
-    def filter_function(self, func: Callable, **flags: Any) -> Callable: ...
+    ) -> Callable[..., Any]: ...
+    def filter_function(
+        self, func: Callable[..., Any], **flags: Any
+    ) -> Callable[..., Any]: ...
     def simple_tag(
         self,
-        func: Optional[Union[Callable, str]] = ...,
+        func: Optional[Union[Callable[..., Any], str]] = ...,
         takes_context: Optional[bool] = ...,
         name: Optional[str] = ...,
-    ) -> Callable: ...
+    ) -> Callable[..., Any]: ...
     def inclusion_tag(
         self,
         filename: Union[Template, str],
         func: None = ...,
         takes_context: Optional[bool] = ...,
         name: Optional[str] = ...,
-    ) -> Callable: ...
+    ) -> Callable[..., Any]: ...
 
 class TagHelperNode(Node):
     func: Any = ...
@@ -46,7 +48,7 @@ class TagHelperNode(Node):
     kwargs: Any = ...
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         takes_context: Optional[bool],
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],
@@ -57,7 +59,7 @@ class TagHelperNode(Node):
 
 class SimpleNode(TagHelperNode):
     args: List[FilterExpression]
-    func: Callable
+    func: Callable[..., Any]
     kwargs: Dict[str, FilterExpression]
     origin: Origin
     takes_context: Optional[bool]
@@ -65,7 +67,7 @@ class SimpleNode(TagHelperNode):
     target_var: Optional[str] = ...
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         takes_context: Optional[bool],
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],
@@ -74,7 +76,7 @@ class SimpleNode(TagHelperNode):
 
 class InclusionNode(TagHelperNode):
     args: List[FilterExpression]
-    func: Callable
+    func: Callable[..., Any]
     kwargs: Dict[str, FilterExpression]
     origin: Origin
     takes_context: Optional[bool]
@@ -82,7 +84,7 @@ class InclusionNode(TagHelperNode):
     filename: Union[Template, str] = ...
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         takes_context: Optional[bool],
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],

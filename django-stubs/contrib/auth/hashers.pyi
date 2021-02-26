@@ -7,7 +7,7 @@ def is_password_usable(encoded: Optional[str]) -> bool: ...
 def check_password(
     password: Optional[str],
     encoded: str,
-    setter: Optional[Callable] = ...,
+    setter: Optional[Callable[..., Any]] = ...,
     preferred: str = ...,
 ) -> bool: ...
 def make_password(

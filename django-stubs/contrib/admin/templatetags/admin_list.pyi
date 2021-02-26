@@ -9,8 +9,6 @@ from django.template.base import Parser, Token
 from django.template.context import RequestContext
 from django.utils.safestring import SafeText
 
-from .base import InclusionAdminNode
-
 register: Any
 DOT: str
 
@@ -24,7 +22,7 @@ def items_for_result(
     cl: ChangeList, result: Model, form: None
 ) -> Iterator[SafeText]: ...
 
-class ResultList(list):
+class ResultList(List[Any]):
     form: None = ...
     def __init__(self, form: None, *items: Any) -> None: ...
 

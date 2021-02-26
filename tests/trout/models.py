@@ -18,6 +18,8 @@ from django.contrib.postgres.fields import (
 from django.db import connection, connections, models
 from django.db.backends.utils import CursorWrapper
 from django.db.models.manager import RelatedManager
+from django.http.request import HttpRequest
+from django.views.decorators.http import require_GET, require_POST
 from psycopg2 import ProgrammingError
 from psycopg2.extensions import parse_dsn
 
@@ -161,6 +163,10 @@ class Comment(models.Model):
         "User", on_delete=models.CASCADE, help_text="owner of the comment"
     )
 
+    auth_token = models.ForeignKey["Optional[User]"](
+        "User", null=True, on_delete=models.CASCADE, help_text=""
+    )
+
     user_type = models.ForeignKey(User, on_delete=models.CASCADE)
     user_str = models.ForeignKey("User", on_delete=models.CASCADE)  # type: ignore [var-annotated]
     nullable_user_type = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -196,11 +202,19 @@ def process_non_nullable(
 
 def main() -> None:
 
+    request = HttpRequest()
+    header = request.headers.get("FOO")
+    if header is not None and not isinstance(header, str):
+        print(header)  # type: ignore [unreachable]
+    else:
+        print(header)
+
     post = Post()
 
     print(post.id)  # type: ignore [attr-defined]
 
     comment = Comment()
+    comment.auth_token = User()
     comment.save()
 
     # Django way to duplicate an instance
@@ -560,23 +574,23 @@ def raw_database_queries() -> None:
     with connection.cursor() as cursor:
         cursor.execute(
             """
-            SELECT id, name
-            FROM
-                table
-            WHERE
-                field = %s AND other_field = ANY(%s);
-            """,
+           SELECT id, name
+           FROM
+               table
+           WHERE
+               field = %s AND other_field = ANY(%s);
+           """,
             ["foo", list(other_field_values)],
         )
         cursor.execute(
             """
-        SELECT id, name
-        FROM table
-        WHERE
-            id = %(foo)s
-            and name = ANY(%(bar)s)
-            and address = ANY(%(buzz)s)
-        """,
+       SELECT id, name
+       FROM table
+       WHERE
+           id = %(foo)s
+           and name = ANY(%(bar)s)
+           and address = ANY(%(buzz)s)
+       """,
             dict(foo="foo", bar=["id-1", "id-2"], buzz=[1, 2, 3]),
         )
         cursor.execute("", {"foo_ids": ("foo", "bar")})
@@ -675,6 +689,19 @@ LINE 1: SELECT * FROM barf
         cursor = connections[name].cursor()
         cursor.execute("SELECT 1;")
         assert cursor.fetchone() is not None
+
+
+# test decorators
+
+
+@require_POST
+def post_data_view(request: HttpRequest, id: str) -> None:
+    return None
+
+
+@require_GET
+def get_data_view(request: HttpRequest, id: str) -> None:
+    return None
 
 
 def test_psycopg_top_level_exports() -> None:

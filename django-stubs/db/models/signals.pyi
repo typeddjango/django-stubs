@@ -9,7 +9,7 @@ class_prepared: Any
 class ModelSignal(Signal):
     def connect(  # type: ignore
         self,
-        receiver: Callable,
+        receiver: Callable[..., Any],
         sender: Optional[Union[Type[Model], str]] = ...,
         weak: bool = ...,
         dispatch_uid: None = ...,
@@ -17,7 +17,7 @@ class ModelSignal(Signal):
     ) -> None: ...
     def disconnect(  # type: ignore
         self,
-        receiver: Callable = ...,
+        receiver: Callable[..., Any] = ...,
         sender: Optional[Union[Type[Model], str]] = ...,
         dispatch_uid: None = ...,
         apps: Optional[Apps] = ...,

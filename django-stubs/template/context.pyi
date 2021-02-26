@@ -9,7 +9,7 @@ _ContextValues = Union[Dict[str, Any], "Context"]
 
 class ContextPopException(Exception): ...
 
-class ContextDict(dict):
+class ContextDict(Dict[Any, Any]):
     context: BaseContext = ...
     def __init__(self, context: BaseContext, *args: Any, **kwargs: Any) -> None: ...
     def __enter__(self) -> ContextDict: ...
@@ -74,7 +74,7 @@ class RequestContext(Context):
         self,
         request: HttpRequest,
         dict_: Optional[Dict[str, Any]] = ...,
-        processors: Optional[List[Callable]] = ...,
+        processors: Optional[List[Callable[..., Any]]] = ...,
         use_l10n: None = ...,
         use_tz: None = ...,
         autoescape: bool = ...,

@@ -8,7 +8,7 @@ class XViewMiddleware(MiddlewareMixin):
     def process_view(
         self,
         request: WSGIRequest,
-        view_func: Callable,
-        view_args: Tuple,
+        view_func: Callable[..., Any],
+        view_args: Tuple[Any, ...],
         view_kwargs: Dict[Any, Any],
     ) -> Optional[HttpResponse]: ...

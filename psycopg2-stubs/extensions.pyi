@@ -54,7 +54,6 @@ _TransactionStatus = Literal[0, 1, 2, 3, 4]
 _Mixed = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
 _SQLType = Union[_Mixed, Sequence[_Mixed], Mapping[str, _Mixed]]
 
-
 class cursor:
     def __init__(self, conn: _connection) -> None: ...
     @property

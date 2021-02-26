@@ -4,7 +4,7 @@ from django.urls.resolvers import ResolverMatch
 
 def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
 def reverse(
-    viewname: Optional[Union[Callable, str]],
+    viewname: Optional[Union[Callable[..., Any], str]],
     urlconf: Optional[str] = ...,
     args: Optional[Sequence[Any]] = ...,
     kwargs: Optional[Dict[str, Any]] = ...,

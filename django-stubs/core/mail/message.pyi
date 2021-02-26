@@ -26,13 +26,13 @@ class MIMEMixin: ...
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
     defects: List[Any]
     epilogue: None
-    policy: Policy
+    policy: Policy  # type: ignore [no-any-unimported]
     preamble: None
 
 class SafeMIMEText(MIMEMixin, MIMEText):
     defects: List[Any]
     epilogue: None
-    policy: Policy
+    policy: Policy  # type: ignore [no-any-unimported]
     preamble: None
     encoding: str = ...
     def __init__(
@@ -42,7 +42,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     defects: List[Any]
     epilogue: None
-    policy: Policy
+    policy: Policy  # type: ignore [no-any-unimported]
     preamble: None
     encoding: str = ...
     def __init__(
@@ -54,7 +54,7 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         **_params: Any
     ) -> None: ...
 
-_AttachmentContent = Union[bytes, EmailMessage, Message, SafeMIMEText, str]
+_AttachmentContent = Union[bytes, "EmailMessage", Message, SafeMIMEText, str]
 _AttachmentTuple = Union[
     Tuple[str, _AttachmentContent],
     Tuple[Optional[str], _AttachmentContent, str],

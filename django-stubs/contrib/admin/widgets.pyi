@@ -17,7 +17,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         verbose_name: str,
         is_stacked: bool,
         attrs: None = ...,
-        choices: Tuple = ...,
+        choices: Tuple[Any, ...] = ...,
     ) -> None: ...
 
 class AdminDateWidget(forms.DateInput):
@@ -106,7 +106,7 @@ class AutocompleteMixin:
         rel: ForeignObjectRel,
         admin_site: AdminSite,
         attrs: Optional[Dict[str, str]] = ...,
-        choices: Tuple = ...,
+        choices: Tuple[Any, ...] = ...,
         using: None = ...,
     ) -> None: ...
     def get_url(self) -> str: ...

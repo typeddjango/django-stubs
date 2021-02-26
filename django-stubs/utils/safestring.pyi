@@ -17,7 +17,7 @@ class SafeText(str, SafeData):
 
 SafeString = SafeText
 
-_C = TypeVar("_C", bound=Callable)
+_C = TypeVar("_C", bound=Callable[..., Any])
 @overload
 def mark_safe(s: _SD) -> _SD: ...
 @overload

@@ -7,7 +7,7 @@ from django.utils.safestring import SafeText
 
 class InclusionAdminNode(InclusionNode):
     args: List[Any]
-    func: Callable
+    func: Callable[..., Any]
     kwargs: Dict[Any, Any]
     takes_context: bool
     template_name: str = ...
@@ -15,7 +15,7 @@ class InclusionAdminNode(InclusionNode):
         self,
         parser: Parser,
         token: Token,
-        func: Callable,
+        func: Callable[..., Any],
         template_name: str,
         takes_context: bool = ...,
     ) -> None: ...

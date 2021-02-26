@@ -1,9 +1,11 @@
+from typing import Any
+
 from django.db.models import Lookup, Transform
 from django.db.models.lookups import Exact
 
 from .search import SearchVectorExact
 
-class PostgresSimpleLookup(Lookup):
+class PostgresSimpleLookup(Lookup[Any]):
     operator: str
 
 class DataContains(PostgresSimpleLookup): ...

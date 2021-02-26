@@ -47,21 +47,21 @@ class SupportsGetAbsoluteUrl(Protocol): ...
 
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl],
+    to: Union[Callable[..., Any], str, SupportsGetAbsoluteUrl],
     *args: Any,
     permanent: Literal[True],
     **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl],
+    to: Union[Callable[..., Any], str, SupportsGetAbsoluteUrl],
     *args: Any,
     permanent: Literal[False],
     **kwargs: Any
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl],
+    to: Union[Callable[..., Any], str, SupportsGetAbsoluteUrl],
     *args: Any,
     permanent: bool = ...,
     **kwargs: Any
@@ -75,4 +75,6 @@ def get_object_or_404(
 def get_list_or_404(
     klass: Union[Type[_T], Manager[_T], QuerySet[_T]], *args: Any, **kwargs: Any
 ) -> List[_T]: ...
-def resolve_url(to: Union[Callable, Model, str], *args: Any, **kwargs: Any) -> str: ...
+def resolve_url(
+    to: Union[Callable[..., Any], Model, str], *args: Any, **kwargs: Any
+) -> str: ...

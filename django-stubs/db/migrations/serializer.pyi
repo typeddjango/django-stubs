@@ -14,7 +14,9 @@ class DecimalSerializer(BaseSerializer): ...
 class DeconstructableSerializer(BaseSerializer):
     @staticmethod
     def serialize_deconstructed(
-        path: str, args: List[Any], kwargs: Dict[str, Union[Callable, int, str]]
+        path: str,
+        args: List[Any],
+        kwargs: Dict[str, Union[Callable[..., Any], int, str]],
     ) -> Tuple[str, Set[str]]: ...
 
 class DictionarySerializer(BaseSerializer): ...

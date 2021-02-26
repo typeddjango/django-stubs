@@ -9,15 +9,15 @@ fi
 
 # format code
 if [[ $CI ]]; then
-    ./.venv/bin/black --check .
-    ./.venv/bin/isort --check-only .
+    ./.venv/bin/black --check tests typings
+    ./.venv/bin/isort --check-only tests typings
 else
-    ./.venv/bin/black .
-    ./.venv/bin/isort .
+    ./.venv/bin/black tests typings
+    ./.venv/bin/isort tests typings
 fi
 
 # type check code
-./.venv/bin/mypy tests
+./.venv/bin/mypy tests typings
 
 # lint
-./.venv/bin/flake8 tests
+./.venv/bin/flake8 tests typings

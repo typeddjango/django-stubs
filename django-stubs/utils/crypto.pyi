@@ -1,5 +1,5 @@
 from hmac import HMAC
-from typing import Callable, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 using_sysrandom: bool
 
@@ -13,5 +13,5 @@ def pbkdf2(
     salt: Union[bytes, str],
     iterations: int,
     dklen: int = ...,
-    digest: Optional[Callable] = ...,
+    digest: Optional[Callable[..., Any]] = ...,
 ) -> bytes: ...

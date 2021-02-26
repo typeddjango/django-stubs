@@ -10,7 +10,7 @@ from .base import Template
 _Loader = Any
 
 class Engine:
-    template_context_processors: Tuple[Callable]
+    template_context_processors: Tuple[Callable[..., Any]]
     template_loaders: List[Loader]
     default_builtins: Any = ...
     dirs: List[str] = ...

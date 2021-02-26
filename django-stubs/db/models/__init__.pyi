@@ -55,7 +55,6 @@ from .fields import BigIntegerField as BigIntegerField
 from .fields import BinaryField as BinaryField
 from .fields import BooleanField as BooleanField
 from .fields import CharField as CharField
-from .fields import CommaSeparatedIntegerField as CommaSeparatedIntegerField
 from .fields import DateField as DateField
 from .fields import DateTimeField as DateTimeField
 from .fields import DecimalField as DecimalField
@@ -68,7 +67,6 @@ from .fields import FloatField as FloatField
 from .fields import GenericIPAddressField as GenericIPAddressField
 from .fields import IntegerField as IntegerField
 from .fields import IPAddressField as IPAddressField
-from .fields import NullBooleanField as NullBooleanField
 from .fields import PositiveIntegerField as PositiveIntegerField
 from .fields import PositiveSmallIntegerField as PositiveSmallIntegerField
 from .fields import SlugField as SlugField
