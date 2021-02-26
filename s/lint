@@ -2,10 +2,6 @@
 
 set -ex
 
-if [[ ! -f ./.venv/lib/python3.7/site-packages/django-stubs.egg-link ]]; then
-  ./.venv/bin/pip install -e .
-fi
-
 
 # format code
 if [[ $CI ]]; then

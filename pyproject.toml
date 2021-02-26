@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-types"
-version = "0.4.0"
+version = "0.4.1"
 description = "Type stubs for Django"
 repository = "https://github.com/sbdchd/django-types"
 readme = "README.md"
@@ -14,7 +14,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 
 [tool.poetry.dev-dependencies]
 black = {version = "20.8b1",allows-prereleases = true}
@@ -25,7 +25,6 @@ isort = "^5.6"
 django = "^3.1"
 flake8 = "^3.8"
 psycopg2 = "^2.8"
-ipython = "^7.19"
 
 [tool.black]
 line-length = 88
