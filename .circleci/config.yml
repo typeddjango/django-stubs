@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - django-types-v1-{{ checksum "poetry.lock" }}-{{ checksum "yarn.lock" }}
+            - django-types-v2-{{ checksum "poetry.lock" }}-{{ checksum "yarn.lock" }}
       - run:
           name: install python dependencies
           command: |
@@ -16,8 +16,9 @@ jobs:
             echo 'export PATH="$PATH":"$HOME"/.local/bin' >> $BASH_ENV
             source $BASH_ENV
             sudo python -m pip uninstall poetry -y
-            python -m pip install --user poetry==0.12.12
+            python -m pip install --user poetry==0.12.11
             poetry config settings.virtualenvs.in-project true
+            poetry --version
             poetry install
       - run:
           name: install node dependencies
@@ -27,7 +28,7 @@ jobs:
           paths:
             - ./.mypy_cache
             - /root/.cache/
-          key: django-types-v1-{{ checksum "poetry.lock" }}-{{ checksum "yarn.lock" }}
+          key: django-types-v2-{{ checksum "poetry.lock" }}-{{ checksum "yarn.lock" }}
       - run:
           name: lint
           command: ./s/lint
