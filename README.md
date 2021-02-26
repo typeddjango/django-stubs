@@ -26,6 +26,8 @@ argument. You can either use [`django-stubs-ext`](https://pypi.org/project/djang
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 
+# NOTE: there are probably other items you'll need to monkey patch depending on
+# your version.
 for cls in (QuerySet, BaseManager):
     cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore [attr-defined]
 ```
@@ -69,6 +71,23 @@ class User(models.Model):
     team = models.ForeignKey("Team", null=True, on_delete=models.SET_NULL)
     if TYPE_CHECKING:
         team_id: int
+```
+
+### `AutoField`
+
+By default Django will create an `AutoField` for you if one doesn't exist.
+
+For type checkers to know about the `id` field you'll need to declare the
+field explicitly.
+
+```python
+# before
+class Post(models.Model):
+    ...
+
+# after
+class Post(models.Model):
+    id = models.AutoField(primary_key=True)
 ```
 
 ### `HttpRequest`'s `user` property
