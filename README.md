@@ -157,3 +157,10 @@ Then the following will type error:
 def activity(request: HttpRequest, team_id: str) -> HttpResponse:
     ...
 ```
+
+## related
+
+- <https://github.com/sbdchd/djangorestframework-types>
+- <https://github.com/sbdchd/celery-types>
+- <https://github.com/sbdchd/mongo-types>
+- <https://github.com/sbdchd/msgpack-types>
