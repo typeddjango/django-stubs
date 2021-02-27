@@ -3,7 +3,7 @@ from collections import namedtuple
 from datetime import time, timedelta
 from decimal import Decimal
 from io import StringIO
-from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import UUID
 
 import psycopg2
@@ -19,7 +19,21 @@ from django.db import connection, connections, models
 from django.db.backends.utils import CursorWrapper
 from django.db.models.manager import RelatedManager
 from django.http.request import HttpRequest
-from django.views.decorators.http import require_GET, require_POST
+from django.http.response import HttpResponse
+from django.middleware.cache import CacheMiddleware
+from django.utils.decorators import (
+    decorator_from_middleware,
+    decorator_from_middleware_with_args,
+)
+from django.views.decorators.cache import cache_control, cache_page, never_cache
+from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
+from django.views.decorators.gzip import gzip_page
+from django.views.decorators.http import (
+    condition,
+    last_modified,
+    require_GET,
+    require_POST,
+)
 from psycopg2 import ProgrammingError
 from psycopg2.extensions import parse_dsn
 
@@ -702,6 +716,62 @@ def post_data_view(request: HttpRequest, id: str) -> None:
 @require_GET
 def get_data_view(request: HttpRequest, id: str) -> None:
     return None
+
+
+@cache_page(3600)
+def cached_page_view(request: HttpRequest) -> HttpResponse:
+    ...
+
+
+@cache_control(private=True)
+def cache_control_view(request: HttpRequest) -> HttpResponse:
+    ...
+
+
+cache_page_2 = decorator_from_middleware_with_args(CacheMiddleware)
+
+
+@cache_page_2(3600)
+def cached_view_take_2(request: HttpRequest) -> HttpResponse:
+    ...
+
+
+cache_page_3_no_args = decorator_from_middleware(CacheMiddleware)
+
+
+@cache_page_3_no_args
+def cached_view_take_3(request: HttpRequest) -> HttpResponse:
+    ...
+
+
+@never_cache
+@gzip_page
+def compressed_view(request: HttpRequest, id: str) -> HttpResponse:
+    ...
+
+
+def latest_entry(request: HttpRequest, blog_id: str) -> bool:
+    ...
+
+
+@condition(last_modified_func=latest_entry)
+def front_page(request: HttpRequest, blog_id: str) -> HttpResponse:
+    ...
+
+
+@last_modified(latest_entry)
+def front_page_2(request: HttpRequest, blog_id: str) -> HttpResponse:
+    ...
+
+
+@sensitive_post_parameters("password")
+def login_view(request: HttpRequest) -> HttpResponse:
+    ...
+
+
+@sensitive_variables("password")
+def signup_view(request: HttpRequest) -> HttpResponse:
+    ...
 
 
 def test_psycopg_top_level_exports() -> None:

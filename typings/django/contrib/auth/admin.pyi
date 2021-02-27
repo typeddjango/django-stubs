@@ -1,11 +1,13 @@
-from typing import Any
+from typing import Any, Callable, TypeVar
 
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
 
-csrf_protect_m: Any
-sensitive_post_parameters_m: Any
+_F = TypeVar("_F", bound=Callable[..., Any])
+
+def csrf_protect_m(func: _F) -> _F: ...
+def sensitive_post_parameters_m(func: _F) -> _F: ...
 
 class GroupAdmin(admin.ModelAdmin[Any]): ...
 
