@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError as ValidationError
 
+from . import utils as utils
 from .boundfield import BoundField as BoundField
 from .boundfield import BoundWidget as BoundWidget
 from .fields import BooleanField as BooleanField

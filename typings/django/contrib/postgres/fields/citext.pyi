@@ -20,7 +20,7 @@ _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
-_C = TypeVar("_C")
+_C = TypeVar("_C", bound="Optional[str]")
 
 class CIText: ...
 
@@ -76,7 +76,7 @@ class CICharField(CIText, CharField[_C]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
     def __get__(self: CICharField[_C], instance: Any, owner: Any) -> _C: ...  # type: ignore [override]
-    def __set__(self, instance: Any, value: _C) -> None: ...  # type: ignore [override]
+    def __set__(self: CICharField[_C], instance: Any, value: _C) -> None: ...  # type: ignore [override]
 
 class CIEmailField(CIText, EmailField[_C]):
     @overload
@@ -184,4 +184,4 @@ class CITextField(CIText, TextField[_C]):
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
     def __get__(self: CITextField[_C], instance: Any, owner: Any) -> _C: ...  # type: ignore [override]
-    def __set__(self, instance: Any, value: _C) -> None: ...  # type: ignore [override]
+    def __set__(self: CITextField[_C], instance: Any, value: _C) -> None: ...  # type: ignore [override]

@@ -1,15 +1,20 @@
-from collections import namedtuple
-from typing import Any
+from typing import Any, NamedTuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection as BaseDatabaseIntrospection,
 )
 
 FieldInfo: Any
-InfoLine = namedtuple(
-    "InfoLine",
-    "col_name data_type max_len num_prec num_scale extra column_default is_unsigned",
-)
+
+class InfoLine(NamedTuple):
+    col_name: Any
+    data_type: Any
+    max_len: Any
+    num_prec: Any
+    num_scale: Any
+    extra: Any
+    column_default: Any
+    is_unsigned: Any
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse: Any = ...

@@ -1,4 +1,4 @@
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from typing import (
     Any,
     Callable,
@@ -8,6 +8,7 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    NamedTuple,
     Optional,
     Sequence,
     Set,
@@ -24,10 +25,13 @@ from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.datastructures import BaseTable
 from django.db.models.sql.where import WhereNode
 
-JoinInfo = namedtuple(
-    "JoinInfo",
-    ["final_field", "targets", "opts", "joins", "path", "transform_function"],
-)
+class JoinInfo(NamedTuple):
+    final_field: Any
+    targets: Any
+    opts: Any
+    joins: Any
+    path: Any
+    transform_function: Any
 
 class RawQuery:
     high_mark: Optional[int]

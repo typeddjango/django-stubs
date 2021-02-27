@@ -174,7 +174,7 @@ class Comment(models.Model):
     not_nullable_user_str = models.ForeignKey(  # type: ignore [var-annotated]
         "User", on_delete=models.CASCADE, null=False
     )
-    null_str_specified = models.ForeignKey["User"](
+    null_str_specified = models.ForeignKey["Optional[User]"](
         "User", on_delete=models.CASCADE, null=True
     )
 

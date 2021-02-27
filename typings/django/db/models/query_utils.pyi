@@ -1,4 +1,3 @@
-from collections import namedtuple
 from typing import (
     Any,
     Collection,
@@ -6,6 +5,7 @@ from typing import (
     Iterator,
     List,
     Mapping,
+    NamedTuple,
     Optional,
     Sequence,
     Set,
@@ -21,10 +21,14 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 from django.utils import tree
 
-PathInfo = namedtuple(
-    "PathInfo",
-    "from_opts to_opts target_fields join_field m2m direct filtered_relation",
-)
+class PathInfo(NamedTuple):
+    from_opts: Any
+    to_opts: Any
+    target_fields: Any
+    join_field: Any
+    m2m: Any
+    direct: Any
+    filtered_relation: Any
 
 class InvalidQuery(Exception): ...
 

@@ -2,7 +2,7 @@ from typing import Any
 
 from django.db.backends.utils import CursorWrapper
 
-from . import migrations
+from . import migrations as migrations
 from .utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
 from .utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
 from .utils import ConnectionDoesNotExist as ConnectionDoesNotExist

@@ -2,14 +2,10 @@ from typing import Any
 
 from django.utils.functional import LazyObject
 
-# explicit dependency on standard settings to make it loaded
-from . import global_settings
-
 ENVIRONMENT_VARIABLE: str = ...
 DEFAULT_CONTENT_TYPE_DEPRECATED_MSG: str = ...
 FILE_CHARSET_DEPRECATED_MSG: str = ...
 
-# required for plugin to be able to distinguish this specific instance of LazySettings from others
 class _DjangoConfLazyObject(LazyObject):
     def __getattr__(self, item: Any) -> Any: ...
 

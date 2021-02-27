@@ -1,7 +1,6 @@
 from typing import Any, Optional, Union
 from uuid import UUID
 
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
 

@@ -1,16 +1,22 @@
-from collections import namedtuple
-from typing import Any, Dict, List, Optional, Set, Type
+from typing import Any, Dict, List, NamedTuple, Optional, Set, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 
-TableInfo = namedtuple("TableInfo", ["name", "type"])
+class TableInfo(NamedTuple):
+    name: Any
+    type: Any
 
-FieldInfo = namedtuple(
-    "FieldInfo",
-    "name type_code display_size internal_size precision scale null_ok default",
-)
+class FieldInfo(NamedTuple):
+    name: Any
+    type_code: Any
+    display_size: Any
+    internal_size: Any
+    precision: Any
+    scale: Any
+    null_ok: Any
+    default: Any
 
 class BaseDatabaseIntrospection:
     data_types_reverse: Any = ...

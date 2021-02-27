@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Tuple, Type
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps

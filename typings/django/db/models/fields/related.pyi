@@ -17,7 +17,6 @@ from uuid import UUID
 
 from django.db import models
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import (
@@ -112,7 +111,7 @@ class ForeignObject(RelatedField[_M, _M]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
+    ) -> None: ...
 
 class ForeignKey(Generic[_M], ForeignObject[_M]):
     @overload
@@ -147,7 +146,7 @@ class ForeignKey(Generic[_M], ForeignObject[_M]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
+    ) -> None: ...
     @overload
     def __init__(
         self: ForeignKey[Optional[_M]],
@@ -180,7 +179,7 @@ class ForeignKey(Generic[_M], ForeignObject[_M]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
+    ) -> None: ...
     # class access
     @overload  # type: ignore
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor: ...
@@ -228,7 +227,7 @@ class OneToOneField(Generic[_M], RelatedField[_M, _M]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
+    ) -> None: ...
     @overload
     def __init__(
         self: OneToOneField[Optional[_M]],
@@ -261,7 +260,7 @@ class OneToOneField(Generic[_M], RelatedField[_M, _M]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ): ...
+    ) -> None: ...
     # class access
     @overload  # type: ignore
     def __get__(self, instance: None, owner: Any) -> ForwardOneToOneDescriptor: ...
@@ -284,7 +283,7 @@ class ManyToManyField(RelatedField[Sequence[Any], RelatedManager[Any]]):
     swappable: bool = ...
     def __init__(
         self,
-        to: Union[Type[_T], str],
+        to: Union[Type[Any], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
         limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,

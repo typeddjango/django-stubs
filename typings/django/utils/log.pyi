@@ -1,4 +1,4 @@
-import logging.config
+import logging
 from logging import LogRecord
 from typing import Any, Callable, Dict, Optional, Union
 

@@ -1,6 +1,5 @@
-from collections import namedtuple
 from datetime import date
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Union
 
 from django.template.base import FilterExpression, Parser, Token
 from django.template.context import Context
@@ -101,7 +100,9 @@ class LoremNode(Node):
     method: str
     def __init__(self, count: FilterExpression, method: str, common: bool) -> None: ...
 
-GroupedResult = namedtuple("GroupedResult", ["grouper", "list"])
+class GroupedResult(NamedTuple):
+    grouper: Any
+    list: Any
 
 class RegroupNode(Node):
     expression: FilterExpression

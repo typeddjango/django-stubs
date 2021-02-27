@@ -240,7 +240,7 @@ class Case(Expression):
 class ExpressionWrapper(Expression):
     def __init__(
         self, expression: Union[Q, Combinable], output_field: _OutputField
-    ): ...
+    ) -> None: ...
 
 class Col(Expression):
     def __init__(

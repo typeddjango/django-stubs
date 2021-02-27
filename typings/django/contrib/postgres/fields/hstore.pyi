@@ -22,7 +22,7 @@ _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
 _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
 
-_T = TypeVar("_T")
+_T = TypeVar("_T", bound="Optional[Dict[str, Optional[str]]]")
 
 class HStoreField(Generic[_T], CheckFieldDefaultMixin, Field[Any, Any]):
     @overload

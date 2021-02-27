@@ -21,7 +21,7 @@ from typing_extensions import Literal
 
 from .mixins import CheckFieldDefaultMixin
 
-_T = TypeVar("_T")
+_T = TypeVar("_T", bound=Optional[List[Any]])
 
 class ArrayField(
     Generic[_T],

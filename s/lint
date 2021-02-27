@@ -15,5 +15,11 @@ fi
 # type check code
 ./.venv/bin/mypy tests typings
 
+
+# TODO(sbdchd): re-enable once the latest pyright ships
+if [[ -z $CI ]]; then
+    ./node_modules/.bin/pyright typings
+fi
+
 # lint
 ./.venv/bin/flake8 tests typings
