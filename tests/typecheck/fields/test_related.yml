@@ -672,3 +672,9 @@
                     objects = OrderManager()
                     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='orders')
 
+-   case: many_to_many_field_can_be_used_in_alias
+    main: |
+        from typing import TypeVar, Sequence, Union
+        from django.db import models
+        T = TypeVar("T", bound=models.Model)
+        ManyToManyFieldAlias = Union["models.ManyToManyField[Sequence[T], models.manager.RelatedManager[T]]"]
