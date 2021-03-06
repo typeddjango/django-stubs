@@ -163,3 +163,5 @@
         book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year")
         book.published = Year(2006)
         reveal_type(book.published)  # N: Revealed type is 'main.Year*'
+        def accepts_int(arg: int) -> None: ...
+        accepts_int(book.published)
