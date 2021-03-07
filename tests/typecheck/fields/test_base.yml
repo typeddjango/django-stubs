@@ -151,3 +151,17 @@
 
                 class MyModel(AuthMixin, models.Model):
                     pass
+-   case: can_narrow_field_type
+    main: |
+        from typing import cast, NewType
+        from django.db import models
+        Year = NewType("Year", int)
+        class Book(models.Model):
+            published = cast(models.Field[Year, Year], models.IntegerField())
+        book = Book()
+        reveal_type(book.published)  # N: Revealed type is 'main.Year*'
+        book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year")
+        book.published = Year(2006)
+        reveal_type(book.published)  # N: Revealed type is 'main.Year*'
+        def accepts_int(arg: int) -> None: ...
+        accepts_int(book.published)

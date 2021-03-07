@@ -38,9 +38,9 @@ _ErrorMessagesToOverride = Dict[str, Any]
 
 _T = TypeVar("_T", bound="Field")
 # __set__ value type
-_ST = TypeVar("_ST")
+_ST = TypeVar("_ST", contravariant=True)
 # __get__ return type
-_GT = TypeVar("_GT")
+_GT = TypeVar("_GT", covariant=True)
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     _pyi_private_set_type: Any
