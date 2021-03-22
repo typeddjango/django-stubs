@@ -193,6 +193,7 @@ class Comment(models.Model):
     )
 
     metadata = JSONField()
+    other_metadata = models.JSONField()
 
     objects = Manager["Comment"]()
 
