@@ -19,7 +19,7 @@ pip install django-types
 
 If you're on a Django version < 3.1, you'll need to monkey patch Django's
 `QuerySet` and `Manager` classes so we can index into them with a generic
-argument. You can either use [`django-stubs-ext`](https://pypi.org/project/django-stubs-ext/`) or do this yourself manually:
+argument. You can either use [`django-stubs-ext`](https://pypi.org/project/django-stubs-ext/) or do this yourself manually:
 
 ```python
 # in settings.py
