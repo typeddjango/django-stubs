@@ -275,6 +275,8 @@ class AddRelatedManagers(ModelClassInitializer):
                 # create new RelatedManager subclass
                 parametrized_related_manager_type = Instance(related_manager_info, [Instance(related_model_info, [])])
                 default_manager_type = related_model_info.names["objects"].type
+                if default_manager_type is None:
+                    default_manager_type = self.try_generate_related_manager(related_model_cls, related_model_info)
                 if (
                     default_manager_type is None
                     or not isinstance(default_manager_type, Instance)
@@ -283,11 +285,31 @@ class AddRelatedManagers(ModelClassInitializer):
                     self.add_new_node_to_model_class(attname, parametrized_related_manager_type)
                     continue
 
-                name = related_model_cls.__name__ + "_" + "RelatedManager"
+                name = model_cls.__name__ + "_" + related_model_cls.__name__ + "_" + "RelatedManager"
                 bases = [parametrized_related_manager_type, default_manager_type]
                 new_related_manager_info = self.add_new_class_for_current_module(name, bases)
 
                 self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []))
+
+    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
+        base_manager_info = self.lookup_typeinfo(base_manager_fullname)
+        if base_manager_info is None or "from_queryset_managers" not in base_manager_info.metadata:
+            return {}
+        return base_manager_info.metadata["from_queryset_managers"]
+
+    def try_generate_related_manager(
+        self, related_model_cls: Type[Model], related_model_info: TypeInfo
+    ) -> Optional[Instance]:
+        manager = related_model_cls._meta.managers_map["objects"]
+        base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
+        manager_fullname = helpers.get_class_fullname(manager.__class__)
+        generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
+        if manager_fullname in generated_managers:
+            real_manager_fullname = generated_managers[manager_fullname]
+            manager_info = self.lookup_typeinfo(real_manager_fullname)  # type: ignore
+            if manager_info:
+                return Instance(manager_info, [Instance(related_model_info, [])])
+        return None
 
 
 class AddExtraFieldMethods(ModelClassInitializer):

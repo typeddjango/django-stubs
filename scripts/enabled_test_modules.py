@@ -290,7 +290,7 @@ IGNORED_ERRORS = {
         'Incompatible types in assignment (expression has type "HttpResponseBase", variable has type "HttpResponse")',
     ],
     "many_to_many": [
-        '(expression has type "List[Article]", variable has type "Article_RelatedManager2',
+        '(expression has type "List[Article]", variable has type "Publication_Article_RelatedManager1',
         '"add" of "RelatedManager" has incompatible type "Article"; expected "Union[Publication, int]"',
     ],
     "many_to_one": [
