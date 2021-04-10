@@ -70,11 +70,11 @@ To execute the unit tests, simply run:
 pytest
 ```
 
-We also test the stubs against the Django's own test suite. This is done in CI but you can also do this locally.
+We also test the stubs against Django's own test suite. This is done in CI but you can also do this locally.
 To execute the script run:
 
 ```bash
-python ./scripts/typecheck_tests.py --django_version 3.0
+python ./scripts/typecheck_tests.py --django_version 3.1
 ```
 
 
