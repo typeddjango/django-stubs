@@ -1,14 +1,14 @@
 import types
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Type, Union
+from typing import Any, ContextManager, Dict, List, Mapping, Optional, Sequence, Tuple, Type, Union
 from uuid import UUID
 
 logger: Any
 
 # Python types that can be adapted to SQL.
 _SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
-_ExecuteParameters = Optional[Union[Sequence[_SQLType], Mapping[str, _SQLType]]]
+_ExecuteParameters = Union[Sequence[_SQLType], Mapping[str, _SQLType]]
 
 class CursorWrapper:
     cursor: Any = ...
@@ -25,8 +25,8 @@ class CursorWrapper:
         tb: Optional[types.TracebackType],
     ) -> None: ...
     def callproc(self, procname: str, params: List[Any] = ..., kparams: Dict[str, int] = ...) -> Any: ...
-    def execute(self, sql: str, params: _ExecuteParameters = ...) -> Optional[Any]: ...
-    def executemany(self, sql: str, param_list: Sequence[_ExecuteParameters]) -> Optional[Any]: ...
+    def execute(self, sql: str, params: Optional[_ExecuteParameters] = ...) -> Optional[Any]: ...
+    def executemany(self, sql: str, param_list: Optional[Sequence[_ExecuteParameters]]) -> Optional[Any]: ...
 
 class CursorDebugWrapper(CursorWrapper):
     cursor: Any
@@ -34,10 +34,10 @@ class CursorDebugWrapper(CursorWrapper):
     def debug_sql(
         self,
         sql: Optional[str] = ...,
-        params: Union[_ExecuteParameters, Sequence[_ExecuteParameters]] = ...,
+        params: Optional[Union[_ExecuteParameters, Sequence[_ExecuteParameters]]] = ...,
         use_last_executed_query: bool = ...,
         many: bool = ...,
-    ) -> None: ...
+    ) -> ContextManager[None]: ...
 
 def typecast_date(s: Optional[str]) -> Optional[date]: ...
 def typecast_time(s: Optional[str]) -> Optional[time]: ...
