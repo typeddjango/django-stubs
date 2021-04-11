@@ -1,6 +1,8 @@
-from typing import Dict, Tuple
+from io import IOBase
+from typing import Any, Dict, Optional, Tuple
 
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
 
 def psycopg2_version() -> Tuple[int, ...]: ...
 
@@ -15,3 +17,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     _named_cursor_idx: int = ...
     @property
     def pg_version(self) -> str: ...
+
+class CursorDebugWrapper(BaseCursorDebugWrapper):
+    def copy_expert(self, sql: Optional[str], file: IOBase, *args: Any): ...
+    def copy_to(self, file: IOBase, table: str, *args: Any, **kwargs: Any): ...
