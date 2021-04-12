@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-pyright@^1.1.116:
-  version "1.1.116"
-  resolved "https://registry.yarnpkg.com/pyright/-/pyright-1.1.116.tgz#202abd42424d84ad3929347c99a2a45ac54364d6"
-  integrity sha512-SdsLo/bahs+ncCYIY7E4bL/B+ZuI/OdKJudNuUFAJciXEkkkp2ICzpzQSt0n4ZeYsPfqb5g48QoGo7x4a+LDcQ==
+pyright@^1.1.129:
+  version "1.1.129"
+  resolved "https://registry.yarnpkg.com/pyright/-/pyright-1.1.129.tgz#11fb60bc8bb48a934360c226101ace673aca0871"
+  integrity sha512-7GFRfANFT6xhEVlDWWk+81D2IJA57j8L9TbSVG61qPe79qb0O6yVzu9asCTJVopd7q6aRPVhXlfuXLMFKmKekQ==

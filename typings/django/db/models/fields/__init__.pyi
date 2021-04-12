@@ -72,8 +72,8 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     column: str
     default: Any
     error_messages: _ErrorMessagesToOverride
-    def __init__(
-        self,
+    def __new__(
+        cls,
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
@@ -95,7 +95,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> None: ...
+    ) -> Field[_ST, _GT]: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload

@@ -1,4 +1,4 @@
-from typing import Any, Callable, TypeVar, overload
+from typing import Any, TypeVar, overload
 
 _SD = TypeVar("_SD", bound="SafeData")
 
@@ -17,10 +17,4 @@ class SafeText(str, SafeData):
 
 SafeString = SafeText
 
-_C = TypeVar("_C", bound=Callable[..., Any])
-@overload
-def mark_safe(s: _SD) -> _SD: ...
-@overload
-def mark_safe(s: _C) -> _C: ...
-@overload
 def mark_safe(s: Any) -> SafeText: ...

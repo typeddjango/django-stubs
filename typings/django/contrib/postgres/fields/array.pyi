@@ -36,8 +36,8 @@ class ArrayField(
     default_validators: Any = ...
     from_db_value: Any = ...
     @overload
-    def __init__(
-        self: ArrayField[List[Any]],
+    def __new__(  # type: ignore [misc]
+        cls,
         base_field: Field[Any, Any],
         size: Optional[int] = ...,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -61,10 +61,10 @@ class ArrayField(
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> None: ...
+    ) -> ArrayField[List[Any]]: ...
     @overload
-    def __init__(
-        self: ArrayField[Optional[List[Any]]],
+    def __new__(
+        cls,
         base_field: Field[Any, Any],
         size: Optional[int] = ...,
         verbose_name: Optional[Union[str, bytes]] = ...,
@@ -88,7 +88,7 @@ class ArrayField(
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> None: ...
+    ) -> ArrayField[Optional[List[Any]]]: ...
     def __get__(self: ArrayField[_T], instance: Any, owner: Any) -> _T: ...  # type: ignore [override]
     def __set__(self: ArrayField[_T], instance: Any, value: _T) -> None: ...  # type: ignore [override]
     @property

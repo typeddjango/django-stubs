@@ -182,10 +182,12 @@ class Comment(models.Model):
     )
 
     user_type = models.ForeignKey(User, on_delete=models.CASCADE)
-    user_str = models.ForeignKey("User", on_delete=models.CASCADE)  # type: ignore [var-annotated]
+    user_str = models.ForeignKey[User]("User", on_delete=models.CASCADE)
     nullable_user_type = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    nullable_user_str = models.ForeignKey("User", on_delete=models.CASCADE, null=True)
-    not_nullable_user_str = models.ForeignKey(  # type: ignore [var-annotated]
+    nullable_user_str = models.ForeignKey[Optional[User]](
+        "User", on_delete=models.CASCADE, null=True
+    )
+    not_nullable_user_str = models.ForeignKey[User](
         "User", on_delete=models.CASCADE, null=False
     )
     null_str_specified = models.ForeignKey["Optional[User]"](
@@ -528,10 +530,10 @@ def main() -> None:
     if isinstance(comment.nullable_user_str, type(None)):
         print(comment.nullable_user_str)
     if comment.nullable_user_str is not None:
-        print(comment.nullable_user_str)  # type: ignore [unreachable]
+        print(comment.nullable_user_str)
 
     if isinstance(comment.not_nullable_user_str, type(None)):
-        print(comment.not_nullable_user_str)
+        print(comment.not_nullable_user_str)  # type: ignore [unreachable]
     if comment.not_nullable_user_str is not None:
         print(comment.not_nullable_user_str)
 
@@ -821,7 +823,7 @@ def namedtuplefetchall(cursor: CursorWrapper) -> List[Tuple[Any, ...]]:
 def dictfetchall(cursor: CursorWrapper) -> List[Dict[str, Any]]:
     "Return all rows from a cursor as a dict"
     assert cursor.description is not None
-    columns = []
+    columns: List[str] = []
     for col in cursor.description:
         if col.name is not None:
             columns.append(col.name)
