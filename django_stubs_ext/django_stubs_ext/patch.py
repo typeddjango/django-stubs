@@ -1,4 +1,13 @@
-from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from django import VERSION as VERSION
 from django.contrib.admin import ModelAdmin
@@ -46,15 +55,24 @@ _need_generic: List[MPGeneric[Any]] = [
 ]
 
 
-# currently just adds the __class_getitem__ dunder. if more monkeypatching is needed, add it here
 def monkeypatch() -> None:
     """Monkey patch django as necessary to work properly with mypy."""
+
+    # Add the __class_getitem__ dunder.
     suited_for_this_version = filter(
         lambda spec: spec.version is None or VERSION[:2] <= spec.version,
         _need_generic,
     )
     for el in suited_for_this_version:
         el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
+
+    # Define reveal_type/reveal_locals, to not cause NameError during setting
+    # up Django.
+    if not TYPE_CHECKING:
+        import builtins
+
+        builtins.reveal_type = lambda _: None
+        builtins.reveal_locals = lambda: None
 
 
 __all__ = ["monkeypatch"]
