@@ -108,3 +108,7 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     lookup_val_isnull: None
     title: str
     used_parameters: Dict[Any, Any]
+
+class EmptyFieldListFilter(FieldListFilter):
+    lookup_kwarg: str = ...
+    lookup_val: None = ...
