@@ -1,5 +1,5 @@
 import builtins
-from typing import TYPE_CHECKING, Any, Generic, List, Optional, Tuple, Type, TypeVar
+from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION as VERSION
 from django.contrib.admin import ModelAdmin
