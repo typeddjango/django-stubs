@@ -6,7 +6,6 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query_utils import Q
 
-
 class Index:
     model: Type[Model]
     suffix: str = ...

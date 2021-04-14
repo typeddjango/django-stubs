@@ -71,10 +71,11 @@ def test_patched_version_specific(
             assert el.cls[int] is el.cls
 
 
-def test_patched_mypy_builtins(make_generic_classes: _MakeGenericClasses) -> None:
+def test_patched_mypy_builtins(
+    make_generic_classes: _MakeGenericClasses,
+) -> None:
+    """Ensures that we properly patch builtins with `mypy` specific helpers."""
     make_generic_classes()
 
     assert builtins.reveal_type
     assert builtins.reveal_locals
-
-    reveal_type(reveal_locals)  # noqa: F821
