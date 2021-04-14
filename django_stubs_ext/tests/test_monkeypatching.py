@@ -1,3 +1,4 @@
+import builtins
 from contextlib import suppress
 from typing import Optional
 
@@ -27,6 +28,9 @@ def make_generic_classes(
         for el in _need_generic:
             with suppress(AttributeError):
                 delattr(el.cls, "__class_getitem__")
+
+        del builtins.reveal_type
+        del builtins.reveal_locals
 
     def factory(django_version: Optional[_VersionSpec] = None) -> None:
         if django_version is not None:
@@ -65,3 +69,12 @@ def test_patched_version_specific(
     for el in _need_generic:
         if el.version is not None and django_version <= el.version:
             assert el.cls[int] is el.cls
+
+
+def test_patched_mypy_builtins(make_generic_classes: _MakeGenericClasses) -> None:
+    make_generic_classes()
+
+    assert builtins.reveal_type
+    assert builtins.reveal_locals
+
+    reveal_type(reveal_locals)  # noqa: F821
