@@ -103,7 +103,7 @@
 
       class A(admin.ModelAdmin):
           fieldsets = [  # type: ignore
-              (None, {}),  # E: Key 'fields' missing for TypedDict "_FieldOpts"
+              (None, {}),  # E: Missing key 'fields' for TypedDict "_FieldOpts"
           ]
 -   case: errors_on_invalid_radio_fields
     main: |
