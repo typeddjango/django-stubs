@@ -7,6 +7,8 @@
             pass
         with transaction.atomic(using="mydb", savepoint=False):
             pass
+        with transaction.atomic(using="mydb", savepoint=False, durable=True):
+            pass
 
 -   case: transaction_atomic_decorator
     main: |

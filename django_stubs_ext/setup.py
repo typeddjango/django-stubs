@@ -11,7 +11,7 @@ dependencies = [
 
 setup(
     name="django-stubs-ext",
-    version="0.1.0",
+    version="0.2.0",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -19,6 +19,8 @@ setup(
     url="https://github.com/typeddjango/django-stubs",
     author="Simula Proxy",
     author_email="3nki.nam.shub@gmail.com",
+    maintainer="Nikita Sobolev",
+    maintainer_email="mail@sobolevn.me",
     py_modules=[],
     python_requires=">=3.6",
     install_requires=dependencies,
@@ -35,6 +37,7 @@ setup(
         "Framework :: Django :: 2.2",
         "Framework :: Django :: 3.0",
         "Framework :: Django :: 3.1",
+        "Framework :: Django :: 3.2",
     ],
     project_urls={
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",

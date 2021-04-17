@@ -4,7 +4,9 @@ from .resolvers import URLResolver, URLPattern
 from ..conf.urls import IncludedURLConf
 from ..http.response import HttpResponseBase
 
-def include(arg: Any, namespace: Optional[str] = ...) -> Tuple[List[Union[URLResolver, URLPattern]], Optional[str], Optional[str]]: ...
+def include(
+    arg: Any, namespace: Optional[str] = ...
+) -> Tuple[List[Union[URLResolver, URLPattern]], Optional[str], Optional[str]]: ...
 
 # path()
 @overload
