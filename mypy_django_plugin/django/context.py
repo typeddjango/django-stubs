@@ -198,7 +198,12 @@ class DjangoContext:
                 # it's generic, so cannot set specific model
                 field_name = field.name
                 gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                gfk_set_type = helpers.get_private_descriptor_type(gfk_info, "_pyi_private_set_type", is_nullable=True)
+                if gfk_info is None:
+                    gfk_set_type = AnyType(TypeOfAny.unannotated)
+                else:
+                    gfk_set_type = helpers.get_private_descriptor_type(
+                        gfk_info, "_pyi_private_set_type", is_nullable=True
+                    )
                 expected_types[field_name] = gfk_set_type
 
         return expected_types
