@@ -73,7 +73,10 @@ class HttpResponseBase(Iterable[Any]):
     def __iter__(self) -> Iterator[Any]: ...
 
 class HttpResponse(HttpResponseBase):
-    content: Any
+    @property
+    def content(self) -> bytes: ...
+    @content.setter
+    def content(self, value: Any) -> None: ...
     csrf_cookie_set: bool
     redirect_chain: List[Tuple[str, int]]
     sameorigin: bool
@@ -98,7 +101,10 @@ class HttpResponse(HttpResponseBase):
 
 class StreamingHttpResponse(HttpResponseBase):
     content: Any
-    streaming_content: Iterator[Any]
+    @property
+    def streaming_content(self) -> Iterator[bytes]: ...
+    @streaming_content.setter
+    def streaming_content(self, value: Iterable[Any]) -> None: ...
     def __init__(self, streaming_content: Iterable[Any] = ..., *args: Any, **kwargs: Any) -> None: ...
     def getvalue(self) -> bytes: ...
 
