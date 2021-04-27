@@ -36,6 +36,7 @@ from django.views.decorators.http import (
 )
 from psycopg2 import ProgrammingError
 from psycopg2.extensions import parse_dsn
+from psycopg2.extras import execute_values
 
 
 class User(models.Model):
@@ -561,6 +562,9 @@ def raw_database_queries() -> None:
         print(row)
 
         cursor.executemany("select 1;", [])
+
+        values: List[Tuple[str, int]] = [("foo", 123)]
+        execute_values(cursor, "SELECT 1", (values,))
 
         cursor.executemany(
             "INSERT INTO table (id, name) VALUES (%s, %s)",

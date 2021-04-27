@@ -1,5 +1,6 @@
 from typing import Any, Optional
 
+from psycopg2 import _psycopg as _psycopg
 from psycopg2 import errors as errors
 from psycopg2 import extensions as extensions
 from psycopg2 import tz as tz
