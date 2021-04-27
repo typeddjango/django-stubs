@@ -34,7 +34,7 @@ from django.views.decorators.http import (
     require_GET,
     require_POST,
 )
-from psycopg2 import ProgrammingError
+from psycopg2 import ProgrammingError, sql
 from psycopg2.extensions import parse_dsn
 from psycopg2.extras import execute_values
 
@@ -636,6 +636,52 @@ def get_data() -> Dict[str, Dict[str, str]]:
 
 def test_psycopg2() -> None:
     with connection.cursor() as cursor:
+        comp = sql.Composed([sql.SQL("insert into "), sql.Identifier("table")])
+        print(comp.as_string(cursor))
+
+        query = sql.SQL("select {0} from {1}").format(
+            sql.SQL(", ").join([sql.Identifier("foo"), sql.Identifier("bar")]),
+            sql.Identifier("table"),
+        )
+        print(query.as_string(cursor))
+
+        snip = sql.SQL(", ").join(sql.Identifier(n) for n in ["foo", "bar", "baz"])
+        print(snip.as_string(cursor))
+
+        query = sql.SQL("select {} from {}").format(
+            sql.Identifier("table", "field"), sql.Identifier("schema", "table")
+        )
+        print(query.as_string(cursor))
+
+        t1 = sql.Identifier("foo")
+        t2 = sql.Identifier("ba'r")
+        t3 = sql.Identifier('ba"z')
+        print(sql.SQL(", ").join([t1, t2, t3]).as_string(cursor))
+
+        s1 = sql.Literal("foo")
+        s2 = sql.Literal("ba'r")
+        s3 = sql.Literal(42)
+        print(sql.SQL(", ").join([s1, s2, s3]).as_string(cursor))
+
+        query = sql.SQL("select {} from {}").format(
+            sql.Identifier("table", "field"), sql.Identifier("schema", "table")
+        )
+        print(query.as_string(cursor))
+
+        names = ["foo", "bar", "baz"]
+
+        q1 = sql.SQL("insert into table ({}) values ({})").format(
+            sql.SQL(", ").join(map(sql.Identifier, names)),
+            sql.SQL(", ").join(sql.Placeholder() * len(names)),
+        )
+        print(q1.as_string(cursor))
+
+        q2 = sql.SQL("insert into table ({}) values ({})").format(
+            sql.SQL(", ").join(map(sql.Identifier, names)),
+            sql.SQL(", ").join(map(sql.Placeholder, names)),
+        )
+        print(q2.as_string(cursor))
+
         cur = cursor.cursor
         cur.execute("SELECT * FROM test;")
         for record in cur:
