@@ -2,7 +2,7 @@ import string
 from typing import Any, Iterable, Iterator, List, Optional, Union
 
 from psycopg2 import extensions as ext
-from psycopg2.extensions import connection
+from psycopg2.extensions import _SQLType, connection
 from psycopg2.extras import _CursorLike
 
 _formatter: string.Formatter
@@ -10,7 +10,7 @@ _formatter: string.Formatter
 _Context = Union[connection, _CursorLike]
 
 class Composable:
-    def __init__(self, wrapped: Any) -> None: ...
+    def __init__(self, wrapped: _SQLType) -> None: ...
     def as_string(self, context: _Context) -> str: ...
     def __add__(self, other: Any) -> Composed: ...
     def __mul__(self, n: int) -> Composed: ...
