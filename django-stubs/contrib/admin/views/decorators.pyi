@@ -1,7 +1,6 @@
 from typing import Callable, Optional, TypeVar, overload
 
 _C = TypeVar("_C", bound=Callable)
-
 @overload
 def staff_member_required(
     view_func: _C = ..., redirect_field_name: Optional[str] = ..., login_url: str = ...
