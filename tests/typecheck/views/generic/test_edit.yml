@@ -10,3 +10,21 @@
                 """Ensure that form can have type AuthenticationForm."""
                 form.get_user()
                 return HttpResponseRedirect(self.get_success_url())
+-   case: dispatch_http_response
+    main: |
+        from django.http import HttpResponse
+        from django.views.generic.base import View
+
+        class MyView(View):
+            def dispatch(self, request, *args, **kwargs) -> HttpResponse:
+                response: HttpResponse
+                return response
+-   case: dispatch_streaming_http_response
+    main: |
+        from django.http import StreamingHttpResponse
+        from django.views.generic.base import View
+
+        class MyView(View):
+            def dispatch(self, request, *args, **kwargs) -> StreamingHttpResponse:
+                response: StreamingHttpResponse
+                return response
