@@ -12,6 +12,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
 _P = TypeVar("_P", bound=Promise)
 _S = TypeVar("_S", bound=str)
 _PT = TypeVar("_PT", None, int, float, Decimal, datetime.datetime, datetime.date, datetime.time)
+
 @overload
 def smart_text(s: _P, encoding: str = ..., strings_only: bool = ..., errors: str = ...) -> _P: ...
 @overload
@@ -40,6 +41,7 @@ def force_bytes(s: Any, encoding: str = ..., strings_only: bool = ..., errors: s
 
 smart_str = smart_text
 force_str = force_text
+
 @overload
 def iri_to_uri(iri: None) -> None: ...
 @overload
