@@ -5,9 +5,9 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.db import models
 from django.http import HttpRequest, HttpResponse
 
-T = TypeVar('T', bound=models.Model)
+T = TypeVar("T", bound=models.Model)
 
-class SingleObjectMixin(ContextMixin):
+class SingleObjectMixin(Generic[T], ContextMixin):
     model: Type[T] = ...
     queryset: models.query.QuerySet[T] = ...
     slug_field: str = ...
