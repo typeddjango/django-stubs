@@ -6,7 +6,7 @@
       @method_decorator(login_required, name='dispatch')
       class TestView(View): ...
       reveal_type(TestView())  # N: Revealed type is 'main.TestView'
--   case: method_decorator_function
+-   case: method_decorator_function_HttpResponse
     main: |
       from django.views.generic.base import View
       from django.utils.decorators import method_decorator
@@ -16,5 +16,19 @@
       class TestView(View):
           @method_decorator(login_required)
           def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-              return super().dispatch(request, *args, **kwargs)
+              response: HttpResponse
+              return response
           reveal_type(dispatch)  # N: Revealed type is 'def (self: main.TestView, request: django.http.request.HttpRequest, *args: Any, **kwargs: Any) -> django.http.response.HttpResponse'
+-   case: method_decorator_function_StreamingHttpResponse
+    main: |
+      from django.views.generic.base import View
+      from django.utils.decorators import method_decorator
+      from django.contrib.auth.decorators import login_required
+      from django.http.response import StreamingHttpResponse
+      from django.http.request import HttpRequest
+      class TestView(View):
+          @method_decorator(login_required)
+          def dispatch(self, request: HttpRequest, *args, **kwargs) -> StreamingHttpResponse:
+              response: StreamingHttpResponse
+              return response
+          reveal_type(dispatch)  # N: Revealed type is 'def (self: main.TestView, request: django.http.request.HttpRequest, *args: Any, **kwargs: Any) -> django.http.response.StreamingHttpResponse'
