@@ -1,4 +1,4 @@
-from typing import Any, Callable, Collection, Dict, Iterable, List, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Collection, Dict, Iterable, List, Optional, Set, Tuple, Type, TypeVar, Union, ClassVar
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import (
@@ -26,7 +26,7 @@ class Model(metaclass=ModelBase):
     class Meta: ...
     _meta: Options[Any]
     _default_manager: BaseManager[Model]
-    objects: BaseManager[Any]
+    objects: ClassVar[BaseManager[Any]]
     pk: Any = ...
     _state: ModelState
     def __init__(self: _Self, *args, **kwargs) -> None: ...
