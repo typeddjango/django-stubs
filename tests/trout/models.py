@@ -21,6 +21,7 @@ from django.db.models.manager import Manager, RelatedManager
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.middleware.cache import CacheMiddleware
+from django.test.client import Client
 from django.utils.decorators import (
     decorator_from_middleware,
     decorator_from_middleware_with_args,
@@ -221,6 +222,13 @@ def process_non_nullable(
 
 
 def main() -> None:
+
+    client = Client()
+
+    res = client.post(
+        "/api/users", data={"buzz": "bar"}, QUERY_STRING="?foo=1", HTTP_X_FOO_BAR="foo"
+    )
+    print(res)
 
     request = HttpRequest()
     header = request.headers.get("FOO")

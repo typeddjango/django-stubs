@@ -38,71 +38,98 @@ class ClientHandler(BaseHandler):
 def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
 def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
 
+_RequestData = Optional[Any]
+
 class RequestFactory:
     json_encoder: Type[JSONEncoder]
     defaults: Dict[str, str]
-    cookies: SimpleCookie  # type: ignore [no-any-unimported]
+    cookies: SimpleCookie[str]
     errors: BytesIO
     def __init__(
         self, *, json_encoder: Type[JSONEncoder] = ..., **defaults: Any
     ) -> None: ...
     def request(self, **request: Any) -> WSGIRequest: ...
     def get(
-        self, path: str, data: Any = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: _RequestData = ...,
+        secure: bool = ...,
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
     def post(
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
     def head(
-        self, path: str, data: Any = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: _RequestData = ...,
+        secure: bool = ...,
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
-    def trace(self, path: str, secure: bool = ..., **extra: Any) -> WSGIRequest: ...
+    def trace(
+        self, path: str, secure: bool = ..., *, QUERY_STRING: str = ..., **extra: str
+    ) -> WSGIRequest: ...
     def options(
         self,
         path: str,
-        data: Union[Dict[str, str], str] = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
-        follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
     def put(
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
     def patch(
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
     def delete(
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
     def generic(
         self,
         method: str,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: Optional[str] = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> WSGIRequest: ...
 
 class Client(RequestFactory):
@@ -118,70 +145,91 @@ class Client(RequestFactory):
         **defaults: Any
     ) -> None: ...
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
-    def request(self, **request: Any) -> HttpResponse: ...  # type: ignore
-    def get(  # type: ignore
+    def request(self, **request: Any) -> HttpResponse: ...  # type: ignore [override]
+    def get(  # type: ignore [override]
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
-    def post(  # type: ignore
+    def post(  # type: ignore [override]
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
-    def head(  # type: ignore
+    def head(  # type: ignore [override]
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
-    def trace(  # type: ignore
-        self, path: str, follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...
-    def options(  # type: ignore
+    def trace(  # type: ignore [override]
         self,
         path: str,
-        data: Union[Dict[str, str], str] = ...,
+        data: _RequestData = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
+    ) -> HttpResponse: ...
+    def options(  # type: ignore [override]
+        self,
+        path: str,
+        data: _RequestData = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
-    def put(  # type: ignore
+    def put(  # type: ignore [override]
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
-    def patch(  # type: ignore
+    def patch(  # type: ignore [override]
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
-    def delete(  # type: ignore
+    def delete(  # type: ignore [override]
         self,
         path: str,
-        data: Any = ...,
+        data: _RequestData = ...,
         content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
-        **extra: Any
+        *,
+        QUERY_STRING: str = ...,
+        **extra: str
     ) -> HttpResponse: ...
     def store_exc_info(self, **kwargs: Any) -> None: ...
     @property
