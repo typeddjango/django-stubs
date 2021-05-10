@@ -111,7 +111,7 @@ class DjangoContext:
         # Strip suffix which is present if the model came from QuerySet.annotate
         if is_annotated_model_fullname(fullname):
             fullname, _, _ = fullname.rpartition(ANNOTATED_SUFFIX)
-        module, _, model_cls_name = fullname.rpartition('.')
+        module, _, model_cls_name = fullname.rpartition(".")
         for model_cls in self.model_modules.get(module, set()):
             if model_cls.__name__ == model_cls_name:
                 return model_cls
