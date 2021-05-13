@@ -1,6 +1,6 @@
 from typing import Any, List, Optional, Tuple, Union
 
-from django.db.backends.sqlite3.base import DatabaseWrapper
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler
 
@@ -18,7 +18,7 @@ class Left(Func):
     def __init__(self, expression: str, length: Union[Value, int], **extra: Any) -> None: ...
     def get_substr(self) -> Substr: ...
     def use_substr(
-        self, compiler: SQLCompiler, connection: DatabaseWrapper, **extra_context: Any
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> Tuple[str, List[int]]: ...
 
 class Length(Transform): ...
