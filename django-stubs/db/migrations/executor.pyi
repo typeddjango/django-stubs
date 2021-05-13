@@ -1,6 +1,5 @@
 from typing import Any, Callable, List, Optional, Set, Tuple, Union
 
-from django.db import DefaultConnectionProxy
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
 
@@ -9,13 +8,13 @@ from .recorder import MigrationRecorder
 from .state import ProjectState
 
 class MigrationExecutor:
-    connection: Any = ...
+    connection: BaseDatabaseWrapper = ...
     loader: MigrationLoader = ...
     recorder: MigrationRecorder = ...
     progress_callback: Callable = ...
     def __init__(
         self,
-        connection: Optional[Union[DefaultConnectionProxy, BaseDatabaseWrapper]],
+        connection: Optional[BaseDatabaseWrapper],
         progress_callback: Optional[Callable] = ...,
     ) -> None: ...
     def migration_plan(
