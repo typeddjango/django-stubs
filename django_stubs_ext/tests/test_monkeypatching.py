@@ -29,9 +29,6 @@ def make_generic_classes(
             with suppress(AttributeError):
                 delattr(el.cls, "__class_getitem__")
 
-        del builtins.reveal_type
-        del builtins.reveal_locals
-
     def factory(django_version: Optional[_VersionSpec] = None) -> None:
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
@@ -71,11 +68,15 @@ def test_patched_version_specific(
             assert el.cls[int] is el.cls
 
 
-def test_patched_mypy_builtins(
+def test_mypy_builtins_not_patched_globally(
     make_generic_classes: _MakeGenericClasses,
 ) -> None:
-    """Ensures that we properly patch builtins with `mypy` specific helpers."""
+    """Ensures that builtins are not patched with `mypy` specific helpers.
+
+    This should only happend during `django.setup()`
+    (https://github.com/typeddjango/django-stubs/issues/609).
+    """
     make_generic_classes()
 
-    assert builtins.reveal_type
-    assert builtins.reveal_locals
+    assert not hasattr(builtins, "reveal_type")
+    assert not hasattr(builtins, "reveal_locals")
