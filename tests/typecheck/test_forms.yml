@@ -19,7 +19,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django import forms
 
                 class Article(models.Model):
                     pass
