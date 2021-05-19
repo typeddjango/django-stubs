@@ -16,3 +16,13 @@
     -   index: GistIndex
     -   index: HashIndex
     -   index: SpGistIndex
+
+-   case: can_instantiate_opclass
+    main: |
+        from django.db.models import Index
+        from django.db.models.functions import Lower
+        from django.contrib.postgres.indexes import OpClass
+        Index(
+            OpClass(Lower('username'), name='varchar_pattern_ops'),
+            name='lower_username_idx',
+        )
