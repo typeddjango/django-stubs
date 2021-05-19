@@ -2,7 +2,7 @@ from typing import Optional, Sequence, Union
 
 from django.db.models.query_utils import Q
 
-from django.db.models import Index
+from django.db.models import Index, Func
 from django.db.models.expressions import BaseExpression, Combinable
 
 
@@ -87,4 +87,11 @@ class SpGistIndex(PostgresIndex):
         opclasses: Sequence[str] = ...,
         condition: Optional[Q] = ...,
         include: Optional[Sequence[str]] = ...,
+    ) -> None: ...
+
+class OpClass(Func):
+    def __init__(
+        self,
+        expression: Union[BaseExpression, Combinable, str],
+        name: str,
     ) -> None: ...
