@@ -100,6 +100,8 @@ import django_stubs_ext
 django_stubs_ext.monkeypatch()
 ```
 
+Note: This monkey patching approach will only work when using Python 3.7 and higher, when the `__class_getitem__` magic method was introduced.
+
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
