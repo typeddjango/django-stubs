@@ -226,6 +226,7 @@ class CharField(Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        db_collation: Optional[str] = ...,
     ): ...
 
 class SlugField(CharField[_ST, _GT]):
