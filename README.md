@@ -5,6 +5,7 @@
 [![Build status](https://github.com/typeddjango/django-stubs/workflows/test/badge.svg?branch=master&event=push)](https://github.com/typeddjango/django-stubs/actions?query=workflow%3Atest)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
+[![StackOverflow](https://img.shields.io/stackexchange/stackoverflow/t/django-stubs)](https://stackoverflow.com/questions/tagged/django-stubs)
 
 
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
@@ -190,5 +191,6 @@ This project is open source and community driven. As such we encourage contribut
 1. Contribute code (e.g. improve stubs, add plugin capabilities, write tests etc) - to do so please follow the [contribution guide](./CONTRIBUTING.md).
 2. Assist in code reviews and discussions in issues.
 3. Identify bugs and issues and report these
+4. Ask and answer questions on [StackOverflow](https://stackoverflow.com/questions/tagged/django-stubs)
 
 You can always also reach out in gitter to discuss your contributions!
