@@ -72,6 +72,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     choices: _FieldChoices = ...
     db_column: Optional[str]
     column: str
+    concrete: bool
     default: Any
     error_messages: _ErrorMessagesToOverride
     def __init__(
