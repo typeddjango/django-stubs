@@ -224,11 +224,11 @@ class ChoiceField(Field):
 
 class TypedChoiceField(ChoiceField):
     coerce: Union[Callable, Type[Any]] = ...
-    empty_value: Optional[str] = ...
+    empty_value: Optional[Any] = ...
     def __init__(
         self,
         coerce: Any = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: Optional[Any] = ...,
         choices: Any = ...,
         required: bool = ...,
         widget: Optional[Union[Widget, Type[Widget]]] = ...,
@@ -251,7 +251,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
     def __init__(
         self,
         coerce: Any = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: Optional[Any] = ...,
         choices: Any = ...,
         required: bool = ...,
         widget: Optional[Union[Widget, Type[Widget]]] = ...,
