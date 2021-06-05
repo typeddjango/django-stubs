@@ -1,9 +1,9 @@
 -   case: filtering_with_proper_types
     main: |
         from myapp.models import User
-        User.objects.filter(username='maksim')
-        User.objects.get(username='maksim')
-        User.objects.exclude(username='maksim')
+        reveal_type(User.objects.filter(username='maksim'))
+        reveal_type(User.objects.get(username='maksim'))
+        reveal_type(User.objects.exclude(username='maksim'))
     installed_apps:
         - myapp
     files:
