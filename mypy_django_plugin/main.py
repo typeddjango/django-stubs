@@ -3,6 +3,7 @@ import sys
 from functools import partial
 from typing import Callable, Dict, List, NoReturn, Optional, Tuple, cast
 
+import toml
 from django.db.models.fields.related import RelatedField
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
@@ -79,18 +80,54 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
         }
         handler.error("'django_settings_module' is not set: " + messages[error_type])
 
-    parser = configparser.ConfigParser()
-    try:
-        with open(cast(str, config_file_path)) as handle:
-            parser.read_file(handle, source=config_file_path)
-    except (IsADirectoryError, OSError):
-        exit(1)
+    def exit_toml(error_type: int) -> NoReturn:
+        from mypy.main import CapturableArgumentParser
 
-    section = "mypy.plugins.django-stubs"
-    if not parser.has_section(section):
-        exit(2)
-    settings = parser.get(section, "django_settings_module", fallback=None) or exit(3)
-    return cast(str, settings).strip("'\"")
+        usage = """(config)
+        ...
+        [tool.django-stubs]
+        django_settings_module = str (required)
+        ...
+        """.replace(
+            "\n" + 8 * " ", "\n"
+        )
+        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=usage)
+        messages = {
+            1: "mypy config file is not specified or found",
+            2: "no section [tool.django-stubs]",
+            3: "the setting is not provided",
+            4: "the setting must be a string",
+        }
+        handler.error("'django_settings_module' not found or invalid: " + messages[error_type])
+
+    if config_file_path and helpers.is_toml(config_file_path):
+        toml_data = toml.load(config_file_path)
+        try:
+            config = toml_data["tool"]["django-stubs"]
+        except KeyError:
+            exit_toml(2)
+
+        if "django_settings_module" not in config:
+            exit_toml(3)
+
+        if not isinstance(config["django_settings_module"], str):
+            exit_toml(4)
+
+        return config["django_settings_module"]
+    else:
+        parser = configparser.ConfigParser()
+        try:
+            with open(cast(str, config_file_path)) as handle:
+                parser.read_file(handle, source=config_file_path)
+        except (IsADirectoryError, OSError):
+            exit(1)
+
+        section = "mypy.plugins.django-stubs"
+        if not parser.has_section(section):
+            exit(2)
+        settings = parser.get(section, "django_settings_module", fallback=None) or exit(3)
+
+        return cast(str, settings).strip("'\"")
 
 
 class NewSemanalDjangoPlugin(Plugin):
