@@ -20,7 +20,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
     assert isinstance(base_manager_info, TypeInfo)
     new_manager_info = semanal_api.basic_new_typeinfo(
-        ctx.name, basetype_or_fallback=Instance(base_manager_info, [AnyType(TypeOfAny.unannotated)])
+        ctx.name, basetype_or_fallback=Instance(base_manager_info, [AnyType(TypeOfAny.unannotated)]), line=ctx.call.line
     )
     new_manager_info.line = ctx.call.line
     new_manager_info.defn.line = ctx.call.line
