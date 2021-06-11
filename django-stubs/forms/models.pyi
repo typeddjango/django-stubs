@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import (
     Any,
     Callable,
+    Collection,
     Dict,
     Iterator,
     List,
@@ -36,7 +37,7 @@ from django.db.models import ForeignKey
 
 ALL_FIELDS: str
 
-_Fields = Union[List[Union[Callable, str]], Sequence[str], Literal["__all__"]]
+_Fields = Union[Collection[str], Literal["__all__"]]
 _Labels = Dict[str, str]
 _ErrorMessages = Dict[str, Dict[str, str]]
 
