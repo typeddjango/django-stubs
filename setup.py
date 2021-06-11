@@ -25,6 +25,7 @@ dependencies = [
     "typing-extensions",
     "django",
     "django-stubs-ext",
+    "types-pytz",
 ]
 
 setup(

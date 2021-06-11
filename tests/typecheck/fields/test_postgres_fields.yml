@@ -2,7 +2,7 @@
     main: |
         from myapp.models import User
         user = User(array=[])
-        reveal_type(user.array)  # N: Revealed type is 'builtins.list*[Any]'
+        reveal_type(user.array)  # N: Revealed type is "builtins.list*[Any]"
     installed_apps:
         - myapp
     files:
@@ -19,8 +19,8 @@
     main: |
         from myapp.models import User
         user = User()
-        reveal_type(user.members)  # N: Revealed type is 'builtins.list*[builtins.int]'
-        reveal_type(user.members_as_text)  # N: Revealed type is 'builtins.list*[builtins.str]'
+        reveal_type(user.members)  # N: Revealed type is "builtins.list*[builtins.int]"
+        reveal_type(user.members_as_text)  # N: Revealed type is "builtins.list*[builtins.str]"
     installed_apps:
         - myapp
     files:

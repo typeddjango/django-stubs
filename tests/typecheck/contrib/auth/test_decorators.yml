@@ -3,7 +3,7 @@
         from django.contrib.auth.decorators import login_required
         @login_required
         def view_func(request): ...
-        reveal_type(view_func)  # N: Revealed type is 'def (request: Any) -> Any'
+        reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
 -   case: login_required_fancy
     main: |
         from django.contrib.auth.decorators import login_required
@@ -11,14 +11,14 @@
         from django.http import HttpResponse
         @login_required(redirect_field_name='a', login_url='b')
         def view_func(request: WSGIRequest, arg: str) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is 'def (request: django.core.handlers.wsgi.WSGIRequest, arg: builtins.str) -> django.http.response.HttpResponse'
+        reveal_type(view_func)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: builtins.str) -> django.http.response.HttpResponse"
 -   case: login_required_weird
     main: |
         from django.contrib.auth.decorators import login_required
         # This is non-conventional usage, but covered in Django tests, so we allow it.
         def view_func(request): ...
         wrapped_view = login_required(view_func, redirect_field_name='a', login_url='b')
-        reveal_type(wrapped_view)  # N: Revealed type is 'def (request: Any) -> Any'
+        reveal_type(wrapped_view)  # N: Revealed type is "def (request: Any) -> Any"
 -   case: login_required_incorrect_return
     main: |
         from django.contrib.auth.decorators import login_required
@@ -29,7 +29,7 @@
         from django.contrib.auth.decorators import user_passes_test
         @user_passes_test(lambda u: u.username.startswith('super'))
         def view_func(request): ...
-        reveal_type(view_func)  # N: Revealed type is 'def (request: Any) -> Any'
+        reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
 -   case: user_passes_test_bare_is_error
     main: |
         from django.http.response import HttpResponse

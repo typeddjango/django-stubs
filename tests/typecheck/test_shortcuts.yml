@@ -3,13 +3,13 @@
         from django.shortcuts import get_object_or_404, get_list_or_404
         from myapp.models import MyModel
 
-        reveal_type(get_object_or_404(MyModel))  # N: Revealed type is 'myapp.models.MyModel*'
-        reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is 'myapp.models.MyModel*'
-        reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is 'myapp.models.MyModel*'
+        reveal_type(get_object_or_404(MyModel))  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "myapp.models.MyModel*"
 
-        reveal_type(get_list_or_404(MyModel))  # N: Revealed type is 'builtins.list[myapp.models.MyModel*]'
-        reveal_type(get_list_or_404(MyModel.objects))  # N: Revealed type is 'builtins.list[myapp.models.MyModel*]'
-        reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is 'builtins.list[myapp.models.MyModel*]'
+        reveal_type(get_list_or_404(MyModel))  # N: Revealed type is "builtins.list[myapp.models.MyModel*]"
+        reveal_type(get_list_or_404(MyModel.objects))  # N: Revealed type is "builtins.list[myapp.models.MyModel*]"
+        reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "builtins.list[myapp.models.MyModel*]"
     installed_apps:
         - myapp
     files:
@@ -25,7 +25,7 @@
     main: |
         from django.contrib.auth import get_user_model
         UserModel = get_user_model()
-        reveal_type(UserModel.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyUser]'
+        reveal_type(UserModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyUser]"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
         AUTH_USER_MODEL = 'myapp.MyUser'
@@ -46,14 +46,14 @@
 
         TestContext = TypedDict("TestContext", {"user": Any})
         test_context: TestContext = {"user": "test"}
-        reveal_type(test_context) # N: Revealed type is 'TypedDict('main.TestContext', {'user': Any})'
-        reveal_type(render(HttpRequest(), '', test_context)) # N: Revealed type is 'django.http.response.HttpResponse'
+        reveal_type(test_context) # N: Revealed type is "TypedDict('main.TestContext', {'user': Any})"
+        reveal_type(render(HttpRequest(), '', test_context)) # N: Revealed type is "django.http.response.HttpResponse"
 
 -   case: check_redirect_return_annotation
     main: |
         from django.shortcuts import redirect
-        reveal_type(redirect(to = '', permanent = True)) # N: Revealed type is 'django.http.response.HttpResponsePermanentRedirect'
-        reveal_type(redirect(to = '', permanent = False)) # N: Revealed type is 'django.http.response.HttpResponseRedirect'
+        reveal_type(redirect(to = '', permanent = True)) # N: Revealed type is "django.http.response.HttpResponsePermanentRedirect"
+        reveal_type(redirect(to = '', permanent = False)) # N: Revealed type is "django.http.response.HttpResponseRedirect"
 
         var = True
-        reveal_type(redirect(to = '', permanent = var)) # N: Revealed type is 'Union[django.http.response.HttpResponseRedirect, django.http.response.HttpResponsePermanentRedirect]'
+        reveal_type(redirect(to = '', permanent = var)) # N: Revealed type is "Union[django.http.response.HttpResponseRedirect, django.http.response.HttpResponsePermanentRedirect]"

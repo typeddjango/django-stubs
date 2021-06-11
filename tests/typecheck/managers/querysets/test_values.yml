@@ -2,13 +2,13 @@
     main: |
         from myapp.models import Blog
         values = Blog.objects.values('num_posts', 'text').get()
-        reveal_type(values)  # N: Revealed type is 'TypedDict({'num_posts': builtins.int, 'text': builtins.str})'
-        reveal_type(values["num_posts"])  # N: Revealed type is 'builtins.int'
-        reveal_type(values["text"])  # N: Revealed type is 'builtins.str'
+        reveal_type(values)  # N: Revealed type is "TypedDict({'num_posts': builtins.int, 'text': builtins.str})"
+        reveal_type(values["num_posts"])  # N: Revealed type is "builtins.int"
+        reveal_type(values["text"])  # N: Revealed type is "builtins.str"
 
         values_pk = Blog.objects.values('pk').get()
-        reveal_type(values_pk)  # N: Revealed type is 'TypedDict({'pk': builtins.int})'
-        reveal_type(values_pk["pk"])  # N: Revealed type is 'builtins.int'
+        reveal_type(values_pk)  # N: Revealed type is "TypedDict({'pk': builtins.int})"
+        reveal_type(values_pk["pk"])  # N: Revealed type is "builtins.int"
     installed_apps:
         - myapp
     files:
@@ -24,10 +24,10 @@
     main: |
         from myapp.models import Blog
         all_values_dict = Blog.objects.values().get()
-        reveal_type(all_values_dict)  # N: Revealed type is 'TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})'
-        reveal_type(all_values_dict["id"])  # N: Revealed type is 'builtins.int'
-        reveal_type(all_values_dict["num_posts"])  # N: Revealed type is 'builtins.int'
-        reveal_type(all_values_dict["text"])  # N: Revealed type is 'builtins.str'
+        reveal_type(all_values_dict)  # N: Revealed type is "TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})"
+        reveal_type(all_values_dict["id"])  # N: Revealed type is "builtins.int"
+        reveal_type(all_values_dict["num_posts"])  # N: Revealed type is "builtins.int"
+        reveal_type(all_values_dict["text"])  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -45,16 +45,16 @@
     main: |
         from myapp.models import Blog
         values1 = Blog.objects.values('publisher').get()
-        reveal_type(values1)  # N: Revealed type is 'TypedDict({'publisher': builtins.int})'
-        reveal_type(values1['publisher'])  # N: Revealed type is 'builtins.int'
+        reveal_type(values1)  # N: Revealed type is "TypedDict({'publisher': builtins.int})"
+        reveal_type(values1['publisher'])  # N: Revealed type is "builtins.int"
 
         values2 = Blog.objects.values('publisher_id').get()
-        reveal_type(values2)  # N: Revealed type is 'TypedDict({'publisher_id': builtins.int})'
-        reveal_type(values2["publisher_id"])  # N: Revealed type is 'builtins.int'
+        reveal_type(values2)  # N: Revealed type is "TypedDict({'publisher_id': builtins.int})"
+        reveal_type(values2["publisher_id"])  # N: Revealed type is "builtins.int"
 
         # all values return _id version
         all_values = Blog.objects.values().get()
-        reveal_type(all_values)  # N: Revealed type is 'TypedDict({'id': builtins.int, 'publisher_id': builtins.int})'
+        reveal_type(all_values)  # N: Revealed type is "TypedDict({'id': builtins.int, 'publisher_id': builtins.int})"
     installed_apps:
         - myapp
     files:
@@ -71,10 +71,10 @@
     main: |
         from myapp.models import Entry
         values = Entry.objects.values('blog__num_articles', 'blog__publisher__name').get()
-        reveal_type(values)  # N: Revealed type is 'TypedDict({'blog__num_articles': builtins.int, 'blog__publisher__name': builtins.str})'
+        reveal_type(values)  # N: Revealed type is "TypedDict({'blog__num_articles': builtins.int, 'blog__publisher__name': builtins.str})"
 
         pk_values = Entry.objects.values('blog__pk', 'blog__publisher__pk').get()
-        reveal_type(pk_values)  # N: Revealed type is 'TypedDict({'blog__pk': builtins.int, 'blog__publisher__pk': builtins.int})'
+        reveal_type(pk_values)  # N: Revealed type is "TypedDict({'blog__pk': builtins.int, 'blog__publisher__pk': builtins.int})"
     installed_apps:
         - myapp
     files:
@@ -94,7 +94,7 @@
     main: |
         from myapp.models import Publisher
         related_model_values = Publisher.objects.values('id', 'blog__name').get()
-        reveal_type(related_model_values)  # N: Revealed type is 'TypedDict({'id': builtins.int, 'blog__name': builtins.str})'
+        reveal_type(related_model_values)  # N: Revealed type is "TypedDict({'id': builtins.int, 'blog__name': builtins.str})"
     installed_apps:
         - myapp
     files:
@@ -111,8 +111,8 @@
 -   case: values_of_many_to_many_field
     main: |
         from myapp.models import Author, Book
-        reveal_type(Book.objects.values('authors'))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Book, TypedDict({'authors': builtins.int})]'
-        reveal_type(Author.objects.values('books'))  # N: Revealed type is 'django.db.models.query.ValuesQuerySet[myapp.models.Author, TypedDict({'books': builtins.int})]'
+        reveal_type(Book.objects.values('authors'))  # N: Revealed type is "django.db.models.query.ValuesQuerySet[myapp.models.Book, TypedDict({'authors': builtins.int})]"
+        reveal_type(Author.objects.values('books'))  # N: Revealed type is "django.db.models.query.ValuesQuerySet[myapp.models.Author, TypedDict({'books': builtins.int})]"
     installed_apps:
         - myapp
     files:

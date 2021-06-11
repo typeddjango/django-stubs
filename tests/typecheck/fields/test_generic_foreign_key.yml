@@ -6,7 +6,7 @@
         Tag(content_object=myuser)
         Tag.objects.create(content_object=None)
         Tag.objects.create(content_object=myuser)
-        reveal_type(Tag().content_object)  # N: Revealed type is 'Union[Any, None]'
+        reveal_type(Tag().content_object)  # N: Revealed type is "Union[Any, None]"
     installed_apps:
         - myapp
     files:
@@ -27,7 +27,7 @@
         Tag(content_object=myuser)
         Tag.objects.create(content_object=None)
         Tag.objects.create(content_object=myuser)
-        reveal_type(Tag().content_object)  # N: Revealed type is 'Union[Any, None]'
+        reveal_type(Tag().content_object)  # N: Revealed type is "Union[Any, None]"
     installed_apps:
         - myapp
     files:

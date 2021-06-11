@@ -2,7 +2,7 @@
     main: |
         from myapp.models import MyUser
         user = MyUser(pk=1)
-        reveal_type(user._state)  # N: Revealed type is 'django.db.models.base.ModelState'
+        reveal_type(user._state)  # N: Revealed type is "django.db.models.base.ModelState"
     installed_apps:
         - myapp
     files:

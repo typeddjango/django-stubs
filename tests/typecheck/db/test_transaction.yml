@@ -3,19 +3,19 @@
       from django.db.transaction import atomic
       @atomic
       def func(x: int) -> list: ...
-      reveal_type(func)  # N: Revealed type is 'def (x: builtins.int) -> builtins.list[Any]'
+      reveal_type(func)  # N: Revealed type is "def (x: builtins.int) -> builtins.list[Any]"
 -   case: atomic_args
     main: |
       from django.db.transaction import atomic
       @atomic(using='bla', savepoint=False)
       def func(x: int) -> list: ...
-      reveal_type(func)  # N: Revealed type is 'def (x: builtins.int) -> builtins.list[Any]'
+      reveal_type(func)  # N: Revealed type is "def (x: builtins.int) -> builtins.list[Any]"
 -   case: non_atomic_requests_bare
     main: |
       from django.db.transaction import non_atomic_requests
       @non_atomic_requests
       def view_func(request): ...
-      reveal_type(view_func)  # N: Revealed type is 'def (request: Any) -> Any'
+      reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
 
 -   case: non_atomic_requests_args
     main: |
@@ -24,5 +24,5 @@
       from django.db.transaction import non_atomic_requests
       @non_atomic_requests
       def view_func(request: HttpRequest, arg: str) -> HttpResponse: ...
-      reveal_type(view_func)  # N: Revealed type is 'def (request: django.http.request.HttpRequest, arg: builtins.str) -> django.http.response.HttpResponse'
+      reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest, arg: builtins.str) -> django.http.response.HttpResponse"
 

@@ -3,7 +3,7 @@
         from myapp.models import MyUser
         user = MyUser(name='user', gender='M')
         user.get_name_display()  # E: "MyUser" has no attribute "get_name_display"; maybe "get_gender_display"?
-        reveal_type(user.get_gender_display())  # N: Revealed type is 'builtins.str'
+        reveal_type(user.get_gender_display())  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -22,10 +22,10 @@
 -   case: date_datetime_fields_have_get_next_by_get_previous_by
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser().get_next_by_date())  # N: Revealed type is 'myapp.models.MyUser'
-        reveal_type(MyUser().get_next_by_datetime())  # N: Revealed type is 'myapp.models.MyUser'
-        reveal_type(MyUser().get_previous_by_date())  # N: Revealed type is 'myapp.models.MyUser'
-        reveal_type(MyUser().get_previous_by_datetime())  # N: Revealed type is 'myapp.models.MyUser'
+        reveal_type(MyUser().get_next_by_date())  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(MyUser().get_next_by_datetime())  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(MyUser().get_previous_by_date())  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(MyUser().get_previous_by_datetime())  # N: Revealed type is "myapp.models.MyUser"
 
         # accept arbitrary kwargs
         MyUser().get_next_by_date(arg1=1, arg2=2)
