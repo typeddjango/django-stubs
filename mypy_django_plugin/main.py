@@ -1,5 +1,6 @@
 import configparser
 import sys
+import textwrap
 from functools import partial
 from typing import Callable, Dict, List, NoReturn, Optional, Tuple, cast
 
@@ -64,15 +65,14 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
         """
         from mypy.main import CapturableArgumentParser
 
-        usage = """(config)
+        usage = """
+        (config)
         ...
         [mypy.plugins.django_stubs]
             django_settings_module: str (required)
         ...
-        """.replace(
-            "\n" + 8 * " ", "\n"
-        )
-        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=usage)
+        """
+        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=textwrap.dedent(usage))
         messages = {
             1: "mypy config file is not specified or found",
             2: "no section [mypy.plugins.django-stubs]",
@@ -83,15 +83,14 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
     def exit_toml(error_type: int) -> NoReturn:
         from mypy.main import CapturableArgumentParser
 
-        usage = """(config)
+        usage = """
+        (config)
         ...
         [tool.django-stubs]
         django_settings_module = str (required)
         ...
-        """.replace(
-            "\n" + 8 * " ", "\n"
-        )
-        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=usage)
+        """
+        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=textwrap.dedent(usage))
         messages = {
             1: "mypy config file is not specified or found",
             2: "no section [tool.django-stubs]",

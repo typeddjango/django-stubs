@@ -5,7 +5,8 @@ import pytest
 
 from mypy_django_plugin.main import extract_django_settings_module
 
-TEMPLATE = """usage: (config)
+TEMPLATE = """
+(config)
 ...
 [mypy.plugins.django_stubs]
     django_settings_module: str (required)
@@ -13,7 +14,8 @@ TEMPLATE = """usage: (config)
 (django-stubs) mypy: error: 'django_settings_module' is not set: {}
 """
 
-TEMPLATE_TOML = """usage: (config)
+TEMPLATE_TOML = """
+(config)
 ...
 [tool.django-stubs]
 django_settings_module = str (required)
@@ -60,7 +62,7 @@ def test_misconfiguration_handling(capsys, config_file_contents, message_part):
         with pytest.raises(SystemExit, match="2"):
             extract_django_settings_module(config_file.name)
 
-    error_message = TEMPLATE.format(message_part)
+    error_message = "usage: " + TEMPLATE.format(message_part)
     assert error_message == capsys.readouterr().err
 
 
@@ -98,7 +100,7 @@ def test_toml_misconfiguration_handling(capsys, config_file_contents, message_pa
         with pytest.raises(SystemExit, match="2"):
             extract_django_settings_module(config_file.name)
 
-    error_message = TEMPLATE_TOML.format(message_part)
+    error_message = "usage: " + TEMPLATE_TOML.format(message_part)
     assert error_message == capsys.readouterr().err
 
 
