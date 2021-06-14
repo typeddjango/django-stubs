@@ -5,12 +5,22 @@ import pytest
 
 from mypy_django_plugin.main import extract_django_settings_module
 
-TEMPLATE = """usage: (config)
+TEMPLATE = """
+(config)
 ...
 [mypy.plugins.django_stubs]
     django_settings_module: str (required)
 ...
 (django-stubs) mypy: error: 'django_settings_module' is not set: {}
+"""
+
+TEMPLATE_TOML = """
+(config)
+...
+[tool.django-stubs]
+django_settings_module = str (required)
+...
+(django-stubs) mypy: error: 'django_settings_module' not found or invalid: {}
 """
 
 
@@ -52,8 +62,62 @@ def test_misconfiguration_handling(capsys, config_file_contents, message_part):
         with pytest.raises(SystemExit, match="2"):
             extract_django_settings_module(config_file.name)
 
-    error_message = TEMPLATE.format(message_part)
+    error_message = "usage: " + TEMPLATE.format(message_part)
     assert error_message == capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "config_file_contents,message_part",
+    [
+        (
+            """
+            [tool.django-stubs]
+            django_settings_module = 123
+            """,
+            "the setting must be a string",
+        ),
+        (
+            """
+            [tool.not-really-django-stubs]
+            django_settings_module = "my.module"
+            """,
+            "no section [tool.django-stubs]",
+        ),
+        (
+            """
+            [tool.django-stubs]
+            not_django_not_settings_module = "badbadmodule"
+            """,
+            "the setting is not provided",
+        ),
+    ],
+)
+def test_toml_misconfiguration_handling(capsys, config_file_contents, message_part):
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".toml") as config_file:
+        config_file.write(config_file_contents)
+        config_file.seek(0)
+
+        with pytest.raises(SystemExit, match="2"):
+            extract_django_settings_module(config_file.name)
+
+    error_message = "usage: " + TEMPLATE_TOML.format(message_part)
+    assert error_message == capsys.readouterr().err
+
+
+def test_correct_toml_configuration() -> None:
+    config_file_contents = """
+    [tool.django-stubs]
+    some_other_setting = "setting"
+    django_settings_module = "my.module"
+    """
+
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".toml") as config_file:
+        config_file.write(config_file_contents)
+        config_file.seek(0)
+
+        extracted = extract_django_settings_module(config_file.name)
+
+    assert extracted == "my.module"
 
 
 def test_correct_configuration() -> None:

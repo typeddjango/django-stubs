@@ -26,6 +26,7 @@ dependencies = [
     "django",
     "django-stubs-ext",
     "types-pytz",
+    "toml",
 ]
 
 setup(

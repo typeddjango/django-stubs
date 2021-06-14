@@ -30,7 +30,17 @@ django_settings_module = "myproject.settings"
 
 in your `mypy.ini` or `setup.cfg` [file](https://mypy.readthedocs.io/en/latest/config_file.html).
 
-Two things happeining here:
+[pyproject.toml](https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file) configurations are also supported:
+
+```toml
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "myproject.settings"
+```
+
+Two things happening here:
 
 1. We need to explicitly list our plugin to be loaded by `mypy`
 2. Our plugin also requires `django` settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified
