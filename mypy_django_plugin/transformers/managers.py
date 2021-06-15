@@ -1,4 +1,4 @@
-from mypy.nodes import GDEF, FuncDef, MemberExpr, NameExpr, RefExpr, StrExpr, SymbolTableNode, TypeInfo
+from mypy.nodes import GDEF, Decorator, FuncDef, MemberExpr, NameExpr, RefExpr, StrExpr, SymbolTableNode, TypeInfo
 from mypy.plugin import ClassDefContext, DynamicClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny
 
@@ -67,6 +67,11 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             break
         for name, sym in class_mro_info.names.items():
             if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(
-                    class_def_context, self_type, new_method_name=name, method_node=sym.node
-                )
+                func_node = sym.node
+            elif isinstance(sym.node, Decorator):
+                func_node = sym.node.func
+            else:
+                continue
+            helpers.copy_method_to_another_class(
+                class_def_context, self_type, new_method_name=name, method_node=func_node
+            )
