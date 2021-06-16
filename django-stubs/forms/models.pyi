@@ -5,6 +5,7 @@ from typing import (
     Collection,
     Dict,
     Iterator,
+    Generic,
     List,
     Mapping,
     MutableMapping,
@@ -78,8 +79,8 @@ class ModelFormOptions:
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass): ...
 
-class BaseModelForm(BaseForm):
-    instance: Any = ...
+class BaseModelForm(Generic[_M], BaseForm):
+    instance: _M
     def __init__(
         self,
         data: Optional[Mapping[str, Any]] = ...,
@@ -95,10 +96,10 @@ class BaseModelForm(BaseForm):
         renderer: Any = ...,
     ) -> None: ...
     def validate_unique(self) -> None: ...
-    save_m2m: Any = ...
-    def save(self, commit: bool = ...) -> Any: ...
+    def save(self, commit: bool = ...) -> _M: ...
+    def save_m2m(self) -> None: ...
 
-class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
+class ModelForm(BaseModelForm[_M], metaclass=ModelFormMetaclass):
     base_fields: ClassVar[Dict[str, Field]] = ...
 
 def modelform_factory(
