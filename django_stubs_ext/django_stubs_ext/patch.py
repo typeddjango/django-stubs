@@ -7,7 +7,9 @@ from django.contrib.admin.options import BaseModelAdmin
 from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormMixin
+from django.views.generic.list import MultipleObjectMixin
 
 _T = TypeVar("_T")
 _VersionSpec = Tuple[int, int]
@@ -38,7 +40,9 @@ class MPGeneric(Generic[_T]):
 # this list stores them so `monkeypatch` can fix them when called
 _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(ModelAdmin),
+    MPGeneric(SingleObjectMixin),
     MPGeneric(FormMixin),
+    MPGeneric(MultipleObjectMixin),
     MPGeneric(BaseModelAdmin),
     MPGeneric(Field),
     # These types do have native `__class_getitem__` method since django 3.1:
