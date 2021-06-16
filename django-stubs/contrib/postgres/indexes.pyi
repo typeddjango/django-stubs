@@ -5,7 +5,6 @@ from django.db.models.query_utils import Q
 from django.db.models import Index, Func
 from django.db.models.expressions import BaseExpression, Combinable
 
-
 class PostgresIndex(Index): ...
 
 class BrinIndex(PostgresIndex):
