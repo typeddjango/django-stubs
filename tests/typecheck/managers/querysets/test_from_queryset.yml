@@ -179,3 +179,25 @@
                 class BaseQuerySet(models.QuerySet):
                     def base_queryset_method(self, param: Union[int, str]) -> NoReturn:
                         raise ValueError
+
+-   case: from_queryset_with_decorated_queryset_methods
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models, transaction
+
+                class ModelQuerySet(models.QuerySet):
+                    @transaction.atomic
+                    def queryset_method(self) -> str:
+                        return 'hello'
+
+                NewManager = models.Manager.from_queryset(ModelQuerySet)
+                class MyModel(models.Model):
+                    objects = NewManager()
