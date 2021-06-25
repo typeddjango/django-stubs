@@ -1,4 +1,3 @@
-import builtins
 from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION as VERSION
@@ -61,10 +60,6 @@ def monkeypatch() -> None:
     )
     for el in suited_for_this_version:
         el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
-
-    # Define mypy builtins, to not cause NameError during setting up Django.
-    builtins.reveal_type = lambda _: None
-    builtins.reveal_locals = lambda: None
 
 
 __all__ = ["monkeypatch"]

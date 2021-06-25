@@ -82,7 +82,7 @@ But, it does not make any sense to use this project without `mypy`.
 
 ### mypy crashes when I run it with this plugin installed
 
-Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`.
+The current implementation uses Django's runtime to extract information about models, so it might crash if your installed apps or `models.py` are broken.
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too.
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
