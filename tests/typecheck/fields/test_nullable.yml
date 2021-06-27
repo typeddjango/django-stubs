@@ -1,3 +1,36 @@
+-   case: autofield_can_be_set_to_none
+    main: |
+        from myapp.models import MyModel, MyModelExplicitPK
+        m = MyModel()
+        m.id = 3
+        m.id = None
+        m2 = MyModel(id=None)
+        MyModel.objects.create(id=None)
+        MyModel.objects.all().update(id=None) # Should give an error since there's a not-null constraint
+
+        def foo(a: int) -> bool:
+          return True
+        m2 = MyModel()
+        foo(m2.id)
+
+        # At runtime, this would be an error, unless m.save() was called to populate the `id` field.
+        # but the plugin cannot catch this.
+        foo(m.id)
+
+        exp = MyModelExplicitPK()
+        exp.id = 3
+        exp.id = None
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    pass
+                class MyModelExplicitPK(models.Model):
+                    id = models.AutoField(primary_key=True)
 -   case: nullable_field_with_strict_optional_true
     main: |
         from myapp.models import MyModel

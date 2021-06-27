@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, cast
 
-from django.db.models.fields import Field
+from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
@@ -99,13 +99,26 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     )
 
 
-def get_field_descriptor_types(field_info: TypeInfo, is_nullable: bool) -> Tuple[MypyType, MypyType]:
-    set_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_set_type", is_nullable=is_nullable)
-    get_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
+def get_field_descriptor_types(
+    field_info: TypeInfo, *, is_set_nullable: bool, is_get_nullable: bool
+) -> Tuple[MypyType, MypyType]:
+    set_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_set_type", is_nullable=is_set_nullable)
+    get_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_get_nullable)
     return set_type, get_type
 
 
-def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
+def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    current_field = _get_current_field_from_assignment(ctx, django_context)
+    if current_field is not None:
+        if isinstance(current_field, AutoField):
+            return set_descriptor_types_for_field(ctx, is_set_nullable=True)
+
+    return set_descriptor_types_for_field(ctx)
+
+
+def set_descriptor_types_for_field(
+    ctx: FunctionContext, *, is_set_nullable: bool = False, is_get_nullable: bool = False
+) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
 
     is_nullable = False
@@ -113,7 +126,11 @@ def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
     if null_expr is not None:
         is_nullable = helpers.parse_bool(null_expr) or False
 
-    set_type, get_type = get_field_descriptor_types(default_return_type.type, is_nullable)
+    set_type, get_type = get_field_descriptor_types(
+        default_return_type.type,
+        is_set_nullable=is_set_nullable or is_nullable,
+        is_get_nullable=is_get_nullable or is_nullable,
+    )
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
 
@@ -148,4 +165,4 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
     if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
         return determine_type_of_array_field(ctx, django_context)
 
-    return set_descriptor_types_for_field(ctx)
+    return set_descriptor_types_for_field_callback(ctx, django_context)

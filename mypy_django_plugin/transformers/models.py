@@ -97,7 +97,9 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
             auto_field_fullname = helpers.get_class_fullname(auto_field.__class__)
             auto_field_info = self.lookup_typeinfo_or_incomplete_defn_error(auto_field_fullname)
 
-            set_type, get_type = fields.get_field_descriptor_types(auto_field_info, is_nullable=False)
+            set_type, get_type = fields.get_field_descriptor_types(
+                auto_field_info, is_set_nullable=True, is_get_nullable=False
+            )
             self.add_new_node_to_model_class(auto_field.attname, Instance(auto_field_info, [set_type, get_type]))
 
 
@@ -131,7 +133,9 @@ class AddRelatedModelsId(ModelClassInitializer):
                         continue
 
                 is_nullable = self.django_context.get_field_nullability(field, None)
-                set_type, get_type = get_field_descriptor_types(field_info, is_nullable)
+                set_type, get_type = get_field_descriptor_types(
+                    field_info, is_set_nullable=is_nullable, is_get_nullable=is_nullable
+                )
                 self.add_new_node_to_model_class(field.attname, Instance(field_info, [set_type, get_type]))
 
 
