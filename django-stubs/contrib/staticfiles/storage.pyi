@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import Any, Callable, Iterator, Optional, Tuple
 
 from django.core.files.base import File
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import FileSystemStorage, Storage
 from django.utils.functional import LazyObject
 
 class StaticFilesStorage(FileSystemStorage):
@@ -52,4 +52,4 @@ class CachedStaticFilesStorage(CachedFilesMixin, StaticFilesStorage): ...
 class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage): ...
 class ConfiguredStorage(LazyObject): ...
 
-staticfiles_storage: Any
+staticfiles_storage: Storage

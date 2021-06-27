@@ -1,3 +1,4 @@
+import builtins
 import os
 import sys
 from collections import defaultdict
@@ -61,6 +62,13 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
 
         models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
         models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
+
+        # Define mypy builtins, to not cause NameError during setting up Django.
+        # TODO: temporary/unpatch
+        assert not hasattr(builtins, "reveal_type")
+        builtins.reveal_type = lambda _: None
+        assert not hasattr(builtins, "reveal_locals")
+        builtins.reveal_locals = lambda: None
 
         from django.apps import apps
         from django.conf import settings

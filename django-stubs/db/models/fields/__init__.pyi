@@ -18,9 +18,9 @@ from typing import (
 )
 
 from django.core.checks import CheckMessage
-
-from django.db.models import Model
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
+from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.models import Model
 from django.db.models.expressions import Combinable, Col
 from django.db.models.query_utils import RegisterLookupMixin
 from django.forms import Field as FormField, Widget
@@ -43,6 +43,64 @@ _ST = TypeVar("_ST", contravariant=True)
 _GT = TypeVar("_GT", covariant=True)
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
+    """
+    Typing model fields.
+
+    How does this work?
+    Let's take a look at the self-contained example
+    (it is way easier than our django implementation, but has the same concept).
+
+    To understand this example you need:
+    1. Be familiar with descriptors: https://docs.python.org/3/howto/descriptor.html
+    2. Follow our explanation bellow
+
+    Let's start with defining our fake model class and fake integer field.
+
+    .. code:: python
+
+        from typing import Generic, Union
+
+        class Model(object):
+            ...
+
+        _SetType = Union[int, float]  # You can assign ints and floats
+        _GetType = int  # access type is always `int`
+
+        class IntField(object):
+            def __get__(self, instance: Model, owner) -> _GetType:
+                ...
+
+            def __set__(self, instance, value: _SetType) -> None:
+                ...
+
+    Now, let's create our own example model,
+    this would be something like ``User`` in your own apps:
+
+    .. code:: python
+
+        class Example(Model):
+            count = IntField()
+
+    And now, lets test that our reveal type works:
+
+    .. code:: python
+
+        example = Example()
+        reveal_type(example.count)
+        # Revealed type is "builtins.int"
+
+        example.count = 1.5  # ok
+        example.count = 'a'
+        # Incompatible types in assignment
+        # (expression has type "str", variable has type "Union[int, float]")
+
+    Notice, that this is not magic. This is how descriptors work with ``mypy``.
+
+    We also need ``_pyi_private_set_type`` attributes
+    and friends to help inside our plugin.
+    It is required to enhance parts like ``filter`` queries.
+    """
+
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
     _pyi_lookup_exact_type: Any
@@ -72,6 +130,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     choices: _FieldChoices = ...
     db_column: Optional[str]
     column: str
+    concrete: bool
     default: Any
     error_messages: _ErrorMessagesToOverride
     def __init__(
@@ -110,12 +169,12 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def __get__(self: _T, instance, owner) -> _T: ...
     def deconstruct(self) -> Any: ...
     def set_attributes_from_name(self, name: str) -> None: ...
-    def db_type(self, connection: Any) -> str: ...
-    def db_parameters(self, connection: Any) -> Dict[str, str]: ...
+    def db_type(self, connection: BaseDatabaseWrapper) -> str: ...
+    def db_parameters(self, connection: BaseDatabaseWrapper) -> Dict[str, str]: ...
     def pre_save(self, model_instance: Model, add: bool) -> Any: ...
     def get_prep_value(self, value: Any) -> Any: ...
-    def get_db_prep_value(self, value: Any, connection: Any, prepared: bool) -> Any: ...
-    def get_db_prep_save(self, value: Any, connection: Any) -> Any: ...
+    def get_db_prep_value(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool) -> Any: ...
+    def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def get_internal_type(self) -> str: ...
     # TODO: plugin support
     def formfield(self, **kwargs) -> Any: ...
@@ -150,7 +209,7 @@ class IntegerField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: Union[str, int]
 
 class PositiveIntegerRelDbTypeMixin:
-    def rel_db_type(self, connection: Any): ...
+    def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
@@ -226,6 +285,7 @@ class CharField(Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        db_collation: Optional[str] = ...,
     ): ...
 
 class SlugField(CharField[_ST, _GT]):
@@ -263,6 +323,31 @@ class TextField(Field[_ST, _GT]):
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+    def __init__(
+        self,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        db_collation: Optional[str] = ...,
+    ): ...
 
 class BooleanField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[bool, Combinable]

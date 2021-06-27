@@ -55,6 +55,10 @@ class IncompleteDefnException(Exception):
     pass
 
 
+def is_toml(filename: str) -> bool:
+    return filename.lower().endswith(".toml")
+
+
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
     if "." not in fullname:
         return None

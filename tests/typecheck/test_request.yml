@@ -2,9 +2,9 @@
     disable_cache: true
     main: |
         from django.http.request import HttpRequest
-        reveal_type(HttpRequest().user)  # N: Revealed type is 'Union[myapp.models.MyUser, django.contrib.auth.models.AnonymousUser]'
+        reveal_type(HttpRequest().user)  # N: Revealed type is "Union[myapp.models.MyUser, django.contrib.auth.models.AnonymousUser]"
         # check that other fields work ok
-        reveal_type(HttpRequest().method)  # N: Revealed type is 'Union[builtins.str, None]'
+        reveal_type(HttpRequest().method)  # N: Revealed type is "Union[builtins.str, None]"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
         AUTH_USER_MODEL='myapp.MyUser'
@@ -20,11 +20,11 @@
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
-        reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
+        reveal_type(request.user) # N: Revealed type is "Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]"
         if not request.user.is_anonymous:
-            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+            reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User"
         if request.user.is_authenticated:
-            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+            reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 -   case: request_object_user_without_auth_and_contenttypes_apps
@@ -32,17 +32,17 @@
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
-        reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.base_user.AbstractBaseUser, django.contrib.auth.models.AnonymousUser]'
+        reveal_type(request.user) # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, django.contrib.auth.models.AnonymousUser]"
         if request.user.is_authenticated:
-            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.base_user.AbstractBaseUser'
+            reveal_type(request.user) # N: Revealed type is "django.contrib.auth.base_user.AbstractBaseUser"
 -   case: request_object_user_without_auth_but_with_contenttypes_apps
     disable_cache: true
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
-        reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.base_user.AbstractBaseUser, django.contrib.auth.models.AnonymousUser]'
+        reveal_type(request.user) # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, django.contrib.auth.models.AnonymousUser]"
         if request.user.is_authenticated:
-            reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.base_user.AbstractBaseUser'
+            reveal_type(request.user) # N: Revealed type is "django.contrib.auth.base_user.AbstractBaseUser"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes',)
 -   case: subclass_request_not_changed_user_type
@@ -53,7 +53,7 @@
             foo: int # Just do something
 
         request = MyRequest()
-        reveal_type(request.user) # N: Revealed type is 'Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]'
+        reveal_type(request.user) # N: Revealed type is "Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 
@@ -66,7 +66,7 @@
             user: User # Override the type of user
 
         request = MyRequest()
-        reveal_type(request.user) # N: Revealed type is 'django.contrib.auth.models.User'
+        reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 

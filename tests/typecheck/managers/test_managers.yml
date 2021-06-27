@@ -1,8 +1,8 @@
 -   case: test_every_model_has_objects_queryset_available
     main: |
         from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.User]'
-        reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
+        reveal_type(User.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
+        reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User*"
     installed_apps:
         - myapp
     files:
@@ -16,8 +16,8 @@
 -   case: every_model_has_its_own_objects_queryset
     main: |
         from myapp.models import Parent, Child
-        reveal_type(Parent.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.Parent]'
-        reveal_type(Child.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.Child]'
+        reveal_type(Parent.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Parent]"
+        reveal_type(Child.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Child]"
     installed_apps:
         - myapp
     files:
@@ -34,7 +34,7 @@
     main: |
         from myapp.models import Base, MyModel
         base_instance = Base(MyModel)
-        reveal_type(base_instance.model_cls._default_manager)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
+        reveal_type(base_instance.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -48,17 +48,17 @@
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: Type[_T]):
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is 'django.db.models.manager.BaseManager[django.db.models.base.Model]'
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[django.db.models.base.Model]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
                     def method(self) -> None:
-                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
 
 -   case: if_custom_manager_defined_it_is_set_to_default_manager
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel._default_manager)  # N: Revealed type is 'myapp.models.CustomManager[myapp.models.MyModel]'
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.CustomManager[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -76,7 +76,7 @@
 -   case: if_default_manager_name_is_passed_set_default_manager_to_it
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel._default_manager)  # N: Revealed type is 'myapp.models.Manager2[myapp.models.MyModel]'
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.Manager2[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -100,9 +100,9 @@
 -   case: test_leave_as_is_if_objects_is_set_and_fill_typevars_with_outer_class
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser.objects)  # N: Revealed type is 'myapp.models.UserManager[myapp.models.MyUser]'
-        reveal_type(MyUser.objects.get())  # N: Revealed type is 'myapp.models.MyUser*'
-        reveal_type(MyUser.objects.get_or_404())  # N: Revealed type is 'myapp.models.MyUser'
+        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.UserManager[myapp.models.MyUser]"
+        reveal_type(MyUser.objects.get())  # N: Revealed type is "myapp.models.MyUser*"
+        reveal_type(MyUser.objects.get_or_404())  # N: Revealed type is "myapp.models.MyUser"
     installed_apps:
         - myapp
     files:
@@ -121,8 +121,8 @@
 -   case: model_imported_from_different_file
     main: |
         from myapp.models import Inventory, Band
-        reveal_type(Inventory.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.main.Inventory]'
-        reveal_type(Band.objects)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.Band]'
+        reveal_type(Inventory.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.main.Inventory]"
+        reveal_type(Band.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Band]"
     installed_apps:
         - myapp
     files:
@@ -142,10 +142,10 @@
 -   case: managers_that_defined_on_other_models_do_not_influence
     main: |
         from myapp.models import AbstractPerson, Book
-        reveal_type(AbstractPerson.abstract_persons)  # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.AbstractPerson]'
-        reveal_type(Book.published_objects)  # N: Revealed type is 'myapp.models.PublishedBookManager[myapp.models.Book]'
+        reveal_type(AbstractPerson.abstract_persons)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.AbstractPerson]"
+        reveal_type(Book.published_objects)  # N: Revealed type is "myapp.models.PublishedBookManager[myapp.models.Book]"
         Book.published_objects.create(title='hello')
-        reveal_type(Book.annotated_objects)  # N: Revealed type is 'myapp.models.AnnotatedBookManager[myapp.models.Book]'
+        reveal_type(Book.annotated_objects)  # N: Revealed type is "myapp.models.AnnotatedBookManager[myapp.models.Book]"
         Book.annotated_objects.create(title='hello')
     installed_apps:
         - myapp
@@ -196,11 +196,11 @@
 -   case: model_has_a_manager_of_the_same_type
     main: |
         from myapp.models import UnrelatedModel, MyModel
-        reveal_type(UnrelatedModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.UnrelatedModel]'
-        reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is 'Union[myapp.models.UnrelatedModel*, None]'
+        reveal_type(UnrelatedModel.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.UnrelatedModel]"
+        reveal_type(UnrelatedModel.objects.first()) # N: Revealed type is "Union[myapp.models.UnrelatedModel*, None]"
 
-        reveal_type(MyModel.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel]'
-        reveal_type(MyModel.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel*, None]'
+        reveal_type(MyModel.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.first()) # N: Revealed type is "Union[myapp.models.MyModel*, None]"
     installed_apps:
         - myapp
     files:
@@ -217,11 +217,11 @@
 -   case: manager_without_annotation_of_the_model_gets_it_from_outer_one
     main: |
         from myapp.models import UnrelatedModel2, MyModel2
-        reveal_type(UnrelatedModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.UnrelatedModel2]'
-        reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is 'Union[myapp.models.UnrelatedModel2*, None]'
+        reveal_type(UnrelatedModel2.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.UnrelatedModel2]"
+        reveal_type(UnrelatedModel2.objects.first()) # N: Revealed type is "Union[myapp.models.UnrelatedModel2*, None]"
 
-        reveal_type(MyModel2.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel2]'
-        reveal_type(MyModel2.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel2*, None]'
+        reveal_type(MyModel2.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel2]"
+        reveal_type(MyModel2.objects.first()) # N: Revealed type is "Union[myapp.models.MyModel2*, None]"
     installed_apps:
         - myapp
     files:
@@ -238,11 +238,11 @@
 -   case: inherited_manager_has_the_proper_type_of_model
     main: |
         from myapp.models import ParentOfMyModel3, MyModel3
-        reveal_type(ParentOfMyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.ParentOfMyModel3]'
-        reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is 'Union[myapp.models.ParentOfMyModel3*, None]'
+        reveal_type(ParentOfMyModel3.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.ParentOfMyModel3]"
+        reveal_type(ParentOfMyModel3.objects.first()) # N: Revealed type is "Union[myapp.models.ParentOfMyModel3*, None]"
 
-        reveal_type(MyModel3.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel3]'
-        reveal_type(MyModel3.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel3*, None]'
+        reveal_type(MyModel3.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel3]"
+        reveal_type(MyModel3.objects.first()) # N: Revealed type is "Union[myapp.models.MyModel3*, None]"
     installed_apps:
         - myapp
     files:
@@ -259,11 +259,11 @@
 -   case: inheritance_with_explicit_type_on_child_manager
     main: |
         from myapp.models import ParentOfMyModel4, MyModel4
-        reveal_type(ParentOfMyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.ParentOfMyModel4]'
-        reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is 'Union[myapp.models.ParentOfMyModel4*, None]'
+        reveal_type(ParentOfMyModel4.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.ParentOfMyModel4]"
+        reveal_type(ParentOfMyModel4.objects.first()) # N: Revealed type is "Union[myapp.models.ParentOfMyModel4*, None]"
 
-        reveal_type(MyModel4.objects) # N: Revealed type is 'django.db.models.manager.Manager[myapp.models.MyModel4]'
-        reveal_type(MyModel4.objects.first()) # N: Revealed type is 'Union[myapp.models.MyModel4*, None]'
+        reveal_type(MyModel4.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel4]"
+        reveal_type(MyModel4.objects.first()) # N: Revealed type is "Union[myapp.models.MyModel4*, None]"
     installed_apps:
         - myapp
     files:
@@ -281,11 +281,11 @@
 #-   case: inheritance_of_two_models_with_custom_objects_manager
 #    main: |
 #        from myapp.models import MyBaseUser, MyUser
-#        reveal_type(MyBaseUser.objects)  # N: Revealed type is 'myapp.models.MyBaseManager[myapp.models.MyBaseUser]'
-#        reveal_type(MyBaseUser.objects.get())  # N: Revealed type is 'myapp.models.MyBaseUser'
+#        reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseManager[myapp.models.MyBaseUser]"
+#        reveal_type(MyBaseUser.objects.get())  # N: Revealed type is "myapp.models.MyBaseUser"
 #
-#        reveal_type(MyUser.objects)  # N: Revealed type is 'myapp.models.MyManager[myapp.models.MyUser]'
-#        reveal_type(MyUser.objects.get())  # N: Revealed type is 'myapp.models.MyUser'
+#        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.MyUser]"
+#        reveal_type(MyUser.objects.get())  # N: Revealed type is "myapp.models.MyUser"
 #    installed_apps:
 #        - myapp
 #    files:
@@ -307,18 +307,18 @@
 -   case: custom_manager_returns_proper_model_types
     main: |
         from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is 'myapp.models.User_MyManager2[myapp.models.User]'
-        reveal_type(User.objects.select_related())  # N: Revealed type is 'myapp.models.User_MyManager2[myapp.models.User]'
-        reveal_type(User.objects.get())  # N: Revealed type is 'myapp.models.User*'
-        reveal_type(User.objects.get_instance())  # N: Revealed type is 'builtins.int'
-        reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is 'Any'
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.User_MyManager2[myapp.models.User]"
+        reveal_type(User.objects.select_related())  # N: Revealed type is "myapp.models.User_MyManager2[myapp.models.User]"
+        reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User*"
+        reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
-        reveal_type(ChildUser.objects)  # N: Revealed type is 'myapp.models.ChildUser_MyManager2[myapp.models.ChildUser]'
-        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is 'myapp.models.ChildUser_MyManager2[myapp.models.ChildUser]'
-        reveal_type(ChildUser.objects.get())  # N: Revealed type is 'myapp.models.ChildUser*'
-        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is 'builtins.int'
-        reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is 'Any'
+        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.ChildUser_MyManager2[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "myapp.models.ChildUser_MyManager2[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser*"
+        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
     installed_apps:
         - myapp
     files:
@@ -339,8 +339,8 @@
 -   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
-        reveal_type(ModelA.objects)  # N: Revealed type is 'myapp.models.ModelA_ManagerA1[myapp.models.ModelA]'
-        reveal_type(ModelA.objects.do_something)  # N: Revealed type is 'def (other_obj: myapp.models.ModelB) -> builtins.str'
+        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA1[myapp.models.ModelA]"
+        reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
     installed_apps:
         - myapp
     files:

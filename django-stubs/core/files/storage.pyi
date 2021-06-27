@@ -42,6 +42,6 @@ class FileSystemStorage(Storage):
 
 class DefaultStorage(LazyObject): ...
 
-default_storage: Any
+default_storage: Storage
 
 def get_storage_class(import_path: Optional[str] = ...) -> Type[Storage]: ...

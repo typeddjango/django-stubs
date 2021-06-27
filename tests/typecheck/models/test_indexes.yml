@@ -3,6 +3,7 @@
         from django.db import models
         from django.db.models.functions import Lower
         models.Index(fields=["foo"])
+        models.Index(models.F("bar"), name="test")
         models.Index("foo", models.F("bar"), Lower("baz"), name="test")
         models.Index("foo", name="test", opclasses=["bar"])
         models.Index("foo", name="test", condition=models.Q(foo=1))

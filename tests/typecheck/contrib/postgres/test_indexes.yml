@@ -1,0 +1,28 @@
+-   case: can_instantiate_index
+    main: |
+        from django.db import models
+        from django.db.models.functions import Lower
+        from django.contrib.postgres.indexes import {{ index }}
+        {{ index }}(fields=["foo"])
+        {{ index }}(models.F("bar"), name="test")
+        {{ index }}("foo", models.F("bar"), Lower("baz"), name="test")
+        {{ index }}("foo", name="test", opclasses=["bar"])
+        {{ index }}("foo", name="test", condition=models.Q(foo=1))
+        {{ index }}("foo", name="test", include=["bar"])
+    parametrized:
+    -   index: BrinIndex
+    -   index: BTreeIndex
+    -   index: GinIndex
+    -   index: GistIndex
+    -   index: HashIndex
+    -   index: SpGistIndex
+
+-   case: can_instantiate_opclass
+    main: |
+        from django.db.models import Index
+        from django.db.models.functions import Lower
+        from django.contrib.postgres.indexes import OpClass
+        Index(
+            OpClass(Lower('username'), name='varchar_pattern_ops'),
+            name='lower_username_idx',
+        )

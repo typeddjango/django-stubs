@@ -5,6 +5,7 @@
 [![Build status](https://github.com/typeddjango/django-stubs/workflows/test/badge.svg?branch=master&event=push)](https://github.com/typeddjango/django-stubs/actions?query=workflow%3Atest)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
+[![StackOverflow](https://img.shields.io/stackexchange/stackoverflow/t/django-stubs)](https://stackoverflow.com/questions/tagged/django-stubs)
 
 
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
@@ -29,7 +30,17 @@ django_settings_module = "myproject.settings"
 
 in your `mypy.ini` or `setup.cfg` [file](https://mypy.readthedocs.io/en/latest/config_file.html).
 
-Two things happeining here:
+[pyproject.toml](https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file) configurations are also supported:
+
+```toml
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "myproject.settings"
+```
+
+Two things happening here:
 
 1. We need to explicitly list our plugin to be loaded by `mypy`
 2. Our plugin also requires `django` settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified
@@ -71,7 +82,7 @@ But, it does not make any sense to use this project without `mypy`.
 
 ### mypy crashes when I run it with this plugin installed
 
-Current implementation uses Django runtime to extract models information, so it will crash, if your installed apps or `models.py` is not correct. For this same reason, you cannot use `reveal_type` inside global scope of any Python file that will be executed for `django.setup()`.
+The current implementation uses Django's runtime to extract information about models, so it might crash if your installed apps or `models.py` are broken.
 
 In other words, if your `manage.py runserver` crashes, mypy will crash too.
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
@@ -99,6 +110,8 @@ import django_stubs_ext
 
 django_stubs_ext.monkeypatch()
 ```
+
+Note: This monkey patching approach will only work when using Python 3.7 and higher, when the `__class_getitem__` magic method was introduced.
 
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
@@ -188,5 +201,6 @@ This project is open source and community driven. As such we encourage contribut
 1. Contribute code (e.g. improve stubs, add plugin capabilities, write tests etc) - to do so please follow the [contribution guide](./CONTRIBUTING.md).
 2. Assist in code reviews and discussions in issues.
 3. Identify bugs and issues and report these
+4. Ask and answer questions on [StackOverflow](https://stackoverflow.com/questions/tagged/django-stubs)
 
 You can always also reach out in gitter to discuss your contributions!
