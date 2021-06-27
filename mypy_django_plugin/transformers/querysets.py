@@ -7,7 +7,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.nodes import Expression, NameExpr
-from mypy.plugin import CheckerPluginInterface, FunctionContext, MethodContext
+from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny
@@ -48,7 +48,7 @@ def get_field_type_from_lookup(
     *,
     method: str,
     lookup: str,
-    silent_on_error: bool = False
+    silent_on_error: bool = False,
 ) -> Optional[MypyType]:
     try:
         lookup_field = django_context.resolve_lookup_into_field(model_cls, lookup)
@@ -75,6 +75,7 @@ def get_values_list_row_type(
     ctx: MethodContext,
     django_context: DjangoContext,
     model_cls: Type[Model],
+    *,
     is_annotated: bool,
     flat: bool,
     named: bool,
@@ -194,8 +195,9 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     model_module_name = model_type.type.module_name
     type_name = model_type.type.name + ANNOTATED_SUFFIX
 
+    api = ctx.api
+
     # If already existing annotated type for model exists, reuse it
-    api: CheckerPluginInterface = ctx.api
     if model_type.type.has_base(ANY_ATTR_ALLOWED_CLASS_FULLNAME):
         annotated_type = model_type
     else:

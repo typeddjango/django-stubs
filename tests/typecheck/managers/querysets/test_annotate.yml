@@ -62,6 +62,7 @@
         qs = qs.annotate(bar=F('id'))
         annotated = qs.get()
         reveal_type(annotated.foo) # N: Revealed type is 'Any'
+        reveal_type(annotated.bar) # N: Revealed type is 'Any'
         reveal_type(annotated.username) # N: Revealed type is 'builtins.str*'
     installed_apps:
         - myapp

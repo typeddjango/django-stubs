@@ -32,7 +32,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
 
         lookup_type: MypyType
         if is_annotated_model_fullname(model_cls_fullname):
-            lookup_type = AnyType(TypeOfAny.explicit)
+            lookup_type = AnyType(TypeOfAny.implementation_artifact)
         else:
             lookup_type = django_context.resolve_lookup_expected_type(ctx, model_cls, lookup_kwarg)
         # Managers as provided_type is not supported yet
