@@ -357,3 +357,44 @@
                 class ModelB(models.Model):
                     movie = models.TextField()
 
+
+-   case: override_manager_create1
+    main: |
+        from myapp.models import MyModel
+        MyModel.objects.create()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModelManager(models.Manager):
+
+                    def create(self, *args, **kwargs) -> 'MyModel':
+                          return super().create(*args, **kwargs)
+
+
+                class MyModel(models.Model):
+
+                   objects = MyModelManager()
+
+-   case: override_manager_create2
+    main: |
+        from myapp.models import MyModel
+        MyModel.objects.create()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModelManager(models.Manager['MyModel']):
+
+                    def create(self, *args, **kwargs) -> 'MyModel':
+                          return super().create(*args, **kwargs)
+
+                class MyModel(models.Model):
+
+                   objects = MyModelManager()
