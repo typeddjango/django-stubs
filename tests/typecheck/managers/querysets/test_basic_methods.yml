@@ -14,8 +14,8 @@
         reveal_type(qs.in_bulk()) # N: Revealed type is "builtins.dict[Any, myapp.models.Blog*]"
 
         # .dates / .datetimes
-        reveal_type(Blog.objects.dates("created_at", "day")) # N: Revealed type is "django.db.models.query.ValuesQuerySet[myapp.models.Blog*, datetime.date]"
-        reveal_type(Blog.objects.datetimes("created_at", "day")) # N: Revealed type is "django.db.models.query.ValuesQuerySet[myapp.models.Blog*, datetime.datetime]"
+        reveal_type(Blog.objects.dates("created_at", "day")) # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Blog*, datetime.date]"
+        reveal_type(Blog.objects.datetimes("created_at", "day")) # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Blog*, datetime.datetime]"
 
         # AND-ing QuerySets
         reveal_type(Blog.objects.all() & Blog.objects.all()) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Blog]"
