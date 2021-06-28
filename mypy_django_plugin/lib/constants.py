@@ -1,1 +1,3 @@
-ANNOTATED_SUFFIX = " (annotated)"
+from typing import Final
+
+ANNOTATED_SUFFIX: Final = " (annotated)"
