@@ -1,0 +1,16 @@
+-   case: alias_values_query_set
+    main: |
+        from django_stubs_ext import ValuesQuerySet
+        from myapp.models import Blog
+
+        a: ValuesQuerySet[Blog, Blog]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Blog(models.Model):
+                    created_at = models.DateTimeField()
