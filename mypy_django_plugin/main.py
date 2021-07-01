@@ -273,7 +273,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if method_name == "annotate":
             info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.BASE_QUERYSET_CLASS_FULLNAME):
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context)
 
         if method_name == "get_field":
