@@ -169,6 +169,9 @@ class _ValuesQuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Que
     def latest(self, *fields: Any, field_name: Optional[Any] = ...) -> _Row: ...  # type: ignore
     def first(self) -> Optional[_Row]: ...  # type: ignore
     def last(self) -> Optional[_Row]: ...  # type: ignore
+    def distinct(self, *field_names: Any) ->  _ValuesQuerySet[_T, _Row]: ... # type: ignore
+    def order_by(self, *field_names: Any) -> _ValuesQuerySet[_T, _Row]: ... # type: ignore
+    def all(self) -> _ValuesQuerySet[_T, _Row]: ... # type: ignore
 
 class RawQuerySet(Iterable[_T], Sized):
     query: RawQuery
