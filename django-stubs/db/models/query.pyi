@@ -154,6 +154,9 @@ class _ValuesQuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Que
     def distinct(self, *field_names: Any) ->  _ValuesQuerySet[_T, _Row]: ... # type: ignore
     def order_by(self, *field_names: Any) -> _ValuesQuerySet[_T, _Row]: ... # type: ignore
     def all(self) -> _ValuesQuerySet[_T, _Row]: ... # type: ignore
+    def annotate(self, *args: Any, **kwargs: Any) -> _ValuesQuerySet[_T, Any]: ...
+    def filter(self, *args: Any, **kwargs: Any) -> _ValuesQuerySet[_T, _Row]: ...
+    def exclude(self, *args: Any, **kwargs: Any) -> _ValuesQuerySet[_T, _Row]: ...
 
 class RawQuerySet(Iterable[_T], Sized):
     query: RawQuery

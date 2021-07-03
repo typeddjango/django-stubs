@@ -29,11 +29,15 @@
 -   case: values_list_supports_queryset_methods
     main: |
         from myapp.models import MyUser
+        from django.db.models.functions import Length
         query = MyUser.objects.values_list('name')
         reveal_type(query.order_by("name").get())  # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.distinct("name").get()) # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.distinct().get()) # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.all().get()) # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(query.filter(age__gt=16).get()) # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(query.exclude(age__lte=16).get()) # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(query.annotate(name_length=Length("name")).get()) # N: Revealed type is "Any"
     installed_apps:
         - myapp
     files:
