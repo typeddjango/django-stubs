@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Type, Sequence, Union, TypeVar, Any
+from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.sites import AdminSite

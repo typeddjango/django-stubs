@@ -1,5 +1,6 @@
-from django.db.backends.base.introspection import BaseDatabaseIntrospection as BaseDatabaseIntrospection
 from typing import Any
+
+from django.db.backends.base.introspection import BaseDatabaseIntrospection as BaseDatabaseIntrospection
 
 FieldInfo: Any
 

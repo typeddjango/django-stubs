@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Tuple, Union, Dict
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 class Reference:
     def references_table(self, table: Any): ...

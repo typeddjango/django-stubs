@@ -9,6 +9,7 @@ from typing import (
     List,
     MutableMapping,
     Optional,
+    Reversible,
     Sequence,
     Sized,
     Tuple,
@@ -16,16 +17,15 @@ from typing import (
     TypeVar,
     Union,
     overload,
-    Reversible,
 )
-
-from django.db.models.base import Model
-from django.db.models.expressions import Combinable as Combinable, F as F  # noqa: F401
-from django.db.models.sql.query import Query, RawQuery
 
 from django.db import models
 from django.db.models import Manager
+from django.db.models.base import Model
+from django.db.models.expressions import Combinable as Combinable  # noqa: F401
+from django.db.models.expressions import F as F
 from django.db.models.query_utils import Q as Q  # noqa: F401
+from django.db.models.sql.query import Query, RawQuery
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 _QS = TypeVar("_QS", bound="QuerySet")

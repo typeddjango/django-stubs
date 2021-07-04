@@ -1,5 +1,6 @@
-from django.apps import AppConfig as AppConfig
 from typing import Any
+
+from django.apps import AppConfig as AppConfig
 
 RANGE_TYPES: Any
 

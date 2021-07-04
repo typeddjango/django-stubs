@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
+from django.db.models.fields import Field, PositiveIntegerField
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ForeignObject
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
@@ -11,8 +12,6 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
-
-from django.db.models.fields import Field, PositiveIntegerField
 
 class GenericForeignKey(FieldCacheMixin):
     # django-stubs implementation only fields

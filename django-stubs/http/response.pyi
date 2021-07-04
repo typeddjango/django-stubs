@@ -5,10 +5,10 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, U
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
-from django.test.client import Client
-from django.utils.datastructures import CaseInsensitiveMapping
 from django.template import Context, Template
+from django.test.client import Client
 from django.urls import ResolverMatch
+from django.utils.datastructures import CaseInsensitiveMapping
 
 class BadHeaderError(ValueError): ...
 

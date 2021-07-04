@@ -1,13 +1,12 @@
-from typing import Any, Callable, List, Optional, Tuple, Type, Union, Generic, TypeVar
+from typing import Any, Callable, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import RelatedField, OneToOneField
+from django.db.models.fields.related import OneToOneField, RelatedField
 from django.db.models.fields.reverse_related import ManyToManyRel, OneToOneRel
 from django.db.models.query import QuerySet
-
-from django.db.models.fields import Field
 
 _T = TypeVar("_T")
 

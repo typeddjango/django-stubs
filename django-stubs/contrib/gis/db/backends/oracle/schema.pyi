@@ -1,5 +1,6 @@
-from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from typing import Any
+
+from django.db.backends.oracle.schema import DatabaseSchemaEditor
 
 class OracleGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_geometry_metadata: str = ...

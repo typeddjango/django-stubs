@@ -1,5 +1,5 @@
 import zipfile
-from typing import List, Optional, Set, Sequence, Tuple, Type
+from typing import List, Optional, Sequence, Set, Tuple, Type
 
 from django.apps.config import AppConfig
 from django.core.management.base import BaseCommand

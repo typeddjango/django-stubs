@@ -7,13 +7,13 @@ from typing import (
     Dict,
     Generic,
     Iterable,
+    List,
     Optional,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
     Union,
-    Sequence,
-    List,
     overload,
 )
 
@@ -21,9 +21,10 @@ from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
-from django.db.models.expressions import Combinable, Col
+from django.db.models.expressions import Col, Combinable
 from django.db.models.query_utils import RegisterLookupMixin
-from django.forms import Field as FormField, Widget
+from django.forms import Field as FormField
+from django.forms import Widget
 
 class NOT_PROVIDED: ...
 

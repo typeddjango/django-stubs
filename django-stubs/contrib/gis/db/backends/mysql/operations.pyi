@@ -1,6 +1,7 @@
+from typing import Any
+
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations as BaseSpatialOperations
 from django.db.backends.mysql.operations import DatabaseOperations as DatabaseOperations
-from typing import Any
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     mysql: bool = ...

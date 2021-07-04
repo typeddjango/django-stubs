@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Set, Tuple, Union, Type
+from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 
 class BaseSerializer:
     value: Any = ...

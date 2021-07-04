@@ -1,13 +1,12 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union, Iterable
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
+from django import forms
+from django.db.models.fields import AutoField
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.utils import ErrorDict
 from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeText
-
-from django import forms
-from django.db.models.fields import AutoField
 
 ACTION_CHECKBOX_NAME: str
 

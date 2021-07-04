@@ -1,16 +1,15 @@
 from io import BytesIO
+from json import JSONEncoder
 from types import TracebackType
 from typing import Any, Dict, List, Optional, Pattern, Tuple, Type, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.base import BaseHandler
+from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
-
-from django.core.handlers.wsgi import WSGIRequest
-from json import JSONEncoder
 
 BOUNDARY: str = ...
 MULTIPART_CONTENT: str = ...

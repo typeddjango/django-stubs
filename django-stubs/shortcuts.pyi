@@ -1,15 +1,12 @@
 import sys
-from typing import Any, Callable, List, Mapping, Optional, overload, Protocol, Sequence, Type, TypeVar, Union
-
-from django.db.models.base import Model
-from django.http.response import (
-    HttpResponse as HttpResponse,
-    HttpResponseRedirect as HttpResponseRedirect,
-    HttpResponsePermanentRedirect as HttpResponsePermanentRedirect,
-)
+from typing import Any, Callable, List, Mapping, Optional, Protocol, Sequence, Type, TypeVar, Union, overload
 
 from django.db.models import Manager, QuerySet
+from django.db.models.base import Model
 from django.http import HttpRequest
+from django.http.response import HttpResponse as HttpResponse
+from django.http.response import HttpResponsePermanentRedirect as HttpResponsePermanentRedirect
+from django.http.response import HttpResponseRedirect as HttpResponseRedirect
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal

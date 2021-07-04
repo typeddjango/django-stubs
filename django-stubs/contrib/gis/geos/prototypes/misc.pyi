@@ -1,5 +1,6 @@
-from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 from typing import Any
+
+from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 class DblFromGeom(GEOSFuncFactory):
     restype: Any = ...

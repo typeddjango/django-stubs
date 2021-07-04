@@ -4,12 +4,10 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 
-from .exceptions import (
-    AmbiguityError as AmbiguityError,
-    BadMigrationError as BadMigrationError,
-    InconsistentMigrationHistory as InconsistentMigrationHistory,
-    NodeNotFoundError as NodeNotFoundError,
-)
+from .exceptions import AmbiguityError as AmbiguityError
+from .exceptions import BadMigrationError as BadMigrationError
+from .exceptions import InconsistentMigrationHistory as InconsistentMigrationHistory
+from .exceptions import NodeNotFoundError as NodeNotFoundError
 
 MIGRATIONS_MODULE_NAME: str
 

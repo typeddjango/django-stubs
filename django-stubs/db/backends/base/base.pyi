@@ -3,16 +3,12 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Type, TypeVar
 
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
+from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
-
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-
-from django.db.backends.base.features import BaseDatabaseFeatures
-
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-
-from django.db.backends.base.operations import BaseDatabaseOperations
 
 NO_DB_ALIAS: str
 

@@ -1,3 +1,3 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 LANG_INFO: Dict[str, Any] = ...

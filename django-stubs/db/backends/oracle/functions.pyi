@@ -1,5 +1,6 @@
-from django.db.models import Func as Func
 from typing import Any, Optional
+
+from django.db.models import Func as Func
 
 class IntervalToSeconds(Func):
     function: str = ...

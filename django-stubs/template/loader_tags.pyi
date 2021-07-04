@@ -1,7 +1,7 @@
 import collections
 from typing import Any, Dict, List, Optional, Union
 
-from django.template.base import FilterExpression, NodeList, Parser, Token, Origin
+from django.template.base import FilterExpression, NodeList, Origin, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeText
 

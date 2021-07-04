@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List, Optional, Iterator, Type
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Type
 
 from django.apps import AppConfig
 from django.db.backends.base.base import BaseDatabaseWrapper

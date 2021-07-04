@@ -1,8 +1,7 @@
 from typing import Any, Dict
 
-from django.template.backends.base import BaseEngine
-
 from django.template import Template
+from django.template.backends.base import BaseEngine
 
 ROOT: Any
 

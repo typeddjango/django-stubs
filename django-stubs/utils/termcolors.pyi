@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, Tuple, Union, Sequence
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union
 
 color_names: Any
 foreground: Any

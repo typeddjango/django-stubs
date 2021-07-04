@@ -1,5 +1,6 @@
-from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from typing import Any
+
+from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 
 class OracleSpatialAdapter(WKTAdapter):
     input_size: Any = ...

@@ -1,5 +1,6 @@
-from django.core.serializers.python import Serializer as PythonSerializer
 from typing import Any
+
+from django.core.serializers.python import Serializer as PythonSerializer
 from yaml import CSafeDumper as SafeDumper
 
 class DjangoSafeDumper(SafeDumper):

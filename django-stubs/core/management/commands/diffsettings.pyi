@@ -1,5 +1,6 @@
-from django.core.management.base import BaseCommand as BaseCommand
 from typing import Any, Callable, Dict, List
+
+from django.core.management.base import BaseCommand as BaseCommand
 
 def module_to_dict(module: Any, omittable: Callable[[str], bool] = ...) -> Dict[str, str]: ...
 

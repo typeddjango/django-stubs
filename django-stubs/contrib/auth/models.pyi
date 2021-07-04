@@ -2,13 +2,13 @@ import sys
 from typing import Any, Collection, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser, BaseUserManager as BaseUserManager
+from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
+from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
-
-from django.db import models
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal

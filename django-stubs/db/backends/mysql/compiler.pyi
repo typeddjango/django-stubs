@@ -1,5 +1,6 @@
-from django.db.models.sql import compiler as compiler
 from typing import Any
+
+from django.db.models.sql import compiler as compiler
 
 class SQLCompiler(compiler.SQLCompiler):
     def as_subquery_condition(self, alias: Any, columns: Any, compiler: Any): ...

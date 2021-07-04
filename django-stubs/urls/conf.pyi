@@ -1,8 +1,8 @@
-from typing import Any, Optional, Sequence, Tuple, overload, Callable, Dict, Union
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, overload
 
-from .resolvers import URLResolver, URLPattern
 from ..conf.urls import IncludedURLConf
 from ..http.response import HttpResponseBase
+from .resolvers import URLPattern, URLResolver
 
 def include(
     arg: Any, namespace: Optional[str] = ...

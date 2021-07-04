@@ -1,8 +1,7 @@
 from typing import Any, List, Optional, Sequence
 
-from django.core.checks.messages import Error
-
 from django.apps.config import AppConfig
+from django.core.checks.messages import Error
 
 E001: Any
 E002: Any

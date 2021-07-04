@@ -1,10 +1,9 @@
 from collections import OrderedDict
 from typing import Callable, Dict, Optional, Type, Union
 
+from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
-
-from django.contrib.sitemaps import GenericSitemap, Sitemap
 
 def x_robots_tag(func: Callable) -> Callable: ...
 def index(

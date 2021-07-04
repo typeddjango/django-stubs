@@ -1,9 +1,8 @@
 from typing import Any, Dict, Optional, TypeVar, Union
 
+from django.db.models import Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func, Value, _OutputField
 from django.db.models.lookups import Lookup
-
-from django.db.models import Field
 
 _Expression = Union[str, Combinable, "SearchQueryCombinable"]
 

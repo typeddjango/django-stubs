@@ -1,8 +1,7 @@
 from typing import Any, Optional, Set, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import AnonymousUser, User, Permission
-
+from django.contrib.auth.models import AnonymousUser, Permission, User
 from django.db.models.base import Model
 from django.http.request import HttpRequest
 

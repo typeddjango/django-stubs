@@ -1,9 +1,8 @@
 # Stubs for django.conf.urls (Python 3.5)
-from typing import Any, Callable, Dict, Optional, overload, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, overload
 
 from django.http.response import HttpResponse, HttpResponseBase
-
-from django.urls import URLResolver, URLPattern
+from django.urls import URLPattern, URLResolver
 
 handler400: Union[str, Callable[..., HttpResponse]] = ...
 handler403: Union[str, Callable[..., HttpResponse]] = ...

@@ -1,6 +1,7 @@
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
 from enum import IntEnum
 from typing import Any, Optional
+
+from django.contrib.gis.gdal.base import GDALBase as GDALBase
 
 class AxisOrder(IntEnum):
     TRADITIONAL: int = ...

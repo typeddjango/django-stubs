@@ -1,5 +1,7 @@
-from datetime import date, datetime as datetime
+from datetime import date
+from datetime import datetime as datetime
 from typing import Any, Callable, Dict, Optional, SupportsInt, Tuple, Type, Union
+
 from django import template
 
 register: template.Library

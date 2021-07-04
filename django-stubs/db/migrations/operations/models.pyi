@@ -1,11 +1,10 @@
 from typing import Any, Collection, Dict, List, Optional, Sequence, Tuple, Union
 
 from django.db.migrations.operations.base import Operation
-from django.db.models.indexes import Index
-from django.db.models.manager import Manager
-
 from django.db.models.constraints import BaseConstraint
 from django.db.models.fields import Field
+from django.db.models.indexes import Index
+from django.db.models.manager import Manager
 
 class ModelOperation(Operation):
     name: str = ...

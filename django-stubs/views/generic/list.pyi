@@ -1,11 +1,10 @@
 from typing import Any, Generic, Optional, Sequence, Tuple, Type, TypeVar
 
 from django.core.paginator import Paginator
-from django.db.models.query import QuerySet
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
-
 from django.db.models import Model
+from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 T = TypeVar("T", bound=Model)
 

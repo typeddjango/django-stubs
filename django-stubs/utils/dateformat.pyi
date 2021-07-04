@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import Any, Optional, Union
 
 from django.utils.timezone import FixedOffset

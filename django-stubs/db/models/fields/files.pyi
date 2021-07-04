@@ -5,8 +5,7 @@ from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import FileSystemStorage, Storage
 from django.db.models.base import Model
-
-from django.db.models.fields import Field, _FieldChoices, _ValidatorCallable, _ErrorMessagesToOverride
+from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
 
 class FieldFile(File):
     instance: Model = ...

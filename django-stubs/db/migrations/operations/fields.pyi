@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from django.db.models.fields import Field
+
 from .base import Operation
 
 class FieldOperation(Operation):

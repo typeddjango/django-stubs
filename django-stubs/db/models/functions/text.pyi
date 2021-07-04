@@ -1,10 +1,9 @@
 from typing import Any, List, Optional, Tuple, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.models import Func, Transform
 from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler
-
-from django.db.models import Func, Transform
 
 class BytesToCharFieldConversionMixin: ...
 class Chr(Transform): ...

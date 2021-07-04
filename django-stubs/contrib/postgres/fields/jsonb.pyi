@@ -3,6 +3,7 @@ from typing import Any, Optional, Type
 
 from django.db.models import Field
 from django.db.models.lookups import Transform
+
 from .mixins import CheckFieldDefaultMixin
 
 class JsonAdapter:

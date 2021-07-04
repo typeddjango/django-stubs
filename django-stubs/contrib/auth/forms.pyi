@@ -1,12 +1,11 @@
 from typing import Any, Dict, Iterator, Optional
 
+from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
-
-from django import forms
 
 UserModel: Any
 

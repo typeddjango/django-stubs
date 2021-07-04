@@ -1,10 +1,9 @@
 import threading
 from ctypes import Structure
-from django.contrib.gis.geos.base import GEOSBase as GEOSBase
-from django.contrib.gis.geos.libgeos import (
-    GEOSFuncFactory as GEOSFuncFactory,
-)
 from typing import Any, Optional
+
+from django.contrib.gis.geos.base import GEOSBase as GEOSBase
+from django.contrib.gis.geos.libgeos import GEOSFuncFactory as GEOSFuncFactory
 
 class WKTReader_st(Structure): ...
 class WKTWriter_st(Structure): ...

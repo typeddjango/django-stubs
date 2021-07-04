@@ -1,12 +1,11 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Iterator
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type
 
 from django.contrib.admin.options import ModelAdmin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
-
-from django.db.models.fields import Field
 
 class ListFilter:
     title: Any = ...

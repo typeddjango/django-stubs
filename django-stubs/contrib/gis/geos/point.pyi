@@ -1,5 +1,6 @@
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
 from typing import Any, Optional
+
+from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
 
 class Point(GEOSGeometry):
     has_cs: bool = ...

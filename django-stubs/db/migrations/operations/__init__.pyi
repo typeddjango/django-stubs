@@ -1,22 +1,20 @@
-from .fields import (
-    AddField as AddField,
-    AlterField as AlterField,
-    RemoveField as RemoveField,
-    RenameField as RenameField,
-)
-from .models import (
-    AddIndex as AddIndex,
-    AlterIndexTogether as AlterIndexTogether,
-    AlterModelManagers as AlterModelManagers,
-    AlterModelOptions as AlterModelOptions,
-    AlterModelTable as AlterModelTable,
-    AlterOrderWithRespectTo as AlterOrderWithRespectTo,
-    AlterUniqueTogether as AlterUniqueTogether,
-    CreateModel as CreateModel,
-    DeleteModel as DeleteModel,
-    RemoveIndex as RemoveIndex,
-    RenameModel as RenameModel,
-    AddConstraint as AddConstraint,
-    RemoveConstraint as RemoveConstraint,
-)
-from .special import RunPython as RunPython, RunSQL as RunSQL, SeparateDatabaseAndState as SeparateDatabaseAndState
+from .fields import AddField as AddField
+from .fields import AlterField as AlterField
+from .fields import RemoveField as RemoveField
+from .fields import RenameField as RenameField
+from .models import AddConstraint as AddConstraint
+from .models import AddIndex as AddIndex
+from .models import AlterIndexTogether as AlterIndexTogether
+from .models import AlterModelManagers as AlterModelManagers
+from .models import AlterModelOptions as AlterModelOptions
+from .models import AlterModelTable as AlterModelTable
+from .models import AlterOrderWithRespectTo as AlterOrderWithRespectTo
+from .models import AlterUniqueTogether as AlterUniqueTogether
+from .models import CreateModel as CreateModel
+from .models import DeleteModel as DeleteModel
+from .models import RemoveConstraint as RemoveConstraint
+from .models import RemoveIndex as RemoveIndex
+from .models import RenameModel as RenameModel
+from .special import RunPython as RunPython
+from .special import RunSQL as RunSQL
+from .special import SeparateDatabaseAndState as SeparateDatabaseAndState
