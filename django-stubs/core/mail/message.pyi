@@ -1,4 +1,4 @@
-from email._policybase import Policy  # type: ignore
+from email._policybase import Policy
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage

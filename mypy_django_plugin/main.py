@@ -126,7 +126,7 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
             exit(2)
         settings = parser.get(section, "django_settings_module", fallback=None) or exit(3)
 
-        return cast(str, settings).strip("'\"")
+        return settings.strip("'\"")
 
 
 class NewSemanalDjangoPlugin(Plugin):

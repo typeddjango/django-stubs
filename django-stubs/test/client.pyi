@@ -94,16 +94,16 @@ class Client(RequestFactory):
     def request(self, **request: Any) -> HttpResponse: ...  # type: ignore
     def get(  # type: ignore
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def post(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def head(  # type: ignore
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def trace(  # type: ignore
         self, path: str, follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def options(  # type: ignore
         self,
         path: str,
@@ -112,16 +112,16 @@ class Client(RequestFactory):
         follow: bool = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def put(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def patch(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def delete(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> HttpResponse: ...  # type: ignore
+    ) -> HttpResponse: ...
     def store_exc_info(self, **kwargs: Any) -> None: ...
     @property
     def session(self) -> SessionBase: ...
