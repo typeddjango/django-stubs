@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, Iterable
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Type, Union
 
 from django.http.request import HttpRequest
 from django.template.base import Node, Origin, Template

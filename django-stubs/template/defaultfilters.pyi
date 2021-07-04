@@ -1,8 +1,10 @@
-from datetime import date as _date, datetime, time as _time
+from datetime import date as _date
+from datetime import datetime
+from datetime import time as _time
 from typing import Any, Callable, Dict, List, Optional, Union
 
-from django.utils.safestring import SafeText
 from django.utils.html import escape as escape  # noqa: F401
+from django.utils.safestring import SafeText
 
 register: Any
 

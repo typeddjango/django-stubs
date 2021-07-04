@@ -1,9 +1,8 @@
-from typing import Any, Callable, Iterable, Optional, Type, Union, TypeVar
+from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union
 
 from django.utils.deprecation import MiddlewareMixin
-from django.views.generic.base import View
-
 from django.utils.functional import classproperty as classproperty
+from django.views.generic.base import View
 
 _T = TypeVar("_T", bound=Union[View, Callable])  # Any callable
 _CallableType = TypeVar("_CallableType", bound=Callable)

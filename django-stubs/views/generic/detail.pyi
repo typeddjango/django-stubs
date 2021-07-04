@@ -1,9 +1,8 @@
 from typing import Any, Generic, Optional, Type, TypeVar
 
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
-
 from django.db import models
 from django.http import HttpRequest, HttpResponse
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 T = TypeVar("T", bound=models.Model)
 

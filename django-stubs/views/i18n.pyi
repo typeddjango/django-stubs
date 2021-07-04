@@ -3,7 +3,6 @@ from typing import Any, Callable, Dict, List, Optional, Union
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.utils.translation.trans_real import DjangoTranslation
-
 from django.views.generic import View
 
 LANGUAGE_QUERY_PARAMETER: str

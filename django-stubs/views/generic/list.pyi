@@ -1,11 +1,10 @@
 from typing import Any, Generic, Optional, Sequence, Tuple, Type, TypeVar
 
 from django.core.paginator import Paginator
-from django.db.models.query import QuerySet
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
-
 from django.db.models import Model
+from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 T = TypeVar("T", bound=Model)
 
@@ -21,9 +20,7 @@ class MultipleObjectMixin(Generic[T], ContextMixin):
     ordering: Sequence[str] = ...
     def get_queryset(self) -> QuerySet[T]: ...
     def get_ordering(self) -> Sequence[str]: ...
-    def paginate_queryset(
-        self, queryset: QuerySet, page_size: int
-    ) -> Tuple[Paginator, int, QuerySet[T], bool]: ...
+    def paginate_queryset(self, queryset: QuerySet, page_size: int) -> Tuple[Paginator, int, QuerySet[T], bool]: ...
     def get_paginate_by(self, queryset: QuerySet) -> Optional[int]: ...
     def get_paginator(
         self, queryset: QuerySet, per_page: int, orphans: int = ..., allow_empty_first_page: bool = ..., **kwargs: Any

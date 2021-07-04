@@ -1,4 +1,6 @@
-from datetime import date as real_date, datetime as real_datetime, time as real_time
+from datetime import date as real_date
+from datetime import datetime as real_datetime
+from datetime import time as real_time
 from typing import Union
 
 class date(real_date): ...

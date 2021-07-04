@@ -1,5 +1,5 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, TypeVar, Generic, overload
 from functools import wraps as wraps  # noqa: F401
+from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union, overload
 
 from django.db.models.base import Model
 

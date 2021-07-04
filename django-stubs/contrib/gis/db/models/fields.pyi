@@ -1,4 +1,5 @@
-from typing import Any, Iterable, NamedTuple, Optional, TypeVar, Union, Tuple
+from typing import Any, Iterable, NamedTuple, Optional, Tuple, TypeVar, Union
+
 from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
 
 # __set__ value type

@@ -1,7 +1,8 @@
 from collections import OrderedDict
-from typing import Any, List, Tuple, Type, Iterable
+from typing import Any, Iterable, List, Tuple, Type
 
 from django.db.models.expressions import Expression
+from django.db.models.fields import Field
 from django.db.models.lookups import (
     BuiltinLookup,
     Exact,
@@ -12,8 +13,6 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-
-from django.db.models.fields import Field
 
 class MultiColSource:
     alias: str

@@ -1,5 +1,6 @@
-from django.db import models as models
 from typing import Any
+
+from django.db import models as models
 
 class AreaField(models.FloatField):
     geo_field: Any = ...

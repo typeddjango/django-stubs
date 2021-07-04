@@ -1,13 +1,12 @@
 from datetime import date
 from io import BufferedReader, StringIO, TextIOWrapper
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union, Collection
+from typing import Any, Collection, Dict, Iterable, List, Mapping, Optional, Type, Union
 from uuid import UUID
 
 from django.core.management.base import OutputWrapper
 from django.db.models.base import Model
-from django.db.models.fields.related import ForeignKey, ManyToManyField
-
 from django.db.models.fields import Field
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 class SerializerDoesNotExist(KeyError): ...
 class SerializationError(Exception): ...

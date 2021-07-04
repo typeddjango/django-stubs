@@ -4,14 +4,14 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Type, U
 from django.apps.config import AppConfig
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.checks import CheckMessage
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
-from django.urls import URLResolver, URLPattern
+from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject
-from django.core.checks import CheckMessage
 
 if sys.version_info >= (3, 9):
     from weakref import WeakSet

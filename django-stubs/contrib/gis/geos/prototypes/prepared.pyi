@@ -1,7 +1,6 @@
-from django.contrib.gis.geos.libgeos import (
-    GEOSFuncFactory as GEOSFuncFactory,
-)
 from typing import Any
+
+from django.contrib.gis.geos.libgeos import GEOSFuncFactory as GEOSFuncFactory
 
 geos_prepare: Any
 prepared_destroy: Any

@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional, Set
 
 from django.db.migrations.state import ModelState
-
 from django.db.models.fields import Field
 
 class MigrationQuestioner:

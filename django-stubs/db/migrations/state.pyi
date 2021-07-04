@@ -1,11 +1,10 @@
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, Type, Union, Set
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.apps import AppConfig
 from django.apps.registry import Apps
 from django.db.models.base import Model
-from django.db.models.manager import Manager
-
 from django.db.models.fields import Field
+from django.db.models.manager import Manager
 
 class AppConfigStub(AppConfig): ...
 

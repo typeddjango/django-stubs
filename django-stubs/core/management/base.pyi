@@ -1,10 +1,10 @@
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from io import StringIO, TextIOBase, TextIOWrapper
-from typing import Any, Callable, List, Optional, Union, Tuple
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 from django.apps.config import AppConfig
-from django.core.management.color import Style
 from django.core.checks import Tags
+from django.core.management.color import Style
 
 class CommandError(Exception): ...
 class SystemCheckError(CommandError): ...

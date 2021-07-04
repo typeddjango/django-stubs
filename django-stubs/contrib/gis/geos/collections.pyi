@@ -1,5 +1,7 @@
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry, LinearGeometryMixin as LinearGeometryMixin
 from typing import Any
+
+from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
+from django.contrib.gis.geos.geometry import LinearGeometryMixin as LinearGeometryMixin
 
 class GeometryCollection(GEOSGeometry):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...

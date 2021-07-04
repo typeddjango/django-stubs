@@ -1,11 +1,12 @@
 import threading
 import unittest
 from datetime import date
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, ClassVar, overload
+from typing import Any, Callable, ClassVar, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, overload
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
+from django.db import connections as connections  # noqa: F401
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
@@ -15,7 +16,6 @@ from django.template.base import Template
 from django.test.client import Client
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.safestring import SafeText
-from django.db import connections as connections  # noqa: F401
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
     test_case: SimpleTestCase = ...

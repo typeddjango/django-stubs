@@ -3,24 +3,22 @@ from uuid import UUID
 
 from django.db import models
 from django.db.models.base import Model
-from django.db.models.fields import Field
-from django.db.models.query_utils import Q, PathInfo
-from django.db.models.manager import RelatedManager
 from django.db.models.expressions import Combinable
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
+from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
 from django.db.models.fields.related_descriptors import (  # noqa: F401
     ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
-    ForwardManyToOneDescriptor as ForwardManyToOneDescriptor,
-    ManyToManyDescriptor as ManyToManyDescriptor,
-    ReverseOneToOneDescriptor as ReverseOneToOneDescriptor,
-    ReverseManyToOneDescriptor as ReverseManyToOneDescriptor,
 )
-from django.db.models.fields.reverse_related import (  # noqa: F401
-    ForeignObjectRel as ForeignObjectRel,
-    OneToOneRel as OneToOneRel,
-    ManyToOneRel as ManyToOneRel,
-    ManyToManyRel as ManyToManyRel,
-)
+from django.db.models.fields.related_descriptors import ManyToManyDescriptor as ManyToManyDescriptor
+from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor as ReverseManyToOneDescriptor
+from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor as ReverseOneToOneDescriptor
+from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignObjectRel  # noqa: F401
+from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyRel
+from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
+from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
+from django.db.models.manager import RelatedManager
+from django.db.models.query_utils import PathInfo, Q
 
 _T = TypeVar("_T", bound=models.Model)
 _F = TypeVar("_F", bound=models.Field)

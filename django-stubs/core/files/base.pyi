@@ -1,6 +1,6 @@
 import types
 from io import StringIO
-from typing import Any, IO, Iterator, Optional, Type, TypeVar, Union
+from typing import IO, Any, Iterator, Optional, Type, TypeVar, Union
 
 from django.core.files.utils import FileProxyMixin
 

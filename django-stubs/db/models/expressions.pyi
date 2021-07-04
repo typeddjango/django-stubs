@@ -1,14 +1,13 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, Iterable
-
-from django.db.models.lookups import Lookup
-from django.db.models.sql.compiler import SQLCompiler
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q, QuerySet
 from django.db.models.fields import Field
+from django.db.models.lookups import Lookup
 from django.db.models.query import QuerySet
+from django.db.models.sql.compiler import SQLCompiler
 
 _OutputField = Union[Field, str]
 

@@ -1,9 +1,8 @@
-from typing import Callable, List, Optional, Set, Union, TypeVar, overload
+from typing import Callable, List, Optional, Set, TypeVar, Union, overload
 
 from django.contrib.auth import REDIRECT_FIELD_NAME as REDIRECT_FIELD_NAME  # noqa: F401
-from django.http.response import HttpResponseBase
-
 from django.contrib.auth.models import AbstractUser
+from django.http.response import HttpResponseBase
 
 _VIEW = TypeVar("_VIEW", bound=Callable[..., HttpResponseBase])
 

@@ -1,4 +1,4 @@
-from typing import Any, List, Iterable, Optional, Dict
+from typing import Any, Dict, Iterable, List, Optional
 
 from django.template.base import Origin, Template
 from django.template.engine import Engine

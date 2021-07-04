@@ -1,8 +1,9 @@
+from typing import Any
+
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func
-from typing import Any
 
 BILATERAL: str
 

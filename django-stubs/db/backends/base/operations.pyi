@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta, time
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any, List, Optional, Sequence, Tuple, Type, Union
 
@@ -7,8 +7,8 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import Case, Expression
-from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.fields import Field
+from django.db.models.sql.compiler import SQLCompiler
 
 class BaseDatabaseOperations:
     compiler_module: str = ...

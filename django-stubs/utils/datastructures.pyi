@@ -3,16 +3,16 @@ from typing import (
     Callable,
     Dict,
     Iterable,
+    Iterator,
     List,
     Mapping,
     MutableMapping,
     MutableSet,
+    Optional,
     Tuple,
     TypeVar,
     Union,
     overload,
-    Iterator,
-    Optional,
 )
 
 from typing_extensions import Literal

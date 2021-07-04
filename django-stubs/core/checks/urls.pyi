@@ -1,9 +1,8 @@
-from typing import Any, Callable, List, Tuple, Union, Optional, Sequence
-
-from django.core.checks.messages import CheckMessage, Error, Warning
-from django.urls.resolvers import URLPattern, URLResolver
+from typing import Any, Callable, List, Optional, Sequence, Tuple, Union
 
 from django.apps.config import AppConfig
+from django.core.checks.messages import CheckMessage, Error, Warning
+from django.urls.resolvers import URLPattern, URLResolver
 
 def check_url_config(app_configs: Optional[Sequence[AppConfig]] = ..., **kwargs: Any) -> List[CheckMessage]: ...
 def check_resolver(resolver: Union[Tuple[str, Callable], URLPattern, URLResolver]) -> List[CheckMessage]: ...

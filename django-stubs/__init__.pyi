@@ -1,4 +1,5 @@
 from typing import Any, NamedTuple
+
 from .utils.version import get_version as get_version
 
 VERSION: Any

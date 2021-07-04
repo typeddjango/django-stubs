@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Any, Optional, Union
 
+from django.template import Node
 from django.template.base import FilterExpression, NodeList, Parser, Token
 from django.utils.timezone import FixedOffset
-
-from django.template import Node
 
 register: Any
 

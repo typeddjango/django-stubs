@@ -1,5 +1,6 @@
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
 from typing import Any
+
+from django.contrib.gis.gdal.base import GDALBase as GDALBase
 
 class Field(GDALBase):
     ptr: Any = ...

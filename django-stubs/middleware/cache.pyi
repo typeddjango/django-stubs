@@ -1,10 +1,9 @@
-from typing import Any, Optional, Union, Callable
+from typing import Any, Callable, Optional, Union
 
+from django.core.cache import BaseCache
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
-
-from django.core.cache import BaseCache
 
 class UpdateCacheMiddleware(MiddlewareMixin):
     cache_timeout: float = ...

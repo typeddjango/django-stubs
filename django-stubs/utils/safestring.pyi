@@ -1,4 +1,4 @@
-from typing import TypeVar, overload, Callable, Any
+from typing import Any, Callable, TypeVar, overload
 
 _SD = TypeVar("_SD", bound="SafeData")
 

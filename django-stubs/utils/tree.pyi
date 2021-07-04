@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, Optional, Tuple, Union, Sequence, List
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from django.db.models.sql.where import NothingNode
 

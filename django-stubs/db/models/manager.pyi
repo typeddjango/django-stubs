@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Iterable, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, TypeVar, Union
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet

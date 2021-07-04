@@ -1,5 +1,6 @@
-from django.forms.widgets import Widget as Widget
 from typing import Any, Optional
+
+from django.forms.widgets import Widget as Widget
 
 logger: Any
 

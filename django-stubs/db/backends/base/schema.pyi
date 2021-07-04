@@ -3,9 +3,8 @@ from typing import Any, ContextManager, List, Optional, Sequence, Tuple, Type, U
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.ddl_references import Statement
 from django.db.models.base import Model
-from django.db.models.indexes import Index
-
 from django.db.models.fields import Field
+from django.db.models.indexes import Index
 
 logger: Any
 
