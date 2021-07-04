@@ -2,7 +2,7 @@ from typing import Any
 
 from django.db import models
 
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange  # type: ignore
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
 
 class RangeField(models.Field):
     empty_strings_allowed: bool = ...

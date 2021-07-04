@@ -99,7 +99,7 @@ class DjangoContext:
 
     @cached_property
     def model_modules(self) -> Dict[str, Set[Type[Model]]]:
-        """ All modules that contain Django models. """
+        """All modules that contain Django models."""
         if self.apps_registry is None:
             return {}
 
@@ -251,7 +251,7 @@ class DjangoContext:
         return nullable
 
     def get_field_set_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
-        """ Get a type of __set__ for this specific Django field. """
+        """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
             target_field = field.target_field
@@ -269,7 +269,7 @@ class DjangoContext:
         return field_set_type
 
     def get_field_get_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
-        """ Get a type of __get__ for this specific Django field. """
+        """Get a type of __get__ for this specific Django field."""
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
             return AnyType(TypeOfAny.unannotated)

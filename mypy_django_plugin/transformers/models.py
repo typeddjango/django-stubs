@@ -189,9 +189,12 @@ class AddManagers(ModelClassInitializer):
         return custom_manager_type
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        manager_info: Optional[TypeInfo]
+
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_class_name = manager.__class__.__name__
             manager_fullname = helpers.get_class_fullname(manager.__class__)
+
             try:
                 manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
             except helpers.IncompleteDefnException as exc:
@@ -204,7 +207,7 @@ class AddManagers(ModelClassInitializer):
                         # not a generated manager, continue with the loop
                         continue
                     real_manager_fullname = generated_managers[manager_fullname]
-                    manager_info = self.lookup_typeinfo(real_manager_fullname)  # type: ignore
+                    manager_info = self.lookup_typeinfo(real_manager_fullname)
                     if manager_info is None:
                         continue
                     manager_class_name = real_manager_fullname.rsplit(".", maxsplit=1)[1]
@@ -310,7 +313,7 @@ class AddRelatedManagers(ModelClassInitializer):
         generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
         if manager_fullname in generated_managers:
             real_manager_fullname = generated_managers[manager_fullname]
-            manager_info = self.lookup_typeinfo(real_manager_fullname)  # type: ignore
+            manager_info = self.lookup_typeinfo(real_manager_fullname)
             if manager_info:
                 return Instance(manager_info, [Instance(related_model_info, [])])
         return None
