@@ -179,6 +179,28 @@ def use_my_model():
   return foo.xyz # Gives an error
 ```
 
+### How do I annotate cases where I called QuerySet.annotate?
+
+Django-stubs provides a special type, `django_stubs_ext.WithAnnotations`, which marks a `Model` as having been
+annotated, meaning it allows getting/setting any attribute on the model instance.
+
+Currently, the mypy plugin is not smart enough to recognize that specific names were passed to `QuerySet.annotate` and
+include them in the type.
+
+```python
+from django_stubs_ext import WithAnnotations
+from django.db import models
+
+class MyModel(models.Model):
+    username = models.CharField(max_length=100)
+
+
+def func(m: WithAnnotations[MyModel]) -> str:
+    return m.asdf # OK, since the model is annotated
+
+func(MyModel.objects.annotate(foo="").get(id=1))  # OK
+func(MyModel.objects.get(id=1))  # Error, since this model will not allow access to any attribute
+```
 
 ## Related projects
 
