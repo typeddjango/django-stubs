@@ -41,7 +41,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames
-from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
+from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
@@ -62,7 +62,15 @@ def is_toml(filename: str) -> bool:
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
     if "." not in fullname:
         return None
-    module, cls_name = fullname.rsplit(".", 1)
+    if "[" in fullname:
+        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
+        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
+        bracket_start = fullname.index("[")
+        fullname_without_bracket = fullname[:bracket_start]
+        module, cls_name = fullname_without_bracket.rsplit(".", 1)
+        cls_name += fullname[bracket_start:]
+    else:
+        module, cls_name = fullname.rsplit(".", 1)
 
     module_file = all_modules.get(module)
     if module_file is None:
@@ -197,7 +205,7 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
 
 
 def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
-    return model_cls_fullname.endswith(ANNOTATED_SUFFIX)
+    return model_cls_fullname.startswith(WITH_ANNOTATIONS_FULLNAME + "[")
 
 
 def add_new_class_for_module(

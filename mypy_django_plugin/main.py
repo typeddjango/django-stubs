@@ -10,6 +10,7 @@ from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
+    AnalyzeTypeContext,
     AttributeContext,
     ClassDefContext,
     DynamicClassDefContext,
@@ -24,7 +25,11 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.managers import create_new_manager_class_from_from_queryset_method
-from mypy_django_plugin.transformers.models import process_model_class, set_auth_user_model_boolean_fields
+from mypy_django_plugin.transformers.models import (
+    handle_annotated_type,
+    process_model_class,
+    set_auth_user_model_boolean_fields,
+)
 
 
 def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
@@ -230,7 +235,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname:
                     deps.add(self._new_dependency(related_model_module))
-        return list(deps)
+        return list(deps) + [self._new_dependency("django_stubs_ext")]  # for annotate
 
     def get_function_hook(self, fullname: str) -> Optional[Callable[[FunctionContext], MypyType]]:
         if fullname == "django.contrib.auth.get_user_model":
@@ -318,6 +323,14 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
         return None
+
+    def get_type_analyze_hook(self, fullname: str) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
+        if fullname in (
+            "typing.Annotated",
+            "typing_extensions.Annotated",
+            "django_stubs_ext.annotations.WithAnnotations",
+        ):
+            return partial(handle_annotated_type, django_context=self.django_context)
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
         if fullname.endswith("from_queryset"):

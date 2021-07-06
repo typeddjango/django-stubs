@@ -1,11 +1,12 @@
-from typing import Dict, List, Optional, Type, cast
+from typing import Dict, List, Optional, Type, Union, cast
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
+from mypy.checker import TypeChecker
 from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
-from mypy.plugin import AttributeContext, ClassDefContext
+from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
@@ -14,6 +15,8 @@ from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
+from mypy_django_plugin.lib.helpers import add_new_class_for_module
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 
@@ -390,3 +393,59 @@ def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: Dj
     boolinfo = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), bool)
     assert boolinfo is not None
     return Instance(boolinfo, [])
+
+
+def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
+    args = ctx.type.args
+    type_arg = ctx.api.analyze_type(args[0])
+    api = cast(SemanticAnalyzer, ctx.api.api)  # type: ignore
+
+    if not isinstance(type_arg, Instance):
+        return ctx.api.analyze_type(ctx.type)
+
+    return get_or_create_annotated_type(api, type_arg)
+
+
+def get_or_create_annotated_type(
+    api: Union[SemanticAnalyzer, CheckerPluginInterface], model_type: Instance
+) -> Instance:
+    """
+
+    Get or create the type for a model for which you getting/setting any attr is allowed.
+
+    The generated type is an subclass of the model and django._AnyAttrAllowed.
+    The generated type is placed in the django_stubs_ext module, with the name WithAnnotations[ModelName].
+    If the user wanted to annotate their code using this type, then this is the annotation they would use.
+    This is a bit of a hack to make a pretty type for error messages and which would make sense for users.
+    """
+    model_module_name = "django_stubs_ext"
+    type_name = f"WithAnnotations[{model_type.type.fullname}]"
+
+    # If already existing annotated type for model exists, reuse it
+    if model_type.type.has_base(ANY_ATTR_ALLOWED_CLASS_FULLNAME):
+        annotated_type = model_type
+    else:
+        annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(
+            cast(TypeChecker, api), model_module_name + "." + type_name
+        )
+        if annotated_typeinfo is None:
+            model_module_file = api.modules[model_module_name]  # type: ignore
+            if isinstance(api, SemanticAnalyzer):
+                annotated_model_type = api.named_type_or_none(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
+                assert annotated_model_type is not None
+            else:
+                annotated_model_type = api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
+
+            # Create a new class in the same module as the model, with the same name as the model but with a suffix
+            # The class inherits from the model and an internal class which allows get/set of any attribute.
+            # Essentially, this is a way of making an "intersection" type between the two types.
+            annotated_typeinfo = add_new_class_for_module(
+                model_module_file,
+                type_name,
+                bases=[
+                    model_type,
+                    annotated_model_type,
+                ],
+            )
+        annotated_type = Instance(annotated_typeinfo, [])
+    return annotated_type

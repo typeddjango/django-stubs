@@ -1,11 +1,10 @@
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Type, cast
+from typing import List, Optional, Sequence, Type
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
-from mypy.checker import TypeChecker
 from mypy.nodes import Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType
@@ -14,9 +13,9 @@ from mypy.types import TypedDictType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.constants import ANNOTATED_SUFFIX
 from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME, VALUES_QUERYSET_CLASS_FULLNAME
-from mypy_django_plugin.lib.helpers import add_new_class_for_module, is_annotated_model_fullname
+from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
+from mypy_django_plugin.transformers.models import get_or_create_annotated_type
 
 
 def _extract_model_type_from_queryset(queryset_type: Instance) -> Optional[Instance]:
@@ -192,34 +191,9 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    model_module_name = model_type.type.module_name
-    type_name = model_type.type.name + ANNOTATED_SUFFIX
-
     api = ctx.api
 
-    # If already existing annotated type for model exists, reuse it
-    if model_type.type.has_base(ANY_ATTR_ALLOWED_CLASS_FULLNAME):
-        annotated_type = model_type
-    else:
-        annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(
-            cast(TypeChecker, api), model_module_name + "." + type_name
-        )
-        if annotated_typeinfo is None:
-            model_module_file = api.modules[model_module_name]  # type: ignore
-            annotated_model_type = api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
-
-            # Create a new class in the same module as the model, with the same name as the model but with a suffix
-            # The class inherits from the model and an internal class which allows get/set of any attribute.
-            # Essentially, this is a way of making an "intersection" type between the two types.
-            annotated_typeinfo = add_new_class_for_module(
-                model_module_file,
-                type_name,
-                bases=[
-                    model_type,
-                    annotated_model_type,
-                ],
-            )
-        annotated_type = Instance(annotated_typeinfo, [])
+    annotated_type = get_or_create_annotated_type(api, model_type)
     if ctx.type.type.has_base(VALUES_QUERYSET_CLASS_FULLNAME):
         original_row_type: MypyType = ctx.default_return_type.args[1]
         row_type: MypyType = original_row_type
