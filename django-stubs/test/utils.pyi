@@ -5,6 +5,7 @@ from io import StringIO
 from typing import (
     Any,
     Callable,
+    ContextManager,
     Dict,
     Iterable,
     Iterator,
@@ -14,20 +15,18 @@ from typing import (
     Set,
     Tuple,
     Type,
-    Union,
-    ContextManager,
     TypeVar,
+    Union,
 )
 
 from django.apps.registry import Apps
+from django.conf import LazySettings, Settings
 from django.core.checks.registry import CheckRegistry
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
-
-from django.conf import LazySettings, Settings
-from django.db.backends.base.base import BaseDatabaseWrapper
 
 _TestClass = Type[SimpleTestCase]
 _DecoratedTest = Union[Callable, _TestClass]

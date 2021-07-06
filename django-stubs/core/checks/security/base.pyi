@@ -1,8 +1,7 @@
 from typing import Any, List, Optional, Sequence
 
-from django.core.checks.messages import Warning
-
 from django.apps.config import AppConfig
+from django.core.checks.messages import Warning
 
 SECRET_KEY_MIN_LENGTH: int
 SECRET_KEY_MIN_UNIQUE_CHARACTERS: int

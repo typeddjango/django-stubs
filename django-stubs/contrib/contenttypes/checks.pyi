@@ -1,8 +1,7 @@
 from typing import Any, List, Optional, Sequence
 
-from django.core.checks.messages import CheckMessage
-
 from django.apps.config import AppConfig
+from django.core.checks.messages import CheckMessage
 
 def check_generic_foreign_keys(
     app_configs: Optional[Sequence[AppConfig]] = ..., **kwargs: Any

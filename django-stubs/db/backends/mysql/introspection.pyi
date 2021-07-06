@@ -1,6 +1,7 @@
 from collections import namedtuple
-from django.db.backends.base.introspection import BaseDatabaseIntrospection as BaseDatabaseIntrospection
 from typing import Any
+
+from django.db.backends.base.introspection import BaseDatabaseIntrospection as BaseDatabaseIntrospection
 
 FieldInfo: Any
 InfoLine = namedtuple("InfoLine", "col_name data_type max_len num_prec num_scale extra column_default is_unsigned")

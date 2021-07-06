@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List, Optional, Union, Iterable
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
 
 from django.contrib.admin.filters import FieldListFilter
 from django.contrib.admin.templatetags.base import InclusionAdminNode

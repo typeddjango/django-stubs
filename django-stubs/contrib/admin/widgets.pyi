@@ -1,12 +1,11 @@
 from typing import Any, Dict, Optional, Tuple, Union
 from uuid import UUID
 
+from django import forms
 from django.contrib.admin.sites import AdminSite
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel
 from django.forms.models import ModelChoiceIterator
 from django.forms.widgets import Media
-
-from django import forms
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     @property

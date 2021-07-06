@@ -1,5 +1,6 @@
-from django.db.models.query_utils import DeferredAttribute
 from typing import Any, Optional
+
+from django.db.models.query_utils import DeferredAttribute
 
 class SpatialProxy(DeferredAttribute):
     def __init__(self, klass: Any, field: Any, load_func: Optional[Any] = ...) -> None: ...

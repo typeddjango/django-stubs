@@ -1,5 +1,6 @@
-from django.db.models import Aggregate
 from typing import Any, Optional
+
+from django.db.models import Aggregate
 
 class GeoAggregate(Aggregate):
     function: Any = ...

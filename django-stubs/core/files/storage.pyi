@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, IO, List, Optional, Tuple, Type
+from typing import IO, Any, List, Optional, Tuple, Type
 
 from django.core.files.base import File
 from django.utils.functional import LazyObject

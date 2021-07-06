@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Set, Container, List
+from typing import Any, Container, Dict, Iterator, List, Set
 
 class CyclicDependencyError(ValueError): ...
 

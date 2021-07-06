@@ -20,10 +20,9 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
-from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
-
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
+from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 
 RAISE_ERROR: object = ...
 host_validation_re: Pattern = ...

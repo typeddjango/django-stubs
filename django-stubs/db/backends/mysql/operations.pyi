@@ -1,5 +1,6 @@
-from django.db.backends.base.operations import BaseDatabaseOperations as BaseDatabaseOperations
 from typing import Any, Optional
+
+from django.db.backends.base.operations import BaseDatabaseOperations as BaseDatabaseOperations
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module: str = ...

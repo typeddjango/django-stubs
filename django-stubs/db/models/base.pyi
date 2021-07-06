@@ -1,11 +1,8 @@
 from typing import Any, Callable, Collection, Dict, Iterable, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.core.checks.messages import CheckMessage
-from django.core.exceptions import (
-    ValidationError,
-    ObjectDoesNotExist,
-    MultipleObjectsReturned as BaseMultipleObjectsReturned,
-)
+from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.manager import BaseManager
 from django.db.models.options import Options
 

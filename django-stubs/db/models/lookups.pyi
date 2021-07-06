@@ -1,14 +1,13 @@
 from datetime import datetime
-from typing import Any, Iterable, List, Optional, Tuple, Type, Union, Mapping, TypeVar, Generic
+from typing import Any, Generic, Iterable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression, Func
+from django.db.models.fields import TextField, related_lookups
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.utils.datastructures import OrderedSet
 from django.utils.safestring import SafeText
-
-from django.db.models.fields import TextField, related_lookups
 
 _T = TypeVar("_T")
 

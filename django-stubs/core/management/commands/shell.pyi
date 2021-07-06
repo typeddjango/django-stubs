@@ -1,6 +1,8 @@
-from django.core.management import BaseCommand as BaseCommand, CommandError as CommandError
-from django.utils.datastructures import OrderedSet as OrderedSet
 from typing import Any, List
+
+from django.core.management import BaseCommand as BaseCommand
+from django.core.management import CommandError as CommandError
+from django.utils.datastructures import OrderedSet as OrderedSet
 
 class Command(BaseCommand):
     shells: List[str] = ...

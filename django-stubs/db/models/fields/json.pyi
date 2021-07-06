@@ -1,10 +1,12 @@
-from . import Field
-from .mixins import CheckFieldDefaultMixin
+from typing import Any, Callable, Optional
+
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler
-from typing import Any, Optional, Callable
+
+from . import Field
+from .mixins import CheckFieldDefaultMixin
 
 class JSONField(CheckFieldDefaultMixin, Field):
     def __init__(

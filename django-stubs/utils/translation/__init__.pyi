@@ -1,6 +1,6 @@
 import functools
 from contextlib import ContextDecorator
-from typing import Any, Optional, Callable, Union
+from typing import Any, Callable, Optional, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 

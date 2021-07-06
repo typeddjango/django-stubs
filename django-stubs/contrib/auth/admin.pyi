@@ -1,9 +1,8 @@
 from typing import Any
 
+from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
-
-from django.contrib import admin
 
 csrf_protect_m: Any
 sensitive_post_parameters_m: Any

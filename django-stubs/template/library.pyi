@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union, overload
 
-from django.template.base import FilterExpression, Parser, Origin, Token
+from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeText
 

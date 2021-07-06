@@ -1,13 +1,12 @@
 from typing import Any, Callable, Dict, Generic, Optional, Sequence, Type, TypeVar, Union
 
+from django.db import models
 from django.forms.forms import BaseForm
 from django.forms.models import BaseModelForm
+from django.http import HttpRequest, HttpResponse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
 from typing_extensions import Literal
-from django.db import models
-
-from django.http import HttpRequest, HttpResponse
 
 _FormT = TypeVar("_FormT", bound=BaseForm)
 _ModelFormT = TypeVar("_ModelFormT", bound=BaseModelForm)

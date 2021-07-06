@@ -1,6 +1,7 @@
+from typing import Any
+
 from django.contrib.syndication.views import Feed as BaseFeed
 from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
-from typing import Any
 
 class GeoFeedMixin:
     def georss_coords(self, coords: Any): ...

@@ -1,6 +1,6 @@
 import collections
 from collections import OrderedDict, namedtuple
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union, Iterable
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Expression, Field, FilteredRelation, Model, Q, QuerySet

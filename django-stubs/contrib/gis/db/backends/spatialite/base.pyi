@@ -1,5 +1,6 @@
-from django.db.backends.sqlite3.base import DatabaseWrapper as SQLiteDatabaseWrapper
 from typing import Any
+
+from django.db.backends.sqlite3.base import DatabaseWrapper as SQLiteDatabaseWrapper
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
     SchemaEditorClass: Any = ...

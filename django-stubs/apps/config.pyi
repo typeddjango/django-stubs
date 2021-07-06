@@ -1,4 +1,4 @@
-from typing import Any, Iterator, Type, Optional, Dict
+from typing import Any, Dict, Iterator, Optional, Type
 
 from django.apps.registry import Apps
 from django.db.models.base import Model

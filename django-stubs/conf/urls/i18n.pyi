@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Callable
+from typing import Any, Callable, List, Tuple
 
 from django.urls.resolvers import URLPattern
 

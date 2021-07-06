@@ -2,10 +2,12 @@ from datetime import datetime
 from typing import (
     Any,
     Callable,
+    ClassVar,
     Collection,
+    Container,
     Dict,
-    Iterator,
     Generic,
+    Iterator,
     List,
     Mapping,
     MutableMapping,
@@ -13,15 +15,15 @@ from typing import (
     Sequence,
     Tuple,
     Type,
-    Union,
-    ClassVar,
-    Container,
     TypeVar,
+    Union,
 )
 from unittest.mock import MagicMock
 from uuid import UUID
 
 from django.core.files.base import File
+from django.db import models
+from django.db.models import ForeignKey
 from django.db.models.base import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
@@ -32,9 +34,6 @@ from django.forms.formsets import BaseFormSet
 from django.forms.utils import ErrorList
 from django.forms.widgets import Input, Widget
 from typing_extensions import Literal
-
-from django.db import models
-from django.db.models import ForeignKey
 
 ALL_FIELDS: str
 

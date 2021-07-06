@@ -1,5 +1,6 @@
-from django.db.backends.mysql.base import DatabaseWrapper as MySQLDatabaseWrapper
 from typing import Any
+
+from django.db.backends.mysql.base import DatabaseWrapper as MySQLDatabaseWrapper
 
 class DatabaseWrapper(MySQLDatabaseWrapper):
     SchemaEditorClass: Any = ...

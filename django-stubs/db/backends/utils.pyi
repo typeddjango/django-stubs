@@ -1,13 +1,13 @@
 import types
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, ContextManager, Dict, List, Mapping, Optional, Sequence, Tuple, Type, Union
+from typing import Any, ContextManager, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union
 from uuid import UUID
 
 logger: Any
 
 # Python types that can be adapted to SQL.
-_SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime, UUID]
+_SQLType = Union[None, bool, int, float, Decimal, str, bytes, date, datetime, UUID, Tuple[Any, ...], List[Any]]
 _ExecuteParameters = Optional[Union[Sequence[_SQLType], Mapping[str, _SQLType]]]
 
 class CursorWrapper:
@@ -16,7 +16,7 @@ class CursorWrapper:
     def __init__(self, cursor: Any, db: Any) -> None: ...
     WRAP_ERROR_ATTRS: Any = ...
     def __getattr__(self, attr: str) -> Any: ...
-    def __iter__(self) -> None: ...
+    def __iter__(self) -> Iterator[Tuple[Any, ...]]: ...
     def __enter__(self) -> CursorWrapper: ...
     def __exit__(
         self,

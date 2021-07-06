@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from .base import BaseCommand as BaseCommand, CommandError as CommandError
+from .base import BaseCommand as BaseCommand
+from .base import CommandError as CommandError
 
 def find_commands(management_dir: str) -> List[str]: ...
 def load_command_class(app_name: str, name: str) -> BaseCommand: ...

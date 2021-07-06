@@ -1,5 +1,6 @@
-from .base import GEOSBase as GEOSBase
 from typing import Any
+
+from .base import GEOSBase as GEOSBase
 
 class PreparedGeometry(GEOSBase):
     ptr_type: Any = ...

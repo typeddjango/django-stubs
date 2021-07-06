@@ -1,9 +1,8 @@
 from typing import Optional, Sequence, Union
 
-from django.db.models.query_utils import Q
-
-from django.db.models import Index, Func
+from django.db.models import Func, Index
 from django.db.models.expressions import BaseExpression, Combinable
+from django.db.models.query_utils import Q
 
 class PostgresIndex(Index): ...
 

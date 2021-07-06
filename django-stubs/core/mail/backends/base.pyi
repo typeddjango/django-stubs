@@ -1,5 +1,5 @@
 import types
-from typing import Any, TypeVar, Type, Iterable, Optional
+from typing import Any, Iterable, Optional, Type, TypeVar
 
 from django.core.mail.message import EmailMessage
 

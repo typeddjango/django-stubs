@@ -1,5 +1,6 @@
-from django.contrib.admin import ModelAdmin as ModelAdmin
 from typing import Any
+
+from django.contrib.admin import ModelAdmin as ModelAdmin
 
 spherical_mercator_srid: int
 

@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import Any, Callable, Optional, overload, TypeVar, Iterator
+from typing import Any, Callable, Iterator, Optional, TypeVar, overload
 
 from django.db import ProgrammingError
 

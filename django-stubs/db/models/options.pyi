@@ -9,14 +9,13 @@ from django.contrib.postgres.fields.citext import CIText
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.constraints import BaseConstraint
+from django.db.models.fields import AutoField, Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ManyToManyField, OneToOneField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList
-
-from django.db.models.fields import AutoField, Field
 
 PROXY_PARENTS: Any
 EMPTY_RELATION_TREE: Any

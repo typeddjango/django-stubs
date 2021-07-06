@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import Any, TypeVar, overload, Union
+from typing import Any, TypeVar, Union, overload
 
 from django.utils.functional import Promise
 from typing_extensions import Literal

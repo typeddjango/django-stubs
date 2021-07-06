@@ -2,17 +2,14 @@ from collections import OrderedDict
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.contrib.admin.filters import ListFilter, SimpleListFilter
-from django.contrib.admin.options import (  # noqa: F401
-    ModelAdmin,
-    IS_POPUP_VAR as IS_POPUP_VAR,
-    TO_FIELD_VAR as TO_FIELD_VAR,
-)
+from django.contrib.admin.options import IS_POPUP_VAR as IS_POPUP_VAR  # noqa: F401
+from django.contrib.admin.options import TO_FIELD_VAR as TO_FIELD_VAR
+from django.contrib.admin.options import ModelAdmin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, CombinedExpression, OrderBy
-from django.db.models.query import QuerySet
-
 from django.db.models.options import Options
+from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
 
 ALL_VAR: str

@@ -1,5 +1,6 @@
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
 from typing import Any
+
+from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
 
 class Polygon(GEOSGeometry):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...

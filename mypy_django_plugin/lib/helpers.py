@@ -158,7 +158,7 @@ def iter_bases(info: TypeInfo) -> Iterator[Instance]:
 
 
 def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
-    """ Return declared type of type_info's private_field_name (used for private Field attributes)"""
+    """Return declared type of type_info's private_field_name (used for private Field attributes)"""
     sym = type_info.get(private_field_name)
     if sym is None:
         return AnyType(TypeOfAny.explicit)

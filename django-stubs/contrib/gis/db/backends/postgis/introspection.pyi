@@ -1,5 +1,6 @@
-from django.db.backends.postgresql.introspection import DatabaseIntrospection as DatabaseIntrospection
 from typing import Any
+
+from django.db.backends.postgresql.introspection import DatabaseIntrospection as DatabaseIntrospection
 
 class PostGISIntrospection(DatabaseIntrospection):
     postgis_oid_lookup: Any = ...

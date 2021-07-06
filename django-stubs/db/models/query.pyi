@@ -9,6 +9,7 @@ from typing import (
     List,
     MutableMapping,
     Optional,
+    Reversible,
     Sequence,
     Sized,
     Tuple,
@@ -16,16 +17,15 @@ from typing import (
     TypeVar,
     Union,
     overload,
-    Reversible,
 )
-
-from django.db.models.base import Model
-from django.db.models.expressions import Combinable as Combinable, F as F  # noqa: F401
-from django.db.models.sql.query import Query, RawQuery
 
 from django.db import models
 from django.db.models import Manager
+from django.db.models.base import Model
+from django.db.models.expressions import Combinable as Combinable  # noqa: F401
+from django.db.models.expressions import F as F
 from django.db.models.query_utils import Q as Q  # noqa: F401
+from django.db.models.sql.query import Query, RawQuery
 
 _T = TypeVar("_T", bound=models.Model, covariant=True)
 _QS = TypeVar("_QS", bound="QuerySet")
@@ -124,8 +124,6 @@ class QuerySet(Generic[_T], Collection[_T], Reversible[_T], Sized):
     @property
     def db(self) -> str: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
-
-
     def __iter__(self) -> Iterator[_T]: ...
     def __contains__(self, x: object) -> bool: ...
     @overload
@@ -136,26 +134,7 @@ class QuerySet(Generic[_T], Collection[_T], Reversible[_T], Sized):
 
 _Row = TypeVar("_Row", covariant=True)
 
-class BaseIterable(Sequence[_Row]):
-    def __init__(self, queryset: QuerySet, chunked_fetch: bool = ..., chunk_size: int = ...): ...
-    def __iter__(self) -> Iterator[_Row]: ...
-    def __contains__(self, x: object) -> bool: ...
-    def __len__(self) -> int: ...
-    @overload
-    def __getitem__(self, i: int) -> _Row: ...
-    @overload
-    def __getitem__(self, s: slice) -> Sequence[_Row]: ...
-
-class ModelIterable(BaseIterable[Model]): ...
-class ValuesIterable(BaseIterable[Dict[str, Any]]): ...
-class ValuesListIterable(BaseIterable[Tuple]): ...
-class NamedValuesListIterable(ValuesListIterable): ...
-
-class FlatValuesListIterable(BaseIterable):
-    def __iter__(self) -> Iterator[Any]: ...
-
 class _ValuesQuerySet(QuerySet[_T], Collection[_Row], Reversible[_Row], Sized):
-    def __contains__(self, x: object) -> bool: ...
     def __iter__(self) -> Iterator[_Row]: ...  # type: ignore
     @overload  # type: ignore
     def __getitem__(self, i: int) -> _Row: ...

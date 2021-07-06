@@ -1,20 +1,17 @@
 from .array import ArrayField as ArrayField
-from .jsonb import JSONField as JSONField, JsonAdapter as JsonAdapter
-from .ranges import (
-    RangeField as RangeField,
-    IntegerRangeField as IntegerRangeField,
-    BigIntegerRangeField as BigIntegerRangeField,
-    DecimalRangeField as DecimalRangeField,
-    FloatRangeField as FloatRangeField,
-    DateRangeField as DateRangeField,
-    DateTimeRangeField as DateTimeRangeField,
-    RangeOperators as RangeOperators,
-    RangeBoundary as RangeBoundary,
-)
+from .citext import CICharField as CICharField
+from .citext import CIEmailField as CIEmailField
+from .citext import CIText as CIText
+from .citext import CITextField as CITextField
 from .hstore import HStoreField as HStoreField
-from .citext import (
-    CICharField as CICharField,
-    CIEmailField as CIEmailField,
-    CIText as CIText,
-    CITextField as CITextField,
-)
+from .jsonb import JsonAdapter as JsonAdapter
+from .jsonb import JSONField as JSONField
+from .ranges import BigIntegerRangeField as BigIntegerRangeField
+from .ranges import DateRangeField as DateRangeField
+from .ranges import DateTimeRangeField as DateTimeRangeField
+from .ranges import DecimalRangeField as DecimalRangeField
+from .ranges import FloatRangeField as FloatRangeField
+from .ranges import IntegerRangeField as IntegerRangeField
+from .ranges import RangeBoundary as RangeBoundary
+from .ranges import RangeField as RangeField
+from .ranges import RangeOperators as RangeOperators

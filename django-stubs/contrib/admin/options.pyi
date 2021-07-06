@@ -6,19 +6,15 @@ from typing import (
     Generic,
     Iterator,
     List,
+    Mapping,
     Optional,
     Sequence,
     Set,
     Tuple,
     Type,
-    Union,
-    Mapping,
     TypeVar,
+    Union,
 )
-
-from django.forms.forms import BaseForm
-from django.forms.models import BaseInlineFormSet
-from typing_extensions import Literal, TypedDict
 
 from django.contrib.admin.filters import ListFilter
 from django.contrib.admin.models import LogEntry
@@ -29,19 +25,20 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
 from django.core.paginator import Paginator
 from django.db.models.base import Model
+from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.fields import TypedChoiceField
-from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
+from django.forms.forms import BaseForm
+from django.forms.models import BaseInlineFormSet, ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import Media
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.urls.resolvers import URLPattern
 from django.utils.safestring import SafeText
-
-from django.db.models.fields import Field
+from typing_extensions import Literal, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str

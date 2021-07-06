@@ -1,9 +1,8 @@
 from typing import Any, List, Optional, Sequence
 
+from django.apps.config import AppConfig
 from django.contrib.admin.options import BaseModelAdmin
 from django.core.checks.messages import CheckMessage, Error
-
-from django.apps.config import AppConfig
 
 def check_admin_app(app_configs: Optional[Sequence[AppConfig]] = ..., **kwargs: Any) -> List[Error]: ...
 def check_dependencies(app_configs: Optional[Sequence[AppConfig]] = ..., **kwargs: Any) -> List[Error]: ...

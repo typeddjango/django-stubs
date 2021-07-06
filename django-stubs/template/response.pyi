@@ -3,12 +3,11 @@ from http.cookies import SimpleCookie
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
+from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.template.base import Template
 from django.template.context import RequestContext
 from django.test.client import Client
-
-from django.http import HttpResponse
 
 class ContentNotRenderedError(Exception): ...
 
