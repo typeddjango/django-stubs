@@ -37,7 +37,7 @@
         from django.db.models.expressions import F
 
         qs = User.objects.annotate(foo=F('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.manager.Manager[django_stubs_ext.WithAnnotations[myapp.models.User]]"
+        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.User], django_stubs_ext.WithAnnotations[myapp.models.User]]"
 
         annotated = qs.get()
         reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp.models.User]*"
@@ -113,8 +113,7 @@
         from django.db.models import QuerySet
         from django.db.models.expressions import F
 
-        # Annotating as QuerySet[User], otherwise mypy infers Manager[User], which is overly precise
-        qs: QuerySet[User] = User.objects.filter(id=1)
+        qs = User.objects.filter(id=1)
 
         # There is currently no way to say this returns an "annotated" QuerySet[User]
         def add_annotation(qs: QuerySet[User]) -> QuerySet[User]:
@@ -200,9 +199,9 @@
         # It's possible to provide more precise types than than this, but without inspecting the
         # arguments to .annotate, these are the best types we can infer.
         qs1 = Blog.objects.values('text').annotate(foo=F('id'))
-        reveal_type(qs1) # N: Revealed type is "django.db.models.query._ValuesQuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.dict[builtins.str, Any]]"
+        reveal_type(qs1) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.dict[builtins.str, Any]]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
-        reveal_type(qs2) # N: Revealed type is "django.db.models.query._ValuesQuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.tuple[Any]]"
+        reveal_type(qs2) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.tuple[Any]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
         # TODO: Would be nice to infer a NamedTuple which contains the field 'text' (str) + any number of other fields.
         #  The reason it would have to appear to have any other fields is that annotate could potentially be called with
@@ -210,9 +209,9 @@
         #  But it's not trivial to make such a NamedTuple, partly because since it is also an ordinary tuple, it would
         #  have to have an arbitrary length, but still have certain fields at certain indices with specific types.
         #  For now, Any :)
-        reveal_type(qs3) # N: Revealed type is "django.db.models.query._ValuesQuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], Any]"
+        reveal_type(qs3) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], Any]"
         qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=F('id'))
-        reveal_type(qs4) # N: Revealed type is "django.db.models.query._ValuesQuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.str]"
+        reveal_type(qs4) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.str]"
 
 
         before_values_no_params = Blog.objects.values().annotate(foo=F('id')).get()

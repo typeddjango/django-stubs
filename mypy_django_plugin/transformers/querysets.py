@@ -9,11 +9,11 @@ from mypy.nodes import Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny
+from mypy.types import TypedDictType, TypeOfAny, get_proper_type
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME, VALUES_QUERYSET_CLASS_FULLNAME
+from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
 from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
 from mypy_django_plugin.transformers.models import get_or_create_annotated_type
 
@@ -145,7 +145,8 @@ def get_values_list_row_type(
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
     assert isinstance(ctx.type, Instance)
-    assert isinstance(ctx.default_return_type, Instance)
+    default_return_type = get_proper_type(ctx.default_return_type)
+    assert isinstance(default_return_type, Instance)
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -153,7 +154,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
 
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
-        return ctx.default_return_type
+        return default_return_type
 
     flat_expr = helpers.get_call_argument_by_name(ctx, "flat")
     if flat_expr is not None and isinstance(flat_expr, NameExpr):
@@ -169,7 +170,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
-        return helpers.reparametrize_instance(ctx.default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
+        return helpers.reparametrize_instance(default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
     # account for possible None
     flat = flat or False
@@ -179,13 +180,14 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     row_type = get_values_list_row_type(
         ctx, django_context, model_cls, is_annotated=is_annotated, flat=flat, named=named
     )
-    return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
+    return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
     assert isinstance(ctx.type, Instance)
-    assert isinstance(ctx.default_return_type, Instance)
+    default_return_type = get_proper_type(ctx.default_return_type)
+    assert isinstance(default_return_type, Instance)
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -194,9 +196,11 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     api = ctx.api
 
     annotated_type = get_or_create_annotated_type(api, model_type)
-    if ctx.type.type.has_base(VALUES_QUERYSET_CLASS_FULLNAME):
-        original_row_type: MypyType = ctx.default_return_type.args[1]
-        row_type: MypyType = original_row_type
+
+    row_type: MypyType
+    if len(default_return_type.args) > 1:
+        original_row_type: MypyType = default_return_type.args[1]
+        row_type = original_row_type
         if isinstance(original_row_type, TypedDictType):
             row_type = api.named_generic_type(
                 "builtins.dict", [api.named_generic_type("builtins.str", []), AnyType(TypeOfAny.from_omitted_generics)]
@@ -209,9 +213,13 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
                 row_type = AnyType(TypeOfAny.implementation_artifact)
             else:
                 row_type = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
-        return helpers.reparametrize_instance(ctx.default_return_type, [annotated_type, row_type])
+        elif isinstance(original_row_type, Instance) and original_row_type.type.has_base(
+            fullnames.MODEL_CLASS_FULLNAME
+        ):
+            row_type = annotated_type
     else:
-        return helpers.reparametrize_instance(ctx.default_return_type, [annotated_type])
+        row_type = annotated_type
+    return helpers.reparametrize_instance(default_return_type, [annotated_type, row_type])
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[List[str]]:
@@ -227,7 +235,8 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: Dj
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on QuerySet, return QuerySet of something
     assert isinstance(ctx.type, Instance)
-    assert isinstance(ctx.default_return_type, Instance)
+    default_return_type = get_proper_type(ctx.default_return_type)
+    assert isinstance(default_return_type, Instance)
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -235,10 +244,10 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
-        return ctx.default_return_type
+        return default_return_type
 
     if is_annotated_model_fullname(model_type.type.fullname):
-        return ctx.default_return_type
+        return default_return_type
 
     field_lookups = resolve_field_lookups(ctx.args[0], django_context)
     if field_lookups is None:
@@ -254,9 +263,9 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             ctx, django_context, model_cls, lookup=field_lookup, method="values"
         )
         if field_lookup_type is None:
-            return helpers.reparametrize_instance(ctx.default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
+            return helpers.reparametrize_instance(default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
         column_types[field_lookup] = field_lookup_type
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()))
-    return helpers.reparametrize_instance(ctx.default_return_type, [model_type, row_type])
+    return helpers.reparametrize_instance(default_return_type, [model_type, row_type])

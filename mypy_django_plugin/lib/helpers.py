@@ -62,7 +62,7 @@ def is_toml(filename: str) -> bool:
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
     if "." not in fullname:
         return None
-    if "[" in fullname:
+    if "[" in fullname and "]" in fullname:
         # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
         # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
         bracket_start = fullname.index("[")

@@ -197,7 +197,6 @@ class AddManagers(ModelClassInitializer):
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_class_name = manager.__class__.__name__
             manager_fullname = helpers.get_class_fullname(manager.__class__)
-
             try:
                 manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
             except helpers.IncompleteDefnException as exc:

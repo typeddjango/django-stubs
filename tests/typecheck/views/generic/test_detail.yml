@@ -50,6 +50,6 @@
                     ...
     out: |
       main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "SingleObjectMixin" defined the type as "Type[Other]")
-      main:8: error: Incompatible types in assignment (expression has type "Manager[MyModel]", base class "SingleObjectMixin" defined the type as "QuerySet[Other]")
-      main:10: error: Return type "QuerySet[MyModel]" of "get_queryset" incompatible with return type "QuerySet[Other]" in supertype "SingleObjectMixin"
-      main:12: error: Incompatible return value type (got "QuerySet[Other]", expected "QuerySet[MyModel]")
+      main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "_QuerySet[Other, Other]")
+      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QuerySet[Other, Other]" in supertype "SingleObjectMixin"
+      main:12: error: Incompatible return value type (got "_QuerySet[Other, Other]", expected "_QuerySet[MyModel, MyModel]")

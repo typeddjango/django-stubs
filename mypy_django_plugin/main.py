@@ -266,19 +266,21 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return forms.extract_proper_type_for_get_form
 
+        manager_classes = self._get_current_manager_bases()
+
         if method_name == "values":
             info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
                 return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
 
         if method_name == "values_list":
             info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
                 return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
 
         if method_name == "annotate":
             info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
                 return partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context)
 
         if method_name == "get_field":
@@ -286,7 +288,6 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
-        manager_classes = self._get_current_manager_bases()
         if class_fullname in manager_classes and method_name == "create":
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
         if class_fullname in manager_classes and method_name in {"filter", "get", "exclude"}:

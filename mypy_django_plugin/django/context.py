@@ -19,7 +19,6 @@ from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
-from typing_extensions import Final
 
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
@@ -116,10 +115,10 @@ class DjangoContext:
 
     def get_model_class_by_fullname(self, fullname: str) -> Optional[Type[Model]]:
         """Returns None if Model is abstract"""
-        ANNOTATED_PREFIX: Final = WITH_ANNOTATIONS_FULLNAME + "["
-        if fullname.startswith(ANNOTATED_PREFIX):
+        annotated_prefix = WITH_ANNOTATIONS_FULLNAME + "["
+        if fullname.startswith(annotated_prefix):
             # For our "annotated models", extract the original model fullname
-            fullname = fullname[len(ANNOTATED_PREFIX) :].rstrip("]")
+            fullname = fullname[len(annotated_prefix) :].rstrip("]")
 
         module, _, model_cls_name = fullname.rpartition(".")
         for model_cls in self.model_modules.get(module, set()):
