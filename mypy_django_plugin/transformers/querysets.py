@@ -1,11 +1,11 @@
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Type
+from typing import Dict, List, Optional, Sequence, Type
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
-from mypy.nodes import Expression, NameExpr
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType
 from mypy.types import Type as MypyType
@@ -183,6 +183,23 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
 
 
+def gather_kwargs(ctx: MethodContext) -> Optional[Dict[str, MypyType]]:
+    num_args = len(ctx.arg_kinds)
+    kwargs = {}
+    named = (ARG_NAMED, ARG_NAMED_OPT)
+    for i in range(num_args):
+        if not ctx.arg_kinds[i]:
+            continue
+        if any(kind not in named for kind in ctx.arg_kinds[i]):
+            # Only named arguments supported
+            return None
+        for j in range(len(ctx.arg_names[i])):
+            name = ctx.arg_names[i][j]
+            assert name is not None
+            kwargs[name] = ctx.arg_types[i][j]
+    return kwargs
+
+
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
     assert isinstance(ctx.type, Instance)
@@ -195,7 +212,23 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     api = ctx.api
 
-    annotated_type = get_or_create_annotated_type(api, model_type)
+    field_types = model_type.type.metadata.get("annotated_field_types")
+    kwargs = gather_kwargs(ctx)
+    if kwargs:
+        # For now, we don't try to resolve the output_field of the field would be, but use Any.
+        added_field_types = {name: AnyType(TypeOfAny.implementation_artifact) for name, typ in kwargs.items()}
+        if field_types is not None:
+            # Annotate was called more than once, so add/update existing field types
+            field_types.update(added_field_types)
+        else:
+            field_types = added_field_types
+
+    fields_dict = None
+    if field_types is not None:
+        fields_dict = helpers.make_typeddict(
+            api, fields=OrderedDict(field_types), required_keys=set(field_types.keys())
+        )
+    annotated_type = get_or_create_annotated_type(api, model_type, fields_dict=fields_dict)
 
     row_type: MypyType
     if len(default_return_type.args) > 1:

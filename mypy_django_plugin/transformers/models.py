@@ -11,11 +11,11 @@ from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import TypedDictType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
+from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME
 from mypy_django_plugin.lib.helpers import add_new_class_for_module
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
@@ -402,11 +402,23 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext
     if not isinstance(type_arg, Instance):
         return ctx.api.analyze_type(ctx.type)
 
-    return get_or_create_annotated_type(api, type_arg)
+    fields_dict = None
+    if len(args) > 1:
+        second_arg_type = ctx.api.analyze_type(args[1])
+        if isinstance(second_arg_type, TypedDictType):
+            fields_dict = second_arg_type
+        elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
+            annotations_type_arg = second_arg_type.args[0]
+            if isinstance(annotations_type_arg, TypedDictType):
+                fields_dict = annotations_type_arg
+            elif not isinstance(annotations_type_arg, AnyType):
+                ctx.api.fail("Only TypedDicts are supported as type arguments to Annotations", ctx.context)
+
+    return get_or_create_annotated_type(api, type_arg, fields_dict=fields_dict)
 
 
 def get_or_create_annotated_type(
-    api: Union[SemanticAnalyzer, CheckerPluginInterface], model_type: Instance
+    api: Union[SemanticAnalyzer, CheckerPluginInterface], model_type: Instance, fields_dict: Optional[TypedDictType]
 ) -> Instance:
     """
 
@@ -418,33 +430,38 @@ def get_or_create_annotated_type(
     This is a bit of a hack to make a pretty type for error messages and which would make sense for users.
     """
     model_module_name = "django_stubs_ext"
-    type_name = f"WithAnnotations[{model_type.type.fullname}]"
 
-    # If already existing annotated type for model exists, reuse it
-    if model_type.type.has_base(ANY_ATTR_ALLOWED_CLASS_FULLNAME):
-        annotated_type = model_type
+    if helpers.is_annotated_model_fullname(model_type.type.fullname):
+        # If it's already a generated class, we want to use the original model as a base
+        model_type = model_type.type.bases[0]
+
+    if fields_dict is not None:
+        type_name = f"WithAnnotations[{model_type.type.fullname}, {fields_dict}]"
     else:
-        annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(
-            cast(TypeChecker, api), model_module_name + "." + type_name
-        )
-        if annotated_typeinfo is None:
-            model_module_file = api.modules[model_module_name]  # type: ignore
-            if isinstance(api, SemanticAnalyzer):
-                annotated_model_type = api.named_type_or_none(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
-                assert annotated_model_type is not None
-            else:
-                annotated_model_type = api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
+        type_name = f"WithAnnotations[{model_type.type.fullname}]"
 
-            # Create a new class in the same module as the model, with the same name as the model but with a suffix
-            # The class inherits from the model and an internal class which allows get/set of any attribute.
-            # Essentially, this is a way of making an "intersection" type between the two types.
-            annotated_typeinfo = add_new_class_for_module(
-                model_module_file,
-                type_name,
-                bases=[
-                    model_type,
-                    annotated_model_type,
-                ],
-            )
-        annotated_type = Instance(annotated_typeinfo, [])
+    annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(
+        cast(TypeChecker, api), model_module_name + "." + type_name
+    )
+    if annotated_typeinfo is None:
+        model_module_file = api.modules[model_module_name]  # type: ignore
+
+        if isinstance(api, SemanticAnalyzer):
+            annotated_model_type = api.named_type_or_none(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
+            assert annotated_model_type is not None
+        else:
+            annotated_model_type = api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
+
+        annotated_typeinfo = add_new_class_for_module(
+            model_module_file,
+            type_name,
+            bases=[model_type] if fields_dict is not None else [model_type, annotated_model_type],
+            fields=fields_dict.items if fields_dict is not None else None,
+        )
+        if fields_dict is not None:
+            # To allow structural subtyping, make it a Protocol
+            annotated_typeinfo.is_protocol = True
+            # Save for later to easily find which field types were annotated
+            annotated_typeinfo.metadata["annotated_field_types"] = fields_dict.items
+    annotated_type = Instance(annotated_typeinfo, [])
     return annotated_type

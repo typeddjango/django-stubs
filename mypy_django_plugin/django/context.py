@@ -119,6 +119,9 @@ class DjangoContext:
         if fullname.startswith(annotated_prefix):
             # For our "annotated models", extract the original model fullname
             fullname = fullname[len(annotated_prefix) :].rstrip("]")
+            if "," in fullname:
+                # Remove second type arg, which might be present
+                fullname = fullname[: fullname.index(",")]
 
         module, _, model_cls_name = fullname.rpartition(".")
         for model_cls in self.model_modules.get(module, set()):

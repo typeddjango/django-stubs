@@ -3,24 +3,25 @@
         from typing_extensions import Annotated
         from myapp.models import User
         from django_stubs_ext import WithAnnotations, Annotations
-        annotated_user = User.objects.annotate(foo="").get()
+        from django.db.models.expressions import Value
+        annotated_user = User.objects.annotate(foo=Value("")).get()
 
         unannotated_user = User.objects.get(id=1)
 
-        print(annotated_user.asdf)
+        print(annotated_user.asdf) # E: "WithAnnotations[myapp.models.User, TypedDict({'foo': Any})]" has no attribute "asdf"
         print(unannotated_user.asdf) # E: "User" has no attribute "asdf"
 
-        def func(user: Annotated[User, Annotations()]) -> str:
+        def func(user: Annotated[User, Annotations]) -> str:
             return user.asdf
 
         func(unannotated_user) # E: Argument 1 to "func" has incompatible type "User"; expected "WithAnnotations[myapp.models.User]"
-        func(annotated_user)
+        func(annotated_user) # E: Argument 1 to "func" has incompatible type "WithAnnotations[myapp.models.User, TypedDict({'foo': Any})]"; expected "WithAnnotations[myapp.models.User]"
 
         def func2(user: WithAnnotations[User]) -> str:
             return user.asdf
 
         func2(unannotated_user) # E: Argument 1 to "func2" has incompatible type "User"; expected "WithAnnotations[myapp.models.User]"
-        func2(annotated_user)
+        func2(annotated_user) # E: Argument 1 to "func2" has incompatible type "WithAnnotations[myapp.models.User, TypedDict({'foo': Any})]"; expected "WithAnnotations[myapp.models.User]"
     installed_apps:
         - myapp
     files:
@@ -31,18 +32,119 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
 
+-   case: annotate_using_with_annotations_typeddict
+    main: |
+        from typing import Any
+        from typing_extensions import Annotated, TypedDict
+        from myapp.models import User
+        from django_stubs_ext import WithAnnotations, Annotations
+        from django.db.models.expressions import Value
+
+        class MyDict(TypedDict):
+            foo: str
+
+        def func(user: Annotated[User, Annotations[MyDict]]) -> str:
+            print(user.asdf) # E: "WithAnnotations[myapp.models.User, TypedDict('main.MyDict', {'foo': builtins.str})]" has no attribute "asdf"
+            return user.foo
+
+        unannotated_user = User.objects.get(id=1)
+        annotated_user = User.objects.annotate(foo=Value("")).get()
+        other_annotated_user = User.objects.annotate(other=Value("")).get()
+
+        func(unannotated_user) # E: Argument 1 to "func" has incompatible type "User"; expected "WithAnnotations[myapp.models.User, TypedDict('main.MyDict', {'foo': builtins.str})]"
+        x: WithAnnotations[User]
+        func(x)
+        func(annotated_user)
+        func(other_annotated_user) # E: Argument 1 to "func" has incompatible type "WithAnnotations[myapp.models.User, TypedDict({'other': Any})]"; expected "WithAnnotations[myapp.models.User, TypedDict('main.MyDict', {'foo': builtins.str})]"
+
+        def func2(user: WithAnnotations[User, MyDict]) -> str:
+            print(user.asdf) # E: "WithAnnotations[myapp.models.User, TypedDict('main.MyDict', {'foo': builtins.str})]" has no attribute "asdf"
+            return user.foo
+
+        func2(unannotated_user) # E: Argument 1 to "func2" has incompatible type "User"; expected "WithAnnotations[myapp.models.User, TypedDict('main.MyDict', {'foo': builtins.str})]"
+        func2(annotated_user)
+        func2(other_annotated_user) # E: Argument 1 to "func2" has incompatible type "WithAnnotations[myapp.models.User, TypedDict({'other': Any})]"; expected "WithAnnotations[myapp.models.User, TypedDict('main.MyDict', {'foo': builtins.str})]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+-   case: annotate_using_with_annotations_typeddict_subtypes
+    main: |
+        from typing_extensions import Annotated, TypedDict
+        from myapp.models import User
+        from django_stubs_ext import WithAnnotations, Annotations
+
+        class BroadDict(TypedDict):
+            foo: str
+            bar: str
+
+        class NarrowDict(TypedDict):
+            foo: str
+
+        class OtherDict(TypedDict):
+            other: str
+
+        def func(user: WithAnnotations[User, NarrowDict]) -> str:
+            return user.foo
+
+        x: WithAnnotations[User, NarrowDict]
+        func(x)
+
+        y: WithAnnotations[User, BroadDict]
+        func(y)
+
+        z: WithAnnotations[User, OtherDict]
+        func(z) # E: Argument 1 to "func" has incompatible type "WithAnnotations[myapp.models.User, TypedDict('main.OtherDict', {'other': builtins.str})]"; expected "WithAnnotations[myapp.models.User, TypedDict('main.NarrowDict', {'foo': builtins.str})]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+
 -   case: annotate_basic
     main: |
         from myapp.models import User
         from django.db.models.expressions import F
 
         qs = User.objects.annotate(foo=F('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.User], django_stubs_ext.WithAnnotations[myapp.models.User]]"
+        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.User, TypedDict({'foo': Any})], django_stubs_ext.WithAnnotations[myapp.models.User, TypedDict({'foo': Any})]]"
 
         annotated = qs.get()
-        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp.models.User]*"
+        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp.models.User, TypedDict({'foo': Any})]*"
         reveal_type(annotated.foo) # N: Revealed type is "Any"
+        print(annotated.bar) # E: "WithAnnotations[myapp.models.User, TypedDict({'foo': Any})]" has no attribute "bar"
         reveal_type(annotated.username) # N: Revealed type is "builtins.str*"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+
+-   case: annotate_no_field_name
+    main: |
+        from myapp.models import User
+        from django.db.models import Count
+
+        qs = User.objects.annotate(Count('id'))
+        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.User], django_stubs_ext.WithAnnotations[myapp.models.User]]"
 
     installed_apps:
         - myapp
@@ -57,8 +159,9 @@
 -   case: annotate_model_usage_across_methods
     main: |
         from myapp.models import User, Animal
-        from django.db.models.expressions import F
-        qs = User.objects.annotate(foo=F('id'))
+        from django.db.models import Count
+
+        qs = User.objects.annotate(Count('id'))
         annotated_user = qs.get()
 
         def animals_only(param: Animal):
@@ -89,11 +192,11 @@
         from myapp.models import User
         from django.db.models.expressions import F
 
-        # This is just to prevent regressions due to a plugin implementation detail:
-        # Since the annotated class is generated, this ensures it's not generated twice under conflicting names
+        # Django annotations are additive
         qs = User.objects.annotate(foo=F('id'))
         qs = qs.annotate(bar=F('id'))
         annotated = qs.get()
+        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp.models.User, TypedDict({'foo': Any, 'bar': Any})]*"
         reveal_type(annotated.foo) # N: Revealed type is "Any"
         reveal_type(annotated.bar) # N: Revealed type is "Any"
         reveal_type(annotated.username) # N: Revealed type is "builtins.str*"
@@ -110,19 +213,25 @@
 -   case: annotate_using_queryset_across_methods
     main: |
         from myapp.models import User
+        from django_stubs_ext import WithAnnotations
         from django.db.models import QuerySet
         from django.db.models.expressions import F
+        from typing_extensions import TypedDict
 
         qs = User.objects.filter(id=1)
 
-        # There is currently no way to say this returns an "annotated" QuerySet[User]
-        def add_annotation(qs: QuerySet[User]) -> QuerySet[User]:
+        class FooDict(TypedDict):
+            foo: str
+
+        def add_annotation(qs: QuerySet[User]) -> QuerySet[WithAnnotations[User, FooDict]]:
           return qs.annotate(foo=F('id'))
 
+        def add_wrong_annotation(qs: QuerySet[User]) -> QuerySet[WithAnnotations[User, FooDict]]:
+          return qs.annotate(bar=F('id')) # E: Incompatible return value type (got "_QuerySet[WithAnnotations[myapp.models.User, TypedDict({'bar': Any})], WithAnnotations[myapp.models.User, TypedDict({'bar': Any})]]", expected "_QuerySet[WithAnnotations[myapp.models.User, TypedDict('main.FooDict', {'foo': builtins.str})], WithAnnotations[myapp.models.User, TypedDict('main.FooDict', {'foo': builtins.str})]]")
+
         qs = add_annotation(qs)
-        # Hack: So that we can turn this is into an annotated QuerySet, we have to call .annotate.
-        qs = qs.annotate()
         qs.get().foo
+        qs.get().bar # E: "WithAnnotations[myapp.models.User, TypedDict('main.FooDict', {'foo': builtins.str})]" has no attribute "bar"
 
     installed_apps:
         - myapp
@@ -135,7 +244,7 @@
                     username = models.CharField(max_length=100)
 
 
--   case: annotate_currently_allows_non_existant_field
+-   case: annotate_currently_allows_lookups_of_non_existant_field
     main: |
         from myapp.models import User
         from django.db.models.expressions import F
@@ -199,9 +308,9 @@
         # It's possible to provide more precise types than than this, but without inspecting the
         # arguments to .annotate, these are the best types we can infer.
         qs1 = Blog.objects.values('text').annotate(foo=F('id'))
-        reveal_type(qs1) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.dict[builtins.str, Any]]"
+        reveal_type(qs1) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog, TypedDict({'foo': Any})], builtins.dict[builtins.str, Any]]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
-        reveal_type(qs2) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.tuple[Any]]"
+        reveal_type(qs2) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog, TypedDict({'foo': Any})], builtins.tuple[Any]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
         # TODO: Would be nice to infer a NamedTuple which contains the field 'text' (str) + any number of other fields.
         #  The reason it would have to appear to have any other fields is that annotate could potentially be called with
@@ -209,9 +318,9 @@
         #  But it's not trivial to make such a NamedTuple, partly because since it is also an ordinary tuple, it would
         #  have to have an arbitrary length, but still have certain fields at certain indices with specific types.
         #  For now, Any :)
-        reveal_type(qs3) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], Any]"
+        reveal_type(qs3) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog, TypedDict({'foo': Any})], Any]"
         qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=F('id'))
-        reveal_type(qs4) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog], builtins.str]"
+        reveal_type(qs4) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp.models.Blog, TypedDict({'foo': Any})], builtins.str]"
 
 
         before_values_no_params = Blog.objects.values().annotate(foo=F('id')).get()
