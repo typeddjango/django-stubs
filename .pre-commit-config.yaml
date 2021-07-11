@@ -11,6 +11,7 @@ repos:
       - id: check-executables-have-shebangs
       - id: debug-statements
       - id: check-merge-conflict
+      - id: end-of-file-fixer
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.20.0
     hooks:

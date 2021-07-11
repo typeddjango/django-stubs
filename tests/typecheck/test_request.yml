@@ -69,4 +69,3 @@
         reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
-

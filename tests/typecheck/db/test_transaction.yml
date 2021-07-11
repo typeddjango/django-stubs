@@ -25,4 +25,3 @@
       @non_atomic_requests
       def view_func(request: HttpRequest, arg: str) -> HttpResponse: ...
       reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest, arg: builtins.str) -> django.http.response.HttpResponse"
-
