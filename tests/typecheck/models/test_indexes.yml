@@ -8,4 +8,3 @@
         models.Index("foo", name="test", opclasses=["bar"])
         models.Index("foo", name="test", condition=models.Q(foo=1))
         models.Index("foo", name="test", include=["bar"])
-
