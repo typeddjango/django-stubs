@@ -72,30 +72,6 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     column: str
     default: Any
     error_messages: _ErrorMessagesToOverride
-    def __new__(
-        cls,
-        verbose_name: Optional[Union[str, bytes]] = ...,
-        name: Optional[str] = ...,
-        primary_key: bool = ...,
-        max_length: Optional[int] = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> Field[_ST, _GT]: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
@@ -554,7 +530,31 @@ class DecimalField(
         self, instance: Any, value: Union[str, float, Combinable, _DEC]
     ) -> None: ...
 
-class AutoField(Field[Union[Combinable, int, str, None], int]): ...
+class AutoField(Field[Union[Combinable, int, str, None], int]):
+    def __init__(
+        self,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
 
 _C = TypeVar("_C", bound="Optional[str]")
 

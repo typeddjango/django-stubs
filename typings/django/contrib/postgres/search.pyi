@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, Dict, Iterable, Optional, TypeVar, Union
 
 from django.db.models import Field
 from django.db.models.expressions import (
@@ -8,13 +8,68 @@ from django.db.models.expressions import (
     Value,
     _OutputField,
 )
+from django.db.models.fields import (
+    _ErrorMessagesToOverride,
+    _FieldChoices,
+    _ValidatorCallable,
+)
 from django.db.models.lookups import Lookup
 
 _Expression = Union[str, Combinable, "SearchQueryCombinable"]
 
 class SearchVectorExact(Lookup[Any]): ...
-class SearchVectorField(Field[Any, Any]): ...
-class SearchQueryField(Field[Any, Any]): ...
+
+class SearchVectorField(Field[Any, Any]):
+    def __init__(
+        self,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+
+class SearchQueryField(Field[Any, Any]):
+    def __init__(
+        self,
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
 
 class SearchVectorCombinable:
     ADD: str = ...
