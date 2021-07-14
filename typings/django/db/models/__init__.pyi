@@ -69,6 +69,7 @@ from .fields import IntegerField as IntegerField
 from .fields import IPAddressField as IPAddressField
 from .fields import PositiveIntegerField as PositiveIntegerField
 from .fields import PositiveSmallIntegerField as PositiveSmallIntegerField
+from .fields import PositiveBigIntegerField as PositiveBigIntegerField
 from .fields import SlugField as SlugField
 from .fields import SmallIntegerField as SmallIntegerField
 from .fields import TextField as TextField
