@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import UUID
 
 import psycopg2
+from django.contrib.auth.models import User as AuthUser
 from django.contrib.postgres.fields import (
     ArrayField,
     CICharField,
@@ -915,3 +916,6 @@ class HandField(models.Field[Any, Any]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs["max_length"] = 104
         super().__init__(*args, **kwargs)  # type: ignore [call-arg]
+
+
+AuthUser.objects.create_superuser(username="foo", email=None, password=None)
