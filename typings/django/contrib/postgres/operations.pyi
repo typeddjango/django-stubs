@@ -1,4 +1,8 @@
+from typing import Union
+
+from django.db.migrations import AddIndex
 from django.db.migrations.operations.base import Operation
+from django.db.models.indexes import Index
 
 class CreateExtension(Operation):
     reversible: bool = ...
@@ -25,3 +29,6 @@ class TrigramExtension(CreateExtension):
 
 class UnaccentExtension(CreateExtension):
     def __init__(self) -> None: ...
+
+class AddIndexConcurrently(AddIndex):
+    def __init__(self, model_name: str, index: Union[str, Index]) -> None: ...
