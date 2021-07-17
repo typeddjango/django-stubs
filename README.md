@@ -215,6 +215,7 @@ class MyTypedDict(TypedDict):
     foo: str
 
 def func2(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
+    print(m.bar) # Error, since field "bar" is not in MyModel or MyTypedDict.
     return m.foo # OK, since we said field "foo" was allowed
 
 func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
