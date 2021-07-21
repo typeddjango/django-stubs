@@ -19,6 +19,16 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
         return
 
     assert isinstance(base_manager_info, TypeInfo)
+
+    passed_queryset = ctx.call.args[0]
+    assert isinstance(passed_queryset, NameExpr)
+
+    derived_queryset_fullname = passed_queryset.fullname
+    if derived_queryset_fullname is None:
+        # In some cases, due to the way the semantic analyzer works, only passed_queryset.name is available.
+        # But it should be analyzed again, so this isn't a problem.
+        return
+
     new_manager_info = semanal_api.basic_new_typeinfo(
         ctx.name, basetype_or_fallback=Instance(base_manager_info, [AnyType(TypeOfAny.unannotated)]), line=ctx.call.line
     )
@@ -28,11 +38,6 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
     current_module = semanal_api.cur_mod_node
     current_module.names[ctx.name] = SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
-    passed_queryset = ctx.call.args[0]
-    assert isinstance(passed_queryset, NameExpr)
-
-    derived_queryset_fullname = passed_queryset.fullname
-    assert derived_queryset_fullname is not None
 
     sym = semanal_api.lookup_fully_qualified_or_none(derived_queryset_fullname)
     assert sym is not None

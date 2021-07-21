@@ -5,4 +5,6 @@ if typing.TYPE_CHECKING:
 
     ValuesQuerySet = _QuerySet[_T, _Row]
 else:
-    ValuesQuerySet = typing.Any
+    from django.db.models.query import QuerySet
+
+    ValuesQuerySet = QuerySet
