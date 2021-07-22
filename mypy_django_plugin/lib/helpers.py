@@ -355,8 +355,28 @@ def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument],
     return prepared_arguments, return_type
 
 
+def get_method_return_type(semanal_api: SemanticAnalyzer, method_node: FuncDef) -> Optional[MypyType]:
+    method_type = method_node.type
+    if not isinstance(method_type, CallableType):
+        if not semanal_api.final_iteration:
+            semanal_api.defer()
+        return None
+
+    bound_return_type = semanal_api.anal_type(method_type.ret_type, allow_placeholder=True)
+
+    assert bound_return_type is not None
+
+    if isinstance(bound_return_type, PlaceholderNode):
+        return None
+    return bound_return_type
+
+
 def copy_method_to_another_class(
-    ctx: ClassDefContext, self_type: Instance, new_method_name: str, method_node: FuncDef
+    ctx: ClassDefContext,
+    self_type: Instance,
+    new_method_name: str,
+    method_node: FuncDef,
+    override_return_type: Optional[MypyType] = None,
 ) -> None:
     semanal_api = get_semanal_api(ctx)
     if method_node.type is None:
@@ -374,12 +394,8 @@ def copy_method_to_another_class(
             semanal_api.defer()
         return
 
-    arguments = []
-    bound_return_type = semanal_api.anal_type(method_type.ret_type, allow_placeholder=True)
-
-    assert bound_return_type is not None
-
-    if isinstance(bound_return_type, PlaceholderNode):
+    bound_return_type = get_method_return_type(semanal_api, method_node)
+    if bound_return_type is None:
         return
 
     try:
@@ -387,6 +403,7 @@ def copy_method_to_another_class(
     except AttributeError:
         original_arguments = []
 
+    arguments = []
     for arg_name, arg_type, original_argument in zip(
         method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
     ):
@@ -405,5 +422,8 @@ def copy_method_to_another_class(
         )
         argument.set_line(original_argument)
         arguments.append(argument)
+
+    if override_return_type is not None:
+        bound_return_type = override_return_type
 
     add_method(ctx, new_method_name, args=arguments, return_type=bound_return_type, self_type=self_type)
