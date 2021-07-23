@@ -390,14 +390,8 @@ def copy_method_to_another_class(
     for arg_name, arg_type, original_argument in zip(
         method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
     ):
-        bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
-        if bound_arg_type is None and not semanal_api.final_iteration:
-            semanal_api.defer()
-            return
-
-        assert bound_arg_type is not None
-
-        if isinstance(bound_arg_type, PlaceholderNode):
+        bound_arg_type = semanal_api.anal_type(arg_type)
+        if bound_arg_type is None:
             return
 
         var = Var(name=original_argument.variable.name, type=arg_type)
