@@ -179,6 +179,48 @@ def use_my_model():
   return foo.xyz # Gives an error
 ```
 
+### How do I annotate cases where I called QuerySet.annotate?
+
+Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model]`, which indicates that the `Model` has
+been annotated, meaning it allows getting/setting extra attributes on the model instance.
+
+Optionally, you can provide a `TypedDict` of these attributes,
+e.g. `WithAnnotations[MyModel, MyTypedDict]`, to specify which annotated attributes are present.
+
+Currently, the mypy plugin can recognize that specific names were passed to `QuerySet.annotate` and
+include them in the type, but does not record the types of these attributes.
+
+The knowledge of the specific annotated fields is not yet used in creating more specific types for `QuerySet`'s
+`values`, `values_list`, or `filter` methods, however knowledge that the model was annotated _is_ used to create a
+broader type result type for `values`/`values_list`, and to allow `filter`ing on any field.
+
+```python
+from typing import TypedDict
+from django_stubs_ext import WithAnnotations
+from django.db import models
+from django.db.models.expressions import Value
+
+class MyModel(models.Model):
+    username = models.CharField(max_length=100)
+
+
+def func(m: WithAnnotations[MyModel]) -> str:
+    return m.asdf # OK, since the model is annotated as allowing any attribute
+
+func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
+func(MyModel.objects.get(id=1))  # Error, since this model will not allow access to any attribute
+
+
+class MyTypedDict(TypedDict):
+    foo: str
+
+def func2(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
+    print(m.bar) # Error, since field "bar" is not in MyModel or MyTypedDict.
+    return m.foo # OK, since we said field "foo" was allowed
+
+func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
+func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
+```
 
 ## Related projects
 

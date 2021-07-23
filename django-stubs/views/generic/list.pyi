@@ -6,7 +6,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
-T = TypeVar("T", bound=Model)
+T = TypeVar("T", bound=Model, covariant=True)
 
 class MultipleObjectMixin(Generic[T], ContextMixin):
     allow_empty: bool = ...

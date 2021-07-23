@@ -37,7 +37,7 @@
         reveal_type(query.all().get()) # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.filter(age__gt=16).get()) # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.exclude(age__lte=16).get()) # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.annotate(name_length=Length("name")).get()) # N: Revealed type is "Any"
+        reveal_type(query.annotate(name_length=Length("name")).get()) # N: Revealed type is "builtins.tuple*[Any]"
     installed_apps:
         - myapp
     files:
@@ -214,8 +214,8 @@
 -   case: values_list_flat_true_with_ids
     main: |
         from myapp.models import Blog, Publisher
-        reveal_type(Blog.objects.values_list('id', flat=True))  # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Blog, builtins.int]"
-        reveal_type(Blog.objects.values_list('publisher_id', flat=True))  # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Blog, builtins.int]"
+        reveal_type(Blog.objects.values_list('id', flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, builtins.int]"
+        reveal_type(Blog.objects.values_list('publisher_id', flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, builtins.int]"
         # is Iterable[int]
         reveal_type(list(Blog.objects.values_list('id', flat=True)))  # N: Revealed type is "builtins.list[builtins.int*]"
     installed_apps:
@@ -234,8 +234,8 @@
     main: |
         from myapp.models import TransactionQuerySet
         reveal_type(TransactionQuerySet())  # N: Revealed type is "myapp.models.TransactionQuerySet"
-        reveal_type(TransactionQuerySet().values())  # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Transaction, TypedDict({'id': builtins.int, 'total': builtins.int})]"
-        reveal_type(TransactionQuerySet().values_list())  # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Transaction, Tuple[builtins.int, builtins.int]]"
+        reveal_type(TransactionQuerySet().values())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Transaction, TypedDict({'id': builtins.int, 'total': builtins.int})]"
+        reveal_type(TransactionQuerySet().values_list())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Transaction, Tuple[builtins.int, builtins.int]]"
     installed_apps:
         - myapp
     files:
@@ -251,8 +251,8 @@
 -   case: values_list_of_many_to_many_field
     main: |
         from myapp.models import Author, Book
-        reveal_type(Book.objects.values_list('authors'))  # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Book, Tuple[builtins.int]]"
-        reveal_type(Author.objects.values_list('books'))  # N: Revealed type is "django.db.models.query._ValuesQuerySet[myapp.models.Author, Tuple[builtins.int]]"
+        reveal_type(Book.objects.values_list('authors'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, Tuple[builtins.int]]"
+        reveal_type(Author.objects.values_list('books'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Author, Tuple[builtins.int]]"
     installed_apps:
         - myapp
     files:

@@ -41,6 +41,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames
+from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
@@ -61,7 +62,15 @@ def is_toml(filename: str) -> bool:
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
     if "." not in fullname:
         return None
-    module, cls_name = fullname.rsplit(".", 1)
+    if "[" in fullname and "]" in fullname:
+        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
+        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
+        bracket_start = fullname.index("[")
+        fullname_without_bracket = fullname[:bracket_start]
+        module, cls_name = fullname_without_bracket.rsplit(".", 1)
+        cls_name += fullname[bracket_start:]
+    else:
+        module, cls_name = fullname.rsplit(".", 1)
 
     module_file = all_modules.get(module)
     if module_file is None:
@@ -195,6 +204,10 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
+def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
+    return model_cls_fullname.startswith(WITH_ANNOTATIONS_FULLNAME + "[")
+
+
 def add_new_class_for_module(
     module: MypyFile, name: str, bases: List[Instance], fields: Optional[Dict[str, MypyType]] = None
 ) -> TypeInfo:
@@ -233,10 +246,14 @@ def get_current_module(api: TypeChecker) -> MypyFile:
     return current_module
 
 
-def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]") -> TupleType:
+def make_oneoff_named_tuple(
+    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: Optional[List[Instance]] = None
+) -> TupleType:
     current_module = get_current_module(api)
+    if extra_bases is None:
+        extra_bases = []
     namedtuple_info = add_new_class_for_module(
-        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", [])], fields=fields
+        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", [])] + extra_bases, fields=fields
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
@@ -373,14 +390,8 @@ def copy_method_to_another_class(
     for arg_name, arg_type, original_argument in zip(
         method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
     ):
-        bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
-        if bound_arg_type is None and not semanal_api.final_iteration:
-            semanal_api.defer()
-            return
-
-        assert bound_arg_type is not None
-
-        if isinstance(bound_arg_type, PlaceholderNode):
+        bound_arg_type = semanal_api.anal_type(arg_type)
+        if bound_arg_type is None:
             return
 
         var = Var(name=original_argument.variable.name, type=arg_type)

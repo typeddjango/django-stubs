@@ -11,10 +11,13 @@ ONETOONE_FIELD_FULLNAME = "django.db.models.fields.related.OneToOneField"
 MANYTOMANY_FIELD_FULLNAME = "django.db.models.fields.related.ManyToManyField"
 DUMMY_SETTINGS_BASE_CLASS = "django.conf._DjangoConfLazyObject"
 
-QUERYSET_CLASS_FULLNAME = "django.db.models.query.QuerySet"
+QUERYSET_CLASS_FULLNAME = "django.db.models.query._QuerySet"
 BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
 RELATED_MANAGER_CLASS = "django.db.models.manager.RelatedManager"
+
+WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.WithAnnotations"
+ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.Annotations"
 
 BASEFORM_CLASS_FULLNAME = "django.forms.forms.BaseForm"
 FORM_CLASS_FULLNAME = "django.forms.forms.Form"
@@ -34,3 +37,5 @@ OPTIONS_CLASS_FULLNAME = "django.db.models.options.Options"
 HTTPREQUEST_CLASS_FULLNAME = "django.http.request.HttpRequest"
 
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
+
+ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django._AnyAttrAllowed"
