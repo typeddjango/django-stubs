@@ -127,7 +127,7 @@
         from myapp.models import Publisher, PublisherDatetime, Book
         Book(publisher_id=1, publisher_dt_id=now)
         Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "List[Any]", expected "Union[Combinable, int, str, None]")
-        Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "Union[str, date, Combinable, None]")
+        Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "Union[str, datetime, date, Combinable, None]")
     installed_apps:
         - myapp
     files:
