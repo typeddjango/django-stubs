@@ -451,6 +451,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     ): ...
 
 class DateTimeField(DateField[_ST, _GT]):
+    _pyi_private_set_type: Union[str, datetime, date, Combinable]
     _pyi_private_get_type: datetime
     _pyi_lookup_exact_type: Union[str, datetime]
 
