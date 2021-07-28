@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Iterable, Optional
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -52,7 +52,7 @@ class PasswordResetForm(forms.Form):
         to_email: str,
         html_email_template_name: Optional[str] = ...,
     ) -> None: ...
-    def get_users(self, email: str) -> Iterator[Any]: ...
+    def get_users(self, email: str) -> Iterable[Any]: ...
     def save(
         self,
         domain_override: Optional[str] = ...,
