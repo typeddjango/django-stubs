@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
+from django.http.request import HttpRequest
 
 UserModel: Any
 
@@ -61,7 +62,7 @@ class PasswordResetForm(forms.Form):
         use_https: bool = ...,
         token_generator: PasswordResetTokenGenerator = ...,
         from_email: Optional[str] = ...,
-        request: Optional[WSGIRequest] = ...,
+        request: Optional[HttpRequest] = ...,
         html_email_template_name: Optional[str] = ...,
         extra_email_context: Optional[Dict[str, str]] = ...,
     ) -> None: ...
