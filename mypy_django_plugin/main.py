@@ -53,10 +53,8 @@ def transform_form_class(ctx: ClassDefContext) -> None:
     forms.make_meta_nested_class_inherit_from_any(ctx)
 
 
-def add_new_manager_base(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        helpers.get_django_metadata(sym.node)["manager_bases"][ctx.cls.fullname] = 1
+def add_new_manager_base_hook(ctx: ClassDefContext) -> None:
+    helpers.add_new_manager_base(ctx.api, ctx.cls.fullname)
 
 
 def extract_django_settings_module(config_file_path: Optional[str]) -> str:
@@ -235,7 +233,12 @@ class NewSemanalDjangoPlugin(Plugin):
                 related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname:
                     deps.add(self._new_dependency(related_model_module))
-        return list(deps) + [self._new_dependency("django_stubs_ext")]  # for annotate
+        return list(deps) + [
+            # for QuerySet.annotate
+            self._new_dependency("django_stubs_ext"),
+            # For BaseManager.from_queryset
+            self._new_dependency("django.db.models.query"),
+        ]
 
     def get_function_hook(self, fullname: str) -> Optional[Callable[[FunctionContext], MypyType]]:
         if fullname == "django.contrib.auth.get_user_model":
@@ -305,7 +308,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(transform_model_class, django_context=self.django_context)
 
         if fullname in self._get_current_manager_bases():
-            return add_new_manager_base
+            return add_new_manager_base_hook
 
         if fullname in self._get_current_form_bases():
             return transform_form_class

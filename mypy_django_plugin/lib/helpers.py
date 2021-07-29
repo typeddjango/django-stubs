@@ -18,7 +18,6 @@ from mypy.nodes import (
     MemberExpr,
     MypyFile,
     NameExpr,
-    PlaceholderNode,
     StrExpr,
     SymbolNode,
     SymbolTable,
@@ -33,12 +32,13 @@ from mypy.plugin import (
     DynamicClassDefContext,
     FunctionContext,
     MethodContext,
+    SemanticAnalyzerPluginInterface,
 )
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, UnionType
+from mypy.types import TypedDictType, TypeOfAny, UnboundType, UnionType
 
 from mypy_django_plugin.lib import fullnames
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
@@ -355,8 +355,26 @@ def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument],
     return prepared_arguments, return_type
 
 
+def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Optional[str] = None) -> Optional[MypyType]:
+    """Analyze a type. If an unbound type, try to look it up in the given module name.
+
+    That should hopefully give a bound type."""
+    if isinstance(t, UnboundType) and module_name is not None:
+        node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
+        if node is None:
+            return None
+        return node.type
+    else:
+        return api.anal_type(t)
+
+
 def copy_method_to_another_class(
-    ctx: ClassDefContext, self_type: Instance, new_method_name: str, method_node: FuncDef
+    ctx: ClassDefContext,
+    self_type: Instance,
+    new_method_name: str,
+    method_node: FuncDef,
+    return_type: Optional[MypyType] = None,
+    original_module_name: Optional[str] = None,
 ) -> None:
     semanal_api = get_semanal_api(ctx)
     if method_node.type is None:
@@ -374,23 +392,20 @@ def copy_method_to_another_class(
             semanal_api.defer()
         return
 
-    arguments = []
-    bound_return_type = semanal_api.anal_type(method_type.ret_type, allow_placeholder=True)
-
-    assert bound_return_type is not None
-
-    if isinstance(bound_return_type, PlaceholderNode):
+    if return_type is None:
+        return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
+    if return_type is None:
         return
-
     try:
         original_arguments = method_node.arguments[1:]
     except AttributeError:
         original_arguments = []
 
+    arguments = []
     for arg_name, arg_type, original_argument in zip(
         method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
     ):
-        bound_arg_type = semanal_api.anal_type(arg_type)
+        bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
         if bound_arg_type is None:
             return
 
@@ -406,4 +421,10 @@ def copy_method_to_another_class(
         argument.set_line(original_argument)
         arguments.append(argument)
 
-    add_method(ctx, new_method_name, args=arguments, return_type=bound_return_type, self_type=self_type)
+    add_method(ctx, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
+
+
+def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:
+    sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
+    if sym is not None and isinstance(sym.node, TypeInfo):
+        get_django_metadata(sym.node)["manager_bases"][fullname] = 1
