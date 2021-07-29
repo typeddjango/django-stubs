@@ -131,8 +131,6 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             # Skip any method that doesn't return _QS
             original_return_type = get_proper_type(original_return_type)
             if isinstance(original_return_type, UnboundType):
-                if not semanal_api.final_iteration:
-                    semanal_api.defer()
                 if original_return_type.name != "_QS":
                     continue
             elif isinstance(original_return_type, TypeVarType):
