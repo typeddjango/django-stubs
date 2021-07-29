@@ -1,10 +1,11 @@
 -   case: from_queryset_with_base_manager
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
-        MyModel.objects.filter(id=1).queryset_method()
+        reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel*]"
     installed_apps:
         - myapp
     files:
@@ -24,7 +25,7 @@
 -   case: from_queryset_with_manager
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
     installed_apps:
@@ -98,7 +99,7 @@
 -   case: from_queryset_with_class_inheritance
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
     installed_apps:
@@ -122,7 +123,7 @@
 -   case: from_queryset_with_manager_in_another_directory_and_imports
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
         reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: Union[builtins.str, None] =) -> Union[builtins.str, None]"
         reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "Union[builtins.str, None]"
@@ -152,7 +153,7 @@
     disable_cache: true
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
         reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: Union[builtins.int, builtins.str]) -> <nothing>"
         reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "<nothing>"
@@ -184,7 +185,7 @@
 -   case: from_queryset_with_decorated_queryset_methods
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.MyModel_NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
