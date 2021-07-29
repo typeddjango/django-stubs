@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Iterable, Optional
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
+from django.http.request import HttpRequest
 
 UserModel: Any
 
@@ -52,7 +53,7 @@ class PasswordResetForm(forms.Form):
         to_email: str,
         html_email_template_name: Optional[str] = ...,
     ) -> None: ...
-    def get_users(self, email: str) -> Iterator[Any]: ...
+    def get_users(self, email: str) -> Iterable[Any]: ...
     def save(
         self,
         domain_override: Optional[str] = ...,
@@ -61,7 +62,7 @@ class PasswordResetForm(forms.Form):
         use_https: bool = ...,
         token_generator: PasswordResetTokenGenerator = ...,
         from_email: Optional[str] = ...,
-        request: Optional[WSGIRequest] = ...,
+        request: Optional[HttpRequest] = ...,
         html_email_template_name: Optional[str] = ...,
         extra_email_context: Optional[Dict[str, str]] = ...,
     ) -> None: ...
