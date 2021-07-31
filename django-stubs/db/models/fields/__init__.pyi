@@ -493,7 +493,7 @@ class FilePathField(Field[_ST, _GT]):
     ): ...
 
 class BinaryField(Field[_ST, _GT]):
-    _pyi_private_get_type: bytes
+    _pyi_private_get_type: Union[bytes, memoryview]
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta
