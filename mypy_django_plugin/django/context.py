@@ -64,9 +64,7 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
 
         # Define mypy builtins, to not cause NameError during setting up Django.
         # TODO: temporary/unpatch
-        assert not hasattr(builtins, "reveal_type")
         builtins.reveal_type = lambda _: None
-        assert not hasattr(builtins, "reveal_locals")
         builtins.reveal_locals = lambda: None
 
         from django.apps import apps
