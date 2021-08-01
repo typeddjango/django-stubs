@@ -17,18 +17,19 @@ Type stubs for [Django](https://www.djangoproject.com).
 pip install django-types
 ```
 
-If you're on a Django version < 3.1, you'll need to monkey patch Django's
-`QuerySet` and `Manager` classes so we can index into them with a generic
-argument. You can either use [`django-stubs-ext`](https://pypi.org/project/django-stubs-ext/) or do this yourself manually:
+You'll need to monkey patch Django's `QuerySet`, `Manager` (note needed for Django 3.2+) and
+`ForeignKey` classes so we can index into them with a generic argument. Add this to your
+settings.py:
 
 ```python
 # in settings.py
+from django.db.models import ForeignKey
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 
 # NOTE: there are probably other items you'll need to monkey patch depending on
 # your version.
-for cls in (QuerySet, BaseManager):
+for cls in [QuerySet, BaseManager, ForeignKey]:
     cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore [attr-defined]
 ```
 
@@ -41,37 +42,103 @@ have to explicitly type the property.
 
 ```python
 from django.db import connection, models
-from django.db.models.manager import Manager
+
 
 class User(models.Model):
-    title = models.CharField(max_length=255)
+    objects = models.Manager["User"]()
 
-    objects = Manager["User"]()
 
 reveal_type(User.objects.all().first())
 # note: Revealed type is 'Optional[User]'
 ```
 
-### ForeignKey ids as properties in ORM models
+### ForeignKey ids and related names as properties in ORM models
 
 When defining a Django ORM model with a foreign key, like so:
 
 ```python
 class User(models.Model):
-    team = models.ForeignKey("Team", null=True, on_delete=models.SET_NULL)
+    team = models.ForeignKey(
+        "Team",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    role = models.ForeignKey(
+        "Role",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="users",
+    )
 ```
 
-two properties are created, `team` as expected, and `team_id`. In order for
-mypy to know about the id property we need to define it manually as follows:
+two properties are created, `team` as expected, and `team_id`. Also, a related
+manager called `user_set` is created on `Team` for the reverse access.
+
+In order to properly add typing to the foreing key itself and also for the created ids you can do
+something like this:
 
 ```python
 from typing import TYPE_CHECKING
 
+from someapp.models import Team
+if TYPE_CHECKING:
+    # In this example Role cannot be imported due to circular import issues,
+    # but doing so inside TYPE_CHECKING will make sure that the typing bellow
+    # knows what "Role" means
+    from anotherapp.models import Role
+
+
 class User(models.Model):
-    team = models.ForeignKey("Team", null=True, on_delete=models.SET_NULL)
-    if TYPE_CHECKING:
-        team_id: int
+    team_id: Optional[int]
+    team = models.ForeignKey(
+        Team,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    role_id: int
+    role = models.ForeignKey["Role"](
+        "Role",
+        null=False,
+        on_delete=models.SET_NULL,
+        related_name="users",
+    )
+
+
+reveal_type(User().team)
+# note: Revealed type is 'Optional[Team]'
+reveal_type(User().role)
+# note: Revealed type is 'Role'
 ```
+
+This will make sure that `team_id` and `role_id` can be accessed. Also, `team` and `role`
+will be typed to their right objects.
+
+To be able to access the related manager `Team` and `Role` you could do:
+
+```python
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # This doesn't really on django exist so it always need to be imported this way
+    from django.db.models.manager import RelatedManager
+    from user.models import User
+
+
+class Team(models.Model):
+    if TYPE_CHECKING:
+        user_set = RelatedManager["User"]()
+
+
+class Role(models.Model):
+    if TYPE_CHECKING:
+        users = RelatedManager["User"]()
+
+reveal_type(Team().user_set)
+# note: Revealed type is 'RelatedManager[User]'
+reveal_type(Role().users)
+# note: Revealed type is 'RelatedManager[User]'
+```
+
 
 ### `AutoField`
 
