@@ -165,3 +165,12 @@
         reveal_type(book.published)  # N: Revealed type is "main.Year*"
         def accepts_int(arg: int) -> None: ...
         accepts_int(book.published)
+
+-  case: test_binary_field_return_types
+   main: |
+        from django.db import models
+        class EncodedMessage(models.Model):
+            message = models.BinaryField()
+        obj = EncodedMessage(b'\x010')
+
+        reveal_type(obj.message) # N: Revealed type is "Union[builtins.bytes, builtins.memoryview]"
