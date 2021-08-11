@@ -20,5 +20,5 @@ class DefaultCacheProxy:
     def __delattr__(self, name: Any) -> Any: ...
     def __contains__(self, key: str) -> bool: ...
 
-cache: Any
+cache: BaseCache
 caches: CacheHandler

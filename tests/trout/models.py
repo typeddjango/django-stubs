@@ -17,6 +17,7 @@ from django.contrib.postgres.fields import (
     JSONField,
 )
 from django.contrib.postgres.search import SearchVectorField
+from django.core.cache import cache
 from django.db import connection, connections, models
 from django.db.backends.utils import CursorWrapper
 from django.db.models.manager import Manager, RelatedManager
@@ -231,6 +232,9 @@ def main() -> None:
         "/api/users", data={"buzz": "bar"}, QUERY_STRING="?foo=1", HTTP_X_FOO_BAR="foo"
     )
     print(res)
+
+    cache.set("foo", "bar")
+    cache.set_many({}, timeout=10, version=10)
 
     request = HttpRequest()
     header = request.headers.get("FOO")
