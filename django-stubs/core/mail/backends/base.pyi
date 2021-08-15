@@ -1,5 +1,5 @@
 import types
-from typing import Any, Iterable, Optional, Type, TypeVar
+from typing import Any, Optional, Sequence, Type, TypeVar
 
 from django.core.mail.message import EmailMessage
 
@@ -13,4 +13,4 @@ class BaseEmailBackend:
     def __exit__(
         self, exc_type: Type[BaseException], exc_value: BaseException, traceback: types.TracebackType
     ) -> None: ...
-    def send_messages(self, email_messages: Iterable[EmailMessage]) -> int: ...
+    def send_messages(self, email_messages: Sequence[EmailMessage]) -> int: ...
