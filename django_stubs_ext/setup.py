@@ -25,6 +25,7 @@ setup(
     python_requires=">=3.6",
     install_requires=dependencies,
     packages=["django_stubs_ext", *find_packages(exclude=["scripts"])],
+    package_data={"django_stubs_ext": ["py.typed"]},
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
