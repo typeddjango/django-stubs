@@ -101,8 +101,8 @@ class HttpResponse(HttpResponseBase):
 
 class StreamingHttpResponse(HttpResponseBase):
     content: Any
-    streaming_content: Iterator[Any]
-    def __init__(self, streaming_content: Iterable[Any] = ..., *args: Any, **kwargs: Any) -> None: ...
+    streaming_content: Iterator[bytes]
+    def __init__(self, streaming_content: Iterable[bytes] = ..., *args: Any, **kwargs: Any) -> None: ...
     def getvalue(self) -> bytes: ...
 
 class FileResponse(StreamingHttpResponse):
