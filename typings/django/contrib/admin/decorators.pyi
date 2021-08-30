@@ -9,7 +9,9 @@ from django.http import HttpRequest, HttpResponse
 _M = TypeVar("_M", bound=Model)
 
 def action(
-    function: Optional[Callable[[ModelAdmin[_M], HttpRequest, QuerySet[_M]], Optional[HttpResponse]]] = ...,
+    function: Optional[
+        Callable[[ModelAdmin[_M], HttpRequest, QuerySet[_M]], Optional[HttpResponse]]
+    ] = ...,
     *,
     permissions: Optional[Sequence[str]] = ...,
     description: Optional[str] = ...,
