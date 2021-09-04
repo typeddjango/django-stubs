@@ -11,7 +11,7 @@ dependencies = [
 
 setup(
     name="django-stubs-ext",
-    version="0.2.0",
+    version="0.3.0",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
