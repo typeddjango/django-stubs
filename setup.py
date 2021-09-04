@@ -21,18 +21,20 @@ with open("README.md") as f:
     readme = f.read()
 
 dependencies = [
-    "mypy>=0.900",
-    "typing-extensions",
+    "mypy>=0.910",
     "django",
-    "django-stubs-ext",
+    "django-stubs-ext>=0.3.0",
+    "toml",
+
+    # Types:
+    "typing-extensions",
     "types-pytz",
     "types-PyYAML",
-    "toml",
 ]
 
 setup(
     name="django-stubs",
-    version="1.8.0",
+    version="1.9.0",
     description="Mypy stubs for Django",
     long_description=readme,
     long_description_content_type="text/markdown",
