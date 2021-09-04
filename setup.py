@@ -25,7 +25,6 @@ dependencies = [
     "django",
     "django-stubs-ext>=0.3.0",
     "toml",
-
     # Types:
     "typing-extensions",
     "types-pytz",
