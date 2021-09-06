@@ -5,6 +5,8 @@ from typing import Optional
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.monkeypatch import MonkeyPatch
+from django.db.models import Model
+from django.forms.models import ModelForm
 from typing_extensions import Protocol
 
 import django_stubs_ext
@@ -45,6 +47,9 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
     for el in _need_generic:
         if el.version is None:
             assert el.cls[type] is el.cls  # `type` is arbitrary
+
+    class TestForm(ModelForm[Model]):
+        pass
 
 
 @pytest.mark.parametrize(
