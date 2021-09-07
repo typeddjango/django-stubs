@@ -7,6 +7,7 @@ with open("README.md") as f:
 
 dependencies = [
     "django",
+    "typing-extensions",
 ]
 
 setup(
