@@ -72,6 +72,7 @@ from .fields import PositiveBigIntegerField as PositiveBigIntegerField
 from .fields import PositiveIntegerField as PositiveIntegerField
 from .fields import PositiveSmallIntegerField as PositiveSmallIntegerField
 from .fields import SlugField as SlugField
+from .fields import SmallAutoField as SmallAutoField
 from .fields import SmallIntegerField as SmallIntegerField
 from .fields import TextField as TextField
 from .fields import TimeField as TimeField
