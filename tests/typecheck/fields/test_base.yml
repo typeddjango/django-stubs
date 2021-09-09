@@ -174,3 +174,12 @@
         obj = EncodedMessage(b'\x010')
 
         reveal_type(obj.message) # N: Revealed type is "Union[builtins.bytes, builtins.memoryview]"
+
+-  case: test_small_auto_field_class_presents_as_int
+   main: |
+        from django.db import models
+        class MyModel(models.Model):
+            small = models.SmallAutoField(primary_key=True)
+        obj = MyModel()
+
+        reveal_type(obj.small) # N: Revealed type is "builtins.int*"
