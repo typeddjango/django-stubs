@@ -1,0 +1,102 @@
+-   case: http_response
+    main: |
+      from django.http.request import HttpRequest
+      from django.http.response import HttpResponse
+      from django.utils.translation import gettext_lazy as _
+
+      def empty_response(request: HttpRequest) -> HttpResponse:
+          return HttpResponse()
+
+      def str_response(request: HttpRequest) -> HttpResponse:
+          return HttpResponse('It works!')
+
+      def bytes_response(request: HttpRequest) -> HttpResponse:
+          return HttpResponse(b'It works!')
+
+      def object_response(request: HttpRequest) -> HttpResponse:
+          return HttpResponse(_('It works!'))
+
+-   case: http_response_content
+    main: |
+      from django.http.request import HttpRequest
+      from django.http.response import HttpResponse
+      from django.utils.translation import gettext_lazy as _
+
+      def empty_response(request: HttpRequest) -> HttpResponse:
+          response = HttpResponse()
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          return response
+
+      def str_response(request: HttpRequest) -> HttpResponse:
+          response = HttpResponse()
+          response.content = 'It works!'
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          return response
+
+      def bytes_response(request: HttpRequest) -> HttpResponse:
+          response = HttpResponse()
+          response.content = b'It works!'
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          return response
+
+      def object_response(request: HttpRequest) -> HttpResponse:
+          response = HttpResponse()
+          response.content = _('It works!')
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          return response
+
+-   case: streaming_http_response
+    main: |
+      from django.http.request import HttpRequest
+      from django.http.response import StreamingHttpResponse
+      from django.utils.translation import gettext_lazy as _
+
+      def empty_response(request: HttpRequest) -> StreamingHttpResponse:
+          return StreamingHttpResponse()
+
+      def str_response(request: HttpRequest) -> StreamingHttpResponse:
+          return StreamingHttpResponse(['It works!'])
+
+      def bytes_response(request: HttpRequest) -> StreamingHttpResponse:
+          return StreamingHttpResponse([b'It works!'])
+
+      def object_response(request: HttpRequest) -> StreamingHttpResponse:
+          return StreamingHttpResponse([_('It works!')])
+
+      def mixed_response(request: HttpRequest) -> StreamingHttpResponse:
+          return StreamingHttpResponse([_('Yes'), '/', _('No')])
+
+-   case: streaming_http_response_streaming_content
+    main: |
+      from django.http.request import HttpRequest
+      from django.http.response import StreamingHttpResponse
+      from django.utils.translation import gettext_lazy as _
+
+      def empty_response(request: HttpRequest) -> StreamingHttpResponse:
+          response = StreamingHttpResponse()
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          return response
+
+      def str_response(request: HttpRequest) -> StreamingHttpResponse:
+          response = StreamingHttpResponse()
+          response.streaming_content = ['It works!']
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          return response
+
+      def bytes_response(request: HttpRequest) -> StreamingHttpResponse:
+          response = StreamingHttpResponse()
+          response.streaming_content = [b'It works!']
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          return response
+
+      def object_response(request: HttpRequest) -> StreamingHttpResponse:
+          response = StreamingHttpResponse()
+          response.streaming_content = [_('It works!')]
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          return response
+
+      def mixed_response(request: HttpRequest) -> StreamingHttpResponse:
+          response = StreamingHttpResponse()
+          response.streaming_content = [_('Yes'), '/', _('No')]
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          return response
