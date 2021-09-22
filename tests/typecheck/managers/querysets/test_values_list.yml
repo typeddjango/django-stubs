@@ -281,3 +281,22 @@
                 class Blog(models.Model):
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100, blank=True)
+
+-   case: values_list_field_defaults
+    main: |
+        from myapp.models import MyModel
+        values_tuple = MyModel.objects.values_list().get()
+        reveal_type(values_tuple[1])  # N: Revealed type is "builtins.bool"
+        reveal_type(values_tuple[2])  # N: Revealed type is "Union[builtins.bool, None]"
+        reveal_type(values_tuple[3])  # N: Revealed type is "builtins.bool"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    no_default = models.BooleanField()
+                    default_none = models.BooleanField(default=None)
+                    default_not_none = models.BooleanField(default=True)

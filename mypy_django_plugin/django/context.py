@@ -277,7 +277,9 @@ class DjangoContext:
         if method == "create":
             if isinstance(field, AutoField):
                 return True
-        if isinstance(field, Field) and field.has_default():
+            if isinstance(field, Field) and field.primary_key and field.has_default() and field.default is not None:
+                return True
+        if isinstance(field, Field) and field.has_default() and field.default is None:
             return True
         return nullable
 
