@@ -273,7 +273,8 @@ class AddRelatedManagers(ModelClassInitializer):
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
                         fullnames.RELATED_MANAGER_CLASS
                     )  # noqa: E501
-                    if "objects" not in related_model_info.names:
+                    objects = related_model_info.get("objects")
+                    if not objects:
                         raise helpers.IncompleteDefnException()
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
@@ -283,7 +284,7 @@ class AddRelatedManagers(ModelClassInitializer):
 
                 # create new RelatedManager subclass
                 parametrized_related_manager_type = Instance(related_manager_info, [Instance(related_model_info, [])])
-                default_manager_type = related_model_info.names["objects"].type
+                default_manager_type = objects.type
                 if default_manager_type is None:
                     default_manager_type = self.try_generate_related_manager(related_model_cls, related_model_info)
                 if (
