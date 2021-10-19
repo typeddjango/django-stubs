@@ -52,12 +52,8 @@
         b_instance = B()
         reveal_type(b_instance.b_attr) # N: Revealed type is "builtins.int"
 
-        reveal_type(b_instance.non_existent_attribute)
-        b_instance.non_existent_attribute = 2
-    out: |
-        main:5: note: Revealed type is "Any"
-        main:5: error: "B" has no attribute "non_existent_attribute"
-        main:6: error: "B" has no attribute "non_existent_attribute"
+        b_instance.non_existent_attribute  # E: "B" has no attribute "non_existent_attribute"
+        b_instance.non_existent_attribute = 2  # E: "B" has no attribute "non_existent_attribute"
     installed_apps:
         - myapp
     files:

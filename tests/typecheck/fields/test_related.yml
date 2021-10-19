@@ -130,10 +130,7 @@
     main: |
         from myapp.models import View
         reveal_type(View().app.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
-        reveal_type(View().app.unknown)
-    out: |
-        main:3: note: Revealed type is "Any"
-        main:3: error: "App" has no attribute "unknown"
+        View().app.unknown  # E: "App" has no attribute "unknown"
     installed_apps:
         - myapp
         - myapp2
