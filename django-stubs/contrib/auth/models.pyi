@@ -39,7 +39,7 @@ class Group(models.Model):
 
     name = models.CharField(max_length=150)
     permissions = models.ManyToManyField(Permission)
-    def natural_key(self): ...
+    def natural_key(self) -> Tuple[str]: ...
 
 _T = TypeVar("_T", bound=Model)
 
