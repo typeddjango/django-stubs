@@ -18,11 +18,9 @@
         reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is "django.db.models.fields.CharField[Any, Any]"
         reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is "django.db.models.fields.CharField[Any, Any]"
         reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is "django.db.models.fields.IntegerField[Any, Any]"
-        reveal_type(MyUser._meta.get_field('unknown'))
         reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is "django.db.models.fields.related.ForeignKey[Any, Any]"
-    out: |
-        main:5: note: Revealed type is "Any"
-        main:5: error: MyUser has no field named 'unknown'
+
+        MyUser._meta.get_field('unknown')  # E: MyUser has no field named 'unknown'
     installed_apps:
         - myapp
     files:

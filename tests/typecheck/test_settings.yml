@@ -30,10 +30,7 @@
 -   case: fail_if_there_is_no_setting
     main: |
         from django.conf import settings
-        reveal_type(settings.NOT_EXISTING)
-    out: |
-        main:2: note: Revealed type is "Any"
-        main:2: error: 'Settings' object has no attribute 'NOT_EXISTING'
+        settings.NOT_EXISTING  # E: 'Settings' object has no attribute 'NOT_EXISTING'
 
 -   case: override_default_setting_with_different_type_in_the_different_module
     custom_settings: |

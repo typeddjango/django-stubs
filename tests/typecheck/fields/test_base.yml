@@ -63,10 +63,7 @@
     main: |
         from myapp.models import User
         reveal_type(User().my_pk)  # N: Revealed type is "builtins.int*"
-        reveal_type(User().id)
-    out: |
-        main:3: note: Revealed type is "Any"
-        main:3: error: "User" has no attribute "id"
+        User().id  # E: "User" has no attribute "id"
     installed_apps:
         - myapp
     files:
