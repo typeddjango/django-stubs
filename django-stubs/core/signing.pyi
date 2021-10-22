@@ -18,11 +18,15 @@ class JSONSerializer:
     def loads(self, data: bytes) -> Dict[str, Union[int, str]]: ...
 
 def dumps(
-    obj: Any, key: None = ..., salt: str = ..., serializer: Type[Serializer] = ..., compress: bool = ...
+    obj: Any,
+    key: Optional[Union[bytes, str]] = ...,
+    salt: str = ...,
+    serializer: Type[Serializer] = ...,
+    compress: bool = ...,
 ) -> str: ...
 def loads(
     s: str,
-    key: None = ...,
+    key: Optional[Union[bytes, str]] = ...,
     salt: str = ...,
     serializer: Type[Serializer] = ...,
     max_age: Optional[Union[int, timedelta]] = ...,
