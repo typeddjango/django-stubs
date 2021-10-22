@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Sequence, Tuple
 
 from .message import DEFAULT_ATTACHMENT_MIME_TYPE as DEFAULT_ATTACHMENT_MIME_TYPE
 from .message import BadHeaderError as BadHeaderError
@@ -15,7 +15,7 @@ def send_mail(
     subject: str,
     message: str,
     from_email: Optional[str],
-    recipient_list: List[str],
+    recipient_list: Sequence[str],
     fail_silently: bool = ...,
     auth_user: Optional[str] = ...,
     auth_password: Optional[str] = ...,
