@@ -35,23 +35,6 @@ for cls in [QuerySet, BaseManager, ForeignKey]:
 
 ## usage
 
-### getting `objects` to work
-
-By default the base `Model` class doesn't have `objects` defined, so you'll
-have to explicitly type the property.
-
-```python
-from django.db import connection, models
-
-
-class User(models.Model):
-    objects = models.Manager["User"]()
-
-
-reveal_type(User.objects.all().first())
-# note: Revealed type is 'Optional[User]'
-```
-
 ### ForeignKey ids and related names as properties in ORM models
 
 When defining a Django ORM model with a foreign key, like so:
@@ -119,7 +102,7 @@ To be able to access the related manager `Team` and `Role` you could do:
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    # This doesn't really on django exist so it always need to be imported this way
+    # This doesn't really exists on django so it always need to be imported this way
     from django.db.models.manager import RelatedManager
     from user.models import User
 

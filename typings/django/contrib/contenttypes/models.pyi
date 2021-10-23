@@ -2,9 +2,10 @@ from typing import Any, Dict, Optional, Tuple, Type, Union
 
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 
-class ContentTypeManager(models.Manager["ContentType"]):
+class ContentTypeManager(BaseManager["ContentType"]):
     def get_by_natural_key(self, app_label: str, model: str) -> ContentType: ...
     def get_for_model(
         self, model: Union[Type[Model], Model], for_concrete_model: bool = ...

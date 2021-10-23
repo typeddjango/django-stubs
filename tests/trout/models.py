@@ -20,7 +20,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.cache import cache
 from django.db import connection, connections, models
 from django.db.backends.utils import CursorWrapper
-from django.db.models.manager import Manager, RelatedManager
+from django.db.models.manager import RelatedManager
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.middleware.cache import CacheMiddleware
@@ -202,8 +202,6 @@ class Comment(models.Model):
     metadata = JSONField()
     other_metadata = models.JSONField()
 
-    objects = Manager["Comment"]()
-
 
 def process_non_nullable(
     x: Union[
@@ -251,7 +249,11 @@ def main() -> None:
     comment.auth_token = User()
     comment.save()
 
-    Comment.objects.filter(foo=True).filter(bar=False).first()
+    maybe_c = Comment.objects.filter(foo=True).filter(bar=False).first()
+    if maybe_c is not None:
+        process_non_nullable(maybe_c.integer)
+    for_sure_c = Comment.objects.get(pk=comment.pk)
+    process_non_nullable(for_sure_c.integer)
 
     # Django way to duplicate an instance
     comment.id = None
