@@ -48,7 +48,7 @@ class FileUploadHandler:
 
 class TemporaryFileUploadHandler(FileUploadHandler):
     def __init__(self, request: Optional[HttpRequest] = ...) -> None: ...
-    file = ...  # type: TemporaryUploadedFile
+    file: TemporaryUploadedFile = ...
     def new_file(
         self,
         field_name: str,
@@ -62,8 +62,8 @@ class TemporaryFileUploadHandler(FileUploadHandler):
     def file_complete(self, file_size: int) -> Optional[UploadedFile]: ...
 
 class MemoryFileUploadHandler(FileUploadHandler):
-    activated = ...  # type: bool
-    file = ...  # type: IO[bytes]
+    activated: bool = ...
+    file: IO[bytes] = ...
     def handle_raw_input(
         self,
         input_data: IO[bytes],

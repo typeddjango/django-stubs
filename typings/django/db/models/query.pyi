@@ -27,7 +27,7 @@ from django.db.models.expressions import F as F
 from django.db.models.query_utils import Q as Q  # noqa: F401
 from django.db.models.sql.query import Query, RawQuery
 
-_T = TypeVar("_T", bound=models.Model, covariant=True)
+_T = TypeVar("_T", bound=models.Model)
 _QS = TypeVar("_QS", bound="_BaseQuerySet[Any]")
 
 class _BaseQuerySet(Generic[_T], Sized):

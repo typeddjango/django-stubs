@@ -4,8 +4,8 @@ from typing import Any, Optional
 from django.contrib.gis.gdal.base import GDALBase as GDALBase
 
 class AxisOrder(IntEnum):
-    TRADITIONAL: int = ...
-    AUTHORITY: int = ...
+    TRADITIONAL: int
+    AUTHORITY: int
 
 class SpatialReference(GDALBase):
     destructor: Any = ...
