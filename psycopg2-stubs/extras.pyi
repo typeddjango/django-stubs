@@ -164,8 +164,7 @@ class LogicalReplicationConnection(_replicationConnection):
 class PhysicalReplicationConnection(_replicationConnection):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
-class StopReplication(Exception):
-    pass
+class StopReplication(Exception): ...
 
 class ReplicationCursor(_replicationCursor):
     def create_replication_slot(

@@ -19,6 +19,7 @@ def force_bytes(
 
 smart_str = smart_text
 force_str = force_text
+
 @overload
 def iri_to_uri(iri: None) -> None: ...
 @overload

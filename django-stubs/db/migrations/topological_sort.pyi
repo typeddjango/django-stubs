@@ -6,5 +6,5 @@ def topological_sort_as_sets(
     dependency_graph: Dict[Operation, Set[Operation]]
 ) -> Iterator[Set[Operation]]: ...
 def stable_topological_sort(
-    l: List[Operation], dependency_graph: Dict[Operation, Set[Operation]]
+    l: List[Operation], dependency_graph: Dict[Operation, Set[Operation]]  # noqa:E741
 ) -> List[Operation]: ...
