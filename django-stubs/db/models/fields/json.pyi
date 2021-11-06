@@ -1,34 +1,100 @@
-from typing import Any, Optional
+import json
+from typing import Any, Callable, Iterable, Optional, Tuple, TypeVar, Union, overload
 
 from django.db.models import lookups
 from django.db.models.lookups import PostgresOperatorLookup, Transform
+from typing_extensions import Literal
 
-from . import Field
+from . import Field, _ErrorMessagesToOverride, _ValidatorCallable
 from .mixins import CheckFieldDefaultMixin
 
-class JSONField(CheckFieldDefaultMixin, Field[Any, Any]):
-    empty_strings_allowed: bool = ...
-    description: Any = ...
+_A = TypeVar("_A", bound=Optional[Any])
+
+class JSONField(CheckFieldDefaultMixin, Field[_A, _A]):
     default_error_messages: Any = ...
-    encoder: Any = ...
-    decoder: Any = ...
-    def __init__(
-        self,
-        verbose_name: Optional[Any] = ...,
-        name: Optional[Any] = ...,
-        encoder: Optional[Any] = ...,
-        decoder: Optional[Any] = ...,
-        **kwargs: Any
-    ) -> None: ...
-    def check(self, **kwargs: Any) -> Any: ...
-    def deconstruct(self) -> Any: ...
+    encoder: json.JSONEncoder = ...
+    decoder: json.JSONEncoder = ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
-    def get_internal_type(self) -> Any: ...
-    def get_prep_value(self, value: Any) -> Any: ...
     def get_transform(self, name: Any) -> Any: ...
-    def validate(self, value: Any, model_instance: Any) -> None: ...
     def value_to_string(self, obj: Any) -> Any: ...
-    def formfield(self, **kwargs: Any) -> Any: ...
+    @overload
+    def __init__(
+        self: JSONField[_A],
+        encoder: json.JSONEncoder = ...,
+        decoder: json.JSONDecoder = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Optional[Union[_A, Callable[[], _A]]] = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Iterable[
+            Union[Tuple[_A, str], Tuple[str, Iterable[Tuple[_A, str]]]]
+        ] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: JSONField[Optional[_A]],
+        encoder: json.JSONEncoder = ...,
+        decoder: json.JSONDecoder = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Optional[Union[_A, Callable[[], _A]]] = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Iterable[
+            Union[Tuple[_A, str], Tuple[str, Iterable[Tuple[_A, str]]]]
+        ] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __new__(
+        cls,
+        *args: Any,
+        null: Literal[False] = ...,
+        choices: Iterable[
+            Union[Tuple[_A, str], Tuple[str, Iterable[Tuple[_A, str]]]]
+        ] = ...,
+        **kwargs: Any,
+    ) -> JSONField[_A]: ...
+    @overload
+    def __new__(
+        cls,
+        *args: Any,
+        null: Literal[True],
+        choices: Iterable[
+            Union[Tuple[_A, str], Tuple[str, Iterable[Tuple[_A, str]]]]
+        ] = ...,
+        **kwargs: Any,
+    ) -> JSONField[Optional[_A]]: ...
 
 class DataContains(PostgresOperatorLookup):
     lookup_name: str = ...
