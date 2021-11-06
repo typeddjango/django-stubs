@@ -1,4 +1,4 @@
-from typing import Any, Callable, Collection, Iterable, Optional, Type, Union
+from typing import Any, Callable, Collection, Iterable, Optional, Set, Type, Union
 
 from django.db import IntegrityError
 from django.db.models.base import Model
@@ -16,8 +16,13 @@ def get_candidate_relations_to_delete(
     opts: Options[Any],
 ) -> Iterable[Field[Any, Any]]: ...
 
-class ProtectedError(IntegrityError): ...
-class RestrictedError(IntegrityError): ...
+class ProtectedError(IntegrityError):
+    protected_objects: Set[Model]
+    def __init__(self, msg: str, protected_objects: Set[Model]) -> None: ...
+
+class RestrictedError(IntegrityError):
+    restricted_objects: Set[Model]
+    def __init__(self, msg: str, restricted_objects: Set[Model]) -> None: ...
 
 class Collector:
     def __init__(self, using: str) -> None: ...
