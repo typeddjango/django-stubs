@@ -1056,9 +1056,12 @@ class GenericIPAddressField(
 
 class DateTimeCheckMixin: ...
 
-class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
+_D = TypeVar("_D", bound=Optional[date])
+
+class DateField(Generic[_D], DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
+    @overload
     def __init__(
-        self,
+        self: DateField[date],
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
         auto_now: bool = ...,
@@ -1067,7 +1070,7 @@ class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -1080,6 +1083,32 @@ class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
     ) -> None: ...
+    @overload
+    def __init__(
+        self: DateField[Optional[date]],
+        verbose_name: Optional[Union[str, bytes]] = ...,
+        name: Optional[str] = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __get__(self, instance: Any, owner: Any) -> _D: ...  # type: ignore [override]
+    def __set__(self, instance: Any, value: _D) -> None: ...  # type: ignore [override]
 
 _TM = TypeVar("_TM", bound=Optional[time])
 
