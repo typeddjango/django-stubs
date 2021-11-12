@@ -123,7 +123,7 @@ reveal_type(Role().users)
 ```
 
 
-### `AutoField`
+### `id Field`
 
 By default Django will create an `AutoField` for you if one doesn't exist.
 
@@ -138,6 +138,8 @@ class Post(models.Model):
 # after
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
+    # OR
+    id: int
 ```
 
 ### `HttpRequest`'s `user` property
