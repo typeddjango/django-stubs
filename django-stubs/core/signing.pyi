@@ -51,3 +51,15 @@ class Signer:
 class TimestampSigner(Signer):
     def timestamp(self) -> str: ...
     def unsign(self, value: str, max_age: Optional[Union[int, timedelta]] = ...) -> str: ...
+    def sign_object(
+        self,
+        obj: Any,
+        serializer: Type[Serializer] = ...,
+        compress: bool = ...,
+    ) -> str: ...
+    def unsign_object(
+        self,
+        signed_obj: str,
+        serializer: Type[Serializer] = ...,
+        max_age: Optional[Union[int, timedelta]] = ...,
+    ) -> Any: ...
