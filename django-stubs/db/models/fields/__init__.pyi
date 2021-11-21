@@ -1058,7 +1058,9 @@ class DateTimeCheckMixin: ...
 
 _D = TypeVar("_D", bound=Optional[date])
 
-class DateField(Generic[_D], DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
+class DateField(
+    Generic[_D], DateTimeCheckMixin, Field[Union[str, date, Combinable], date]
+):
     @overload
     def __init__(
         self: DateField[date],

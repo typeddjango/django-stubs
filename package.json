@@ -1,5 +1,5 @@
 {
   "devDependencies": {
-    "pyright": "^1.1.181"
+    "pyright": "1.1.188"
   }
 }
