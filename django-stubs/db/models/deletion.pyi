@@ -1,17 +1,59 @@
-from typing import Any, Callable, Collection, Iterable, Optional, Set, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Iterable,
+    Optional,
+    Sequence,
+    Set,
+    Type,
+    Union,
+)
 
 from django.db import IntegrityError
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.options import Options
 
-def CASCADE(collector: Any, field: Any, sub_objs: Any, using: Any) -> Any: ...
-def SET_NULL(collector: Any, field: Any, sub_objs: Any, using: Any) -> Any: ...
-def SET_DEFAULT(collector: Any, field: Any, sub_objs: Any, using: Any) -> Any: ...
-def DO_NOTHING(collector: Any, field: Any, sub_objs: Any, using: Any) -> Any: ...
-def PROTECT(collector: Any, field: Any, sub_objs: Any, using: Any) -> Any: ...
-def RESTRICT(collector: Any, field: Any, sub_objs: Any, using: Any) -> Any: ...
-def SET(value: Any) -> Callable[..., Any]: ...
+def CASCADE(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: Sequence[Model],
+    using: str,
+) -> None: ...
+def SET_NULL(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: Sequence[Model],
+    using: str,
+) -> None: ...
+def SET_DEFAULT(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: Sequence[Model],
+    using: str,
+) -> None: ...
+def DO_NOTHING(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: Sequence[Model],
+    using: str,
+) -> None: ...
+def PROTECT(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: Sequence[Model],
+    using: str,
+) -> None: ...
+def RESTRICT(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: Sequence[Model],
+    using: str,
+) -> None: ...
+def SET(
+    value: Union[Any, Callable[[], Any]]
+) -> Callable[["Collector", Field[Any, Any], Sequence[Model], str], None]: ...
 def get_candidate_relations_to_delete(
     opts: Options[Any],
 ) -> Iterable[Field[Any, Any]]: ...

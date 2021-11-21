@@ -1,9 +1,22 @@
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    Iterable,
+    List,
+    MutableMapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
-_T = TypeVar("_T", bound=Model, covariant=True)
+_T = TypeVar("_T", bound=Model)
+_V = TypeVar("_V", bound=Model)
 _M = TypeVar("_M", bound="BaseManager[Any]")
 
 class BaseManager(QuerySet[_T]):
@@ -35,16 +48,53 @@ class Manager(BaseManager[_T]): ...
 
 class RelatedManager(Manager[_T]):
     related_val: Tuple[int, ...]
-    def add(self, *objs: Union[_T, int], bulk: bool = ...) -> None: ...
-    def remove(self, *objs: Union[_T, int], bulk: bool = ...) -> None: ...
+    def add(self, *objs: Union[QuerySet[_T], _T], bulk: bool = ...) -> None: ...
+    def remove(self, *objs: Union[QuerySet[_T], _T], bulk: bool = ...) -> None: ...
     def set(
         self,
-        objs: Union[QuerySet[_T], Iterable[Union[_T, int]]],
+        objs: Union[QuerySet[_T], Iterable[_T]],
         *,
         bulk: bool = ...,
-        clear: bool = ...
+        clear: bool = ...,
     ) -> None: ...
     def clear(self) -> None: ...
+
+class ManyToManyRelatedManager(Generic[_T, _V], Manager[_T]):
+    through: RelatedManager[_V]
+    def add(
+        self,
+        *objs: Union[QuerySet[_T], _T],
+        through_defaults: MutableMapping[str, Any] = ...,
+    ) -> None: ...
+    def remove(self, *objs: Union[QuerySet[_T], _T]) -> None: ...
+    def set(
+        self,
+        objs: Union[QuerySet[_T], Iterable[_T]],
+        *,
+        clear: bool = ...,
+        through_defaults: MutableMapping[str, Any] = ...,
+    ) -> None: ...
+    def clear(self) -> None: ...
+    def create(
+        self,
+        defaults: Optional[MutableMapping[str, Any]] = ...,
+        through_defaults: Optional[MutableMapping[str, Any]] = ...,
+        **kwargs: Any,
+    ) -> _T: ...
+    def get_or_create(
+        self,
+        defaults: Optional[MutableMapping[str, Any]] = ...,
+        *,
+        through_defaults: MutableMapping[str, Any] = ...,
+        **kwargs: Any,
+    ) -> Tuple[_T, bool]: ...
+    def update_or_create(
+        self,
+        defaults: Optional[MutableMapping[str, Any]] = ...,
+        *,
+        through_defaults: MutableMapping[str, Any] = ...,
+        **kwargs: Any,
+    ) -> Tuple[_T, bool]: ...
 
 class ManagerDescriptor:
     manager: Manager[Any] = ...

@@ -6,6 +6,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    Protocol,
     Sequence,
     Tuple,
     Type,
@@ -17,6 +18,7 @@ from uuid import UUID
 
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.deletion import Collector
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import (
@@ -40,15 +42,25 @@ from django.db.models.fields.reverse_related import (  # noqa: F401
 from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyRel
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
-from django.db.models.manager import RelatedManager
+from django.db.models.manager import ManyToManyRelatedManager
 from django.db.models.query_utils import PathInfo, Q
 from typing_extensions import Literal
 
-_T = TypeVar("_T", bound=models.Model)
+class _DeleteProtocol(Protocol):
+    def __call__(
+        self,
+        collector: Collector,
+        field: Field[Any, Any],
+        sub_objs: Sequence[Model],
+        using: str,
+    ) -> None: ...
+
 _F = TypeVar("_F", bound=models.Field[Any, Any])
 _Choice = Tuple[Any, str]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
+_ChoicesLimit = Union[Dict[str, Any], Q, Callable[[], Q]]
+_OnDeleteOptions = Union[_DeleteProtocol, Callable[[Any], _DeleteProtocol]]
 
 _ValidatorCallable = Callable[..., None]
 _ErrorMessagesToOverride = Dict[str, Any]
@@ -56,16 +68,16 @@ _ErrorMessagesToOverride = Dict[str, Any]
 RECURSIVE_RELATIONSHIP_CONSTANT: str = ...
 
 # __set__ value type
-_ST = TypeVar("_ST")
+_ST = TypeVar("_ST", covariant=True)
 # __get__ return type
-_GT = TypeVar("_GT")
+_GT = TypeVar("_GT", contravariant=True)
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     one_to_many: bool = ...
     one_to_one: bool = ...
     many_to_many: bool = ...
     many_to_one: bool = ...
-    related_model: Type[Model]
+    related_model: Type[_GT] = ...
     opts: Any = ...
     def get_forward_related_filter(self, obj: Model) -> Dict[str, Union[int, UUID]]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
@@ -77,24 +89,163 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     def related_query_name(self) -> str: ...
     @property
     def target_field(self) -> Field[Any, Any]: ...
+    @overload
+    def __init__(
+        self: RelatedField[_ST, _GT],
+        related_name: Optional[str] = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Optional[Union[_GT, Callable[[], _GT]]] = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: RelatedField[Optional[_ST], Optional[_GT]],
+        related_name: Optional[str] = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        max_length: Optional[int] = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Optional[Union[_GT, Callable[[], _GT]]] = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: Optional[str] = ...,
+        unique_for_month: Optional[str] = ...,
+        unique_for_year: Optional[str] = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __new__(
+        cls,
+        *args: Any,
+        null: Literal[False] = ...,
+        **kwargs: Any,
+    ) -> RelatedField[_ST, _GT]: ...
+    @overload
+    def __new__(
+        cls,
+        *args: Any,
+        null: Literal[True],
+        **kwargs: Any,
+    ) -> RelatedField[Optional[_ST], Optional[_GT]]: ...
 
 _M = TypeVar("_M", bound=Optional[Model])
 
 class ForeignObject(RelatedField[_M, _M]):
-    def __new__(
-        cls,
+    one_to_many: bool = False
+    one_to_one: bool = False
+    many_to_many: bool = False
+    many_to_one: bool = True
+    related_model: Type[_M] = ...
+    @overload
+    def __init__(
+        self: ForeignObject[_M],
         to: Union[Type[_M], str],
-        on_delete: Callable[..., None],
+        on_delete: _OnDeleteOptions,
         from_fields: Sequence[str],
         to_fields: Sequence[str],
         rel: Optional[ForeignObjectRel] = ...,
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
         parent_link: bool = ...,
         db_constraint: bool = ...,
         swappable: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: ForeignObject[Optional[_M]],
+        to: Union[Type[_M], str],
+        on_delete: _OnDeleteOptions,
+        from_fields: Sequence[str],
+        to_fields: Sequence[str],
+        rel: Optional[ForeignObjectRel] = ...,
+        related_name: Optional[str] = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
+        parent_link: bool = ...,
+        db_constraint: bool = ...,
+        swappable: bool = ...,
+        verbose_name: Optional[str] = ...,
+        name: Optional[str] = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: Optional[_FieldChoices] = ...,
+        help_text: str = ...,
+        db_column: Optional[str] = ...,
+        db_tablespace: Optional[str] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+    ) -> None: ...
+    def __new__(
+        cls,
+        to: Union[Type[_M], str],
+        on_delete: _OnDeleteOptions,
+        from_fields: Sequence[str],
+        to_fields: Sequence[str],
+        rel: Optional[ForeignObjectRel] = ...,
+        related_name: Optional[str] = ...,
+        related_query_name: Optional[str] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
+        parent_link: bool = ...,
+        db_constraint: bool = ...,
+        swappable: bool = ...,
+        verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         unique: bool = ...,
@@ -114,21 +265,44 @@ class ForeignObject(RelatedField[_M, _M]):
     ) -> ForeignObject[_M]: ...
 
 class ForeignKey(Generic[_M], ForeignObject[_M]):
+    one_to_many: bool = False
+    one_to_one: bool = False
+    many_to_many: bool = False
+    many_to_one: bool = True
+    related_model: Type[_M] = ...
     @overload
-    def __new__(  # type: ignore [misc]
+    def __new__(
         cls,
         to: Union[Type[_M], str],
-        on_delete: Callable[..., None],
+        on_delete: _OnDeleteOptions,
+        *args: Any,
+        null: Literal[False] = ...,
+        **kwargs: Any,
+    ) -> ForeignKey[_M]: ...
+    @overload
+    def __new__(
+        cls,
+        to: Union[Type[_M], str],
+        on_delete: _OnDeleteOptions,
+        *args: Any,
+        null: Literal[True],
+        **kwargs: Any,
+    ) -> ForeignKey[Optional[_M]]: ...
+    @overload
+    def __init__(
+        self: ForeignKey[_M],
+        to: Union[Type[_M], str],
+        on_delete: _OnDeleteOptions,
         to_field: Optional[str] = ...,
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
         parent_link: bool = ...,
         db_constraint: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        swappable: bool = ...,
+        verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: Literal[False] = ...,
@@ -137,31 +311,28 @@ class ForeignKey(Generic[_M], ForeignObject[_M]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> ForeignKey[_M]: ...
+    ) -> None: ...
     @overload
-    def __new__(
-        cls,
+    def __init__(
+        self: ForeignKey[Optional[_M]],
         to: Union[Type[_M], str],
-        on_delete: Callable[..., None],
+        on_delete: _OnDeleteOptions,
         to_field: Optional[str] = ...,
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
         parent_link: bool = ...,
         db_constraint: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        swappable: bool = ...,
+        verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: Literal[True] = ...,
@@ -170,16 +341,13 @@ class ForeignKey(Generic[_M], ForeignObject[_M]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> ForeignKey[Optional[_M]]: ...
+    ) -> None: ...
     # class access
     @overload  # type: ignore
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor: ...
@@ -194,72 +362,29 @@ class ForeignKey(Generic[_M], ForeignObject[_M]):
     @overload
     def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
 
-class OneToOneField(Generic[_M], RelatedField[_M, _M]):
+class OneToOneField(ForeignKey[_M]):
+    one_to_many: bool = False
+    one_to_one: bool = True
+    many_to_many: bool = False
+    many_to_one: bool = False
+    related_model: Type[_M] = ...
     @overload
-    def __new__(  # type: ignore [misc]
+    def __new__(
         cls,
         to: Union[Type[_M], str],
-        on_delete: Any,
-        to_field: Optional[str] = ...,
-        related_name: Optional[str] = ...,
-        related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
-        parent_link: bool = ...,
-        db_constraint: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
-        name: Optional[str] = ...,
-        primary_key: bool = ...,
-        max_length: Optional[int] = ...,
-        unique: bool = ...,
-        blank: bool = ...,
+        on_delete: _OnDeleteOptions,
+        *args: Any,
         null: Literal[False] = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        **kwargs: Any,
     ) -> OneToOneField[_M]: ...
     @overload
     def __new__(
         cls,
         to: Union[Type[_M], str],
-        on_delete: Any,
-        to_field: Optional[str] = ...,
-        related_name: Optional[str] = ...,
-        related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
-        parent_link: bool = ...,
-        db_constraint: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
-        name: Optional[str] = ...,
-        primary_key: bool = ...,
-        max_length: Optional[int] = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: Literal[True] = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        on_delete: _OnDeleteOptions,
+        *args: Any,
+        null: Literal[True],
+        **kwargs: Any,
     ) -> OneToOneField[Optional[_M]]: ...
     # class access
     @overload  # type: ignore
@@ -275,55 +400,75 @@ class OneToOneField(Generic[_M], RelatedField[_M, _M]):
     @overload
     def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
 
-class ManyToManyField(RelatedField[Sequence[Any], RelatedManager[Any]]):
+_MM = TypeVar("_MM", bound=Model)
+_MN = TypeVar("_MN", bound=Model)
 
+class ManyToManyField(
+    Generic[_MM, _MN], RelatedField[Sequence[_MN], ManyToManyRelatedManager[_MM, _MN]]
+):
+
+    one_to_many: bool = False
+    one_to_one: bool = False
+    many_to_many: bool = False
+    many_to_one: bool = True
     rel_class: Any = ...
     description: Any = ...
     has_null_arg: Any = ...
     swappable: bool = ...
+    related_model: Type[_MM] = ...  # type: ignore [assignment]
+    @overload
     def __new__(
         cls,
-        to: Union[Type[Any], str],
+        to: Type[_MM],
+        through: Type[_MN],
+        *args: Any,
+        **kwargs: Any,
+    ) -> ManyToManyField[_MM, _MN]: ...
+    @overload
+    def __new__(
+        cls,
+        to: Type[_MM],
+        through: Optional[str] = ...,
+        *args: Any,
+        **kwargs: Any,
+    ) -> ManyToManyField[_MM, Any]: ...
+    @overload
+    def __new__(
+        cls,
+        to: str,
+        through: Optional[str] = ...,
+        *args: Any,
+        **kwargs: Any,
+    ) -> ManyToManyField[Any, Any]: ...
+    def __init__(
+        self,
+        to: Union[Type[_MM], str],
+        through: Optional[Union[Type[_MN], str]] = ...,
+        to_field: Optional[str] = ...,
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any], Q]] = ...,
+        limit_choices_to: Optional[_ChoicesLimit] = ...,
         symmetrical: Optional[bool] = ...,
-        through: Optional[Union[str, Type[Model]]] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,
         db_constraint: bool = ...,
-        db_table: Optional[str] = ...,
         swappable: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
         help_text: str = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesToOverride] = ...,
-    ) -> ManyToManyField: ...
-    # class access
-    @overload  # type: ignore
-    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor: ...
-    # Model instance access
-    @overload
-    def __get__(self, instance: Model, owner: Any) -> RelatedManager[Any]: ...
-    # non-Model instances
-    @overload
-    def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
+    ) -> None: ...
     def get_path_info(self, filtered_relation: None = ...) -> List[PathInfo]: ...
     def get_reverse_path_info(
         self, filtered_relation: None = ...

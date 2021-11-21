@@ -20,7 +20,6 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.cache import cache
 from django.db import connection, connections, models
 from django.db.backends.utils import CursorWrapper
-from django.db.models.manager import RelatedManager
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.middleware.cache import CacheMiddleware
@@ -73,9 +72,12 @@ class Comment(models.Model):
     )
 
     post_many_to_many = models.ManyToManyField(Post, through=PostToComment)
-    post_many_to_many_nullable = models.ManyToManyField(
-        Post, through=PostToComment, null=True
-    )
+    # NOTE: null has no meaning for ManyToMany and django just ignores it and warns about it
+    # post_many_to_many_nullable = models.ManyToManyField(
+    #     Post,
+    #     through=PostToComment,
+    #     null=True,
+    # )
 
     created_at = models.DateTimeField()
     created_at_nullable = models.DateTimeField(null=True)
@@ -286,15 +288,20 @@ def main() -> None:
     if not comment.post_one_to_one and not isinstance(comment.post_one_to_one, Post):
         print()  # type: ignore [unreachable]
 
-    # many to many is complicated so we don't check nullability like we do with other fields
-    if comment.post_many_to_many_nullable is not None:
-        print(comment.post_many_to_many_nullable)
-    if not isinstance(comment.post_many_to_many, RelatedManager):
-        print()  # type: ignore [unreachable]
-    if not comment.post_many_to_many and not isinstance(
-        comment.post_many_to_many, RelatedManager
-    ):
-        print()  # type: ignore [unreachable]
+    # if comment.post_many_to_many_nullable is not None:
+    #    print(comment.post_many_to_many_nullable)
+    # refinement doesn't work
+    # see: https://github.com/python/mypy/issues/9783
+    # if not isinstance(comment.post_many_to_many, ManyToManyRelatedManager):
+    #     print()  # type: ignore [unreachable]
+    # if not isinstance(comment.post_many_to_many.through, RelatedManager):
+    #     print()  # type: ignore [unreachable]
+    for obj in comment.post_many_to_many.all():
+        if not isinstance(obj, Post):
+            print()  # type: ignore [unreachable]
+    for obj2 in comment.post_many_to_many.through.all():
+        if not isinstance(obj2, PostToComment):
+            print()  # type: ignore [unreachable]
 
     process_non_nullable(comment.text)
     if isinstance(comment.text_nullable, type(None)):

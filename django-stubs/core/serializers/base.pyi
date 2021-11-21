@@ -97,7 +97,7 @@ def build_instance(
     Model: Type[Model], data: Dict[str, Optional[Union[date, int, str, UUID]]], db: str
 ) -> Model: ...
 def deserialize_m2m_values(
-    field: ManyToManyField, field_value: Any, using: str
+    field: ManyToManyField[Any, Any], field_value: Any, using: str
 ) -> List[Any]: ...
 def deserialize_fk_value(
     field: ForeignKey[Any], field_value: Any, using: str

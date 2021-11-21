@@ -42,7 +42,7 @@ class Group(models.Model):
     objects: GroupManager
 
     name = models.CharField(max_length=150)
-    permissions = models.ManyToManyField(Permission)
+    permissions = models.ManyToManyField[Permission, Any](Permission)
     def natural_key(self) -> Any: ...
 
 _T = TypeVar("_T", bound=Model)
@@ -73,8 +73,8 @@ class UserManager(BaseUserManager[_T]):
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
-    groups = models.ManyToManyField(Group)
-    user_permissions = models.ManyToManyField(Permission)
+    groups = models.ManyToManyField[Group, Any](Group)
+    user_permissions = models.ManyToManyField[Permission, Any](Permission)
     def get_user_permissions(self, obj: Optional[_AnyUser] = ...) -> Set[str]: ...
     def get_group_permissions(self, obj: Optional[_AnyUser] = ...) -> Set[str]: ...
     def get_all_permissions(self, obj: Optional[_AnyUser] = ...) -> Set[str]: ...
