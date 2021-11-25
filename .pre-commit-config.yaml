@@ -1,0 +1,53 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+  python: python3.9
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-yaml
+      - id: trailing-whitespace
+      - id: check-executables-have-shebangs
+      - id: debug-statements
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.20.0
+    hooks:
+      - id: pyupgrade
+        args: ["--py36-plus"]
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.9.1
+    hooks:
+      - id: isort
+        name: isort (python)
+        args: ["--profile", "black"]
+      - id: isort
+        name: isort (pyi)
+        types: [pyi]
+        args: ["--profile", "black"]
+  - repo: https://github.com/psf/black
+    rev: 21.6b0
+    hooks:
+      - id: black
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [ python ]
+        exclude: "scripts/|django_stubs_ext/"
+        args: [ "--config=mypy.ini", "--cache-dir=/dev/null", "--no-incremental" ]
+      - id: mypy
+        name: mypy (django_stubs_ext)
+        entry: mypy
+        language: system
+        types: [ python ]
+        files: "django_stubs_ext/|django_stubs_ext/tests/"
+        args: [ "--config=mypy.ini", "--cache-dir=/dev/null", "--no-incremental", "--strict" ]

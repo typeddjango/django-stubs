@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any, Dict, Optional, Type
 
 from django.contrib.sessions.backends.base import SessionBase
-
 from django.db import models
 
 class BaseSessionManager(models.Manager):

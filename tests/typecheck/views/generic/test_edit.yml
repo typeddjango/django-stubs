@@ -1,0 +1,63 @@
+-   case: login_form_form_valid_typechecks
+    main: |
+        from django.contrib.auth.views import LoginView
+        from django.contrib.auth import login as auth_login
+        from django.http import HttpResponseRedirect
+        from django.contrib.auth.forms import AuthenticationForm
+
+        class MyLoginView(LoginView):
+            def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect:
+                """Ensure that form can have type AuthenticationForm."""
+                form.get_user()
+                return HttpResponseRedirect(self.get_success_url())
+
+
+-   case: dispatch_http_response
+    main: |
+        from django.http import HttpResponse
+        from django.views.generic.base import View
+
+        class MyView(View):
+            def dispatch(self, request, *args, **kwargs) -> HttpResponse:
+                response: HttpResponse
+                return response
+
+
+-   case: dispatch_streaming_http_response
+    main: |
+        from django.http import StreamingHttpResponse
+        from django.views.generic.base import View
+
+        class MyView(View):
+            def dispatch(self, request, *args, **kwargs) -> StreamingHttpResponse:
+                response: StreamingHttpResponse
+                return response
+
+
+-   case: generic_form_views
+    main: |
+        from django.views.generic.edit import CreateView, UpdateView
+        from django import forms
+        from myapp.models import Article
+
+        class ArticleModelForm(forms.ModelForm[Article]):
+            class Meta:
+                model = Article
+
+        class MyCreateView(CreateView[Article, ArticleModelForm]):
+            def some(self) -> None:
+                reveal_type(self.get_form_class())  # N: Revealed type is "Type[main.ArticleModelForm*]"
+
+        class MyUpdateView(UpdateView[Article, ArticleModelForm]):
+            def some(self) -> None:
+                reveal_type(self.get_form_class()) # N: Revealed type is "Type[main.ArticleModelForm*]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    pass

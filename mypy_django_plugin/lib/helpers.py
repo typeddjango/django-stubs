@@ -1,7 +1,5 @@
 from collections import OrderedDict
-from typing import (
-    TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -10,36 +8,69 @@ from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.mro import calculate_mro
 from mypy.nodes import (
-    GDEF, MDEF, Argument, Block, ClassDef, Expression, FuncDef, MemberExpr, MypyFile, NameExpr, PlaceholderNode,
-    StrExpr, SymbolNode, SymbolTable, SymbolTableNode, TypeInfo, Var,
+    GDEF,
+    MDEF,
+    Argument,
+    Block,
+    ClassDef,
+    Expression,
+    FuncDef,
+    MemberExpr,
+    MypyFile,
+    NameExpr,
+    StrExpr,
+    SymbolNode,
+    SymbolTable,
+    SymbolTableNode,
+    TypeInfo,
+    Var,
 )
 from mypy.plugin import (
-    AttributeContext, CheckerPluginInterface, ClassDefContext, DynamicClassDefContext, FunctionContext, MethodContext,
+    AttributeContext,
+    CheckerPluginInterface,
+    ClassDefContext,
+    DynamicClassDefContext,
+    FunctionContext,
+    MethodContext,
+    SemanticAnalyzerPluginInterface,
 )
 from mypy.plugins.common import add_method
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, UnionType
+from mypy.types import TypedDictType, TypeOfAny, UnboundType, UnionType
 
 from mypy_django_plugin.lib import fullnames
+from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
 
 
 def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:
-    return model_info.metadata.setdefault('django', {})
+    return model_info.metadata.setdefault("django", {})
 
 
 class IncompleteDefnException(Exception):
     pass
 
 
+def is_toml(filename: str) -> bool:
+    return filename.lower().endswith(".toml")
+
+
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
-    if '.' not in fullname:
+    if "." not in fullname:
         return None
-    module, cls_name = fullname.rsplit('.', 1)
+    if "[" in fullname and "]" in fullname:
+        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
+        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
+        bracket_start = fullname.index("[")
+        fullname_without_bracket = fullname[:bracket_start]
+        module, cls_name = fullname_without_bracket.rsplit(".", 1)
+        cls_name += fullname[bracket_start:]
+    else:
+        module, cls_name = fullname.rsplit(".", 1)
 
     module_file = all_modules.get(module)
     if module_file is None:
@@ -71,12 +102,11 @@ def lookup_class_typeinfo(api: TypeChecker, klass: type) -> Optional[TypeInfo]:
 
 
 def reparametrize_instance(instance: Instance, new_args: List[MypyType]) -> Instance:
-    return Instance(instance.type, args=new_args,
-                    line=instance.line, column=instance.column)
+    return Instance(instance.type, args=new_args, line=instance.line, column=instance.column)
 
 
 def get_class_fullname(klass: type) -> str:
-    return klass.__module__ + '.' + klass.__qualname__
+    return klass.__module__ + "." + klass.__qualname__
 
 
 def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
@@ -115,9 +145,9 @@ def make_optional(typ: MypyType) -> MypyType:
 
 def parse_bool(expr: Expression) -> Optional[bool]:
     if isinstance(expr, NameExpr):
-        if expr.fullname == 'builtins.True':
+        if expr.fullname == "builtins.True":
             return True
-        if expr.fullname == 'builtins.False':
+        if expr.fullname == "builtins.False":
             return False
     return None
 
@@ -136,7 +166,7 @@ def iter_bases(info: TypeInfo) -> Iterator[Instance]:
 
 
 def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
-    """ Return declared type of type_info's private_field_name (used for private Field attributes)"""
+    """Return declared type of type_info's private_field_name (used for private Field attributes)"""
     sym = type_info.get(private_field_name)
     if sym is None:
         return AnyType(TypeOfAny.explicit)
@@ -164,27 +194,28 @@ def get_field_lookup_exact_type(api: TypeChecker, field: Field) -> MypyType:
     field_info = lookup_class_typeinfo(api, field.__class__)
     if field_info is None:
         return AnyType(TypeOfAny.explicit)
-    return get_private_descriptor_type(field_info, '_pyi_lookup_exact_type',
-                                       is_nullable=field.null)
+    return get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
 
 def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]:
-    metaclass_sym = info.names.get('Meta')
+    metaclass_sym = info.names.get("Meta")
     if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
         return metaclass_sym.node
     return None
 
 
-def add_new_class_for_module(module: MypyFile,
-                             name: str,
-                             bases: List[Instance],
-                             fields: Optional[Dict[str, MypyType]] = None
-                             ) -> TypeInfo:
+def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
+    return model_cls_fullname.startswith(WITH_ANNOTATIONS_FULLNAME + "[")
+
+
+def add_new_class_for_module(
+    module: MypyFile, name: str, bases: List[Instance], fields: Optional[Dict[str, MypyType]] = None
+) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
 
     # make new class expression
     classdef = ClassDef(new_class_unique_name, Block([]))
-    classdef.fullname = module.fullname + '.' + new_class_unique_name
+    classdef.fullname = module.fullname + "." + new_class_unique_name
 
     # make new TypeInfo
     new_typeinfo = TypeInfo(SymbolTable(), classdef, module.fullname)
@@ -197,7 +228,7 @@ def add_new_class_for_module(module: MypyFile,
         for field_name, field_type in fields.items():
             var = Var(field_name, type=field_type)
             var.info = new_typeinfo
-            var._fullname = new_typeinfo.fullname + '.' + field_name
+            var._fullname = new_typeinfo.fullname + "." + field_name
             new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
     classdef.info = new_typeinfo
@@ -215,18 +246,21 @@ def get_current_module(api: TypeChecker) -> MypyFile:
     return current_module
 
 
-def make_oneoff_named_tuple(api: TypeChecker, name: str, fields: 'OrderedDict[str, MypyType]') -> TupleType:
+def make_oneoff_named_tuple(
+    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: Optional[List[Instance]] = None
+) -> TupleType:
     current_module = get_current_module(api)
-    namedtuple_info = add_new_class_for_module(current_module, name,
-                                               bases=[api.named_generic_type('typing.NamedTuple', [])],
-                                               fields=fields)
+    if extra_bases is None:
+        extra_bases = []
+    namedtuple_info = add_new_class_for_module(
+        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", [])] + extra_bases, fields=fields
+    )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
 
-def make_tuple(api: 'TypeChecker', fields: List[MypyType]) -> TupleType:
+def make_tuple(api: "TypeChecker", fields: List[MypyType]) -> TupleType:
     # fallback for tuples is any builtins.tuple instance
-    fallback = api.named_generic_type('builtins.tuple',
-                                      [AnyType(TypeOfAny.special_form)])
+    fallback = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
     return TupleType(fields, fallback=fallback)
 
 
@@ -235,8 +269,7 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
         converted_items = []
         for item in typ.items:
             converted_items.append(convert_any_to_type(item, referred_to_type))
-        return UnionType.make_union(converted_items,
-                                    line=typ.line, column=typ.column)
+        return UnionType.make_union(converted_items, line=typ.line, column=typ.column)
     if isinstance(typ, Instance):
         args = []
         for default_arg in typ.args:
@@ -252,21 +285,22 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
     return typ
 
 
-def make_typeddict(api: CheckerPluginInterface, fields: 'OrderedDict[str, MypyType]',
-                   required_keys: Set[str]) -> TypedDictType:
-    object_type = api.named_generic_type('mypy_extensions._TypedDict', [])
+def make_typeddict(
+    api: CheckerPluginInterface, fields: "OrderedDict[str, MypyType]", required_keys: Set[str]
+) -> TypedDictType:
+    object_type = api.named_generic_type("mypy_extensions._TypedDict", [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
     return typed_dict_type
 
 
-def resolve_string_attribute_value(attr_expr: Expression, django_context: 'DjangoContext') -> Optional[str]:
+def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> Optional[str]:
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
     # support extracting from settings, in general case it's unresolvable yet
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
-        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == 'django.conf.settings':
+        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
             if hasattr(django_context.settings, member_name):
                 return getattr(django_context.settings, member_name)
     return None
@@ -274,27 +308,27 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: 'Djang
 
 def get_semanal_api(ctx: Union[ClassDefContext, DynamicClassDefContext]) -> SemanticAnalyzer:
     if not isinstance(ctx.api, SemanticAnalyzer):
-        raise ValueError('Not a SemanticAnalyzer')
+        raise ValueError("Not a SemanticAnalyzer")
     return ctx.api
 
 
 def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionContext]) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
-        raise ValueError('Not a TypeChecker')
+        raise ValueError("Not a TypeChecker")
     return ctx.api
 
 
-def is_model_subclass_info(info: TypeInfo, django_context: 'DjangoContext') -> bool:
-    return (info.fullname in django_context.all_registered_model_class_fullnames
-            or info.has_base(fullnames.MODEL_CLASS_FULLNAME))
+def is_model_subclass_info(info: TypeInfo, django_context: "DjangoContext") -> bool:
+    return info.fullname in django_context.all_registered_model_class_fullnames or info.has_base(
+        fullnames.MODEL_CLASS_FULLNAME
+    )
 
 
-def check_types_compatible(ctx: Union[FunctionContext, MethodContext],
-                           *, expected_type: MypyType, actual_type: MypyType, error_message: str) -> None:
+def check_types_compatible(
+    ctx: Union[FunctionContext, MethodContext], *, expected_type: MypyType, actual_type: MypyType, error_message: str
+) -> None:
     api = get_typechecker_api(ctx)
-    api.check_subtype(actual_type, expected_type,
-                      ctx.context, error_message,
-                      'got', 'expected')
+    api.check_subtype(actual_type, expected_type, ctx.context, error_message, "got", "expected")
 
 
 def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> None:
@@ -302,11 +336,10 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> No
     var = Var(name=name, type=sym_type)
     # var.info: type of the object variable is bound to
     var.info = info
-    var._fullname = info.fullname + '.' + name
+    var._fullname = info.fullname + "." + name
     var.is_initialized_in_class = True
     var.is_inferred = True
-    info.names[name] = SymbolTableNode(MDEF, var,
-                                       plugin_generated=True)
+    info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
 
 
 def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
@@ -322,8 +355,27 @@ def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument],
     return prepared_arguments, return_type
 
 
-def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
-                                 new_method_name: str, method_node: FuncDef) -> None:
+def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Optional[str] = None) -> Optional[MypyType]:
+    """Analyze a type. If an unbound type, try to look it up in the given module name.
+
+    That should hopefully give a bound type."""
+    if isinstance(t, UnboundType) and module_name is not None:
+        node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
+        if node is None:
+            return None
+        return node.type
+    else:
+        return api.anal_type(t)
+
+
+def copy_method_to_another_class(
+    ctx: ClassDefContext,
+    self_type: Instance,
+    new_method_name: str,
+    method_node: FuncDef,
+    return_type: Optional[MypyType] = None,
+    original_module_name: Optional[str] = None,
+) -> None:
     semanal_api = get_semanal_api(ctx)
     if method_node.type is None:
         if not semanal_api.final_iteration:
@@ -331,11 +383,7 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
             return
 
         arguments, return_type = build_unannotated_method_args(method_node)
-        add_method(ctx,
-                   new_method_name,
-                   args=arguments,
-                   return_type=return_type,
-                   self_type=self_type)
+        add_method(ctx, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
         return
 
     method_type = method_node.type
@@ -344,41 +392,39 @@ def copy_method_to_another_class(ctx: ClassDefContext, self_type: Instance,
             semanal_api.defer()
         return
 
-    arguments = []
-    bound_return_type = semanal_api.anal_type(method_type.ret_type,
-                                              allow_placeholder=True)
-
-    assert bound_return_type is not None
-
-    if isinstance(bound_return_type, PlaceholderNode):
+    if return_type is None:
+        return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
+    if return_type is None:
         return
+    try:
+        original_arguments = method_node.arguments[1:]
+    except AttributeError:
+        original_arguments = []
 
-    for arg_name, arg_type, original_argument in zip(method_type.arg_names[1:],
-                                                     method_type.arg_types[1:],
-                                                     method_node.arguments[1:]):
-        bound_arg_type = semanal_api.anal_type(arg_type, allow_placeholder=True)
-        if bound_arg_type is None and not semanal_api.final_iteration:
-            semanal_api.defer()
+    arguments = []
+    for arg_name, arg_type, original_argument in zip(
+        method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
+    ):
+        bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
+        if bound_arg_type is None:
             return
 
-        assert bound_arg_type is not None
-
-        if isinstance(bound_arg_type, PlaceholderNode):
-            return
-
-        var = Var(name=original_argument.variable.name,
-                  type=arg_type)
+        var = Var(name=original_argument.variable.name, type=arg_type)
         var.line = original_argument.variable.line
         var.column = original_argument.variable.column
-        argument = Argument(variable=var,
-                            type_annotation=bound_arg_type,
-                            initializer=original_argument.initializer,
-                            kind=original_argument.kind)
+        argument = Argument(
+            variable=var,
+            type_annotation=bound_arg_type,
+            initializer=original_argument.initializer,
+            kind=original_argument.kind,
+        )
         argument.set_line(original_argument)
         arguments.append(argument)
 
-    add_method(ctx,
-               new_method_name,
-               args=arguments,
-               return_type=bound_return_type,
-               self_type=self_type)
+    add_method(ctx, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
+
+
+def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:
+    sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
+    if sym is not None and isinstance(sym.node, TypeInfo):
+        get_django_metadata(sym.node)["manager_bases"][fullname] = 1

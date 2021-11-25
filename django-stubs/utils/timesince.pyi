@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any, Optional, Dict
+from typing import Any, Dict, Optional
 
 TIME_STRINGS: Dict[str, str]
 TIMESINCE_CHUNKS: Any

@@ -1,1 +1,2 @@
-from django.dispatch.dispatcher import Signal as Signal, receiver as receiver
+from django.dispatch.dispatcher import Signal as Signal
+from django.dispatch.dispatcher import receiver as receiver

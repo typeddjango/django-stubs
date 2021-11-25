@@ -3,6 +3,7 @@ from typing import Any, Optional, Type
 
 from django.db.models import Field
 from django.db.models.lookups import Transform
+
 from .mixins import CheckFieldDefaultMixin
 
 class JsonAdapter:
@@ -22,7 +23,6 @@ class JSONField(CheckFieldDefaultMixin, Field):
         encoder: Optional[Type[JSONEncoder]] = ...,
         **kwargs: Any
     ) -> None: ...
-    def value_to_string(self, obj: Any): ...
 
 class KeyTransform(Transform):
     operator: str = ...

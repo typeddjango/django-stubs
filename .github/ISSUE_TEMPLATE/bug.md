@@ -33,3 +33,4 @@ That is EXTREMELY helpful!
 - `django` version:
 - `mypy` version:
 - `django-stubs` version:
+- `django-stubs-ext` version:

@@ -2,13 +2,13 @@ import sys
 from typing import Any, Collection, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser, BaseUserManager as BaseUserManager
+from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
+from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
-
-from django.db import models
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
@@ -39,7 +39,7 @@ class Group(models.Model):
 
     name = models.CharField(max_length=150)
     permissions = models.ManyToManyField(Permission)
-    def natural_key(self): ...
+    def natural_key(self) -> Tuple[str]: ...
 
 _T = TypeVar("_T", bound=Model)
 
@@ -70,7 +70,7 @@ class PermissionsMixin(models.Model):
     def has_perms(self, perm_list: Collection[str], obj: Optional[_AnyUser] = ...) -> bool: ...
     def has_module_perms(self, app_label: str) -> bool: ...
 
-class AbstractUser(AbstractBaseUser, PermissionsMixin):  # type: ignore
+class AbstractUser(AbstractBaseUser, PermissionsMixin):
     username_validator: UnicodeUsernameValidator = ...
 
     username = models.CharField(max_length=150)

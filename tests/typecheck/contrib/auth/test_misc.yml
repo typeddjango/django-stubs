@@ -1,0 +1,37 @@
+-   case: test_request_session
+    main: |
+      from django.contrib.auth import get_user
+      from django.contrib.sessions.middleware import SessionMiddleware
+      from django.http import HttpRequest
+
+      request = HttpRequest()
+      SessionMiddleware().process_request(request)
+      get_user(request)
+-   case: test_client_session
+    main: |
+        from django.contrib.auth import get_user
+        from django.test import Client
+
+        get_user(Client())
+-   case: test_user_fields
+    main: |
+        from typing import Union
+        from django.contrib.auth.models import AnonymousUser, User
+
+        anonymous: AnonymousUser
+        anonymous_is_staff: bool = anonymous.is_staff
+        anonymous_is_active: bool = anonymous.is_active
+        anonymous_is_superuser: bool = anonymous.is_superuser
+        anonymous_is_authenticated: bool = anonymous.is_authenticated
+
+        user: User
+        user_is_staff: bool = user.is_staff
+        user_is_active: bool = user.is_active
+        user_is_superuser: bool = user.is_superuser
+        user_is_authenticated: bool = user.is_authenticated
+
+        union: Union[User, AnonymousUser]
+        union_is_staff: bool = union.is_staff
+        union_is_active: bool = union.is_active
+        union_is_superuser: bool = union.is_superuser
+        union_is_authenticated: bool = union.is_authenticated

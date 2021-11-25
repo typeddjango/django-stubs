@@ -1,8 +1,7 @@
 from typing import Any, Optional, Tuple, Type
 
-from django.http.request import HttpRequest
-
 from django.db import models
+from django.http.request import HttpRequest
 
 SITE_CACHE: Any
 

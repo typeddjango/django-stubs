@@ -1,0 +1,55 @@
+-   case: generic_detail_view
+    main: |
+        from django.views.generic import DetailView
+        from django.db.models import QuerySet
+
+        from myapp.models import MyModel
+
+        class MyDetailView(DetailView[MyModel]):
+            model = MyModel
+            queryset = MyModel.objects.all()
+
+            def get_queryset(self) -> QuerySet[MyModel]:
+                self.get_object(super().get_queryset())
+                return super().get_queryset()
+    custom_settings: |
+        INSTALLED_APPS = ('myapp',)
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    ...
+
+
+-   case: generic_detail_view_wrong
+    main: |
+        from django.views.generic import DetailView
+        from django.db.models import QuerySet
+
+        from myapp.models import MyModel, Other
+
+        class MyDetailView(DetailView[Other]):
+            model = MyModel
+            queryset = MyModel.objects.all()
+
+            def get_queryset(self) -> QuerySet[MyModel]:
+                self.get_object(super().get_queryset())
+                return super().get_queryset()
+    custom_settings: |
+        INSTALLED_APPS = ('myapp',)
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    ...
+                class Other(models.Model):
+                    ...
+    out: |
+      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "SingleObjectMixin" defined the type as "Type[Other]")
+      main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "_QuerySet[Other, Other]")
+      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QuerySet[Other, Other]" in supertype "SingleObjectMixin"
+      main:12: error: Incompatible return value type (got "_QuerySet[Other, Other]", expected "_QuerySet[MyModel, MyModel]")

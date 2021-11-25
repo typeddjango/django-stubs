@@ -1,7 +1,7 @@
 import threading
 import types
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Set, Dict, Union, Iterator, Tuple, Iterable
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
 
 from django.apps.registry import Apps
 

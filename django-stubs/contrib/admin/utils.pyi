@@ -9,12 +9,11 @@ from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.deletion import Collector
+from django.db.models.fields import Field, reverse_related
 from django.db.models.fields.reverse_related import ManyToOneRel
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
-
-from django.db.models.fields import Field, reverse_related
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 

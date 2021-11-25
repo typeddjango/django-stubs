@@ -1,5 +1,26 @@
-from typing import Any, Callable, Optional, Type
+from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union
 
+from django.contrib.admin import ModelAdmin
+from django.contrib.admin.sites import AdminSite
+from django.db.models import Combinable, QuerySet
 from django.db.models.base import Model
+from django.db.models.expressions import BaseExpression
+from django.http import HttpRequest
 
-def register(*models: Type[Model], site: Optional[Any] = ...) -> Callable: ...
+_ModelT = TypeVar("_ModelT", bound=Model)
+
+def action(
+    function: Optional[Callable[[ModelAdmin, HttpRequest, QuerySet], None]] = ...,
+    *,
+    permissions: Optional[Sequence[str]] = ...,
+    description: Optional[str] = ...,
+) -> Callable: ...
+def display(
+    function: Optional[Callable[[_ModelT], Any]] = ...,
+    *,
+    boolean: Optional[bool] = ...,
+    ordering: Optional[Union[str, Combinable, BaseExpression]] = ...,
+    description: Optional[str] = ...,
+    empty_value: Optional[str] = ...,
+) -> Callable: ...
+def register(*models: Type[Model], site: Optional[AdminSite] = ...) -> Callable: ...

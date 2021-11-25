@@ -1,8 +1,7 @@
-from typing import Any, Callable, Iterable, Optional, Union, Collection, Type
-
-from django.db.models.base import Model
+from typing import Any, Callable, Collection, Iterable, Optional, Set, Type, Union
 
 from django.db import IntegrityError
+from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.options import Options
 
@@ -15,8 +14,13 @@ def RESTRICT(collector, field, sub_objs, using): ...
 def SET(value: Any) -> Callable: ...
 def get_candidate_relations_to_delete(opts: Options) -> Iterable[Field]: ...
 
-class ProtectedError(IntegrityError): ...
-class RestrictedError(IntegrityError): ...
+class ProtectedError(IntegrityError):
+    protected_objects: Set[Model]
+    def __init__(self, msg: str, protected_objects: Set[Model]) -> None: ...
+
+class RestrictedError(IntegrityError):
+    restricted_objects: Set[Model]
+    def __init__(self, msg: str, restricted_objects: Set[Model]) -> None: ...
 
 class Collector:
     def __init__(self, using: str) -> None: ...

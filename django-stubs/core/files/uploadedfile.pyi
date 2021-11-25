@@ -1,4 +1,4 @@
-from typing import Any, Dict, IO, Optional, Union
+from typing import IO, Any, Dict, Optional, Union
 
 from django.core.files.base import File
 

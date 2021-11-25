@@ -1,0 +1,19 @@
+-   case: check_email_message_attach
+    main: |
+        from email.mime.text import MIMEText
+        from email.mime.image import MIMEImage
+        from django.core.mail.message import EmailMessage
+
+        message = EmailMessage()
+        reveal_type(message)  # N: Revealed type is "django.core.mail.message.EmailMessage"
+
+        message.attach("myfilename", "mycontent", "text/plain")
+
+        mime_text = MIMEText("mytext")
+        reveal_type(mime_text)  # N: Revealed type is "email.mime.text.MIMEText"
+        message.attach(mime_text)
+
+        mime_image = MIMEImage("mydata", "image/png")
+        reveal_type(mime_image)  # N: Revealed type is "email.mime.image.MIMEImage"
+        message.attach(mime_image)
+        reveal_type(message.attachments)  # N: Revealed type is "builtins.list[Any]"

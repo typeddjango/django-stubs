@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.core.handlers.wsgi import WSGIRequest
+from django.http.request import HttpRequest
 from django.http.response import FileResponse
 
-def serve(request: WSGIRequest, path: str, insecure: bool = ..., **kwargs: Any) -> FileResponse: ...
+def serve(request: HttpRequest, path: str, insecure: bool = ..., **kwargs: Any) -> FileResponse: ...

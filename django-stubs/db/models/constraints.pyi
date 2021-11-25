@@ -1,3 +1,4 @@
+import enum
 from typing import Any, Optional, Sequence, Tuple, Type, TypeVar
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
@@ -5,6 +6,10 @@ from django.db.models.base import Model
 from django.db.models.query_utils import Q
 
 _T = TypeVar("_T", bound="BaseConstraint")
+
+class Deferrable(enum.Enum):
+    DEFERRED: str
+    IMMEDIATE: str
 
 class BaseConstraint:
     name: str
@@ -24,4 +29,7 @@ class CheckConstraint(BaseConstraint):
 class UniqueConstraint(BaseConstraint):
     fields: Tuple[str]
     condition: Optional[Q]
-    def __init__(self, *, fields: Sequence[str], name: str, condition: Optional[Q] = ...): ...
+    deferrable: Optional[Deferrable]
+    def __init__(
+        self, *, fields: Sequence[str], name: str, condition: Optional[Q] = ..., deferrable: Optional[Deferrable] = ...
+    ) -> None: ...

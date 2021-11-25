@@ -1,0 +1,18 @@
+-   case: test_path_accepts_mix_of_pattern_and_resolver_output
+    main: |
+      from typing import List, Tuple, Union
+      from django.urls import path, URLPattern, URLResolver
+
+      def include() -> Tuple[List[Union[URLPattern, URLResolver]], None, None]: ...
+
+      path('test/', include())
+
+
+-   case: test_path_accepts_pattern_resolver_union_subset
+    main: |
+      from typing import List, Tuple
+      from django.urls import path, URLPattern
+
+      def include() -> Tuple[List[URLPattern], None, None]: ...
+
+      path('test/', include())

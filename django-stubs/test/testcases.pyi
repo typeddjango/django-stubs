@@ -1,12 +1,13 @@
 import threading
 import unittest
 from datetime import date
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, ClassVar, overload
+from typing import Any, Callable, ClassVar, Dict, Iterator, List, Optional, Set, Tuple, Type, Union, overload
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
-from django.db.backends.sqlite3.base import DatabaseWrapper
+from django.db import connections as connections  # noqa: F401
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
 from django.forms.fields import EmailField
@@ -15,12 +16,11 @@ from django.template.base import Template
 from django.test.client import Client
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.safestring import SafeText
-from django.db import connections as connections  # noqa: F401
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
     test_case: SimpleTestCase = ...
     num: int = ...
-    def __init__(self, test_case: Any, num: Any, connection: Any) -> None: ...
+    def __init__(self, test_case: Any, num: Any, connection: BaseDatabaseWrapper) -> None: ...
 
 class _AssertTemplateUsedContext:
     test_case: SimpleTestCase = ...
@@ -200,12 +200,12 @@ class LiveServerThread(threading.Thread):
     is_ready: threading.Event = ...
     error: Optional[ImproperlyConfigured] = ...
     static_handler: Type[WSGIHandler] = ...
-    connections_override: Dict[str, Any] = ...
+    connections_override: Dict[str, BaseDatabaseWrapper] = ...
     def __init__(
         self,
         host: str,
         static_handler: Type[WSGIHandler],
-        connections_override: Dict[str, DatabaseWrapper] = ...,
+        connections_override: Dict[str, BaseDatabaseWrapper] = ...,
         port: int = ...,
     ) -> None: ...
     httpd: ThreadedWSGIServer = ...

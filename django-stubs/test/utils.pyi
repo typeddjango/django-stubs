@@ -5,6 +5,7 @@ from io import StringIO
 from typing import (
     Any,
     Callable,
+    ContextManager,
     Dict,
     Iterable,
     Iterator,
@@ -14,19 +15,18 @@ from typing import (
     Set,
     Tuple,
     Type,
-    Union,
-    ContextManager,
     TypeVar,
+    Union,
 )
 
 from django.apps.registry import Apps
+from django.conf import LazySettings, Settings
 from django.core.checks.registry import CheckRegistry
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
-
-from django.conf import LazySettings, Settings
 
 _TestClass = Type[SimpleTestCase]
 _DecoratedTest = Union[Callable, _TestClass]
@@ -84,11 +84,11 @@ class override_system_checks(TestContextDecorator):
     old_deployment_checks: Set[Callable] = ...
 
 class CaptureQueriesContext:
-    connection: Any = ...
+    connection: BaseDatabaseWrapper = ...
     force_debug_cursor: bool = ...
     initial_queries: int = ...
     final_queries: Optional[int] = ...
-    def __init__(self, connection: Any) -> None: ...
+    def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
     def __iter__(self): ...
     def __getitem__(self, index: int) -> Dict[str, str]: ...
     def __len__(self) -> int: ...

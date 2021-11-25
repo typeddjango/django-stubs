@@ -3,15 +3,14 @@ from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, over
 
 from django.core.files.base import File
 from django.core.files.images import ImageFile
-from django.core.files.storage import FileSystemStorage, Storage
+from django.core.files.storage import Storage
 from django.db.models.base import Model
-
-from django.db.models.fields import Field, _FieldChoices, _ValidatorCallable, _ErrorMessagesToOverride
+from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
 
 class FieldFile(File):
     instance: Model = ...
     field: FileField = ...
-    storage: FileSystemStorage = ...
+    storage: Storage = ...
     def __init__(self, instance: Model, field: FileField, name: Optional[str]) -> None: ...
     file: Any = ...
     @property
@@ -34,14 +33,14 @@ class FileDescriptor:
 _T = TypeVar("_T", bound="Field")
 
 class FileField(Field):
-    storage: Any = ...
+    storage: Storage = ...
     upload_to: Union[str, Callable] = ...
     def __init__(
         self,
-        upload_to: Union[str, Callable, Path] = ...,
-        storage: Optional[Union[Storage, Callable[[], Storage]]] = ...,
         verbose_name: Optional[Union[str, bytes]] = ...,
         name: Optional[str] = ...,
+        upload_to: Union[str, Callable, Path] = ...,
+        storage: Optional[Union[Storage, Callable[[], Storage]]] = ...,
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,

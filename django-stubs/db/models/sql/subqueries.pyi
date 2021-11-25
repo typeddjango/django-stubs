@@ -2,11 +2,10 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from django.db.models.base import Model
 from django.db.models.expressions import Case
+from django.db.models.fields import Field
 from django.db.models.query import QuerySet
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
-
-from django.db.models.fields import Field
 
 class DeleteQuery(Query):
     select: Tuple

@@ -1,4 +1,4 @@
-from typing import Any, List, Set, Tuple, Union, Type
+from typing import Any, List, Set, Tuple, Type, Union
 
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation

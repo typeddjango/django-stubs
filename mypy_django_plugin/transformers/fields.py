@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, cast
 
-from django.db.models.fields import Field
+from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
@@ -14,8 +14,7 @@ from mypy_django_plugin.lib import fullnames, helpers
 
 def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Field]:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if (outer_model_info is None
-            or not helpers.is_model_subclass_info(outer_model_info, django_context)):
+    if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
         return None
 
     field_name = None
@@ -60,8 +59,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
 
     # self reference with abstract=True on the model where ForeignKey is defined
     current_model_cls = current_field.model
-    if (current_model_cls._meta.abstract
-            and current_model_cls == related_model_cls):
+    if current_model_cls._meta.abstract and current_model_cls == related_model_cls:
         # for all derived non-abstract classes, set variable with this name to
         # __get__/__set__ of ForeignKey of derived model
         for model_cls in django_context.all_registered_model_classes:
@@ -69,11 +67,10 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
                 derived_model_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), model_cls)
                 if derived_model_info is not None:
                     fk_ref_type = Instance(derived_model_info, [])
-                    derived_fk_type = reparametrize_related_field_type(default_related_field_type,
-                                                                       set_type=fk_ref_type, get_type=fk_ref_type)
-                    helpers.add_new_sym_for_info(derived_model_info,
-                                                 name=current_field.name,
-                                                 sym_type=derived_fk_type)
+                    derived_fk_type = reparametrize_related_field_type(
+                        default_related_field_type, set_type=fk_ref_type, get_type=fk_ref_type
+                    )
+                    helpers.add_new_sym_for_info(derived_model_info, name=current_field.name, sym_type=derived_fk_type)
 
     related_model = related_model_cls
     related_model_to_set = related_model_cls
@@ -97,35 +94,50 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
 
     # replace Any with referred_to_type
-    return reparametrize_related_field_type(default_related_field_type,
-                                            set_type=related_model_to_set_type,
-                                            get_type=related_model_type)
+    return reparametrize_related_field_type(
+        default_related_field_type, set_type=related_model_to_set_type, get_type=related_model_type
+    )
 
 
-def get_field_descriptor_types(field_info: TypeInfo, is_nullable: bool) -> Tuple[MypyType, MypyType]:
-    set_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_set_type',
-                                                   is_nullable=is_nullable)
-    get_type = helpers.get_private_descriptor_type(field_info, '_pyi_private_get_type',
-                                                   is_nullable=is_nullable)
+def get_field_descriptor_types(
+    field_info: TypeInfo, *, is_set_nullable: bool, is_get_nullable: bool
+) -> Tuple[MypyType, MypyType]:
+    set_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_set_type", is_nullable=is_set_nullable)
+    get_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_get_nullable)
     return set_type, get_type
 
 
-def set_descriptor_types_for_field(ctx: FunctionContext) -> Instance:
+def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    current_field = _get_current_field_from_assignment(ctx, django_context)
+    if current_field is not None:
+        if isinstance(current_field, AutoField):
+            return set_descriptor_types_for_field(ctx, is_set_nullable=True)
+
+    return set_descriptor_types_for_field(ctx)
+
+
+def set_descriptor_types_for_field(
+    ctx: FunctionContext, *, is_set_nullable: bool = False, is_get_nullable: bool = False
+) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
 
     is_nullable = False
-    null_expr = helpers.get_call_argument_by_name(ctx, 'null')
+    null_expr = helpers.get_call_argument_by_name(ctx, "null")
     if null_expr is not None:
         is_nullable = helpers.parse_bool(null_expr) or False
 
-    set_type, get_type = get_field_descriptor_types(default_return_type.type, is_nullable)
+    set_type, get_type = get_field_descriptor_types(
+        default_return_type.type,
+        is_set_nullable=is_set_nullable or is_nullable,
+        is_get_nullable=is_get_nullable or is_nullable,
+    )
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
 
 def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = set_descriptor_types_for_field(ctx)
 
-    base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, 'base_field')
+    base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, "base_field")
     if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
         return default_return_type
 
@@ -142,8 +154,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if (outer_model_info is None
-            or not helpers.is_model_subclass_info(outer_model_info, django_context)):
+    if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
         return ctx.default_return_type
 
     assert isinstance(outer_model_info, TypeInfo)
@@ -154,4 +165,4 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
     if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
         return determine_type_of_array_field(ctx, django_context)
 
-    return set_descriptor_types_for_field(ctx)
+    return set_descriptor_types_for_field_callback(ctx, django_context)

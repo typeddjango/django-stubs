@@ -1,9 +1,8 @@
 from typing import Any, Optional
 
+from django import template
 from django.template.base import FilterExpression, Parser, Token
 from django.template.context import Context
-
-from django import template
 
 register: Any
 

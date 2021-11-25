@@ -1,8 +1,7 @@
 from typing import Any, List, Optional
 
-from django.template.base import FilterExpression, NodeList, Parser, Token
-
 from django.template import Node
+from django.template.base import FilterExpression, NodeList, Parser, Token
 
 register: Any
 

@@ -1,26 +1,25 @@
 from typing import Any
 
-from .utils import (
-    DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS,
-    DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY,
-    ProgrammingError as ProgrammingError,
-    IntegrityError as IntegrityError,
-    OperationalError as OperationalError,
-    DatabaseError as DatabaseError,
-    DataError as DataError,
-    NotSupportedError as NotSupportedError,
-    InternalError as InternalError,
-    InterfaceError as InterfaceError,
-    ConnectionHandler as ConnectionHandler,
-    Error as Error,
-    ConnectionDoesNotExist as ConnectionDoesNotExist,
-)
-
 from . import migrations
+from .backends.base.base import BaseDatabaseWrapper
+from .utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS  # Not exported in __all__
+from .utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
+from .utils import ConnectionDoesNotExist as ConnectionDoesNotExist
+from .utils import ConnectionHandler, ConnectionRouter
+from .utils import DatabaseError as DatabaseError
+from .utils import DataError as DataError
+from .utils import Error as Error
+from .utils import IntegrityError as IntegrityError
+from .utils import InterfaceError as InterfaceError
+from .utils import InternalError as InternalError
+from .utils import NotSupportedError as NotSupportedError
+from .utils import OperationalError as OperationalError
+from .utils import ProgrammingError as ProgrammingError
 
-connections: Any
-router: Any
-connection: Any
+connections: ConnectionHandler
+router: ConnectionRouter
+# Actually DefaultConnectionProxy, but quacks exactly like BaseDatabaseWrapper, it's not worth distinguishing the two.
+connection: BaseDatabaseWrapper
 
 class DefaultConnectionProxy:
     def __getattr__(self, item: str) -> Any: ...
