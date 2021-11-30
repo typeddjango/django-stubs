@@ -371,8 +371,8 @@
                 from django.db import models
                 class MyModelManager(models.Manager):
 
-                    def create(self, *args, **kwargs) -> 'MyModel':
-                          return super().create(*args, **kwargs)
+                    def create(self, **kwargs) -> 'MyModel':
+                          return super().create(**kwargs)
 
 
                 class MyModel(models.Model):
@@ -392,8 +392,8 @@
                 from django.db import models
                 class MyModelManager(models.Manager['MyModel']):
 
-                    def create(self, *args, **kwargs) -> 'MyModel':
-                          return super().create(*args, **kwargs)
+                    def create(self, **kwargs) -> 'MyModel':
+                          return super().create(**kwargs)
 
                 class MyModel(models.Model):
 
