@@ -87,6 +87,19 @@ class Comment(models.Model):
 
     char = models.CharField()
     char_nullable = models.CharField(null=True)
+    char_with_choices = models.CharField(
+        choices=[
+            ("a", "A"),
+            ("b", "B"),
+        ],
+    )
+    char_with_choices_nullable = models.CharField(
+        choices=[
+            ("a", "A"),
+            ("b", "B"),
+        ],
+        null=True,
+    )
 
     text = models.TextField()
     text_nullable = models.TextField(null=True)
@@ -100,6 +113,19 @@ class Comment(models.Model):
 
     integer = models.IntegerField()
     integer_nullable = models.IntegerField(null=True)
+    integer_with_choices = models.IntegerField(
+        choices=[
+            (1, "First Option"),
+            (2, "Second Option"),
+        ],
+    )
+    integer_with_choices_nullable = models.IntegerField(
+        choices=[
+            (1, "First Option"),
+            (2, "Second Option"),
+        ],
+        null=True,
+    )
 
     float = models.FloatField()
     float_nullable = models.FloatField(null=True)
@@ -113,8 +139,8 @@ class Comment(models.Model):
     email = models.EmailField()
     email_nullable = models.EmailField(null=True)
 
-    decimal = models.DecimalField()
-    decimal_nullable = models.DecimalField(null=True)
+    decimal = models.DecimalField(max_digits=20, decimal_places=2)
+    decimal_nullable = models.DecimalField(null=True, max_digits=20, decimal_places=2)
 
     bool = models.BooleanField()
     bool_nullable = models.BooleanField(null=True)
@@ -263,7 +289,7 @@ def main() -> None:
     process_non_nullable(for_sure_c.integer)
 
     # Django way to duplicate an instance
-    comment.id = None
+    comment.pk = None
     comment.save()
 
     print(comment.id)
@@ -321,6 +347,18 @@ def main() -> None:
     if not isinstance(comment.integer, int):
         print()  # type: ignore [unreachable]
     if not comment.integer and not isinstance(comment.integer, int):
+        print()  # type: ignore [unreachable]
+
+    process_non_nullable(comment.integer_with_choices)
+    if isinstance(comment.integer_with_choices_nullable, type(None)):
+        print(comment.integer_with_choices_nullable)
+    if comment.integer_with_choices_nullable is not None:
+        print(comment.integer_with_choices_nullable)
+    if not isinstance(comment.integer_with_choices, int):
+        print()  # type: ignore [unreachable]
+    if not comment.integer_with_choices and not isinstance(
+        comment.integer_with_choices, int
+    ):
         print()  # type: ignore [unreachable]
 
     process_non_nullable(comment.float)
@@ -513,6 +551,16 @@ def main() -> None:
     if not isinstance(comment.ci_char, str):
         print()  # type: ignore [unreachable]
     if not comment.ci_char and not isinstance(comment.ci_char, str):
+        print()  # type: ignore [unreachable]
+
+    process_non_nullable(comment.char_with_choices)
+    if isinstance(comment.char_with_choices_nullable, type(None)):
+        print(comment.char_with_choices_nullable)
+    if comment.char_with_choices_nullable is not None:
+        print(comment.char_with_choices_nullable)
+    if not isinstance(comment.char_with_choices, str):
+        print()  # type: ignore [unreachable]
+    if not comment.char_with_choices and not isinstance(comment.char_with_choices, str):
         print()  # type: ignore [unreachable]
 
     process_non_nullable(comment.ci_email)
@@ -929,7 +977,8 @@ class Foo(models.Model):
         null=True,
         default=None,
         blank=True,
-        max_digits=2,
+        max_digits=4,
+        decimal_places=2,
     )
 
     search_field = SearchVectorField(null=True, help_text="foo")
@@ -944,7 +993,7 @@ class HandField(models.Field[Any, Any]):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs["max_length"] = 104
-        super().__init__(*args, **kwargs)  # type: ignore [call-arg]
+        super().__init__(*args, **kwargs)
 
 
 AuthUser.objects.create_superuser(username="foo", email=None, password=None)

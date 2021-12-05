@@ -2,20 +2,21 @@
 
 set -ex
 
-
 # format code
 if [[ $CI ]]; then
-    ./.venv/bin/black --check tests typings
-    ./.venv/bin/isort --check-only tests typings
+  ./.venv/bin/black --check tests typings
+  ./.venv/bin/isort --check-only tests typings
 else
-    ./.venv/bin/black tests typings
-    ./.venv/bin/isort tests typings
+  ./.venv/bin/black tests typings
+  ./.venv/bin/isort tests typings
 fi
 
 # type check code
 ./.venv/bin/mypy tests typings
 
+# pyright tests
 ./node_modules/.bin/pyright tests typings
+./.venv/bin/pytest tests typings -p no:warnings -v
 
 # lint
 ./.venv/bin/flake8 tests typings
