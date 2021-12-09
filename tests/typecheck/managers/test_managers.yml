@@ -48,7 +48,7 @@
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: Type[_T]):
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[django.db.models.base.Model]"
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[_T`1]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
