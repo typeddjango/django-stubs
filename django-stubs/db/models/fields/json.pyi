@@ -1,5 +1,5 @@
 import json
-from typing import Any, Callable, Iterable, Optional, Tuple, TypeVar, Union, overload
+from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union, overload
 
 from django.db.models import lookups
 from django.db.models.lookups import PostgresOperatorLookup, Transform
@@ -12,16 +12,16 @@ _A = TypeVar("_A", bound=Optional[Any])
 
 class JSONField(CheckFieldDefaultMixin, Field[_A, _A]):
     default_error_messages: Any = ...
-    encoder: json.JSONEncoder = ...
-    decoder: json.JSONEncoder = ...
+    encoder: Type[json.JSONEncoder] = ...
+    decoder: Type[json.JSONEncoder] = ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
     def get_transform(self, name: Any) -> Any: ...
     def value_to_string(self, obj: Any) -> Any: ...
     @overload
     def __init__(
         self: JSONField[_A],
-        encoder: json.JSONEncoder = ...,
-        decoder: json.JSONDecoder = ...,
+        encoder: Type[json.JSONEncoder] = ...,
+        decoder: Type[json.JSONDecoder] = ...,
         verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
@@ -49,8 +49,8 @@ class JSONField(CheckFieldDefaultMixin, Field[_A, _A]):
     @overload
     def __init__(
         self: JSONField[Optional[_A]],
-        encoder: json.JSONEncoder = ...,
-        decoder: json.JSONDecoder = ...,
+        encoder: Type[json.JSONEncoder] = ...,
+        decoder: Type[json.JSONDecoder] = ...,
         verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
