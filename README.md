@@ -17,7 +17,7 @@ Type stubs for [Django](https://www.djangoproject.com).
 pip install django-types
 ```
 
-You'll need to monkey patch Django's `QuerySet`, `Manager` (note needed for Django 3.2+) and
+You'll need to monkey patch Django's `QuerySet`, `Manager` (not needed for Django 3.1+) and
 `ForeignKey` classes so we can index into them with a generic argument. Add this to your
 settings.py:
 
