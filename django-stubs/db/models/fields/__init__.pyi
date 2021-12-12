@@ -38,9 +38,9 @@ _ErrorMessagesToOverride = Dict[str, Any]
 
 _T = TypeVar("_T", bound="Field[Any, Any]")
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST = TypeVar("_ST")
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True)
+_GT = TypeVar("_GT")
 
 class NOT_PROVIDED: ...
 

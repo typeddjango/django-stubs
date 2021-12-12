@@ -1,5 +1,15 @@
 import json
-from typing import Any, Callable, Iterable, Optional, Tuple, Type, TypeVar, Union, overload
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from django.db.models import lookups
 from django.db.models.lookups import PostgresOperatorLookup, Transform

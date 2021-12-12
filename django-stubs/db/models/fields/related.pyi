@@ -68,9 +68,9 @@ _ErrorMessagesToOverride = Dict[str, Any]
 RECURSIVE_RELATIONSHIP_CONSTANT: str = ...
 
 # __set__ value type
-_ST = TypeVar("_ST", covariant=True)
+_ST = TypeVar("_ST")
 # __get__ return type
-_GT = TypeVar("_GT", contravariant=True)
+_GT = TypeVar("_GT")
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     one_to_many: bool = ...
