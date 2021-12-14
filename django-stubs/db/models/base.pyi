@@ -23,6 +23,7 @@ class Model(metaclass=ModelBase):
     class Meta: ...
     _meta: Options[Any]
     _default_manager: BaseManager[Model]
+    _base_manager: BaseManager[Model]
     objects: BaseManager[Any]
     pk: Any = ...
     _state: ModelState
