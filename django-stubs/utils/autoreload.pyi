@@ -2,7 +2,7 @@ import os
 import threading
 import types
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Set, Tuple, Union
+from typing import Any, Callable, DefaultDict, Dict, Iterable, Iterator, Optional, Set, Tuple, Union
 
 from django.apps.registry import Apps
 from django.dispatch import Signal
@@ -55,9 +55,9 @@ class StatReloader(BaseReloader):
 class WatchmanUnavailable(RuntimeError): ...
 
 class WatchmanReloader(BaseReloader):
-    roots: Any
-    processed_request: Any
-    client_timeout: Any
+    roots: DefaultDict[Set]
+    processed_request: threading.Event
+    client_timeout: int
     def __init__(self) -> None: ...
     @property
     def client(self) -> Any: ...
