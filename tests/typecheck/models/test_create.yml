@@ -19,9 +19,9 @@
     main: |
         from myapp.models import Child
         c = Child.objects.create(name='Maxim', lastname='Maxim2')
-        reveal_type(c.id)
-        reveal_type(c.name)
-        reveal_type(c.lastname)
+        reveal_type(c.id)  # N: Revealed type is "builtins.int*"
+        reveal_type(c.name)  # N: Revealed type is "builtins.str*"
+        reveal_type(c.lastname)  # N: Revealed type is "builtins.str*"
     installed_apps:
         - myapp
     files:
