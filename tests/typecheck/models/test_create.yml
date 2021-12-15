@@ -18,7 +18,10 @@
 -   case: model_recognises_parent_attributes
     main: |
         from myapp.models import Child
-        Child.objects.create(name='Maxim', lastname='Maxim2')
+        c = Child.objects.create(name='Maxim', lastname='Maxim2')
+        reveal_type(c.id)
+        reveal_type(c.name)
+        reveal_type(c.lastname)
     installed_apps:
         - myapp
     files:
