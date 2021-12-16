@@ -11,9 +11,10 @@ from scripts.enabled_test_modules import EXTERNAL_MODULES, IGNORED_ERRORS, IGNOR
 from scripts.git_helpers import checkout_django_branch
 from scripts.paths import DJANGO_SOURCE_DIRECTORY, PROJECT_DIRECTORY
 
-DJANGO_COMMIT_REFS: Dict[str, str] = {
+DJANGO_COMMIT_REFS = {
     "2.2": "8093aaa8ff9dd7386a069c6eb49fcc1c5980c033",
-    "3.0": "44da7abda848f05caaed74f6a749038c87dedfda",
+    "3.2": "0153a63a674937e4a56d9d5e4ca2d629b011fbde",
+    "4.0": "67d0c4644acfd7707be4a31e8976f865509b09ac",
 }
 
 
@@ -28,7 +29,7 @@ def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern],
     return unused_ignores
 
 
-def is_pattern_fits(pattern: Union[Pattern, str], line: str):
+def does_pattern_fit(pattern: Union[Pattern, str], line: str):
     if isinstance(pattern, Pattern):
         if pattern.search(line):
             return True
@@ -46,12 +47,12 @@ def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[
         return True
 
     for pattern in IGNORED_ERRORS.get(test_folder_name, []):
-        if is_pattern_fits(pattern, line):
+        if does_pattern_fit(pattern, line):
             ignored_message_freqs[test_folder_name][pattern] += 1
             return True
 
     for pattern in IGNORED_ERRORS["__common__"]:
-        if is_pattern_fits(pattern, line):
+        if does_pattern_fit(pattern, line):
             ignored_message_freqs["__common__"][pattern] += 1
             return True
 
