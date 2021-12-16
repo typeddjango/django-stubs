@@ -1,10 +1,10 @@
 wheel
-black==21.6b0
-requests==2.24.0
+black==21.12b0
+requests==2.26.0
 coreapi==2.3.3
-gitpython==3.1.9
-pre-commit==2.13.0
-pytest==6.1.1
+gitpython==3.1.24
+pre-commit==2.16.0
+pytest==6.2.5
 pytest-mypy-plugins==1.9.2
 psycopg2-binary
 -e ./django_stubs_ext
