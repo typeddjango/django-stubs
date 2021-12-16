@@ -7,6 +7,5 @@ pre-commit==2.13.0
 pytest==6.1.1
 pytest-mypy-plugins==1.9.2
 psycopg2-binary
-types-toml==0.1.1
 -e ./django_stubs_ext
 -e .

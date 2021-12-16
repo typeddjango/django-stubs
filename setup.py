@@ -24,7 +24,7 @@ dependencies = [
     "mypy>=0.910",
     "django",
     "django-stubs-ext>=0.3.0",
-    "toml",
+    "tomli",
     # Types:
     "typing-extensions",
     "types-pytz",
