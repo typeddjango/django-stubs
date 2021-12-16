@@ -1,5 +1,5 @@
 wheel
-black==21.6b0
+black==21.12b0
 requests==2.24.0
 coreapi==2.3.3
 gitpython==3.1.9
