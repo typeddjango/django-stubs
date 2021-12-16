@@ -510,11 +510,14 @@ IGNORED_ERRORS = {
     "wsgi": [
         '"HttpResponse" has no attribute "block_size"',
     ],
+    "namespace_package_base": [
+        'Duplicate module named "apps"',
+    ],
 }
 
 
 def check_if_custom_ignores_are_covered_by_common() -> None:
-    from scripts.typecheck_tests import is_pattern_fits
+    from scripts.typecheck_tests import does_pattern_fit
 
     common_ignore_patterns = IGNORED_ERRORS["__common__"]
     for module_name, patterns in IGNORED_ERRORS.items():
@@ -522,7 +525,7 @@ def check_if_custom_ignores_are_covered_by_common() -> None:
             continue
         for pattern in patterns:
             for common_pattern in common_ignore_patterns:
-                if isinstance(pattern, str) and is_pattern_fits(common_pattern, pattern):
+                if isinstance(pattern, str) and does_pattern_fit(common_pattern, pattern):
                     print(f'pattern "{module_name}: {pattern!r}" is covered by pattern {common_pattern!r}')
 
 

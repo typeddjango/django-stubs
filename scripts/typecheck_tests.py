@@ -29,7 +29,7 @@ def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern],
     return unused_ignores
 
 
-def is_pattern_fits(pattern: Union[Pattern, str], line: str):
+def does_pattern_fit(pattern: Union[Pattern, str], line: str):
     if isinstance(pattern, Pattern):
         if pattern.search(line):
             return True
@@ -47,12 +47,12 @@ def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[
         return True
 
     for pattern in IGNORED_ERRORS.get(test_folder_name, []):
-        if is_pattern_fits(pattern, line):
+        if does_pattern_fit(pattern, line):
             ignored_message_freqs[test_folder_name][pattern] += 1
             return True
 
     for pattern in IGNORED_ERRORS["__common__"]:
-        if is_pattern_fits(pattern, line):
+        if does_pattern_fit(pattern, line):
             ignored_message_freqs["__common__"][pattern] += 1
             return True
 
