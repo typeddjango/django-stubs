@@ -111,6 +111,7 @@ IGNORED_ERRORS = {
         "Unsupported dynamic base class",
         'error: "HttpResponse" has no attribute "streaming_content"',
         'error: "HttpResponse" has no attribute "context_data"',
+        'Duplicate module named "apps"',
     ],
     "admin_checks": ['Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'],
     "admin_default_site": [
@@ -509,9 +510,6 @@ IGNORED_ERRORS = {
     ],
     "wsgi": [
         '"HttpResponse" has no attribute "block_size"',
-    ],
-    "namespace_package_base": [
-        'Duplicate module named "apps"',
     ],
 }
 
