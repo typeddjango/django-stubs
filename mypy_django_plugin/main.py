@@ -4,7 +4,7 @@ import textwrap
 from functools import partial
 from typing import Callable, Dict, List, NoReturn, Optional, Tuple, cast
 
-import toml
+import tomli
 from django.db.models.fields.related import RelatedField
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
@@ -103,7 +103,7 @@ def extract_django_settings_module(config_file_path: Optional[str]) -> str:
         handler.error("'django_settings_module' not found or invalid: " + messages[error_type])
 
     if config_file_path and helpers.is_toml(config_file_path):
-        toml_data = toml.load(config_file_path)
+        toml_data = tomli.load(config_file_path)
         try:
             config = toml_data["tool"]["django-stubs"]
         except KeyError:
