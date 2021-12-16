@@ -180,3 +180,11 @@
         obj = MyModel()
 
         reveal_type(obj.small) # N: Revealed type is "builtins.int*"
+
+
+-  case: test_access_to_id_field_through_self_if_no_primary_key_defined
+   main: |
+        from django.db import models
+        class MyModel(models.Model):
+            def __str__(self):
+                reveal_type(self.id)  # N: Revealed type is "builtins.int*"
