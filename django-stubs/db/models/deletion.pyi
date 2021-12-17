@@ -4,14 +4,45 @@ from django.db import IntegrityError
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.options import Options
+from django.db.models.query import QuerySet
 
-def CASCADE(collector, field, sub_objs, using): ...
-def SET_NULL(collector, field, sub_objs, using): ...
-def SET_DEFAULT(collector, field, sub_objs, using): ...
-def DO_NOTHING(collector, field, sub_objs, using): ...
-def PROTECT(collector, field, sub_objs, using): ...
-def RESTRICT(collector, field, sub_objs, using): ...
-def SET(value: Any) -> Callable: ...
+def CASCADE(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: QuerySet[Model],
+    using: str,
+) -> None: ...
+def SET_NULL(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: QuerySet[Model],
+    using: str,
+) -> None: ...
+def SET_DEFAULT(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: QuerySet[Model],
+    using: str,
+) -> None: ...
+def DO_NOTHING(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: QuerySet[Model],
+    using: str,
+) -> None: ...
+def PROTECT(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: QuerySet[Model],
+    using: str,
+) -> None: ...
+def RESTRICT(
+    collector: "Collector",
+    field: Field[Any, Any],
+    sub_objs: QuerySet[Model],
+    using: str,
+) -> None: ...
+def SET(value: Any) -> Callable[..., Any]: ...
 def get_candidate_relations_to_delete(opts: Options) -> Iterable[Field]: ...
 
 class ProtectedError(IntegrityError):
