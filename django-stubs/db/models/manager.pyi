@@ -63,10 +63,10 @@ class ManyToManyRelatedManager(Generic[_T, _V], Manager[_T]):
     through: RelatedManager[_V]
     def add(
         self,
-        *objs: Union[QuerySet[_T], _T],
+        *objs: Union[QuerySet[_T], _T, _V],
         through_defaults: MutableMapping[str, Any] = ...,
     ) -> None: ...
-    def remove(self, *objs: Union[QuerySet[_T], _T]) -> None: ...
+    def remove(self, *objs: Union[QuerySet[_T], _T, _V]) -> None: ...
     def set(
         self,
         objs: Union[QuerySet[_T], Iterable[_T]],
