@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./dev-requirements.txt
+          pip install -r ./requirements.txt
 
       - name: Run pre-commit
         run: pre-commit install && pre-commit run --all-files
@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./dev-requirements.txt
+          pip install -r ./requirements.txt
 
       - name: Run tests
         run: pytest
@@ -70,7 +70,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./dev-requirements.txt
+          pip install -r ./requirements.txt
 
       - name: Run tests
         run: python ./scripts/typecheck_tests.py --django_version="${{ matrix.django-version }}"
