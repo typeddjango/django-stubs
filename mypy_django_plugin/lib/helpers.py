@@ -34,7 +34,7 @@ from mypy.plugin import (
     MethodContext,
     SemanticAnalyzerPluginInterface,
 )
-from mypy.plugins.common import add_method
+from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
@@ -383,7 +383,9 @@ def copy_method_to_another_class(
             return
 
         arguments, return_type = build_unannotated_method_args(method_node)
-        add_method(ctx, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
+        add_method_to_class(
+            semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
+        )
         return
 
     method_type = method_node.type
@@ -421,7 +423,9 @@ def copy_method_to_another_class(
         argument.set_line(original_argument)
         arguments.append(argument)
 
-    add_method(ctx, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
+    add_method_to_class(
+        semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
+    )
 
 
 def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:
