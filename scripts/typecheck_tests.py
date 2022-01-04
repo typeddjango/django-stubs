@@ -12,7 +12,7 @@ from scripts.git_helpers import checkout_django_branch
 from scripts.paths import DJANGO_SOURCE_DIRECTORY, PROJECT_DIRECTORY
 
 DJANGO_COMMIT_REFS = {
-    "2.2": "8093aaa8ff9dd7386a069c6eb49fcc1c5980c033",
+    "2.2": "44e7cca62382f2535ed0f5d2842b433f0bd23a57",
     "3.2": "0153a63a674937e4a56d9d5e4ca2d629b011fbde",
     "4.0": "67d0c4644acfd7707be4a31e8976f865509b09ac",
 }
