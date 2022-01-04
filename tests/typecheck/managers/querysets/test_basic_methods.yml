@@ -30,7 +30,7 @@
         reveal_type(qs.count()) # N: Revealed type is "builtins.int"
         reveal_type(qs.update(created_at=timezone.now()))  # N: Revealed type is "builtins.int"
         reveal_type(qs.in_bulk()) # N: Revealed type is "builtins.dict[Any, myapp.models.Blog*]"
-        reveal_type(qs.bulk_update(list(qs), fields=["created_at"]))  # N: Revealed type is "None"
+        reveal_type(qs.bulk_update(list(qs), fields=["created_at"]))  # N: Revealed type is "builtins.int"
         reveal_type(qs.bulk_create([]))  # N: Revealed type is "builtins.list[myapp.models.Blog*]"
         reveal_type(qs.delete()) # N: Revealed type is "Tuple[builtins.int, builtins.dict[builtins.str, builtins.int]]"
     installed_apps:
