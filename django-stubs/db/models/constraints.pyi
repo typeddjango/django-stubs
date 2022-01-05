@@ -28,7 +28,7 @@ class CheckConstraint(BaseConstraint):
     def __init__(self, *, check: Q, name: str) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
-    expressions: Tuple[Combinable]
+    expressions: Tuple[Combinable, ...]
     fields: Tuple[str]
     condition: Optional[Q]
     deferrable: Optional[Deferrable]
