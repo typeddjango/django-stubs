@@ -29,7 +29,7 @@ class CheckConstraint(BaseConstraint):
 
 class UniqueConstraint(BaseConstraint):
     expressions: Tuple[Combinable, ...]
-    fields: Tuple[str]
+    fields: Tuple[str, ...]
     condition: Optional[Q]
     deferrable: Optional[Deferrable]
     def __init__(
