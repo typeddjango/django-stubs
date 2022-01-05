@@ -1,8 +1,9 @@
 import enum
-from typing import Any, Optional, Sequence, Tuple, Type, TypeVar
+from typing import Any, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
 from django.db.models.query_utils import Q
 
 _T = TypeVar("_T", bound="BaseConstraint")
@@ -27,9 +28,15 @@ class CheckConstraint(BaseConstraint):
     def __init__(self, *, check: Q, name: str) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
+    expressions: Tuple[Combinable]
     fields: Tuple[str]
     condition: Optional[Q]
     deferrable: Optional[Deferrable]
     def __init__(
-        self, *, fields: Sequence[str], name: str, condition: Optional[Q] = ..., deferrable: Optional[Deferrable] = ...
+        self,
+        *expressions: Union[str, Combinable],
+        fields: Optional[Sequence[str]] = ...,
+        name: str,
+        condition: Optional[Q] = ...,
+        deferrable: Optional[Deferrable] = ...,
     ) -> None: ...
