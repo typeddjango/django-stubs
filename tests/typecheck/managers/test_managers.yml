@@ -78,7 +78,7 @@
                     pass
                 class Child(Base[MyModel]):
                     def method(self) -> None:
-                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[myapp.models.MyModel*]"
 
 -   case: if_custom_manager_defined_it_is_set_to_default_manager
     main: |
