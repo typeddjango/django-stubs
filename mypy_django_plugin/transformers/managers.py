@@ -20,7 +20,6 @@ from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, TypeVarType, UnboundType, get_proper_type
 
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 
 
@@ -96,7 +95,7 @@ def get_method_type_from_reverse_manager(
     )
 
 
-def resolve_manager_method(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
+def resolve_manager_method(ctx: AttributeContext) -> MypyType:
     """
     A 'get_attribute_hook' that is intended to be invoked whenever the TypeChecker encounters
     an attribute on a class that has 'django.db.models.BaseManager' as a base.
@@ -179,9 +178,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     new_manager_info.metaclass_type = new_manager_info.calculate_metaclass_type()
     # Stash the queryset fullname which was passed to .from_queryset
     # So that our 'resolve_manager_method' attribute hook can fetch the method from that QuerySet class
-    new_manager_info.metadata.setdefault("django", {})
-    new_manager_info.metadata["django"].setdefault("from_queryset_manager", {})
-    new_manager_info.metadata["django"]["from_queryset_manager"] = derived_queryset_fullname
+    new_manager_info.metadata["django"] = {"from_queryset_manager": derived_queryset_fullname}
 
     if len(ctx.call.args) > 1:
         expr = ctx.call.args[1]

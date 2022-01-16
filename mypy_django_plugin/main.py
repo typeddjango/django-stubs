@@ -309,37 +309,51 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        # Base class is a Model class definition
         if (
             fullname in self.django_context.all_registered_model_class_fullnames
             or fullname in self._get_current_model_bases()
         ):
             return partial(transform_model_class, django_context=self.django_context)
 
+        # Base class is a Manager class definition
         if fullname in self._get_current_manager_bases():
             return add_new_manager_base_hook
 
+        # Base class is a Form class definition
         if fullname in self._get_current_form_bases():
             return transform_form_class
         return None
 
     def get_attribute_hook(self, fullname: str) -> Optional[Callable[[AttributeContext], MypyType]]:
         class_name, _, attr_name = fullname.rpartition(".")
+
+        # Lookup of a settings variable
         if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
             return partial(settings.get_type_of_settings_attribute, django_context=self.django_context)
 
         info = self._get_typeinfo_or_none(class_name)
+
+        # Lookup of the '.is_superuser' attribute
         if info and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
+
+        # Lookup of the 'request.user' attribute
         if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == "user":
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
+
+        # Lookup of the 'user.is_staff' or 'user.is_active' attribute
         if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
+
+        # Lookup of a method on a dynamically generated manager class
+        # i.e. a manager class only existing while mypy is running, not collected from the AST
         if (
             info
             and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
             and class_name in self._get_current_manager_bases()
         ):
-            return partial(resolve_manager_method, django_context=self.django_context)
+            return resolve_manager_method
 
         return None
 
@@ -352,6 +366,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(handle_annotated_type, django_context=self.django_context)
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
+        # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
         if fullname.endswith("from_queryset"):
             class_name, _, _ = fullname.rpartition(".")
             info = self._get_typeinfo_or_none(class_name)
