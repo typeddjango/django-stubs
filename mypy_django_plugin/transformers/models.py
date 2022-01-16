@@ -68,6 +68,20 @@ class ModelClassInitializer:
             return
         self.run_with_model_cls(model_cls)
 
+    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
+        base_manager_info = self.lookup_typeinfo(base_manager_fullname)
+        if base_manager_info is None or "from_queryset_managers" not in base_manager_info.metadata:
+            return {}
+        return base_manager_info.metadata["from_queryset_managers"]
+
+    def get_generated_manager_info(self, manager_fullname: str, base_manager_fullname: str) -> Optional[TypeInfo]:
+        generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
+        real_manager_fullname = generated_managers.get(manager_fullname)
+        if real_manager_fullname:
+            return self.lookup_typeinfo(real_manager_fullname)
+        # Not a generated manager
+        return None
+
     def run_with_model_cls(self, model_cls):
         raise NotImplementedError("Implement this in subclasses")
 
@@ -179,12 +193,6 @@ class AddManagers(ModelClassInitializer):
     def is_any_parametrized_manager(self, typ: Instance) -> bool:
         return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
 
-    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
-        base_manager_info = self.lookup_typeinfo(base_manager_fullname)
-        if base_manager_info is None or "from_queryset_managers" not in base_manager_info.metadata:
-            return {}
-        return base_manager_info.metadata["from_queryset_managers"]
-
     def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
         bases = []
         for original_base in base_manager_info.bases:
@@ -230,23 +238,25 @@ class AddManagers(ModelClassInitializer):
                 if not self.api.final_iteration:
                     raise exc
                 else:
+                    # On final round, see if we can find info for a generated (dynamic class) manager
                     base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                    generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
-                    if manager_fullname not in generated_managers:
-                        # not a generated manager, continue with the loop
-                        continue
-                    real_manager_fullname = generated_managers[manager_fullname]
-                    manager_info = self.lookup_typeinfo(real_manager_fullname)
+                    manager_info = self.get_generated_manager_info(manager_fullname, base_manager_fullname)
                     if manager_info is None:
                         continue
-                    manager_class_name = real_manager_fullname.rsplit(".", maxsplit=1)[1]
+                    _, manager_class_name = manager_info.fullname.rsplit(".", maxsplit=1)
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
                 self.add_new_node_to_model_class(manager_name, manager_type)
             else:
-                # creates new MODELNAME_MANAGERCLASSNAME class that represents manager parametrized with current model
-                if not self.has_any_parametrized_manager_as_base(manager_info):
+                # Ending up here could for instance be due to having a custom _Manager_
+                # that is not built from a custom QuerySet. Another example is a
+                # related manager.
+                # Don't interfere with dynamically generated manager classes
+                is_dynamically_generated = "django" in manager_info.metadata and manager_info.metadata["django"].get(
+                    "from_queryset_manager"
+                )
+                if not self.has_any_parametrized_manager_as_base(manager_info) or is_dynamically_generated:
                     continue
 
                 custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
@@ -262,12 +272,27 @@ class AddManagers(ModelClassInitializer):
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
-        # add _default_manager
-        if "_default_manager" not in self.model_classdef.info.names:
-            default_manager_fullname = helpers.get_class_fullname(model_cls._meta.default_manager.__class__)
+        if "_default_manager" in self.model_classdef.info.names:
+            return None
+
+        default_manager_cls = model_cls._meta.default_manager.__class__
+        default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
+        try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
-            default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
-            self.add_new_node_to_model_class("_default_manager", default_manager)
+        except helpers.IncompleteDefnException as exc:
+            if not self.api.final_iteration:
+                raise exc
+            else:
+                base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
+                generated_manager_info = self.get_generated_manager_info(
+                    default_manager_fullname, base_manager_fullname
+                )
+                if generated_manager_info is None:
+                    return
+                default_manager_info = generated_manager_info
+
+        default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+        self.add_new_node_to_model_class("_default_manager", default_manager)
 
 
 class AddRelatedManagers(ModelClassInitializer):
@@ -300,6 +325,8 @@ class AddRelatedManagers(ModelClassInitializer):
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
                         fullnames.RELATED_MANAGER_CLASS
                     )  # noqa: E501
+                    # TODO: Use default manager instead of 'objects'
+                    # See: https://docs.djangoproject.com/en/dev/topics/db/queries/#using-a-custom-reverse-manager
                     objects = related_model_info.get("objects")
                     if not objects:
                         raise helpers.IncompleteDefnException()
@@ -325,14 +352,9 @@ class AddRelatedManagers(ModelClassInitializer):
                 name = model_cls.__name__ + "_" + related_model_cls.__name__ + "_" + "RelatedManager"
                 bases = [parametrized_related_manager_type, default_manager_type]
                 new_related_manager_info = self.add_new_class_for_current_module(name, bases)
+                new_related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_info.fullname}
 
                 self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []))
-
-    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
-        base_manager_info = self.lookup_typeinfo(base_manager_fullname)
-        if base_manager_info is None or "from_queryset_managers" not in base_manager_info.metadata:
-            return {}
-        return base_manager_info.metadata["from_queryset_managers"]
 
     def try_generate_related_manager(
         self, related_model_cls: Type[Model], related_model_info: TypeInfo

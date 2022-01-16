@@ -684,6 +684,7 @@
         reveal_type(User().orders)  # N: Revealed type is "myapp.models.User_Order_RelatedManager1"
         reveal_type(User().orders.get())  # N: Revealed type is "myapp.models.Order*"
         reveal_type(User().orders.manager_method())  # N: Revealed type is "builtins.int"
+        reveal_type(Product.objects.queryset_method())  # N: Revealed type is "builtins.int"
         reveal_type(Order().products)  # N: Revealed type is "myapp.models.Order_Product_RelatedManager1"
         reveal_type(Order().products.get())  # N: Revealed type is "myapp.models.Product*"
         reveal_type(Order().products.queryset_method())  # N: Revealed type is "builtins.int"

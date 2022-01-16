@@ -24,7 +24,10 @@ import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
-from mypy_django_plugin.transformers.managers import create_new_manager_class_from_from_queryset_method
+from mypy_django_plugin.transformers.managers import (
+    create_new_manager_class_from_from_queryset_method,
+    resolve_manager_method,
+)
 from mypy_django_plugin.transformers.models import (
     handle_annotated_type,
     process_model_class,
@@ -302,6 +305,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
             )
+
         return None
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
@@ -330,6 +334,13 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
         if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
+        if (
+            info
+            and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+            and class_name in self._get_current_manager_bases()
+        ):
+            return partial(resolve_manager_method, django_context=self.django_context)
+
         return None
 
     def get_type_analyze_hook(self, fullname: str) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
