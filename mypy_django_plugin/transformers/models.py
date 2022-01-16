@@ -283,6 +283,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
             if not self.api.final_iteration:
                 raise exc
             else:
+                # On final round, see if the default manager is a generated (dynamic class) manager
                 base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
                 generated_manager_info = self.get_generated_manager_info(
                     default_manager_fullname, base_manager_fullname
