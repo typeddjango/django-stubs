@@ -1,9 +1,11 @@
 import tempfile
 import typing
+import uuid
+from contextlib import contextmanager
 
 import pytest
 
-from mypy_django_plugin.main import extract_django_settings_module
+from mypy_django_plugin.config import DjangoPluginConfig
 
 TEMPLATE = """
 (config)
@@ -11,7 +13,7 @@ TEMPLATE = """
 [mypy.plugins.django_stubs]
     django_settings_module: str (required)
 ...
-(django-stubs) mypy: error: 'django_settings_module' is not set: {}
+(django-stubs) mypy: error: {}
 """
 
 TEMPLATE_TOML = """
@@ -20,31 +22,34 @@ TEMPLATE_TOML = """
 [tool.django-stubs]
 django_settings_module = str (required)
 ...
-(django-stubs) mypy: error: 'django_settings_module' not found or invalid: {}
+(django-stubs) mypy: error: {}
 """
 
 
+@contextmanager
+def write_to_file(file_contents: str, suffix: typing.Optional[str] = None) -> typing.Generator[str, None, None]:
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=suffix) as config_file:
+        config_file.write(file_contents)
+        config_file.seek(0)
+        yield config_file.name
+
+
 @pytest.mark.parametrize(
-    "config_file_contents,message_part",
+    ("config_file_contents", "message_part"),
     [
         pytest.param(
-            None,
-            "mypy config file is not specified or found",
-            id="missing-file",
-        ),
-        pytest.param(
             ["[not-really-django-stubs]"],
-            "no section [mypy.plugins.django-stubs]",
+            "no section [mypy.plugins.django-stubs] found",
             id="missing-section",
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]", "\tnot_django_not_settings_module = badbadmodule"],
-            "the setting is not provided",
+            "missing required 'django_settings_module' config",
             id="missing-settings-module",
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]"],
-            "the setting is not provided",
+            "missing required 'django_settings_module' config",
             id="no-settings-given",
         ),
     ],
@@ -52,53 +57,69 @@ django_settings_module = str (required)
 def test_misconfiguration_handling(capsys, config_file_contents, message_part):
     #  type: (typing.Any, typing.List[str], str) -> None
     """Invalid configuration raises `SystemExit` with a precise error message."""
-    with tempfile.NamedTemporaryFile(mode="w+") as config_file:
-        if not config_file_contents:
-            config_file.close()
-        else:
-            config_file.write("\n".join(config_file_contents).expandtabs(4))
-            config_file.seek(0)
-
+    contents = "\n".join(config_file_contents).expandtabs(4)
+    with write_to_file(contents) as filename:
         with pytest.raises(SystemExit, match="2"):
-            extract_django_settings_module(config_file.name)
+            DjangoPluginConfig(filename)
 
     error_message = "usage: " + TEMPLATE.format(message_part)
     assert error_message == capsys.readouterr().err
 
 
 @pytest.mark.parametrize(
-    "config_file_contents,message_part",
+    "filename",
     [
-        (
+        pytest.param(uuid.uuid4().hex, id="not matching an existing file"),
+        pytest.param("", id="as empty string"),
+        pytest.param(None, id="as none"),
+    ],
+)
+def test_handles_filename(capsys, filename: str):
+    with pytest.raises(SystemExit, match="2"):
+        DjangoPluginConfig(filename)
+
+    error_message = "usage: " + TEMPLATE.format("mypy config file is not specified or found")
+    assert error_message == capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    ("config_file_contents", "message_part"),
+    [
+        pytest.param(
             """
             [tool.django-stubs]
             django_settings_module = 123
             """,
-            "the setting must be a string",
+            "invalid 'django_settings_module': the setting must be a string",
+            id="django_settings_module not string",
         ),
-        (
+        pytest.param(
             """
             [tool.not-really-django-stubs]
             django_settings_module = "my.module"
             """,
-            "no section [tool.django-stubs]",
+            "no section [tool.django-stubs] found",
+            id="missing django-stubs section",
         ),
-        (
+        pytest.param(
             """
             [tool.django-stubs]
             not_django_not_settings_module = "badbadmodule"
             """,
-            "the setting is not provided",
+            "missing required 'django_settings_module' config",
+            id="missing django_settings_module",
+        ),
+        pytest.param(
+            "tool.django-stubs]",
+            "could not load configuration file",
+            id="invalid toml",
         ),
     ],
 )
 def test_toml_misconfiguration_handling(capsys, config_file_contents, message_part):
-    with tempfile.NamedTemporaryFile(mode="w+", suffix=".toml") as config_file:
-        config_file.write(config_file_contents)
-        config_file.seek(0)
-
+    with write_to_file(config_file_contents, suffix=".toml") as filename:
         with pytest.raises(SystemExit, match="2"):
-            extract_django_settings_module(config_file.name)
+            DjangoPluginConfig(filename)
 
     error_message = "usage: " + TEMPLATE_TOML.format(message_part)
     assert error_message == capsys.readouterr().err
@@ -111,26 +132,22 @@ def test_correct_toml_configuration() -> None:
     django_settings_module = "my.module"
     """
 
-    with tempfile.NamedTemporaryFile(mode="w+", suffix=".toml") as config_file:
-        config_file.write(config_file_contents)
-        config_file.seek(0)
+    with write_to_file(config_file_contents, suffix=".toml") as filename:
+        config = DjangoPluginConfig(filename)
 
-        extracted = extract_django_settings_module(config_file.name)
-
-    assert extracted == "my.module"
+    assert config.django_settings_module == "my.module"
 
 
 def test_correct_configuration() -> None:
     """Django settings module gets extracted given valid configuration."""
-    config_file_contents = [
-        "[mypy.plugins.django-stubs]",
-        "\tsome_other_setting = setting",
-        "\tdjango_settings_module = my.module",
-    ]
-    with tempfile.NamedTemporaryFile(mode="w+") as config_file:
-        config_file.write("\n".join(config_file_contents).expandtabs(4))
-        config_file.seek(0)
+    config_file_contents = "\n".join(
+        [
+            "[mypy.plugins.django-stubs]",
+            "\tsome_other_setting = setting",
+            "\tdjango_settings_module = my.module",
+        ]
+    ).expandtabs(4)
+    with write_to_file(config_file_contents) as filename:
+        config = DjangoPluginConfig(filename)
 
-        extracted = extract_django_settings_module(config_file.name)
-
-    assert extracted == "my.module"
+    assert config.django_settings_module == "my.module"
