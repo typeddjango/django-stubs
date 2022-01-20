@@ -15,11 +15,12 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, TypeVarType, UnboundType, get_proper_type
 
+from mypy_django_plugin import errorcodes
 from mypy_django_plugin.lib import fullnames, helpers
 
 
@@ -278,3 +279,20 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
     # Insert the new manager (dynamic) class
     assert semanal_api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True))
+
+
+def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:
+    """
+    Method hook that checks if method `<Manager>.from_queryset` is called inside a model class body.
+
+    Doing so won't, for instance, trigger the dynamic class hook(`create_new_manager_class_from_from_queryset_method`)
+    for managers.
+    """
+    api = helpers.get_typechecker_api(ctx)
+    outer_model_info = api.scope.active_class()
+    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+        # Not inside a model class definition
+        return ctx.default_return_type
+
+    api.fail("`.from_queryset` called from inside model class body", ctx.context, code=errorcodes.MANAGER_UNTYPED)
+    return ctx.default_return_type
