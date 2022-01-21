@@ -309,3 +309,40 @@
                 NewManager = MyManager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
                     objects = NewManager()
+
+-   case: from_queryset_in_model_class_body_yields_message
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.base_manager)  # N: Revealed type is "myapp.models.BaseManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.manager)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.custom_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+
+                class MyQuerySet(models.QuerySet["MyModel"]):
+                    def queryset_method(self) -> int:
+                        return 1
+
+                class MyManager(BaseManager):
+                    ...
+
+                BaseManagerFromMyQuerySet = BaseManager.from_queryset(MyQuerySet)
+                ManagerFromMyQuerySet = models.Manager.from_queryset(MyQuerySet)
+                MyManagerFromMyQuerySet = MyManager.from_queryset(MyQuerySet)
+                class MyModel(models.Model):
+                    objects1 = BaseManager.from_queryset(MyQuerySet)()  # E: `.from_queryset` called from inside model class body
+                    objects2 = BaseManager.from_queryset(MyQuerySet)  # E: `.from_queryset` called from inside model class body
+                    objects3 = models.Manager.from_queryset(MyQuerySet)()  # E: `.from_queryset` called from inside model class body
+                    objects4 = models.Manager.from_queryset(MyQuerySet)  # E: `.from_queryset` called from inside model class body
+                    objects5 = MyManager.from_queryset(MyQuerySet)  # E: `.from_queryset` called from inside model class body
+                    objects6 = MyManager.from_queryset(MyQuerySet)()  # E: `.from_queryset` called from inside model class body
+                    # Initiating the manager type is fine
+                    base_manager = BaseManagerFromMyQuerySet()
+                    manager = ManagerFromMyQuerySet()
+                    custom_manager = MyManagerFromMyQuerySet()

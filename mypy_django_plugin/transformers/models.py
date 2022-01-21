@@ -280,17 +280,17 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
         try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
         except helpers.IncompleteDefnException as exc:
-            if not self.api.final_iteration:
-                raise exc
-            else:
-                # On final round, see if the default manager is a generated (dynamic class) manager
-                base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
-                generated_manager_info = self.get_generated_manager_info(
-                    default_manager_fullname, base_manager_fullname
-                )
-                if generated_manager_info is None:
-                    return
-                default_manager_info = generated_manager_info
+            # Check if default manager could be a generated manager
+            base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
+            generated_manager_info = self.get_generated_manager_info(default_manager_fullname, base_manager_fullname)
+            if generated_manager_info is None:
+                # Manager doesn't appear to be generated. Unless we're on the final round,
+                # see if another round could help figuring out the default manager type
+                if not self.api.final_iteration:
+                    raise exc
+                else:
+                    return None
+            default_manager_info = generated_manager_info
 
         default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
         self.add_new_node_to_model_class("_default_manager", default_manager)
@@ -326,10 +326,8 @@ class AddRelatedManagers(ModelClassInitializer):
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
                         fullnames.RELATED_MANAGER_CLASS
                     )  # noqa: E501
-                    # TODO: Use default manager instead of 'objects'
-                    # See: https://docs.djangoproject.com/en/dev/topics/db/queries/#using-a-custom-reverse-manager
-                    objects = related_model_info.get("objects")
-                    if not objects:
+                    default_manager = related_model_info.get("_default_manager")
+                    if not default_manager:
                         raise helpers.IncompleteDefnException()
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
@@ -339,7 +337,7 @@ class AddRelatedManagers(ModelClassInitializer):
 
                 # create new RelatedManager subclass
                 parametrized_related_manager_type = Instance(related_manager_info, [Instance(related_model_info, [])])
-                default_manager_type = objects.type
+                default_manager_type = default_manager.type
                 if default_manager_type is None:
                     default_manager_type = self.try_generate_related_manager(related_model_cls, related_model_info)
                 if (
@@ -360,7 +358,7 @@ class AddRelatedManagers(ModelClassInitializer):
     def try_generate_related_manager(
         self, related_model_cls: Type[Model], related_model_info: TypeInfo
     ) -> Optional[Instance]:
-        manager = related_model_cls._meta.managers_map["objects"]
+        manager = related_model_cls._meta.managers_map["_default_manager"]
         base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
         manager_fullname = helpers.get_class_fullname(manager.__class__)
         generated_managers = self.get_generated_manager_mappings(base_manager_fullname)

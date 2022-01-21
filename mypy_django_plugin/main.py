@@ -1,10 +1,7 @@
-import configparser
 import sys
-import textwrap
 from functools import partial
-from typing import Callable, Dict, List, NoReturn, Optional, Tuple, cast
+from typing import Callable, Dict, List, Optional, Tuple
 
-import tomli
 from django.db.models.fields.related import RelatedField
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
@@ -21,11 +18,13 @@ from mypy.plugin import (
 from mypy.types import Type as MypyType
 
 import mypy_django_plugin.transformers.orm_lookups
+from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
+    fail_if_manager_type_created_in_model_body,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -60,94 +59,15 @@ def add_new_manager_base_hook(ctx: ClassDefContext) -> None:
     helpers.add_new_manager_base(ctx.api, ctx.cls.fullname)
 
 
-def extract_django_settings_module(config_file_path: Optional[str]) -> str:
-    def exit(error_type: int) -> NoReturn:
-        """Using mypy's argument parser, raise `SystemExit` to fail hard if validation fails.
-
-        Considering that the plugin's startup duration is around double as long as mypy's, this aims to
-        import and construct objects only when that's required - which happens once and terminates the
-        run. Considering that most of the runs are successful, there's no need for this to linger in the
-        global scope.
-        """
-        from mypy.main import CapturableArgumentParser
-
-        usage = """
-        (config)
-        ...
-        [mypy.plugins.django_stubs]
-            django_settings_module: str (required)
-        ...
-        """
-        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=textwrap.dedent(usage))
-        messages = {
-            1: "mypy config file is not specified or found",
-            2: "no section [mypy.plugins.django-stubs]",
-            3: "the setting is not provided",
-        }
-        handler.error("'django_settings_module' is not set: " + messages[error_type])
-
-    def exit_toml(error_type: int) -> NoReturn:
-        from mypy.main import CapturableArgumentParser
-
-        usage = """
-        (config)
-        ...
-        [tool.django-stubs]
-        django_settings_module = str (required)
-        ...
-        """
-        handler = CapturableArgumentParser(prog="(django-stubs) mypy", usage=textwrap.dedent(usage))
-        messages = {
-            1: "mypy config file is not specified or found",
-            2: "no section [tool.django-stubs]",
-            3: "the setting is not provided",
-            4: "the setting must be a string",
-        }
-        handler.error("'django_settings_module' not found or invalid: " + messages[error_type])
-
-    if config_file_path and helpers.is_toml(config_file_path):
-        try:
-            with open(config_file_path, encoding="utf-8") as config_file_obj:
-                toml_data = tomli.loads(config_file_obj.read())
-        except Exception:
-            exit_toml(1)
-        try:
-            config = toml_data["tool"]["django-stubs"]
-        except KeyError:
-            exit_toml(2)
-
-        if "django_settings_module" not in config:
-            exit_toml(3)
-
-        if not isinstance(config["django_settings_module"], str):
-            exit_toml(4)
-
-        return config["django_settings_module"]
-    else:
-        parser = configparser.ConfigParser()
-        try:
-            with open(cast(str, config_file_path)) as handle:
-                parser.read_file(handle, source=config_file_path)
-        except (IsADirectoryError, OSError):
-            exit(1)
-
-        section = "mypy.plugins.django-stubs"
-        if not parser.has_section(section):
-            exit(2)
-        settings = parser.get(section, "django_settings_module", fallback=None) or exit(3)
-
-        return settings.strip("'\"")
-
-
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
-        django_settings_module = extract_django_settings_module(options.config_file)
+        self.plugin_config = DjangoPluginConfig(options.config_file)
         # Add paths from MYPYPATH env var
         sys.path.extend(mypy_path())
         # Add paths from mypy_path config option
         sys.path.extend(options.mypy_path)
-        self.django_context = DjangoContext(django_settings_module)
+        self.django_context = DjangoContext(self.plugin_config.django_settings_module)
 
     def _get_current_queryset_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
@@ -305,6 +225,11 @@ class NewSemanalDjangoPlugin(Plugin):
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
             )
+
+        if method_name == "from_queryset":
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return fail_if_manager_type_created_in_model_body
 
         return None
 
