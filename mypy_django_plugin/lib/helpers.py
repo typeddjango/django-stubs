@@ -406,30 +406,31 @@ def copy_method_to_another_class(
         return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
     if return_type is None:
         return
-    try:
-        original_arguments = method_node.arguments[1:]
-    except AttributeError:
-        original_arguments = []
 
+    # We build the arguments from the method signature (`CallableType`), because if we were to
+    # use the arguments from the method node (`FuncDef.arguments`) we're not compatible with
+    # a method loaded from cache. As mypy doesn't serialize `FuncDef.arguments` when caching
     arguments = []
-    for arg_name, arg_type, original_argument in zip(
-        method_type.arg_names[1:], method_type.arg_types[1:], original_arguments
+    # Note that the first argument is excluded, as that's `self`
+    for pos, (arg_type, arg_kind, arg_name) in enumerate(
+        zip(method_type.arg_types[1:], method_type.arg_kinds[1:], method_type.arg_names[1:]),
+        start=1,
     ):
         bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
         if bound_arg_type is None:
             return
-
-        var = Var(name=original_argument.variable.name, type=arg_type)
-        var.line = original_argument.variable.line
-        var.column = original_argument.variable.column
-        argument = Argument(
-            variable=var,
-            type_annotation=bound_arg_type,
-            initializer=original_argument.initializer,
-            kind=original_argument.kind,
+        if arg_name is None and hasattr(method_node, "arguments"):
+            arg_name = method_node.arguments[pos].variable.name
+        arguments.append(
+            Argument(
+                # Positional only arguments can have name as `None`, if we can't find a name, we just invent one..
+                variable=Var(name=arg_name if arg_name is not None else f"arg{pos}", type=arg_type),
+                type_annotation=bound_arg_type,
+                initializer=None,
+                kind=arg_kind,
+                pos_only=arg_name is None,
+            )
         )
-        argument.set_line(original_argument)
-        arguments.append(argument)
 
     add_method_to_class(
         semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
