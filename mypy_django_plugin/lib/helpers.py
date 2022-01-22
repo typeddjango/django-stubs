@@ -209,7 +209,11 @@ def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
 
 
 def add_new_class_for_module(
-    module: MypyFile, name: str, bases: List[Instance], fields: Optional[Dict[str, MypyType]] = None
+    module: MypyFile,
+    name: str,
+    bases: List[Instance],
+    fields: Optional[Dict[str, MypyType]] = None,
+    no_serialize: bool = False,
 ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
 
@@ -229,10 +233,14 @@ def add_new_class_for_module(
             var = Var(field_name, type=field_type)
             var.info = new_typeinfo
             var._fullname = new_typeinfo.fullname + "." + field_name
-            new_typeinfo.names[field_name] = SymbolTableNode(MDEF, var, plugin_generated=True)
+            new_typeinfo.names[field_name] = SymbolTableNode(
+                MDEF, var, plugin_generated=True, no_serialize=no_serialize
+            )
 
     classdef.info = new_typeinfo
-    module.names[new_class_unique_name] = SymbolTableNode(GDEF, new_typeinfo, plugin_generated=True)
+    module.names[new_class_unique_name] = SymbolTableNode(
+        GDEF, new_typeinfo, plugin_generated=True, no_serialize=no_serialize
+    )
     return new_typeinfo
 
 
@@ -331,7 +339,7 @@ def check_types_compatible(
     api.check_subtype(actual_type, expected_type, ctx.context, error_message, "got", "expected")
 
 
-def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> None:
+def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False) -> None:
     # type=: type of the variable itself
     var = Var(name=name, type=sym_type)
     # var.info: type of the object variable is bound to
@@ -339,7 +347,7 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType) -> No
     var._fullname = info.fullname + "." + name
     var.is_initialized_in_class = True
     var.is_inferred = True
-    info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True)
+    info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
 
 
 def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
