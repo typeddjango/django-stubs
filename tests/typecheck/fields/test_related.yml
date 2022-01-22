@@ -608,8 +608,8 @@
         reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser*"
 
         user = MyUser()
-        reveal_type(user.book_set) # N: Revealed type is "myapp.models.MyUser_Book_RelatedManager1"
-        reveal_type(user.article_set) # N: Revealed type is "myapp.models.MyUser_Article_RelatedManager1"
+        reveal_type(user.book_set) # N: Revealed type is "myapp.models.Book_RelatedManager"
+        reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
         reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book*, builtins.int], *, bulk: builtins.bool =)"
         reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article*, builtins.int], *, bulk: builtins.bool =)"
         reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book*]"
@@ -689,18 +689,18 @@
 -   case: related_manager_is_a_subclass_of_default_manager
     main: |
         from myapp.models import User, Order, Product
-        reveal_type(User().orders)  # N: Revealed type is "myapp.models.User_Order_RelatedManager1"
+        reveal_type(User().orders)  # N: Revealed type is "myapp.models.Order_RelatedManager"
         reveal_type(User().orders.get())  # N: Revealed type is "myapp.models.Order*"
         reveal_type(User().orders.manager_method())  # N: Revealed type is "builtins.int"
         reveal_type(Product.objects.queryset_method())  # N: Revealed type is "builtins.int"
-        reveal_type(Order().products)  # N: Revealed type is "myapp.models.Order_Product_RelatedManager1"
+        reveal_type(Order().products)  # N: Revealed type is "myapp.models.Product_RelatedManager"
         reveal_type(Order().products.get())  # N: Revealed type is "myapp.models.Product*"
         reveal_type(Order().products.queryset_method())  # N: Revealed type is "builtins.int"
-        # TODO: realted manager support to use the same type for all related managers
         if 1 == 2:
             manager = User().products
         else:
-            manager = Order().products  # E: Incompatible types in assignment (expression has type "Order_Product_RelatedManager1", variable has type "User_Product_RelatedManager1")
+            manager = Order().products
+        reveal_type(manager)  # N: Revealed type is "myapp.models.Product_RelatedManager"
     installed_apps:
         - myapp
     files:
@@ -724,6 +724,90 @@
                     objects = ProductManager()
                     order = models.ForeignKey(to=Order, on_delete=models.CASCADE, related_name='products')
                     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='products')
+
+-   case: related_manager_shared_between_multiple_relations
+    main: |
+        from myapp.models.store import Store
+        from myapp.models.user import User
+        reveal_type(Store().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
+        reveal_type(Store().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
+        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase*]"
+        reveal_type(Store().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
+        reveal_type(User().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
+        reveal_type(User().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
+        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase*]"
+        reveal_type(User().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from .purchase import Purchase
+                from .store import Store
+                from .user import User
+        -   path: myapp/models/store.py
+            content: |
+                from django.db import models
+
+                class Store(models.Model):
+                    ...
+        -   path: myapp/models/user.py
+            content: |
+                from django.db import models
+
+                class User(models.Model):
+                    ...
+        -   path: myapp/models/querysets.py
+            content: |
+                from django.db.models import QuerySet
+                from typing import TYPE_CHECKING
+                if TYPE_CHECKING:
+                    from .purchase import Purchase
+
+                class PurchaseQuerySet(QuerySet['Purchase']):
+                    def queryset_method(self) -> "PurchaseQuerySet":
+                        return self.all()
+        -   path: myapp/models/purchase.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from .querysets import PurchaseQuerySet
+                from .store import Store
+                from .user import User
+
+                PurchaseManager = BaseManager.from_queryset(PurchaseQuerySet)
+                class Purchase(models.Model):
+                    objects = PurchaseManager()
+                    store = models.ForeignKey(to=Store, on_delete=models.CASCADE, related_name='purchases')
+                    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='purchases')
+
+-   case: explicitly_declared_related_manager_is_not_overridden
+    main: |
+        from myapp.models import User
+        reveal_type(User().purchases)  # N: Revealed type is "builtins.int"
+        User().purchases.filter()  # E: "int" has no attribute "filter"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+
+                class User(models.Model):
+                    purchases: int
+
+                class PurchaseQuerySet(models.QuerySet['Purchase']):
+                    def queryset_method(self) -> "PurchaseQuerySet":
+                        return self.all()
+
+                PurchaseManager = BaseManager.from_queryset(PurchaseQuerySet)
+                class Purchase(models.Model):
+                    objects = PurchaseManager()
+                    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='purchases')
+
 
 -   case: related_manager_no_conflict_from_star_import
     main: |
