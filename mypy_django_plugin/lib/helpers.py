@@ -424,7 +424,7 @@ def copy_method_to_another_class(
         arguments.append(
             Argument(
                 # Positional only arguments can have name as `None`, if we can't find a name, we just invent one..
-                variable=Var(name=arg_name if arg_name is not None else f"arg{pos}", type=arg_type),
+                variable=Var(name=arg_name if arg_name is not None else str(pos), type=arg_type),
                 type_annotation=bound_arg_type,
                 initializer=None,
                 kind=arg_kind,
