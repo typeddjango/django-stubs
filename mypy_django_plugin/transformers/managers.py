@@ -204,13 +204,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
         if class_mro_info.fullname == fullnames.QUERYSET_CLASS_FULLNAME:
             break
         for name, sym in class_mro_info.names.items():
-            if isinstance(sym.node, FuncDef):
-                func_node = sym.node
-            elif isinstance(sym.node, Decorator):
-                func_node = sym.node.func
-            else:
+            if not isinstance(sym.node, (FuncDef, Decorator)):
                 continue
-
             # Insert the queryset method name as a class member. Note that the type of
             # the method is set as Any. Figuring out the type is the job of the
             # 'resolve_manager_method' attribute hook, which comes later.
@@ -218,7 +213,12 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             # class BaseManagerFromMyQuerySet(BaseManager):
             #    queryset_method: Any = ...
             #
-            helpers.add_new_sym_for_info(new_manager_info, name=name, sym_type=AnyType(TypeOfAny.special_form))
+            helpers.add_new_sym_for_info(
+                new_manager_info,
+                name=name,
+                sym_type=AnyType(TypeOfAny.special_form),
+                no_serialize=True,
+            )
 
     # we need to copy all methods in MRO before django.db.models.query.QuerySet
     # Gather names of all BaseManager methods
@@ -278,7 +278,9 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             )
 
     # Insert the new manager (dynamic) class
-    assert semanal_api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True))
+    assert semanal_api.add_symbol_table_node(
+        ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True, no_serialize=True)
+    )
 
 
 def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:

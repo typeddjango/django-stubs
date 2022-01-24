@@ -9,6 +9,9 @@ from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
 
 
 def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
+    # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
+
     lookup_kwargs = ctx.arg_names[1]
     provided_lookup_types = ctx.arg_types[1]
 
