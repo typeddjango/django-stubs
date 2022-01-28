@@ -38,4 +38,4 @@ HTTPREQUEST_CLASS_FULLNAME = "django.http.request.HttpRequest"
 
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 
-ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django._AnyAttrAllowed"
+ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
