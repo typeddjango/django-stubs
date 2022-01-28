@@ -48,12 +48,37 @@
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: Type[_T]):
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[django.db.models.base.Model]"
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[_T`1]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
                     def method(self) -> None:
                         reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
+
+-   case: test_base_manager_called_on_model_cls_as_generic_parameter
+    main: |
+        from myapp.models import Base, MyModel
+        base_instance = Base(MyModel)
+        reveal_type(base_instance.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[myapp.models.MyModel*]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar, Generic, Type
+                from django.db import models
+
+                _T = TypeVar('_T', bound=models.Model)
+                class Base(Generic[_T]):
+                    def __init__(self, model_cls: Type[_T]):
+                        self.model_cls = model_cls
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[_T`1]"
+                class MyModel(models.Model):
+                    pass
+                class Child(Base[MyModel]):
+                    def method(self) -> None:
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[myapp.models.MyModel*]"
 
 -   case: if_custom_manager_defined_it_is_set_to_default_manager
     main: |
