@@ -1,3 +1,5 @@
+from django.contrib.gis.gdal.datasource import DataSource
+from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException as GDALException
 from django.contrib.gis.gdal.error import SRSException as SRSException
 from django.contrib.gis.gdal.error import check_err as check_err
