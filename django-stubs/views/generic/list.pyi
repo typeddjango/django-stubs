@@ -30,6 +30,7 @@ class MultipleObjectMixin(Generic[T], ContextMixin):
     def get_context_object_name(self, object_list: QuerySet) -> Optional[str]: ...
 
 class BaseListView(MultipleObjectMixin[T], View):
+    object_list: Sequence[T]
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
 
 class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
