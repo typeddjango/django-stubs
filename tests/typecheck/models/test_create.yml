@@ -95,12 +95,28 @@
 -   case: when_default_for_primary_key_is_specified_allow_none_to_be_set
     main: |
         from myapp.models import MyModel
-        MyModel(id=None)
-        MyModel.objects.create(id=None)
+        first = MyModel(id=None)
+        reveal_type(first.id)  # N: Revealed type is "builtins.int*"
+        first = MyModel.objects.create(id=None)
+        reveal_type(first.id)  # N: Revealed type is "builtins.int*"
+        first = MyModel()
+        first.id = None
+        reveal_type(first.id)  # N: Revealed type is "builtins.int*"
 
         from myapp.models import MyModel2
-        MyModel2(id=None)
+        MyModel2(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, int, str, Combinable]")
         MyModel2.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, int, str, Combinable]")
+        second = MyModel2()
+        second.id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, int, str, Combinable]")
+        reveal_type(second.id)  # N: Revealed type is "builtins.int*"
+
+        # default set but no primary key doesn't allow None
+        from myapp.models import MyModel3
+        MyModel3(default=None)  # E: Incompatible type for "default" of "MyModel3" (got "None", expected "Union[float, int, str, Combinable]")
+        MyModel3.objects.create(default=None)  # E: Incompatible type for "default" of "MyModel3" (got "None", expected "Union[float, int, str, Combinable]")
+        third = MyModel3()
+        third.default = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, int, str, Combinable]")
+        reveal_type(third.default)  # N: Revealed type is "builtins.int*"
     installed_apps:
         - myapp
     files:
@@ -114,3 +130,5 @@
                     id = models.IntegerField(primary_key=True, default=return_int)
                 class MyModel2(models.Model):
                     id = models.IntegerField(primary_key=True)
+                class MyModel3(models.Model):
+                    default = models.IntegerField(default=return_int)

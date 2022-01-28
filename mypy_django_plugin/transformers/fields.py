@@ -6,7 +6,7 @@ from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import TypeOfAny, UnionType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
@@ -125,6 +125,11 @@ def set_descriptor_types_for_field(
     null_expr = helpers.get_call_argument_by_name(ctx, "null")
     if null_expr is not None:
         is_nullable = helpers.parse_bool(null_expr) or False
+    # Allow setting field value to `None` when a field is primary key and has a default that can produce a value
+    default_expr = helpers.get_call_argument_by_name(ctx, "default")
+    primary_key_expr = helpers.get_call_argument_by_name(ctx, "primary_key")
+    if default_expr is not None and primary_key_expr is not None:
+        is_set_nullable = helpers.parse_bool(primary_key_expr) or False
 
     set_type, get_type = get_field_descriptor_types(
         default_return_type.type,
@@ -141,10 +146,46 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
     if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
         return default_return_type
 
-    base_type = base_field_arg_type.args[1]  # extract __get__ type
+    def drop_combinable(_type: MypyType) -> Optional[MypyType]:
+        if isinstance(_type, Instance) and _type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
+            return None
+        elif isinstance(_type, UnionType):
+            items_without_combinable = []
+            for item in _type.items:
+                reduced = drop_combinable(item)
+                if reduced is not None:
+                    items_without_combinable.append(reduced)
+
+            if len(items_without_combinable) > 1:
+                return UnionType(
+                    items_without_combinable,
+                    line=_type.line,
+                    column=_type.column,
+                    is_evaluated=_type.is_evaluated,
+                    uses_pep604_syntax=_type.uses_pep604_syntax,
+                )
+            elif len(items_without_combinable) == 1:
+                return items_without_combinable[0]
+            else:
+                return None
+
+        return _type
+
+    # Both base_field and return type should derive from Field and thus expect 2 arguments
+    assert len(base_field_arg_type.args) == len(default_return_type.args) == 2
     args = []
-    for default_arg in default_return_type.args:
-        args.append(helpers.convert_any_to_type(default_arg, base_type))
+    for new_type, default_arg in zip(base_field_arg_type.args, default_return_type.args):
+        # Drop any base_field Combinable type
+        reduced = drop_combinable(new_type)
+        if reduced is None:
+            ctx.api.fail(
+                f"Can't have ArrayField expecting {fullnames.COMBINABLE_EXPRESSION_FULLNAME!r} as data type",
+                ctx.context,
+            )
+        else:
+            new_type = reduced
+
+        args.append(helpers.convert_any_to_type(default_arg, new_type))
 
     return helpers.reparametrize_instance(default_return_type, args)
 

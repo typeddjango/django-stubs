@@ -94,7 +94,7 @@
 -   case: blank_and_not_null_charfield_does_not_allow_none
     main: |
         from myapp.models import MyModel
-        MyModel(notnulltext=None)  # Should allow None in constructor
+        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "Union[str, int, Combinable]")
         MyModel(notnulltext="")
         MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")
         reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str*"
