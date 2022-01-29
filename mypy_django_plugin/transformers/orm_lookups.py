@@ -29,7 +29,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         if lookup_kwarg is None:
             continue
         if isinstance(provided_type, Instance) and provided_type.type.has_base(
-            "django.db.models.expressions.Combinable"
+            fullnames.COMBINABLE_EXPRESSION_FULLNAME
         ):
             provided_type = resolve_combinable_type(provided_type, django_context)
 

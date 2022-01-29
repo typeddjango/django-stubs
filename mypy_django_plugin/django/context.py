@@ -15,6 +15,7 @@ from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
 from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
+from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
@@ -174,10 +175,29 @@ class DjangoContext:
             field_set_type = self.get_field_set_type(api, primary_key_field, method=method)
             expected_types["pk"] = field_set_type
 
+        def get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
+            if info is None:
+                return None
+            field_node = info.names.get(field_name)
+            if field_node is None or not isinstance(field_node.type, Instance):
+                return None
+            elif not field_node.type.args:
+                # Field declares a set and a get type arg. Fallback to `None` when we can't find any args
+                return None
+
+            set_type = field_node.type.args[0]
+            return set_type
+
+        model_info = helpers.lookup_class_typeinfo(api, model_cls)
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 field_name = field.attname
-                field_set_type = self.get_field_set_type(api, field, method=method)
+                # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
+                # from django-stubs own declaration. This is to align with the setter types declared for
+                # assignment.
+                field_set_type = get_field_set_type_from_model_type_info(
+                    model_info, field_name
+                ) or self.get_field_set_type(api, field, method=method)
                 expected_types[field_name] = field_set_type
 
                 if isinstance(field, ForeignKey):

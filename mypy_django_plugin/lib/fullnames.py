@@ -36,6 +36,7 @@ MIGRATION_CLASS_FULLNAME = "django.db.migrations.migration.Migration"
 OPTIONS_CLASS_FULLNAME = "django.db.models.options.Options"
 HTTPREQUEST_CLASS_FULLNAME = "django.http.request.HttpRequest"
 
+COMBINABLE_EXPRESSION_FULLNAME = "django.db.models.expressions.Combinable"
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 
 ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
