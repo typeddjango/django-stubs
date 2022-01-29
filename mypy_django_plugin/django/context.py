@@ -193,8 +193,8 @@ class DjangoContext:
             if isinstance(field, Field):
                 field_name = field.attname
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
-                # from django-stubs own declaration. This is to honor any explicitly declared (i.e. non-inferred)
-                # field types.
+                # from django-stubs own declaration. This is to align with the setter types declared for
+                # assignment.
                 field_set_type = get_field_set_type_from_model_type_info(
                     model_info, field_name
                 ) or self.get_field_set_type(api, field, method=method)
