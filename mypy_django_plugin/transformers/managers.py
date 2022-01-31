@@ -217,7 +217,6 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
                 new_manager_info,
                 name=name,
                 sym_type=AnyType(TypeOfAny.special_form),
-                no_serialize=True,
             )
 
     # we need to copy all methods in MRO before django.db.models.query.QuerySet
@@ -278,9 +277,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             )
 
     # Insert the new manager (dynamic) class
-    assert semanal_api.add_symbol_table_node(
-        ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True, no_serialize=True)
-    )
+    assert semanal_api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True))
 
 
 def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:
