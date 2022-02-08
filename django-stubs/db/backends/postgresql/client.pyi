@@ -1,9 +1,10 @@
-from typing import Dict
+from typing import Iterable, List, Optional, Tuple
 
 from django.db.backends.base.client import BaseDatabaseClient
 
 class DatabaseClient(BaseDatabaseClient):
     executable_name: str = ...
     @classmethod
-    def runshell_db(cls, conn_params: Dict[str, str]) -> None: ...
-    def runshell(self) -> None: ...
+    def settings_to_cmd_args_env(
+        self, settings_dict: dict, parameters: Iterable[str]
+    ) -> Tuple[List[str], Optional[dict]]: ...
