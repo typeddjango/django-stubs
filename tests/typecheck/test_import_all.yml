@@ -231,6 +231,7 @@
         import django.db.backends.dummy.base
         import django.db.backends.mysql
         import django.db.backends.mysql.client
+        import django.db.backends.oracle.client
         import django.db.backends.postgresql
         import django.db.backends.postgresql.base
         import django.db.backends.postgresql.client
@@ -239,6 +240,7 @@
         import django.db.backends.signals
         import django.db.backends.sqlite3
         import django.db.backends.sqlite3.base
+        import django.db.backends.sqlite3.client
         import django.db.backends.sqlite3.creation
         import django.db.backends.sqlite3.features
         import django.db.backends.sqlite3.introspection
