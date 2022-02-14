@@ -25,7 +25,7 @@ def get_cache_key(
     request: Union[ASGIRequest, HttpRequest, WSGIRequest],
     key_prefix: Optional[str] = ...,
     method: str = ...,
-    cache: Optional[BaseCache] = ...
+    cache: Optional[BaseCache] = ...,
 ) -> Optional[str]: ...
 def learn_cache_key(
     request: WSGIRequest,
