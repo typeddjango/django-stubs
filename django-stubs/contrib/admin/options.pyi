@@ -16,6 +16,7 @@ from typing import (
     Union,
 )
 
+from django import forms
 from django.contrib.admin.filters import ListFilter
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import AdminSite
@@ -24,6 +25,7 @@ from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
 from django.core.paginator import Paginator
+from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
@@ -93,8 +95,8 @@ class BaseModelAdmin(Generic[_ModelT]):
     checks_class: Any = ...
     def check(self, **kwargs: Any) -> List[CheckMessage]: ...
     def formfield_for_dbfield(
-        self, db_field: Field, request: Optional[HttpRequest], **kwargs: Any
-    ) -> Optional[Field]: ...
+        self, db_field: models.Field, request: Optional[HttpRequest], **kwargs: Any
+    ) -> Optional[forms.Field]: ...
     def formfield_for_choice_field(
         self, db_field: Field, request: Optional[HttpRequest], **kwargs: Any
     ) -> TypedChoiceField: ...
