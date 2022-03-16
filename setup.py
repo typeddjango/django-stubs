@@ -1,8 +1,11 @@
 import os
+import site
 from distutils.core import setup
 from typing import List
 
 from setuptools import find_packages
+
+site.ENABLE_USER_SITE = True
 
 
 def find_stub_files(name: str) -> List[str]:
