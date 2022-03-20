@@ -378,6 +378,10 @@ class SlugField(CharField):
     def __init__(
         self,
         allow_unicode: bool = ...,
+        max_length: Optional[Any] = ...,
+        min_length: Optional[Any] = ...,
+        strip: bool = ...,
+        empty_value: Optional[str] = ...,
         required: bool = ...,
         widget: Optional[Union[Widget, Type[Widget]]] = ...,
         label: Optional[Any] = ...,
