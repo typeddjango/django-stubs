@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type
+from typing import Any, Collection, Dict, Iterator, List, Mapping, Optional, Sequence, Set, Tuple, Type, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
@@ -45,6 +45,10 @@ class DeferredAttribute:
     field: Field
     def __init__(self, field_name: str) -> None: ...
 
+        
+L = TypeVar("L", bound=Lookup)
+
+
 class RegisterLookupMixin:
     lookup_name: str
     @classmethod
@@ -54,9 +58,9 @@ class RegisterLookupMixin:
     @staticmethod
     def merge_dicts(dicts: List[Dict[str, Any]]) -> Dict[str, Any]: ...
     @classmethod
-    def register_lookup(cls, lookup: Any, lookup_name: Optional[str] = ...) -> Type[Any]: ...
+    def register_lookup(cls, lookup: Type[L], lookup_name: Optional[str] = ...) -> Type[L]: ...
     @classmethod
-    def _unregister_lookup(cls, lookup: Any, lookup_name: Optional[str] = ...): ...
+    def _unregister_lookup(cls, lookup: Type[Lookup], lookup_name: Optional[str] = ...): ...
 
 def select_related_descend(
     field: Field,
