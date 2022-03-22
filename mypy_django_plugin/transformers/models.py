@@ -533,6 +533,7 @@ def get_or_create_annotated_type(
             type_name,
             bases=[model_type] if fields_dict is not None else [model_type, annotated_model_type],
             fields=fields_dict.items if fields_dict is not None else None,
+            no_serialize=True,
         )
         if fields_dict is not None:
             # To allow structural subtyping, make it a Protocol
