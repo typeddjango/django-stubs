@@ -76,7 +76,7 @@ def partition(
     values: List[_PartitionMember]
 ) -> Tuple[List[_PartitionMember], List[_PartitionMember]]: ...
 
-_Get = TypeVar("_Get")
+_Get = TypeVar("_Get", covariant=True)
 _Self = TypeVar("_Self")
 
 class classproperty(Generic[_Get]):
