@@ -1,11 +1,10 @@
 from typing import Union
 
 from django.contrib.auth.models import AnonymousUser, User
-from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
 from django.utils.deprecation import MiddlewareMixin
 
-def get_user(request: WSGIRequest) -> Union[AnonymousUser, User]: ...
+def get_user(request: HttpRequest) -> Union[AnonymousUser, User]: ...
 
 class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest) -> None: ...

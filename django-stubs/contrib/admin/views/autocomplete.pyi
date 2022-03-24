@@ -1,10 +1,11 @@
-from typing import Any
+from typing import Any, Optional
 
 from django.contrib.admin.options import ModelAdmin
-from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import Model
+from django.http.request import HttpRequest
 from django.views.generic.list import BaseListView
 
 class AutocompleteJsonView(BaseListView):
     model_admin: ModelAdmin = ...
     term: Any = ...
-    def has_perm(self, request: WSGIRequest, obj: None = ...) -> bool: ...
+    def has_perm(self, request: HttpRequest, obj: Optional[Model] = ...) -> bool: ...

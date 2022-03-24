@@ -1,18 +1,18 @@
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Type
 
 from django.contrib.admin.options import ModelAdmin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 
 class ListFilter:
     title: Any = ...
     template: str = ...
     used_parameters: Any = ...
     def __init__(
-        self, request: WSGIRequest, params: Dict[str, str], model: Type[Model], model_admin: ModelAdmin
+        self, request: HttpRequest, params: Dict[str, str], model: Type[Model], model_admin: ModelAdmin
     ) -> None: ...
     def has_output(self) -> bool: ...
     def choices(self, changelist: Any) -> Optional[Iterator[Dict[str, Any]]]: ...
@@ -32,7 +32,7 @@ class FieldListFilter(ListFilter):
     def __init__(
         self,
         field: Field,
-        request: WSGIRequest,
+        request: HttpRequest,
         params: Dict[str, str],
         model: Type[Model],
         model_admin: ModelAdmin,
@@ -44,7 +44,7 @@ class FieldListFilter(ListFilter):
     def create(
         cls,
         field: Field,
-        request: WSGIRequest,
+        request: HttpRequest,
         params: Dict[str, str],
         model: Type[Model],
         model_admin: ModelAdmin,
@@ -64,7 +64,7 @@ class RelatedFieldListFilter(FieldListFilter):
     @property
     def include_empty_choice(self) -> bool: ...
     def field_choices(
-        self, field: RelatedField, request: WSGIRequest, model_admin: ModelAdmin
+        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
     ) -> List[Tuple[str, str]]: ...
 
 class BooleanFieldListFilter(FieldListFilter):

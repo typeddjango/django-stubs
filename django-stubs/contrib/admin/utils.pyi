@@ -6,7 +6,6 @@ from uuid import UUID
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.forms import AdminPasswordChangeForm
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.base import Model
 from django.db.models.deletion import Collector
 from django.db.models.fields import Field, reverse_related
@@ -14,6 +13,7 @@ from django.db.models.fields.reverse_related import ManyToOneRel
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
+from django.http.request import HttpRequest
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 
@@ -24,7 +24,7 @@ def unquote(s: str) -> str: ...
 def flatten(fields: Any) -> List[Union[Callable, str]]: ...
 def flatten_fieldsets(fieldsets: Any) -> List[Union[Callable, str]]: ...
 def get_deleted_objects(
-    objs: Sequence[Optional[Model]], request: WSGIRequest, admin_site: AdminSite
+    objs: Union[Sequence[Optional[Model]], QuerySet[Model]], request: HttpRequest, admin_site: AdminSite
 ) -> Tuple[List[Any], Dict[Any, Any], Set[Any], List[Any]]: ...
 
 class NestedObjects(Collector):
