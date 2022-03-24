@@ -39,7 +39,8 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.urls.resolvers import URLPattern
-from django.utils.safestring import SafeText
+from django.utils.safestring import SafeString
+from django.utils.datastructures import _ListOrTuple
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal, TypedDict
@@ -72,7 +73,6 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # https://github.com/python/mypy/issues/8921
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
 _T = TypeVar("_T")
-_ListOrTuple = Union[Tuple[_T, ...], List[_T]]
 _FieldsetSpec = _ListOrTuple[Tuple[Optional[str], _FieldOpts]]
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
@@ -194,7 +194,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def log_addition(self, request: HttpRequest, object: _ModelT, message: Any) -> LogEntry: ...
     def log_change(self, request: HttpRequest, object: _ModelT, message: Any) -> LogEntry: ...
     def log_deletion(self, request: HttpRequest, object: _ModelT, object_repr: str) -> LogEntry: ...
-    def action_checkbox(self, obj: _ModelT) -> SafeText: ...
+    def action_checkbox(self, obj: _ModelT) -> SafeString: ...
     def get_actions(self, request: HttpRequest) -> Dict[str, Optional[Tuple[Callable[..., str], str, str]]]: ...
     def get_action_choices(
         self, request: HttpRequest, default_choices: List[Tuple[str, str]] = ...

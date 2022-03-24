@@ -48,15 +48,15 @@
     main: |
         from django.utils.safestring import mark_safe
         s = 'hello'
-        reveal_type(mark_safe(s))  # N: Revealed type is "django.utils.safestring.SafeText"
-        reveal_type(mark_safe(s) + mark_safe(s))  # N: Revealed type is "django.utils.safestring.SafeText"
+        reveal_type(mark_safe(s))  # N: Revealed type is "django.utils.safestring.SafeString"
+        reveal_type(mark_safe(s) + mark_safe(s))  # N: Revealed type is "django.utils.safestring.SafeString"
         reveal_type(s + mark_safe(s))  # N: Revealed type is "builtins.str"
 
         s += mark_safe(s)
         reveal_type(s)  # N: Revealed type is "builtins.str"
         ms = mark_safe(s)
         ms += mark_safe(s)
-        reveal_type(ms)  # N: Revealed type is "django.utils.safestring.SafeText"
+        reveal_type(ms)  # N: Revealed type is "django.utils.safestring.SafeString"
 
         @mark_safe
         def func(s: str) -> str:

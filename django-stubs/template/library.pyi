@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union, o
 
 from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
-from django.utils.safestring import SafeText
+from django.utils.safestring import SafeString
 
 from .base import Node, Template
 
@@ -51,7 +51,7 @@ class TagHelperNode(Node):
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],
     ) -> None: ...
-    def get_resolved_arguments(self, context: Context) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
+    def get_resolved_arguments(self, context: Context) -> Tuple[List[int], Dict[str, Union[SafeString, int]]]: ...
 
 class SimpleNode(TagHelperNode):
     args: List[FilterExpression]

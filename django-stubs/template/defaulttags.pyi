@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from django.template.base import FilterExpression, Parser, Token
 from django.template.context import Context
-from django.utils.safestring import SafeText
+from django.utils.safestring import SafeString
 
 from .base import Node, NodeList
 from .library import Library
@@ -135,8 +135,8 @@ class URLNode(Node):
     ) -> None: ...
 
 class VerbatimNode(Node):
-    content: SafeText = ...
-    def __init__(self, content: SafeText) -> None: ...
+    content: SafeString = ...
+    def __init__(self, content: SafeString) -> None: ...
 
 class WidthRatioNode(Node):
     val_expr: FilterExpression = ...
