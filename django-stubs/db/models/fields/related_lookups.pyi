@@ -1,9 +1,8 @@
 from typing import Any, Iterable, List, Mapping, Optional, Tuple, Type
 
-from django.db.models.expressions import Expression
 from django.db.models.fields import Field
 from django.db.models.lookups import (
-    BuiltinLookup,
+    Lookup,
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
@@ -24,13 +23,13 @@ class MultiColSource:
         self, alias: str, targets: Tuple[Field, Field], sources: Tuple[Field, Field], field: Field
     ) -> None: ...
     def relabeled_clone(self, relabels: Mapping[str, str]) -> MultiColSource: ...
-    def get_lookup(self, lookup: str) -> Type[BuiltinLookup]: ...
+    def get_lookup(self, lookup: str) -> Optional[Type[Lookup]]: ...
 
-def get_normalized_value(value: Any, lhs: Expression) -> Tuple[None]: ...
+def get_normalized_value(value: Any, lhs: Any) -> Tuple[Any, ...]: ...
 
 class RelatedIn(In):
     bilateral_transforms: List[Any]
-    lhs: Expression
+    lhs: Any
     rhs: Any = ...
     def get_prep_lookup(self) -> Iterable[Any]: ...
 

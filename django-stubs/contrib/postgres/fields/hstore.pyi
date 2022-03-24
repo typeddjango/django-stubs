@@ -1,8 +1,7 @@
 from typing import Any
 
 from django.db.models import Field, Transform
-
-from .mixins import CheckFieldDefaultMixin
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 
 class HStoreField(CheckFieldDefaultMixin, Field):
     def get_transform(self, name) -> Any: ...

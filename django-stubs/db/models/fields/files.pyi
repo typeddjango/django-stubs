@@ -1,11 +1,18 @@
 from pathlib import Path
+import sys
 from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, overload
 
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
+from django.core import validators  # due to weird mypy.stubtest error
 from django.db.models.base import Model
-from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
+from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Protocol
+else:
+    from typing import Protocol
 
 class FieldFile(File):
     instance: Model = ...
@@ -31,16 +38,21 @@ class FileDescriptor:
     def __get__(self, instance: Optional[Model], cls: Type[Model] = ...) -> Union[FieldFile, FileDescriptor]: ...
 
 _T = TypeVar("_T", bound="Field")
+_M = TypeVar("_M", bound=Model, contravariant=True)
+
+class _UploadToCallable(Protocol[_M]):
+    def __call__(self, __instance: _M, filename: str) -> Union[str, Path]: ...
 
 class FileField(Field):
     storage: Storage = ...
-    upload_to: Union[str, Callable] = ...
+    upload_to: Union[str, _UploadToCallable, Path] = ...
     def __init__(
         self,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
-        upload_to: Union[str, Callable, Path] = ...,
+        upload_to: Union[str, _UploadToCallable, Path] = ...,
         storage: Optional[Union[Storage, Callable[[], Storage]]] = ...,
+        *,
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
@@ -57,8 +69,8 @@ class FileField(Field):
         help_text: str = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     # class access
     @overload  # type: ignore
