@@ -1,12 +1,13 @@
+import sys
 from typing import (
     Any,
-    Callable,
+    Collection,
     Dict,
+    Generic,
     Iterable,
     Iterator,
     List,
     Mapping,
-    MutableMapping,
     MutableSet,
     Optional,
     Tuple,
@@ -15,10 +16,49 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Literal
+if sys.version_info < (3, 8):
+    from typing_extensions import Protocol
+else:
+    from typing import Protocol
+
 
 _K = TypeVar("_K")
 _V = TypeVar("_V")
+_Z = TypeVar("_Z")
+_I = TypeVar("_I", covariant=True)
+
+# Unfortunately, there's often check `if isinstance(var, (list, tuple))` in django
+# codebase. So we need sometimes to declare exactly list or tuple.
+_ListOrTuple = Union[List[_K], Tuple[_K, ...], Tuple[()]]
+
+class _PropertyDescriptor(Generic[_K, _V]):
+    """
+    This helper property descriptor allows defining asynmetric getter/setters
+    which mypy currently doesn't support with either:
+
+        class HttpResponse:
+            @property
+            def content(...): ...
+            @property.setter
+            def content(...): ...
+
+    or:
+
+        class HttpResponse:
+            def _get_content(...): ...
+            def _set_content(...): ...
+            content = property(_get_content, _set_content)
+    """
+
+    def __get__(self, instance: Any, owner: Optional[Any]) -> _V: ...
+    def __set__(self, instance: Any, value: _K) -> None: ...
+
+_IC = TypeVar("_IC", bound='_IndexableCollection')
+class _IndexableCollection(Protocol[_I], Collection[_I]):
+    @overload
+    def __getitem__(self, index: int) -> _I:...
+    @overload
+    def __getitem__(self: _IC, index: slice) -> _IC:...
 
 class OrderedSet(MutableSet[_K]):
     dict: Dict[_K, None] = ...
