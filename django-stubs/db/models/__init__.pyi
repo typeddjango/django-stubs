@@ -37,7 +37,6 @@ from .expressions import F as F
 from .expressions import Func as Func
 from .expressions import OrderBy as OrderBy
 from .expressions import OuterRef as OuterRef
-from .expressions import Random as Random
 from .expressions import RawSQL as RawSQL
 from .expressions import Ref as Ref
 from .expressions import RowRange as RowRange

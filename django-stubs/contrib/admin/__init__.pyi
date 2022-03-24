@@ -12,7 +12,6 @@ from .filters import ListFilter as ListFilter
 from .filters import RelatedFieldListFilter as RelatedFieldListFilter
 from .filters import RelatedOnlyFieldListFilter as RelatedOnlyFieldListFilter
 from .filters import SimpleListFilter as SimpleListFilter
-from .helpers import ACTION_CHECKBOX_NAME as ACTION_CHECKBOX_NAME
 from .options import HORIZONTAL as HORIZONTAL
 from .options import VERTICAL as VERTICAL
 from .options import ModelAdmin as ModelAdmin
