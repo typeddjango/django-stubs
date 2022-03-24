@@ -121,6 +121,7 @@ class DjangoContext:
             if "," in fullname:
                 # Remove second type arg, which might be present
                 fullname = fullname[: fullname.index(",")]
+            fullname = fullname.replace("__", ".")
 
         module, _, model_cls_name = fullname.rpartition(".")
         for model_cls in self.model_modules.get(module, set()):

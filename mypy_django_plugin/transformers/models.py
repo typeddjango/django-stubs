@@ -512,9 +512,9 @@ def get_or_create_annotated_type(
         model_type = model_type.type.bases[0]
 
     if fields_dict is not None:
-        type_name = f"WithAnnotations[{model_type.type.fullname}, {fields_dict}]"
+        type_name = f"WithAnnotations[{model_type.type.fullname.replace('.', '__')}, {fields_dict}]"
     else:
-        type_name = f"WithAnnotations[{model_type.type.fullname}]"
+        type_name = f"WithAnnotations[{model_type.type.fullname.replace('.', '__')}]"
 
     annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(
         cast(TypeChecker, api), model_module_name + "." + type_name
