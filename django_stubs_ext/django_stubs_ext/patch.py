@@ -1,6 +1,7 @@
 from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION as VERSION
+from django.core.paginator import Paginator
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
 from django.db.models.fields import Field
@@ -45,6 +46,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(MultipleObjectMixin),
     MPGeneric(BaseModelAdmin),
     MPGeneric(Field),
+    MPGeneric(Paginator),
     MPGeneric(BaseModelForm),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
