@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Iterator, List, Optional, Union
+from typing import Callable, Iterable, Iterator, List, Optional, Pattern, Union
 
 from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject
@@ -6,11 +6,11 @@ from django.utils.safestring import SafeString
 
 def capfirst(x: Optional[str]) -> Optional[str]: ...
 
-re_words: Any
-re_chars: Any
-re_tag: Any
-re_newlines: Any
-re_camel_case: Any
+re_words: Pattern[str]
+re_chars: Pattern[str]
+re_tag: Pattern[str]
+re_newlines: Pattern[str]
+re_camel_case: Pattern[str]
 
 def wrap(text: str, width: int) -> str: ...
 
@@ -36,7 +36,7 @@ class StreamingBuffer:
 
 def compress_sequence(sequence: Iterable[bytes]) -> Iterator[bytes]: ...
 
-smart_split_re: Any
+smart_split_re: Pattern[str]
 
 def smart_split(text: str) -> Iterator[str]: ...
 def unescape_entities(text: str) -> str: ...
@@ -44,4 +44,4 @@ def unescape_string_literal(s: str) -> str: ...
 def slugify(value: str, allow_unicode: bool = ...) -> str: ...
 def camel_case_to_spaces(value: str) -> str: ...
 
-format_lazy: Any
+format_lazy: Callable[..., str]

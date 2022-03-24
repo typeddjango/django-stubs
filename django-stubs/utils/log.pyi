@@ -1,8 +1,9 @@
 import logging.config
-from logging import LogRecord
+from logging import LogRecord, Logger
 from typing import Any, Callable, Dict, Optional, Union
 
 from django.core.management.color import Style
+from django.http import HttpRequest, HttpResponse
 
 request_logger: Any
 DEFAULT_LOGGING: Any
@@ -12,7 +13,12 @@ def configure_logging(logging_config: str, logging_settings: Dict[str, Any]) -> 
 class AdminEmailHandler(logging.Handler):
     include_html: bool = ...
     email_backend: Optional[str] = ...
-    def __init__(self, include_html: bool = ..., email_backend: Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        include_html: bool = ...,
+        email_backend: Optional[str] = ...,
+        reporter_class: Optional[str] = ...,
+    ) -> None: ...
     def send_mail(self, subject: str, message: str, *args: Any, **kwargs: Any) -> None: ...
     def connection(self) -> Any: ...
     def format_subject(self, subject: str) -> str: ...
@@ -29,7 +35,7 @@ class RequireDebugTrue(logging.Filter):
     def filter(self, record: Union[str, LogRecord]) -> bool: ...
 
 class ServerFormatter(logging.Formatter):
-    datefmt: None
+    default_time_format: str = ...
     style: Style = ...
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def uses_server_time(self) -> bool: ...
@@ -37,9 +43,9 @@ class ServerFormatter(logging.Formatter):
 def log_response(
     message: str,
     *args: Any,
-    response: Optional[Any] = ...,
-    request: Optional[Any] = ...,
-    logger: Any = ...,
-    level: Optional[Any] = ...,
+    response: Optional[HttpResponse] = ...,
+    request: Optional[HttpRequest] = ...,
+    logger: Logger = ...,
+    level: Optional[str] = ...,
     exc_info: Optional[Any] = ...
 ) -> None: ...

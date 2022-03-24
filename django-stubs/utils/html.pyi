@@ -1,15 +1,14 @@
 from html.parser import HTMLParser
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Pattern, Tuple, Type
 
 from django.utils.safestring import SafeString
 
 TRAILING_PUNCTUATION_CHARS: str
-WRAPPING_PUNCTUATION: Any
-DOTS: Any
-unencoded_ampersands_re: Any
-word_split_re: Any
-simple_url_re: Any
-simple_url_2_re: Any
+WRAPPING_PUNCTUATION: List[Tuple[str, str]]
+DOTS: List[str]
+word_split_re: Pattern[str]
+simple_url_re: Pattern[str]
+simple_url_2_re: Pattern[str]
 
 def escape(text: Any) -> SafeString: ...
 def escapejs(value: Any) -> SafeString: ...
@@ -32,4 +31,4 @@ def strip_spaces_between_tags(value: str) -> str: ...
 def smart_urlquote(url: str) -> str: ...
 def urlize(text: str, trim_url_limit: Optional[int] = ..., nofollow: bool = ..., autoescape: bool = ...) -> str: ...
 def avoid_wrapping(value: str) -> str: ...
-def html_safe(klass: Any): ...
+def html_safe(klass: Type) -> Type: ...
