@@ -1,4 +1,4 @@
-from collections import OrderedDict
+import sys
 from typing import (
     Any,
     Callable,
@@ -40,7 +40,11 @@ from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRed
 from django.template.response import TemplateResponse
 from django.urls.resolvers import URLPattern
 from django.utils.safestring import SafeText
-from typing_extensions import Literal, TypedDict
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal, TypedDict
+else:
+    from typing import Literal, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
@@ -191,7 +195,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def log_change(self, request: HttpRequest, object: _ModelT, message: Any) -> LogEntry: ...
     def log_deletion(self, request: HttpRequest, object: _ModelT, object_repr: str) -> LogEntry: ...
     def action_checkbox(self, obj: _ModelT) -> SafeText: ...
-    def get_actions(self, request: HttpRequest) -> OrderedDict: ...
+    def get_actions(self, request: HttpRequest) -> Dict[str, Optional[Tuple[Callable[..., str], str, str]]]: ...
     def get_action_choices(
         self, request: HttpRequest, default_choices: List[Tuple[str, str]] = ...
     ) -> List[Tuple[str, str]]: ...

@@ -1,4 +1,4 @@
-from collections import OrderedDict
+import sys
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 from django.contrib.admin.filters import ListFilter, SimpleListFilter
@@ -12,6 +12,11 @@ from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 ALL_VAR: str
 ORDER_VAR: str
@@ -82,7 +87,7 @@ class ChangeList:
     def get_results(self, request: HttpRequest) -> None: ...
     def get_ordering_field(self, field_name: Union[Callable, str]) -> Optional[Union[CombinedExpression, str]]: ...
     def get_ordering(self, request: HttpRequest, queryset: QuerySet) -> List[Union[Expression, str]]: ...
-    def get_ordering_field_columns(self) -> OrderedDict: ...
+    def get_ordering_field_columns(self) -> Dict[int, Literal['desc', 'asc']]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet: ...
     def apply_select_related(self, qs: QuerySet) -> QuerySet: ...
     def has_related_field_in_list_display(self) -> bool: ...

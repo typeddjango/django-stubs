@@ -1,4 +1,3 @@
-import collections
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 from uuid import UUID
@@ -28,7 +27,7 @@ def get_deleted_objects(
 ) -> Tuple[List[Any], Dict[Any, Any], Set[Any], List[Any]]: ...
 
 class NestedObjects(Collector):
-    data: collections.OrderedDict
+    data: Dict[str, Any]
     dependencies: Dict[Any, Any]
     fast_deletes: List[Any]
     field_updates: Dict[Any, Any]
