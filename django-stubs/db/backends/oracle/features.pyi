@@ -1,8 +1,10 @@
 from typing import Any
 
 from django.db.backends.base.features import BaseDatabaseFeatures as BaseDatabaseFeatures
+from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseFeatures(BaseDatabaseFeatures):
+    connection: DatabaseWrapper
     interprets_empty_strings_as_nulls: bool = ...
     has_select_for_update: bool = ...
     has_select_for_update_nowait: bool = ...

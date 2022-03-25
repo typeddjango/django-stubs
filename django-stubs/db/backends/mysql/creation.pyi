@@ -1,4 +1,6 @@
 from django.db.backends.base.creation import BaseDatabaseCreation as BaseDatabaseCreation
+from django.db.backends.mysql.base import DatabaseWrapper
 
 class DatabaseCreation(BaseDatabaseCreation):
-    def sql_table_creation_suffix(self): ...
+    connection: DatabaseWrapper
+    def sql_table_creation_suffix(self) -> str: ...

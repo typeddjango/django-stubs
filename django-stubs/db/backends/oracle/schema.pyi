@@ -1,8 +1,10 @@
 from typing import Any
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor as BaseDatabaseSchemaEditor
+from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+    connection: DatabaseWrapper
     sql_create_column: str = ...
     sql_alter_column_type: str = ...
     sql_alter_column_null: str = ...

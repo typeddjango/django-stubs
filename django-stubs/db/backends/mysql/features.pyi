@@ -1,8 +1,10 @@
 from typing import Any, Dict, Set
 
 from django.db.backends.base.features import BaseDatabaseFeatures as BaseDatabaseFeatures
+from django.db.backends.mysql.base import DatabaseWrapper
 
 class DatabaseFeatures(BaseDatabaseFeatures):
+    connection: DatabaseWrapper
     empty_fetchmany_value: Any = ...
     allows_group_by_pk: bool = ...
     related_fields_match_type: bool = ...

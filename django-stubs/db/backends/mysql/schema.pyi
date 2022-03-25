@@ -1,8 +1,10 @@
 from typing import Any
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor as BaseDatabaseSchemaEditor
+from django.db.backends.mysql.base import DatabaseWrapper
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+    connection: DatabaseWrapper
     sql_rename_table: str = ...
     sql_alter_column_null: str = ...
     sql_alter_column_not_null: str = ...

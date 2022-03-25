@@ -21,7 +21,6 @@
         import django.contrib.admin.templatetags
         import django.contrib.admin.templatetags.admin_list
         import django.contrib.admin.templatetags.admin_modify
-        import django.contrib.admin.templatetags.admin_static
         import django.contrib.admin.templatetags.admin_urls
         import django.contrib.admin.templatetags.base
         import django.contrib.admin.templatetags.log
@@ -271,8 +270,6 @@
         import django.contrib.staticfiles.management.commands.findstatic
         import django.contrib.staticfiles.management.commands.runserver
         import django.contrib.staticfiles.storage
-        import django.contrib.staticfiles.templatetags
-        import django.contrib.staticfiles.templatetags.staticfiles
         import django.contrib.staticfiles.testing
         import django.contrib.staticfiles.urls
         import django.contrib.staticfiles.utils
@@ -550,7 +547,6 @@
         import django.utils.numberformat
         import django.utils.regex_helper
         import django.utils.safestring
-        import django.utils.six
         import django.utils.termcolors
         import django.utils.text
         import django.utils.timesince

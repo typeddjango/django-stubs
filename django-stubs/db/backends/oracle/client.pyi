@@ -1,8 +1,10 @@
 from typing import Any, Dict, Iterable, List, Tuple
 
 from django.db.backends.base.client import BaseDatabaseClient as BaseDatabaseClient
+from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseClient(BaseDatabaseClient):
+    connection: DatabaseWrapper
     executable_name: str = ...
     wrapper_name: str = ...
     @staticmethod

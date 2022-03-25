@@ -1,13 +1,23 @@
-import types
-from datetime import date, datetime, time
+from contextlib import contextmanager
+import datetime
 from decimal import Decimal
-from typing import Any, ContextManager, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union
+import sys
+from typing import (
+    Any, Dict, Generator, Iterator, List, Mapping, Optional, Sequence,
+    Tuple, Type, Union, overload
+)
+import types
 from uuid import UUID
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 logger: Any
 
 # Python types that can be adapted to SQL.
-_SQLType = Union[None, bool, int, float, Decimal, str, bytes, date, datetime, UUID, Tuple[Any, ...], List[Any]]
+_SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime.date, datetime.datetime, UUID, Tuple[Any, ...], List[Any]]
 _ExecuteParameters = Optional[Union[Sequence[_SQLType], Mapping[str, _SQLType]]]
 
 class CursorWrapper:
@@ -20,29 +30,41 @@ class CursorWrapper:
     def __enter__(self) -> CursorWrapper: ...
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        tb: Optional[types.TracebackType],
+        type: Optional[Type[BaseException]],
+        value: Optional[BaseException],
+        traceback: Optional[types.TracebackType],
     ) -> None: ...
-    def callproc(self, procname: str, params: List[Any] = ..., kparams: Dict[str, int] = ...) -> Any: ...
+    def callproc(self, procname: str, params: Optional[Sequence[Any]] = ..., kparams: Optional[Dict[str, int]] = ...) -> Any: ...
     def execute(self, sql: str, params: _ExecuteParameters = ...) -> Any: ...
     def executemany(self, sql: str, param_list: Sequence[_ExecuteParameters]) -> Any: ...
 
 class CursorDebugWrapper(CursorWrapper):
     cursor: Any
     db: Any
+    @contextmanager
     def debug_sql(
         self,
         sql: Optional[str] = ...,
         params: Optional[Union[_ExecuteParameters, Sequence[_ExecuteParameters]]] = ...,
         use_last_executed_query: bool = ...,
         many: bool = ...,
-    ) -> ContextManager[None]: ...
+    ) -> Generator[None, None, None]: ...
 
-def typecast_date(s: Optional[str]) -> Optional[date]: ...
-def typecast_time(s: Optional[str]) -> Optional[time]: ...
-def typecast_timestamp(s: Optional[str]) -> Optional[date]: ...
-def rev_typecast_decimal(d: Decimal) -> str: ...
+@overload
+def typecast_date(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
+@overload
+def typecast_date(s: str) -> datetime.date: ...
+
+@overload
+def typecast_time(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
+@overload
+def typecast_time(s: str) -> datetime.time: ...
+
+@overload
+def typecast_timestamp(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
+@overload
+def typecast_timestamp(s: str) -> datetime.datetime: ...
+
 def split_identifier(identifier: str) -> Tuple[str, str]: ...
 def truncate_name(identifier: str, length: Optional[int] = ..., hash_len: int = ...) -> str: ...
 def format_number(

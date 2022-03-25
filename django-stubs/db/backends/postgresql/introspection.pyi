@@ -1,8 +1,10 @@
 from typing import Any
 
 from django.db.backends.base.introspection import BaseDatabaseIntrospection as BaseDatabaseIntrospection
+from django.db.backends.postgresql.base import DatabaseWrapper
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
+    connection: DatabaseWrapper
     data_types_reverse: Any = ...
     ignored_tables: Any = ...
     def get_field_type(self, data_type: Any, description: Any): ...
