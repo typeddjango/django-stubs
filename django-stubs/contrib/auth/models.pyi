@@ -1,7 +1,6 @@
 import sys
 from typing import Any, Iterable, Optional, Set, Tuple, Type, TypeVar, Union
 
-from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -55,7 +54,7 @@ class UserManager(BaseUserManager[_T]):
         perm: Union[str, Permission],
         is_active: bool = ...,
         include_superusers: bool = ...,
-        backend: Optional[Union[Type[ModelBackend], str]] = ...,
+        backend: Optional[str] = ...,
         obj: Optional[Model] = ...,
     ): ...
 
