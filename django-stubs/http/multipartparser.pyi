@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Dict, IO, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, IO, Iterator, List, Mapping, Optional, Tuple, Union
 
 from django.http.request import QueryDict
 from django.utils.datastructures import ImmutableList, MultiValueDict
@@ -19,7 +19,7 @@ FIELD: Literal['field'] = "field"
 class MultiPartParser:
     def __init__(
         self,
-        META: Dict[str, Any],
+        META: Mapping[str, Any],
         input_data: IO[bytes],
         upload_handlers: Union[List[Any], ImmutableList[Any]],
         encoding: Optional[str] = ...,

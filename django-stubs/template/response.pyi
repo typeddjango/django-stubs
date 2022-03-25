@@ -8,6 +8,9 @@ from django.http.request import HttpRequest
 from django.template.base import Template
 from django.template.context import RequestContext
 from django.test.client import Client
+from django.utils.datastructures import _ListOrTuple
+
+_TemplateForResponseT = Union[_ListOrTuple[str], Template, str]
 
 class ContentNotRenderedError(Exception): ...
 
@@ -17,17 +20,18 @@ class SimpleTemplateResponse(HttpResponse):
     cookies: SimpleCookie
     status_code: int
     rendering_attrs: Any = ...
-    template_name: Union[List[str], Template, str] = ...
+    template_name: _TemplateForResponseT = ...
     context_data: Optional[Dict[str, Any]] = ...
     using: Optional[str] = ...
     def __init__(
         self,
-        template: Union[List[str], Template, str],
+        template: _TemplateForResponseT,
         context: Optional[Dict[str, Any]] = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
         charset: Optional[str] = ...,
         using: Optional[str] = ...,
+        headers: Optional[Dict[str, Any]] = ...,
     ) -> None: ...
     def resolve_template(self, template: Union[Sequence[str], Template, str]) -> Template: ...
     def resolve_context(self, context: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]: ...
@@ -48,9 +52,9 @@ class TemplateResponse(SimpleTemplateResponse):
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
-    request: Dict[str, Union[int, str]]
+    _request: HttpRequest
     status_code: int
-    template_name: Union[List[str], Template, str]
+    template_name: _TemplateForResponseT
     templates: List[Template]
     using: Optional[str]
     wsgi_request: WSGIRequest
@@ -58,10 +62,11 @@ class TemplateResponse(SimpleTemplateResponse):
     def __init__(
         self,
         request: HttpRequest,
-        template: Union[List[str], Template, str],
+        template: _TemplateForResponseT,
         context: Optional[Dict[str, Any]] = ...,
         content_type: Optional[str] = ...,
         status: Optional[int] = ...,
-        charset: None = ...,
+        charset: Optional[str] = ...,
         using: Optional[str] = ...,
+        headers: Optional[Dict[str, Any]] = ...,
     ) -> None: ...
