@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.migration import Migration
@@ -24,7 +24,7 @@ class MigrationAutodetector:
     ) -> Dict[str, List[Migration]]: ...
     def deep_deconstruct(self, obj: Any) -> Any: ...
     def only_relation_agnostic_fields(
-        self, fields: List[Tuple[str, Field]]
+        self, fields: Dict[str, Field]
     ) -> List[Tuple[str, List[Any], Dict[str, Union[Callable, int, str]]]]: ...
     def check_dependency(
         self, operation: Operation, dependency: Tuple[str, str, Optional[str], Union[bool, str]]
@@ -33,7 +33,7 @@ class MigrationAutodetector:
         self,
         app_label: str,
         operation: Operation,
-        dependencies: Optional[List[Tuple[str, str, Optional[str], Union[bool, str]]]] = ...,
+        dependencies: Optional[Iterable[Tuple[str, str, Optional[str], Union[bool, str]]]] = ...,
         beginning: bool = ...,
     ) -> None: ...
     def swappable_first_key(self, item: Tuple[str, str]) -> Tuple[str, str]: ...
@@ -61,7 +61,5 @@ class MigrationAutodetector:
     def arrange_for_graph(
         self, changes: Dict[str, List[Migration]], graph: MigrationGraph, migration_name: Optional[str] = ...
     ) -> Dict[str, List[Migration]]: ...
-    @classmethod
-    def suggest_name(cls, ops: List[Operation]) -> str: ...
     @classmethod
     def parse_number(cls, name: str) -> int: ...

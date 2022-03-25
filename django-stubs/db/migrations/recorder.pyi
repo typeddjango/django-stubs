@@ -1,11 +1,11 @@
-from typing import Any, Dict, Optional, Set, Tuple
+from typing import Any, Dict, Tuple
 
-from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
 class MigrationRecorder:
-    class Migration(models.Model):
+    class Migration(Model):
         app: Any = ...
         name: Any = ...
         applied: Any = ...

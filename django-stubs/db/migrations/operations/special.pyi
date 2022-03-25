@@ -1,10 +1,19 @@
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+import sys
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
-from typing_extensions import Literal
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 from .base import Operation
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal, Protocol
+else:
+    from typing import Literal, Protocol
 
 class SeparateDatabaseAndState(Operation):
     database_operations: Sequence[Operation] = ...
@@ -28,14 +37,19 @@ class RunSQL(Operation):
         elidable: bool = ...,
     ) -> None: ...
 
+class _CodeCallable(Protocol):
+    def __call__(
+        self, __state_apps: StateApps, __shema_editor: BaseDatabaseSchemaEditor
+    ) -> None: ...
+
 class RunPython(Operation):
-    code: Callable[[StateApps, BaseDatabaseSchemaEditor], None] = ...
-    reverse_code: Optional[Callable[[StateApps, BaseDatabaseSchemaEditor], None]] = ...
+    code: _CodeCallable = ...
+    reverse_code: Optional[_CodeCallable] = ...
     hints: Optional[Dict[str, Any]] = ...
     def __init__(
         self,
-        code: Callable[[StateApps, BaseDatabaseSchemaEditor], None],
-        reverse_code: Optional[Callable[[StateApps, BaseDatabaseSchemaEditor], None]] = ...,
+        code: _CodeCallable,
+        reverse_code: Optional[_CodeCallable] = ...,
         atomic: Optional[bool] = ...,
         hints: Optional[Dict[str, Any]] = ...,
         elidable: bool = ...,

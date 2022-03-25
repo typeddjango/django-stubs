@@ -1,4 +1,32 @@
-from django.db.migrations.state import ProjectState
-from django.db.models.fields import Field
+from collections import namedtuple
+import sys
+from typing import Iterator, Optional, Tuple, Union
 
-def is_referenced_by_foreign_key(state: ProjectState, model_name_lower: str, field: Field, field_name: str) -> bool: ...
+from django.db.models import Field
+from django.db.migrations.state import ModelState, ProjectState
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
+
+def resolve_relation(model, app_label: Optional[str] = ..., model_name: Optional[str] = ...) -> Tuple[str, str]:...
+
+FieldReference = namedtuple("FieldReference", ["to", "through"])
+
+def field_references(
+    model_tuple: Tuple[str, str],
+    field: Field,
+    reference_model_tuple: Tuple[str, str],
+    reference_field_name: Optional[str] = ...,
+    reference_field: Optional[Field] = ...,
+) -> Union[Literal[False], FieldReference]: ...
+
+def get_references(
+    state: ProjectState,
+    model_tuple: Tuple[str, str],
+    field_tuple: Union[Tuple[()], Tuple[str, Field]] = ...,
+) -> Iterator[Tuple[ModelState, str, Field, FieldReference]]: ...
+
+
+def field_is_referenced(state: ProjectState, model_tuple: Tuple[str, str], field_tuple: Tuple[str, Field]) -> bool: ...
