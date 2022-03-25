@@ -3,7 +3,7 @@
 -   case: test_full_admin
     main: |
       from django.contrib import admin
-      from django.forms import Form, Textarea
+      from django.forms import Form, ModelForm, Textarea
       from django.db import models
       from django.core.paginator import Paginator
       from django.contrib.admin.sites import AdminSite
@@ -30,7 +30,7 @@
               (None, {"fields": ["a", "b"]}),
               ("group", {"fields": ("c",), "classes": ("a",), "description": "foo"}),
           ]
-          form = Form
+          form = ModelForm
           filter_vertical = ("fields",)
           filter_horizontal = ("plenty", "of", "fields")
           radio_fields = {
@@ -48,7 +48,7 @@
           # ModelAdmin
           list_display = ("pk",)
           list_display_links = ("str",)
-          list_filter = ("str", admin.SimpleListFilter, ("str", admin.SimpleListFilter))
+          list_filter = ("str", admin.SimpleListFilter, ("str", admin.FieldListFilter))
           list_select_related = True
           list_per_page = 1
           list_max_show_all = 2
