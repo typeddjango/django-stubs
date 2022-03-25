@@ -43,7 +43,7 @@ class Context(BaseContext):
     render_context: RenderContext = ...
     template: Optional[Template] = ...
     def __init__(
-        self, dict_: Any = ..., autoescape: bool = ..., use_l10n: Optional[bool] = ..., use_tz: None = ...
+        self, dict_: Any = ..., autoescape: bool = ..., use_l10n: Optional[bool] = ..., use_tz: Optional[bool] = ...
     ) -> None: ...
     @contextmanager
     def bind_template(self, template: Template) -> Iterator[None]: ...
@@ -60,16 +60,16 @@ class RequestContext(Context):
     dicts: List[Dict[str, str]]
     render_context: RenderContext
     template_name: Optional[str]
-    use_l10n: None
-    use_tz: None
+    use_l10n: Optional[bool]
+    use_tz: Optional[bool]
     request: HttpRequest = ...
     def __init__(
         self,
         request: HttpRequest,
         dict_: Optional[Dict[str, Any]] = ...,
         processors: Optional[List[Callable]] = ...,
-        use_l10n: None = ...,
-        use_tz: None = ...,
+        use_l10n: Optional[bool] = ...,
+        use_tz: Optional[bool] = ...,
         autoescape: bool = ...,
     ) -> None: ...
     template: Optional[Template] = ...
