@@ -1,9 +1,14 @@
 from collections import UserList
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.utils.safestring import SafeString
+
+
+_DataT = Mapping[str, Any]
+_FilesT = Mapping[str, Iterable[File]]
 
 def pretty_name(name: str) -> str: ...
 def flatatt(attrs: Dict[str, Any]) -> SafeString: ...

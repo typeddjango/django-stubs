@@ -7,7 +7,8 @@ from django.contrib.admin.options import BaseModelAdmin
 from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
-from django.forms.models import BaseModelForm
+from django.forms.formsets import BaseFormSet
+from django.forms.models import BaseModelForm, BaseModelFormSet
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormMixin
 from django.views.generic.list import MultipleObjectMixin
@@ -17,7 +18,7 @@ _VersionSpec = Tuple[int, int]
 
 
 class MPGeneric(Generic[_T]):
-    """Create a data class to hold metadata about the gneric classes needing monkeypatching.
+    """Create a data class to hold metadata about the generic classes needing monkeypatching.
 
     The `version` param is optional, and a value of `None` means that the monkeypatch is
     version-independent.
@@ -47,7 +48,9 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(BaseModelAdmin),
     MPGeneric(Field),
     MPGeneric(Paginator),
+    MPGeneric(BaseFormSet),
     MPGeneric(BaseModelForm),
+    MPGeneric(BaseModelFormSet),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
