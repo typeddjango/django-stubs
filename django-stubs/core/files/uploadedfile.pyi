@@ -1,4 +1,4 @@
-from typing import IO, Any, Dict, Optional, Union
+from typing import IO, Dict, Optional, TypeVar, Type, Union
 
 from django.core.files.base import File
 
@@ -6,6 +6,8 @@ class UploadedFile(File):
     content_type: Optional[str] = ...
     charset: Optional[str] = ...
     content_type_extra: Optional[Dict[str, str]] = ...
+    size: Optional[int]  # type: ignore[assignment]
+    name: Optional[str]
     def __init__(
         self,
         file: Optional[IO] = ...,
@@ -19,7 +21,7 @@ class UploadedFile(File):
 class TemporaryUploadedFile(UploadedFile):
     def __init__(
         self,
-        name: Optional[str],
+        name: str,
         content_type: Optional[str],
         size: Optional[int],
         charset: Optional[str],
@@ -40,7 +42,9 @@ class InMemoryUploadedFile(UploadedFile):
         content_type_extra: Dict[str, str] = ...,
     ) -> None: ...
 
+_C = TypeVar('_C', bound='SimpleUploadedFile')
+
 class SimpleUploadedFile(InMemoryUploadedFile):
-    def __init__(self, name: str, content: Optional[Union[bytes, str]], content_type: str = ...) -> None: ...
+    def __init__(self, name: str, content: Optional[bytes], content_type: str = ...) -> None: ...
     @classmethod
-    def from_dict(cls: Any, file_dict: Dict[str, Union[str, bytes]]) -> None: ...
+    def from_dict(cls: Type[_C], file_dict: Dict[str, Union[str, bytes]]) -> _C: ...
