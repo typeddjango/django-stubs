@@ -110,10 +110,10 @@
       from django.contrib import admin
 
       class A(admin.ModelAdmin):
-          radio_fields = {"some_field": 0}  # E: Dict entry 0 has incompatible type "str": "Literal[0]"; expected "str": "Union[Literal[1], Literal[2]]"
+          radio_fields = {"some_field": 0}  # E: Dict entry 0 has incompatible type "str": "Literal[0]"; expected "str": "Literal[1, 2]"
 
       class B(admin.ModelAdmin):
-          radio_fields = {1: admin.VERTICAL}  # E: Dict entry 0 has incompatible type "int": "Literal[2]"; expected "str": "Union[Literal[1], Literal[2]]"
+          radio_fields = {1: admin.VERTICAL}  # E: Dict entry 0 has incompatible type "int": "Literal[2]"; expected "str": "Literal[1, 2]"
 -   case: errors_for_invalid_formfield_overrides
     main: |
       from django.contrib import admin
