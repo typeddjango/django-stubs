@@ -31,6 +31,9 @@ _T = TypeVar("_T", bound=models.Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True)
 _QS = TypeVar("_QS", bound="_QuerySet")
 
+MAX_GET_RESULTS: int = ...
+REPR_OUTPUT_SIZE: int = ...
+
 class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     model: Type[_T]
     query: Query
@@ -169,7 +172,7 @@ class RawQuerySet(Iterable[_T], Sized):
 
 QuerySet = _QuerySet[_T, _T]
 
-class Prefetch(object):
+class Prefetch:
     def __init__(self, lookup: str, queryset: Optional[QuerySet] = ..., to_attr: Optional[str] = ...) -> None: ...
     def __getstate__(self) -> Dict[str, Any]: ...
     def add_prefix(self, prefix: str) -> None: ...
