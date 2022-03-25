@@ -289,7 +289,7 @@
         reveal_type(values_no_params)  # N: Revealed type is "builtins.dict*[builtins.str, Any]"
 
         values_list_no_params = Blog.objects.annotate(foo=F('id')).values_list().get()
-        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any]"
+        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any, ...]"
 
         values_list_flat_no_params = Blog.objects.annotate(foo=F('id')).values_list(flat=True).get()
         reveal_type(values_list_flat_no_params)  # N: Revealed type is "builtins.int*"
@@ -327,7 +327,7 @@
         reveal_type(before_values_no_params)  # N: Revealed type is "builtins.dict*[builtins.str, Any]"
 
         before_values_list_no_params = Blog.objects.values_list().annotate(foo=F('id')).get()
-        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any]"
+        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any, ...]"
 
         before_values_list_flat_no_params = Blog.objects.values_list(flat=True).annotate(foo=F('id')).get()
         reveal_type(before_values_list_flat_no_params)  # N: Revealed type is "builtins.int*"
