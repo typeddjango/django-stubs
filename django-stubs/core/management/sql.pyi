@@ -6,7 +6,6 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 def sql_flush(
     style: Style,
     connection: BaseDatabaseWrapper,
-    only_django: bool = ...,
     reset_sequences: bool = ...,
     allow_cascade: bool = ...,
 ) -> List[str]: ...

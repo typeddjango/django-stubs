@@ -1,10 +1,11 @@
+from email import charset as Charset
 from email._policybase import Policy
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, overload
+from typing import Any, Dict, List, Optional, Set, Sequence, Tuple, Union, overload
 
 utf8_charset: Any
 utf8_charset_qp: Any
@@ -13,41 +14,50 @@ RFC5322_EMAIL_LINE_LENGTH_LIMIT: int
 
 class BadHeaderError(ValueError): ...
 
-ADDRESS_HEADERS: Any
+ADDRESS_HEADERS: Set[str]
 
 def forbid_multi_line_headers(name: str, val: str, encoding: str) -> Tuple[str, str]: ...
-def split_addr(addr: str, encoding: str) -> Tuple[str, str]: ...
 def sanitize_address(addr: Union[Tuple[str, str], str], encoding: str) -> str: ...
 
-class MIMEMixin: ...
+class MIMEMixin:
+    def as_string(self, unixfrom: bool = ..., linesep: str = '\n') -> str: ...
+    def as_bytes(self, unixfrom: bool = ..., linesep: str = '\n') -> bytes: ...
 
-class SafeMIMEMessage(MIMEMixin, MIMEMessage):
+class SafeMIMEMessage(MIMEMixin, MIMEMessage):  # type: ignore
     defects: List[Any]
-    epilogue: None
+    epilogue: Any
     policy: Policy
-    preamble: None
+    preamble: Any
+    def __setitem__(self, name: str, val: str) -> None: ...
 
-class SafeMIMEText(MIMEMixin, MIMEText):
+class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore
     defects: List[Any]
     epilogue: None
     policy: Policy
     preamble: None
     encoding: str = ...
     def __init__(self, _text: str, _subtype: str = ..., _charset: str = ...) -> None: ...
+    def __setitem__(self, name: str, val: str) -> None: ...
+    def set_payload(
+        self, payload: Union[List[Message], str, bytes], charset: Union[str, Charset.Charset, None] = ...
+    ) -> None: ...
 
-class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
+class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore
     defects: List[Any]
     epilogue: None
     policy: Policy
     preamble: None
     encoding: str = ...
     def __init__(
-        self, _subtype: str = ..., boundary: None = ..., _subparts: None = ..., encoding: str = ..., **_params: Any
+        self, _subtype: str = ..., boundary: Optional[Any] = ..., _subparts: Optional[Any] = ..., encoding: str = ..., **_params: Any
     ) -> None: ...
+    def __setitem__(self, name: str, val: str) -> None: ...
 
 _AttachmentContent = Union[bytes, EmailMessage, Message, SafeMIMEText, str]
 _AttachmentTuple = Union[
-    Tuple[str, _AttachmentContent], Tuple[Optional[str], _AttachmentContent, str], Tuple[str, _AttachmentContent, None]
+    Tuple[str, _AttachmentContent],
+    Tuple[Optional[str], _AttachmentContent, str],
+    Tuple[str, _AttachmentContent, None]
 ]
 
 class EmailMessage:
@@ -83,7 +93,7 @@ class EmailMessage:
     def recipients(self) -> List[str]: ...
     def send(self, fail_silently: bool = ...) -> int: ...
     @overload
-    def attach(self, filename: MIMEBase = ...) -> None: ...
+    def attach(self, filename: MIMEBase = ..., content: None = ..., mimetype: None = ...) -> None: ...
     @overload
     def attach(self, filename: None = ..., content: _AttachmentContent = ..., mimetype: str = ...) -> None: ...
     @overload
@@ -92,7 +102,7 @@ class EmailMessage:
 
 class EmailMultiAlternatives(EmailMessage):
     alternative_subtype: str = ...
-    alternatives: Sequence[Tuple[_AttachmentContent, str]] = ...
+    alternatives: List[Tuple[_AttachmentContent, str]] = ...
     def __init__(
         self,
         subject: str = ...,
@@ -103,7 +113,7 @@ class EmailMultiAlternatives(EmailMessage):
         connection: Optional[Any] = ...,
         attachments: Optional[Sequence[Union[MIMEBase, _AttachmentTuple]]] = ...,
         headers: Optional[Dict[str, str]] = ...,
-        alternatives: Optional[Sequence[Tuple[_AttachmentContent, str]]] = ...,
+        alternatives: Optional[List[Tuple[_AttachmentContent, str]]] = ...,
         cc: Optional[Sequence[str]] = ...,
         reply_to: Optional[Sequence[str]] = ...,
     ) -> None: ...

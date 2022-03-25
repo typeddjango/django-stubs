@@ -8,7 +8,7 @@ from django.utils.safestring import SafeString
 class InclusionAdminNode(InclusionNode):
     args: List[Any]
     func: Callable
-    kwargs: Dict[Any, Any]
+    kwargs: Dict[str, Any]
     takes_context: bool
     template_name: str = ...
     def __init__(
