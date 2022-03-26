@@ -1,9 +1,7 @@
-from typing import (
-    Any, Iterable, List, Optional, Sequence, TypeVar, Type, Union
-)
+from typing import Any, Iterable, List, Optional, Sequence, Type, TypeVar, Union
 
 from django.core.validators import _ValidatorCallable
-from django.db.models import Transform, Field
+from django.db.models import Field, Transform
 from django.db.models.expressions import Combinable
 from django.db.models.fields import _ErrorMessagesT, _FieldChoices
 from django.db.models.fields.mixins import CheckFieldDefaultMixin

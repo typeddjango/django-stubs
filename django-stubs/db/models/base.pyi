@@ -1,7 +1,4 @@
-from typing import (
-    Any, Collection, Dict, Iterable, List, Optional, Set,
-    Sequence, Tuple, Type, TypeVar
-)
+from typing import Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
@@ -45,9 +42,7 @@ class Model(metaclass=ModelBase):
     def clean(self) -> None: ...
     def clean_fields(self, exclude: Optional[Collection[str]] = ...) -> None: ...
     def validate_unique(self, exclude: Optional[Collection[str]] = ...) -> None: ...
-    def unique_error_message(
-        self, model_class: Type[_Self], unique_check: Sequence[str]
-    ) -> ValidationError: ...
+    def unique_error_message(self, model_class: Type[_Self], unique_check: Sequence[str]) -> ValidationError: ...
     def save(
         self,
         force_insert: bool = ...,

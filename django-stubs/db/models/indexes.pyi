@@ -1,10 +1,10 @@
 from typing import Any, List, Optional, Sequence, Set, Tuple, Type, Union
 
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.models.base import Model
-from django.db.models.expressions import BaseExpression, Expression, Combinable, Func
+from django.db.models.expressions import BaseExpression, Combinable, Expression, Func
 from django.db.models.query_utils import Q
 from django.db.models.sql.compiler import SQLCompiler
 
@@ -43,8 +43,7 @@ class Index:
 class IndexExpression(Func):
     template: str = ...
     wrapper_classes: Sequence[Expression] = ...
-
-    def set_wrapper_classes(self, connection: Optional[Any] = ...) -> None:...
+    def set_wrapper_classes(self, connection: Optional[Any] = ...) -> None: ...
     @classmethod
     def register_wrappers(cls, *wrapper_classes: Expression) -> None: ...
     def resolve_expression(

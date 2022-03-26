@@ -1,17 +1,12 @@
-from typing import (
-    Any, ClassVar, Dict, Iterator, List, Mapping, Optional, Sequence,
-    Type, Union, Iterable,
-)
+from typing import Any, ClassVar, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Type, Union
 
 from django.core.exceptions import ValidationError as ValidationError
 from django.forms.boundfield import BoundField
 from django.forms.fields import Field
 from django.forms.renderers import BaseRenderer
-from django.forms.utils import ErrorDict, ErrorList
-from django.forms.utils import _DataT, _FilesT
+from django.forms.utils import ErrorDict, ErrorList, _DataT, _FilesT
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.safestring import SafeString
-
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 

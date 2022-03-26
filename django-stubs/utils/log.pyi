@@ -1,5 +1,5 @@
 import logging.config
-from logging import LogRecord, Logger
+from logging import Logger, LogRecord
 from typing import Any, Callable, Dict, Optional, Union
 
 from django.core.management.color import Style

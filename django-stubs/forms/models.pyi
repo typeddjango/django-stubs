@@ -25,30 +25,24 @@ from uuid import UUID
 from django.db import models
 from django.db.models import ForeignKey
 from django.db.models.base import Model
-from django.db.models.fields import (
-    _AllLimitChoicesTo, _ChoicesCallable, _FieldChoices, _LimitChoicesTo,
-)
+from django.db.models.fields import _AllLimitChoicesTo, _ChoicesCallable, _FieldChoices, _LimitChoicesTo
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
-from django.forms.fields import ChoiceField, Field, CallableChoiceIterator
-from django.forms.fields import _ClassLevelWidgetT
+from django.forms.fields import CallableChoiceIterator, ChoiceField, Field, _ClassLevelWidgetT
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
-from django.forms.utils import ErrorList
-from django.forms.utils import _DataT, _FilesT
-from django.forms.widgets import Input, Widget, ChoiceWidget
-from django.utils.datastructures import (
-    _IndexableCollection, _PropertyDescriptor, _ListOrTuple
-)
+from django.forms.utils import ErrorList, _DataT, _FilesT
+from django.forms.widgets import ChoiceWidget, Input, Widget
+from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal, Protocol
 else:
     from typing import Literal, Protocol
 
-ALL_FIELDS: Literal['__all__']
+ALL_FIELDS: Literal["__all__"]
 
 _Fields = Union[_ListOrTuple[str], Literal["__all__"]]
 _Widgets = Dict[str, Union[Type[Widget], Widget]]
@@ -78,7 +72,7 @@ def fields_for_model(
     error_messages: Optional[_ErrorMessages] = ...,
     field_classes: Optional[Mapping[str, Type[Field]]] = ...,
     *,
-    apply_limit_choices_to: bool = ...
+    apply_limit_choices_to: bool = ...,
 ) -> Dict[str, Any]: ...
 
 class ModelFormOptions(Generic[_M]):
@@ -133,7 +127,7 @@ def modelform_factory(
     field_classes: Optional[Mapping[str, Type[Field]]] = ...,
 ) -> Type[ModelForm[_M]]: ...
 
-_ModelFormT = TypeVar('_ModelFormT', bound=ModelForm)
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
 
 class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     model: Type[_M] = ...
@@ -149,7 +143,7 @@ class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
         queryset: Optional[QuerySet[_M]] = ...,
         *,
         initial: Optional[Sequence[Dict[str, Any]]] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     def initial_form_count(self) -> int: ...
     def get_queryset(self) -> _IndexableCollection[_M]: ...
@@ -162,7 +156,7 @@ class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     def clean(self) -> None: ...
     def validate_unique(self) -> None: ...
     def get_unique_error_message(self, unique_check: Sequence[str]) -> str: ...
-    def get_date_error_message(self, date_check: Tuple[str, Literal['date', 'year', 'month'], str, str]) -> str: ...
+    def get_date_error_message(self, date_check: Tuple[str, Literal["date", "year", "month"], str, str]) -> str: ...
     def get_form_error(self) -> str: ...
     changed_objects: List[Tuple[_M, List[str]]] = ...
     deleted_objects: List[_M] = ...
@@ -208,7 +202,7 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
         save_as_new: bool = ...,
         prefix: Optional[str] = ...,
         queryset: Optional[QuerySet[_M]] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     def initial_form_count(self) -> int: ...
     @classmethod
@@ -303,7 +297,7 @@ class ModelChoiceField(ChoiceField):
         to_field_name: Optional[str] = ...,
         limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
         blank: bool = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def label_from_instance(self, obj: Model) -> str: ...
@@ -332,7 +326,6 @@ class ModelMultipleChoiceField(ModelChoiceField):
     def has_changed(self, initial: Optional[Collection[Any]], data: Optional[Collection[Any]]) -> bool: ...  # type: ignore
 
 def modelform_defines_fields(form_class: Type[ModelForm]) -> bool: ...
-
 @overload
 def _get_foreign_key(  # type: ignore
     parent_model: Type[Model], model: Type[Model], fk_name: Optional[str] = ..., can_fail: Literal[True] = ...

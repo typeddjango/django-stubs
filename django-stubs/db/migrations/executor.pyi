@@ -14,12 +14,7 @@ else:
     from typing import Protocol
 
 class _ProgressCallbackT(Protocol):
-    def __call__(
-        self,
-        __action: str,
-        __migration: Optional[Migration] = ...,
-        __fake: Optional[bool] = ...
-    ) -> None: ...
+    def __call__(self, __action: str, __migration: Optional[Migration] = ..., __fake: Optional[bool] = ...) -> None: ...
 
 class MigrationExecutor:
     connection: BaseDatabaseWrapper = ...

@@ -1,7 +1,9 @@
 import decimal
 import sys
 import uuid
-from datetime import date, datetime as real_datetime, time, timedelta
+from datetime import date
+from datetime import datetime as real_datetime
+from datetime import time, timedelta
 from typing import (
     Any,
     Callable,
@@ -18,14 +20,14 @@ from typing import (
     overload,
 )
 
+from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
-from django.core import validators  # due to weird mypy.stubtest error
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
-from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.expressions import Col, Combinable
-from django.db.models.query_utils import RegisterLookupMixin, Q
+from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
@@ -195,7 +197,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def deconstruct(self) -> Any: ...
     def set_attributes_from_name(self, name: str) -> None: ...
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
-    def db_check(self, connection: BaseDatabaseWrapper) -> Optional[str]:...
+    def db_check(self, connection: BaseDatabaseWrapper) -> Optional[str]: ...
     def db_type(self, connection: BaseDatabaseWrapper) -> Optional[str]: ...
     def db_parameters(self, connection: BaseDatabaseWrapper) -> Dict[str, Optional[str]]: ...
     def pre_save(self, model_instance: Model, add: bool) -> Any: ...
@@ -343,6 +345,7 @@ class SlugField(CharField[_ST, _GT]):
     ): ...
 
 class EmailField(CharField[_ST, _GT]): ...
+
 class URLField(CharField[_ST, _GT]):
     def __init__(
         self,

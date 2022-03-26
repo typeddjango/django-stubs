@@ -1,4 +1,4 @@
-from typing import Any, AnyStr, IO, Iterator, Generic, Optional
+from typing import IO, Any, AnyStr, Generic, Iterator, Optional
 
 from django.utils._os import _PathCompatible
 

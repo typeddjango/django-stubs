@@ -1,5 +1,5 @@
-from typing import Any, Dict, List, Sequence
 import sys
+from typing import Any, Dict, List, Sequence
 
 if sys.version_info < (3, 8):
     from typing_extensions import Protocol
@@ -7,7 +7,8 @@ else:
     from typing import Protocol
 
 class _QuoteCallable(Protocol):
-    """ Get rid of `cannot assign to method` """
+    """Get rid of `cannot assign to method`"""
+
     def __call__(self, __column: str) -> str: ...
 
 class Reference:
@@ -40,7 +41,8 @@ class Columns(TableColumns):
     ) -> None: ...
 
 class _NameCallable(Protocol):
-    """ Get rid of `cannot assign to method` """
+    """Get rid of `cannot assign to method`"""
+
     def __call__(self, __table: str, __columns: List[str], __suffix: str) -> str: ...
 
 class IndexName(TableColumns):
@@ -55,7 +57,6 @@ class IndexColumns(Columns):
     def __init__(
         self, table: Any, columns: Any, quote_name: Any, col_suffixes: Any = ..., opclasses: Any = ...
     ) -> None: ...
-
 
 class ForeignKeyName(TableColumns):
     columns: List[str]

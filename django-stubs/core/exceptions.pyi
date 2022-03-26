@@ -7,7 +7,6 @@ if sys.version_info < (3, 8):
 else:
     from typing import Literal
 
-
 class FieldDoesNotExist(Exception): ...
 class AppRegistryNotReady(Exception): ...
 
@@ -34,10 +33,15 @@ NON_FIELD_ERRORS: Literal["__all__"] = ...
 
 _MsgTypeBase = Union[str, ValidationError]
 # Yeah, it's really ugly, but __init__ checks with isinstance()
-_MsgType = Union[_MsgTypeBase,
-                 Dict[str, _MsgTypeBase], List[_MsgTypeBase],
-                 Dict[str, str], Dict[str, ValidationError],
-                 List[str], List[ValidationError]]
+_MsgType = Union[
+    _MsgTypeBase,
+    Dict[str, _MsgTypeBase],
+    List[_MsgTypeBase],
+    Dict[str, str],
+    Dict[str, ValidationError],
+    List[str],
+    List[ValidationError],
+]
 
 class ValidationError(Exception):
     error_dict: Dict[str, ValidationError] = ...
@@ -55,9 +59,7 @@ class ValidationError(Exception):
     def message_dict(self) -> Optional[Dict[str, List[str]]]: ...
     @property
     def messages(self) -> List[str]: ...
-    def update_error_dict(
-        self, error_dict: Dict[str, List[ValidationError]]
-    ) -> Dict[str, List[ValidationError]]: ...
+    def update_error_dict(self, error_dict: Dict[str, List[ValidationError]]) -> Dict[str, List[ValidationError]]: ...
     def __iter__(self) -> Iterator[Union[Tuple[str, List[str]], str]]: ...
 
 class EmptyResultSet(Exception): ...

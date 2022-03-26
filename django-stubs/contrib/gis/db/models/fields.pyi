@@ -1,8 +1,7 @@
 from typing import Any, Iterable, NamedTuple, Optional, Tuple, TypeVar, Union
 
 from django.core.validators import _ValidatorCallable
-from django.db.models.fields import Field
-from django.db.models.fields import _ErrorMessagesT, _FieldChoices
+from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 
 # __set__ value type
 _ST = TypeVar("_ST")

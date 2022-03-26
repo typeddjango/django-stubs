@@ -23,5 +23,8 @@ def url(
 ) -> URLResolver: ...
 @overload
 def url(
-    regex: str, view: Sequence[Union[URLResolver, str]], kwargs: Optional[Dict[str, Any]] = ..., name: Optional[str] = ...
+    regex: str,
+    view: Sequence[Union[URLResolver, str]],
+    kwargs: Optional[Dict[str, Any]] = ...,
+    name: Optional[str] = ...,
 ) -> URLResolver: ...

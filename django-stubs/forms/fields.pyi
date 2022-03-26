@@ -1,29 +1,14 @@
 import datetime
 from decimal import Decimal
+from typing import Any, Collection, Dict, Iterator, List, Optional, Pattern, Protocol, Sequence, Tuple, Type, Union
 from uuid import UUID
-from typing import (
-    Any,
-    Collection,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Pattern,
-    Protocol,
-    Sequence,
-    Tuple,
-    Type,
-    Union,
-)
 
 from django.core.files import File
 from django.core.validators import _ValidatorCallable
-from django.db.models.fields import (
-    _Choice, _ChoiceNamedGroup, _ChoicesCallable, _FieldChoices, _ErrorMessagesT
-)
+from django.db.models.fields import _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ErrorMessagesT, _FieldChoices
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
-from django.forms.widgets import Widget, ChoiceWidget
+from django.forms.widgets import ChoiceWidget, Widget
 from django.utils.datastructures import _PropertyDescriptor
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
@@ -201,7 +186,7 @@ class DurationField(Field):
     def to_python(self, value: Optional[Any]) -> Optional[datetime.timedelta]: ...
 
 class RegexField(CharField):
-    regex:  _PropertyDescriptor[Union[str, Pattern[str]], Pattern[str]] = ...
+    regex: _PropertyDescriptor[Union[str, Pattern[str]], Pattern[str]] = ...
     def __init__(
         self,
         regex: Union[str, Pattern[str]],

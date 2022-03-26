@@ -4,15 +4,14 @@ from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
-from django.http.request import HttpRequest
 from django.db import models
 from django.db.models.fields import _ErrorMessagesT
-from django.forms.widgets import Widget
 from django.forms.fields import _ClassLevelWidgetT
-
+from django.forms.widgets import Widget
+from django.http.request import HttpRequest
 
 UserModel: Type[AbstractBaseUser]
-_User = TypeVar('_User', bound=AbstractBaseUser)
+_User = TypeVar("_User", bound=AbstractBaseUser)
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name: str = ...

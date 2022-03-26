@@ -1,9 +1,9 @@
 import collections
-from collections import namedtuple
-from typing import Any, Callable, Dict, Iterable, Iterator, FrozenSet, List, Optional, Sequence, Set, Tuple, Type, Union
 import sys
+from collections import namedtuple
+from typing import Any, Callable, Dict, FrozenSet, Iterable, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union
 
-if sys.version_info < (3,8):
+if sys.version_info < (3, 8):
     from typing_extensions import Literal
 else:
     from typing import Literal
@@ -11,15 +11,15 @@ else:
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models import Field, FilteredRelation, Model, Q, QuerySet
-from django.db.models.expressions import Combinable, BaseExpression, Expression, OrderBy
-from django.db.models.options import Options
+from django.db.models.expressions import BaseExpression, Combinable, Expression, OrderBy
 from django.db.models.lookups import Lookup, Transform
+from django.db.models.options import Options
 from django.db.models.query_utils import PathInfo, RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.datastructures import BaseTable, Join
 from django.db.models.sql.where import WhereNode
 
-JoinInfo = namedtuple('JoinInfo', ('final_field', 'targets', 'opts', 'joins', 'path', 'transform_function'))
+JoinInfo = namedtuple("JoinInfo", ("final_field", "targets", "opts", "joins", "path", "transform_function"))
 
 class RawQuery:
     high_mark: Optional[int]
@@ -93,7 +93,9 @@ class Query(BaseExpression):
     def base_table(self) -> str: ...
     def sql_with_params(self) -> Tuple[str, Tuple]: ...
     def __deepcopy__(self, memo: Dict[int, Any]) -> Query: ...
-    def get_compiler(self, using: Optional[str] = ..., connection: Optional[BaseDatabaseWrapper] = ...) -> SQLCompiler: ...
+    def get_compiler(
+        self, using: Optional[str] = ..., connection: Optional[BaseDatabaseWrapper] = ...
+    ) -> SQLCompiler: ...
     def get_meta(self) -> Options: ...
     def clone(self) -> Query: ...
     def chain(self, klass: Optional[Type[Query]] = ...) -> Query: ...
@@ -116,7 +118,9 @@ class Query(BaseExpression):
     def resolve_expression(self, query: Query, *args: Any, **kwargs: Any) -> Query: ...  # type: ignore
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> Any: ...
     def resolve_lookup_value(self, value: Any, can_reuse: Optional[Set[str]], allow_joins: bool) -> Any: ...
-    def solve_lookup_type(self, lookup: str) -> Tuple[Sequence[str], Sequence[str], Union[Expression, Literal[False]]]: ...
+    def solve_lookup_type(
+        self, lookup: str
+    ) -> Tuple[Sequence[str], Sequence[str], Union[Expression, Literal[False]]]: ...
     def build_filter(
         self,
         filter_expr: Union[Q, Expression, Dict[str, str], Tuple[str, Any]],
@@ -200,9 +204,7 @@ class Query(BaseExpression):
     def trim_start(self, names_with_path: List[Tuple[str, List[PathInfo]]]) -> Tuple[str, bool]: ...
     def is_nullable(self, field: Field) -> bool: ...
     def check_filterable(self, expression: Any) -> None: ...
-    def build_lookup(
-        self, lookups: Sequence[str], lhs: Union[Expression, Query], rhs: Any
-    ) -> Lookup: ...
+    def build_lookup(self, lookups: Sequence[str], lhs: Union[Expression, Query], rhs: Any) -> Lookup: ...
     def try_transform(self, lhs: Union[Expression, Query], name: str) -> Transform: ...
 
 class JoinPromoter:

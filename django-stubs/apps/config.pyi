@@ -1,5 +1,5 @@
-from typing import Dict, Iterator, Optional, Type
 import types
+from typing import Dict, Iterator, Optional, Type
 
 from django.apps.registry import Apps
 from django.db.models.base import Model

@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Dict, IO, Iterator, List, Mapping, Optional, Tuple, Union
+from typing import IO, Any, Dict, Iterator, List, Mapping, Optional, Tuple, Union
 
 from django.http.request import QueryDict
 from django.utils.datastructures import ImmutableList, MultiValueDict
@@ -12,9 +12,9 @@ else:
 class MultiPartParserError(Exception): ...
 class InputStreamExhausted(Exception): ...
 
-RAW: Literal['raw'] = "raw"
-FILE: Literal['file'] = "file"
-FIELD: Literal['field'] = "field"
+RAW: Literal["raw"] = "raw"
+FILE: Literal["file"] = "file"
+FIELD: Literal["field"] = "field"
 
 class MultiPartParser:
     def __init__(

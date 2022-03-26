@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
-from django.db.models.expressions import Func
 from django.db import models
+from django.db.models.expressions import Func
 
 class CumeDist(Func):
     output_field: models.FloatField = ...

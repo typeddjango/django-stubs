@@ -1,6 +1,6 @@
 from contextlib import ContextDecorator, contextmanager
-from typing import Any, Callable, Iterator, Optional, Type, TypeVar, overload
 from types import TracebackType
+from typing import Any, Callable, Iterator, Optional, Type, TypeVar, overload
 
 from django.db import ProgrammingError
 
@@ -31,7 +31,12 @@ class Atomic:
     # When decorating, return the decorated function as-is, rather than clobbering it as ContextDecorator does.
     def __call__(self, func: _C) -> _C: ...
     def __enter__(self) -> None: ...
-    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]) -> None: ...
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None: ...
 
 # Bare decorator
 @overload

@@ -1,9 +1,6 @@
 from contextlib import contextmanager
 from datetime import tzinfo
-from typing import (
-    Any, Callable, Dict, Generator, Iterator, List, Optional, Set,
-    Tuple, Type, TypeVar,
-)
+from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Set, Tuple, Type, TypeVar
 
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation

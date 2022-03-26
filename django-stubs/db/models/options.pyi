@@ -1,7 +1,4 @@
-from typing import (
-    Any, Dict, Generic, Iterable, List, Optional, Set, Sequence, Tuple, Type,
-    TypeVar, Union,
-)
+from typing import Any, Dict, Generic, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -24,7 +21,9 @@ DEFAULT_NAMES: Tuple[str, ...]
 def normalize_together(
     option_together: Union[List[Tuple[str, str]], Tuple[Tuple[str, str], ...], Tuple[()], Tuple[str, str]]
 ) -> Tuple[Tuple[str, str], ...]: ...
+
 _T = TypeVar("_T")
+
 def make_immutable_fields_list(name: str, data: Iterable[_T]) -> ImmutableList[_T]: ...
 
 _M = TypeVar("_M", bound="Model")

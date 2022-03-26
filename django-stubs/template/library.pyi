@@ -1,6 +1,18 @@
 from typing import (
-    Any, Callable, Collection, Dict, Iterable, List, Mapping, Optional,
-    Sequence, Sized, Tuple, TypeVar, Union, overload,
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Sized,
+    Tuple,
+    TypeVar,
+    Union,
+    overload,
 )
 
 from django.template.base import FilterExpression, Origin, Parser, Token

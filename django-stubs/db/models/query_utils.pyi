@@ -1,11 +1,23 @@
+import sys
 from collections import namedtuple
 from typing import (
-    Any, Collection, Dict, Iterator, Iterable,List, Mapping, Optional, Sequence,
-    Set, Tuple, Type, TypeVar, Union
+    Any,
+    Collection,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
 )
-import sys
 
-if sys.version_info < (3,8):
+if sys.version_info < (3, 8):
     from typing_extensions import Literal
 else:
     from typing import Literal
@@ -21,7 +33,9 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 from django.utils import tree
 
-PathInfo = namedtuple("PathInfo", ["from_opts", "to_opts", "target_fields", "join_field", "m2m", "direct", "filtered_relation"])
+PathInfo = namedtuple(
+    "PathInfo", ["from_opts", "to_opts", "target_fields", "join_field", "m2m", "direct", "filtered_relation"]
+)
 
 class InvalidQuery(Exception): ...
 
@@ -50,7 +64,7 @@ class DeferredAttribute:
     field: Field
     def __init__(self, field: Field) -> None: ...
 
-_R = TypeVar('_R', bound=Type)
+_R = TypeVar("_R", bound=Type)
 
 class RegisterLookupMixin:
     class_lookups: List[Dict[Any, Any]]
@@ -74,8 +88,11 @@ def select_related_descend(
     reverse: bool = ...,
 ) -> bool: ...
 
-_E = TypeVar('_E', bound=BaseExpression)
-def refs_expression(lookup_parts: Sequence[str], annotations: Mapping[str, _E]) -> Tuple[Union[Literal[False], _E], Sequence[str]]: ...
+_E = TypeVar("_E", bound=BaseExpression)
+
+def refs_expression(
+    lookup_parts: Sequence[str], annotations: Mapping[str, _E]
+) -> Tuple[Union[Literal[False], _E], Sequence[str]]: ...
 def check_rel_lookup_compatibility(model: Type[Model], target_opts: Any, field: FieldCacheMixin) -> bool: ...
 
 class FilteredRelation:

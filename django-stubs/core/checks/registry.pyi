@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Callable, List, Optional, Set, Sequence, TypeVar, Union
+from typing import Any, Callable, List, Optional, Sequence, Set, TypeVar, Union
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
@@ -24,7 +24,7 @@ class Tags:
     urls: str = ...
 
 _CheckCallable = Callable[..., Sequence[CheckMessage]]
-_C = TypeVar('_C', bound=_CheckCallable)
+_C = TypeVar("_C", bound=_CheckCallable)
 
 class _ProcessedCheckCallable(Protocol[_C]):
     tags: Sequence[str]
@@ -35,10 +35,7 @@ class CheckRegistry:
     deployment_checks: Set[_ProcessedCheckCallable] = ...
     def __init__(self) -> None: ...
     def register(
-        self,
-        check: Optional[Union[_CheckCallable, str]] = ...,
-        *tags: str,
-        **kwargs: Any
+        self, check: Optional[Union[_CheckCallable, str]] = ..., *tags: str, **kwargs: Any
     ) -> Union[Callable[[_CheckCallable], _ProcessedCheckCallable], _ProcessedCheckCallable]: ...
     def run_checks(
         self,

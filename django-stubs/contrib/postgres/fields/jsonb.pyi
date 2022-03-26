@@ -1,8 +1,6 @@
 from django.db.models import JSONField as BuiltinJSONField
-from django.db.models.fields.json import (
-    KeyTextTransform as BuiltinKeyTextTransform,
-    KeyTransform as BuiltinKeyTransform,
-)
+from django.db.models.fields.json import KeyTextTransform as BuiltinKeyTextTransform
+from django.db.models.fields.json import KeyTransform as BuiltinKeyTransform
 
 # All deprecated
 class JSONField(BuiltinJSONField): ...

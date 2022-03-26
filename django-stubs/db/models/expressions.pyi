@@ -1,19 +1,15 @@
 import datetime
-from decimal import Decimal
 import sys
-from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence,
-    Set, Tuple, Type, TypeVar, Union,
-)
+from decimal import Decimal
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q
 from django.db.models.fields import Field
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.query import QuerySet
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
-from django.db.models.sql.compiler import SQLCompiler
-from django.db.models.sql.compiler import _AsSqlType
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
@@ -21,9 +17,7 @@ else:
     from typing import Literal
 
 class SQLiteNumericMixin:
-    def as_sqlite(
-        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
-    ) -> _AsSqlType: ...
+    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 _Self = TypeVar("_Self")
 _Numeric = Union[float, Decimal]
@@ -64,6 +58,7 @@ class Combinable:
     def __ror__(self, other: Any) -> Combinable: ...
 
 _SelfB = TypeVar("_SelfB", bound="BaseExpression")
+
 class BaseExpression:
     is_summary: bool = ...
     filterable: bool = ...

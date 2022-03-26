@@ -1,6 +1,4 @@
-from typing import (
-    Any, Collection, Dict, IO, Iterable, Optional, Sequence, Type, Union
-)
+from typing import IO, Any, Collection, Dict, Iterable, Optional, Sequence, Type, Union
 
 from django.db.models.base import Model
 from django.db.models.fields import Field
@@ -82,5 +80,9 @@ class DeserializedObject:
     def save_deferred_fields(self, using: Optional[str] = ...) -> None: ...
 
 def build_instance(Model: Type[Model], data: Dict[str, Any], db: str) -> Model: ...
-def deserialize_m2m_values(field: ManyToManyField, field_value: Iterable[Any], using: Optional[str], handle_forward_references: bool) -> Union[Sequence[Any], object]: ...
-def deserialize_fk_value(field: ForeignKey, field_value: Any, using: Optional[str], handle_forward_references: bool) -> Union[Any, object]: ...
+def deserialize_m2m_values(
+    field: ManyToManyField, field_value: Iterable[Any], using: Optional[str], handle_forward_references: bool
+) -> Union[Sequence[Any], object]: ...
+def deserialize_fk_value(
+    field: ForeignKey, field_value: Any, using: Optional[str], handle_forward_references: bool
+) -> Union[Any, object]: ...

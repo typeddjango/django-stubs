@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from typing import Any, Generator, Optional, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
+
 from .client import DatabaseClient
 from .creation import DatabaseCreation
 from .features import DatabaseFeatures

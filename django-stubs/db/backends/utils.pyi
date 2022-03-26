@@ -1,12 +1,9 @@
-from contextlib import contextmanager
 import datetime
-from decimal import Decimal
 import sys
-from typing import (
-    Any, Dict, Generator, Iterator, List, Mapping, Optional, Sequence,
-    Tuple, Type, Union, overload
-)
 import types
+from contextlib import contextmanager
+from decimal import Decimal
+from typing import Any, Dict, Generator, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union, overload
 from uuid import UUID
 
 if sys.version_info < (3, 8):
@@ -17,7 +14,9 @@ else:
 logger: Any
 
 # Python types that can be adapted to SQL.
-_SQLType = Union[None, bool, int, float, Decimal, str, bytes, datetime.date, datetime.datetime, UUID, Tuple[Any, ...], List[Any]]
+_SQLType = Union[
+    None, bool, int, float, Decimal, str, bytes, datetime.date, datetime.datetime, UUID, Tuple[Any, ...], List[Any]
+]
 _ExecuteParameters = Optional[Union[Sequence[_SQLType], Mapping[str, _SQLType]]]
 
 class CursorWrapper:
@@ -34,7 +33,9 @@ class CursorWrapper:
         value: Optional[BaseException],
         traceback: Optional[types.TracebackType],
     ) -> None: ...
-    def callproc(self, procname: str, params: Optional[Sequence[Any]] = ..., kparams: Optional[Dict[str, int]] = ...) -> Any: ...
+    def callproc(
+        self, procname: str, params: Optional[Sequence[Any]] = ..., kparams: Optional[Dict[str, int]] = ...
+    ) -> Any: ...
     def execute(self, sql: str, params: _ExecuteParameters = ...) -> Any: ...
     def executemany(self, sql: str, param_list: Sequence[_ExecuteParameters]) -> Any: ...
 
@@ -54,17 +55,14 @@ class CursorDebugWrapper(CursorWrapper):
 def typecast_date(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
 @overload
 def typecast_date(s: str) -> datetime.date: ...
-
 @overload
 def typecast_time(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
 @overload
 def typecast_time(s: str) -> datetime.time: ...
-
 @overload
 def typecast_timestamp(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
 @overload
 def typecast_timestamp(s: str) -> datetime.datetime: ...
-
 def split_identifier(identifier: str) -> Tuple[str, str]: ...
 def truncate_name(identifier: str, length: Optional[int] = ..., hash_len: int = ...) -> str: ...
 def format_number(

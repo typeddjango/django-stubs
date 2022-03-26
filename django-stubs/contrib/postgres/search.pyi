@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, TypeVar, Union
 
-from django.db.models import Field, Expression
+from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
 from django.db.models.lookups import Lookup
 
@@ -24,7 +24,9 @@ class SearchVector(SearchVectorCombinable, Func):
     function: str = ...
     arg_joiner: str = ...
     output_field: Field
-    def __init__(self, *expressions: _Expression, config: Optional[_Expression] = ..., weight: Optional[Any] = ...) -> None: ...
+    def __init__(
+        self, *expressions: _Expression, config: Optional[_Expression] = ..., weight: Optional[Any] = ...
+    ) -> None: ...
 
 class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
     def __init__(
@@ -33,7 +35,7 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         connector: str,
         rhs: Combinable,
         config: Optional[_Expression],
-        output_field: Optional[Field] = None
+        output_field: Optional[Field] = None,
     ) -> None: ...
 
 _T = TypeVar("_T", bound="SearchQueryCombinable")
@@ -55,7 +57,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
         *,
         config: Optional[_Expression] = ...,
         invert: bool = ...,
-        search_type: str = ...
+        search_type: str = ...,
     ): ...
     def __invert__(self: _T) -> _T: ...
 
@@ -66,7 +68,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
         connector: str,
         rhs: Combinable,
         config: Optional[_Expression],
-        output_field: Optional[Field] = None
+        output_field: Optional[Field] = None,
     ) -> None: ...
 
 class SearchRank(Func):
@@ -83,7 +85,6 @@ class SearchHeadline(Func):
     function: str = ...
     template: str = ...
     output_field: Field = ...
-
     def __init__(
         self,
         expression: _Expression,

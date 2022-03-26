@@ -9,10 +9,9 @@ from .features import DatabaseFeatures
 from .introspection import DatabaseIntrospection
 from .operations import DatabaseOperations
 
-_R = TypeVar('_R')
+_R = TypeVar("_R")
 
 def decoder(conv_func: Callable[[str], _R]) -> Callable[[bytes], _R]: ...
-
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     client: DatabaseClient

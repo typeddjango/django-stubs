@@ -16,16 +16,16 @@ class RangeBoundary(models.Expression):
     def __init__(self, inclusive_lower: bool = ..., inclusive_upper: bool = ...): ...
 
 class RangeOperators:
-    EQUAL: Literal['=']
-    NOT_EQUAL: Literal['<>']
-    CONTAINS: Literal['@>']
-    CONTAINED_BY: Literal['<@']
-    OVERLAPS: Literal['&&']
-    FULLY_LT: Literal['<<']
-    FULLY_GT: Literal['>>']
-    NOT_LT: Literal['&>']
-    NOT_GT: Literal['&<']
-    ADJACENT_TO: Literal['-|-']
+    EQUAL: Literal["="]
+    NOT_EQUAL: Literal["<>"]
+    CONTAINS: Literal["@>"]
+    CONTAINED_BY: Literal["<@"]
+    OVERLAPS: Literal["&&"]
+    FULLY_LT: Literal["<<"]
+    FULLY_GT: Literal[">>"]
+    NOT_LT: Literal["&>"]
+    NOT_GT: Literal["&<"]
+    ADJACENT_TO: Literal["-|-"]
 
 class RangeField(models.Field):
     empty_strings_allowed: bool = ...
@@ -114,4 +114,3 @@ class UpperInfinite(models.Transform):
     lookup_name: str = ...
     function: str = ...
     output_field: models.BooleanField = ...
-

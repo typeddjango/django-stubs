@@ -1,6 +1,8 @@
-from datetime import date, time as builtin_time, datetime as builtin_datetime
-from typing import Any, Optional, Pattern, Union
 import sys
+from datetime import date
+from datetime import datetime as builtin_datetime
+from datetime import time as builtin_time
+from typing import Any, Optional, Pattern, Union
 
 from django.utils.timezone import _TzInfoT
 
@@ -33,7 +35,7 @@ class TimeFormat(Formatter):
     def s(self) -> str: ...
     def T(self) -> str: ...
     def u(self) -> str: ...
-    def Z(self) -> Union[int, Literal['']]: ...
+    def Z(self) -> Union[int, Literal[""]]: ...
 
 class DateFormat(TimeFormat):
     data: Union[builtin_datetime, date, builtin_time]  # type: ignore

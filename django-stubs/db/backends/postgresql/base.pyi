@@ -3,6 +3,7 @@ from typing import Any, Dict, Tuple, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
+
 from .client import DatabaseClient
 from .creation import DatabaseCreation
 from .features import DatabaseFeatures

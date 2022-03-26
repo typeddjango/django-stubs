@@ -2,8 +2,20 @@ from io import BytesIO
 from json import JSONEncoder
 from types import TracebackType
 from typing import (
-    Any, Callable, Dict, Generic, Iterable, Iterator, List, NoReturn,
-    Optional, Pattern, Tuple, Type, TypeVar, Union,
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    NoReturn,
+    Optional,
+    Pattern,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
 )
 
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -32,7 +44,8 @@ class FakePayload:
     def read(self, num_bytes: int = ...) -> bytes: ...
     def write(self, content: Union[bytes, str]) -> None: ...
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
+
 def closing_iterator_wrapper(iterable: Iterable[_T], close: Callable[[], Any]) -> Iterator[_T]: ...
 def conditional_content_removal(request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
 
@@ -63,11 +76,11 @@ class _RequestFactory(Generic[_T]):
     cookies: SimpleCookie
     errors: BytesIO
     def __init__(self, *, json_encoder: Type[JSONEncoder] = ..., **defaults: Any) -> None: ...
-    def request(self, **request: Any) -> _T: ...
-    def get(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def post(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def trace(self, path: str, secure: bool = ..., **extra: Any) -> _T: ...
+    def request(self, **request: Any) -> _R: ...
+    def get(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _R: ...
+    def post(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _R: ...
+    def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _R: ...
+    def trace(self, path: str, secure: bool = ..., **extra: Any) -> _R: ...
     def options(
         self,
         path: str,
@@ -75,10 +88,10 @@ class _RequestFactory(Generic[_T]):
         content_type: str = ...,
         secure: bool = ...,
         **extra: Any
-    ) -> _T: ...
-    def put(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def patch(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def delete(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
+    ) -> _R: ...
+    def put(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _R: ...
+    def patch(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _R: ...
+    def delete(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _R: ...
     def generic(
         self,
         method: str,
@@ -117,10 +130,7 @@ class Client(ClientMixin, RequestFactory[_MonkeyPatchedHttpResponseBase[WSGIRequ
     raise_request_exception: bool
     exc_info: Optional[Tuple[Type[BaseException], BaseException, TracebackType]]
     def __init__(
-        self,
-        enforce_csrf_checks: bool = ...,
-        raise_request_exception: bool = ...,
-        **defaults: Any
+        self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
     ) -> None: ...
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedHttpResponseBase[WSGIRequest]: ...
@@ -161,9 +171,6 @@ class AsyncClient(ClientMixin, AsyncRequestFactory[_MonkeyPatchedHttpResponseBas
     exc_info: Any
     extra: Any
     def __init__(
-        self,
-        enforce_csrf_checks: bool = ...,
-        raise_request_exception: bool = ...,
-        **defaults: Any
+        self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
     ) -> None: ...
     async def request(self, **request: Any) -> _MonkeyPatchedHttpResponseBase[ASGIRequest]: ...  # type: ignore

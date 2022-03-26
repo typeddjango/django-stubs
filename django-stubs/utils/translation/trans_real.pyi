@@ -1,7 +1,7 @@
 import gettext as gettext_module
+import sys
 from gettext import NullTranslations
 from typing import Any, Callable, Dict, Iterator, List, Optional, Pattern, Protocol, Tuple, TypeVar, Union
-import sys
 
 from django.http.request import HttpRequest
 
@@ -10,8 +10,7 @@ if sys.version_info < (3, 8):
 else:
     from typing import Literal
 
-
-CONTEXT_SEPARATOR: Literal['\x04']
+CONTEXT_SEPARATOR: Literal["\x04"]
 accept_language_re: Pattern[str]
 language_code_re: Pattern[str]
 language_code_prefix_re: Pattern[str]
@@ -22,13 +21,13 @@ class _PluralCallable(Protocol):
 def reset_cache(**kwargs: Any) -> None: ...
 
 _KeyT = Union[str, Tuple[str, int]]
-_Z = TypeVar('_Z')
+_Z = TypeVar("_Z")
 
 class TranslationCatalog:
     _catalogs: List[Dict[_KeyT, str]]
     def __init__(self, trans: Optional[gettext_module.NullTranslations] = ...) -> None: ...
     def __getitem__(self, key: _KeyT) -> str: ...
-    def __setitem__(self, key: _KeyT, value: str) -> None:...
+    def __setitem__(self, key: _KeyT, value: str) -> None: ...
     def __contains__(self, key: _KeyT) -> bool: ...
     def items(self) -> Iterator[Tuple[_KeyT, str]]: ...
     def keys(self) -> Iterator[_KeyT]: ...

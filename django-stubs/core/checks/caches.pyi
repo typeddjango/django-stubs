@@ -5,9 +5,7 @@ from django.core.checks.messages import Error, Warning
 
 E001: Error
 
-def check_default_cache_is_configured(
-    app_configs: Optional[Sequence[AppConfig]], **kwargs: Any
-) -> Sequence[Error]: ...
+def check_default_cache_is_configured(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> Sequence[Error]: ...
 def check_cache_location_not_exposed(
     app_configs: Optional[Sequence[AppConfig]], **kwargs: Any
 ) -> Sequence[Warning]: ...

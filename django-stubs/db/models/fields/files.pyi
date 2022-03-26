@@ -1,11 +1,11 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, overload
 
+from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
-from django.core import validators  # due to weird mypy.stubtest error
 from django.db.models.base import Model
 from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
@@ -102,7 +102,7 @@ class ImageField(FileField):
         name: Optional[str] = ...,
         width_field: Optional[str] = ...,
         height_field: Optional[str] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     # class access
     @overload  # type: ignore

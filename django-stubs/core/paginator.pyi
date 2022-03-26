@@ -1,15 +1,14 @@
-from typing import Generic, Iterable, Iterator, Optional, Protocol, Sequence, Sized, Union, TypeVar, overload
+from typing import Generic, Iterable, Iterator, Optional, Protocol, Sequence, Sized, TypeVar, Union, overload
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
-
 
 class UnorderedObjectListWarning(RuntimeWarning): ...
 class InvalidPage(Exception): ...
 class PageNotAnInteger(InvalidPage): ...
 class EmptyPage(InvalidPage): ...
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 class _SupportsPagination(Protocol[_T], Sized, Iterable):
     @overload
@@ -40,11 +39,7 @@ class Paginator(Generic[_T]):
     @property
     def page_range(self) -> range: ...
     def get_elided_page_range(
-        self,
-        number: Union[int, float, str] = ...,
-        *,
-        on_each_side: int = ...,
-        on_ends: int = ...
+        self, number: Union[int, float, str] = ..., *, on_each_side: int = ..., on_ends: int = ...
     ) -> Iterator[Union[str, int]]: ...
 
 QuerySetPaginator = Paginator

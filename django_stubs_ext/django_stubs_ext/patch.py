@@ -1,9 +1,9 @@
 from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION as VERSION
-from django.core.paginator import Paginator
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
+from django.core.paginator import Paginator
 from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet

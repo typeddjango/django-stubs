@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from django.db.migrations.migration import Migration, SwappableTuple
 from django.db.migrations.state import ProjectState
@@ -50,6 +50,6 @@ class MigrationGraph:
         self,
         nodes: Union[None, Tuple[str, str], Sequence[Tuple[str, str]]] = ...,
         at_end: bool = ...,
-        real_apps: List[str] = ...
+        real_apps: List[str] = ...,
     ) -> ProjectState: ...
     def __contains__(self, node: Tuple[str, str]) -> bool: ...

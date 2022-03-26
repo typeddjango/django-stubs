@@ -1,12 +1,11 @@
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Type
 from types import TracebackType
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Type
 
 from django.apps import AppConfig
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.utils.connection import BaseConnectionHandler
 from django.utils.connection import ConnectionDoesNotExist as ConnectionDoesNotExist
-
 
 DEFAULT_DB_ALIAS: str
 DJANGO_VERSION_PICKLE_KEY: str
@@ -24,7 +23,9 @@ class NotSupportedError(DatabaseError): ...
 class DatabaseErrorWrapper:
     def __init__(self, wrapper: Any) -> None: ...
     def __enter__(self) -> None: ...
-    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: TracebackType) -> None: ...
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: TracebackType
+    ) -> None: ...
 
 def load_backend(backend_name: str) -> Any: ...
 

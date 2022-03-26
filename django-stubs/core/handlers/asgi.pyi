@@ -1,7 +1,7 @@
 from typing import (
+    IO,
     Any,
     Awaitable,
-    IO,
     Callable,
     Dict,
     Iterator,
@@ -9,14 +9,15 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    TypeVar,
     Type,
+    TypeVar,
     Union,
 )
+
 from django.core.handlers import base as base
 from django.http import HttpRequest, QueryDict
 from django.http.response import HttpResponseBase
-from django.urls.resolvers import URLResolver, ResolverMatch
+from django.urls.resolvers import ResolverMatch, URLResolver
 from django.utils.datastructures import MultiValueDict
 
 _ReceiveCallback = Callable[[], Awaitable[Mapping[str, Any]]]
@@ -39,7 +40,7 @@ class ASGIRequest(HttpRequest):
     @property
     def COOKIES(self) -> Dict[str, str]: ...  # type: ignore
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 class ASGIHandler(base.BaseHandler):
     request_class: Type[ASGIRequest] = ...
@@ -52,8 +53,12 @@ class ASGIHandler(base.BaseHandler):
         send: _SendCallback,
     ) -> None: ...
     async def read_body(self, receive: _ReceiveCallback) -> IO[bytes]: ...
-    def create_request(self, scope: Mapping[str, Any], body_file: IO[bytes]) -> Union[Tuple[ASGIRequest, None], Tuple[None, HttpResponseBase]]: ...
-    def handle_uncaught_exception(self, request: HttpRequest, resolver: URLResolver, exc_info: Any) -> HttpResponseBase: ...
+    def create_request(
+        self, scope: Mapping[str, Any], body_file: IO[bytes]
+    ) -> Union[Tuple[ASGIRequest, None], Tuple[None, HttpResponseBase]]: ...
+    def handle_uncaught_exception(
+        self, request: HttpRequest, resolver: URLResolver, exc_info: Any
+    ) -> HttpResponseBase: ...
     async def send_response(self, response: HttpResponseBase, send: _SendCallback) -> None: ...
     @classmethod
     def chunk_bytes(cls, data: Sequence[_T]) -> Iterator[Tuple[Sequence[_T], bool]]: ...

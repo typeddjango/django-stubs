@@ -1,17 +1,6 @@
-from functools import wraps as wraps  # noqa: F401
 import sys
-from typing import (
-    Any,
-    Callable,
-    Generic,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from functools import wraps as wraps  # noqa: F401
+from typing import Any, Callable, Generic, List, Optional, Tuple, Type, TypeVar, Union, overload
 
 from django.db.models.base import Model
 
@@ -34,6 +23,7 @@ class cached_property(Generic[_T]):
 class Promise: ...
 
 _C = TypeVar("_C", bound=Callable)
+
 def lazy(func: _C, *resultclasses: Any) -> _C: ...
 def lazystr(text: Any) -> str: ...
 def keep_lazy(*resultclasses: Any) -> Callable: ...
@@ -72,8 +62,7 @@ class SimpleLazyObject(LazyObject):
 _PartitionMember = TypeVar("_PartitionMember")
 
 def partition(
-    predicate: Callable[[_PartitionMember], Union[int, bool]],
-    values: List[_PartitionMember]
+    predicate: Callable[[_PartitionMember], Union[int, bool]], values: List[_PartitionMember]
 ) -> Tuple[List[_PartitionMember], List[_PartitionMember]]: ...
 
 _Get = TypeVar("_Get", covariant=True)
@@ -86,11 +75,12 @@ class classproperty(Generic[_Get]):
     def getter(self, method: Callable[[Type[_Self]], _Get]) -> classproperty[_Get]: ...
 
 class _Getter(Protocol[_Get]):
-    """ Type fake to declare some read-only properties (until `property` builtin is generic)
+    """Type fake to declare some read-only properties (until `property` builtin is generic)
 
     We can use something like `Union[_Getter[str], str]` in base class to avoid errors
     when redefining attribute with property or property with attribute.
     """
+
     @overload
     def __get__(self: _Self, __instance: None, __typeobj: Optional[Type[Any]]) -> _Self: ...
     @overload

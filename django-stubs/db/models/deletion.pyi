@@ -1,6 +1,17 @@
 from typing import (
-    Any, Callable, Collection, Dict, Iterable, Iterator, List, Optional,
-    Set, Sequence, Tuple, Type, Union
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
 )
 
 from django.db import IntegrityError
@@ -70,7 +81,7 @@ class Collector:
         objs: _IndexableCollection[Model],
         source: Optional[Type[Model]] = ...,
         nullable: bool = ...,
-        reverse_dependency: bool = ...
+        reverse_dependency: bool = ...,
     ) -> List[Model]: ...
     def add_dependency(self, model: Type[Model], dependency: Type[Model], reverse_dependency: bool = ...) -> None: ...
     def add_field_update(self, field: Field, value: Any, objs: _IndexableCollection[Model]) -> None: ...
@@ -78,7 +89,9 @@ class Collector:
     def clear_restricted_objects_from_set(self, model: Type[Model], objs: Set[Model]) -> None: ...
     def clear_restricted_objects_from_queryset(self, model: Type[Model], qs: QuerySet[Model]) -> None: ...
     def can_fast_delete(self, objs: Union[Model, Iterable[Model]], from_field: Optional[Field] = ...) -> bool: ...
-    def get_del_batches(self, objs: _IndexableCollection[Model], fields: Iterable[Field]) -> Sequence[Sequence[Model]]: ...
+    def get_del_batches(
+        self, objs: _IndexableCollection[Model], fields: Iterable[Field]
+    ) -> Sequence[Sequence[Model]]: ...
     def collect(
         self,
         objs: _IndexableCollection[Optional[Model]],
@@ -88,9 +101,11 @@ class Collector:
         source_attr: Optional[str] = ...,
         reverse_dependency: bool = ...,
         keep_parents: bool = ...,
-        fail_on_restricted: bool = ...
+        fail_on_restricted: bool = ...,
     ) -> None: ...
-    def related_objects(self, related_model: Type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]) -> QuerySet[Model]: ...
+    def related_objects(
+        self, related_model: Type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]
+    ) -> QuerySet[Model]: ...
     def instances_with_model(self) -> Iterator[Tuple[Type[Model], Model]]: ...
     def sort(self) -> None: ...
     def delete(self) -> Tuple[int, Dict[str, int]]: ...

@@ -1,7 +1,8 @@
-from typing import Any, Dict, Optional, Type
 import sys
+from typing import Any, Dict, Optional, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
+
 from .client import DatabaseClient
 from .creation import DatabaseCreation
 from .features import DatabaseFeatures

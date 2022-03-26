@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, Tuple, TypeVar, Union
 from django.http.request import HttpRequest
 from django.utils.functional import SimpleLazyObject
 
-_R = TypeVar('_R', bound=HttpRequest)
+_R = TypeVar("_R", bound=HttpRequest)
 
 def csrf(request: HttpRequest) -> Dict[str, SimpleLazyObject]: ...
 def debug(request: HttpRequest) -> Dict[str, Union[Callable, bool]]: ...

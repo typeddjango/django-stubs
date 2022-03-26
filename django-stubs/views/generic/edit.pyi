@@ -5,11 +5,9 @@ from django.db import models
 from django.forms.forms import BaseForm
 from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
-from django.views.generic.detail import (
-    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
-)
 from django.utils.datastructures import _ListOrTuple
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.detail import BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal

@@ -5,7 +5,7 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Dict, List, Optional, Set, Sequence, Tuple, Union, overload
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union, overload
 
 utf8_charset: Any
 utf8_charset_qp: Any
@@ -20,8 +20,8 @@ def forbid_multi_line_headers(name: str, val: str, encoding: str) -> Tuple[str, 
 def sanitize_address(addr: Union[Tuple[str, str], str], encoding: str) -> str: ...
 
 class MIMEMixin:
-    def as_string(self, unixfrom: bool = ..., linesep: str = '\n') -> str: ...
-    def as_bytes(self, unixfrom: bool = ..., linesep: str = '\n') -> bytes: ...
+    def as_string(self, unixfrom: bool = ..., linesep: str = "\n") -> str: ...
+    def as_bytes(self, unixfrom: bool = ..., linesep: str = "\n") -> bytes: ...
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):  # type: ignore
     defects: List[Any]
@@ -49,15 +49,18 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore
     preamble: None
     encoding: str = ...
     def __init__(
-        self, _subtype: str = ..., boundary: Optional[Any] = ..., _subparts: Optional[Any] = ..., encoding: str = ..., **_params: Any
+        self,
+        _subtype: str = ...,
+        boundary: Optional[Any] = ...,
+        _subparts: Optional[Any] = ...,
+        encoding: str = ...,
+        **_params: Any
     ) -> None: ...
     def __setitem__(self, name: str, val: str) -> None: ...
 
 _AttachmentContent = Union[bytes, EmailMessage, Message, SafeMIMEText, str]
 _AttachmentTuple = Union[
-    Tuple[str, _AttachmentContent],
-    Tuple[Optional[str], _AttachmentContent, str],
-    Tuple[str, _AttachmentContent, None]
+    Tuple[str, _AttachmentContent], Tuple[Optional[str], _AttachmentContent, str], Tuple[str, _AttachmentContent, None]
 ]
 
 class EmailMessage:

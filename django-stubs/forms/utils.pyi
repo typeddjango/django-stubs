@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.utils.safestring import SafeString
 
-
 _DataT = Mapping[str, Any]
 _FilesT = Mapping[str, Iterable[File]]
 

@@ -4,12 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import (
-    OneToOneField, RelatedField, ForeignKey, ManyToManyField
-)
-from django.db.models.fields.reverse_related import (
-    ManyToManyRel, ManyToOneRel, OneToOneRel
-)
+from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField, RelatedField
+from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 
@@ -49,7 +45,9 @@ class ReverseOneToOneDescriptor:
     def get_prefetch_queryset(
         self, instances: List[Model], queryset: Optional[QuerySet] = ...
     ) -> Tuple[QuerySet, Callable, Callable, bool, str, bool]: ...
-    def __get__(self, instance: Optional[Model], cls: Optional[Type[Model]] = ...) -> Union[Model, ReverseOneToOneDescriptor]: ...
+    def __get__(
+        self, instance: Optional[Model], cls: Optional[Type[Model]] = ...
+    ) -> Union[Model, ReverseOneToOneDescriptor]: ...
     def __set__(self, instance: Model, value: Optional[Model]) -> None: ...
     def __reduce__(self) -> Tuple[Callable, Tuple[Type[Model], str]]: ...
 
@@ -65,8 +63,8 @@ class ReverseManyToOneDescriptor:
 def create_reverse_many_to_one_manager(superclass: Type, rel: Any): ...
 
 class ManyToManyDescriptor(ReverseManyToOneDescriptor):
-    field: ManyToManyField  #type: ignore[assignment]
-    rel: ManyToManyRel  #type: ignore[assignment]
+    field: ManyToManyField  # type: ignore[assignment]
+    rel: ManyToManyRel  # type: ignore[assignment]
     reverse: bool = ...
     def __init__(self, rel: ManyToManyRel, reverse: bool = ...) -> None: ...
     @property

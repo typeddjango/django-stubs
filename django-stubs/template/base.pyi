@@ -1,7 +1,18 @@
 from enum import Enum
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional,
-    Pattern, Sequence, Tuple, Type, Union
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Pattern,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
 )
 
 from django.template.context import Context as Context

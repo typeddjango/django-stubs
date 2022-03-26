@@ -37,7 +37,7 @@ class ModelBackend(BaseBackend):
 
 class AllowAllUsersModelBackend(ModelBackend): ...
 
-_U = TypeVar('_U', bound=AbstractBaseUser)
+_U = TypeVar("_U", bound=AbstractBaseUser)
 
 class RemoteUserBackend(ModelBackend):
     create_unknown_user: bool = ...

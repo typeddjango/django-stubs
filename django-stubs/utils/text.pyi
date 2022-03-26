@@ -1,6 +1,6 @@
+from io import BytesIO
 from typing import Callable, Iterable, Iterator, List, Optional, Pattern, Union
 
-from io import BytesIO
 from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import SafeString

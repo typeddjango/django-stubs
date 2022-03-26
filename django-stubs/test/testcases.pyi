@@ -2,9 +2,22 @@ import threading
 import unittest
 from datetime import date
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional,
-    Sequence, Set, Tuple, Type, Union, overload
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+    overload,
 )
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
@@ -18,8 +31,8 @@ from django.template.base import Template
 from django.test.client import Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
-from django.utils.safestring import SafeString
 from django.utils.functional import classproperty
+from django.utils.safestring import SafeString
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...
@@ -162,9 +175,7 @@ class TransactionTestCase(SimpleTestCase):
         msg: Optional[str] = ...,
     ) -> None: ...
     @overload
-    def assertNumQueries(  # type: ignore
-        self, num: int, using: str = ...
-    ) -> _AssertNumQueriesContext: ...
+    def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore
     @overload
     def assertNumQueries(
         self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any

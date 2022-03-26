@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict, List, Optional, Type
 
-from django.http.response import HttpResponseBase, HttpResponse
 from django.http.request import HttpRequest
+from django.http.response import HttpResponse, HttpResponseBase
 
 class ContextMixin:
     extra_context: Optional[Dict[str, Any]]

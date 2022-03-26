@@ -1,8 +1,5 @@
 import sys
-from typing import (
-    Any, Callable, Dict, Iterable, List, Optional, Sequence,
-    Tuple, Type, TypeVar, Union, overload
-)
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
 from uuid import UUID
 
 if sys.version_info < (3, 8):
@@ -14,10 +11,7 @@ from django.core import validators  # due to weird mypy.stubtest error
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
-from django.db.models.fields import Field
-from django.db.models.fields import (
-    _AllLimitChoicesTo, _ErrorMessagesT, _FieldChoices, _LimitChoicesTo,
-)
+from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesT, _FieldChoices, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
 from django.db.models.fields.related_descriptors import (  # noqa: F401
@@ -31,7 +25,7 @@ from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyR
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
 from django.db.models.manager import RelatedManager
-from django.db.models.query_utils import PathInfo, FilteredRelation, Q
+from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 
 _T = TypeVar("_T", bound=models.Model)
 _F = TypeVar("_F", bound=models.Field)
@@ -55,7 +49,6 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     remote_field: ForeignObjectRel
     rel_class: Type[ForeignObjectRel]
     swappable: bool
-
     @property
     def related_model(self) -> Type[Model]: ...  # type: ignore
     def get_forward_related_filter(self, obj: Model) -> Dict[str, Union[int, UUID]]: ...
@@ -73,7 +66,6 @@ class ForeignObject(RelatedField[_ST, _GT]):
     remote_field: ForeignObjectRel
     rel_class: Type[ForeignObjectRel]
     swappable: bool
-
     def __init__(
         self,
         to: Union[Type[Model], str],
@@ -122,7 +114,6 @@ class ForeignKey(ForeignObject[_ST, _GT]):
 
     remote_field: ManyToOneRel
     rel_class: Type[ManyToOneRel]
-
     def __init__(
         self,
         to: Union[Type[Model], str],
@@ -172,7 +163,6 @@ class OneToOneField(ForeignKey[_ST, _GT]):
 
     remote_field: OneToOneRel
     rel_class: Type[OneToOneRel]
-
     def __init__(
         self,
         to: Union[Type[Model], str],
@@ -231,7 +221,6 @@ class ManyToManyField(RelatedField[_ST, _GT]):
 
     remote_field: ManyToManyRel
     rel_class: Type[ManyToManyRel]
-
     def __init__(
         self,
         to: Union[Type[Model], str],

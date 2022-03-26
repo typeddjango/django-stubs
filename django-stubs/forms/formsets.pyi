@@ -1,24 +1,9 @@
-from typing import (
-    Any,
-    Dict,
-    Generic,
-    Iterator,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    Sized,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Dict, Generic, Iterator, List, Mapping, Optional, Sequence, Sized, Type, TypeVar, Union
 
-from django.forms.forms import Form, BaseForm
-from django.forms.utils import ErrorList
-from django.forms.utils import _DataT, _FilesT
-from django.forms.widgets import Widget, Media
+from django.forms.forms import BaseForm, Form
+from django.forms.utils import ErrorList, _DataT, _FilesT
+from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeString
-
 
 TOTAL_FORM_COUNT: str = ...
 INITIAL_FORM_COUNT: str = ...
@@ -30,11 +15,10 @@ DELETION_FIELD_NAME: str = ...
 DEFAULT_MIN_NUM: int = ...
 DEFAULT_MAX_NUM: int = ...
 
-_F = TypeVar('_F', bound=BaseForm)
+_F = TypeVar("_F", bound=BaseForm)
 
 class ManagementForm(Form):
     cleaned_data: Dict[str, Optional[int]]
-
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def clean(self) -> Dict[str, Optional[int]]: ...
 

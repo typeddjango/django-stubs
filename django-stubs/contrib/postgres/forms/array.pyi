@@ -1,17 +1,15 @@
 from typing import Any, Dict, Optional, Sequence, Type, Union
 
-from ..utils import prefix_validation_error as prefix_validation_error
 from django import forms as forms
-from django.contrib.postgres.validators import (
-    ArrayMaxLengthValidator as ArrayMaxLengthValidator,
-    ArrayMinLengthValidator as ArrayMinLengthValidator
-)
+from django.contrib.postgres.validators import ArrayMaxLengthValidator as ArrayMaxLengthValidator
+from django.contrib.postgres.validators import ArrayMinLengthValidator as ArrayMinLengthValidator
 from django.core.exceptions import ValidationError as ValidationError
 from django.db.models.fields import _ErrorMessagesT
 from django.forms.fields import _ClassLevelWidgetT
-from django.forms.widgets import Media
 from django.forms.utils import _DataT, _FilesT
-from django.forms.widgets import _OptAttrs
+from django.forms.widgets import Media, _OptAttrs
+
+from ..utils import prefix_validation_error as prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages: _ErrorMessagesT = ...
@@ -39,9 +37,7 @@ class SplitArrayWidget(forms.Widget):
     template_name: str
     widget: _ClassLevelWidgetT
     size: int
-    def __init__(
-        self, widget: Union[forms.Widget, Type[forms.Widget]], size: int, **kwargs: Any
-    ) -> None: ...
+    def __init__(self, widget: Union[forms.Widget, Type[forms.Widget]], size: int, **kwargs: Any) -> None: ...
     @property
     def is_hidden(self) -> bool: ...
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...

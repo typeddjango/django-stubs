@@ -1,5 +1,5 @@
-from typing import Any, Iterable, List, Optional, Set, Sequence, Tuple, Type, Union
 import os
+from typing import Any, Iterable, List, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.apps.config import AppConfig
 from django.db.models.base import Model

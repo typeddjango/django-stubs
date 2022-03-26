@@ -1,6 +1,6 @@
 import os
 import types
-from typing import AnyStr, IO, Iterator, Optional, Type, TypeVar, Union, type_check_only
+from typing import IO, AnyStr, Iterator, Optional, Type, TypeVar, Union, type_check_only
 
 from django.core.files.utils import FileProxyMixin
 
@@ -30,7 +30,6 @@ class File(FileProxyMixin[AnyStr], IO[AnyStr]):
     ) -> None: ...
     def open(self: _T, mode: Optional[str] = ...) -> _T: ...
     def close(self) -> None: ...
-
     @type_check_only
     def __next__(self) -> AnyStr: ...
 

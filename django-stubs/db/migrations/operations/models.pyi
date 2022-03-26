@@ -1,17 +1,15 @@
-from typing import (
-    Any, Dict, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
-)
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
 
-from django.db.migrations.operations.base import Operation
-from django.db.models.constraints import BaseConstraint
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.migrations.operations.base import Operation
 from django.db.models.base import Model
+from django.db.models.constraints import BaseConstraint
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
 from django.utils.datastructures import _ListOrTuple
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 class ModelOperation(Operation):
     name: str = ...
@@ -52,7 +50,6 @@ class AlterModelTable(ModelOptionOperation):
 
 class AlterTogetherOptionOperation(ModelOptionOperation):
     option_name: str = ...
-
     def __init__(
         self,
         name: str,
@@ -63,18 +60,10 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
     def deconstruct(self) -> Tuple[str, Sequence[Any], Dict[str, Any]]: ...
     def state_forwards(self, app_label: str, state: Any) -> None: ...
     def database_forwards(
-        self,
-        app_label: str,
-        schema_editor: BaseDatabaseSchemaEditor,
-        from_state: Any,
-        to_state: Any
+        self, app_label: str, schema_editor: BaseDatabaseSchemaEditor, from_state: Any, to_state: Any
     ) -> None: ...
     def database_backwards(
-        self,
-        app_label: str,
-        schema_editor: BaseDatabaseSchemaEditor,
-        from_state: Any,
-        to_state: Any
+        self, app_label: str, schema_editor: BaseDatabaseSchemaEditor, from_state: Any, to_state: Any
     ) -> None: ...
     def references_field(self, model_name: str, name: str, app_label: str) -> bool: ...
     def describe(self) -> str: ...

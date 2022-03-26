@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures as BaseSpatialFeatures
 from django.db.backends.mysql.features import DatabaseFeatures as MySQLDatabaseFeatures
 

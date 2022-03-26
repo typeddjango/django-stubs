@@ -7,8 +7,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.checks import CheckMessage
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
-from django.http.response import HttpResponse
 from django.http.request import HttpRequest
+from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject
@@ -62,10 +62,6 @@ class AdminSite:
     def get_action(self, name: str) -> Callable: ...
     @property
     def actions(self) -> Iterable[Tuple[str, _ActionCallback]]: ...
-
-
-
-
     def has_permission(self, request: HttpRequest) -> bool: ...
     def admin_view(self, view: Callable, cacheable: bool = ...) -> Callable: ...
     def get_urls(self) -> List[Union[URLResolver, URLPattern]]: ...

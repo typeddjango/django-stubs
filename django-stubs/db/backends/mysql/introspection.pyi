@@ -5,7 +5,20 @@ from django.db.backends.base.introspection import BaseDatabaseIntrospection as B
 from django.db.backends.mysql.base import DatabaseWrapper
 
 FieldInfo: Any
-InfoLine = namedtuple("InfoLine", ["col_name", "data_type", "max_len", "num_prec", "num_scale", "extra", "column_default", "collation", "is_unsigned"])
+InfoLine = namedtuple(
+    "InfoLine",
+    [
+        "col_name",
+        "data_type",
+        "max_len",
+        "num_prec",
+        "num_scale",
+        "extra",
+        "column_default",
+        "collation",
+        "is_unsigned",
+    ],
+)
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     connection: DatabaseWrapper

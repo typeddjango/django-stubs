@@ -1,14 +1,14 @@
-from psycopg2.extras import Range  # type: ignore
 from typing import Any, Optional, Tuple, Type, Union
 
 from django import forms
 from django.db.models.fields import _ErrorMessagesT
-from django.forms.widgets import MultiWidget
-from django.forms.widgets import _OptAttrs
-
+from django.forms.widgets import MultiWidget, _OptAttrs
+from psycopg2.extras import Range  # type: ignore
 
 class RangeWidget(MultiWidget):
-    def __init__(self, base_widget: Union[forms.Widget, Type[forms.Widget]], attrs: Optional[_OptAttrs] = ...) -> None: ...
+    def __init__(
+        self, base_widget: Union[forms.Widget, Type[forms.Widget]], attrs: Optional[_OptAttrs] = ...
+    ) -> None: ...
     def decompress(self, value: Any) -> Tuple[Optional[Any], Optional[Any]]: ...
 
 class HiddenRangeWidget(RangeWidget):

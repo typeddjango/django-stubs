@@ -1,15 +1,13 @@
+import sys
 import types
 from contextlib import ContextDecorator
-from datetime import (
-    date,
-    time,
-    timezone,
-    datetime as datetime,
-    timedelta as timedelta,
-    tzinfo as tzinfo,
-)
+from datetime import date
+from datetime import datetime as datetime
+from datetime import time
+from datetime import timedelta as timedelta
+from datetime import timezone
+from datetime import tzinfo as tzinfo
 from typing import Any, Optional, Type, Union, overload
-import sys
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
@@ -47,7 +45,10 @@ class override(ContextDecorator):
     def __init__(self, timezone: Optional[Union[str, _TzInfoT]]) -> None: ...
     def __enter__(self) -> None: ...
     def __exit__(
-        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[types.TracebackType]
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[types.TracebackType],
     ) -> None: ...
 
 def localtime(value: Optional[datetime] = ..., timezone: Optional[_TzInfoT] = ...) -> datetime: ...

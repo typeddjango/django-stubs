@@ -2,7 +2,6 @@ from typing import Any, Iterable, List, Mapping, Optional, Tuple, Type
 
 from django.db.models.fields import Field
 from django.db.models.lookups import (
-    Lookup,
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
@@ -10,6 +9,7 @@ from django.db.models.lookups import (
     IsNull,
     LessThan,
     LessThanOrEqual,
+    Lookup,
 )
 
 class MultiColSource:

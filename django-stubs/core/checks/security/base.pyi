@@ -1,7 +1,7 @@
 from typing import Any, Optional, Sequence
 
 from django.apps.config import AppConfig
-from django.core.checks.messages import Warning, Error, CheckMessage
+from django.core.checks.messages import CheckMessage, Error, Warning
 
 SECRET_KEY_MIN_LENGTH: int
 SECRET_KEY_MIN_UNIQUE_CHARACTERS: int
@@ -22,9 +22,7 @@ E023: Error
 E100: Error
 
 def check_security_middleware(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> Sequence[Warning]: ...
-def check_xframe_options_middleware(
-    app_configs: Optional[Sequence[AppConfig]], **kwargs: Any
-) -> Sequence[Warning]: ...
+def check_xframe_options_middleware(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> Sequence[Warning]: ...
 def check_sts(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> Sequence[Warning]: ...
 def check_sts_include_subdomains(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> Sequence[Warning]: ...
 def check_sts_preload(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> Sequence[Warning]: ...

@@ -1,6 +1,4 @@
-from typing import (
-    Any, Dict, Iterable, Iterator, List, Optional, Union, overload
-)
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Union, overload
 
 from django.forms.fields import Field
 from django.forms.forms import BaseForm
@@ -8,7 +6,6 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from django.forms.widgets import Widget
 from django.utils.safestring import SafeString
-
 
 _AttrsT = Dict[str, Union[str, bool]]
 

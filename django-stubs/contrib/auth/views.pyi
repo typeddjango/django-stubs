@@ -3,7 +3,7 @@ from typing import Any, Optional, Set
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.http.request import HttpRequest
-from django.http.response import HttpResponseRedirect, HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 

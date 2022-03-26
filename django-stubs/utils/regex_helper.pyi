@@ -18,5 +18,6 @@ def flatten_result(
 ) -> Tuple[List[str], List[List[str]]]: ...
 
 # Returns SimpleLazyObject, but we can safely ignore it
-_P = TypeVar('_P', str, bytes)
+_P = TypeVar("_P", str, bytes)
+
 def _lazy_re_compile(regex: Union[_P, Pattern[_P]], flags: int = ...) -> Pattern[_P]: ...

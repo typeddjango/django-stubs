@@ -1,4 +1,4 @@
-from typing import Any, IO, Union
+from typing import IO, Any, Union
 from xml.sax.expatreader import ExpatParser as _ExpatParser  # type: ignore
 
 from django.core.serializers import base as base
@@ -20,7 +20,12 @@ class Deserializer(base.Deserializer):
     db: str = ...
     ignore: bool = ...
     def __init__(
-        self, stream_or_string: Union[bytes, str, IO[bytes], IO[str]], *, using: str = ..., ignorenonexistent: bool = ..., **options: Any
+        self,
+        stream_or_string: Union[bytes, str, IO[bytes], IO[str]],
+        *,
+        using: str = ...,
+        ignorenonexistent: bool = ...,
+        **options: Any
     ) -> None: ...
     def __next__(self) -> base.DeserializedObject: ...
 

@@ -5,6 +5,7 @@ from django.http.response import HttpResponse
 
 class RemovedInDjango40Warning(DeprecationWarning): ...
 class RemovedInDjango41Warning(PendingDeprecationWarning): ...
+
 RemovedInNextVersionWarning = RemovedInDjango40Warning
 
 class warn_about_renamed_method:

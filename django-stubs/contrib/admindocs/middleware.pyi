@@ -10,5 +10,5 @@ class XViewMiddleware(MiddlewareMixin):
         request: HttpRequest,
         view_func: Callable[..., HttpResponseBase],
         view_args: Tuple,
-        view_kwargs: Dict[Any, Any]
+        view_kwargs: Dict[Any, Any],
     ) -> Optional[HttpResponse]: ...

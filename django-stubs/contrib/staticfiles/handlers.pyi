@@ -1,11 +1,11 @@
 from typing import Any, Awaitable, Callable, Dict, Mapping, Sequence, Tuple
-
 from urllib.parse import ParseResult
-from django.http import HttpRequest
-from django.http.response import HttpResponseBase
+
+from django.core.handlers.asgi import ASGIHandler, ASGIRequest
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
-from django.core.handlers.asgi import ASGIHandler, ASGIRequest
+from django.http import HttpRequest
+from django.http.response import HttpResponseBase
 
 class StaticFilesHandlerMixin:
     handles_files: bool = ...

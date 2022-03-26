@@ -1,4 +1,6 @@
-from datetime import date, datetime as builtin_datetime, time, timedelta
+from datetime import date
+from datetime import datetime as builtin_datetime
+from datetime import time, timedelta
 from typing import Optional, Pattern
 
 date_re: Pattern[str]

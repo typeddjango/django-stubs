@@ -1,13 +1,17 @@
-from datetime import date, datetime as builtin_datetime, time
-from decimal import Decimal
-from typing import Any, Dict, Iterator, FrozenSet, List, Optional, TypeVar, Union, overload
 import types
+from datetime import date
+from datetime import datetime as builtin_datetime
+from datetime import time
+from decimal import Decimal
+from typing import Any, Dict, FrozenSet, Iterator, List, Optional, TypeVar, Union, overload
 
 ISO_INPUT_FORMATS: Dict[str, List[str]]
 FORMAT_SETTINGS: FrozenSet[str]
 
 def reset_format_cache() -> None: ...
-def iter_format_modules(lang: str, format_module_path: Optional[Union[List[str], str]] = ...) -> Iterator[types.ModuleType]: ...
+def iter_format_modules(
+    lang: str, format_module_path: Optional[Union[List[str], str]] = ...
+) -> Iterator[types.ModuleType]: ...
 def get_format_modules(lang: Optional[str] = ..., reverse: bool = ...) -> List[types.ModuleType]: ...
 def get_format(format_type: str, lang: Optional[str] = ..., use_l10n: Optional[bool] = ...) -> Any: ...
 
@@ -26,7 +30,7 @@ def number_format(
     force_grouping: bool = ...,
 ) -> str: ...
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 # Mypy considers this invalid (overlapping signatures), but thanks to implementation
 # details it works as expected (all values from Union are `localize`d to str,
@@ -37,12 +41,10 @@ def localize(  # type: ignore
 ) -> str: ...
 @overload
 def localize(value: _T, use_l10n: Optional[bool] = ...) -> _T: ...
-
 @overload
 def localize_input(  # type: ignore
     value: Union[builtin_datetime, date, time, Decimal, float, str], default: Optional[str] = ...
 ) -> str: ...
 @overload
 def localize_input(value: _T, default: Optional[str] = ...) -> _T: ...
-
 def sanitize_separators(value: _T) -> _T: ...

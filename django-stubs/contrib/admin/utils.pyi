@@ -1,9 +1,6 @@
 import datetime
 import sys
-from typing import (
-    Any, Callable, Dict, Iterable, List, Optional, Sequence, Set,
-    Tuple, Type, Union, overload
-)
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, Union, overload
 from uuid import UUID
 
 from django.contrib.admin.options import BaseModelAdmin
@@ -48,10 +45,7 @@ class NestedObjects(Collector):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def add_edge(self, source: Optional[Model], target: Model) -> None: ...
     def related_objects(
-        self,
-        related_model: Type[Model],
-        related_fields: Iterable[Field],
-        objs: _IndexableCollection[Model]
+        self, related_model: Type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]
     ) -> QuerySet[Model]: ...
     def nested(self, format_callback: Callable = ...) -> List[Any]: ...
     def can_fast_delete(self, *args: Any, **kwargs: Any) -> bool: ...
@@ -61,7 +55,6 @@ def model_ngettext(obj: Union[Options, QuerySet], n: Optional[int] = ...) -> str
 def lookup_field(
     name: Union[Callable, str], obj: Model, model_admin: Optional[BaseModelAdmin] = ...
 ) -> Tuple[Optional[Field], Optional[str], Any]: ...
-
 @overload
 def label_for_field(  # type: ignore
     name: Union[Callable, str],
@@ -78,7 +71,6 @@ def label_for_field(
     return_attr: Literal[False] = ...,
     form: Optional[BaseForm] = ...,
 ) -> str: ...
-
 def help_text_for_field(name: str, model: Type[Model]) -> str: ...
 def display_for_field(value: Any, field: Field, empty_value_display: str) -> str: ...
 def display_for_value(value: Any, empty_value_display: str, boolean: bool = ...) -> str: ...

@@ -1,4 +1,4 @@
-from typing import IO, Dict, Optional, TypeVar, Type, Union
+from typing import IO, Dict, Optional, Type, TypeVar, Union
 
 from django.core.files.base import File
 
@@ -42,7 +42,7 @@ class InMemoryUploadedFile(UploadedFile):
         content_type_extra: Dict[str, str] = ...,
     ) -> None: ...
 
-_C = TypeVar('_C', bound='SimpleUploadedFile')
+_C = TypeVar("_C", bound="SimpleUploadedFile")
 
 class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name: str, content: Optional[bytes], content_type: str = ...) -> None: ...

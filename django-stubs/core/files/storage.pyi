@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import IO, Any, List, Optional, Tuple, Type
 
 from django.core.files.base import File
-from django.utils.functional import LazyObject
 from django.utils._os import _PathCompatible
+from django.utils.functional import LazyObject
 
 class Storage:
     def open(self, name: str, mode: str = ...) -> File: ...
