@@ -37,7 +37,7 @@
         reveal_type(query.all().get()) # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.filter(age__gt=16).get()) # N: Revealed type is "Tuple[builtins.str]"
         reveal_type(query.exclude(age__lte=16).get()) # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.annotate(name_length=Length("name")).get()) # N: Revealed type is "builtins.tuple*[Any]"
+        reveal_type(query.annotate(name_length=Length("name")).get()) # N: Revealed type is "builtins.tuple*[Any, ...]"
     installed_apps:
         - myapp
     files:

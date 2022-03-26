@@ -289,7 +289,7 @@
         reveal_type(values_no_params)  # N: Revealed type is "builtins.dict*[builtins.str, Any]"
 
         values_list_no_params = Blog.objects.annotate(foo=F('id')).values_list().get()
-        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any]"
+        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any, ...]"
 
         values_list_flat_no_params = Blog.objects.annotate(foo=F('id')).values_list(flat=True).get()
         reveal_type(values_list_flat_no_params)  # N: Revealed type is "builtins.int*"
@@ -310,7 +310,7 @@
         qs1 = Blog.objects.values('text').annotate(foo=F('id'))
         reveal_type(qs1) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.dict[builtins.str, Any]]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
-        reveal_type(qs2) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.tuple[Any]]"
+        reveal_type(qs2) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.tuple[Any, ...]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
         # TODO: Would be nice to infer a NamedTuple which contains the field 'text' (str) + any number of other fields.
         #  The reason it would have to appear to have any other fields is that annotate could potentially be called with
@@ -327,7 +327,7 @@
         reveal_type(before_values_no_params)  # N: Revealed type is "builtins.dict*[builtins.str, Any]"
 
         before_values_list_no_params = Blog.objects.values_list().annotate(foo=F('id')).get()
-        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any]"
+        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any, ...]"
 
         before_values_list_flat_no_params = Blog.objects.values_list(flat=True).annotate(foo=F('id')).get()
         reveal_type(before_values_list_flat_no_params)  # N: Revealed type is "builtins.int*"

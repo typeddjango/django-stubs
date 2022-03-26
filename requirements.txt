@@ -1,4 +1,3 @@
-wheel
 black==22.1.0
 requests==2.27.1
 coreapi==2.3.3
@@ -9,4 +8,6 @@ pytest-mypy-plugins==1.9.3
 psycopg2-binary
 -e ./django_stubs_ext
 -e .
-mypy==0.931
+
+# Overrides:
+mypy==0.942
