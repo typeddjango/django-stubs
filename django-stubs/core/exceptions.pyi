@@ -1,6 +1,7 @@
-from typing import Any, Dict, Iterator, List, Literal, Mapping, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple, Union
 
 from django.forms.utils import ErrorDict
+from typing_extensions import Literal
 
 class FieldDoesNotExist(Exception): ...
 class AppRegistryNotReady(Exception): ...
