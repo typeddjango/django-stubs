@@ -7,7 +7,7 @@ from setuptools import find_packages
 
 def find_stub_files(name: str) -> List[str]:
     result = []
-    for root, dirs, files in os.walk(name):
+    for root, _dirs, files in os.walk(name):
         for file in files:
             if file.endswith(".pyi"):
                 if os.path.sep in root:
@@ -23,7 +23,7 @@ with open("README.md") as f:
 dependencies = [
     "mypy>=0.930,<0.950",
     "django",
-    "django-stubs-ext>=0.3.0",
+    "django-stubs-ext>=0.4.0",
     "tomli",
     # Types:
     "typing-extensions",
@@ -33,7 +33,7 @@ dependencies = [
 
 setup(
     name="django-stubs",
-    version="1.10.0",
+    version="1.10.1",
     description="Mypy stubs for Django",
     long_description=readme,
     long_description_content_type="text/markdown",
