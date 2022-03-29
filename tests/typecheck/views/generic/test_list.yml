@@ -21,6 +21,29 @@
                 class MyModel(models.Model):
                     ...
 
+-   case: nonqueryset_list_view
+    main: |
+        from typing import List
+
+        from django.views.generic import ListView
+        from django.db.models import QuerySet
+
+        from myapp.models import MyModel
+
+        class MyListView(ListView):
+            model = MyModel
+
+            def get_queryset(self) -> List[MyModel]:
+                ...
+    custom_settings: |
+        INSTALLED_APPS = ('myapp',)
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    ...
 
 -   case: generic_list_view_wrong
     main: |
@@ -49,4 +72,4 @@
     out: |
       main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "MultipleObjectMixin" defined the type as "Optional[Type[Other]]")
       main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "MultipleObjectMixin" defined the type as "Optional[_QuerySet[Other, Other]]")
-      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QuerySet[Other, Other]" in supertype "MultipleObjectMixin"
+      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "Iterable[Other]" in supertype "MultipleObjectMixin"
