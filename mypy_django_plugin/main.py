@@ -276,7 +276,7 @@ class NewSemanalDjangoPlugin(Plugin):
         if (
             info
             and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-            and class_name in self._get_current_manager_bases()
+            and "from_queryset_manager" in helpers.get_django_metadata(info)
         ):
             return resolve_manager_method
 
