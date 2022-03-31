@@ -1,31 +1,89 @@
 -   case: test_related_name_custom_manager
     main: |
-        from myapp.models import Model1
-        reveal_type(Model1().model_2)  # N: Revealed type is "myapp.models.Model2_RelatedManager"
-        reveal_type(Model1().model_3)  # N: Revealed type is "myapp.models.Model3_RelatedManager"
+      from app1.models import Model1
+      from app2.models import Model2
+
+      reveal_type(Model1().test)  # N: Revealed type is "app3.models.Model3_RelatedManager"
+      reveal_type(Model2().test)  # N: Revealed type is "app3.models.Model3_RelatedManager"
+      reveal_type(Model1().test2)  # N: Revealed type is "app3.models.Model4_RelatedManager"
+      reveal_type(Model2().test2)  # N: Revealed type is "app3.models.Model4_RelatedManager"
     installed_apps:
-      - myapp
-      - django.contrib.auth
+      - base
+      - users
+      - app1
+      - app2
+      - app3
     files:
-      - path: myapp/__init__.py
-      - path: myapp/models.py
+      - path: base/__init__.py
+      - path: base/models.py
         content: |
           from django.db import models
-          from django.contrib.auth.models import AbstractBaseUser
+          class OwnedModel(models.Model):
+              owner = models.ForeignKey("users.User", on_delete=models.CASCADE)
+
+              class Meta:
+                  abstract = True
+
+      - path: users/__init__.py
+      - path: users/models.py
+        content: |
+          from django.db import models
+          class User(models.Model):
+              pass
+
+      - path: app1/__init__.py
+      - path: app1/models.py
+        content: |
+          from django.db import models
+          from base.models import OwnedModel
+          from typing import TYPE_CHECKING
+          if TYPE_CHECKING:
+              from app3.models import Model3
 
           class CustomQuerySet(models.QuerySet):
               pass
 
-          class Model1(AbstractBaseUser):
+          Model1Manager = models.Manager.from_queryset(CustomQuerySet)
+          class Model1(OwnedModel):
+              objects = Model1Manager()
+
+      - path: app2/__init__.py
+      - path: app2/models.py
+        content: |
+          from django.db import models
+          from base.models import OwnedModel
+          from typing import TYPE_CHECKING
+          if TYPE_CHECKING:
+              from app3.models import Model3
+
+          class CustomQuerySet(models.QuerySet):
               pass
 
           Model2Manager = models.Manager.from_queryset(CustomQuerySet)
-          class Model2(models.Model):
-              model_1 = models.ForeignKey(Model1, related_name='model_2', on_delete=models.CASCADE)
+          class Model2(OwnedModel):
               objects = Model2Manager()
 
+      - path: app3/__init__.py
+      - path: app3/models.py
+        content: |
+          from django.db import models
+          from app1.models import Model1
+          from app2.models import Model2
+          from base.models import OwnedModel
+
+          class CustomQuerySet(models.QuerySet):
+              pass
+
           Model3Manager = models.Manager.from_queryset(CustomQuerySet)
-          class Model3(models.Model):
-              model_1 = models.ForeignKey(Model1, related_name='model_3', on_delete=models.CASCADE)
+          class Model3(OwnedModel):
+              a = models.ForeignKey(Model1, related_name="test", on_delete=models.CASCADE)
+              b = models.ForeignKey(Model2, related_name="test", on_delete=models.CASCADE)
+
               objects = Model3Manager()
 
+          Model4Manager = models.Manager.from_queryset(CustomQuerySet)
+          class Model4(OwnedModel):
+              a = models.ForeignKey(Model1, related_name="test2", on_delete=models.CASCADE)
+              b = models.ForeignKey(Model2, related_name="test2", on_delete=models.CASCADE)
+
+              objects = Model4Manager()
