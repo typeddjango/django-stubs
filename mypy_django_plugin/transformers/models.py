@@ -363,7 +363,7 @@ class AddRelatedManagers(ModelClassInitializer):
                     self.add_new_node_to_model_class(
                         attname, Instance(default_reverse_manager_info, []), no_serialize=True
                     )
-                    return
+                    continue
 
                 # The reverse manager we're looking for doesn't exist. So we create it.
                 # The (default) reverse manager type is built from a RelatedManager and the default manager on the related model
