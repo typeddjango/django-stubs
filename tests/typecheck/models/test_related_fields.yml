@@ -1,0 +1,31 @@
+-   case: test_related_name_custom_manager
+    main: |
+        from myapp.models import Model1
+        reveal_type(Model1().model_2)  # N: Revealed type is "myapp.models.Model2_RelatedManager"
+        reveal_type(Model1().model_3)  # N: Revealed type is "myapp.models.Model3_RelatedManager"
+    installed_apps:
+      - myapp
+      - django.contrib.auth
+    files:
+      - path: myapp/__init__.py
+      - path: myapp/models.py
+        content: |
+          from django.db import models
+          from django.contrib.auth.models import AbstractBaseUser
+
+          class CustomQuerySet(models.QuerySet):
+              pass
+
+          class Model1(AbstractBaseUser):
+              pass
+
+          Model2Manager = models.Manager.from_queryset(CustomQuerySet)
+          class Model2(models.Model):
+              model_1 = models.ForeignKey(Model1, related_name='model_2', on_delete=models.CASCADE)
+              objects = Model2Manager()
+
+          Model3Manager = models.Manager.from_queryset(CustomQuerySet)
+          class Model3(models.Model):
+              model_1 = models.ForeignKey(Model1, related_name='model_3', on_delete=models.CASCADE)
+              objects = Model3Manager()
+
