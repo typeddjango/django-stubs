@@ -2,8 +2,8 @@ from typing import Optional, Union
 
 from mypy.checker import TypeChecker, fill_typevars
 from mypy.nodes import (
-    CallExpr,
     GDEF,
+    CallExpr,
     Decorator,
     FuncBase,
     FuncDef,
@@ -96,6 +96,7 @@ def get_method_type_from_reverse_manager(
         else None
     )
 
+
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
     api = helpers.get_typechecker_api(ctx)
     method_type = get_method_type_from_dynamic_manager(
@@ -127,7 +128,7 @@ def resolve_manager_method(ctx: AttributeContext) -> MypyType:
     if isinstance(ctx.type, Instance):
         return resolve_manager_method_from_instance(instance=ctx.type, method_name=method_name, ctx=ctx)
     else:
-        ctx.api.fail(f"Unable to resolve return type of queryset/manager method \"{method_name}\"", ctx.context)
+        ctx.api.fail(f'Unable to resolve return type of queryset/manager method "{method_name}"', ctx.context)
         return AnyType(TypeOfAny.from_error)
 
 
