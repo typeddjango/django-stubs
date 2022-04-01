@@ -19,7 +19,7 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny, TypeVarType, UnboundType, UnionType, get_proper_type
+from mypy.types import TypeOfAny, TypeVarType, UnboundType, get_proper_type
 
 from mypy_django_plugin import errorcodes
 from mypy_django_plugin.lib import fullnames, helpers
