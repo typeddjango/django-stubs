@@ -3,6 +3,7 @@ from typing import Optional, Union
 from mypy.checker import TypeChecker, fill_typevars
 from mypy.nodes import (
     GDEF,
+    CallExpr,
     Decorator,
     FuncBase,
     FuncDef,
@@ -96,27 +97,39 @@ def get_method_type_from_reverse_manager(
     )
 
 
+def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
+    api = helpers.get_typechecker_api(ctx)
+    method_type = get_method_type_from_dynamic_manager(
+        api, method_name, instance.type
+    ) or get_method_type_from_reverse_manager(api, method_name, instance.type)
+
+    return method_type if method_type is not None else ctx.default_attr_type
+
+
 def resolve_manager_method(ctx: AttributeContext) -> MypyType:
     """
     A 'get_attribute_hook' that is intended to be invoked whenever the TypeChecker encounters
     an attribute on a class that has 'django.db.models.BaseManager' as a base.
     """
-    api = helpers.get_typechecker_api(ctx)
     # Skip (method) type that is currently something other than Any
     if not isinstance(ctx.default_attr_type, AnyType):
         return ctx.default_attr_type
 
     # (Current state is:) We wouldn't end up here when looking up a method from a custom _manager_.
     # That's why we only attempt to lookup the method for either a dynamically added or reverse manager.
-    assert isinstance(ctx.context, MemberExpr)
-    method_name = ctx.context.name
-    manager_instance = ctx.type
-    assert isinstance(manager_instance, Instance)
-    method_type = get_method_type_from_dynamic_manager(
-        api, method_name, manager_instance.type
-    ) or get_method_type_from_reverse_manager(api, method_name, manager_instance.type)
+    if isinstance(ctx.context, MemberExpr):
+        method_name = ctx.context.name
+    elif isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, MemberExpr):
+        method_name = ctx.context.callee.name
+    else:
+        ctx.api.fail("Unable to resolve return type of queryset/manager method", ctx.context)
+        return AnyType(TypeOfAny.from_error)
 
-    return method_type if method_type is not None else ctx.default_attr_type
+    if isinstance(ctx.type, Instance):
+        return resolve_manager_method_from_instance(instance=ctx.type, method_name=method_name, ctx=ctx)
+    else:
+        ctx.api.fail(f'Unable to resolve return type of queryset/manager method "{method_name}"', ctx.context)
+        return AnyType(TypeOfAny.from_error)
 
 
 def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext) -> None:
