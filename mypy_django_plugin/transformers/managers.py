@@ -121,14 +121,13 @@ def resolve_manager_method(ctx: AttributeContext) -> MypyType:
     elif isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, MemberExpr):
         method_name = ctx.context.callee.name
     else:
-        ctx.api.fail("Unable to resolve return type of manager method", ctx.context)
+        ctx.api.fail("Unable to resolve return type of queryset/manager method", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
     if isinstance(ctx.type, Instance):
-        print(f'Resolving return type of {ctx.type}')
         return resolve_manager_method_from_instance(instance=ctx.type, method_name=method_name, ctx=ctx)
     else:
-        ctx.api.fail(f"Unable to resolve return type of \"{method_name}\"", ctx.context)
+        ctx.api.fail(f"Unable to resolve return type of queryset/manager method \"{method_name}\"", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
 
