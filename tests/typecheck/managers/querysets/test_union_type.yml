@@ -4,13 +4,16 @@
         from django.db.models import QuerySet
         from myapp.models import User, Order
 
-        instance: Union[User, Order] = Order()
+        instance: Union[Order, User] = User()
 
         model_cls = type(instance)
 
-        reveal_type(model_cls.objects)  # N: ...
-        reveal_type(model_cls.objects.all())  # N: ...
-        reveal_type(model_cls.objects.my_method())  # N: ...
+        reveal_type(model_cls) # N: Revealed type is "Union[Type[myapp.models.Order], Type[myapp.models.User]]"
+        reveal_type(model_cls.objects)  # N: Revealed type is "Union[myapp.models.OrderManager[myapp.models.Order], myapp.models.UserManager[myapp.models.User]]"
+        model_cls.objects.my_method()  # E: Unable to resolve return type of "my_method"
+
+        # TODO: This also fails and somehow uses the first item in the union
+        # reveal_type(model_cls.objects.filter())  N: Revealed type is "Union[myapp.models.MyQuerySet[myapp.models.Order], myapp.models.MyQuerySet[myapp.models.User]]".
     installed_apps:
         - myapp
     files:

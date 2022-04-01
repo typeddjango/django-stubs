@@ -140,6 +140,7 @@ def set_descriptor_types_for_field(
 
 
 def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    print(f'Determine type of array field {ctx}')
     default_return_type = set_descriptor_types_for_field(ctx)
 
     base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, "base_field")
