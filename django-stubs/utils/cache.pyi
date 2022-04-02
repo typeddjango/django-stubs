@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple
 
 from django.core.cache.backends.base import BaseCache
 from django.http.request import HttpRequest

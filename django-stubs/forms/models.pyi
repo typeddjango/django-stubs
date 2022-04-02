@@ -1,5 +1,4 @@
 import sys
-from datetime import datetime
 from typing import (
     Any,
     Callable,
@@ -19,7 +18,6 @@ from typing import (
     Union,
     overload,
 )
-from unittest.mock import MagicMock
 from uuid import UUID
 
 from django.db import models
@@ -38,9 +36,9 @@ from django.forms.widgets import ChoiceWidget, Input, Widget
 from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
 
 if sys.version_info < (3, 8):
-    from typing_extensions import Literal, Protocol
+    from typing_extensions import Literal
 else:
-    from typing import Literal, Protocol
+    from typing import Literal
 
 ALL_FIELDS: Literal["__all__"]
 

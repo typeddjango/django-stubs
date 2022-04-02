@@ -1,6 +1,4 @@
-from typing import Any, Iterator, List, Mapping, Optional, Pattern, Tuple, Type, TypeVar, Union
-
-from django.utils.functional import SimpleLazyObject
+from typing import Iterator, List, Mapping, Optional, Pattern, Tuple, Type, TypeVar, Union
 
 ESCAPE_MAPPINGS: Mapping[str, Union[str, None]]
 
