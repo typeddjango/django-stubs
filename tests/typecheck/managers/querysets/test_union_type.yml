@@ -1,0 +1,33 @@
+-   case: union_queryset_custom_method
+    main: |
+        from typing import Union
+        from django.db.models import QuerySet
+        from myapp.models import User, Order
+
+        instance: Union[Order, User] = User()
+
+        model_cls = type(instance)
+
+        reveal_type(model_cls) # N: Revealed type is "Union[Type[myapp.models.Order], Type[myapp.models.User]]"
+        reveal_type(model_cls.objects)  # N: Revealed type is "Union[myapp.models.OrderManager[myapp.models.Order], myapp.models.UserManager[myapp.models.User]]"
+        model_cls.objects.my_method()  # E: Unable to resolve return type of queryset/manager method "my_method"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from __future__ import annotations
+                from django.db import models
+
+                class MyQuerySet(models.QuerySet):
+                    def my_method(self) -> MyQuerySet:
+                      pass
+
+                UserManager = models.Manager.from_queryset(MyQuerySet)
+                class User(models.Model):
+                    objects = UserManager()
+
+                OrderManager = models.Manager.from_queryset(MyQuerySet)
+                class Order(models.Model):
+                    objects = OrderManager()
