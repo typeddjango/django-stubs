@@ -11,5 +11,5 @@ class DatabaseClient(BaseDatabaseClient):
     def connect_string(settings_dict: Dict[str, Any]) -> str: ...
     @classmethod
     def settings_to_cmd_args_env(
-        self, settings_dict: Dict[str, Any], parameters: Iterable[str]
+        cls, settings_dict: Dict[str, Any], parameters: Iterable[str]
     ) -> Tuple[List[str], None]: ...
