@@ -1,0 +1,14 @@
+-   case: force_bytes_or_str
+    main: |
+      from django.utils.encoding import force_bytes, force_str
+      class S(str):
+          pass
+
+      reveal_type(force_bytes(123))  # N: Revealed type is "builtins.bytes"
+      reveal_type(force_bytes(123, strings_only=True))  # N: Revealed type is "builtins.int*"
+
+      reveal_type(force_str(123))  # N: Revealed type is "builtins.str"
+      reveal_type(force_str(123, strings_only=True))  # N: Revealed type is "builtins.int*"
+      reveal_type(force_str('foo'))  # N: Revealed type is "builtins.str*"
+      reveal_type(force_str('foo', strings_only=True))  # N: Revealed type is "builtins.str*"
+      reveal_type(force_str(S('foo'), strings_only=True))  # N: Revealed type is "main.S*"
