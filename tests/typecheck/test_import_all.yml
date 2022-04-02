@@ -104,12 +104,20 @@
         import django.contrib.postgres.fields.jsonb
         import django.contrib.postgres.fields.mixins
         import django.contrib.postgres.fields.ranges
+        import django.contrib.postgres.fields.utils
+        import django.contrib.postgres.forms
+        import django.contrib.postgres.forms.array
+        import django.contrib.postgres.forms.hstore
+        import django.contrib.postgres.forms.jsonb
+        import django.contrib.postgres.forms.ranges
+        import django.contrib.postgres.constraints
         import django.contrib.postgres.functions
         import django.contrib.postgres.indexes
         import django.contrib.postgres.lookups
         import django.contrib.postgres.operations
         import django.contrib.postgres.search
         import django.contrib.postgres.signals
+        import django.contrib.postgres.utils
         import django.contrib.postgres.validators
         import django.contrib.redirects
         import django.contrib.redirects.middleware
@@ -157,6 +165,7 @@
         import django.contrib.syndication
         import django.contrib.syndication.views
         import django.core.cache.backends
+        import django.core.asgi
         import django.core.cache.backends.base
         import django.core.cache.backends.db
         import django.core.cache.backends.dummy
@@ -188,6 +197,7 @@
         import django.core.files.uploadhandler
         import django.core.files.utils
         import django.core.handlers
+        import django.core.handlers.asgi
         import django.core.handlers.base
         import django.core.handlers.exception
         import django.core.handlers.wsgi
@@ -210,7 +220,10 @@
         import django.core.serializers
         import django.core.serializers.base
         import django.core.serializers.json
+        import django.core.serializers.jsonl
         import django.core.serializers.python
+        import django.core.serializers.pyyaml
+        import django.core.serializers.xml_serializer
         import django.core.servers
         import django.core.servers.basehttp
         import django.core.signals
@@ -379,9 +392,11 @@
         import django.urls.utils
         import django.utils._os
         import django.utils.archive
+        import django.utils.asyncio
         import django.utils.autoreload
         import django.utils.baseconv
         import django.utils.cache
+        import django.utils.connection
         import django.utils.crypto
         import django.utils.datastructures
         import django.utils.dateformat
@@ -409,7 +424,6 @@
         import django.utils.numberformat
         import django.utils.regex_helper
         import django.utils.safestring
-        import django.utils.six
         import django.utils.termcolors
         import django.utils.text
         import django.utils.timesince

@@ -1,4 +1,4 @@
 from .array import *
 from .hstore import *
-from .jsonb import *  # type: ignore  # due to weird mypy.stubtest error
+from .jsonb import *
 from .ranges import *
