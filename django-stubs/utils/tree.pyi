@@ -1,12 +1,12 @@
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from django.db.models.sql.where import NothingNode
 
-_NodeChildren = Iterable[Union["Node", NothingNode, Sequence[Any]]]
+_NodeChildren = List[Union["Node", NothingNode, Sequence[Any]]]
 
 class Node:
-    children: List[Any]
-    default: Any = ...
+    children: _NodeChildren
+    default: str = ...
     connector: str = ...
     negated: bool = ...
     def __init__(

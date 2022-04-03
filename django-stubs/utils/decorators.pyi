@@ -1,4 +1,4 @@
-from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union
+from typing import Callable, Iterable, Type, TypeVar, Union
 
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import classproperty as classproperty

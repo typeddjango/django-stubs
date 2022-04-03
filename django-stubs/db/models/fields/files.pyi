@@ -1,16 +1,26 @@
+import sys
 from pathlib import Path
 from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, overload
 
+from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
-from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
+from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+from django.db.models.query_utils import DeferredAttribute
+from django.utils._os import _PathCompatible
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Protocol
+else:
+    from typing import Protocol
 
 class FieldFile(File):
     instance: Model = ...
     field: FileField = ...
     storage: Storage = ...
+    name: Optional[str]
     def __init__(self, instance: Model, field: FileField, name: Optional[str]) -> None: ...
     file: Any = ...
     @property
@@ -24,23 +34,29 @@ class FieldFile(File):
     @property
     def closed(self) -> bool: ...
 
-class FileDescriptor:
+class FileDescriptor(DeferredAttribute):
     field: FileField = ...
-    def __init__(self, field: FileField) -> None: ...
     def __set__(self, instance: Model, value: Optional[Any]) -> None: ...
-    def __get__(self, instance: Optional[Model], cls: Type[Model] = ...) -> Union[FieldFile, FileDescriptor]: ...
+    def __get__(
+        self, instance: Optional[Model], cls: Optional[Type[Model]] = ...
+    ) -> Union[FieldFile, FileDescriptor]: ...
 
 _T = TypeVar("_T", bound="Field")
+_M = TypeVar("_M", bound=Model, contravariant=True)
+
+class _UploadToCallable(Protocol[_M]):
+    def __call__(self, __instance: _M, __filename: str) -> _PathCompatible: ...
 
 class FileField(Field):
     storage: Storage = ...
-    upload_to: Union[str, Callable] = ...
+    upload_to: Union[_PathCompatible, _UploadToCallable] = ...
     def __init__(
         self,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[str] = ...,
         name: Optional[str] = ...,
-        upload_to: Union[str, Callable, Path] = ...,
+        upload_to: Union[_PathCompatible, _UploadToCallable] = ...,
         storage: Optional[Union[Storage, Callable[[], Storage]]] = ...,
+        *,
         max_length: Optional[int] = ...,
         unique: bool = ...,
         blank: bool = ...,
@@ -57,8 +73,8 @@ class FileField(Field):
         help_text: str = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     # class access
     @overload  # type: ignore
@@ -69,7 +85,7 @@ class FileField(Field):
     # non-Model instances
     @overload
     def __get__(self: _T, instance, owner) -> _T: ...
-    def generate_filename(self, instance: Optional[Model], filename: str) -> str: ...
+    def generate_filename(self, instance: Optional[Model], filename: _PathCompatible) -> str: ...
 
 class ImageFileDescriptor(FileDescriptor):
     field: ImageField
@@ -86,7 +102,7 @@ class ImageField(FileField):
         name: Optional[str] = ...,
         width_field: Optional[str] = ...,
         height_field: Optional[str] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     # class access
     @overload  # type: ignore

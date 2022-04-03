@@ -1,11 +1,11 @@
-from typing import Any, Tuple, Union
+from typing import Tuple, Union
 
 BASE2_ALPHABET: str
 BASE16_ALPHABET: str
 BASE56_ALPHABET: str
 BASE36_ALPHABET: str
 BASE62_ALPHABET: str
-BASE64_ALPHABET: Any
+BASE64_ALPHABET: str
 
 class BaseConverter:
     decimal_digits: str = ...
@@ -16,9 +16,9 @@ class BaseConverter:
     def decode(self, s: str) -> int: ...
     def convert(self, number: Union[int, str], from_digits: str, to_digits: str, sign: str) -> Tuple[int, str]: ...
 
-base2: Any
-base16: Any
-base36: Any
-base56: Any
-base62: Any
-base64: Any
+base2: BaseConverter
+base16: BaseConverter
+base36: BaseConverter
+base56: BaseConverter
+base62: BaseConverter
+base64: BaseConverter

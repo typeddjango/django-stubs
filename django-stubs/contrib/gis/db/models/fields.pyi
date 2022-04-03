@@ -1,6 +1,7 @@
 from typing import Any, Iterable, NamedTuple, Optional, Tuple, TypeVar, Union
 
-from django.db.models.fields import Field, _ErrorMessagesToOverride, _FieldChoices, _ValidatorCallable
+from django.core.validators import _ValidatorCallable
+from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -21,6 +22,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         verbose_name: Optional[Union[str, bytes]] = ...,
         srid: int = ...,
         spatial_index: bool = ...,
+        *,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -40,7 +42,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     def deconstruct(self): ...
     def db_type(self, connection: Any): ...
@@ -66,6 +68,7 @@ class GeometryField(BaseSpatialField):
         verbose_name: Optional[Union[str, bytes]] = ...,
         dim: int = ...,
         geography: bool = ...,
+        *,
         extent: Tuple[float, float, float, float] = ...,
         tolerance: float = ...,
         srid: int = ...,
@@ -89,10 +92,10 @@ class GeometryField(BaseSpatialField):
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     def deconstruct(self): ...
-    def formfield(self, **kwargs: Any): ...
+    def formfield(self, **kwargs: Any): ...  # type: ignore[override]
     def select_format(self, compiler: Any, sql: Any, params: Any): ...
 
 class PointField(GeometryField):

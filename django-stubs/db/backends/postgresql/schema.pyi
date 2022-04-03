@@ -1,8 +1,10 @@
 from typing import Any
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor as BaseDatabaseSchemaEditor
+from django.db.backends.postgresql.base import DatabaseWrapper
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+    connection: DatabaseWrapper
     sql_create_sequence: str = ...
     sql_delete_sequence: str = ...
     sql_set_sequence_max: str = ...

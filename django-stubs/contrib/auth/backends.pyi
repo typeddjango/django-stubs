@@ -1,11 +1,11 @@
-from typing import Any, Optional, Set, Union
+from typing import Any, Optional, Set, TypeVar, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import AnonymousUser, Permission, User
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.db.models.base import Model
 from django.http.request import HttpRequest
 
-_AnyUser = Union[Model, AnonymousUser]
+_AnyUser = Union[AbstractBaseUser, AnonymousUser]
 
 UserModel: Any
 
@@ -18,6 +18,13 @@ class BaseBackend:
     def has_perm(self, user_obj: _AnyUser, perm: str, obj: Optional[Model] = ...) -> bool: ...
 
 class ModelBackend(BaseBackend):
+    def authenticate(
+        self,
+        request: Optional[HttpRequest],
+        username: Optional[str] = ...,
+        password: Optional[str] = ...,
+        **kwargs: Any
+    ) -> Optional[AbstractBaseUser]: ...
     def has_module_perms(self, user_obj: _AnyUser, app_label: str) -> bool: ...
     def user_can_authenticate(self, user: Optional[_AnyUser]) -> bool: ...
     def with_perm(
@@ -30,9 +37,11 @@ class ModelBackend(BaseBackend):
 
 class AllowAllUsersModelBackend(ModelBackend): ...
 
+_U = TypeVar("_U", bound=AbstractBaseUser)
+
 class RemoteUserBackend(ModelBackend):
     create_unknown_user: bool = ...
     def clean_username(self, username: str) -> str: ...
-    def configure_user(self, request: HttpRequest, user: User) -> User: ...
+    def configure_user(self, request: HttpRequest, user: _U) -> _U: ...
 
 class AllowAllUsersRemoteUserBackend(RemoteUserBackend): ...

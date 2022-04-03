@@ -1,7 +1,8 @@
-from typing import Optional, Tuple, cast
+from typing import Optional, Tuple, Union, cast
 
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.types import AnyType, Instance
@@ -12,7 +13,9 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 
 
-def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> Optional[Field]:
+def _get_current_field_from_assignment(
+    ctx: FunctionContext, django_context: DjangoContext
+) -> Optional[Union[Field, ForeignObjectRel]]:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
         return None

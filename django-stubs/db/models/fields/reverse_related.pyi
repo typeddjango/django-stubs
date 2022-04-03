@@ -1,30 +1,38 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+import sys
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
+from django.db.models import Q
 from django.db.models.base import Model
-from django.db.models.fields import AutoField, Field
-from django.db.models.fields.related import ForeignKey, OneToOneField, RelatedField
-from django.db.models.lookups import BuiltinLookup, StartsWith
+from django.db.models.fields import AutoField, Field, _AllLimitChoicesTo, _ChoicesList, _LimitChoicesTo
+from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToManyField, OneToOneField
+from django.db.models.lookups import BuiltinLookup, Lookup, StartsWith
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 
 from .mixins import FieldCacheMixin
 
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
+
+# Common note: `model` and `through` can be of type `str` when passed to `__init__`.
+# When parent's `contribute_to_class` is called (during startup),
+# strings are resolved to real model classes.
+# Thus `str` is acceptable in __init__, but instance attribute `model` is always
+# `Type[Model]`
+
 class ForeignObjectRel(FieldCacheMixin):
-    many_to_many: bool
-    many_to_one: bool
-    one_to_many: bool
-    one_to_one: bool
     auto_created: bool = ...
-    concrete: bool = ...
+    concrete: Literal[False] = ...
     editable: bool = ...
     is_relation: bool = ...
-    related_model: Type[Model]
     null: bool = ...
-    field: RelatedField = ...
-    model: Union[Type[Model], str] = ...
+    field: ForeignObject = ...
+    model: Type[Model] = ...
     related_name: Optional[str] = ...
     related_query_name: Optional[str] = ...
-    limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...
+    limit_choices_to: Optional[_AllLimitChoicesTo] = ...
     parent_link: bool = ...
     on_delete: Callable = ...
     symmetrical: bool = ...
@@ -32,29 +40,45 @@ class ForeignObjectRel(FieldCacheMixin):
     field_name: Optional[str] = ...
     def __init__(
         self,
-        field: RelatedField,
+        field: ForeignObject,
         to: Union[Type[Model], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
+        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
         parent_link: bool = ...,
-        on_delete: Optional[Callable] = ...,
+        on_delete: Callable = ...,
     ) -> None: ...
     @property
     def hidden(self) -> bool: ...
     @property
     def name(self) -> str: ...
     @property
-    def remote_field(self) -> RelatedField: ...
+    def remote_field(self) -> ForeignObject: ...
     @property
     def target_field(self) -> AutoField: ...
-    def get_lookup(self, lookup_name: str) -> Type[BuiltinLookup]: ...
+    @property
+    def related_model(self) -> Type[Model]: ...
+    @property
+    def many_to_many(self) -> bool: ...
+    @property
+    def many_to_one(self) -> bool: ...
+    @property
+    def one_to_many(self) -> bool: ...
+    @property
+    def one_to_one(self) -> bool: ...
+    def get_lookup(self, lookup_name: str) -> Optional[Type[Lookup]]: ...
     def get_internal_type(self) -> str: ...
     @property
-    def db_type(self) -> Callable: ...
+    def db_type(self) -> Any: ...
+    # Yes, seems that `get_choices` will fail if `limit_choices_to=None`
+    # and `self.limit_choices_to` is callable.
     def get_choices(
-        self, include_blank: bool = ..., blank_choice: List[Tuple[str, str]] = ...
-    ) -> List[Tuple[int, str]]: ...
+        self,
+        include_blank: bool = ...,
+        blank_choice: _ChoicesList = ...,
+        limit_choices_to: Optional[_LimitChoicesTo] = ...,
+        ordering: Sequence[str] = ...,
+    ) -> _ChoicesList: ...
     def is_hidden(self) -> bool: ...
     def get_joining_columns(self) -> Tuple: ...
     def get_extra_restriction(
@@ -65,20 +89,22 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_path_info(self, filtered_relation: Optional[FilteredRelation] = ...) -> List[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
+    field: ForeignKey
     def __init__(
         self,
         field: ForeignKey,
         to: Union[Type[Model], str],
-        field_name: Optional[str],
+        field_name: str,
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Union[Dict[str, Any], Callable[[], Any]]] = ...,
+        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
         parent_link: bool = ...,
         on_delete: Callable = ...,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
 
 class OneToOneRel(ManyToOneRel):
+    field: OneToOneField
     def __init__(
         self,
         field: OneToOneField,
@@ -86,24 +112,25 @@ class OneToOneRel(ManyToOneRel):
         field_name: Optional[str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[Dict[str, str]] = ...,
+        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
         parent_link: bool = ...,
         on_delete: Callable = ...,
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
-    through: Optional[Union[Type[Model], str]] = ...
+    field: ManyToManyField  # type: ignore
+    through: Optional[Type[Model]] = ...
     through_fields: Optional[Tuple[str, str]] = ...
     db_constraint: bool = ...
     def __init__(
         self,
-        field: RelatedField,
+        field: ManyToManyField,
         to: Union[Type[Model], str],
         related_name: Optional[str] = ...,
         related_query_name: Optional[str] = ...,
-        limit_choices_to: Any = ...,
+        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
         symmetrical: bool = ...,
-        through: Optional[Union[Type[Model], str]] = ...,
+        through: Union[Type[Model], str, None] = ...,
         through_fields: Optional[Tuple[str, str]] = ...,
         db_constraint: bool = ...,
     ) -> None: ...

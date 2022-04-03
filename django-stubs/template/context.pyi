@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Type, Union
 
 from django.http.request import HttpRequest
@@ -42,14 +43,16 @@ class Context(BaseContext):
     render_context: RenderContext = ...
     template: Optional[Template] = ...
     def __init__(
-        self, dict_: Any = ..., autoescape: bool = ..., use_l10n: Optional[bool] = ..., use_tz: None = ...
+        self, dict_: Any = ..., autoescape: bool = ..., use_l10n: Optional[bool] = ..., use_tz: Optional[bool] = ...
     ) -> None: ...
+    @contextmanager
     def bind_template(self, template: Template) -> Iterator[None]: ...
     def update(self, other_dict: Union[Dict[str, Any], Context]) -> ContextDict: ...
 
 class RenderContext(BaseContext):
     dicts: List[Dict[Union[IncludeNode, str], str]]
     template: Optional[Template] = ...
+    @contextmanager
     def push_state(self, template: Template, isolated_context: bool = ...) -> Iterator[None]: ...
 
 class RequestContext(Context):
@@ -57,19 +60,20 @@ class RequestContext(Context):
     dicts: List[Dict[str, str]]
     render_context: RenderContext
     template_name: Optional[str]
-    use_l10n: None
-    use_tz: None
+    use_l10n: Optional[bool]
+    use_tz: Optional[bool]
     request: HttpRequest = ...
     def __init__(
         self,
         request: HttpRequest,
         dict_: Optional[Dict[str, Any]] = ...,
         processors: Optional[List[Callable]] = ...,
-        use_l10n: None = ...,
-        use_tz: None = ...,
+        use_l10n: Optional[bool] = ...,
+        use_tz: Optional[bool] = ...,
         autoescape: bool = ...,
     ) -> None: ...
     template: Optional[Template] = ...
+    @contextmanager
     def bind_template(self, template: Template) -> Iterator[None]: ...
     def new(self, values: Optional[_ContextValues] = ...) -> RequestContext: ...
 

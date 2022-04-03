@@ -155,7 +155,8 @@ class NewSemanalDjangoPlugin(Plugin):
                     if related_model_module != file.fullname:
                         deps.add(self._new_dependency(related_model_module))
             # reverse relations
-            for relation in model_class._meta.related_objects:
+            # `related_objects` is private API (according to docstring)
+            for relation in model_class._meta.related_objects:  # type: ignore[attr-defined]
                 related_model_cls = self.django_context.get_field_related_model_cls(relation)
                 related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname:

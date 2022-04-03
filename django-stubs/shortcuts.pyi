@@ -13,13 +13,6 @@ if sys.version_info < (3, 8):
 else:
     from typing import Literal
 
-def render_to_response(
-    template_name: Union[str, Sequence[str]],
-    context: Optional[Mapping[str, Any]] = ...,
-    content_type: Optional[str] = ...,
-    status: Optional[int] = ...,
-    using: Optional[str] = ...,
-) -> HttpResponse: ...
 def render(
     request: HttpRequest,
     template_name: Union[str, Sequence[str]],
@@ -29,15 +22,16 @@ def render(
     using: Optional[str] = ...,
 ) -> HttpResponse: ...
 
-class SupportsGetAbsoluteUrl(Protocol): ...
+class SupportsGetAbsoluteUrl(Protocol):
+    def get_absolute_url(self) -> str: ...
 
 @overload
-def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True], **kwargs: Any
+def redirect(  # type: ignore
+    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True] = ..., **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[False], **kwargs: Any
+    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[False] = ..., **kwargs: Any
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(

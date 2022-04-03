@@ -1,8 +1,23 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union, overload
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Sized,
+    Tuple,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
-from django.utils.safestring import SafeText
+from django.utils.safestring import SafeString
 
 from .base import Node, Template
 
@@ -34,7 +49,7 @@ class Library:
     def inclusion_tag(
         self,
         filename: Union[Template, str],
-        func: None = ...,
+        func: Optional[Callable] = ...,
         takes_context: Optional[bool] = ...,
         name: Optional[str] = ...,
     ) -> Callable[[_C], _C]: ...
@@ -51,7 +66,7 @@ class TagHelperNode(Node):
         args: List[FilterExpression],
         kwargs: Dict[str, FilterExpression],
     ) -> None: ...
-    def get_resolved_arguments(self, context: Context) -> Tuple[List[int], Dict[str, Union[SafeText, int]]]: ...
+    def get_resolved_arguments(self, context: Context) -> Tuple[List[int], Dict[str, Union[SafeString, int]]]: ...
 
 class SimpleNode(TagHelperNode):
     args: List[FilterExpression]
@@ -89,13 +104,13 @@ class InclusionNode(TagHelperNode):
 
 def parse_bits(
     parser: Parser,
-    bits: List[str],
-    params: List[str],
+    bits: Iterable[str],
+    params: Sequence[str],
     varargs: Optional[str],
     varkw: Optional[str],
-    defaults: Optional[Tuple[Union[bool, str]]],
-    kwonly: List[str],
-    kwonly_defaults: Optional[Dict[str, int]],
+    defaults: Optional[Sized],
+    kwonly: Collection[str],
+    kwonly_defaults: Optional[Mapping[str, int]],
     takes_context: Optional[bool],
     name: str,
 ) -> Tuple[List[FilterExpression], Dict[str, FilterExpression]]: ...

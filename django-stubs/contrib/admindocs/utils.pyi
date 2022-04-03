@@ -1,19 +1,18 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional, Tuple
 
 docutils_is_available: bool
 
 def get_view_name(view_func: Callable) -> str: ...
-def trim_docstring(docstring: Any): ...
-def parse_docstring(docstring: Any): ...
-def parse_rst(text: Any, default_reference_context: Any, thing_being_parsed: Optional[Any] = ...): ...
+def parse_docstring(docstring: str) -> Tuple[str, str, Dict[str, str]]: ...
+def parse_rst(text: str, default_reference_context: Any, thing_being_parsed: Optional[Any] = ...): ...
 
-ROLES: Any
+ROLES: Dict[str, str]
 
-def create_reference_role(rolename: Any, urlbase: Any): ...
+def create_reference_role(rolename: str, urlbase: str) -> None: ...
 def default_reference_role(
-    name: Any,
-    rawtext: Any,
-    text: Any,
+    name: str,
+    rawtext: str,
+    text: str,
     lineno: Any,
     inliner: Any,
     options: Optional[Any] = ...,

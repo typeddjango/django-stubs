@@ -1,10 +1,10 @@
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple, Union
 
-color_names: Any
-foreground: Any
-background: Any
+color_names: Sequence
+foreground: Mapping[str, str]
+background: Mapping[str, str]
 RESET: str
-opt_dict: Any
+opt_dict: Mapping[str, str]
 
 def colorize(text: Optional[str] = ..., opts: Sequence[str] = ..., **kwargs: Any) -> str: ...
 def make_style(opts: Tuple = ..., **kwargs: Any) -> Callable: ...
@@ -15,4 +15,4 @@ LIGHT_PALETTE: str
 PALETTES: Any
 DEFAULT_PALETTE: str = ...
 
-def parse_color_setting(config_string: str) -> Optional[Dict[str, Dict[str, Union[Tuple[str], str]]]]: ...
+def parse_color_setting(config_string: str) -> Optional[Dict[str, Dict[str, Union[Tuple[str, ...], str]]]]: ...

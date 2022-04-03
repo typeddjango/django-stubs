@@ -1,0 +1,48 @@
+-   case: multivaluedict
+    main: |
+      from django.utils.datastructures import MultiValueDict
+      from typing import Dict, List, Tuple, Union
+
+      # check constructors
+      var1 = MultiValueDict()  # E: Need type annotation for "var1"
+      d2: Dict[str, List[Union[str, int]]] = {'foo': ['Foo'], 'bar': [2, 3]}
+      var2 = MultiValueDict(d2)
+      d3: Tuple[Tuple[str, List[Union[str, int]]], ...] = (('foo', ['Foo']), ('bar', [2, 3]))
+      var3 = MultiValueDict(d3)
+      reveal_type(var1)  # N: Revealed type is "django.utils.datastructures.MultiValueDict[Any, Any]"
+      reveal_type(var2)  # N: Revealed type is "django.utils.datastructures.MultiValueDict[builtins.str*, Union[builtins.str, builtins.int]]"
+      reveal_type(var3)  # N: Revealed type is "django.utils.datastructures.MultiValueDict[builtins.str*, Union[builtins.str, builtins.int]]"
+
+      # __getitem__, get, getlist (with proofs)
+      d = MultiValueDict({'foo': ['Foo']})
+      d.setlist('bar', [])
+      # actually 'Foo'
+      reveal_type(d['foo'])  # N: Revealed type is "Union[builtins.str*, builtins.list[builtins.object]]"
+      # actually []
+      reveal_type(d['bar'])  # N: Revealed type is "Union[builtins.str*, builtins.list[builtins.object]]"
+      # actually None
+      reveal_type(d.get('bar'))  # N: Revealed type is "Union[builtins.str*, None]"
+      # actually 1
+      reveal_type(d.get('bar', 1))  # N: Revealed type is "Union[builtins.str, builtins.int*]"
+      # actually []
+      reveal_type(d.getlist('bar'))  # N: Revealed type is "builtins.list[builtins.str]"
+      # actually []
+      reveal_type(d.getlist('bar', [1]))  # N: Revealed type is "Union[builtins.list[builtins.str], builtins.list*[builtins.int*]]"
+      # actually True (note that default can be not a list)
+      reveal_type(d.getlist('baz', True))  # N: Revealed type is "Union[builtins.list[builtins.str], builtins.bool*]"
+
+      # setters
+      reveal_type(d.setlistdefault('baz'))  # N: Revealed type is "builtins.list[builtins.str*]"
+      d.setlistdefault('baz', [1])  # E: List item 0 has incompatible type "int"; expected "str"
+      reveal_type(d.setlistdefault('baz', []))  # N: Revealed type is "builtins.list[builtins.str*]"
+      d.appendlist('baz', 'Baz')
+      d.appendlist('baz', 1)  # E: Argument 2 to "appendlist" of "MultiValueDict" has incompatible type "int"; expected "str"
+
+      # iterators
+      # actually [('foo', 'Foo'), ('bar', [])]
+      reveal_type(list(d.items()))  # N: Revealed type is "builtins.list[Tuple[builtins.str*, Union[builtins.str*, builtins.list[builtins.object]]]]"
+      reveal_type(list(d.keys()))  # N: Revealed type is "builtins.list[builtins.str*]"
+      # actually ['Foo', []]
+      reveal_type(list(d.values()))  # N: Revealed type is "builtins.list[Union[builtins.str*, builtins.list[builtins.object]]]"
+      # actually {'foo': 'Foo', 'bar': []}
+      reveal_type(d.dict())  # N: Revealed type is "builtins.dict[builtins.str*, Union[builtins.str*, builtins.list[builtins.object]]]"

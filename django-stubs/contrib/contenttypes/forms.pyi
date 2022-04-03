@@ -38,4 +38,6 @@ def generic_inlineformset_factory(
     for_concrete_model: bool = ...,
     min_num: Optional[Any] = ...,
     validate_min: bool = ...,
+    absolute_max: Optional[int] = ...,
+    can_delete_extra: bool = ...,
 ): ...

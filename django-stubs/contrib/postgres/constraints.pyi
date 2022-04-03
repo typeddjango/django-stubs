@@ -1,5 +1,6 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
+from django.db.models import Deferrable
 from django.db.models.constraints import BaseConstraint
 from django.db.models.expressions import Combinable
 from django.db.models.query_utils import Q
@@ -13,6 +14,9 @@ class ExclusionConstraint(BaseConstraint):
         *,
         name: str,
         expressions: Sequence[Tuple[Union[str, Combinable], str]],
-        condition: Optional[Q] = ...,
         index_type: Optional[str] = ...,
+        condition: Optional[Q] = ...,
+        deferrable: Optional[Deferrable] = ...,
+        include: Union[List[str], Tuple[str], None] = ...,
+        opclasses: Union[List[str], Tuple[str]] = ...,
     ): ...
