@@ -1,12 +1,13 @@
 -   case: multivaluedict
     main: |
       from django.utils.datastructures import MultiValueDict
+      from typing import Dict, List, Tuple, Union
 
       # check constructors
       var1 = MultiValueDict()  # E: Need type annotation for "var1"
-      d2: dict[str, list[str | int]] = {'foo': ['Foo'], 'bar': [2, 3]}
+      d2: Dict[str, List[Union[str, int]]] = {'foo': ['Foo'], 'bar': [2, 3]}
       var2 = MultiValueDict(d2)
-      d3: tuple[tuple[str, list[str | int]], ...] = (('foo', ['Foo']), ('bar', [2, 3]))
+      d3: Tuple[Tuple[str, List[Union[str, int]]], ...] = (('foo', ['Foo']), ('bar', [2, 3]))
       var3 = MultiValueDict(d3)
       reveal_type(var1)  # N: Revealed type is "django.utils.datastructures.MultiValueDict[Any, Any]"
       reveal_type(var2)  # N: Revealed type is "django.utils.datastructures.MultiValueDict[builtins.str*, Union[builtins.str, builtins.int]]"
