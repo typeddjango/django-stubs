@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
+
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
 else:
