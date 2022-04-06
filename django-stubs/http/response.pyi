@@ -1,7 +1,10 @@
 import datetime
 from io import BytesIO
 from json import JSONEncoder
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, TypeVar, Union, overload
+from typing import (
+    Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, TypeVar, Union,
+    overload, type_check_only
+)
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
@@ -81,6 +84,12 @@ class HttpResponseBase:
     def seekable(self) -> bool: ...
     def writable(self) -> bool: ...
     def writelines(self, lines: Iterable[object]) -> None: ...
+
+    # Fake methods that are implemented by all subclasses
+    @type_check_only
+    def __iter__(self) -> Iterator[bytes]: ...
+    @type_check_only
+    def getvalue(self) -> bytes: ...
 
 class HttpResponse(HttpResponseBase, Iterable[bytes]):
     content = _PropertyDescriptor[object, bytes]()
