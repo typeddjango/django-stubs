@@ -232,7 +232,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_attname(self) -> str: ...
     def value_to_string(self, obj: Model) -> str: ...
 
-class IntegerField(Field[_ST, _GT]):
+class IntegerField(Field[Union[float, int, str, Combinable], int]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: Union[str, int]
@@ -246,12 +246,12 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
 class SmallIntegerField(IntegerField[_ST, _GT]): ...
 class BigIntegerField(IntegerField[_ST, _GT]): ...
 
-class FloatField(Field[_ST, _GT]):
+class FloatField(Field[Union[float, int, str, Combinable], float]):
     _pyi_private_set_type: Union[float, int, str, Combinable]
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
 
-class DecimalField(Field[_ST, _GT]):
+class DecimalField(Field[Union[str, float, decimal.Decimal, Combinable], decimal.Decimal]):
     _pyi_private_set_type: Union[str, float, decimal.Decimal, Combinable]
     _pyi_private_get_type: decimal.Decimal
     _pyi_lookup_exact_type: Union[str, decimal.Decimal]
@@ -282,7 +282,7 @@ class DecimalField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
 
-class CharField(Field[_ST, _GT]):
+class CharField(Field[Union[str, int, Combinable], str]):
     _pyi_private_set_type: Union[str, int, Combinable]
     _pyi_private_get_type: str
     # objects are converted to string before comparison
@@ -374,7 +374,7 @@ class URLField(CharField[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
 
-class TextField(Field[_ST, _GT]):
+class TextField(Field[Union[str, Combinable], str]):
     _pyi_private_set_type: Union[str, Combinable]
     _pyi_private_get_type: str
     # objects are converted to string before comparison
@@ -406,21 +406,21 @@ class TextField(Field[_ST, _GT]):
         db_collation: Optional[str] = ...,
     ): ...
 
-class BooleanField(Field[_ST, _GT]):
+class BooleanField(Field[Union[bool, Combinable], bool]):
     _pyi_private_set_type: Union[bool, Combinable]
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
 
-class NullBooleanField(BooleanField[_ST, _GT]):
+class NullBooleanField(BooleanField[Optional[Union[bool, Combinable]]  # type: ignore, Optional[bool]  # type: ignore]):
     _pyi_private_set_type: Optional[Union[bool, Combinable]]  # type: ignore
     _pyi_private_get_type: Optional[bool]  # type: ignore
     _pyi_lookup_exact_type: Optional[bool]  # type: ignore
 
-class IPAddressField(Field[_ST, _GT]):
+class IPAddressField(Field[Union[str, Combinable], str]):
     _pyi_private_set_type: Union[str, Combinable]
     _pyi_private_get_type: str
 
-class GenericIPAddressField(Field[_ST, _GT]):
+class GenericIPAddressField(Field[Union[str, int, Callable[..., Any], Combinable], str]):
     _pyi_private_set_type: Union[str, int, Callable[..., Any], Combinable]
     _pyi_private_get_type: str
 
@@ -452,7 +452,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
 
 class DateTimeCheckMixin: ...
 
-class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
+class DateField(DateTimeCheckMixin, Field[Union[str, date, Combinable], date]):
     _pyi_private_set_type: Union[str, date, Combinable]
     _pyi_private_get_type: date
     _pyi_lookup_exact_type: Union[str, date]
@@ -481,7 +481,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
 
-class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
+class TimeField(DateTimeCheckMixin, Field[Union[str, time, real_datetime, Combinable], time]):
     _pyi_private_set_type: Union[str, time, real_datetime, Combinable]
     _pyi_private_get_type: time
     def __init__(
@@ -508,12 +508,12 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
 
-class DateTimeField(DateField[_ST, _GT]):
+class DateTimeField(DateField[Union[str, real_datetime, date, Combinable], real_datetime]):
     _pyi_private_set_type: Union[str, real_datetime, date, Combinable]
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: Union[str, real_datetime]
 
-class UUIDField(Field[_ST, _GT]):
+class UUIDField(Field[Union[str, uuid.UUID], uuid.UUID]):
     _pyi_private_set_type: Union[str, uuid.UUID]
     _pyi_private_get_type: uuid.UUID
     def __init__(
@@ -577,10 +577,10 @@ class FilePathField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
 
-class BinaryField(Field[_ST, _GT]):
+class BinaryField(Field[_ST, Union[bytes, memoryview]]):
     _pyi_private_get_type: Union[bytes, memoryview]
 
-class DurationField(Field[_ST, _GT]):
+class DurationField(Field[_ST, timedelta]):
     _pyi_private_get_type: timedelta
 
 class AutoFieldMixin:
@@ -588,7 +588,7 @@ class AutoFieldMixin:
 
 class AutoFieldMeta(type): ...
 
-class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):
+class AutoField(AutoFieldMixin, IntegerField[Union[Combinable, int, str], int], metaclass=AutoFieldMeta):
     _pyi_private_set_type: Union[Combinable, int, str]
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: Union[str, int]
