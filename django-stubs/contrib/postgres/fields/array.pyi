@@ -6,12 +6,8 @@ from django.db.models.expressions import Combinable
 from django.db.models.fields import _ErrorMessagesT, _FieldChoices
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 
-# __set__ value type
-_ST = TypeVar("_ST")
-# __get__ return type
-_GT = TypeVar("_GT")
 
-class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
+class ArrayField(CheckFieldDefaultMixin, Field[Union[Sequence[Any], Combinable], List[Any]]):
     _pyi_private_set_type: Union[Sequence[Any], Combinable]
     _pyi_private_get_type: List[Any]
 

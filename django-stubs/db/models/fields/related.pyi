@@ -108,7 +108,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
     @property
     def foreign_related_fields(self) -> Tuple[Field, ...]: ...
 
-class ForeignKey(ForeignObject[_ST, _GT]):
+class ForeignKey(ForeignObject[Union[Any, Combinable], Any]):
     _pyi_private_set_type: Union[Any, Combinable]
     _pyi_private_get_type: Any
 
@@ -157,7 +157,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...
 
-class OneToOneField(ForeignKey[_ST, _GT]):
+class OneToOneField(ForeignKey[Union[Any, Combinable], Any]):
     _pyi_private_set_type: Union[Any, Combinable]
     _pyi_private_get_type: Any
 
@@ -206,7 +206,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     @overload
     def __get__(self: _F, instance, owner) -> _F: ...
 
-class ManyToManyField(RelatedField[_ST, _GT]):
+class ManyToManyField(RelatedField[Sequence[Any], RelatedManager[Any]]):
     _pyi_private_set_type: Sequence[Any]
     _pyi_private_get_type: RelatedManager[Any]
 
