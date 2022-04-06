@@ -1,13 +1,9 @@
 import sys
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Mapping, Optional, Sequence, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from django.utils.datastructures import _ListOrTuple
 
 from .base import Operation
 
@@ -25,14 +21,14 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""] = ...
-    sql: Union[str, List[str], Tuple[str, ...]] = ...
-    reverse_sql: Optional[Union[str, List[str], Tuple[str, ...]]] = ...
+    sql: Union[str, _ListOrTuple[str]] = ...
+    reverse_sql: Optional[Union[str, _ListOrTuple[str]]] = ...
     state_operations: Sequence[Operation] = ...
     hints: Mapping[str, Any] = ...
     def __init__(
         self,
-        sql: Union[str, List[str], Tuple[str, ...]],
-        reverse_sql: Optional[Union[str, List[str], Tuple[str, ...]]] = ...,
+        sql: Union[str, _ListOrTuple[str]],
+        reverse_sql: Optional[Union[str, _ListOrTuple[str]]] = ...,
         state_operations: Sequence[Operation] = ...,
         hints: Optional[Mapping[str, Any]] = ...,
         elidable: bool = ...,
@@ -44,13 +40,13 @@ class _CodeCallable(Protocol):
 class RunPython(Operation):
     code: _CodeCallable = ...
     reverse_code: Optional[_CodeCallable] = ...
-    hints: Optional[Dict[str, Any]] = ...
+    hints: Mapping[str, Any] = ...
     def __init__(
         self,
         code: _CodeCallable,
         reverse_code: Optional[_CodeCallable] = ...,
         atomic: Optional[bool] = ...,
-        hints: Optional[Dict[str, Any]] = ...,
+        hints: Optional[Mapping[str, Any]] = ...,
         elidable: bool = ...,
     ) -> None: ...
     @staticmethod

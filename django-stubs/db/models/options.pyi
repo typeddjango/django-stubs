@@ -1,4 +1,7 @@
-from typing import Any, Dict, Generic, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
+from typing import (
+    Any, Dict, Generic, Iterable, List, Optional, Sequence, Set,
+    Tuple, Type, TypeVar, Union, overload,
+)
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -11,16 +14,24 @@ from django.db.models.fields.related import ManyToManyField, OneToOneField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
-from django.utils.datastructures import ImmutableList
+from django.utils.datastructures import ImmutableList, _ListOrTuple
 
 PROXY_PARENTS: object
 EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: Tuple[str, ...]
 
+_OptionTogetherT = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], Set[Tuple[str, ...]]]
+
+@overload
 def normalize_together(
-    option_together: Union[List[Tuple[str, str]], Tuple[Tuple[str, str], ...], Tuple[()], Tuple[str, str]]
-) -> Tuple[Tuple[str, str], ...]: ...
+    option_together: _ListOrTuple[Union[_ListOrTuple[str], str]]
+) -> Tuple[Tuple[str, ...], ...]: ...
+# Any other value will be returned unchanged, but probably only set is semantically allowed
+@overload
+def normalize_together(
+    option_together: Set[Tuple[str, ...]]
+) -> Set[Tuple[str, ...]]: ...
 
 _T = TypeVar("_T")
 
