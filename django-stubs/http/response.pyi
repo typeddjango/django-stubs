@@ -6,11 +6,7 @@ from typing import (
     overload, type_check_only
 )
 
-from django.core.handlers.wsgi import WSGIRequest
 from django.http.cookie import SimpleCookie
-from django.template import Context, Template
-from django.test.client import Client
-from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
 
 class BadHeaderError(ValueError): ...
@@ -103,14 +99,6 @@ class HttpResponse(HttpResponseBase, Iterable[bytes]):
     def serialize(self) -> bytes: ...
     __bytes__ = serialize
     def __iter__(self) -> Iterator[bytes]: ...
-    # Attributes assigned by monkey-patching in test client ClientHandler.__call__()
-    wsgi_request: WSGIRequest
-    # Attributes assigned by monkey-patching in test client Client.request()
-    client: Client
-    request: Dict[str, Any]
-    templates: List[Template]
-    context: Context
-    resolver_match: ResolverMatch
     def getvalue(self) -> bytes: ...
 
 class StreamingHttpResponse(HttpResponseBase, Iterable[bytes]):
@@ -120,13 +108,7 @@ class StreamingHttpResponse(HttpResponseBase, Iterable[bytes]):
     def getvalue(self) -> bytes: ...
 
 class FileResponse(StreamingHttpResponse):
-    client: Client
-    context: None
     file_to_stream: Optional[BytesIO]
-    request: Dict[str, str]
-    resolver_match: ResolverMatch
-    templates: List[Any]
-    wsgi_request: WSGIRequest
     block_size: int = ...
     as_attachment: bool = ...
     filename: str = ...
