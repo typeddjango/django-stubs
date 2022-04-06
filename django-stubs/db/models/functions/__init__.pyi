@@ -6,6 +6,7 @@ from .comparison import NullIf as NullIf
 from .datetime import Extract as Extract
 from .datetime import ExtractDay as ExtractDay
 from .datetime import ExtractHour as ExtractHour
+from .datetime import ExtractIsoWeekDay as ExtractIsoWeekDay
 from .datetime import ExtractIsoYear as ExtractIsoYear
 from .datetime import ExtractMinute as ExtractMinute
 from .datetime import ExtractMonth as ExtractMonth
