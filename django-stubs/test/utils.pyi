@@ -12,6 +12,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Protocol,
     Set,
     Tuple,
     Type,
@@ -139,12 +140,28 @@ def tag(*tags: str): ...
 _Signature = str
 _TestDatabase = Tuple[str, List[str]]
 
+class TimeKeeperProtocol(Protocol):
+    @contextmanager
+    def timed(self, name: Any) -> Iterator[None]: ...
+    def print_results(self) -> None: ...
+
 def dependency_ordered(
     test_databases: Iterable[Tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, List[str]]
 ) -> List[Tuple[_Signature, _TestDatabase]]: ...
 def get_unique_databases_and_mirrors(
     aliases: Optional[Set[str]] = ...,
 ) -> Tuple[Dict[_Signature, _TestDatabase], Dict[str, Any]]: ...
+def setup_databases(
+    verbosity: int,
+    interactive: bool,
+    *,
+    time_keeper: Optional[TimeKeeperProtocol] = ...,
+    keepdb: bool = ...,
+    debug_sql: bool = ...,
+    parallel: int = ...,
+    aliases: Optional[Mapping[str, Any]] = ...,
+    **kwargs: Any
+) -> List[Tuple[BaseDatabaseWrapper, str, bool]]: ...
 def teardown_databases(
     old_config: Iterable[Tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
 ) -> None: ...

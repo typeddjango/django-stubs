@@ -28,4 +28,4 @@ def checkout_django_branch(django_version: str, commit_sha: Optional[str]) -> Re
     )
     if commit_sha and repo.head.commit.hexsha != commit_sha:
         repo.remote("origin").fetch(branch, progress=ProgressPrinter(), depth=100)
-        repo.git.checkout(commit_sha)
+        repo.git.checkout(branch)
