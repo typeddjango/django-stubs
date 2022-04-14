@@ -1,7 +1,4 @@
-from typing import (
-    Any, Dict, Generic, Iterable, List, Optional, Sequence, Set,
-    Tuple, Type, TypeVar, Union, overload,
-)
+from typing import Any, Dict, Generic, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -24,14 +21,11 @@ DEFAULT_NAMES: Tuple[str, ...]
 _OptionTogetherT = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], Set[Tuple[str, ...]]]
 
 @overload
-def normalize_together(
-    option_together: _ListOrTuple[Union[_ListOrTuple[str], str]]
-) -> Tuple[Tuple[str, ...], ...]: ...
+def normalize_together(option_together: _ListOrTuple[Union[_ListOrTuple[str], str]]) -> Tuple[Tuple[str, ...], ...]: ...
+
 # Any other value will be returned unchanged, but probably only set is semantically allowed
 @overload
-def normalize_together(
-    option_together: Set[Tuple[str, ...]]
-) -> Set[Tuple[str, ...]]: ...
+def normalize_together(option_together: Set[Tuple[str, ...]]) -> Set[Tuple[str, ...]]: ...
 
 _T = TypeVar("_T")
 
