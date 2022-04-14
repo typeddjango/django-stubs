@@ -1,10 +1,7 @@
 import datetime
 from io import BytesIO
 from json import JSONEncoder
-from typing import (
-    Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, TypeVar, Union,
-    overload, type_check_only
-)
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, TypeVar, Union, overload, type_check_only
 
 from django.http.cookie import SimpleCookie
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor

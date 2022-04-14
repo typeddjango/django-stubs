@@ -35,6 +35,7 @@ RELATED_FIELDS_CLASSES = {FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME, MANYTOM
 MIGRATION_CLASS_FULLNAME = "django.db.migrations.migration.Migration"
 OPTIONS_CLASS_FULLNAME = "django.db.models.options.Options"
 HTTPREQUEST_CLASS_FULLNAME = "django.http.request.HttpRequest"
+QUERYDICT_CLASS_FULLNAME = "django.http.request.QueryDict"
 
 COMBINABLE_EXPRESSION_FULLNAME = "django.db.models.expressions.Combinable"
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"

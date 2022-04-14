@@ -32,6 +32,7 @@ from mypy_django_plugin.transformers.models import (
     process_model_class,
     set_auth_user_model_boolean_fields,
 )
+from mypy_django_plugin.transformers.request import check_querydict_is_mutable
 
 
 def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
@@ -187,6 +188,15 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
         class_fullname, _, method_name = fullname.rpartition(".")
+        # It is looked up very often, specialcase this method for minor speed up
+        if method_name == "__init_subclass__":
+            return None
+
+        if class_fullname.endswith("QueryDict"):
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
+                return partial(check_querydict_is_mutable, django_context=self.django_context)
+
         if method_name == "get_form_class":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
