@@ -197,12 +197,12 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
                 return partial(check_querydict_is_mutable, django_context=self.django_context)
 
-        if method_name == "get_form_class":
+        elif method_name == "get_form_class":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return forms.extract_proper_type_for_get_form_class
 
-        if method_name == "get_form":
+        elif method_name == "get_form":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return forms.extract_proper_type_for_get_form
@@ -214,30 +214,30 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
                 return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
 
-        if method_name == "values_list":
+        elif method_name == "values_list":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
                 return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
 
-        if method_name == "annotate":
+        elif method_name == "annotate":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
                 return partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context)
 
-        if method_name == "get_field":
+        elif method_name == "get_field":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
-        if class_fullname in manager_classes and method_name == "create":
+        elif class_fullname in manager_classes and method_name == "create":
             return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
-        if class_fullname in manager_classes and method_name in {"filter", "get", "exclude"}:
+        elif class_fullname in manager_classes and method_name in {"filter", "get", "exclude"}:
             return partial(
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
             )
 
-        if method_name == "from_queryset":
+        elif method_name == "from_queryset":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return fail_if_manager_type_created_in_model_body

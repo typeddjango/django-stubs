@@ -263,8 +263,6 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
                     semanal_api.defer()
                 return None
             original_return_type = method_type.ret_type
-            if original_return_type is None:
-                continue
 
             # Skip any method that doesn't return _QS
             original_return_type = get_proper_type(original_return_type)

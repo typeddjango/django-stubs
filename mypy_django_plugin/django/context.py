@@ -101,9 +101,6 @@ class DjangoContext:
     @cached_property
     def model_modules(self) -> Dict[str, Set[Type[Model]]]:
         """All modules that contain Django models."""
-        if self.apps_registry is None:
-            return {}
-
         modules: Dict[str, Set[Type[Model]]] = defaultdict(set)
         for concrete_model_cls in self.apps_registry.get_models():
             modules[concrete_model_cls.__module__].add(concrete_model_cls)
@@ -328,7 +325,7 @@ class DjangoContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":
+            if related_model_cls == "self":  # type: ignore[unreachable]
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:
@@ -367,9 +364,9 @@ class DjangoContext:
     def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Union[Field, ForeignObjectRel]:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
+
         if lookup_parts:
             raise LookupsAreUnsupported()
-
         return self._resolve_field_from_parts(field_parts, model_cls)
 
     def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
