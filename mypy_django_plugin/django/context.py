@@ -35,6 +35,7 @@ except ImportError:
 if TYPE_CHECKING:
     from django.apps.registry import Apps  # noqa: F401
     from django.conf import LazySettings  # noqa: F401
+    from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 @contextmanager
@@ -343,7 +344,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: Type[Model]
     ) -> Union[Field, ForeignObjectRel]:
         currently_observed_model = model_cls
-        field: Union[Field, ForeignObjectRel, None] = None
+        field: Union[Field, ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
@@ -359,7 +360,8 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 currently_observed_model = field.related_model
 
-        assert field is not None
+        # Guaranteed by `query.solve_lookup_type` before.
+        assert isinstance(field, (Field, ForeignObjectRel))
         return field
 
     def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Union[Field, ForeignObjectRel]:
