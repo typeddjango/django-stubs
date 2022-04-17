@@ -77,7 +77,7 @@ class FileField(Field):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     # class access
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def __get__(self, instance: None, owner) -> FileDescriptor: ...
     # Model instance access
     @overload
@@ -105,7 +105,7 @@ class ImageField(FileField):
         **kwargs: Any,
     ) -> None: ...
     # class access
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def __get__(self, instance: None, owner) -> ImageFileDescriptor: ...
     # Model instance access
     @overload

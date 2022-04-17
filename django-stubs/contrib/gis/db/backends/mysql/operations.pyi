@@ -12,16 +12,16 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     @property
     def mariadb(self) -> bool: ...
     @property
-    def mysql(self) -> bool: ...  # type: ignore
+    def mysql(self) -> bool: ...  # type: ignore[override]
     @property
-    def select(self) -> str: ...  # type: ignore
+    def select(self) -> str: ...  # type: ignore[override]
     @property
-    def from_text(self) -> str: ...  # type: ignore
+    def from_text(self) -> str: ...  # type: ignore[override]
     @property
     def gis_operators(self) -> Dict[str, SpatialOperator]: ...
     disallowed_aggregates: Any = ...
     @property
-    def unsupported_functions(self) -> Set[str]: ...  # type: ignore
+    def unsupported_functions(self) -> Set[str]: ...  # type: ignore[override]
     def geo_db_type(self, f: Any) -> Any: ...
     def get_distance(self, f: Any, value: Any, lookup_type: Any) -> List[Any]: ...
     def get_geometry_converter(self, expression: Any) -> Callable[[Any, Any, Any], Optional[GEOSGeometryBase]]: ...

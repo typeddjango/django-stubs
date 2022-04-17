@@ -413,9 +413,9 @@ class BooleanField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: bool
 
 class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: Optional[Union[bool, Combinable]]  # type: ignore
-    _pyi_private_get_type: Optional[bool]  # type: ignore
-    _pyi_lookup_exact_type: Optional[bool]  # type: ignore
+    _pyi_private_set_type: Optional[Union[bool, Combinable]]  # type: ignore[assignment]
+    _pyi_private_get_type: Optional[bool]  # type: ignore[assignment]
+    _pyi_lookup_exact_type: Optional[bool]  # type: ignore[assignment]
 
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, Combinable]

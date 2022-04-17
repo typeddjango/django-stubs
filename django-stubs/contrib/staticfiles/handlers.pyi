@@ -19,7 +19,7 @@ class StaticFilesHandlerMixin:
     def get_response(self, request: HttpRequest) -> HttpResponseBase: ...
     async def get_response_async(self, request: HttpRequest) -> HttpResponseBase: ...
 
-class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore
+class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore[misc]
     application: WSGIHandler
     base_url: ParseResult
     def __init__(self, application: WSGIHandler) -> None: ...
@@ -29,7 +29,7 @@ class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore
         start_response: Callable[[str, Sequence[Tuple[str, str]]], None],
     ) -> HttpResponseBase: ...
 
-class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore
+class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore[misc]
     application: ASGIHandler
     base_url: ParseResult
     def __init__(self, application: ASGIHandler) -> None: ...

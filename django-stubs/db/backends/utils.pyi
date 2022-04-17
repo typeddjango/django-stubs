@@ -52,15 +52,15 @@ class CursorDebugWrapper(CursorWrapper):
     ) -> Generator[None, None, None]: ...
 
 @overload
-def typecast_date(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
+def typecast_date(s: Union[None, Literal[""]]) -> None: ...  # type: ignore[misc]
 @overload
 def typecast_date(s: str) -> datetime.date: ...
 @overload
-def typecast_time(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
+def typecast_time(s: Union[None, Literal[""]]) -> None: ...  # type: ignore[misc]
 @overload
 def typecast_time(s: str) -> datetime.time: ...
 @overload
-def typecast_timestamp(s: Union[None, Literal[""]]) -> None: ...  # type: ignore
+def typecast_timestamp(s: Union[None, Literal[""]]) -> None: ...  # type: ignore[misc]
 @overload
 def typecast_timestamp(s: str) -> datetime.datetime: ...
 def split_identifier(identifier: str) -> Tuple[str, str]: ...

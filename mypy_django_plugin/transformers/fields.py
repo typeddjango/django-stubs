@@ -88,16 +88,16 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     related_model_info = helpers.lookup_class_typeinfo(typechecker_api, related_model)
     if related_model_info is None:
         # maybe no type stub
-        related_model_type = AnyType(TypeOfAny.unannotated)
+        related_model_type: MypyType = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_type = Instance(related_model_info, [])  # type: ignore
+        related_model_type = Instance(related_model_info, [])
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
     if related_model_to_set_info is None:
         # maybe no type stub
-        related_model_to_set_type = AnyType(TypeOfAny.unannotated)
+        related_model_to_set_type: MypyType = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
+        related_model_to_set_type = Instance(related_model_to_set_info, [])
 
     # replace Any with referred_to_type
     return reparametrize_related_field_type(

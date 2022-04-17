@@ -28,7 +28,7 @@ try:
     from django.contrib.postgres.fields import ArrayField
 except ImportError:
 
-    class ArrayField:  # type: ignore
+    class ArrayField:  # type: ignore[no-redef]
         pass
 
 
@@ -61,8 +61,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
 
         from django.db import models
 
-        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
-        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
+        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore[assignment]
+        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore[attr-defined]
 
         # Define mypy builtins, to not cause NameError during setting up Django.
         # TODO: temporary/unpatch
@@ -72,8 +72,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_models.cache_clear()  # type: ignore
-        apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.get_models.cache_clear()  # type: ignore[attr-defined]
+        apps.get_swappable_settings_name.cache_clear()  # type: ignore[attr-defined]
 
         if not settings.configured:
             settings._setup()

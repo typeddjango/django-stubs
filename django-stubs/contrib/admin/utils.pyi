@@ -56,7 +56,7 @@ def lookup_field(
     name: Union[Callable, str], obj: Model, model_admin: Optional[BaseModelAdmin] = ...
 ) -> Tuple[Optional[Field], Optional[str], Any]: ...
 @overload
-def label_for_field(  # type: ignore
+def label_for_field(  # type: ignore[misc]
     name: Union[Callable, str],
     model: Type[Model],
     model_admin: Optional[BaseModelAdmin] = ...,

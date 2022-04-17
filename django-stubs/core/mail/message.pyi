@@ -23,14 +23,14 @@ class MIMEMixin:
     def as_string(self, unixfrom: bool = ..., linesep: str = "\n") -> str: ...
     def as_bytes(self, unixfrom: bool = ..., linesep: str = "\n") -> bytes: ...
 
-class SafeMIMEMessage(MIMEMixin, MIMEMessage):  # type: ignore
+class SafeMIMEMessage(MIMEMixin, MIMEMessage):  # type: ignore[misc]
     defects: List[Any]
     epilogue: Any
     policy: Policy
     preamble: Any
     def __setitem__(self, name: str, val: str) -> None: ...
 
-class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore
+class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore[misc]
     defects: List[Any]
     epilogue: None
     policy: Policy
@@ -42,7 +42,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore
         self, payload: Union[List[Message], str, bytes], charset: Union[str, Charset.Charset, None] = ...
     ) -> None: ...
 
-class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore
+class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore[misc]
     defects: List[Any]
     epilogue: None
     policy: Policy

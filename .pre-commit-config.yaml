@@ -12,6 +12,15 @@ repos:
       - id: debug-statements
       - id: check-merge-conflict
       - id: end-of-file-fixer
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0
+    hooks:
+      - id: python-check-blanket-type-ignore
+        name: no bare type_ignores (pyi)
+        types: [pyi]
+      - id: python-check-blanket-type-ignore
+        name: no bare type_ignores (python)
+        types: [python]
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.32.0
     hooks:
@@ -37,7 +46,7 @@ repos:
       - id: flake8
   - repo: local
     hooks:
-      - id: stubs_mypy
+      - id: main_mypy
         name: mypy
         entry: mypy
         language: system

@@ -473,7 +473,7 @@ def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: Dj
 def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
     args = ctx.type.args
     type_arg = ctx.api.analyze_type(args[0])
-    api = cast(SemanticAnalyzer, ctx.api.api)  # type: ignore
+    api = cast(SemanticAnalyzer, ctx.api.api)  # type: ignore[attr-defined]
 
     if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
         return type_arg
@@ -520,7 +520,7 @@ def get_or_create_annotated_type(
         cast(TypeChecker, api), model_module_name + "." + type_name
     )
     if annotated_typeinfo is None:
-        model_module_file = api.modules[model_module_name]  # type: ignore
+        model_module_file = api.modules[model_module_name]  # type: ignore[union-attr]
 
         if isinstance(api, SemanticAnalyzer):
             annotated_model_type = api.named_type_or_none(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])

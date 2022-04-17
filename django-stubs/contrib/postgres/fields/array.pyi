@@ -49,5 +49,5 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ) -> None: ...
     @property
-    def description(self) -> str: ...  # type: ignore
+    def description(self) -> str: ...  # type: ignore[override]
     def get_transform(self, name: Any) -> Optional[Type[Transform]]: ...

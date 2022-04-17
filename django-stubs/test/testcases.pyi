@@ -174,7 +174,7 @@ class TransactionTestCase(SimpleTestCase):
         msg: Optional[str] = ...,
     ) -> None: ...
     @overload
-    def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore
+    def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore[misc]
     @overload
     def assertNumQueries(
         self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any

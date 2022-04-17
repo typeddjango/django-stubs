@@ -48,7 +48,7 @@ class SearchQueryCombinable:
     def __and__(self: _T, other: SearchQueryCombinable) -> _T: ...
     def __rand__(self: _T, other: SearchQueryCombinable) -> _T: ...
 
-class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
+class SearchQuery(SearchQueryCombinable, Func):  # type: ignore[misc]
     SEARCH_TYPES: Dict[str, str] = ...
     def __init__(
         self,
@@ -61,7 +61,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
     ): ...
     def __invert__(self: _T) -> _T: ...
 
-class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: ignore
+class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: ignore[misc]
     def __init__(
         self,
         lhs: Combinable,

@@ -26,7 +26,7 @@ class SupportsGetAbsoluteUrl(Protocol):
     def get_absolute_url(self) -> str: ...
 
 @overload
-def redirect(  # type: ignore
+def redirect(  # type: ignore[misc]
     to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True] = ..., **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
 @overload

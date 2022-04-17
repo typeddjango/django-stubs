@@ -50,7 +50,7 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     rel_class: Type[ForeignObjectRel]
     swappable: bool
     @property
-    def related_model(self) -> Type[Model]: ...  # type: ignore
+    def related_model(self) -> Type[Model]: ...  # type: ignore[override]
     def get_forward_related_filter(self, obj: Model) -> Dict[str, Union[int, UUID]]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
     @property
@@ -148,7 +148,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     # class access
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def __get__(self, instance: None, owner) -> ForwardManyToOneDescriptor: ...
     # Model instance access
     @overload
@@ -197,7 +197,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ): ...
     # class access
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def __get__(self, instance: None, owner) -> ForwardOneToOneDescriptor: ...
     # Model instance access
     @overload
@@ -257,7 +257,7 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
     ) -> None: ...
     # class access
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def __get__(self, instance: None, owner) -> ManyToManyDescriptor: ...
     # Model instance access
     @overload

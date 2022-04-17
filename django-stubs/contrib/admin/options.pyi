@@ -320,10 +320,10 @@ class InlineModelAdmin(Generic[_ChildModelT, _ParentModelT], BaseModelAdmin[_Chi
         self, request: HttpRequest, obj: Optional[_ParentModelT] = ..., **kwargs: Any
     ) -> Type[BaseInlineFormSet[_ChildModelT, _ParentModelT, forms.ModelForm[_ChildModelT]]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ChildModelT]: ...
-    def has_add_permission(self, request: HttpRequest, obj: Optional[_ParentModelT]) -> bool: ...  # type: ignore
-    def has_change_permission(self, request: HttpRequest, obj: Optional[_ParentModelT] = ...) -> bool: ...  # type: ignore
-    def has_delete_permission(self, request: HttpRequest, obj: Optional[_ParentModelT] = ...) -> bool: ...  # type: ignore
-    def has_view_permission(self, request: HttpRequest, obj: Optional[_ParentModelT] = ...) -> bool: ...  # type: ignore
+    def has_add_permission(self, request: HttpRequest, obj: Optional[_ParentModelT]) -> bool: ...  # type: ignore[override]
+    def has_change_permission(self, request: HttpRequest, obj: Optional[_ParentModelT] = ...) -> bool: ...  # type: ignore[override]
+    def has_delete_permission(self, request: HttpRequest, obj: Optional[_ParentModelT] = ...) -> bool: ...  # type: ignore[override]
+    def has_view_permission(self, request: HttpRequest, obj: Optional[_ParentModelT] = ...) -> bool: ...  # type: ignore[override]
 
 class StackedInline(InlineModelAdmin[_ChildModelT, _ParentModelT]):
     template: str = ...

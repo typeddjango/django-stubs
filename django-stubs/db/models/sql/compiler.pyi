@@ -99,7 +99,7 @@ class SQLCompiler:
     ) -> Iterator[Sequence[Any]]: ...
     def has_results(self) -> bool: ...
     @overload
-    def execute_sql(  # type: ignore
+    def execute_sql(  # type: ignore[misc]
         self, result_type: Literal["cursor"] = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> CursorWrapper: ...
     @overload
@@ -107,7 +107,7 @@ class SQLCompiler:
         self, result_type: Optional[Literal["no results"]] = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> None: ...
     @overload
-    def execute_sql(  # type: ignore
+    def execute_sql(  # type: ignore[misc]
         self, result_type: Literal["single"] = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> Optional[Iterable[Sequence[Any]]]: ...
     @overload
@@ -125,8 +125,8 @@ class SQLInsertCompiler(SQLCompiler):
     def prepare_value(self, field: Any, value: Any) -> Any: ...
     def pre_save_val(self, field: Any, obj: Any) -> Any: ...
     def assemble_as_sql(self, fields: Any, value_rows: Any) -> Tuple[List[List[str]], List[List[Any]]]: ...
-    def as_sql(self) -> List[_AsSqlType]: ...  # type: ignore
-    def execute_sql(  # type: ignore
+    def as_sql(self) -> List[_AsSqlType]: ...  # type: ignore[override]
+    def execute_sql(  # type: ignore[override]
         self, returning_fields: Optional[Sequence[str]] = ...
     ) -> List[Tuple[Any]]: ...  # 1-tuple
 
@@ -136,18 +136,18 @@ class SQLDeleteCompiler(SQLCompiler):
     def single_alias(self) -> bool: ...
     @property
     def contains_self_reference_subquery(self) -> bool: ...
-    def as_sql(self) -> _AsSqlType: ...  # type: ignore
+    def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
 class SQLUpdateCompiler(SQLCompiler):
     query: UpdateQuery
-    def as_sql(self) -> _AsSqlType: ...  # type: ignore
-    def execute_sql(self, result_type: Literal["cursor", "no results"]) -> int: ...  # type: ignore
-    def pre_sql_setup(self) -> None: ...  # type: ignore
+    def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
+    def execute_sql(self, result_type: Literal["cursor", "no results"]) -> int: ...  # type: ignore[override]
+    def pre_sql_setup(self) -> None: ...  # type: ignore[override]
 
 class SQLAggregateCompiler(SQLCompiler):
     query: AggregateQuery
     col_count: int = ...
-    def as_sql(self) -> _AsSqlType: ...  # type: ignore
+    def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
 def cursor_iter(
     cursor: CursorWrapper, sentinel: Any, col_count: Optional[int], itersize: int

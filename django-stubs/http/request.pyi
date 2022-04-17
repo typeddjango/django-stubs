@@ -143,7 +143,7 @@ class QueryDict(MultiValueDict[str, str]):
         encoding: Optional[str] = ...,
     ) -> None: ...
     @classmethod
-    def fromkeys(  # type: ignore
+    def fromkeys(  # type: ignore[override]
         cls: Type[_Q],
         iterable: Iterable[Union[bytes, str]],
         value: Union[str, bytes] = ...,
