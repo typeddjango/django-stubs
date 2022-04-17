@@ -38,9 +38,5 @@ else
 fi
 
 ./scripts/write_errors_cache.py
-# Always add even if it was set manually before
-git -c 'user.email=django_stubs_test@example.com' -c 'user.name=Cache writing bot' notes --ref cache_history add -f -F .custom_cache/.apply_errors $cur_hash
-git push origin refs/notes/cache_history
-
 cleanup
 exit $result

@@ -47,6 +47,13 @@ jobs:
           pip install 'Django>=3.2,<4.0' isort mypy types-pytz types-PyYAML types-docutils types-geoip2
       - name: Check against Django code
         run: ./scripts/compare_to_master.sh
+      - name: Save cache as notes
+        run: git -c 'user.email=django_stubs_test@example.com' -c 'user.name=Cache writing bot' notes --ref cache_history add -f -F .custom_cache/.apply_errors $cur_hash
+      - name: Push notes
+        uses: ad-m/github-push-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          branch: refs/notes/cache_history
 
   test:
     runs-on: ubuntu-latest
