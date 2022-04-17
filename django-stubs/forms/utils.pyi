@@ -3,11 +3,12 @@ from datetime import datetime
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 from django.core.exceptions import ValidationError
-from django.core.files import File
+from django.core.files.uploadedfile import UploadedFile
+from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeString
 
 _DataT = Mapping[str, Any]
-_FilesT = Mapping[str, Iterable[File]]
+_FilesT = MultiValueDict[str, UploadedFile]
 
 def pretty_name(name: str) -> str: ...
 def flatatt(attrs: Dict[str, Any]) -> SafeString: ...
