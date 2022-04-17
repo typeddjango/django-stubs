@@ -10,3 +10,4 @@ out/
 pip-wheel-metadata/
 stubgen/
 build/
+.custom_cache/

@@ -77,6 +77,28 @@ To execute the script run:
 python ./scripts/typecheck_tests.py --django_version 3.1
 ```
 
+We also have tests that compare `mypy` output on `django` itself when types from stubs are inserted into its code. To view actual errors produced by `mypy`, you can use
+
+```bash
+python ./scripts/compare_errors.py --check-only
+```
+
+To verify changes against master branch, run
+
+```bash
+python ./scripts/compare_to_master.py
+```
+
+NOTE: this doesn't work with uncommited changes, so stash or commit them in advance.
+
+To compare any two states, write cache for one of them and check another against it:
+
+```bash
+git checkout <reference>
+python ./scripts/write_errors_cache.py
+git checkout <new state>
+python ./scripts/compare_errors.py
+```
 
 ### Generating Stubs using Stubgen
 
