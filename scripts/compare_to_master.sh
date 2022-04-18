@@ -3,12 +3,7 @@
 set -euxo pipefail
 cleanup() {
     git remote remove tmp_upstream > /dev/null
-    if [ ! -z $cur_branch ]; then
-        git checkout $cur_branch > /dev/null
-    fi
 }
-
-cur_branch=$(git branch --show-current)
 
 # Will compare to master.
 git remote add tmp_upstream https://github.com/typeddjango/django-stubs || (cleanup && exit 2)
@@ -21,15 +16,15 @@ git fetch tmp_upstream refs/notes/*:refs/notes/*  --quiet # Use * so that it won
 ref_branch=tmp_upstream/master
 
 # Try to compare with master
-ref_hash=$(git rev-parse $ref_branch)
+ref_hash=$(git rev-parse "$ref_branch")
 if [ "$ref_hash" = "$cur_hash" ]; then
     # Already on master; compare to previous commit
-    ref_hash=$(git rev-parse $ref_branch^)
+    ref_hash=$(git rev-parse "$ref_branch"^)
 fi
 
 # Get result of run on ref_hash (should fail on first workflow run)
-git notes --ref cache_history show $ref_hash > .custom_cache/.apply_errors && true
-if [ $? -eq 0 ]; then
+if git notes --ref cache_history show "$ref_hash" > .custom_cache/.apply_errors && true;
+then
     ./scripts/compare_errors.py && true
     result=$?
 else
