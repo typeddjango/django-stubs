@@ -2,7 +2,11 @@
 -   case: annotated_should_not_iterfere
     main: |
         from dataclasses import dataclass
-        from typing import Annotated
+        import sys
+        if sys.version_info < (3, 8):
+            from typing_extensions import Annotated
+        else:
+            from typing import Annotated
 
         class IntegerType:
             def __init__(self, min_value: int, max_value: int) -> None:
