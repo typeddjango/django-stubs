@@ -15,7 +15,7 @@ from mypy.types import TypedDictType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME
+from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME, MODEL_CLASS_FULLNAME
 from mypy_django_plugin.lib.helpers import add_new_class_for_module
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
@@ -475,8 +475,8 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext
     type_arg = ctx.api.analyze_type(args[0])
     api = cast(SemanticAnalyzer, ctx.api.api)  # type: ignore
 
-    if not isinstance(type_arg, Instance):
-        return ctx.api.analyze_type(ctx.type)
+    if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
+        return type_arg
 
     fields_dict = None
     if len(args) > 1:
