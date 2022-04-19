@@ -50,6 +50,7 @@ _ErrorMessages = Dict[str, Dict[str, str]]
 _FormFieldCallback = Callable[[models.Field], Field]
 
 _M = TypeVar("_M", bound=Model)
+_ParentM = TypeVar("_ParentM", bound=Model)
 
 def construct_instance(
     form: BaseForm, instance: _M, fields: Optional[Container[str]] = ..., exclude: Optional[Container[str]] = ...
@@ -187,8 +188,8 @@ def modelformset_factory(
     can_delete_extra: bool = ...,
 ) -> Type[BaseModelFormSet[_M, _ModelFormT]]: ...
 
-class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
-    instance: Model = ...
+class BaseInlineFormSet(Generic[_M, _ParentM, _ModelFormT], BaseModelFormSet[_M, _ModelFormT]):
+    instance: _ParentM
     save_as_new: bool = ...
     unique_fields: Collection[str] = ...
     fk: ForeignKey  # set by inlineformset_set
@@ -196,7 +197,7 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
         self,
         data: Optional[_DataT] = ...,
         files: Optional[_FilesT] = ...,
-        instance: Optional[_M] = ...,
+        instance: Optional[_ParentM] = ...,
         save_as_new: bool = ...,
         prefix: Optional[str] = ...,
         queryset: Optional[QuerySet[_M]] = ...,
@@ -210,7 +211,7 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
     def get_unique_error_message(self, unique_check: Sequence[str]) -> str: ...
 
 def inlineformset_factory(
-    parent_model: Type[Model],
+    parent_model: Type[_ParentM],
     model: Type[_M],
     form: Type[_ModelFormT] = ...,
     formset: Type[BaseInlineFormSet] = ...,
@@ -233,7 +234,7 @@ def inlineformset_factory(
     field_classes: Optional[Mapping[str, Type[Field]]] = ...,
     absolute_max: Optional[int] = ...,
     can_delete_extra: bool = ...,
-) -> Type[BaseInlineFormSet[_M, _ModelFormT]]: ...
+) -> Type[BaseInlineFormSet[_M, _ParentM, _ModelFormT]]: ...
 
 class InlineForeignKeyField(Field):
     disabled: bool
