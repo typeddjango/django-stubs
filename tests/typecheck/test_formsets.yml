@@ -1,0 +1,21 @@
+- case: inlineformset_factory
+  main: |
+    from typing import Any, Type
+    from django import forms
+    from myapp.models import Article, Category
+    ArticleFS: Type[forms.BaseInlineFormSet[Article, Category, Any]] = forms.inlineformset_factory(Category, Article)
+    ArticleFS(instance=Article())  # E: Argument "instance" to "BaseInlineFormSet" has incompatible type "Article"; expected "Optional[Category]"
+    fs = ArticleFS(instance=Category())
+    reveal_type(fs.instance)  # N: Revealed type is "myapp.models.Category*"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class Article(models.Model):
+            pass
+        class Category(models.Model):
+            pass
