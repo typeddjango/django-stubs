@@ -143,6 +143,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     description: Union[str, _Getter[str]]
     blank: bool
     null: bool
+    unique: bool
     editable: bool
     empty_strings_allowed: bool = ...
     choices: Optional[_ChoicesList] = ...
