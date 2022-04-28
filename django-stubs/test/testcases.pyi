@@ -32,7 +32,6 @@ from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.functional import classproperty
-from django.utils.safestring import SafeString
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...
@@ -76,7 +75,7 @@ class SimpleTestCase(unittest.TestCase):
     def modify_settings(self, **kwargs: Any) -> Any: ...
     def assertRedirects(
         self,
-        response: HttpResponse,
+        response: HttpResponseBase,
         expected_url: str,
         status_code: int = ...,
         target_status_code: int = ...,
@@ -94,7 +93,7 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertNotContains(
         self,
-        response: HttpResponse,
+        response: HttpResponseBase,
         text: Union[bytes, str],
         status_code: int = ...,
         msg_prefix: str = ...,
@@ -102,7 +101,7 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertFormError(
         self,
-        response: HttpResponse,
+        response: HttpResponseBase,
         form: str,
         field: Optional[str],
         errors: Union[List[str], str],
@@ -110,7 +109,7 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertFormsetError(
         self,
-        response: HttpResponse,
+        response: HttpResponseBase,
         formset: str,
         form_index: Optional[int],
         field: Optional[str],
@@ -119,13 +118,13 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertTemplateUsed(
         self,
-        response: Optional[Union[HttpResponse, str]] = ...,
+        response: Optional[Union[HttpResponseBase, str]] = ...,
         template_name: Optional[str] = ...,
         msg_prefix: str = ...,
         count: Optional[int] = ...,
     ) -> Optional[_AssertTemplateUsedContext]: ...
     def assertTemplateNotUsed(
-        self, response: Union[HttpResponse, str] = ..., template_name: Optional[str] = ..., msg_prefix: str = ...
+        self, response: Union[HttpResponseBase, str] = ..., template_name: Optional[str] = ..., msg_prefix: str = ...
     ) -> Optional[_AssertTemplateNotUsedContext]: ...
     def assertRaisesMessage(
         self, expected_exception: Type[Exception], expected_message: str, *args: Any, **kwargs: Any
