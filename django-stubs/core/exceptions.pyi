@@ -1,8 +1,6 @@
 import sys
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
-from django.forms.utils import ErrorDict
-
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
 else:
@@ -32,18 +30,6 @@ class FieldError(Exception): ...
 
 NON_FIELD_ERRORS: Literal["__all__"] = ...
 
-_MsgTypeBase = Union[str, ValidationError]
-# Yeah, it's really ugly, but __init__ checks with isinstance()
-_MsgType = Union[
-    _MsgTypeBase,
-    Dict[str, _MsgTypeBase],
-    List[_MsgTypeBase],
-    Dict[str, str],
-    Dict[str, ValidationError],
-    List[str],
-    List[ValidationError],
-]
-
 class ValidationError(Exception):
     error_dict: Dict[str, List[ValidationError]] = ...
     error_list: List[ValidationError] = ...
@@ -52,7 +38,8 @@ class ValidationError(Exception):
     params: Optional[Dict[str, Any]] = ...
     def __init__(
         self,
-        message: _MsgType,
+        # Accepts arbitrarily nested data structure, mypy doesn't allow describing it accurately.
+        message: Union[str, ValidationError, Dict[str, Any], List[Any]],
         code: Optional[str] = ...,
         params: Optional[Dict[str, Any]] = ...,
     ) -> None: ...
