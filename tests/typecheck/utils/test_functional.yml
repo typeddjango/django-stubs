@@ -11,7 +11,7 @@
           reveal_type(attr.name) # N: Revealed type is "builtins.str"
 
       reveal_type(Foo.attr)      # N: Revealed type is "django.utils.functional.cached_property[builtins.list[builtins.str]]"
-      reveal_type(Foo.attr.func) # N: Revealed type is "def (*Any, **Any) -> builtins.list*[builtins.str]"
+      reveal_type(Foo.attr.func) # N: Revealed type is "def (*Any, **Any) -> builtins.list[builtins.str]"
 
       f = Foo()
       reveal_type(f.attr)        # N: Revealed type is "builtins.list[builtins.str]"
