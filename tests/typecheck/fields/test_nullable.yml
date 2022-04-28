@@ -34,7 +34,7 @@
 -   case: nullable_field_with_strict_optional_true
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().text)  # N: Revealed type is "builtins.str*"
+        reveal_type(MyModel().text)  # N: Revealed type is "builtins.str"
         reveal_type(MyModel().text_nullable)  # N: Revealed type is "Union[builtins.str, None]"
         MyModel().text = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")
         MyModel().text_nullable = None

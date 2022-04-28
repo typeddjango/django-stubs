@@ -2,7 +2,7 @@
     main: |
         from myapp.models import Book, Publisher
         book = Book()
-        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher*"
+        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
         publisher = Publisher()
         reveal_type(publisher.books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
     installed_apps:
@@ -22,8 +22,8 @@
     main: |
         from myapp.models import Book
         book = Book()
-        reveal_type(book.publisher_id)  # N: Revealed type is "builtins.int*"
-        reveal_type(book.owner_id)  # N: Revealed type is "builtins.int*"
+        reveal_type(book.publisher_id)  # N: Revealed type is "builtins.int"
+        reveal_type(book.owner_id)  # N: Revealed type is "builtins.int"
     installed_apps:
         - django.contrib.auth
         - myapp
@@ -42,8 +42,8 @@
     main: |
         from myapp.models import Book, Publisher
         book = Book()
-        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher*"
-        reveal_type(book.publisher2)  # N: Revealed type is "myapp.models.Publisher*"
+        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
+        reveal_type(book.publisher2)  # N: Revealed type is "myapp.models.Publisher"
 
         publisher = Publisher()
         reveal_type(publisher.books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
@@ -66,7 +66,7 @@
     main: |
         from myapp2.models import Book
         book = Book()
-        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher*"
+        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
     installed_apps:
         - myapp
         - myapp2
@@ -88,7 +88,7 @@
     main: |
         from myapp.models import User, Profile
         reveal_type(User().profile)  # N: Revealed type is "myapp.models.Profile"
-        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User*"
+        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User"
     installed_apps:
         - myapp
     files:
@@ -197,7 +197,7 @@
 -   case: models_imported_inside_init_file_one_to_one_field
     main: |
         from myapp2.models import Profile
-        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.user.User*"
+        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.user.User"
         reveal_type(Profile().user.profile)  # N: Revealed type is "myapp2.models.Profile"
     installed_apps:
         - myapp
@@ -223,7 +223,7 @@
 -   case: models_triple_circular_reference
     main: |
         from myapp.models import App
-        reveal_type(App().owner)  # N: Revealed type is "myapp.models.user.User*"
+        reveal_type(App().owner)  # N: Revealed type is "myapp.models.user.User"
         reveal_type(App().owner.profile)  # N: Revealed type is "myapp.models.profile.Profile"
     installed_apps:
         - myapp
@@ -253,7 +253,7 @@
 -   case: many_to_many_field_converts_to_queryset_of_model_type
     main: |
         from myapp.models import App, Member
-        reveal_type(Member().apps)  # N: Revealed type is "django.db.models.manager.RelatedManager*[myapp.models.App]"
+        reveal_type(Member().apps)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.App]"
         reveal_type(App().members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
     installed_apps:
         - myapp
@@ -270,7 +270,7 @@
 -   case: many_to_many_works_with_string_if_imported
     main: |
         from myapp.models import Member
-        reveal_type(Member().apps)  # N: Revealed type is "django.db.models.manager.RelatedManager*[myapp2.models.App]"
+        reveal_type(Member().apps)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp2.models.App]"
     installed_apps:
         - myapp
         - myapp2
@@ -291,7 +291,7 @@
 -   case: foreign_key_with_self
     main: |
         from myapp.models import User
-        reveal_type(User().parent)  # N: Revealed type is "myapp.models.User*"
+        reveal_type(User().parent)  # N: Revealed type is "myapp.models.User"
     installed_apps:
         - myapp
     files:
@@ -305,7 +305,7 @@
 -   case: many_to_many_with_self
     main: |
         from myapp.models import User
-        reveal_type(User().friends)  # N: Revealed type is "django.db.models.manager.RelatedManager*[myapp.models.User]"
+        reveal_type(User().friends)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.User]"
     installed_apps:
         - myapp
     files:
@@ -354,14 +354,14 @@
         import datetime
         from myapp.models import Book, Book2
 
-        reveal_type(Book().publisher_id)  # N: Revealed type is "builtins.str*"
+        reveal_type(Book().publisher_id)  # N: Revealed type is "builtins.str"
         Book(publisher_id=1)
         Book(publisher_id='hello')
         Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable]")
         Book.objects.create(publisher_id=1)
         Book.objects.create(publisher_id='hello')
 
-        reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int*"
+        reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int"
         Book2(publisher_id=1)
         Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
         Book2.objects.create(publisher_id=1)
@@ -387,7 +387,7 @@
 -   case: if_model_is_defined_as_name_of_the_class_look_for_it_in_the_same_app
     main: |
         from myapp.models import Book
-        reveal_type(Book().publisher)  # N: Revealed type is "myapp.models.publisher.Publisher*"
+        reveal_type(Book().publisher)  # N: Revealed type is "myapp.models.publisher.Publisher"
     installed_apps:
         - myapp
     files:
@@ -434,7 +434,7 @@
     main: |
         from myapp.models import Book, Publisher
         book = Book()
-        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher*"
+        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
 
         publisher = Publisher()
         reveal_type(publisher.books)
@@ -461,7 +461,7 @@
     main: |
         from myapp.models import Book
         book = Book()
-        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher*"
+        reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
         BOOK_RELATED_MODEL = 'myapp.Publisher'
@@ -481,7 +481,7 @@
 -   case: foreign_key_with_custom_app_name
     main: |
         from myapp.models import MyMain
-        reveal_type(MyMain().user)  # N: Revealed type is "myapp2.models.MyUser*"
+        reveal_type(MyMain().user)  # N: Revealed type is "myapp2.models.MyUser"
     installed_apps:
         - myapp
         - myapp2.apps.MyApp2Config
@@ -509,7 +509,7 @@
 -   case: related_field_to_extracted_from_function
     main: |
         from myapp.models import Profile
-        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User*"
+        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User"
     installed_apps:
         - myapp
     files:
@@ -576,8 +576,8 @@
 -   case: test_foreign_key_from_superclass_inherits_correctly
     main: |
         from myapp.models import MyUser, Book, Article, LibraryEntity
-        reveal_type(Book().registered_by_user)  # N: Revealed type is "myapp.models.MyUser*"
-        reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser*"
+        reveal_type(Book().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
 
         user = MyUser()
         reveal_type(user.book_set) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
@@ -604,16 +604,16 @@
 -   case: test_foreign_key_from_superclass_inherits_correctly_when_also_inheriting_manager
     main: |
         from myapp.models import MyUser, Book, Article, LibraryEntity
-        reveal_type(Book().registered_by_user)  # N: Revealed type is "myapp.models.MyUser*"
-        reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser*"
+        reveal_type(Book().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
 
         user = MyUser()
         reveal_type(user.book_set) # N: Revealed type is "myapp.models.Book_RelatedManager"
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
-        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book*, builtins.int], *, bulk: builtins.bool =)"
-        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article*, builtins.int], *, bulk: builtins.bool =)"
-        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book*]"
-        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article*]"
+        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], *, bulk: builtins.bool =)"
+        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], *, bulk: builtins.bool =)"
+        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book]"
+        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article]"
         reveal_type(user.book_set.queryset_method())  # N: Revealed type is "builtins.int"
         reveal_type(user.article_set.queryset_method())  # N: Revealed type is "builtins.int"
     installed_apps:
@@ -665,8 +665,8 @@
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
     main: |
         from myapp.models import User
-        reveal_type(User().parent)  # N: Revealed type is "myapp.models.User*"
-        reveal_type(User().parent_id)  # N: Revealed type is "builtins.int*"
+        reveal_type(User().parent)  # N: Revealed type is "myapp.models.User"
+        reveal_type(User().parent_id)  # N: Revealed type is "builtins.int"
 
         reveal_type(User().parent2)  # N: Revealed type is "Union[myapp.models.User, None]"
         reveal_type(User().parent2_id)  # N: Revealed type is "Union[builtins.int, None]"
@@ -690,11 +690,11 @@
     main: |
         from myapp.models import User, Order, Product
         reveal_type(User().orders)  # N: Revealed type is "myapp.models.Order_RelatedManager"
-        reveal_type(User().orders.get())  # N: Revealed type is "myapp.models.Order*"
+        reveal_type(User().orders.get())  # N: Revealed type is "myapp.models.Order"
         reveal_type(User().orders.manager_method())  # N: Revealed type is "builtins.int"
         reveal_type(Product.objects.queryset_method())  # N: Revealed type is "builtins.int"
         reveal_type(Order().products)  # N: Revealed type is "myapp.models.Product_RelatedManager"
-        reveal_type(Order().products.get())  # N: Revealed type is "myapp.models.Product*"
+        reveal_type(Order().products.get())  # N: Revealed type is "myapp.models.Product"
         reveal_type(Order().products.queryset_method())  # N: Revealed type is "builtins.int"
         if 1 == 2:
             manager = User().products
@@ -731,11 +731,11 @@
         from myapp.models.user import User
         reveal_type(Store().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
         reveal_type(Store().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
-        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase*]"
+        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase]"
         reveal_type(Store().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
         reveal_type(User().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
         reveal_type(User().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
-        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase*]"
+        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase]"
         reveal_type(User().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
     installed_apps:
         - myapp

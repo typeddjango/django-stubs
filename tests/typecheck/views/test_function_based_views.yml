@@ -24,25 +24,25 @@
 
       def empty_response(request: HttpRequest) -> HttpResponse:
           response = HttpResponse()
-          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
           return response
 
       def str_response(request: HttpRequest) -> HttpResponse:
           response = HttpResponse()
           response.content = 'It works!'
-          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
           return response
 
       def bytes_response(request: HttpRequest) -> HttpResponse:
           response = HttpResponse()
           response.content = b'It works!'
-          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
           return response
 
       def object_response(request: HttpRequest) -> HttpResponse:
           response = HttpResponse()
           response.content = _('It works!')
-          reveal_type(response.content)  # N: Revealed type is "builtins.bytes*"
+          reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
           return response
 
 -   case: streaming_http_response
@@ -74,29 +74,29 @@
 
       def empty_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
-          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes]"
           return response
 
       def str_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = ['It works!']
-          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes]"
           return response
 
       def bytes_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = [b'It works!']
-          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes]"
           return response
 
       def object_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = [_('It works!')]
-          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes]"
           return response
 
       def mixed_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = [_('Yes'), '/', _('No')]
-          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator*[builtins.bytes]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes]"
           return response
