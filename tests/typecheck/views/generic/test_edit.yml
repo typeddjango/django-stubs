@@ -61,3 +61,34 @@
 
                 class Article(models.Model):
                     pass
+
+-   case: generic_form_views_different_form_classes
+    main: |
+        from django.views.generic.edit import CreateView
+        from django import forms
+        from myapp.models import Article
+
+        class ArticleModelForm(forms.ModelForm[Article]):
+            class Meta:
+                model = Article
+        class SubArticleModelForm(ArticleModelForm):
+            pass
+        class AnotherArticleModelForm(forms.ModelForm[Article]):
+            class Meta:
+                model = Article
+
+        class MyCreateView(CreateView[Article, ArticleModelForm]):
+            def some(self) -> None:
+                reveal_type(self.get_form())  # N: Revealed type is "main.ArticleModelForm*"
+                reveal_type(self.get_form(SubArticleModelForm))  # N: Revealed type is "main.SubArticleModelForm"
+                reveal_type(self.get_form(AnotherArticleModelForm))  # N: Revealed type is "main.AnotherArticleModelForm"  # E: Argument 1 to "get_form" of "FormMixin" has incompatible type "Type[AnotherArticleModelForm]"; expected "Optional[Type[ArticleModelForm]]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    pass

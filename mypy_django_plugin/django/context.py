@@ -35,6 +35,7 @@ except ImportError:
 if TYPE_CHECKING:
     from django.apps.registry import Apps  # noqa: F401
     from django.conf import LazySettings  # noqa: F401
+    from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 @contextmanager
@@ -100,9 +101,6 @@ class DjangoContext:
     @cached_property
     def model_modules(self) -> Dict[str, Set[Type[Model]]]:
         """All modules that contain Django models."""
-        if self.apps_registry is None:
-            return {}
-
         modules: Dict[str, Set[Type[Model]]] = defaultdict(set)
         for concrete_model_cls in self.apps_registry.get_models():
             modules[concrete_model_cls.__module__].add(concrete_model_cls)
@@ -327,7 +325,7 @@ class DjangoContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":
+            if related_model_cls == "self":  # type: ignore[unreachable]
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:
@@ -343,7 +341,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: Type[Model]
     ) -> Union[Field, ForeignObjectRel]:
         currently_observed_model = model_cls
-        field: Union[Field, ForeignObjectRel, None] = None
+        field: Union[Field, ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
@@ -359,15 +357,16 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 currently_observed_model = field.related_model
 
-        assert field is not None
+        # Guaranteed by `query.solve_lookup_type` before.
+        assert isinstance(field, (Field, ForeignObjectRel))
         return field
 
     def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Union[Field, ForeignObjectRel]:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
+
         if lookup_parts:
             raise LookupsAreUnsupported()
-
         return self._resolve_field_from_parts(field_parts, model_cls)
 
     def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:

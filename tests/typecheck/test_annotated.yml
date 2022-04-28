@@ -1,0 +1,17 @@
+# Regression test for #893
+-   case: annotated_should_not_iterfere
+    main: |
+        from dataclasses import dataclass
+        import sys
+        if sys.version_info < (3, 9):
+            from typing_extensions import Annotated
+        else:
+            from typing import Annotated
+
+        class IntegerType:
+            def __init__(self, min_value: int, max_value: int) -> None:
+                pass
+
+        @dataclass(unsafe_hash=True)
+        class RatingComposite:
+            max_value: Annotated[int, IntegerType(min_value=1, max_value=10)] = 5

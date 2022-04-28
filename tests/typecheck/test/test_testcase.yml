@@ -9,4 +9,4 @@
               reveal_type(resp.status_code)   # N: Revealed type is "builtins.int"
               # Attributes monkey-patched by test Client class:
               resp.json()
-              reveal_type(resp.wsgi_request)  # N: Revealed type is "django.core.handlers.wsgi.WSGIRequest*"
+              reveal_type(resp.wsgi_request)  # N: Revealed type is "django.core.handlers.wsgi.WSGIRequest"

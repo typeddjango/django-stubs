@@ -15,7 +15,7 @@ from typing import (
 )
 
 from django.core.handlers import base as base
-from django.http import HttpRequest, QueryDict
+from django.http.request import HttpRequest, _ImmutableQueryDict
 from django.http.response import HttpResponseBase
 from django.urls.resolvers import ResolverMatch, URLResolver
 from django.utils.datastructures import MultiValueDict
@@ -34,8 +34,8 @@ class ASGIRequest(HttpRequest):
     META: Dict[str, Any] = ...
     def __init__(self, scope: Mapping[str, Any], body_file: IO[bytes]) -> None: ...
     @property
-    def GET(self) -> QueryDict: ...  # type: ignore
-    POST: QueryDict = ...
+    def GET(self) -> _ImmutableQueryDict: ...  # type: ignore
+    POST: _ImmutableQueryDict = ...
     FILES: MultiValueDict = ...
     @property
     def COOKIES(self) -> Dict[str, str]: ...  # type: ignore

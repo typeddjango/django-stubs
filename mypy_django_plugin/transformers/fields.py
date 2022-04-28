@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Optional, Tuple, Union, cast
 
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
@@ -12,10 +12,13 @@ from mypy.types import TypeOfAny, UnionType
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 
+if TYPE_CHECKING:
+    from django.contrib.contenttypes.fields import GenericForeignKey
+
 
 def _get_current_field_from_assignment(
     ctx: FunctionContext, django_context: DjangoContext
-) -> Optional[Union[Field, ForeignObjectRel]]:
+) -> Optional[Union[Field, ForeignObjectRel, "GenericForeignKey"]]:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
         return None
