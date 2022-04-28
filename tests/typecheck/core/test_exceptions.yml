@@ -1,0 +1,22 @@
+-   case: ValidationError_nested_message
+    main: |
+            from django.core.exceptions import ValidationError
+
+
+            ValidationError({
+                'list': [
+                    'list error 1',
+                    'list error 2'
+                ],
+                'plain_str': 'message',
+                'plain_error': ValidationError('message'),
+                'list_error': [
+                    ValidationError('list error 1', code='test'),
+                    ValidationError('list error 2', code='test'),
+                ]
+            })
+            ValidationError([
+                'message 1',
+                ValidationError('message 2'),
+                ['nested 1', 'nested 2'],
+            ])
