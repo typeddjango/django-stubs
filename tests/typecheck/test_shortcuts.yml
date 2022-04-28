@@ -3,13 +3,13 @@
         from django.shortcuts import get_object_or_404, get_list_or_404
         from myapp.models import MyModel
 
-        reveal_type(get_object_or_404(MyModel))  # N: Revealed type is "myapp.models.MyModel*"
-        reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is "myapp.models.MyModel*"
-        reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(get_object_or_404(MyModel))  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "myapp.models.MyModel"
 
-        reveal_type(get_list_or_404(MyModel))  # N: Revealed type is "builtins.list[myapp.models.MyModel*]"
-        reveal_type(get_list_or_404(MyModel.objects))  # N: Revealed type is "builtins.list[myapp.models.MyModel*]"
-        reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "builtins.list[myapp.models.MyModel*]"
+        reveal_type(get_list_or_404(MyModel))  # N: Revealed type is "builtins.list[myapp.models.MyModel]"
+        reveal_type(get_list_or_404(MyModel.objects))  # N: Revealed type is "builtins.list[myapp.models.MyModel]"
+        reveal_type(get_list_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "builtins.list[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:

@@ -6,7 +6,7 @@
     ArticleFS: Type[forms.BaseInlineFormSet[Article, Category, Any]] = forms.inlineformset_factory(Category, Article)
     ArticleFS(instance=Article())  # E: Argument "instance" to "BaseInlineFormSet" has incompatible type "Article"; expected "Optional[Category]"
     fs = ArticleFS(instance=Category())
-    reveal_type(fs.instance)  # N: Revealed type is "myapp.models.Category*"
+    reveal_type(fs.instance)  # N: Revealed type is "myapp.models.Category"
   installed_apps:
     - myapp
   files:

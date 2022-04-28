@@ -2,11 +2,11 @@
     main: |
         from myapp.models import User
         user = User(small_int=1, name='user', slug='user', text='user')
-        reveal_type(user.id)  # N: Revealed type is "builtins.int*"
-        reveal_type(user.small_int)  # N: Revealed type is "builtins.int*"
-        reveal_type(user.name)  # N: Revealed type is "builtins.str*"
-        reveal_type(user.slug)  # N: Revealed type is "builtins.str*"
-        reveal_type(user.text)  # N: Revealed type is "builtins.str*"
+        reveal_type(user.id)  # N: Revealed type is "builtins.int"
+        reveal_type(user.small_int)  # N: Revealed type is "builtins.int"
+        reveal_type(user.name)  # N: Revealed type is "builtins.str"
+        reveal_type(user.slug)  # N: Revealed type is "builtins.str"
+        reveal_type(user.text)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -25,9 +25,9 @@
     main: |
         from myapp.models import Booking
         booking = Booking()
-        reveal_type(booking.id)  # N: Revealed type is "builtins.int*"
+        reveal_type(booking.id)  # N: Revealed type is "builtins.int"
         reveal_type(booking.time_range)  # N: Revealed type is "Any"
-        reveal_type(booking.some_decimal)  # N: Revealed type is "decimal.Decimal*"
+        reveal_type(booking.some_decimal)  # N: Revealed type is "decimal.Decimal"
     installed_apps:
         - myapp
     files:
@@ -47,7 +47,7 @@
     disable_cache: true
     main: |
         from myapp.models import User
-        reveal_type(User().id)  # N: Revealed type is "builtins.int*"
+        reveal_type(User().id)  # N: Revealed type is "builtins.int"
     installed_apps:
         - myapp
     files:
@@ -62,7 +62,7 @@
     disable_cache: true
     main: |
         from myapp.models import User
-        reveal_type(User().my_pk)  # N: Revealed type is "builtins.int*"
+        reveal_type(User().my_pk)  # N: Revealed type is "builtins.int"
         User().id  # E: "User" has no attribute "id"
     installed_apps:
         - myapp
@@ -97,7 +97,7 @@
         MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "Union[str, int, Combinable]")
         MyModel(notnulltext="")
         MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")
-        reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str*"
+        reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -133,7 +133,7 @@
 -   case: fields_inside_mixins_used_in_model_subclasses_resolved_as_primitives
     main: |
         from myapp.models import MyModel, AuthMixin
-        reveal_type(MyModel().username)  # N: Revealed type is "builtins.str*"
+        reveal_type(MyModel().username)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -156,10 +156,10 @@
         class Book(models.Model):
             published = cast(models.Field[Year, Year], models.IntegerField())
         book = Book()
-        reveal_type(book.published)  # N: Revealed type is "main.Year*"
+        reveal_type(book.published)  # N: Revealed type is "main.Year"
         book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year")
         book.published = Year(2006)
-        reveal_type(book.published)  # N: Revealed type is "main.Year*"
+        reveal_type(book.published)  # N: Revealed type is "main.Year"
         def accepts_int(arg: int) -> None: ...
         accepts_int(book.published)
 
@@ -179,4 +179,4 @@
             small = models.SmallAutoField(primary_key=True)
         obj = MyModel()
 
-        reveal_type(obj.small) # N: Revealed type is "builtins.int*"
+        reveal_type(obj.small) # N: Revealed type is "builtins.int"
