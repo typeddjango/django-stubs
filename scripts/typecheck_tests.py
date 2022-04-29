@@ -16,6 +16,7 @@ DJANGO_COMMIT_REFS = {
     "3.2": "0153a63a674937e4a56d9d5e4ca2d629b011fbde",
     "4.0": "67d0c4644acfd7707be4a31e8976f865509b09ac",
 }
+DEFAULT_DJANGO_VERSION = "3.2"
 
 
 def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]) -> List[str]:
@@ -61,7 +62,7 @@ def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--django_version", default="3.0")
+    parser.add_argument("--django_version", default=DEFAULT_DJANGO_VERSION)
     django_version = parser.parse_args().django_version
     subprocess.check_call([sys.executable, "-m", "pip", "install", f"Django=={django_version}.*"])
     commit_sha = DJANGO_COMMIT_REFS[django_version]
