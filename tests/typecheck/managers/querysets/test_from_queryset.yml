@@ -2,10 +2,10 @@
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
         reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "builtins.str"
-        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel*]"
+        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -27,13 +27,13 @@
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
         reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "builtins.str"
         reveal_type(MyModel.objects.queryset_method_4([]))  # N: Revealed type is "None"
         reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "myapp.querysets.ModelQuerySet"
-        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.querysets.ModelQuerySet[myapp.models.MyModel*]"
+        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.querysets.ModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -75,7 +75,7 @@
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
@@ -149,7 +149,7 @@
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
@@ -173,7 +173,7 @@
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.NewManager[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: Union[builtins.str, None] =) -> Union[builtins.str, None]"
         reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "Union[builtins.str, None]"
     installed_apps:
@@ -203,7 +203,7 @@
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.NewManager[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel*"
+        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: Union[builtins.int, builtins.str]) -> <nothing>"
         reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "<nothing>"
     installed_apps:
@@ -350,25 +350,25 @@
 -   case: from_queryset_includes_methods_returning_queryset
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, *, all: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.select_related)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "def (*lookups: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.defer)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
-        reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: Union[builtins.str, None]) -> myapp.models.MyQuerySet[myapp.models.MyModel*]"
+        reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, *, all: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.select_related)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "def (*lookups: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.defer)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: Union[builtins.str, None]) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:

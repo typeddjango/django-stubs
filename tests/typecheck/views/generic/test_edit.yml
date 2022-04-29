@@ -46,11 +46,11 @@
 
         class MyCreateView(CreateView[Article, ArticleModelForm]):
             def some(self) -> None:
-                reveal_type(self.get_form_class())  # N: Revealed type is "Type[main.ArticleModelForm*]"
+                reveal_type(self.get_form_class())  # N: Revealed type is "Type[main.ArticleModelForm]"
 
         class MyUpdateView(UpdateView[Article, ArticleModelForm]):
             def some(self) -> None:
-                reveal_type(self.get_form_class()) # N: Revealed type is "Type[main.ArticleModelForm*]"
+                reveal_type(self.get_form_class()) # N: Revealed type is "Type[main.ArticleModelForm]"
     installed_apps:
         - myapp
     files:
@@ -79,7 +79,7 @@
 
         class MyCreateView(CreateView[Article, ArticleModelForm]):
             def some(self) -> None:
-                reveal_type(self.get_form())  # N: Revealed type is "main.ArticleModelForm*"
+                reveal_type(self.get_form())  # N: Revealed type is "main.ArticleModelForm"
                 reveal_type(self.get_form(SubArticleModelForm))  # N: Revealed type is "main.SubArticleModelForm"
                 reveal_type(self.get_form(AnotherArticleModelForm))  # N: Revealed type is "main.AnotherArticleModelForm"  # E: Argument 1 to "get_form" of "FormMixin" has incompatible type "Type[AnotherArticleModelForm]"; expected "Optional[Type[ArticleModelForm]]"
     installed_apps:

@@ -26,8 +26,8 @@
       from django.test.client import RequestFactory, AsyncRequestFactory
       factory = RequestFactory()
       request = factory.get('foo')
-      reveal_type(request)  # N: Revealed type is "django.core.handlers.wsgi.WSGIRequest*"
+      reveal_type(request)  # N: Revealed type is "django.core.handlers.wsgi.WSGIRequest"
 
       async_factory = AsyncRequestFactory()
       async_request = async_factory.get('foo')
-      reveal_type(async_request)  # N: Revealed type is "django.core.handlers.asgi.ASGIRequest*"
+      reveal_type(async_request)  # N: Revealed type is "django.core.handlers.asgi.ASGIRequest"

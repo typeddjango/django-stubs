@@ -10,4 +10,4 @@ psycopg2-binary
 -e .
 
 # Overrides:
-mypy==0.942
+mypy==0.950

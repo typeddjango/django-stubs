@@ -69,7 +69,7 @@
 -   case: fields_recognized_if_base_model_is_subclass_of_models_model
     main: |
         from myapp.models import User
-        reveal_type(User().username)  # N: Revealed type is "builtins.str*"
+        reveal_type(User().username)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -90,8 +90,8 @@
 -   case: django_contrib_gis_base_model_mixin_inheritance
     main: |
         from myapp.models import User
-        reveal_type(User().name)  # N: Revealed type is "builtins.str*"
-        reveal_type(User().updated_at)  # N: Revealed type is "datetime.datetime*"
+        reveal_type(User().name)  # N: Revealed type is "builtins.str"
+        reveal_type(User().updated_at)  # N: Revealed type is "datetime.datetime"
     installed_apps:
         - myapp
     files:

@@ -122,10 +122,10 @@
         reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})], django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]]"
 
         annotated = qs.get()
-        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]*"
+        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]"
         reveal_type(annotated.foo) # N: Revealed type is "Any"
         print(annotated.bar) # E: "WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]" has no attribute "bar"
-        reveal_type(annotated.username) # N: Revealed type is "builtins.str*"
+        reveal_type(annotated.username) # N: Revealed type is "builtins.str"
 
     installed_apps:
         - myapp
@@ -196,10 +196,10 @@
         qs = User.objects.annotate(foo=F('id'))
         qs = qs.annotate(bar=F('id'))
         annotated = qs.get()
-        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any, 'bar': Any})]*"
+        reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any, 'bar': Any})]"
         reveal_type(annotated.foo) # N: Revealed type is "Any"
         reveal_type(annotated.bar) # N: Revealed type is "Any"
-        reveal_type(annotated.username) # N: Revealed type is "builtins.str*"
+        reveal_type(annotated.username) # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
@@ -280,19 +280,19 @@
 
         values_list_flat_known = Blog.objects.annotate(foo=F('id')).values_list('text', flat=True).get()
         # Even though it's annotated, we still know the lookup's type.
-        reveal_type(values_list_flat_known)  # N: Revealed type is "builtins.str*"
+        reveal_type(values_list_flat_known)  # N: Revealed type is "builtins.str"
         values_list_flat_unknown = Blog.objects.annotate(foo=F('id')).values_list('foo', flat=True).get()
         # We don't know the type of an unknown lookup
         reveal_type(values_list_flat_unknown)  # N: Revealed type is "Any"
 
         values_no_params = Blog.objects.annotate(foo=F('id')).values().get()
-        reveal_type(values_no_params)  # N: Revealed type is "builtins.dict*[builtins.str, Any]"
+        reveal_type(values_no_params)  # N: Revealed type is "builtins.dict[builtins.str, Any]"
 
         values_list_no_params = Blog.objects.annotate(foo=F('id')).values_list().get()
-        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any, ...]"
+        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple[Any, ...]"
 
         values_list_flat_no_params = Blog.objects.annotate(foo=F('id')).values_list(flat=True).get()
-        reveal_type(values_list_flat_no_params)  # N: Revealed type is "builtins.int*"
+        reveal_type(values_list_flat_no_params)  # N: Revealed type is "builtins.int"
 
         values_list_named_no_params = Blog.objects.annotate(foo=F('id')).values_list(named=True).get()
         reveal_type(values_list_named_no_params.foo) # N: Revealed type is "Any"
@@ -324,13 +324,13 @@
 
 
         before_values_no_params = Blog.objects.values().annotate(foo=F('id')).get()
-        reveal_type(before_values_no_params)  # N: Revealed type is "builtins.dict*[builtins.str, Any]"
+        reveal_type(before_values_no_params)  # N: Revealed type is "builtins.dict[builtins.str, Any]"
 
         before_values_list_no_params = Blog.objects.values_list().annotate(foo=F('id')).get()
-        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple*[Any, ...]"
+        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple[Any, ...]"
 
         before_values_list_flat_no_params = Blog.objects.values_list(flat=True).annotate(foo=F('id')).get()
-        reveal_type(before_values_list_flat_no_params)  # N: Revealed type is "builtins.int*"
+        reveal_type(before_values_list_flat_no_params)  # N: Revealed type is "builtins.int"
 
         before_values_list_named_no_params = Blog.objects.values_list(named=True).annotate(foo=F('id')).get()
         reveal_type(before_values_list_named_no_params.foo) # N: Revealed type is "Any"

@@ -283,10 +283,10 @@
             unset_set_type=[],
         )
     out: |
-        main:4: note: Revealed type is "builtins.int*"
-        main:5: note: Revealed type is "builtins.int*"
-        main:6: note: Revealed type is "builtins.list*[builtins.int]"
-        main:7: note: Revealed type is "builtins.int*"
+        main:4: note: Revealed type is "builtins.int"
+        main:5: note: Revealed type is "builtins.int"
+        main:6: note: Revealed type is "builtins.list[builtins.int]"
+        main:7: note: Revealed type is "builtins.int"
         main:8: note: Revealed type is "Any"
         main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int")
         main:10: error: Incompatible types in assignment (expression has type "str", variable has type "Union[int, float]")
