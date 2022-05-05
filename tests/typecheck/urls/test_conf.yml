@@ -16,3 +16,32 @@
       def include() -> Tuple[List[URLPattern], None, None]: ...
 
       path('test/', include())
+
+-   case: test_urlconf_include
+    main: |
+      from typing import Union, List
+
+      from django.contrib.flatpages import urls as flatpages_urls
+      from django.conf.urls.i18n import urlpatterns as i18n_urlpatterns
+      from django.contrib import admin
+      from django.contrib.auth.views import LoginView
+
+      from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+      from django.urls import URLPattern, URLResolver, re_path, include, path
+
+      foo_patterns: List[Union[URLPattern, URLResolver]] = []
+
+      urlpatterns: List[Union[URLPattern, URLResolver]] = [
+          path('login/', LoginView.as_view(), name='login'),
+          path('admin/', admin.site.urls),
+          re_path('^foo/', include(foo_patterns, namespace='foo')),
+          re_path('^foo/', include((foo_patterns, 'foo'), namespace='foo')),
+          re_path('^foo/', include(foo_patterns, 'foo')),
+          path('flat/', include(flatpages_urls)),
+          path('flat/', include((flatpages_urls, 'static'))),
+          path('i18n/', include(i18n_urlpatterns)),
+          path('i18n/', include((i18n_urlpatterns, 'i18n'))),
+          path('admindocs/', include('django.contrib.admindocs.urls')),
+          path('admindocs/', include(('django.contrib.admindocs.urls', 'i18n'))),
+          path('', include(staticfiles_urlpatterns(prefix='static/')))
+      ]
