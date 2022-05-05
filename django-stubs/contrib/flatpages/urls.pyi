@@ -1,5 +1,5 @@
-from typing import List, Union
+from typing import List
 
-from django.urls import URLPattern, URLResolver
+from django.urls import _AnyURL
 
-urlpatterns: List[Union[URLPattern, URLResolver]] = ...
+urlpatterns: List[_AnyURL] = ...

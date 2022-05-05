@@ -1,10 +1,8 @@
-from typing import Callable, List, Tuple, Union
+from typing import List, Tuple
 
-from django.urls.resolvers import URLPattern, URLResolver
+from django.urls import _AnyURL
 
-def i18n_patterns(
-    *urls: Union[URLPattern, URLResolver], prefix_default_language: bool = ...
-) -> List[Union[URLPattern, URLResolver]]: ...
+def i18n_patterns(*urls: _AnyURL, prefix_default_language: bool = ...) -> List[_AnyURL]: ...
 def is_language_prefix_patterns_used(urlconf: str) -> Tuple[bool, bool]: ...
 
-urlpatterns: List[Union[URLPattern, URLResolver]]
+urlpatterns: List[_AnyURL]
