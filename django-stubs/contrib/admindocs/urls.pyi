@@ -1,3 +1,5 @@
-from typing import Any, List
+from typing import List
 
-urlpatterns: List[Any] = ...
+from django.urls import _AnyURL
+
+urlpatterns: List[_AnyURL] = ...

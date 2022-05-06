@@ -1,7 +1,7 @@
-from typing import Any, List, Optional
+from typing import List, Optional
 
-from django.urls.resolvers import URLPattern
+from django.urls import URLPattern, _AnyURL
 
-urlpatterns: List[Any] = ...
+urlpatterns: List[_AnyURL] = ...
 
 def staticfiles_urlpatterns(prefix: Optional[str] = ...) -> List[URLPattern]: ...

@@ -1,11 +1,15 @@
+from types import ModuleType
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, overload
+
+from django.urls import URLPattern, URLResolver, _AnyURL
 
 from ..conf.urls import IncludedURLConf
 from ..http.response import HttpResponseBase
-from .resolvers import URLPattern, URLResolver
+
+_URLConf = Union[str, ModuleType, Sequence[_AnyURL]]
 
 def include(
-    arg: Any, namespace: Optional[str] = ...
+    arg: Union[_URLConf, tuple[_URLConf, str]], namespace: Optional[str] = ...
 ) -> Tuple[Sequence[Union[URLResolver, URLPattern]], Optional[str], Optional[str]]: ...
 
 # path()
