@@ -125,8 +125,8 @@ class DecimalField(IntegerField):
     def __init__(
         self,
         *,
-        max_value: Optional[int] = ...,
-        min_value: Optional[int] = ...,
+        max_value: Optional[Decimal] = ...,
+        min_value: Optional[Decimal] = ...,
         max_digits: Optional[int] = ...,
         decimal_places: Optional[int] = ...,
         required: bool = ...,
