@@ -126,7 +126,7 @@ class DecimalField(IntegerField):
         self,
         *,
         max_value: Union[Decimal, int, float, None] = ...,
-        min_value: Optional[Union[Decimal, int, float]] = ...,
+        min_value: Union[Decimal, int, float, None] = ...,
         max_digits: Optional[int] = ...,
         decimal_places: Optional[int] = ...,
         required: bool = ...,
