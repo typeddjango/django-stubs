@@ -114,7 +114,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
 
 class F(Combinable):
     name: str
-    def __init__(self, name: str): ...
+    def __init__(self, name: Union[str, F]): ...
     def resolve_expression(
         self,
         query: Any = ...,
