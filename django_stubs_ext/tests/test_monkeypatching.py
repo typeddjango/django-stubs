@@ -1,6 +1,6 @@
 import builtins
 from contextlib import suppress
-from typing import Optional
+from typing import Iterable, Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -14,13 +14,11 @@ import django_stubs_ext
 from django_stubs_ext import patch
 from django_stubs_ext.patch import _need_generic, _VersionSpec
 
-extra_classes = [View]
-
 
 class _MakeGenericClasses(Protocol):
     """Used to represent a type of ``make_generic_classes`` fixture."""
 
-    def __call__(self, django_version: Optional[_VersionSpec] = None) -> None:
+    def __call__(self, django_version: Optional[_VersionSpec] = None, extra_classes: Iterable[type] = []) -> None:
         ...
 
 
@@ -29,15 +27,18 @@ def make_generic_classes(
     request: FixtureRequest,
     monkeypatch: MonkeyPatch,
 ) -> _MakeGenericClasses:
+    _extra_classes: list[type] = []
+
     def fin() -> None:
         for el in _need_generic:
             with suppress(AttributeError):
                 delattr(el.cls, "__class_getitem__")
-        for cls in extra_classes:
+        for cls in _extra_classes:
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
 
-    def factory(django_version: Optional[_VersionSpec] = None) -> None:
+    def factory(django_version: Optional[_VersionSpec] = None, extra_classes: Iterable[type] = []) -> None:
+        _extra_classes.extend(extra_classes)
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
         django_stubs_ext.monkeypatch(extra_classes)
@@ -53,10 +54,21 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
     for el in _need_generic:
         if el.version is None:
             assert el.cls[type] is el.cls  # `type` is arbitrary
+
+    class TestForm(ModelForm[Model]):
+        pass
+
+
+def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasses) -> None:
+    """Test that the generics actually get patched for extra classes."""
+    extra_classes = [View]
+
+    make_generic_classes(django_version=None, extra_classes=extra_classes)
+
     for cls in extra_classes:
         assert cls[type] is cls  # type: ignore[misc]
 
-    class TestForm(ModelForm[Model]):
+    class TestView(View[Model]):  # type: ignore[type-arg]
         pass
 
 
