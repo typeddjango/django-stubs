@@ -7,11 +7,14 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.monkeypatch import MonkeyPatch
 from django.db.models import Model
 from django.forms.models import ModelForm
+from django.views import View
 from typing_extensions import Protocol
 
 import django_stubs_ext
 from django_stubs_ext import patch
 from django_stubs_ext.patch import _need_generic, _VersionSpec
+
+extra_classes = [View]
 
 
 class _MakeGenericClasses(Protocol):
@@ -30,11 +33,14 @@ def make_generic_classes(
         for el in _need_generic:
             with suppress(AttributeError):
                 delattr(el.cls, "__class_getitem__")
+        for cls in extra_classes:
+            with suppress(AttributeError):
+                delattr(cls, "__class_getitem__")
 
     def factory(django_version: Optional[_VersionSpec] = None) -> None:
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
-        django_stubs_ext.monkeypatch()
+        django_stubs_ext.monkeypatch(extra_classes)
 
     request.addfinalizer(fin)
     return factory
@@ -47,6 +53,8 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
     for el in _need_generic:
         if el.version is None:
             assert el.cls[type] is el.cls  # `type` is arbitrary
+    for cls in extra_classes:
+        assert cls[type] is cls  # type: ignore[misc]
 
     class TestForm(ModelForm[Model]):
         pass
