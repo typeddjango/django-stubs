@@ -58,7 +58,7 @@ _need_generic: List[MPGeneric[Any]] = [
 ]
 
 
-def monkeypatch(extra_classes: Iterable[type] = []) -> None:
+def monkeypatch(extra_classes: Optional[Iterable[type]] = None) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
 
     # Add the __class_getitem__ dunder.
@@ -68,8 +68,9 @@ def monkeypatch(extra_classes: Iterable[type] = []) -> None:
     )
     for el in suited_for_this_version:
         el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
-    for cls in extra_classes:
-        cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
+    if extra_classes:
+        for cls in extra_classes:
+            cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
 
 
 __all__ = ["monkeypatch"]

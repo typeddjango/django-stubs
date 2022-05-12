@@ -37,8 +37,9 @@ def make_generic_classes(
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
 
-    def factory(django_version: Optional[_VersionSpec] = None, extra_classes: Iterable[type] = []) -> None:
-        _extra_classes.extend(extra_classes)
+    def factory(django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None) -> None:
+        if extra_classes:
+            _extra_classes.extend(extra_classes)
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
         django_stubs_ext.monkeypatch(extra_classes)
