@@ -53,9 +53,9 @@
     main: |
         from myapp.models import Post, Blog
         values_tuple = Post.objects.values_list('blog', 'blog__num_posts', 'blog__publisher', 'blog__publisher__name').get()
-        reveal_type(values_tuple[0])  # N: Revealed type is "myapp.models.Blog"
+        reveal_type(values_tuple[0])  # N: Revealed type is "builtins.int"
         reveal_type(values_tuple[1])  # N: Revealed type is "builtins.int"
-        reveal_type(values_tuple[2])  # N: Revealed type is "myapp.models.Publisher"
+        reveal_type(values_tuple[2])  # N: Revealed type is "builtins.int"
         reveal_type(values_tuple[3])  # N: Revealed type is "builtins.str"
 
         reverse_fields_list = Blog.objects.values_list('post__text').get()
@@ -215,6 +215,7 @@
     main: |
         from myapp.models import Blog, Publisher
         reveal_type(Blog.objects.values_list('id', flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, builtins.int]"
+        reveal_type(Blog.objects.values_list('publisher', flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, builtins.int]"
         reveal_type(Blog.objects.values_list('publisher_id', flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, builtins.int]"
         # is Iterable[int]
         reveal_type(list(Blog.objects.values_list('id', flat=True)))  # N: Revealed type is "builtins.list[builtins.int]"

@@ -306,7 +306,7 @@ class DjangoContext:
             if related_model_cls is None:
                 return AnyType(TypeOfAny.from_error)
 
-            if method == "values":
+            if method in ("values", "values_list"):
                 primary_key_field = self.get_primary_key_field(related_model_cls)
                 return self.get_field_get_type(api, primary_key_field, method=method)
 
