@@ -18,7 +18,9 @@ from django_stubs_ext.patch import _need_generic, _VersionSpec
 class _MakeGenericClasses(Protocol):
     """Used to represent a type of ``make_generic_classes`` fixture."""
 
-    def __call__(self, django_version: Optional[_VersionSpec] = None, extra_classes: Iterable[type] = []) -> None:
+    def __call__(
+        self, django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None
+    ) -> None:
         ...
 
 
