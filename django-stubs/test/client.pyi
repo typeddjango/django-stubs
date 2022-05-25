@@ -126,6 +126,7 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     client: Client
     templates: List[Template]
     context: List[Dict[str, Any]]
+    content: bytes
     resolver_match: ResolverMatch
 
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
@@ -134,6 +135,7 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
     client: AsyncClient
     templates: List[Template]
     context: List[Dict[str, Any]]
+    content: bytes
     resolver_match: ResolverMatch
 
 class ClientMixin:
