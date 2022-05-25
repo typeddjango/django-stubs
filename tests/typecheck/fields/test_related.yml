@@ -640,6 +640,46 @@
                   pass
 
 
+-   case: test_related_managers_for_subclass_with_multiple_inheritance
+    main: |
+        from myapp import models
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class TimestampedModel(models.Model):
+                    id = models.UUIDField(primary_key=True, editable=False)
+                    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+                    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+                    class Meta:
+                        abstract = True
+
+                class ReprMixin:
+                    def __str__(self) -> str:
+                        return self.__repr__()
+
+                    def __repr__(self) -> str:
+                        return 'yolo'
+
+                class User(ReprMixin, TimestampedModel):
+                    name = models.TextField()
+
+                class Booking(ReprMixin, TimestampedModel):
+                    renter = models.ForeignKey(User, on_delete=models.PROTECT)
+                    owner = models.ForeignKey(User, on_delete=models.PROTECT, related_name='bookingowner_set')
+
+                    class Meta(TimestampedModel.Meta):
+                        ordering = ['-created_at']
+
+                def process_user(user: User):
+                    reveal_type(user.bookingowner_set)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Booking]'
+                    reveal_type(user.booking_set)  # N: Revealed type is 'django.db.models.manager.RelatedManager[myapp.models.Booking]'
+
 -   case: foreign_key_relationship_for_models_with_custom_manager
     main: |
         from myapp.models import Transaction
