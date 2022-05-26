@@ -8,6 +8,7 @@
       reveal_type(response.templates)  # N: Revealed type is "builtins.list[django.template.base.Template]"
       reveal_type(response.client)  # N: Revealed type is "django.test.client.Client"
       reveal_type(response.context)  # N: Revealed type is "builtins.list[builtins.dict[builtins.str, Any]]"
+      reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
       response.json()
 -   case: async_client_methods
     main: |
@@ -20,6 +21,7 @@
         reveal_type(response.templates)  # N: Revealed type is "builtins.list[django.template.base.Template]"
         reveal_type(response.client)  # N: Revealed type is "django.test.client.AsyncClient"
         reveal_type(response.context)  # N: Revealed type is "builtins.list[builtins.dict[builtins.str, Any]]"
+        reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
         response.json()
 -   case: request_factories
     main: |
