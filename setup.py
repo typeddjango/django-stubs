@@ -20,7 +20,7 @@ with open("README.md") as f:
     readme = f.read()
 
 dependencies = [
-    "mypy>=0.930,<0.970",
+    "mypy>=0.930",
     "django",
     "django-stubs-ext>=0.4.0",
     "tomli",
@@ -29,6 +29,10 @@ dependencies = [
     "types-pytz",
     "types-PyYAML",
 ]
+
+extras_require = {
+    "compatible-mypy": ["mypy>=0.930,<0.970"],
+}
 
 setup(
     name="django-stubs",
@@ -43,6 +47,7 @@ setup(
     py_modules=[],
     python_requires=">=3.7",
     install_requires=dependencies,
+    extras_require=extras_require,
     packages=["django-stubs", *find_packages(exclude=["scripts"])],
     package_data={
         "django-stubs": find_stub_files("django-stubs"),
