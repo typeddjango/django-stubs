@@ -67,6 +67,6 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `release-ci failure on ${new Date().toDateString()}`,
+              title: `Release failure on ${new Date().toDateString()}`,
               body: `Details: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/workflows/release.yml`,
             })
