@@ -45,6 +45,7 @@ jobs:
               repo: context.repo.repo,
               tag_name: tagName,
               name: `Release ${tagName.replace(/^v/, '')}`,
+              generate_release_notes: true,
             });
 
             if (release.status < 200 || release.status >= 300) {
