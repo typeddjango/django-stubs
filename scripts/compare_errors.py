@@ -2,32 +2,13 @@
 
 import difflib
 import json
-import os
 import re
-import shutil
 import sys
 from argparse import ArgumentParser
 from collections import defaultdict
-from contextlib import redirect_stdout
-from io import StringIO
-from pathlib import Path
 from typing import Dict, Generator, List, Set
 
-import reapply_types
-from mypy.api import run
-
-if sys.version_info < (3, 8):
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
-
-
-CURRENT_DIR = (Path(__file__) / ".." / "..").resolve()
-ERRORS_FILE = CURRENT_DIR / ".custom_cache" / ".apply_errors"
-TEMP_ERRORS_FILE = CURRENT_DIR / ".custom_cache" / ".apply_errors_temp"
-
-ERRORS_FILE.parent.mkdir(parents=True, exist_ok=True)
-TEMP_ERRORS_FILE.parent.mkdir(parents=True, exist_ok=True)
+from reapply_types import MetaDict, CURRENT_DIR
 
 
 def build_mypy_errors_cache(output: str) -> Dict[str, List[int]]:
@@ -92,46 +73,6 @@ def compare_apply_errors_caches(
     return False
 
 
-class MetaDict(TypedDict):
-    apply_errors_count: int
-    mypy_errors_count: int
-    apply_stdout: List[str]
-    mypy_stdout: List[str]
-
-
-def make_meta() -> MetaDict:
-    parser = reapply_types.make_parser()
-    args = parser.parse_args(["--ignore-errors", "decorators", "--no-color"])
-    stdout = StringIO()
-    with redirect_stdout(stdout):
-        error_count, temp_dir = reapply_types.main(args)
-    stdout.seek(0)
-
-    try:
-        os.chdir(temp_dir / "..")
-        errors, fatal, code = run(["-p", "django", "--config-file", str((CURRENT_DIR / "mypy.ini").resolve())])
-    finally:
-        shutil.rmtree(temp_dir)
-
-    try:
-        mypy_errors_count = int(
-            re.search(
-                r"Found (\d+) errors in \d+ files \(checked \d+ source files\)",
-                errors.splitlines()[-1],
-            ).group(1)
-        )
-    except AttributeError:
-        print(errors, fatal)
-        sys.exit(1)
-
-    return {
-        "apply_errors_count": error_count,
-        "mypy_errors_count": mypy_errors_count,
-        "apply_stdout": stdout.readlines(),
-        "mypy_stdout": errors.splitlines()[:-1],
-    }
-
-
 def compare(meta: MetaDict, old_meta: MetaDict) -> int:
     exit_code = 0
 
@@ -166,24 +107,15 @@ def compare(meta: MetaDict, old_meta: MetaDict) -> int:
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--check-only")
+    parser.add_argument("curr")
+    parser.add_argument("ref")
     args = parser.parse_args()
 
     sys.path.insert(0, str(CURRENT_DIR))
-    meta = make_meta()
 
-    if args.check_only:
-        print("Incompatible stub code:")
-        print(*meta["apply_stdout"], sep="\n")
-        print("=" * 60)
-        print("Mypy errors:")
-        print(*meta["mypy_stdout"])
-        sys.exit(0)
-
-    with open(ERRORS_FILE) as meta_file:
+    with open(parser.ref) as meta_file:
         old_meta = json.load(meta_file)
+    with open(parser.curr) as meta_file:
+        new_meta = json.load(meta_file)
 
-    with open(TEMP_ERRORS_FILE, "w") as meta_file:
-        json.dump(meta, meta_file)
-
-    sys.exit(compare(meta, old_meta))
+    compare(new_meta, old_meta)

@@ -2,15 +2,28 @@
 import ast
 import collections.abc
 import contextlib
+import json
 import os
+import re
+import shutil
+import sys
 import tempfile
 import typing
 from argparse import ArgumentParser, Namespace
+from contextlib import redirect_stdout
 from functools import singledispatchmethod
+from io import StringIO
 from itertools import zip_longest
 from operator import attrgetter
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union, cast
+
+from mypy.api import run
+
+if sys.version_info < (3, 8):
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 if TYPE_CHECKING:
     import black
@@ -18,6 +31,8 @@ if TYPE_CHECKING:
     import isort
     from termcolor import colored
 
+
+CURRENT_DIR = (Path(__file__) / ".." / "..").resolve()
 
 _ContainerT = Union[ast.Module, ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef, ast.If, ast.Try]
 _ContainerTypes = (ast.Module, ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef, ast.If, ast.Try)
@@ -525,10 +540,22 @@ def make_parser() -> ArgumentParser:
         default=False,
         help="Perform django-specific tasks",
     )
+    parser.add_argument(
+        "--print",
+        action="store_true",
+        default=False,
+        help="Print errors to terminal",
+    )
+    parser.add_argument(
+        "-o",
+        "--cache-file",
+        default="apply_errors",
+        help="Filename to write cache",
+    )
     return parser
 
 
-def main(args: Namespace) -> Tuple[int, Path]:
+def reapply(args: Namespace) -> Tuple[int, Path]:
     global colorama, colored, isort, black
     if args.color:
         try:
@@ -555,13 +582,13 @@ def main(args: Namespace) -> Tuple[int, Path]:
             import isort
         except ImportError:
             args.isort = False
-            print("Package isort is not installed. " "Use --no-isort to silence this warning.")
+            print("Package isort is not installed. Use --no-isort to silence this warning.")
     if args.black:
         try:
             import black
         except ImportError:
             args.black = False
-            print("Package black is not installed. " "Don't use --black to silence this warning.")
+            print("Package black is not installed. Don't use --black to silence this warning.")
 
     args.target /= "django"
     errors = 0
@@ -594,6 +621,61 @@ def main(args: Namespace) -> Tuple[int, Path]:
         retyper.write(args.target / rel_path[:-1])
 
     return errors, args.target
+
+
+class MetaDict(TypedDict):
+    apply_errors_count: int
+    mypy_errors_count: int
+    apply_stdout: List[str]
+    mypy_stdout: List[str]
+
+
+def make_meta(args) -> MetaDict:
+    stdout = StringIO()
+    with redirect_stdout(stdout):
+        error_count, temp_dir = reapply(args)
+    stdout.seek(0)
+
+    try:
+        os.chdir(temp_dir / "..")
+        errors, fatal, code = run(["-p", "django", "--config-file", str((CURRENT_DIR / "mypy.ini").resolve())])
+    finally:
+        shutil.rmtree(temp_dir)
+
+    try:
+        mypy_errors_count = int(
+            re.search(
+                r"Found (\d+) errors in \d+ files \(checked \d+ source files\)",
+                errors.splitlines()[-1],
+            ).group(1)
+        )
+    except AttributeError:
+        print(errors, fatal)
+        sys.exit(1)
+
+    if args.print:
+        print('Reapply errors:')
+        print(stdout.read())
+        stdout.seek(0)
+        print('mypy errors:')
+        print(errors)
+        print(fatal)
+
+    return {
+        "apply_errors_count": error_count,
+        "mypy_errors_count": mypy_errors_count,
+        "apply_stdout": stdout.readlines(),
+        "mypy_stdout": errors.splitlines()[:-1],
+    }
+
+
+def main(args):
+    sys.path.insert(0, str(CURRENT_DIR))
+    meta = make_meta(args)
+    errors_file = CURRENT_DIR / ".custom_cache" / args.cache_file
+    errors_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(errors_file, "w") as meta_file:
+        json.dump(meta, meta_file)
 
 
 if __name__ == "__main__":
