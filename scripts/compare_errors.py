@@ -113,9 +113,9 @@ if __name__ == "__main__":
 
     sys.path.insert(0, str(CURRENT_DIR))
 
-    with open(parser.ref) as meta_file:
+    with open(args.ref) as meta_file:
         old_meta = json.load(meta_file)
-    with open(parser.curr) as meta_file:
+    with open(args.curr) as meta_file:
         new_meta = json.load(meta_file)
 
     compare(new_meta, old_meta)
