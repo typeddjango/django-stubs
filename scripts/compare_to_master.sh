@@ -10,7 +10,8 @@ cleanup() {
 }
 
 # Will compare to master.
-git remote add tmp_upstream_12753 https://github.com/typeddjango/django-stubs || (cleanup && exit 2)
+# git remote add tmp_upstream_12753 https://github.com/typeddjango/django-stubs || (cleanup && exit 2)
+git remote add tmp_upstream_12753 https://github.com/sterliakov/django-stubs || (cleanup && exit 2)
 git fetch tmp_upstream_12753 --quiet
 
 # Write cache for local version
@@ -25,7 +26,8 @@ if [ "$should_stash" -eq 1 ]; then
 fi
 
 # Switch to master
-git checkout tmp_upstream_12753/master
+# git checkout tmp_upstream_12753/master
+git checkout tmp_upstream_12753/ci_test
 ./scripts/reapply_types.py --print -o .custom_cache/master.json
 
 ./scripts/compare_errors.py .custom_cache/local.json .custom_cache/master.json
