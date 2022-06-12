@@ -423,3 +423,22 @@
                 class MyModel(models.Model):
 
                    objects = MyModelManager()
+
+-   case: regression_manager_scope_foreign
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.on_site)  # N: Revealed type is "myapp.models.MyModel_CurrentSiteManager[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+        - django.contrib.sites
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.contrib.sites.models import Site
+                from django.contrib.sites.managers import CurrentSiteManager
+
+                class MyModel(models.Model):
+                    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+                    on_site = CurrentSiteManager()
