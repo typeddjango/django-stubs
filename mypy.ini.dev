@@ -1,10 +1,11 @@
-# Regular configuration file (can be used as base in other projects, runs in CI)
+# Configuration file to use during development
 
 [mypy]
 allow_redefinition = True
 check_untyped_defs = True
 ignore_missing_imports = True
-incremental = True
+# Avoid caching between test runs
+incremental = False
 strict_optional = True
 show_traceback = True
 warn_no_return = False
