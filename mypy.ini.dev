@@ -1,5 +1,14 @@
 # Configuration file to use during development
 
+# Changes of plugin code are not detected by mypy, so
+# incremental mode can be harmful during development
+# (mypy cache is not always invalidated).
+# However, incremental mode has to be supported by django-stubs,
+# thus another config (mypy.ini) is used in CI.
+# Incremental mode is recommended for regular usage.
+
+# WARNING: when changing this file, consider doing the same with mypy.ini
+
 [mypy]
 allow_redefinition = True
 check_untyped_defs = True
