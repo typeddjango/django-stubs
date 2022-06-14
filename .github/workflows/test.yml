@@ -46,7 +46,7 @@ jobs:
           pip install -r ./requirements.txt
 
       - name: Run tests
-        run: pytest
+        run: pytest --mypy-ini-file=mypy.ini
 
   typecheck:
     runs-on: ubuntu-latest

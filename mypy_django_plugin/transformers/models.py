@@ -212,7 +212,11 @@ class AddManagers(ModelClassInitializer):
             # replace self type with new class, if copying method
             if isinstance(sym.node, FuncDef):
                 helpers.copy_method_to_another_class(
-                    new_cls_def_context, self_type=custom_manager_type, new_method_name=name, method_node=sym.node
+                    new_cls_def_context,
+                    self_type=custom_manager_type,
+                    new_method_name=name,
+                    method_node=sym.node,
+                    original_module_name=base_manager_info.module_name,
                 )
                 continue
 

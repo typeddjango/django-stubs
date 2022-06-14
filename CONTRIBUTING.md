@@ -70,6 +70,12 @@ To execute the unit tests, simply run:
 pytest
 ```
 
+If you get some unexpected results or want to be sure that tests run is not affected by previous one, remove `mypy` cache:
+
+```bash
+rm -r .mypy_cache
+```
+
 We also test the stubs against Django's own test suite. This is done in CI but you can also do this locally.
 To execute the script run:
 
