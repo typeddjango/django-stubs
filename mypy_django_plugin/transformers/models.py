@@ -14,6 +14,7 @@ from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME, MODEL_CLASS_FULLNAME
 from mypy_django_plugin.lib.helpers import add_new_class_for_module
@@ -345,6 +346,7 @@ class AddRelatedManagers(ModelClassInitializer):
                 continue
 
             if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+                related_manager_info = None
                 try:
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
                         fullnames.RELATED_MANAGER_CLASS
@@ -356,6 +358,26 @@ class AddRelatedManagers(ModelClassInitializer):
                     if not self.api.final_iteration:
                         raise exc
                     else:
+                        if related_manager_info:
+                            """
+                            If a django model has a Manager class that cannot be
+                            resolved statically (if it is generated in a way
+                            where we cannot import it, like `objects = my_manager_factory()`),
+                            we fallback to the default related manager, so you
+                            at least get a base level of working type checking.
+
+                            See https://github.com/typeddjango/django-stubs/pull/993
+                            for more information on when this error can occur.
+                            """
+                            self.add_new_node_to_model_class(
+                                attname, Instance(related_manager_info, [Instance(related_model_info, [])])
+                            )
+                            related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
+                            self.ctx.api.fail(
+                                f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname}.{relation.field}).",
+                                self.ctx.cls,
+                                code=MANAGER_MISSING,
+                            )
                         continue
 
                 # Check if the related model has a related manager subclassed from the default manager
