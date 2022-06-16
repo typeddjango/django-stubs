@@ -243,13 +243,11 @@ class AddManagers(ModelClassInitializer):
             except helpers.IncompleteDefnException as exc:
                 # Check if manager is a generated (dynamic class) manager
                 base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                manager_info = self.get_generated_manager_info(manager_fullname, base_manager_fullname)
-                if manager_info is None:
+                if manager_fullname not in self.get_generated_manager_mappings(base_manager_fullname):
                     # Manager doesn't appear to be generated. Track that we encountered an
                     # incomplete definition and skip
                     incomplete_manager_defs.add(manager_name)
-                    continue
-                _, manager_class_name = manager_info.fullname.rsplit(".", maxsplit=1)
+                continue
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
@@ -285,7 +283,9 @@ class AddManagers(ModelClassInitializer):
                 # ignoring a more specialised manager not being resolved while still
                 # setting _some_ type
                 django_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
-                assert django_manager_info is not None
+                assert (
+                    django_manager_info is not None
+                ), f"Type info for Django's {fullnames.MANAGER_CLASS_FULLNAME} missing"
                 self.add_new_node_to_model_class(
                     manager_name, Instance(django_manager_info, [Instance(self.model_classdef.info, [])])
                 )
@@ -301,7 +301,7 @@ class AddManagers(ModelClassInitializer):
                 ]
                 manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
                 self.api.fail(
-                    f"Couldn't resolve manager type for {manager_fullname!r}",
+                    f'Could not resolve manager type for "{manager_fullname}"',
                     manager_expr[0] if manager_expr else self.ctx.cls,
                     code=MANAGER_MISSING,
                 )

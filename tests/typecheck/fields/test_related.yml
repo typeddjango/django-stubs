@@ -649,10 +649,12 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                from django.db.models.manager import BaseManager
                 class TransactionQuerySet(models.QuerySet):
                     pass
+                TransactionManager = BaseManager.from_queryset(TransactionQuerySet)
                 class Transaction(models.Model):
-                    objects = TransactionQuerySet.as_manager()
+                    objects = TransactionManager()
                     def test(self) -> None:
                         self.transactionlog_set
                 class TransactionLog(models.Model):

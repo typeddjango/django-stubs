@@ -460,8 +460,7 @@
                     be resolved.
                     """
                     class InnerManager(models.Manager):
-                        def some_method(self, arg: str) -> None:
-                            return None
+                        ...
 
                     return InnerManager()
 
@@ -504,21 +503,21 @@
                     reveal_type(user.bookingowner_set)
                     reveal_type(user.booking_set)
     out: |
-        myapp/models:14: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
-        myapp/models:14: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
-        myapp/models:21: error: Couldn't resolve manager type for 'myapp.models.Booking.objects'
-        myapp/models:24: error: Couldn't resolve manager type for 'myapp.models.TwoUnresolvable.objects'
-        myapp/models:25: error: Couldn't resolve manager type for 'myapp.models.TwoUnresolvable.second_objects'
-        myapp/models:28: error: Couldn't resolve manager type for 'myapp.models.AbstractUnresolvable.objects'
-        myapp/models:33: error: Couldn't resolve manager type for 'myapp.models.InvisibleUnresolvable.objects'
+        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
+        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
+        myapp/models:20: error: Could not resolve manager type for "myapp.models.Booking.objects"
+        myapp/models:23: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.objects"
+        myapp/models:24: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.second_objects"
+        myapp/models:27: error: Could not resolve manager type for "myapp.models.AbstractUnresolvable.objects"
+        myapp/models:32: error: Could not resolve manager type for "myapp.models.InvisibleUnresolvable.objects"
+        myapp/models:36: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
         myapp/models:37: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
-        myapp/models:38: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
-        myapp/models:40: note: Revealed type is "django.db.models.manager.Manager[myapp.models.Booking]"
-        myapp/models:41: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.Booking]"
+        myapp/models:39: note: Revealed type is "django.db.models.manager.Manager[myapp.models.Booking]"
+        myapp/models:40: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.Booking]"
+        myapp/models:42: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
         myapp/models:43: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
-        myapp/models:44: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
-        myapp/models:45: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.TwoUnresolvable]"
-        myapp/models:47: note: Revealed type is "django.db.models.manager.Manager[myapp.models.InvisibleUnresolvable]"
-        myapp/models:48: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.InvisibleUnresolvable]"
+        myapp/models:44: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.TwoUnresolvable]"
+        myapp/models:46: note: Revealed type is "django.db.models.manager.Manager[myapp.models.InvisibleUnresolvable]"
+        myapp/models:47: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.InvisibleUnresolvable]"
+        myapp/models:49: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
         myapp/models:50: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
-        myapp/models:51: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
