@@ -16,5 +16,5 @@ class CacheHandler(BaseConnectionHandler):
 
 def close_caches(**kwargs: Any) -> None: ...
 
-cache: ConnectionProxy
+cache: BaseCache
 caches: CacheHandler
