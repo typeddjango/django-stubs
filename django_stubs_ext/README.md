@@ -24,6 +24,7 @@ django_stubs_ext.monkeypatch()
 ```
 
 This only needs to be called once, so the call to `monkeypatch` should be placed in your top-level settings.
+Real-life example [can be found here](https://github.com/wemake-services/wemake-django-template/blob/5bf1569e2710e11befc6991893f94419136d74bd/%7B%7Bcookiecutter.project_name%7D%7D/server/settings/__init__.py#L14-L19).
 
 ## Version compatibility
 
