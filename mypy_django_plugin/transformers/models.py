@@ -5,7 +5,7 @@ from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, Context, FuncDef, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, FuncDef, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
@@ -234,7 +234,7 @@ class AddManagers(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
 
-        encountered_incomplete_manager_def = False
+        incomplete_manager_defs = set()
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_class_name = manager.__class__.__name__
             manager_fullname = helpers.get_class_fullname(manager.__class__)
@@ -243,13 +243,11 @@ class AddManagers(ModelClassInitializer):
             except helpers.IncompleteDefnException as exc:
                 # Check if manager is a generated (dynamic class) manager
                 base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                manager_info = self.get_generated_manager_info(manager_fullname, base_manager_fullname)
-                if manager_info is None:
+                if manager_fullname not in self.get_generated_manager_mappings(base_manager_fullname):
                     # Manager doesn't appear to be generated. Track that we encountered an
                     # incomplete definition and skip
-                    encountered_incomplete_manager_def = True
-                    continue
-                _, manager_class_name = manager_info.fullname.rsplit(".", maxsplit=1)
+                    incomplete_manager_defs.add(manager_name)
+                continue
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
@@ -275,9 +273,38 @@ class AddManagers(ModelClassInitializer):
 
                 self.add_new_node_to_model_class(manager_name, custom_manager_type)
 
-        if encountered_incomplete_manager_def and not self.api.final_iteration:
-            #  Unless we're on the final round, see if another round could figuring out all manager types
+        if incomplete_manager_defs and not self.api.final_iteration:
+            #  Unless we're on the final round, see if another round could figure out all manager types
             raise helpers.IncompleteDefnException()
+        elif self.api.final_iteration:
+            for manager_name in incomplete_manager_defs:
+                # We act graceful and set the type as the bare minimum we know of
+                # (Django's default) before finishing. And emit an error, to allow for
+                # ignoring a more specialised manager not being resolved while still
+                # setting _some_ type
+                django_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
+                assert (
+                    django_manager_info is not None
+                ), f"Type info for Django's {fullnames.MANAGER_CLASS_FULLNAME} missing"
+                self.add_new_node_to_model_class(
+                    manager_name, Instance(django_manager_info, [Instance(self.model_classdef.info, [])])
+                )
+                # Find expression for e.g. `objects = SomeManager()`
+                manager_expr = [
+                    expr
+                    for expr in self.ctx.cls.defs.body
+                    if (
+                        isinstance(expr, AssignmentStmt)
+                        and isinstance(expr.lvalues[0], NameExpr)
+                        and expr.lvalues[0].name == manager_name
+                    )
+                ]
+                manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
+                self.api.fail(
+                    f'Could not resolve manager type for "{manager_fullname}"',
+                    manager_expr[0] if manager_expr else self.ctx.cls,
+                    code=MANAGER_MISSING,
+                )
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):

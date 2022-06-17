@@ -639,43 +639,6 @@
               class Article(LibraryEntity):
                   pass
 
-
--   case: test_related_managers_when_manager_is_dynamically_generated_and_cannot_be_imported
-    main: |
-        from myapp import models
-    installed_apps:
-        - myapp
-    files:
-        -   path: myapp/__init__.py
-        -   path: myapp/models.py
-            content: |
-                from django.db import models
-
-                class User(models.Model):
-                    name = models.TextField()
-
-                def DynamicManager() -> models.Manager:
-                    class InnerManager(models.Manager):
-                        def some_method(self, arg: str) -> None:
-                            return None
-
-                    return InnerManager()
-
-                class Booking(models.Model):
-                    renter = models.ForeignKey(User, on_delete=models.PROTECT)
-                    owner = models.ForeignKey(User, on_delete=models.PROTECT, related_name='bookingowner_set')
-
-                    objects = DynamicManager()
-
-                def process_booking(user: User):
-                    reveal_type(user.bookingowner_set)
-                    reveal_type(user.booking_set)
-    out: |
-        myapp/models:3: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
-        myapp/models:3: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
-        myapp/models:20: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
-        myapp/models:21: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
-
 -   case: foreign_key_relationship_for_models_with_custom_manager
     main: |
         from myapp.models import Transaction
@@ -686,10 +649,12 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                from django.db.models.manager import BaseManager
                 class TransactionQuerySet(models.QuerySet):
                     pass
+                TransactionManager = BaseManager.from_queryset(TransactionQuerySet)
                 class Transaction(models.Model):
-                    objects = TransactionQuerySet.as_manager()
+                    objects = TransactionManager()
                     def test(self) -> None:
                         self.transactionlog_set
                 class TransactionLog(models.Model):
