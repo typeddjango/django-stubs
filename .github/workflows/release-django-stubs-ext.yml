@@ -27,7 +27,7 @@ jobs:
           python -m pip install -U setuptools twine wheel
       - name: Build package
         run: |
-          cd ./django-stubs-ext
+          cd ./django_stubs_ext
           python setup.py --version
           python setup.py sdist bdist_wheel
 
