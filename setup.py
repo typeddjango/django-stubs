@@ -36,7 +36,7 @@ extras_require = {
 
 setup(
     name="django-stubs",
-    version="1.11.1",
+    version="1.12.0",
     description="Mypy stubs for Django",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -44,6 +44,8 @@ setup(
     url="https://github.com/typeddjango/django-stubs",
     author="Maksim Kurnikov",
     author_email="maxim.kurnikov@gmail.com",
+    maintainer="Nikita Sobolev",
+    maintainer_email="mail@sobolevn.me",
     py_modules=[],
     python_requires=">=3.7",
     install_requires=dependencies,
@@ -65,6 +67,7 @@ setup(
         "Framework :: Django :: 3.0",
         "Framework :: Django :: 3.1",
         "Framework :: Django :: 3.2",
+        "Framework :: Django :: 4.0",
     ],
     project_urls={
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",

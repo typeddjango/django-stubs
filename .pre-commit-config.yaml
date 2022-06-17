@@ -4,7 +4,7 @@ default_language_version:
   python: python3.9
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.3.0
     hooks:
       - id: check-yaml
       - id: trailing-whitespace
@@ -13,12 +13,12 @@ repos:
       - id: check-merge-conflict
       - id: end-of-file-fixer
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.29.1
+    rev: v2.34.0
     hooks:
       - id: pyupgrade
         args: ["--py36-plus"]
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.9.3
+    rev: v5.10.1
     hooks:
       - id: isort
         name: isort (python)
