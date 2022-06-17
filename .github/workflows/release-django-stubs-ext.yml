@@ -50,7 +50,7 @@ jobs:
               repo: context.repo.repo,
               tag_name: tagName,
               name: `Release ${tagName}`,
-              generate_release_notes: true,
+              generate_release_notes: false,
             });
 
             if (release.status < 200 || release.status >= 300) {
