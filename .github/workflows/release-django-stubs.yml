@@ -47,7 +47,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: tagName,
-              name: `Release of ${tagName} failed`,
+              name: `Release ${tagName}`,
               generate_release_notes: true,
             });
 
@@ -71,6 +71,6 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Release failure on ${new Date().toDateString()}`,
-              body: `Details: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/workflows/release.yml`,
+              title: `Release of django-stubs failure on ${new Date().toDateString()}`,
+              body: `Details: https://github.com/typeddjango/django-stubs/actions/workflows/release-django-stubs.yml`,
             })
