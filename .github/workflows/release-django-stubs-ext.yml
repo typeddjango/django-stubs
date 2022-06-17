@@ -30,13 +30,14 @@ jobs:
           cd ./django_stubs_ext
           python setup.py --version
           python setup.py sdist bdist_wheel
+          ls dist
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
-          password: ${{ secrets.DJANGO_STUBS_PYPI_API_TOKEN }}
-          packages_dir: './django-stubs-ext/dist'
+          password: ${{ secrets.DJANGO_STUBS_EXT_PYPI_API_TOKEN }}
+          packages_dir: django-stubs-ext/dist
           print_hash: true
 
       - name: Create release
