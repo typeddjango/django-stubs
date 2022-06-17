@@ -37,7 +37,7 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.DJANGO_STUBS_EXT_PYPI_API_TOKEN }}
-          packages_dir: django-stubs-ext/dist
+          packages_dir: django_stubs_ext/dist
           print_hash: true
 
       - name: Create release
