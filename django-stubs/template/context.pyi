@@ -7,7 +7,7 @@ from django.template.defaulttags import IfChangedNode
 from django.template.loader_tags import IncludeNode
 
 _ContextValues = Union[Dict[str, Any], "Context"]
-ContextCopy = TypeVar("ContextCopy", bound="BaseContext")
+_ContextCopy = TypeVar("_ContextCopy", bound="BaseContext")
 
 class ContextPopException(Exception): ...
 
