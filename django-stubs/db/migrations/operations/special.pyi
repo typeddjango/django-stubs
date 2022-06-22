@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Mapping, Optional, Sequence, Union
+from typing import Any, Mapping, Optional, Sequence, Tuple, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
@@ -21,14 +21,14 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""] = ...
-    sql: Union[str, _ListOrTuple[str]] = ...
-    reverse_sql: Optional[Union[str, _ListOrTuple[str]]] = ...
+    sql: Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]] = ...
+    reverse_sql: Optional[Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]]] = ...
     state_operations: Sequence[Operation] = ...
     hints: Mapping[str, Any] = ...
     def __init__(
         self,
-        sql: Union[str, _ListOrTuple[str]],
-        reverse_sql: Optional[Union[str, _ListOrTuple[str]]] = ...,
+        sql: Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]],
+        reverse_sql: Optional[Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]]] = ...,
         state_operations: Sequence[Operation] = ...,
         hints: Optional[Mapping[str, Any]] = ...,
         elidable: bool = ...,
