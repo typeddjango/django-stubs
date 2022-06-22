@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Type, Union
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Type, TypeVar, Union
 
 from django.http.request import HttpRequest
 from django.template.base import Node, Origin, Template
@@ -7,6 +7,7 @@ from django.template.defaulttags import IfChangedNode
 from django.template.loader_tags import IncludeNode
 
 _ContextValues = Union[Dict[str, Any], "Context"]
+ContextCopy = TypeVar("ContextCopy", bound="BaseContext")
 
 class ContextPopException(Exception): ...
 
@@ -18,7 +19,7 @@ class ContextDict(dict):
 
 class BaseContext(Iterable[Any]):
     def __init__(self, dict_: Any = ...) -> None: ...
-    def __copy__(self) -> BaseContext: ...
+    def __copy__(self: ContextCopy) -> ContextCopy: ...
     def __iter__(self) -> Iterator[Any]: ...
     def push(self, *args: Any, **kwargs: Any) -> ContextDict: ...
     def pop(self) -> ContextDict: ...
