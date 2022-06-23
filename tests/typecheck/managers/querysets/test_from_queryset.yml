@@ -384,3 +384,37 @@
                 MyManager = BaseManager.from_queryset(MyQuerySet)
                 class MyModel(models.Model):
                     objects = MyManager()
+
+
+-   case: from_queryset_custom_auth_user_model
+    main: |
+        from users.models import User
+    custom_settings: |
+        AUTH_USER_MODEL = "users.User"
+        INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "users")
+    files:
+        -   path: users/__init__.py
+        -   path: users/models.py
+            content: |
+                from django.contrib.auth.models import AbstractBaseUser
+                from django.db import models
+
+                from .querysets import UserQuerySet
+
+                UserManager = models.Manager.from_queryset(UserQuerySet)
+
+                class User(AbstractBaseUser):
+                    email = models.EmailField(unique=True)
+                    objects = UserManager()
+                    USERNAME_FIELD = "email"
+
+        -   path: users/querysets.py
+            content: |
+                from django.db import models
+                from typing import Optional, TYPE_CHECKING
+
+                if TYPE_CHECKING:
+                    from .models import User
+
+                class UserQuerySet(models.QuerySet["User"]):
+                    pass
