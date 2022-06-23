@@ -124,3 +124,21 @@
                     pass
                 class Book(models.Model):
                     authors = models.ManyToManyField(Author, related_name='books')
+
+-   case: queryset_values_blank_charfield
+    main: |
+        from myapp.models import Blog
+        values = Blog.objects.values('text').get()
+        reveal_type(values)  # N: Revealed type is "TypedDict({'text': builtins.str})"
+        reveal_type(values["text"])  # N: Revealed type is "builtins.str"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Blog(models.Model):
+                    num_posts = models.IntegerField()
+                    text = models.CharField(max_length=100, blank=True)
