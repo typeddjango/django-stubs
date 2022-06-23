@@ -28,7 +28,9 @@ class RunSQL(Operation):
     def __init__(
         self,
         sql: Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]],
-        reverse_sql: Optional[Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]]] = ...,
+        reverse_sql: Optional[
+            Union[str, _ListOrTuple[str], _ListOrTuple[Tuple[str, Optional[_ListOrTuple[str]]]]]
+        ] = ...,
         state_operations: Sequence[Operation] = ...,
         hints: Optional[Mapping[str, Any]] = ...,
         elidable: bool = ...,
