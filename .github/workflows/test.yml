@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
-        run: brew install binutils libproj-dev gdal-bin
+        run: brew install proj gdal
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
