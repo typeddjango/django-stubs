@@ -388,13 +388,13 @@
 
 -   case: from_queryset_custom_auth_user_model
     main: |
-        from this_name_must_be_unique.models import User
+        from users.models import User
     custom_settings: |
-        AUTH_USER_MODEL = "this_name_must_be_unique.User"
-        INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "this_name_must_be_unique", "does_this_need_to_be_unique_too")
+        AUTH_USER_MODEL = "users.User"
+        INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "users")
     files:
-        -   path: this_name_must_be_unique/__init__.py
-        -   path: this_name_must_be_unique/models.py
+        -   path: users/__init__.py
+        -   path: users/models.py
             content: |
                 from django.contrib.auth.models import AbstractBaseUser
                 from django.db import models
@@ -408,7 +408,7 @@
                     objects = UserManager()
                     USERNAME_FIELD = "email"
 
-        -   path: this_name_must_be_unique/querysets.py
+        -   path: users/querysets.py
             content: |
                 from django.db import models
                 from typing import Optional, TYPE_CHECKING
@@ -418,29 +418,3 @@
 
                 class UserQuerySet(models.QuerySet["User"]):
                     pass
-        -   path: does_this_need_to_be_unique_too/__init__.py
-        -   path: does_this_need_to_be_unique_too/models.py
-            content: |
-                from django.db import models
-                from .managers import MyManager, MyQuerySet
-                _MyManager = MyManager.from_queryset(MyQuerySet)
-                class MyModel(models.Model):
-                    objects = _MyManager()
-        -   path: does_this_need_to_be_unique_too/managers.py
-            content: |
-                from typing import TYPE_CHECKING, Optional
-
-                from django.db import models
-
-                if TYPE_CHECKING:
-                    from .models import MyModel
-
-
-                class MyManager(models.Manager):
-                    def my_manager_method(self) -> None:
-                        ...
-
-
-                class MyQuerySet(models.QuerySet["MyModel"]):
-                    def my_method(self, arg: int) -> Optional["MyModel"]:
-                        return self.first()
