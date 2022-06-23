@@ -17,7 +17,7 @@ class ContentNotRenderedError(Exception): ...
 class SimpleTemplateResponse(HttpResponse):
     content: Any = ...
     closed: bool
-    cookies: SimpleCookie
+    cookies: SimpleCookie[str]
     status_code: int
     rendering_attrs: Any = ...
     template_name: _TemplateForResponseT = ...
@@ -48,7 +48,7 @@ class TemplateResponse(SimpleTemplateResponse):
     closed: bool
     context: RequestContext
     context_data: Optional[Dict[str, Any]]
-    cookies: SimpleCookie
+    cookies: SimpleCookie[str]
     csrf_cookie_set: bool
     json: functools.partial
     redirect_chain: List[Tuple[str, int]]
