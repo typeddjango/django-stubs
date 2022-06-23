@@ -28,14 +28,14 @@ jobs:
         run: pre-commit install && pre-commit run --all-files
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-12
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.10']
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
-        run: sudo apt-get install binutils libproj-dev gdal-bin
+        run: brew install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
