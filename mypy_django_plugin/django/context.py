@@ -263,6 +263,9 @@ class DjangoContext:
         return attname
 
     def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str]) -> bool:
+        if method in ("values", "values_list"):
+            return field.null
+
         nullable = field.null
         if not nullable and isinstance(field, CharField) and field.blank:
             return True
