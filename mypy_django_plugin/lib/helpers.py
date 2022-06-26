@@ -369,7 +369,7 @@ def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Option
     That should hopefully give a bound type."""
     if isinstance(t, UnboundType) and module_name is not None:
         node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
-        if node is not None and node.type is not None:
+        if node is not None:
             return node.type
 
     return api.anal_type(t)
@@ -404,6 +404,8 @@ def copy_method_to_another_class(
     if return_type is None:
         return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
     if return_type is None:
+        if not semanal_api.final_iteration:
+            semanal_api.defer()
         return
 
     # We build the arguments from the method signature (`CallableType`), because if we were to
@@ -417,6 +419,8 @@ def copy_method_to_another_class(
     ):
         bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
         if bound_arg_type is None:
+            if not semanal_api.final_iteration:
+                semanal_api.defer()
             return
         if arg_name is None and hasattr(method_node, "arguments"):
             arg_name = method_node.arguments[pos].variable.name
