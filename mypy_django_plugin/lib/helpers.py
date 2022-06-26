@@ -387,29 +387,27 @@ def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Option
 
 
 def copy_method_to_another_class(
-    ctx: ClassDefContext,
+    api: SemanticAnalyzer,
+    cls: ClassDef,
     self_type: Instance,
     new_method_name: str,
     method_node: FuncDef,
     return_type: Optional[MypyType] = None,
     original_module_name: Optional[str] = None,
 ) -> bool:
-    semanal_api = get_semanal_api(ctx)
     if method_node.type is None:
         arguments, return_type = build_unannotated_method_args(method_node)
-        add_method_to_class(
-            semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
-        )
+        add_method_to_class(api, cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
         return True
 
     method_type = method_node.type
     if not isinstance(method_type, CallableType):
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
+        if not api.final_iteration:
+            api.defer()
         return False
 
     if return_type is None:
-        return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
+        return_type = bind_or_analyze_type(method_type.ret_type, api, original_module_name)
     if return_type is None:
         return False
 
@@ -422,7 +420,7 @@ def copy_method_to_another_class(
         zip(method_type.arg_types[1:], method_type.arg_kinds[1:], method_type.arg_names[1:]),
         start=1,
     ):
-        bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
+        bound_arg_type = bind_or_analyze_type(arg_type, api, original_module_name)
         if bound_arg_type is None:
             return False
         if arg_name is None and hasattr(method_node, "arguments"):
@@ -438,9 +436,7 @@ def copy_method_to_another_class(
             )
         )
 
-    add_method_to_class(
-        semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
-    )
+    add_method_to_class(api, cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type)
 
     return True
 

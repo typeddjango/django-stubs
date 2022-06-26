@@ -24,6 +24,7 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
+    create_new_manager_class_from_as_manager_method,
     create_new_manager_class_from_from_queryset_method,
     resolve_manager_method,
 )
@@ -301,11 +302,15 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
         # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
-        if fullname.endswith("from_queryset"):
-            class_name, _, _ = fullname.rpartition(".")
+        class_name, _, method_name = fullname.rpartition(".")
+        if method_name == "from_queryset":
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return create_new_manager_class_from_from_queryset_method
+        elif method_name == "as_manager":
+            info = self._get_typeinfo_or_none(class_name)
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+                return create_new_manager_class_from_as_manager_method
         return None
 
 

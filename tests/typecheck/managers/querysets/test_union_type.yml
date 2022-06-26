@@ -9,7 +9,7 @@
         model_cls = type(instance)
 
         reveal_type(model_cls) # N: Revealed type is "Union[Type[myapp.models.Order], Type[myapp.models.User]]"
-        reveal_type(model_cls.objects)  # N: Revealed type is "Union[myapp.models.OrderManager[myapp.models.Order], myapp.models.UserManager[myapp.models.User]]"
+        reveal_type(model_cls.objects)  # N: Revealed type is "Union[myapp.models.ManagerFromMyQuerySet[myapp.models.Order], myapp.models.ManagerFromMyQuerySet[myapp.models.User]]"
         model_cls.objects.my_method()  # E: Unable to resolve return type of queryset/manager method "my_method"
     installed_apps:
         - myapp

@@ -289,14 +289,14 @@ class AddManagers(ModelClassInitializer):
         # but rather waiting until we know we won't defer
         new_manager_info = self.add_new_class_for_current_module(name, bases)
         # copy fields to a new manager
-        new_cls_def_context = ClassDefContext(cls=new_manager_info.defn, reason=self.ctx.reason, api=self.api)
         custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
 
         for name, sym in base_manager_info.names.items():
             # replace self type with new class, if copying method
             if isinstance(sym.node, FuncDef):
                 copied_method = helpers.copy_method_to_another_class(
-                    new_cls_def_context,
+                    api=self.api,
+                    cls=new_manager_info.defn,
                     self_type=custom_manager_type,
                     new_method_name=name,
                     method_node=sym.node,
@@ -316,37 +316,57 @@ class AddManagers(ModelClassInitializer):
 
         return custom_manager_type
 
+    def lookup_manager(self, fullname: str, manager: "Manager[Any]") -> Optional[TypeInfo]:
+        manager_info = self.lookup_typeinfo(fullname)
+        if manager_info is None:
+            manager_info = self.get_dynamic_manager(fullname, manager)
+        return manager_info
+
+    def is_manager_dynamically_generated(self, manager_info: Optional[TypeInfo]) -> bool:
+        if manager_info is None:
+            return False
+        return manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
+
+    def reparametrize_dynamically_created_manager(self, manager_name: str, manager_info: Optional[TypeInfo]) -> None:
+        if not self.is_manager_dynamically_generated(manager_info):
+            return
+
+        assert manager_info is not None
+        # Reparameterize dynamically created manager with model type
+        manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+        self.add_new_node_to_model_class(manager_name, manager_type)
+
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
 
         incomplete_manager_defs = set()
         for manager_name, manager in model_cls._meta.managers_map.items():
-            # If the manager is already typed do nothing
             manager_node = self.model_classdef.info.names.get(manager_name, None)
-            if manager_node and manager_node.type is not None:
-                continue
-
-            manager_class_name = manager.__class__.__name__
             manager_fullname = helpers.get_class_fullname(manager.__class__)
+            manager_info = self.lookup_manager(manager_fullname, manager)
 
-            manager_info = self.lookup_typeinfo(manager_fullname)
-            if manager_info is None:
+            if manager_node and manager_node.type is not None:
+                # Manager is already typed -> do nothing unless it's a dynamically generated manager
+                self.reparametrize_dynamically_created_manager(manager_name, manager_info)
+                continue
+            elif manager_info is None:
+                # We couldn't find a manager type, see if we should create one
                 manager_info = self.create_manager_from_from_queryset(manager_name)
-            if manager_info is None:
-                manager_info = self.get_dynamic_manager(manager_fullname, manager)
 
             if manager_info is None:
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            is_dynamically_generated = manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
-            if manager_name not in self.model_classdef.info.names or is_dynamically_generated:
+            if manager_name not in self.model_classdef.info.names or self.is_manager_dynamically_generated(
+                manager_info
+            ):
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
                 self.add_new_node_to_model_class(manager_name, manager_type)
             elif self.has_any_parametrized_manager_as_base(manager_info):
                 # Ending up here could for instance be due to having a custom _Manager_
                 # that is not built from a custom QuerySet. Another example is a
                 # related manager.
+                manager_class_name = manager.__class__.__name__
                 custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
                 try:
                     manager_type = self.create_new_model_parametrized_manager(
