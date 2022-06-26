@@ -32,6 +32,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8']
+        mypy_ini_file: ['mypy.ini', 'mypy.ini.dev']
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
@@ -46,7 +47,7 @@ jobs:
           pip install -r ./requirements.txt
 
       - name: Run tests
-        run: pytest
+        run: pytest --mypy_ini_file="${{ matrix.mypy_ini_file }}"
 
   typecheck:
     runs-on: ubuntu-latest

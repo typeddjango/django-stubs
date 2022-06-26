@@ -4,7 +4,7 @@
 # incremental mode can be harmful during development
 # (mypy cache is not always invalidated).
 # However, incremental mode has to be supported by django-stubs,
-# thus another config (mypy.ini) is used in CI.
+# thus both this config and mypy.ini are used in CI.
 # Incremental mode is recommended for regular usage.
 
 # WARNING: when changing this file, consider doing the same with mypy.ini
