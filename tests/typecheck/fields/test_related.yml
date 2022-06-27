@@ -684,6 +684,8 @@
                     def test(self) -> None:
                         reveal_type(self.transactionlog_set)
                         # We use a fallback Any type:
+                        reveal_type(Transaction.objects)
+                        reveal_type(Transaction.objects.get())
                         reveal_type(Transaction.objects.custom())
 
                 class TransactionLog(models.Model):
@@ -692,6 +694,8 @@
         myapp/models:9: error: `.from_queryset` called from inside model class body
         myapp/models:11: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
         myapp/models:13: note: Revealed type is "Any"
+        myapp/models:14: note: Revealed type is "Any"
+        myapp/models:15: note: Revealed type is "Any"
 
 
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
