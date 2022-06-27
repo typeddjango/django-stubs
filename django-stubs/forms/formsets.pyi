@@ -2,7 +2,8 @@ from collections.abc import Iterator, Mapping, Sequence, Sized
 from typing import Any, Generic, TypeVar
 
 from django.forms.forms import BaseForm, Form
-from django.forms.utils import ErrorList, _DataT, _FilesT
+from django.forms.renderers import BaseRenderer
+from django.forms.utils import ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeString
 
@@ -23,7 +24,7 @@ class ManagementForm(Form):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def clean(self) -> dict[str, int | None]: ...
 
-class BaseFormSet(Generic[_F], Sized):
+class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
     form: type[_F]
     extra: int
     can_order: bool
@@ -44,6 +45,11 @@ class BaseFormSet(Generic[_F], Sized):
     form_kwargs: dict[str, Any]
     error_class: type[ErrorList]
     ordering_widget: type[Widget]
+    template_name: str = ...
+    template_name_p: str = ...
+    template_name_table: str = ...
+    template_name_ul: str = ...
+    template_name_label: str = ...
     def __init__(
         self,
         data: _DataT | None = ...,
@@ -95,9 +101,6 @@ class BaseFormSet(Generic[_F], Sized):
     def is_multipart(self) -> bool: ...
     @property
     def media(self) -> Media: ...
-    def as_table(self) -> SafeString: ...
-    def as_p(self) -> SafeString: ...
-    def as_ul(self) -> SafeString: ...
 
 def formset_factory(
     form: type[_F],
@@ -111,5 +114,6 @@ def formset_factory(
     validate_min: bool = ...,
     absolute_max: int | None = ...,
     can_delete_extra: bool = ...,
+    renderer: BaseRenderer | None = ...,
 ) -> type[BaseFormSet[_F]]: ...
 def all_valid(formsets: Sequence[BaseFormSet[_F]]) -> bool: ...
