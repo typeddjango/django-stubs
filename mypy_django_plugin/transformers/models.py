@@ -394,7 +394,7 @@ class AddRelatedManagers(ModelClassInitializer):
                             )
                             related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
                             self.ctx.api.fail(
-                                f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname}.{relation.field}).",
+                                f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname} - {relation.field}).",
                                 self.ctx.cls,
                                 code=MANAGER_MISSING,
                             )

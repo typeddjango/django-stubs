@@ -484,8 +484,8 @@
                     reveal_type(user.bookingowner_set)
                     reveal_type(user.booking_set)
     out: |
-        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
-        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
+        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking - myapp.Booking.renter).
+        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking - myapp.Booking.owner).
         myapp/models:20: error: Could not resolve manager type for "myapp.models.Booking.objects"
         myapp/models:23: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.objects"
         myapp/models:24: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.second_objects"
