@@ -15,7 +15,9 @@ from mypy.plugin import (
     MethodContext,
     Plugin,
 )
+from mypy.types import AnyType
 from mypy.types import Type as MypyType
+from mypy.types import TypeOfAny
 
 import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.config import DjangoPluginConfig
@@ -58,6 +60,31 @@ def transform_form_class(ctx: ClassDefContext) -> None:
 
 def add_new_manager_base_hook(ctx: ClassDefContext) -> None:
     helpers.add_new_manager_base(ctx.api, ctx.cls.fullname)
+
+
+def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
+    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if manager is None or manager.node is None:
+        return
+    assert isinstance(manager.node, TypeInfo)
+
+    should_reparametrize = (
+        manager.node.bases
+        and manager.node.bases[0].args
+        and isinstance(manager.node.bases[0].args[0], AnyType)
+        and manager.node.bases[0].args[0].type_of_any != TypeOfAny.explicit
+        and manager.node.bases[0].type.defn.type_vars
+    )
+    if not should_reparametrize:
+        return
+
+    # breakpoint()
+    tvars = tuple(manager.node.bases[0].type.defn.type_vars)
+    manager.node.bases[0].args = tvars
+    manager.node.defn.type_vars = list(tvars)
+    manager.node.add_type_vars()
+    if not ctx.api.final_iteration:
+        ctx.api.defer()
 
 
 class NewSemanalDjangoPlugin(Plugin):
@@ -243,6 +270,17 @@ class NewSemanalDjangoPlugin(Plugin):
                 return fail_if_manager_type_created_in_model_body
 
         return None
+
+    def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        # We cannot appeal to _get_current_manager_bases here, because new name
+        # is not added there yet
+        manager = self.lookup_fully_qualified(fullname)
+        if (
+            manager is not None
+            and isinstance(manager.node, TypeInfo)
+            and manager.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        ):
+            return reparametrize_manager_base_hook
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition

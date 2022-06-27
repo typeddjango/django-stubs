@@ -5,7 +5,7 @@ from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, FuncDef, NameExpr, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
@@ -192,44 +192,25 @@ class AddManagers(ModelClassInitializer):
         return False
 
     def is_any_parametrized_manager(self, typ: Instance) -> bool:
-        return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
+        return bool(
+            typ.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+            and typ.args
+            and isinstance(typ.args[0], AnyType)
+            and typ.args[0].type_of_any != TypeOfAny.explicit
+        )
 
     def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
-        bases = []
-        for original_base in base_manager_info.bases:
-            if self.is_any_parametrized_manager(original_base):
-                if original_base.type is None:
-                    raise helpers.IncompleteDefnException()
+        parent_manager = self.api.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME).node
+        assert isinstance(parent_manager, TypeInfo)
+        tvars = parent_manager.defn.type_vars
 
-                original_base = helpers.reparametrize_instance(original_base, [Instance(self.model_classdef.info, [])])
-            bases.append(original_base)
+        base = Instance(base_manager_info, tvars)
 
-        new_manager_info = self.add_new_class_for_current_module(name, bases)
-        # copy fields to a new manager
-        new_cls_def_context = ClassDefContext(cls=new_manager_info.defn, reason=self.ctx.reason, api=self.api)
-        custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
+        new_manager_info = self.add_new_class_for_current_module(name, [base])
+        new_manager_info.defn.type_vars = tvars
+        new_manager_info.add_type_vars()
 
-        for name, sym in base_manager_info.names.items():
-            # replace self type with new class, if copying method
-            if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(
-                    new_cls_def_context,
-                    self_type=custom_manager_type,
-                    new_method_name=name,
-                    method_node=sym.node,
-                    original_module_name=base_manager_info.module_name,
-                )
-                continue
-
-            new_sym = sym.copy()
-            if isinstance(new_sym.node, Var):
-                new_var = Var(name, type=sym.type)
-                new_var.info = new_manager_info
-                new_var._fullname = new_manager_info.fullname + "." + name
-                new_sym.node = new_var
-            new_manager_info.names[name] = new_sym
-
-        return custom_manager_type
+        return Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
@@ -389,7 +370,7 @@ class AddRelatedManagers(ModelClassInitializer):
                 try:
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
                         fullnames.RELATED_MANAGER_CLASS
-                    )  # noqa: E501
+                    )
                     default_manager = related_model_info.names.get("_default_manager")
                     if not default_manager:
                         raise helpers.IncompleteDefnException()
