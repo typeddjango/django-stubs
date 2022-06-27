@@ -139,6 +139,15 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     """
     semanal_api = helpers.get_semanal_api(ctx)
 
+    # Do not interfere with `fail_if_manager_type_created_in_model_body`:
+    # stop adding new manager, if we are inside, and fall back to any
+    if semanal_api.scope.classes:
+        any_type = AnyType(TypeOfAny.implementation_artifact)
+        info = semanal_api.lookup_fully_qualified(semanal_api.scope.current_full_target()).node
+        assert isinstance(info, TypeInfo)
+        helpers.add_new_sym_for_info(info=info, name=ctx.name, sym_type=any_type)
+        return
+
     # Don't redeclare the manager class if we've already defined it.
     manager_node = semanal_api.lookup_current_scope(ctx.name)
     if manager_node and isinstance(manager_node.node, TypeInfo):
