@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Final, FrozenSet, Optional, Union
 
 from mypy.checker import TypeChecker, fill_typevars
 from mypy.nodes import (
@@ -19,32 +19,34 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny, TypeVarType, UnboundType, get_proper_type
+from mypy.types import TypeOfAny
 
 from mypy_django_plugin import errorcodes
 from mypy_django_plugin.lib import fullnames, helpers
 
-MANAGER_METHODS_RETURNING_QUERYSET = (
-    "alias",
-    "all",
-    "annotate",
-    "complex_filter",
-    "defer",
-    "difference",
-    "distinct",
-    "exclude",
-    "extra",
-    "filter",
-    "intersection",
-    "none",
-    "only",
-    "order_by",
-    "prefetch_related",
-    "reverse",
-    "select_for_update",
-    "select_related",
-    "union",
-    "using",
+MANAGER_METHODS_RETURNING_QUERYSET: Final[FrozenSet[str]] = frozenset(
+    (
+        "alias",
+        "all",
+        "annotate",
+        "complex_filter",
+        "defer",
+        "difference",
+        "distinct",
+        "exclude",
+        "extra",
+        "filter",
+        "intersection",
+        "none",
+        "only",
+        "order_by",
+        "prefetch_related",
+        "reverse",
+        "select_for_update",
+        "select_related",
+        "union",
+        "using",
+    )
 )
 
 
