@@ -8,31 +8,23 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
 
 
-def get_user_model_hook(
-    ctx: FunctionContext, django_context: DjangoContext
-) -> MypyType:
+def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     auth_user_model = django_context.settings.AUTH_USER_MODEL
     model_cls = django_context.apps_registry.get_model(auth_user_model)
     model_cls_fullname = helpers.get_class_fullname(model_cls)
 
-    model_info = helpers.lookup_fully_qualified_typeinfo(
-        helpers.get_typechecker_api(ctx), model_cls_fullname
-    )
+    model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), model_cls_fullname)
     if model_info is None:
         return AnyType(TypeOfAny.unannotated)
 
     return TypeType(Instance(model_info, []))
 
 
-def get_type_of_settings_attribute(
-    ctx: AttributeContext, django_context: DjangoContext
-) -> MypyType:
+def get_type_of_settings_attribute(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.context, MemberExpr)
     setting_name = ctx.context.name
     if not hasattr(django_context.settings, setting_name):
-        ctx.api.fail(
-            f"'Settings' object has no attribute {setting_name!r}", ctx.context
-        )
+        ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)
         return ctx.default_attr_type
 
     typechecker_api = helpers.get_typechecker_api(ctx)
@@ -50,9 +42,7 @@ def get_type_of_settings_attribute(
     value = getattr(django_context.settings, setting_name)
     value_fullname = helpers.get_class_fullname(value.__class__)
 
-    value_info = helpers.lookup_fully_qualified_typeinfo(
-        typechecker_api, value_fullname
-    )
+    value_info = helpers.lookup_fully_qualified_typeinfo(typechecker_api, value_fullname)
     if value_info is None:
         return ctx.default_attr_type
 

@@ -38,8 +38,7 @@ def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
     from mypy.main import CapturableArgumentParser
 
     handler = CapturableArgumentParser(
-        prog="(django-stubs) mypy",
-        usage=textwrap.dedent(TOML_USAGE if is_toml else INI_USAGE),
+        prog="(django-stubs) mypy", usage=textwrap.dedent(TOML_USAGE if is_toml else INI_USAGE)
     )
     handler.error(msg)
 
@@ -96,6 +95,4 @@ class DjangoPluginConfig:
         if not parser.has_option(section, "django_settings_module"):
             exit_with_error(MISSING_DJANGO_SETTINGS)
 
-        self.django_settings_module = parser.get(
-            section, "django_settings_module"
-        ).strip("'\"")
+        self.django_settings_module = parser.get(section, "django_settings_module").strip("'\"")

@@ -23,15 +23,7 @@ import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import (
-    fields,
-    forms,
-    init_create,
-    meta,
-    querysets,
-    request,
-    settings,
-)
+from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
     fail_if_manager_type_created_in_model_body,
@@ -156,37 +148,25 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # for settings
-        if (
-            file.fullname == "django.conf"
-            and self.django_context.django_settings_module
-        ):
+        if file.fullname == "django.conf" and self.django_context.django_settings_module:
             return [self._new_dependency(self.django_context.django_settings_module)]
 
         # for values / values_list
         if file.fullname == "django.db.models":
-            return [
-                self._new_dependency("mypy_extensions"),
-                self._new_dependency("typing"),
-            ]
+            return [self._new_dependency("mypy_extensions"), self._new_dependency("typing")]
 
         # for `get_user_model()`
         if self.django_context.settings:
-            if file.fullname == "django.contrib.auth" or file.fullname in {
-                "django.http",
-                "django.http.request",
-            }:
+            if file.fullname == "django.contrib.auth" or file.fullname in {"django.http", "django.http.request"}:
                 auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
                 try:
-                    auth_user_module = self.django_context.apps_registry.get_model(
-                        auth_user_model_name
-                    ).__module__
+                    auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
                 except LookupError:
                     # get_user_model() model app is not installed
                     return []
                 return [self._new_dependency(auth_user_module)]
 
-        # ensure that all mentioned to='someapp.SomeModel' are loaded with
-        # corresponding related Fields
+        # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
             return []
@@ -195,9 +175,7 @@ class NewSemanalDjangoPlugin(Plugin):
             # forward relations
             for field in self.django_context.get_model_fields(model_class):
                 if isinstance(field, RelatedField):
-                    related_model_cls = self.django_context.get_field_related_model_cls(
-                        field
-                    )
+                    related_model_cls = self.django_context.get_field_related_model_cls(field)
                     if related_model_cls is None:
                         continue
                     related_model_module = related_model_cls.__module__
@@ -206,9 +184,7 @@ class NewSemanalDjangoPlugin(Plugin):
             # reverse relations
             # `related_objects` is private API (according to docstring)
             for relation in model_class._meta.related_objects:  # type: ignore[attr-defined]
-                related_model_cls = self.django_context.get_field_related_model_cls(
-                    relation
-                )
+                related_model_cls = self.django_context.get_field_related_model_cls(relation)
                 related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname:
                     deps.add(self._new_dependency(related_model_module))
@@ -219,13 +195,9 @@ class NewSemanalDjangoPlugin(Plugin):
             self._new_dependency("django.db.models.query"),
         ]
 
-    def get_function_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[FunctionContext], MypyType]]:
+    def get_function_hook(self, fullname: str) -> Optional[Callable[[FunctionContext], MypyType]]:
         if fullname == "django.contrib.auth.get_user_model":
-            return partial(
-                settings.get_user_model_hook, django_context=self.django_context
-            )
+            return partial(settings.get_user_model_hook, django_context=self.django_context)
 
         manager_bases = self._get_current_manager_bases()
         if fullname in manager_bases:
@@ -234,21 +206,13 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(fullname)
         if info:
             if info.has_base(fullnames.FIELD_FULLNAME):
-                return partial(
-                    fields.transform_into_proper_return_type,
-                    django_context=self.django_context,
-                )
+                return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
             if helpers.is_model_subclass_info(info, self.django_context):
-                return partial(
-                    init_create.redefine_and_typecheck_model_init,
-                    django_context=self.django_context,
-                )
+                return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
         return None
 
-    def get_method_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[MethodContext], MypyType]]:
+    def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
         class_fullname, _, method_name = fullname.rpartition(".")
         # It is looked up very often, specialcase this method for minor speed up
         if method_name == "__init_subclass__":
@@ -257,9 +221,7 @@ class NewSemanalDjangoPlugin(Plugin):
         if class_fullname.endswith("QueryDict"):
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
-                return partial(
-                    check_querydict_is_mutable, django_context=self.django_context
-                )
+                return partial(check_querydict_is_mutable, django_context=self.django_context)
 
         elif method_name == "get_form_class":
             info = self._get_typeinfo_or_none(class_fullname)
@@ -275,58 +237,27 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if method_name == "values":
             info = self._get_typeinfo_or_none(class_fullname)
-            if (
-                info
-                and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
-                or class_fullname in manager_classes
-            ):
-                return partial(
-                    querysets.extract_proper_type_queryset_values,
-                    django_context=self.django_context,
-                )
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
+                return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
 
         elif method_name == "values_list":
             info = self._get_typeinfo_or_none(class_fullname)
-            if (
-                info
-                and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
-                or class_fullname in manager_classes
-            ):
-                return partial(
-                    querysets.extract_proper_type_queryset_values_list,
-                    django_context=self.django_context,
-                )
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
+                return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
 
         elif method_name == "annotate":
             info = self._get_typeinfo_or_none(class_fullname)
-            if (
-                info
-                and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
-                or class_fullname in manager_classes
-            ):
-                return partial(
-                    querysets.extract_proper_type_queryset_annotate,
-                    django_context=self.django_context,
-                )
+            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
+                return partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context)
 
         elif method_name == "get_field":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
-                return partial(
-                    meta.return_proper_field_type_from_get_field,
-                    django_context=self.django_context,
-                )
+                return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
         elif class_fullname in manager_classes and method_name == "create":
-            return partial(
-                init_create.redefine_and_typecheck_model_create,
-                django_context=self.django_context,
-            )
-        elif class_fullname in manager_classes and method_name in {
-            "filter",
-            "get",
-            "exclude",
-        }:
+            return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+        elif class_fullname in manager_classes and method_name in {"filter", "get", "exclude"}:
             return partial(
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
@@ -339,9 +270,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
-    def get_customize_class_mro_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[ClassDefContext], None]]:
+    def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         """
         Reparametrize `Manager`'s with type variable if they miss type argument
 
@@ -359,9 +288,7 @@ class NewSemanalDjangoPlugin(Plugin):
         ):
             return reparametrize_manager_base_hook
 
-    def get_base_class_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[ClassDefContext], None]]:
+    def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
         if (
             fullname in self.django_context.all_registered_model_class_fullnames
@@ -378,50 +305,26 @@ class NewSemanalDjangoPlugin(Plugin):
             return transform_form_class
         return None
 
-    def get_attribute_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[AttributeContext], MypyType]]:
+    def get_attribute_hook(self, fullname: str) -> Optional[Callable[[AttributeContext], MypyType]]:
         class_name, _, attr_name = fullname.rpartition(".")
 
         # Lookup of a settings variable
         if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-            return partial(
-                settings.get_type_of_settings_attribute,
-                django_context=self.django_context,
-            )
+            return partial(settings.get_type_of_settings_attribute, django_context=self.django_context)
 
         info = self._get_typeinfo_or_none(class_name)
 
         # Lookup of the '.is_superuser' attribute
-        if (
-            info
-            and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME)
-            and attr_name == "is_superuser"
-        ):
-            return partial(
-                set_auth_user_model_boolean_fields, django_context=self.django_context
-            )
+        if info and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
+            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of the 'request.user' attribute
-        if (
-            info
-            and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME)
-            and attr_name == "user"
-        ):
-            return partial(
-                request.set_auth_user_model_as_type_for_request_user,
-                django_context=self.django_context,
-            )
+        if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == "user":
+            return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
 
         # Lookup of the 'user.is_staff' or 'user.is_active' attribute
-        if (
-            info
-            and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME)
-            and attr_name in ("is_staff", "is_active")
-        ):
-            return partial(
-                set_auth_user_model_boolean_fields, django_context=self.django_context
-            )
+        if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
+            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of a method on a dynamically generated manager class
         # i.e. a manager class only existing while mypy is running, not collected from the AST
@@ -434,9 +337,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
-    def get_type_analyze_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
+    def get_type_analyze_hook(self, fullname: str) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
         """
         Support `typing.Annotated` to add fields to the model instance.
         """
@@ -447,9 +348,7 @@ class NewSemanalDjangoPlugin(Plugin):
         ):
             return partial(handle_annotated_type, django_context=self.django_context)
 
-    def get_dynamic_class_hook(
-        self, fullname: str
-    ) -> Optional[Callable[[DynamicClassDefContext], None]]:
+    def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
         """
         Create a new manager class from manager's `.from_queryset` method
 

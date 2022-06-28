@@ -9,19 +9,13 @@ from mypy_django_plugin.lib import helpers
 
 
 def _get_field_instance(ctx: MethodContext, field_fullname: str) -> MypyType:
-    field_info = helpers.lookup_fully_qualified_typeinfo(
-        helpers.get_typechecker_api(ctx), field_fullname
-    )
+    field_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), field_fullname)
     if field_info is None:
         return AnyType(TypeOfAny.unannotated)
-    return Instance(
-        field_info, [AnyType(TypeOfAny.explicit), AnyType(TypeOfAny.explicit)]
-    )
+    return Instance(field_info, [AnyType(TypeOfAny.explicit), AnyType(TypeOfAny.explicit)])
 
 
-def return_proper_field_type_from_get_field(
-    ctx: MethodContext, django_context: DjangoContext
-) -> MypyType:
+def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # Options instance
     assert isinstance(ctx.type, Instance)
 
