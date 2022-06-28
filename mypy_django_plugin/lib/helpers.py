@@ -178,10 +178,7 @@ def parse_bool(expr: Expression) -> Optional[bool]:
 
 
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
-    for base_fullname in bases:
-        if info.has_base(base_fullname):
-            return True
-    return False
+    return any(map(info.has_base, bases))
 
 
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:
@@ -356,9 +353,9 @@ def resolve_string_attribute_value(
         if (
             isinstance(attr_expr.expr, NameExpr)
             and attr_expr.expr.fullname == "django.conf.settings"
+            and hasattr(django_context.settings, member_name)
         ):
-            if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)
+            return getattr(django_context.settings, member_name)
     return None
 
 
@@ -437,8 +434,10 @@ def bind_or_analyze_type(
     if isinstance(t, UnboundType) and module_name is not None:
         node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
         if node is not None:
+            # If `node.type` is None, then we have nothing to do: caller may to defer.
             return node.type
 
+    # If lookup failed or type was bound, analyze type. May be `None` too.
     return api.anal_type(t)
 
 
