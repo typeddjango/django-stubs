@@ -1,4 +1,4 @@
-black==22.3.0
+black==22.6.0
 requests==2.28.0
 gitpython==3.1.27
 pre-commit==2.19.0
