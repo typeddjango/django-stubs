@@ -26,11 +26,14 @@ from mypy_django_plugin.lib import fullnames, helpers
 
 
 def get_method_type_from_dynamic_manager(
-    api: TypeChecker, method_name: str, manager_type_info: TypeInfo
+    api: TypeChecker, method_name: str, manager_type: Instance
 ) -> Optional[ProperType]:
     """
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
+
+    manager_type_info = manager_type.type
+
     if (
         "django" not in manager_type_info.metadata
         or "from_queryset_manager" not in manager_type_info.metadata["django"]
@@ -56,11 +59,23 @@ def get_method_type_from_dynamic_manager(
         return None
 
     assert isinstance(method_type, CallableType)
+
+    variables = method_type.variables
+    ret_type = method_type.ret_type
+
+    # If the return type is a typevar or unbound type that appears to be a
+    # queryset we change the return type to be the actual queryset
+    if isinstance(ret_type, (UnboundType, TypeVarType)) and ret_type.name == "_QS":
+        ret_type = Instance(queryset_info, manager_type.args)
+        variables = []
+
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
         arg_types=method_type.arg_types[1:],
         arg_kinds=method_type.arg_kinds[1:],
         arg_names=method_type.arg_names[1:],
+        variables=variables,
+        ret_type=ret_type,
     )
 
 
@@ -90,7 +105,7 @@ def get_method_type_from_reverse_manager(
     assert isinstance(model_info.names["_default_manager"].node, Var)
     manager_instance = model_info.names["_default_manager"].node.type
     return (
-        get_method_type_from_dynamic_manager(api, method_name, manager_instance.type)
+        get_method_type_from_dynamic_manager(api, method_name, manager_instance)
         # TODO: Can we assert on None and Instance?
         if manager_instance is not None and isinstance(manager_instance, Instance)
         else None
@@ -98,9 +113,10 @@ def get_method_type_from_reverse_manager(
 
 
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
+
     api = helpers.get_typechecker_api(ctx)
     method_type = get_method_type_from_dynamic_manager(
-        api, method_name, instance.type
+        api, method_name, instance
     ) or get_method_type_from_reverse_manager(api, method_name, instance.type)
 
     return method_type if method_type is not None else ctx.default_attr_type
@@ -266,25 +282,16 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
             # Skip any method that doesn't return _QS
             original_return_type = get_proper_type(original_return_type)
-            if isinstance(original_return_type, UnboundType):
-                if original_return_type.name != "_QS":
-                    continue
-            elif isinstance(original_return_type, TypeVarType):
+            if isinstance(original_return_type, (UnboundType, TypeVarType)):
                 if original_return_type.name != "_QS":
                     continue
             else:
                 continue
 
-            # Return the custom queryset parameterized by the manager's type vars
-            return_type = Instance(derived_queryset_info, self_type.args)
-
-            helpers.copy_method_to_another_class(
-                class_def_context,
-                self_type,
-                new_method_name=name,
-                method_node=func_node,
-                return_type=return_type,
-                original_module_name=class_mro_info.module_name,
+            helpers.add_new_sym_for_info(
+                new_manager_info,
+                name=name,
+                sym_type=AnyType(TypeOfAny.special_form),
             )
 
     # Insert the new manager (dynamic) class
