@@ -86,7 +86,6 @@ def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
     if not should_reparametrize:
         return
 
-    # breakpoint()
     tvars = tuple(manager.node.bases[0].type.defn.type_vars)
     manager.node.bases[0].args = tvars
     manager.node.defn.type_vars = list(tvars)
