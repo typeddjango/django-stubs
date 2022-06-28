@@ -387,7 +387,7 @@ def check_types_compatible(
     *,
     expected_type: MypyType,
     actual_type: MypyType,
-    error_message: str
+    error_message: str,
 ) -> None:
     api = get_typechecker_api(ctx)
     api.check_subtype(
@@ -434,8 +434,17 @@ def bind_or_analyze_type(
     if isinstance(t, UnboundType) and module_name is not None:
         node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
         if node is not None:
-            # If `node.type` is None, then we have nothing to do: caller may to defer.
-            return node.type
+            if isinstance(node.node, TypeInfo):
+                args = []
+                for type_arg in t.args:
+                    arg = bind_or_analyze_type(type_arg, api, module_name)
+                    if arg is None:
+                        return None
+                    args.append(arg)
+                return Instance(node.node, args)
+            elif isinstance(node.node, Var):
+                return node.node.type
+            assert False, f"Unknown node: {node.node.__class__}"
 
     # If lookup failed or type was bound, analyze type. May be `None` too.
     return api.anal_type(t)
