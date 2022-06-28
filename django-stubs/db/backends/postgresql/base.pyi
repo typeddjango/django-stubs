@@ -3,6 +3,7 @@ from typing import Any, Dict, Tuple, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
+from django.db.backends.utils import _ExecuteQuery
 
 from .client import DatabaseClient
 from .creation import DatabaseCreation
@@ -37,5 +38,5 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def pg_version(self) -> int: ...
 
 class CursorDebugWrapper(BaseCursorDebugWrapper):
-    def copy_expert(self, sql: str, file: IOBase, *args: Any): ...
+    def copy_expert(self, sql: _ExecuteQuery, file: IOBase, *args: Any): ...
     def copy_to(self, file: IOBase, table: str, *args: Any, **kwargs: Any): ...

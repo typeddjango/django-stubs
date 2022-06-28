@@ -4,7 +4,21 @@ import types
 from contextlib import contextmanager
 from decimal import Decimal
 from logging import Logger
-from typing import Any, Dict, Generator, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union, overload
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    overload,
+)
 from uuid import UUID
 
 if sys.version_info < (3, 8):
@@ -13,6 +27,14 @@ else:
     from typing import Literal
 
 logger: Logger
+
+# Protocol matching psycopg2.sql.Composable, to avoid depending psycopg2
+class _Composable(Protocol):
+    def as_string(self, context: Any) -> str: ...
+    def __add__(self, other: _Composable) -> _Composable: ...
+    def __mul__(self, n: int) -> _Composable: ...
+
+_ExecuteQuery = Union[str, _Composable]
 
 # Python types that can be adapted to SQL.
 _SQLType = Union[
@@ -37,8 +59,8 @@ class CursorWrapper:
     def callproc(
         self, procname: str, params: Optional[Sequence[Any]] = ..., kparams: Optional[Dict[str, int]] = ...
     ) -> Any: ...
-    def execute(self, sql: str, params: _ExecuteParameters = ...) -> Any: ...
-    def executemany(self, sql: str, param_list: Sequence[_ExecuteParameters]) -> Any: ...
+    def execute(self, sql: _ExecuteQuery, params: _ExecuteParameters = ...) -> Any: ...
+    def executemany(self, sql: _ExecuteQuery, param_list: Sequence[_ExecuteParameters]) -> Any: ...
 
 class CursorDebugWrapper(CursorWrapper):
     cursor: Any
