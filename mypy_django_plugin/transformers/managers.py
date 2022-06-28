@@ -1,4 +1,4 @@
-from typing import FrozenSet, Optional, Union
+from typing import Optional, Union
 
 from mypy.checker import TypeChecker, fill_typevars
 from mypy.nodes import (
@@ -25,7 +25,7 @@ from typing_extensions import Final
 from mypy_django_plugin import errorcodes
 from mypy_django_plugin.lib import fullnames, helpers
 
-MANAGER_METHODS_RETURNING_QUERYSET: Final[FrozenSet[str]] = frozenset(
+MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
     (
         "alias",
         "all",
