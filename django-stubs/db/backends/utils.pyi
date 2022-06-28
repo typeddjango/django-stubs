@@ -3,6 +3,7 @@ import sys
 import types
 from contextlib import contextmanager
 from decimal import Decimal
+from logging import Logger
 from typing import Any, Dict, Generator, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union, overload
 from uuid import UUID
 
@@ -11,7 +12,7 @@ if sys.version_info < (3, 8):
 else:
     from typing import Literal
 
-logger: Any
+logger: Logger
 
 # Python types that can be adapted to SQL.
 _SQLType = Union[

@@ -1,10 +1,11 @@
+from logging import Logger
 from typing import Any, Callable, Dict, Optional, Tuple
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase, HttpResponseForbidden
 from django.utils.deprecation import MiddlewareMixin
 
-logger: Any
+logger: Logger
 REASON_NO_REFERER: str
 REASON_BAD_REFERER: str
 REASON_NO_CSRF_COOKIE: str

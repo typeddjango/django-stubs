@@ -1,8 +1,9 @@
+from logging import Logger
 from typing import Any
 
 from django.db.backends.mysql.schema import DatabaseSchemaEditor as DatabaseSchemaEditor
 
-logger: Any
+logger: Logger
 
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_spatial_index: str = ...
