@@ -248,17 +248,21 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
                 sym_type=AnyType(TypeOfAny.special_form),
             )
 
-    # we need to copy all methods in MRO before django.db.models.query.QuerySet
-    # Gather names of all BaseManager methods
+    # For methods that are common between BaseManager and QuerySet we need to
+    # update the return type of the methods on the manager to return the
+    # correct QuerySet type. This is done by adding the methods as attributes
+    # with type Any to the manager class, similar to how custom queryset
+    # methods are handled above. The actual type of these methods are resolved
+    # in resolve_manager_method.
+
+    # Find all methods that are defined on BaseManager
     manager_method_names = []
     for manager_mro_info in new_manager_info.mro:
         if manager_mro_info.fullname == fullnames.BASE_MANAGER_CLASS_FULLNAME:
-            for name, sym in manager_mro_info.names.items():
+            for name in manager_mro_info.names:
                 manager_method_names.append(name)
 
-    # Copy/alter all methods in common between BaseManager/QuerySet over to the new manager if their return type is
-    # the QuerySet's self-type. Alter the return type to be the custom queryset, parameterized by the manager's model
-    # type variable.
+    # Find the QuerySet type info and add attributes for methods defined on BaseManager
     for class_mro_info in derived_queryset_info.mro:
         if class_mro_info.fullname != fullnames.QUERYSET_CLASS_FULLNAME:
             continue
