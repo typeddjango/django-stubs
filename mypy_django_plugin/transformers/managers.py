@@ -16,7 +16,12 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
+from mypy.plugin import (
+    AttributeContext,
+    ClassDefContext,
+    DynamicClassDefContext,
+    MethodContext,
+)
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, TypeVarType, UnboundType, get_proper_type
@@ -43,9 +48,13 @@ def get_method_type_from_dynamic_manager(
     queryset_info = helpers.lookup_fully_qualified_typeinfo(api, queryset_fullname)
     assert queryset_info is not None
 
-    def get_funcdef_type(definition: Union[FuncBase, Decorator, None]) -> Optional[ProperType]:
+    def get_funcdef_type(
+        definition: Union[FuncBase, Decorator, None]
+    ) -> Optional[ProperType]:
         # TODO: Handle @overload?
-        if isinstance(definition, FuncBase) and not isinstance(definition, OverloadedFuncDef):
+        if isinstance(definition, FuncBase) and not isinstance(
+            definition, OverloadedFuncDef
+        ):
             return definition.type
         elif isinstance(definition, Decorator):
             return definition.func.type
@@ -74,12 +83,15 @@ def get_method_type_from_reverse_manager(
     Ref: https://docs.djangoproject.com/en/dev/topics/db/queries/#using-a-custom-reverse-manager
     """
     is_reverse_manager = (
-        "django" in manager_type_info.metadata and "related_manager_to_model" in manager_type_info.metadata["django"]
+        "django" in manager_type_info.metadata
+        and "related_manager_to_model" in manager_type_info.metadata["django"]
     )
     if not is_reverse_manager:
         return None
 
-    related_model_fullname = manager_type_info.metadata["django"]["related_manager_to_model"]
+    related_model_fullname = manager_type_info.metadata["django"][
+        "related_manager_to_model"
+    ]
     assert isinstance(related_model_fullname, str)
     model_info = helpers.lookup_fully_qualified_typeinfo(api, related_model_fullname)
     if model_info is None:
@@ -97,7 +109,9 @@ def get_method_type_from_reverse_manager(
     )
 
 
-def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
+def resolve_manager_method_from_instance(
+    instance: Instance, method_name: str, ctx: AttributeContext
+) -> MypyType:
     api = helpers.get_typechecker_api(ctx)
     method_type = get_method_type_from_dynamic_manager(
         api, method_name, instance.type
@@ -108,31 +122,43 @@ def resolve_manager_method_from_instance(instance: Instance, method_name: str, c
 
 def resolve_manager_method(ctx: AttributeContext) -> MypyType:
     """
-    A 'get_attribute_hook' that is intended to be invoked whenever the TypeChecker encounters
-    an attribute on a class that has 'django.db.models.BaseManager' as a base.
+    A 'get_attribute_hook' that is intended to be invoked whenever the TypeChecker
+    encounters an attribute on a class that has 'django.db.models.BaseManager' as a base.
     """
     # Skip (method) type that is currently something other than Any
     if not isinstance(ctx.default_attr_type, AnyType):
         return ctx.default_attr_type
 
-    # (Current state is:) We wouldn't end up here when looking up a method from a custom _manager_.
-    # That's why we only attempt to lookup the method for either a dynamically added or reverse manager.
+    # (Current state is:) We wouldn't end up here when looking up a method
+    # from a custom _manager_. That's why we only attempt to lookup the method
+    # for either a dynamically added or reverse manager.
     if isinstance(ctx.context, MemberExpr):
         method_name = ctx.context.name
-    elif isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, MemberExpr):
+    elif isinstance(ctx.context, CallExpr) and isinstance(
+        ctx.context.callee, MemberExpr
+    ):
         method_name = ctx.context.callee.name
     else:
-        ctx.api.fail("Unable to resolve return type of queryset/manager method", ctx.context)
+        ctx.api.fail(
+            "Unable to resolve return type of queryset/manager method", ctx.context
+        )
         return AnyType(TypeOfAny.from_error)
 
     if isinstance(ctx.type, Instance):
-        return resolve_manager_method_from_instance(instance=ctx.type, method_name=method_name, ctx=ctx)
+        return resolve_manager_method_from_instance(
+            instance=ctx.type, method_name=method_name, ctx=ctx
+        )
     else:
-        ctx.api.fail(f'Unable to resolve return type of queryset/manager method "{method_name}"', ctx.context)
+        ctx.api.fail(
+            f'Unable to resolve return type of queryset/manager method "{method_name}"',
+            ctx.context,
+        )
         return AnyType(TypeOfAny.from_error)
 
 
-def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext) -> None:
+def create_new_manager_class_from_from_queryset_method(
+    ctx: DynamicClassDefContext,
+) -> None:
     """
     Insert a new manager class node for a: '<Name> = <Manager>.from_queryset(<QuerySet>)'.
     When the assignment expression lives at module level.
@@ -143,7 +169,9 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     # stop adding new manager, if we are inside, and fall back to any
     if semanal_api.scope.classes:
         any_type = AnyType(TypeOfAny.implementation_artifact)
-        info = semanal_api.lookup_fully_qualified(semanal_api.scope.current_full_target()).node
+        info = semanal_api.lookup_fully_qualified(
+            semanal_api.scope.current_full_target()
+        ).node
         assert isinstance(info, TypeInfo)
         helpers.add_new_sym_for_info(info=info, name=ctx.name, sym_type=any_type)
         return
@@ -171,7 +199,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
     derived_queryset_fullname = passed_queryset.fullname
     if derived_queryset_fullname is None:
-        # In some cases, due to the way the semantic analyzer works, only passed_queryset.name is available.
+        # In some cases, due to the way the semantic analyzer works, only
+        # `passed_queryset.name` is available.
         # But it should be analyzed again, so this isn't a problem.
         return
 
@@ -187,7 +216,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
         if not semanal_api.final_iteration:
             semanal_api.defer()
         else:
-            # inherit from Any to prevent false-positives, if queryset class cannot be resolved
+            # inherit from Any to prevent false-positives,
+            # if queryset class cannot be resolved
             new_manager_info.fallback_to_any = True
         return
 
@@ -200,28 +230,41 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     new_manager_info.defn.line = ctx.call.line
     new_manager_info.metaclass_type = new_manager_info.calculate_metaclass_type()
     # Stash the queryset fullname which was passed to .from_queryset
-    # So that our 'resolve_manager_method' attribute hook can fetch the method from that QuerySet class
-    new_manager_info.metadata["django"] = {"from_queryset_manager": derived_queryset_fullname}
+    # So that our 'resolve_manager_method' attribute hook can fetch the method
+    # from that QuerySet class
+    new_manager_info.metadata["django"] = {
+        "from_queryset_manager": derived_queryset_fullname
+    }
 
     if len(ctx.call.args) > 1:
         expr = ctx.call.args[1]
         assert isinstance(expr, StrExpr)
         custom_manager_generated_name = expr.value
     else:
-        custom_manager_generated_name = base_manager_info.name + "From" + derived_queryset_info.name
+        custom_manager_generated_name = (
+            base_manager_info.name + "From" + derived_queryset_info.name
+        )
 
-    custom_manager_generated_fullname = ".".join(["django.db.models.manager", custom_manager_generated_name])
+    custom_manager_generated_fullname = ".".join(
+        ["django.db.models.manager", custom_manager_generated_name]
+    )
     base_manager_info.metadata.setdefault("from_queryset_managers", {})
-    base_manager_info.metadata["from_queryset_managers"][custom_manager_generated_fullname] = new_manager_info.fullname
+    base_manager_info.metadata["from_queryset_managers"][
+        custom_manager_generated_fullname
+    ] = new_manager_info.fullname
 
-    # So that the plugin will reparameterize the manager when it is constructed inside of a Model definition
+    # So that the plugin will reparameterize the manager when it is constructed
+    # inside of a Model definition
     helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
 
-    class_def_context = ClassDefContext(cls=new_manager_info.defn, reason=ctx.call, api=semanal_api)
+    class_def_context = ClassDefContext(
+        cls=new_manager_info.defn, reason=ctx.call, api=semanal_api
+    )
     self_type = fill_typevars(new_manager_info)
     assert isinstance(self_type, Instance)
 
-    # We collect and mark up all methods before django.db.models.query.QuerySet as class members
+    # We collect and mark up all methods before `django.db.models.query.QuerySet`
+    # as class members
     for class_mro_info in derived_queryset_info.mro:
         if class_mro_info.fullname == fullnames.QUERYSET_CLASS_FULLNAME:
             break
@@ -249,9 +292,10 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             for name, sym in manager_mro_info.names.items():
                 manager_method_names.append(name)
 
-    # Copy/alter all methods in common between BaseManager/QuerySet over to the new manager if their return type is
-    # the QuerySet's self-type. Alter the return type to be the custom queryset, parameterized by the manager's model
-    # type variable.
+    # Copy/alter all methods in common between BaseManager/QuerySet over to
+    # the new manager if their return type is the QuerySet's self-type.
+    # Alter the return type to be the custom queryset, parameterized by the manager's
+    # model type variable.
     for class_mro_info in derived_queryset_info.mro:
         if class_mro_info.fullname != fullnames.QUERYSET_CLASS_FULLNAME:
             continue
@@ -297,21 +341,29 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             )
 
     # Insert the new manager (dynamic) class
-    assert semanal_api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True))
+    assert semanal_api.add_symbol_table_node(
+        ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
+    )
 
 
 def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:
     """
     Method hook that checks if method `<Manager>.from_queryset` is called inside a model class body.
 
-    Doing so won't, for instance, trigger the dynamic class hook(`create_new_manager_class_from_from_queryset_method`)
-    for managers.
+    Doing so won't, for instance, trigger the dynamic class hook
+    (`create_new_manager_class_from_from_queryset_method`) for managers.
     """
     api = helpers.get_typechecker_api(ctx)
     outer_model_info = api.scope.active_class()
-    if not outer_model_info or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+    if not outer_model_info or not outer_model_info.has_base(
+        fullnames.MODEL_CLASS_FULLNAME
+    ):
         # Not inside a model class definition
         return ctx.default_return_type
 
-    api.fail("`.from_queryset` called from inside model class body", ctx.context, code=errorcodes.MANAGER_UNTYPED)
+    api.fail(
+        "`.from_queryset` called from inside model class body",
+        ctx.context,
+        code=errorcodes.MANAGER_UNTYPED,
+    )
     return ctx.default_return_type

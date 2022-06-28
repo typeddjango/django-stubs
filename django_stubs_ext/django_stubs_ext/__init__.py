@@ -4,4 +4,10 @@ from .annotations import WithAnnotations as WithAnnotations
 from .patch import monkeypatch as monkeypatch
 from .types import AnyAttrAllowed as AnyAttrAllowed
 
-__all__ = ["monkeypatch", "ValuesQuerySet", "WithAnnotations", "Annotations", "AnyAttrAllowed"]
+__all__ = [
+    "monkeypatch",
+    "ValuesQuerySet",
+    "WithAnnotations",
+    "Annotations",
+    "AnyAttrAllowed",
+]

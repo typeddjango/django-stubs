@@ -7,7 +7,12 @@ from collections import defaultdict
 from distutils import spawn
 from typing import Dict, List, Pattern, Union
 
-from scripts.enabled_test_modules import EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS
+from scripts.enabled_test_modules import (
+    EXTERNAL_MODULES,
+    IGNORED_ERRORS,
+    IGNORED_MODULES,
+    MOCK_OBJECTS,
+)
 from scripts.git_helpers import checkout_django_branch
 from scripts.paths import DJANGO_SOURCE_DIRECTORY, PROJECT_DIRECTORY
 
@@ -19,13 +24,15 @@ DJANGO_COMMIT_REFS = {
 DEFAULT_DJANGO_VERSION = "3.2"
 
 
-def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]) -> List[str]:
+def get_unused_ignores(
+    ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]
+) -> List[str]:
     unused_ignores = []
     for root_key, patterns in IGNORED_ERRORS.items():
         for pattern in patterns:
-            if ignored_message_freq[root_key][pattern] == 0 and pattern not in itertools.chain(
-                EXTERNAL_MODULES, MOCK_OBJECTS
-            ):
+            if ignored_message_freq[root_key][
+                pattern
+            ] == 0 and pattern not in itertools.chain(EXTERNAL_MODULES, MOCK_OBJECTS):
                 unused_ignores.append(f"{root_key}: {pattern}")
     return unused_ignores
 
@@ -40,7 +47,12 @@ def does_pattern_fit(pattern: Union[Pattern, str], line: str):
     return False
 
 
-def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[str, Dict[str, int]]) -> bool:
+def is_ignored(
+    line: str,
+    test_folder_name: str,
+    *,
+    ignored_message_freqs: Dict[str, Dict[str, int]],
+) -> bool:
     if "runtests" in line:
         return True
 
@@ -64,7 +76,9 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--django_version", default=DEFAULT_DJANGO_VERSION)
     django_version = parser.parse_args().django_version
-    subprocess.check_call([sys.executable, "-m", "pip", "install", f"Django=={django_version}.*"])
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", f"Django=={django_version}.*"]
+    )
     commit_sha = DJANGO_COMMIT_REFS[django_version]
     repo = checkout_django_branch(django_version, commit_sha)
     mypy_config_file = (PROJECT_DIRECTORY / "mypy.ini").absolute()
@@ -103,7 +117,9 @@ if __name__ == "__main__":
             except IndexError:
                 test_folder_name = "unknown"
 
-            if not is_ignored(line, test_folder_name, ignored_message_freqs=ignored_message_freqs):
+            if not is_ignored(
+                line, test_folder_name, ignored_message_freqs=ignored_message_freqs
+            ):
                 global_rc = 1
                 print(line)
 

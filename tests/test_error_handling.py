@@ -27,7 +27,9 @@ django_settings_module = str (required)
 
 
 @contextmanager
-def write_to_file(file_contents: str, suffix: typing.Optional[str] = None) -> typing.Generator[str, None, None]:
+def write_to_file(
+    file_contents: str, suffix: typing.Optional[str] = None
+) -> typing.Generator[str, None, None]:
     with tempfile.NamedTemporaryFile(mode="w+", suffix=suffix) as config_file:
         config_file.write(file_contents)
         config_file.seek(0)
@@ -43,7 +45,10 @@ def write_to_file(file_contents: str, suffix: typing.Optional[str] = None) -> ty
             id="missing-section",
         ),
         pytest.param(
-            ["[mypy.plugins.django-stubs]", "\tnot_django_not_settings_module = badbadmodule"],
+            [
+                "[mypy.plugins.django-stubs]",
+                "\tnot_django_not_settings_module = badbadmodule",
+            ],
             "missing required 'django_settings_module' config",
             id="missing-settings-module",
         ),
@@ -78,7 +83,9 @@ def test_handles_filename(capsys, filename: str):
     with pytest.raises(SystemExit, match="2"):
         DjangoPluginConfig(filename)
 
-    error_message = "usage: " + TEMPLATE.format("mypy config file is not specified or found")
+    error_message = "usage: " + TEMPLATE.format(
+        "mypy config file is not specified or found"
+    )
     assert error_message == capsys.readouterr().err
 
 

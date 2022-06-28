@@ -3,7 +3,17 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Dict,
+    Iterable,
+    Iterator,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from django.core.exceptions import FieldError
 from django.db import models
@@ -106,7 +116,11 @@ class DjangoContext:
             modules[concrete_model_cls.__module__].add(concrete_model_cls)
             # collect abstract=True models
             for model_cls in concrete_model_cls.mro()[1:]:
-                if issubclass(model_cls, Model) and hasattr(model_cls, "_meta") and model_cls._meta.abstract:
+                if (
+                    issubclass(model_cls, Model)
+                    and hasattr(model_cls, "_meta")
+                    and model_cls._meta.abstract
+                ):
                     modules[model_cls.__module__].add(model_cls)
         return modules
 
@@ -137,23 +151,31 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 yield field
 
-    def get_field_lookup_exact_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel]) -> MypyType:
+    def get_field_lookup_exact_type(
+        self, api: TypeChecker, field: Union[Field, ForeignObjectRel]
+    ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
             related_model_cls = field.related_model
             primary_key_field = self.get_primary_key_field(related_model_cls)
-            primary_key_type = self.get_field_get_type(api, primary_key_field, method="init")
+            primary_key_type = self.get_field_get_type(
+                api, primary_key_field, method="init"
+            )
 
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
             if rel_model_info is None:
                 return AnyType(TypeOfAny.explicit)
 
-            model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
+            model_and_primary_key_type = UnionType.make_union(
+                [Instance(rel_model_info, []), primary_key_type]
+            )
             return helpers.make_optional(model_and_primary_key_type)
 
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
             return AnyType(TypeOfAny.explicit)
-        return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
+        return helpers.get_private_descriptor_type(
+            field_info, "_pyi_lookup_exact_type", is_nullable=field.null
+        )
 
     def get_primary_key_field(self, model_cls: Type[Model]) -> Field:
         for field in model_cls._meta.get_fields():
@@ -162,8 +184,12 @@ class DjangoContext:
                     return field
         raise ValueError("No primary key defined")
 
-    def get_expected_types(self, api: TypeChecker, model_cls: Type[Model], *, method: str) -> Dict[str, MypyType]:
-        contenttypes_in_apps = self.apps_registry.is_installed("django.contrib.contenttypes")
+    def get_expected_types(
+        self, api: TypeChecker, model_cls: Type[Model], *, method: str
+    ) -> Dict[str, MypyType]:
+        contenttypes_in_apps = self.apps_registry.is_installed(
+            "django.contrib.contenttypes"
+        )
         if contenttypes_in_apps:
             from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -171,10 +197,14 @@ class DjangoContext:
         # add pk if not abstract=True
         if not model_cls._meta.abstract:
             primary_key_field = self.get_primary_key_field(model_cls)
-            field_set_type = self.get_field_set_type(api, primary_key_field, method=method)
+            field_set_type = self.get_field_set_type(
+                api, primary_key_field, method=method
+            )
             expected_types["pk"] = field_set_type
 
-        def get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
+        def get_field_set_type_from_model_type_info(
+            info: Optional[TypeInfo], field_name: str
+        ) -> Optional[MypyType]:
             if info is None:
                 return None
             field_node = info.names.get(field_name)
@@ -201,7 +231,9 @@ class DjangoContext:
 
                 if isinstance(field, ForeignKey):
                     field_name = field.name
-                    foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
+                    foreign_key_info = helpers.lookup_class_typeinfo(
+                        api, field.__class__
+                    )
                     if foreign_key_info is None:
                         # maybe there's no type annotation for the field
                         expected_types[field_name] = AnyType(TypeOfAny.unannotated)
@@ -215,16 +247,22 @@ class DjangoContext:
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
 
-                    related_model_info = helpers.lookup_class_typeinfo(api, related_model)
+                    related_model_info = helpers.lookup_class_typeinfo(
+                        api, related_model
+                    )
                     if related_model_info is None:
                         expected_types[field_name] = AnyType(TypeOfAny.unannotated)
                         continue
 
                     is_nullable = self.get_field_nullability(field, method)
                     foreign_key_set_type = helpers.get_private_descriptor_type(
-                        foreign_key_info, "_pyi_private_set_type", is_nullable=is_nullable
+                        foreign_key_info,
+                        "_pyi_private_set_type",
+                        is_nullable=is_nullable,
                     )
-                    model_set_type = helpers.convert_any_to_type(foreign_key_set_type, Instance(related_model_info, []))
+                    model_set_type = helpers.convert_any_to_type(
+                        foreign_key_set_type, Instance(related_model_info, [])
+                    )
 
                     expected_types[field_name] = model_set_type
 
@@ -256,13 +294,17 @@ class DjangoContext:
 
     @cached_property
     def all_registered_model_class_fullnames(self) -> Set[str]:
-        return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
+        return {
+            helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes
+        }
 
     def get_attname(self, field: Field) -> str:
         attname = field.attname
         return attname
 
-    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str]) -> bool:
+    def get_field_nullability(
+        self, field: Union[Field, ForeignObjectRel], method: Optional[str]
+    ) -> bool:
         if method in ("values", "values_list"):
             return field.null
 
@@ -270,7 +312,9 @@ class DjangoContext:
         if not nullable and isinstance(field, CharField) and field.blank:
             return True
         if method == "__init__":
-            if (isinstance(field, Field) and field.primary_key) or isinstance(field, ForeignKey):
+            if (isinstance(field, Field) and field.primary_key) or isinstance(
+                field, ForeignKey
+            ):
                 return True
         if method == "create":
             if isinstance(field, AutoField):
@@ -279,7 +323,9 @@ class DjangoContext:
             return True
         return nullable
 
-    def get_field_set_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
+    def get_field_set_type(
+        self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str
+    ) -> MypyType:
         """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
@@ -290,14 +336,22 @@ class DjangoContext:
             return AnyType(TypeOfAny.from_error)
 
         field_set_type = helpers.get_private_descriptor_type(
-            field_info, "_pyi_private_set_type", is_nullable=self.get_field_nullability(field, method)
+            field_info,
+            "_pyi_private_set_type",
+            is_nullable=self.get_field_nullability(field, method),
         )
         if isinstance(target_field, ArrayField):
-            argument_field_type = self.get_field_set_type(api, target_field.base_field, method=method)
-            field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
+            argument_field_type = self.get_field_set_type(
+                api, target_field.base_field, method=method
+            )
+            field_set_type = helpers.convert_any_to_type(
+                field_set_type, argument_field_type
+            )
         return field_set_type
 
-    def get_field_get_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
+    def get_field_get_type(
+        self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str
+    ) -> MypyType:
         """Get a type of __get__ for this specific Django field."""
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
@@ -319,9 +373,13 @@ class DjangoContext:
 
             return Instance(model_info, [])
         else:
-            return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
+            return helpers.get_private_descriptor_type(
+                field_info, "_pyi_private_get_type", is_nullable=is_nullable
+            )
 
-    def get_field_related_model_cls(self, field: Union[RelatedField, ForeignObjectRel]) -> Optional[Type[Model]]:
+    def get_field_related_model_cls(
+        self, field: Union[RelatedField, ForeignObjectRel]
+    ) -> Optional[Type[Model]]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:
@@ -333,8 +391,12 @@ class DjangoContext:
                 related_model_cls = field.model
             elif "." not in related_model_cls:
                 # same file model
-                related_model_fullname = field.model.__module__ + "." + related_model_cls
-                related_model_cls = self.get_model_class_by_fullname(related_model_fullname)
+                related_model_fullname = (
+                    field.model.__module__ + "." + related_model_cls
+                )
+                related_model_cls = self.get_model_class_by_fullname(
+                    related_model_fullname
+                )
             else:
                 related_model_cls = self.apps_registry.get_model(related_model_cls)
 
@@ -364,7 +426,9 @@ class DjangoContext:
         assert isinstance(field, (Field, ForeignObjectRel))
         return field
 
-    def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Union[Field, ForeignObjectRel]:
+    def resolve_lookup_into_field(
+        self, model_cls: Type[Model], lookup: str
+    ) -> Union[Field, ForeignObjectRel]:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
 
@@ -372,7 +436,9 @@ class DjangoContext:
             raise LookupsAreUnsupported()
         return self._resolve_field_from_parts(field_parts, model_cls)
 
-    def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
+    def resolve_lookup_expected_type(
+        self, ctx: MethodContext, model_cls: Type[Model], lookup: str
+    ) -> MypyType:
         query = Query(model_cls)
         try:
             lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
@@ -393,11 +459,15 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
         if lookup_cls is None or isinstance(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            return self.get_field_lookup_exact_type(
+                helpers.get_typechecker_api(ctx), field
+            )
 
         assert lookup_cls is not None
 
-        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
+        lookup_info = helpers.lookup_class_typeinfo(
+            helpers.get_typechecker_api(ctx), lookup_cls
+        )
         if lookup_info is None:
             return AnyType(TypeOfAny.explicit)
 
@@ -405,8 +475,13 @@ class DjangoContext:
             if lookup_base.args and isinstance(lookup_base.args[0], Instance):
                 lookup_type: MypyType = lookup_base.args[0]
                 # if it's Field, consider lookup_type a __get__ of current field
-                if isinstance(lookup_type, Instance) and lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
-                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
+                if (
+                    isinstance(lookup_type, Instance)
+                    and lookup_type.type.fullname == fullnames.FIELD_FULLNAME
+                ):
+                    field_info = helpers.lookup_class_typeinfo(
+                        helpers.get_typechecker_api(ctx), field.__class__
+                    )
                     if field_info is None:
                         return AnyType(TypeOfAny.explicit)
                     lookup_type = helpers.get_private_descriptor_type(

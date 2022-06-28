@@ -32,10 +32,14 @@ def extract_proper_type_for_get_form(ctx: MethodContext) -> MypyType:
     if form_class_type is None or isinstance(form_class_type, NoneTyp):
         form_class_type = get_specified_form_class(object_type)
 
-    if isinstance(form_class_type, TypeType) and isinstance(form_class_type.item, Instance):
+    if isinstance(form_class_type, TypeType) and isinstance(
+        form_class_type.item, Instance
+    ):
         return form_class_type.item
 
-    if isinstance(form_class_type, CallableType) and isinstance(form_class_type.ret_type, Instance):
+    if isinstance(form_class_type, CallableType) and isinstance(
+        form_class_type.ret_type, Instance
+    ):
         return form_class_type.ret_type
 
     return ctx.default_return_type

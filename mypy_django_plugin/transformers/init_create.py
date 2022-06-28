@@ -14,7 +14,9 @@ def get_actual_types(
 ) -> List[Tuple[str, MypyType]]:
     actual_types = []
     # positionals
-    for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
+    for pos, (actual_name, actual_type) in enumerate(
+        zip(ctx.arg_names[0], ctx.arg_types[0])
+    ):
         if actual_name is None:
             if ctx.callee_arg_names[0] == "kwargs":
                 # unpacked dict as kwargs is not supported
@@ -32,15 +34,23 @@ def get_actual_types(
 
 
 def typecheck_model_method(
-    ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext, model_cls: Type[Model], method: str
+    ctx: Union[FunctionContext, MethodContext],
+    django_context: DjangoContext,
+    model_cls: Type[Model],
+    method: str,
 ) -> MypyType:
     typechecker_api = helpers.get_typechecker_api(ctx)
-    expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
+    expected_types = django_context.get_expected_types(
+        typechecker_api, model_cls, method=method
+    )
     expected_keys = [key for key in expected_types.keys() if key != "pk"]
 
     for actual_name, actual_type in get_actual_types(ctx, expected_keys):
         if actual_name not in expected_types:
-            ctx.api.fail(f'Unexpected attribute "{actual_name}" for model "{model_cls.__name__}"', ctx.context)
+            ctx.api.fail(
+                f'Unexpected attribute "{actual_name}" for model "{model_cls.__name__}"',
+                ctx.context,
+            )
             continue
         helpers.check_types_compatible(
             ctx,
@@ -52,7 +62,9 @@ def typecheck_model_method(
     return ctx.default_return_type
 
 
-def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+def redefine_and_typecheck_model_init(
+    ctx: FunctionContext, django_context: DjangoContext
+) -> MypyType:
     assert isinstance(ctx.default_return_type, Instance)
 
     model_fullname = ctx.default_return_type.type.fullname
@@ -63,7 +75,9 @@ def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: Djan
     return typecheck_model_method(ctx, django_context, model_cls, "__init__")
 
 
-def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+def redefine_and_typecheck_model_create(
+    ctx: MethodContext, django_context: DjangoContext
+) -> MypyType:
     if not isinstance(ctx.default_return_type, Instance):
         # only work with ctx.default_return_type = model Instance
         return ctx.default_return_type

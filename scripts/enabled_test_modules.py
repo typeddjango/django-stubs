@@ -113,7 +113,9 @@ IGNORED_ERRORS = {
         'error: "HttpResponse" has no attribute "context_data"',
         'Duplicate module named "apps"',
     ],
-    "admin_checks": ['Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'],
+    "admin_checks": [
+        'Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'
+    ],
     "admin_default_site": [
         'Incompatible types in assignment (expression has type "DefaultAdminSite", variable has type "AdminSite")'
     ],
@@ -127,7 +129,9 @@ IGNORED_ERRORS = {
         '"Article" has no attribute "non_field"',
     ],
     "aggregation": [
-        re.compile(r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"'),
+        re.compile(
+            r'got "Optional\[(Author|Publisher)\]", expected "Union\[(Author|Publisher), Combinable\]"'
+        ),
         'Argument 2 for "super" not an instance of argument 1',
     ],
     "annotations": [
@@ -170,7 +174,9 @@ IGNORED_ERRORS = {
         'Value of type "Collection[str]" is not indexable',
         "Unsupported target for indexed assignment",
     ],
-    "constraints": ['Argument "condition" to "UniqueConstraint" has incompatible type "str"; expected "Optional[Q]"'],
+    "constraints": [
+        'Argument "condition" to "UniqueConstraint" has incompatible type "str"; expected "Optional[Q]"'
+    ],
     "contenttypes_tests": [
         '"FooWithBrokenAbsoluteUrl" has no attribute "unknown_field"',
         "contenttypes_tests.models.Site",
@@ -205,7 +211,10 @@ IGNORED_ERRORS = {
         'Incompatible type for lookup \'pk\': (got "Optional[int]", expected "Union[str, int]")',
     ],
     "dispatch": ['Item "str" of "Union[ValueError, str]" has no attribute "args"'],
-    "deprecation": ['"Manager" has no attribute "old"', '"Manager" has no attribute "new"'],
+    "deprecation": [
+        '"Manager" has no attribute "old"',
+        '"Manager" has no attribute "new"',
+    ],
     "db_functions": [
         '"FloatModel" has no attribute',
         'Incompatible types in assignment (expression has type "Optional[Any]", variable has type "FloatModel")',
@@ -334,7 +343,9 @@ IGNORED_ERRORS = {
         '"type" has no attribute "base_fields"',
         'Argument "instance" to "InvalidModelForm" has incompatible type "Type[Category]"',
     ],
-    "model_indexes": ['Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'],
+    "model_indexes": [
+        'Argument "condition" to "Index" has incompatible type "str"; expected "Optional[Q]"'
+    ],
     "model_inheritance": [
         'base class "AbstractBase" defined',
         'base class "AbstractModel" defined',
@@ -343,7 +354,9 @@ IGNORED_ERRORS = {
         "referent_references",
         "Cannot resolve keyword 'attached_comment_set' into field",
     ],
-    "model_meta": ['List item 0 has incompatible type "str"; expected "Union[Field[Any, Any], ForeignObjectRel]"'],
+    "model_meta": [
+        'List item 0 has incompatible type "str"; expected "Union[Field[Any, Any], ForeignObjectRel]"'
+    ],
     "model_regress": [
         'Incompatible type for "department" of "Worker"',
         '"PickledModel" has no attribute',
@@ -378,7 +391,9 @@ IGNORED_ERRORS = {
         'Argument "encoder" to "JSONField" has incompatible type "DjangoJSONEncoder";',
         '("None" and "SearchQuery")',
     ],
-    "properties": [re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')],
+    "properties": [
+        re.compile('Unexpected attribute "(full_name|full_name_2)" for model "Person"')
+    ],
     "prefetch_related": [
         '"Person" has no attribute "houses_lst"',
         '"Book" has no attribute "first_authors"',
@@ -410,11 +425,15 @@ IGNORED_ERRORS = {
         'Argument 1 to "TextIOWrapper" has incompatible type "HttpResponse"; expected "BinaryIO"',
     ],
     "reverse_lookup": ["Cannot resolve keyword 'choice' into field"],
-    "settings_tests": ['Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'],
+    "settings_tests": [
+        'Argument 1 to "Settings" has incompatible type "Optional[str]"; expected "str"'
+    ],
     "shortcuts": [
         'error: "Context" has no attribute "request"',
     ],
-    "signals": ['Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]";'],
+    "signals": [
+        'Argument 1 to "append" of "list" has incompatible type "Tuple[Any, Any, Optional[Any], Any]";'
+    ],
     "sites_framework": [
         'expression has type "CurrentSiteManager[CustomArticle]", base class "AbstractArticle"',
         "Name 'Optional' is not defined",
@@ -450,7 +469,9 @@ IGNORED_ERRORS = {
     "serializers": [
         '"Model" has no attribute "data"',
         '"Iterable[Any]" has no attribute "content"',
-        re.compile(r'Argument 1 to "(serialize|deserialize)" has incompatible type "None"; expected "str"'),
+        re.compile(
+            r'Argument 1 to "(serialize|deserialize)" has incompatible type "None"; expected "str"'
+        ),
     ],
     "string_lookup": [
         '"Bar" has no attribute "place"',
@@ -459,7 +480,9 @@ IGNORED_ERRORS = {
         '"PossessedCar" has no attribute "color"',
         'expression has type "None", variable has type "List[str]"',
     ],
-    "test_client": ['(expression has type "HttpResponse", variable has type "StreamingHttpResponse")'],
+    "test_client": [
+        '(expression has type "HttpResponse", variable has type "StreamingHttpResponse")'
+    ],
     "test_client_regress": [
         '(expression has type "Dict[<nothing>, <nothing>]", variable has type "SessionBase")',
         'Unsupported left operand type for + ("None")',
@@ -523,8 +546,12 @@ def check_if_custom_ignores_are_covered_by_common() -> None:
             continue
         for pattern in patterns:
             for common_pattern in common_ignore_patterns:
-                if isinstance(pattern, str) and does_pattern_fit(common_pattern, pattern):
-                    print(f'pattern "{module_name}: {pattern!r}" is covered by pattern {common_pattern!r}')
+                if isinstance(pattern, str) and does_pattern_fit(
+                    common_pattern, pattern
+                ):
+                    print(
+                        f'pattern "{module_name}: {pattern!r}" is covered by pattern {common_pattern!r}'
+                    )
 
 
 check_if_custom_ignores_are_covered_by_common()

@@ -19,7 +19,9 @@ class _MakeGenericClasses(Protocol):
     """Used to represent a type of ``make_generic_classes`` fixture."""
 
     def __call__(
-        self, django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None
+        self,
+        django_version: Optional[_VersionSpec] = None,
+        extra_classes: Optional[Iterable[type]] = None,
     ) -> None:
         ...
 
@@ -39,7 +41,10 @@ def make_generic_classes(
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
 
-    def factory(django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None) -> None:
+    def factory(
+        django_version: Optional[_VersionSpec] = None,
+        extra_classes: Optional[Iterable[type]] = None,
+    ) -> None:
         if extra_classes:
             _extra_classes.extend(extra_classes)
         if django_version is not None:
@@ -62,7 +67,9 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
         pass
 
 
-def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasses) -> None:
+def test_patched_extra_classes_generics(
+    make_generic_classes: _MakeGenericClasses,
+) -> None:
     """Test that the generics actually get patched for extra classes."""
     extra_classes = [View]
 

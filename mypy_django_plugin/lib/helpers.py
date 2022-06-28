@@ -1,5 +1,16 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -59,12 +70,16 @@ def is_toml(filename: str) -> bool:
     return filename.lower().endswith(".toml")
 
 
-def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
+def lookup_fully_qualified_sym(
+    fullname: str, all_modules: Dict[str, MypyFile]
+) -> Optional[SymbolTableNode]:
     if "." not in fullname:
         return None
     if "[" in fullname and "]" in fullname:
-        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
-        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
+        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better
+        # representation to users.
+        # Make sure that we handle lookups of those types of names correctly
+        # if the part inside [] contains "."
         bracket_start = fullname.index("[")
         fullname_without_bracket = fullname[:bracket_start]
         module, cls_name = fullname_without_bracket.rsplit(".", 1)
@@ -81,14 +96,18 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) 
     return sym
 
 
-def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolNode]:
+def lookup_fully_qualified_generic(
+    name: str, all_modules: Dict[str, MypyFile]
+) -> Optional[SymbolNode]:
     sym = lookup_fully_qualified_sym(name, all_modules)
     if sym is None:
         return None
     return sym.node
 
 
-def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], fullname: str) -> Optional[TypeInfo]:
+def lookup_fully_qualified_typeinfo(
+    api: Union[TypeChecker, SemanticAnalyzer], fullname: str
+) -> Optional[TypeInfo]:
     node = lookup_fully_qualified_generic(fullname, api.modules)
     if not isinstance(node, TypeInfo):
         return None
@@ -102,14 +121,18 @@ def lookup_class_typeinfo(api: TypeChecker, klass: type) -> Optional[TypeInfo]:
 
 
 def reparametrize_instance(instance: Instance, new_args: List[MypyType]) -> Instance:
-    return Instance(instance.type, args=new_args, line=instance.line, column=instance.column)
+    return Instance(
+        instance.type, args=new_args, line=instance.line, column=instance.column
+    )
 
 
 def get_class_fullname(klass: type) -> str:
     return klass.__module__ + "." + klass.__qualname__
 
 
-def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
+def get_call_argument_by_name(
+    ctx: Union[FunctionContext, MethodContext], name: str
+) -> Optional[Expression]:
     """
     Return the expression for the specific argument.
     This helper should only be used with non-star arguments.
@@ -124,7 +147,9 @@ def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: 
     return args[0]
 
 
-def get_call_argument_type_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[MypyType]:
+def get_call_argument_type_by_name(
+    ctx: Union[FunctionContext, MethodContext], name: str
+) -> Optional[MypyType]:
     """Return the type for the specific argument.
 
     This helper should only be used with non-star arguments.
@@ -165,8 +190,12 @@ def iter_bases(info: TypeInfo) -> Iterator[Instance]:
         yield from iter_bases(base.type)
 
 
-def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
-    """Return declared type of type_info's private_field_name (used for private Field attributes)"""
+def get_private_descriptor_type(
+    type_info: TypeInfo, private_field_name: str, is_nullable: bool
+) -> MypyType:
+    """
+    Return declared type of type_info's private_field_name (used for private Field attributes)
+    """
     sym = type_info.get(private_field_name)
     if sym is None:
         return AnyType(TypeOfAny.explicit)
@@ -194,7 +223,9 @@ def get_field_lookup_exact_type(api: TypeChecker, field: Field) -> MypyType:
     field_info = lookup_class_typeinfo(api, field.__class__)
     if field_info is None:
         return AnyType(TypeOfAny.explicit)
-    return get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
+    return get_private_descriptor_type(
+        field_info, "_pyi_lookup_exact_type", is_nullable=field.null
+    )
 
 
 def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]:
@@ -255,20 +286,28 @@ def get_current_module(api: TypeChecker) -> MypyFile:
 
 
 def make_oneoff_named_tuple(
-    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: Optional[List[Instance]] = None
+    api: TypeChecker,
+    name: str,
+    fields: "OrderedDict[str, MypyType]",
+    extra_bases: Optional[List[Instance]] = None,
 ) -> TupleType:
     current_module = get_current_module(api)
     if extra_bases is None:
         extra_bases = []
     namedtuple_info = add_new_class_for_module(
-        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", [])] + extra_bases, fields=fields
+        current_module,
+        name,
+        bases=[api.named_generic_type("typing.NamedTuple", [])] + extra_bases,
+        fields=fields,
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
 
 def make_tuple(api: "TypeChecker", fields: List[MypyType]) -> TupleType:
     # fallback for tuples is any builtins.tuple instance
-    fallback = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
+    fallback = api.named_generic_type(
+        "builtins.tuple", [AnyType(TypeOfAny.special_form)]
+    )
     return TupleType(fields, fallback=fallback)
 
 
@@ -294,52 +333,74 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 
 
 def make_typeddict(
-    api: CheckerPluginInterface, fields: "OrderedDict[str, MypyType]", required_keys: Set[str]
+    api: CheckerPluginInterface,
+    fields: "OrderedDict[str, MypyType]",
+    required_keys: Set[str],
 ) -> TypedDictType:
     object_type = api.named_generic_type("mypy_extensions._TypedDict", [])
-    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
+    typed_dict_type = TypedDictType(
+        fields, required_keys=required_keys, fallback=object_type
+    )
     return typed_dict_type
 
 
-def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> Optional[str]:
+def resolve_string_attribute_value(
+    attr_expr: Expression, django_context: "DjangoContext"
+) -> Optional[str]:
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
     # support extracting from settings, in general case it's unresolvable yet
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
-        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
+        if (
+            isinstance(attr_expr.expr, NameExpr)
+            and attr_expr.expr.fullname == "django.conf.settings"
+        ):
             if hasattr(django_context.settings, member_name):
                 return getattr(django_context.settings, member_name)
     return None
 
 
-def get_semanal_api(ctx: Union[ClassDefContext, DynamicClassDefContext]) -> SemanticAnalyzer:
+def get_semanal_api(
+    ctx: Union[ClassDefContext, DynamicClassDefContext]
+) -> SemanticAnalyzer:
     if not isinstance(ctx.api, SemanticAnalyzer):
         raise ValueError("Not a SemanticAnalyzer")
     return ctx.api
 
 
-def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionContext]) -> TypeChecker:
+def get_typechecker_api(
+    ctx: Union[AttributeContext, MethodContext, FunctionContext]
+) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
         raise ValueError("Not a TypeChecker")
     return ctx.api
 
 
 def is_model_subclass_info(info: TypeInfo, django_context: "DjangoContext") -> bool:
-    return info.fullname in django_context.all_registered_model_class_fullnames or info.has_base(
-        fullnames.MODEL_CLASS_FULLNAME
+    return (
+        info.fullname in django_context.all_registered_model_class_fullnames
+        or info.has_base(fullnames.MODEL_CLASS_FULLNAME)
     )
 
 
 def check_types_compatible(
-    ctx: Union[FunctionContext, MethodContext], *, expected_type: MypyType, actual_type: MypyType, error_message: str
+    ctx: Union[FunctionContext, MethodContext],
+    *,
+    expected_type: MypyType,
+    actual_type: MypyType,
+    error_message: str
 ) -> None:
     api = get_typechecker_api(ctx)
-    api.check_subtype(actual_type, expected_type, ctx.context, error_message, "got", "expected")
+    api.check_subtype(
+        actual_type, expected_type, ctx.context, error_message, "got", "expected"
+    )
 
 
-def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False) -> None:
+def add_new_sym_for_info(
+    info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False
+) -> None:
     # type=: type of the variable itself
     var = Var(name=name, type=sym_type)
     # var.info: type of the object variable is bound to
@@ -347,10 +408,14 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_se
     var._fullname = info.fullname + "." + name
     var.is_initialized_in_class = True
     var.is_inferred = True
-    info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
+    info.names[name] = SymbolTableNode(
+        MDEF, var, plugin_generated=True, no_serialize=no_serialize
+    )
 
 
-def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
+def build_unannotated_method_args(
+    method_node: FuncDef,
+) -> Tuple[List[Argument], MypyType]:
     prepared_arguments = []
     try:
         arguments = method_node.arguments[1:]
@@ -363,7 +428,9 @@ def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument],
     return prepared_arguments, return_type
 
 
-def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Optional[str] = None) -> Optional[MypyType]:
+def bind_or_analyze_type(
+    t: MypyType, api: SemanticAnalyzer, module_name: Optional[str] = None
+) -> Optional[MypyType]:
     """Analyze a type. If an unbound type, try to look it up in the given module name.
 
     That should hopefully give a bound type."""
@@ -391,7 +458,12 @@ def copy_method_to_another_class(
 
         arguments, return_type = build_unannotated_method_args(method_node)
         add_method_to_class(
-            semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
+            semanal_api,
+            ctx.cls,
+            new_method_name,
+            args=arguments,
+            return_type=return_type,
+            self_type=self_type,
         )
         return
 
@@ -402,22 +474,31 @@ def copy_method_to_another_class(
         return
 
     if return_type is None:
-        return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
+        return_type = bind_or_analyze_type(
+            method_type.ret_type, semanal_api, original_module_name
+        )
     if return_type is None:
         if not semanal_api.final_iteration:
             semanal_api.defer()
         return
 
-    # We build the arguments from the method signature (`CallableType`), because if we were to
-    # use the arguments from the method node (`FuncDef.arguments`) we're not compatible with
-    # a method loaded from cache. As mypy doesn't serialize `FuncDef.arguments` when caching
+    # We build the arguments from the method signature (`CallableType`), because if we
+    # were to use the arguments from the method node (`FuncDef.arguments`) we're
+    # not compatible with a method loaded from cache, as `mypy` doesn't serialize
+    # `FuncDef.arguments` when caching
     arguments = []
     # Note that the first argument is excluded, as that's `self`
     for pos, (arg_type, arg_kind, arg_name) in enumerate(
-        zip(method_type.arg_types[1:], method_type.arg_kinds[1:], method_type.arg_names[1:]),
+        zip(
+            method_type.arg_types[1:],
+            method_type.arg_kinds[1:],
+            method_type.arg_names[1:],
+        ),
         start=1,
     ):
-        bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
+        bound_arg_type = bind_or_analyze_type(
+            arg_type, semanal_api, original_module_name
+        )
         if bound_arg_type is None:
             if not semanal_api.final_iteration:
                 semanal_api.defer()
@@ -426,8 +507,11 @@ def copy_method_to_another_class(
             arg_name = method_node.arguments[pos].variable.name
         arguments.append(
             Argument(
-                # Positional only arguments can have name as `None`, if we can't find a name, we just invent one..
-                variable=Var(name=arg_name if arg_name is not None else str(pos), type=arg_type),
+                # Positional only arguments can have name as `None`.
+                # If we can't find a name, we just invent one.
+                variable=Var(
+                    name=arg_name if arg_name is not None else str(pos), type=arg_type
+                ),
                 type_annotation=bound_arg_type,
                 initializer=None,
                 kind=arg_kind,
@@ -436,7 +520,12 @@ def copy_method_to_another_class(
         )
 
     add_method_to_class(
-        semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
+        semanal_api,
+        ctx.cls,
+        new_method_name,
+        args=arguments,
+        return_type=return_type,
+        self_type=self_type,
     )
 
 

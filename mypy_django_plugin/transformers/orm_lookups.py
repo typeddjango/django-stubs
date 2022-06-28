@@ -8,9 +8,12 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
 
 
-def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
-    # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
+def typecheck_queryset_filter(
+    ctx: MethodContext, django_context: DjangoContext
+) -> MypyType:
+    # Expected formal arguments for filter methods are `*args` and `**kwargs`.
+    # We'll only typecheck `**kwargs`, which means that `arg_names[1]` is what we're
+    # interested in.
 
     lookup_kwargs = ctx.arg_names[1]
     provided_lookup_types = ctx.arg_types[1]
@@ -37,10 +40,13 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         if is_annotated_model_fullname(model_cls_fullname):
             lookup_type = AnyType(TypeOfAny.implementation_artifact)
         else:
-            lookup_type = django_context.resolve_lookup_expected_type(ctx, model_cls, lookup_kwarg)
+            lookup_type = django_context.resolve_lookup_expected_type(
+                ctx, model_cls, lookup_kwarg
+            )
         # Managers as provided_type is not supported yet
         if isinstance(provided_type, Instance) and helpers.has_any_of_bases(
-            provided_type.type, (fullnames.MANAGER_CLASS_FULLNAME, fullnames.QUERYSET_CLASS_FULLNAME)
+            provided_type.type,
+            (fullnames.MANAGER_CLASS_FULLNAME, fullnames.QUERYSET_CLASS_FULLNAME),
         ):
             return ctx.default_return_type
 
@@ -54,7 +60,9 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     return ctx.default_return_type
 
 
-def resolve_combinable_type(combinable_type: Instance, django_context: DjangoContext) -> MypyType:
+def resolve_combinable_type(
+    combinable_type: Instance, django_context: DjangoContext
+) -> MypyType:
     if combinable_type.type.fullname != fullnames.F_EXPRESSION_FULLNAME:
         # Combinables aside from F expressions are unsupported
         return AnyType(TypeOfAny.explicit)
