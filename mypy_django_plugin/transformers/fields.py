@@ -112,9 +112,10 @@ def fill_descriptor_types_for_related_field(
     related_model_to_set_info = helpers.lookup_class_typeinfo(
         typechecker_api, related_model_to_set
     )
+    related_model_to_set_type: Union[MypyType, Instance]
     if related_model_to_set_info is None:
         # maybe no type stub
-        related_model_to_set_type: MypyType | Instance = AnyType(TypeOfAny.unannotated)
+        related_model_to_set_type = AnyType(TypeOfAny.unannotated)
     else:
         related_model_to_set_type = Instance(related_model_to_set_info, [])
 
