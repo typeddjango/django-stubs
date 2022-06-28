@@ -387,7 +387,13 @@
                     objects = MyManager()
 
 
+# This tests a regression where mypy would generate phantom warnings about
+# undefined types due to unresolved types when copying methods from QuerySet to
+# a manager dynamically created using Manager.from_queryset().
+#
+# For details see: https://github.com/typeddjango/django-stubs/issues/1022
 -   case: from_queryset_custom_auth_user_model
+    # Cache needs to be disable to consistenly reproduce the bug
     disable_cache: true
     main: |
         from users.models import User
