@@ -387,6 +387,7 @@
 
 
 -   case: from_queryset_custom_auth_user_model
+    disable_cache: true
     main: |
         from users.models import User
     custom_settings: |
