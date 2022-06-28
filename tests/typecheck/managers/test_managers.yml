@@ -579,8 +579,8 @@
     main: |
         from myapp.models import MyModel
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.objects.do_something())  # N: Revealed type is "str"
-        reveal_type(MyModel.objects.do_something(2))  # N: Revealed type is "str"
+        reveal_type(MyModel.objects.do_something())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.do_something(2))  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:

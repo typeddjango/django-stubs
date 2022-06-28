@@ -48,23 +48,25 @@ def get_method_type_from_dynamic_manager(
     queryset_info = helpers.lookup_fully_qualified_typeinfo(api, queryset_fullname)
     assert queryset_info is not None
 
-    def get_funcdef_type(
-        definition: Union[FuncBase, Decorator, None]
-    ) -> Optional[ProperType]:
+    def get_funcdef(definition: Union[FuncBase, Decorator, None]) -> Optional[FuncBase]:
         # TODO: Handle @overload?
         if isinstance(definition, FuncBase) and not isinstance(
             definition, OverloadedFuncDef
         ):
-            return definition.type
+            return definition
         elif isinstance(definition, Decorator):
-            return definition.func.type
+            return definition.func
         return None
 
-    method_type = get_funcdef_type(queryset_info.get_method(method_name))
-    if method_type is None:
+    meth = get_funcdef(queryset_info.get_method(method_name))
+    if meth is None:
         return None
+    method_type = meth.type
 
     assert isinstance(method_type, CallableType)
+    if meth.is_static:
+        return method_type
+
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
         arg_types=method_type.arg_types[1:],
