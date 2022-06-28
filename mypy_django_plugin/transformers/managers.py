@@ -1,5 +1,4 @@
 from typing import FrozenSet, Optional, Union
-from typing_extensions import Final
 
 from mypy.checker import TypeChecker, fill_typevars
 from mypy.nodes import (
@@ -21,6 +20,7 @@ from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContex
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
+from typing_extensions import Final
 
 from mypy_django_plugin import errorcodes
 from mypy_django_plugin.lib import fullnames, helpers
