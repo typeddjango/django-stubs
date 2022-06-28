@@ -574,3 +574,27 @@
 
                 class MyModel(models.Model):
                     objects = MyModelManager()
+
+-   case: queryset_staticmethod
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.do_something())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects.do_something(2))  # N: Revealed type is "str"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyQS(models.QuerySet):
+                    @staticmethod
+                    def do_something(x: int = 1) -> str:
+                        return 'something'
+
+                MyManager = models.Manager.from_queryset(MyQS)
+
+                class MyModel(models.Model):
+                    objects = MyManager()
