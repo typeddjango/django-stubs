@@ -1,4 +1,5 @@
 from enum import Enum
+from logging import Logger
 from typing import (
     Any,
     Callable,
@@ -35,7 +36,7 @@ SINGLE_BRACE_START: str
 SINGLE_BRACE_END: str
 UNKNOWN_SOURCE: str
 tag_re: Pattern[str]
-logger: Any
+logger: Logger
 
 class TokenType(Enum):
     TEXT: int = ...

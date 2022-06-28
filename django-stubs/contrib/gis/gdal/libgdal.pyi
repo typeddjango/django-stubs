@@ -1,6 +1,7 @@
+from logging import Logger
 from typing import Any
 
-logger: Any
+logger: Logger
 lib_path: Any
 lib_names: Any
 lgdal: Any

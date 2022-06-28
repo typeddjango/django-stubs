@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, Optional, Union
 from django.core.management.color import Style
 from django.http import HttpRequest, HttpResponse
 
-request_logger: Any
+request_logger: Logger
 DEFAULT_LOGGING: Any
 
 def configure_logging(logging_config: str, logging_settings: Dict[str, Any]) -> None: ...
