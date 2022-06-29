@@ -259,11 +259,9 @@ class AddManagers(ModelClassInitializer):
                 manager_type = self.model_parametrize(manager_info)
                 self.add_new_node_to_model_class(manager_name, manager_type)
                 continue
-
-            if self._is_declared_inside_class(manager_name):
+            elif self._is_declared_inside_class(manager_name):
                 continue
-
-            if not self._should_subclass_manager(manager_info):
+            elif not self._should_subclass_manager(manager_info):
                 self.add_new_node_to_model_class(manager_name, self.model_parametrize(manager_info))
                 continue
 

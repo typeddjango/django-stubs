@@ -368,19 +368,19 @@ def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Option
 
     That should hopefully give a bound type."""
     if isinstance(t, UnboundType) and module_name is not None:
-        node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
-        if node is not None:
-            if isinstance(node.node, TypeInfo):
+        sym = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
+        if sym is not None:
+            if isinstance(sym.node, TypeInfo):
                 args = []
                 for type_arg in t.args:
                     arg = bind_or_analyze_type(type_arg, api, module_name)
                     if arg is None:
                         return None
                     args.append(arg)
-                return Instance(node.node, args)
-            elif isinstance(node.node, Var):
-                return node.node.type
-            assert False, f"Unknown node: {node.node.__class__}"
+                return Instance(sym.node, args)
+            elif isinstance(sym.node, Var):
+                return sym.node.type
+            assert False, f"Unknown node: {sym.node.__class__}"
 
     # If lookup failed or type was bound, analyze type. May be `None` too.
     return api.anal_type(t)
