@@ -71,6 +71,55 @@
                 class MyModel(models.Model):
                     objects = NewManager()
 
+-   case: from_queryset_generated_manager_imported_from_other_module
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
+        reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
+        reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.queryset_method_4([]))  # N: Revealed type is "None"
+        reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "myapp.querysets.ModelQuerySet"
+        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.querysets.ModelQuerySet[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/querysets.py
+            content: |
+                from typing import TYPE_CHECKING, Iterable, Sequence
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                class Custom:
+                    ...
+
+                class ModelQuerySet(models.QuerySet["MyModel"]):
+                    def queryset_method(self) -> "ModelQuerySet":
+                        return self.filter()
+
+                    def queryset_method_2(self) -> Iterable[Custom]:
+                        return []
+
+                    def queryset_method_3(self) -> str:
+                        return 'hello'
+
+                    def queryset_method_4(self, arg: Sequence) -> None:
+                        return None
+
+                NewManager = BaseManager.from_queryset(ModelQuerySet)
+
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from .querysets import NewManager
+
+                class MyModel(models.Model):
+                    objects = NewManager()
+
 -   case: from_queryset_with_manager
     main: |
         from myapp.models import MyModel

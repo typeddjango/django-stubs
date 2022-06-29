@@ -243,26 +243,25 @@ class AddManagers(ModelClassInitializer):
             except helpers.IncompleteDefnException as exc:
                 # Check if manager is a generated (dynamic class) manager
                 base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                if manager_fullname not in self.get_generated_manager_mappings(base_manager_fullname):
+                generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
+                if manager_fullname not in generated_managers:
                     # Manager doesn't appear to be generated. Track that we encountered an
                     # incomplete definition and skip
                     incomplete_manager_defs.add(manager_name)
-                continue
+                    continue
 
-            if manager_name not in self.model_classdef.info.names:
+                manager_info = self.lookup_typeinfo(generated_managers[manager_fullname])
+                if manager_info is None:
+                    continue
+
+            is_dynamically_generated = manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
+            if manager_name not in self.model_classdef.info.names or is_dynamically_generated:
                 manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
                 self.add_new_node_to_model_class(manager_name, manager_type)
-            else:
+            elif self.has_any_parametrized_manager_as_base(manager_info):
                 # Ending up here could for instance be due to having a custom _Manager_
                 # that is not built from a custom QuerySet. Another example is a
                 # related manager.
-                # Don't interfere with dynamically generated manager classes
-                is_dynamically_generated = "django" in manager_info.metadata and manager_info.metadata["django"].get(
-                    "from_queryset_manager"
-                )
-                if not self.has_any_parametrized_manager_as_base(manager_info) or is_dynamically_generated:
-                    continue
-
                 custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
                 try:
                     custom_manager_type = self.create_new_model_parametrized_manager(
