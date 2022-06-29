@@ -275,7 +275,7 @@ class NewSemanalDjangoPlugin(Plugin):
         Reparametrize `Manager`'s with type variable if they miss type argument
 
         We now always assume that ``class MyManager(Manager)`` is a mistake and
-        should be interpreted as ``class MyNanager(Manager[_T])`` and not be
+        should be interpreted as ``class MyManager(Manager[_T])`` and not be
         Any-parametrized. Use explicit `Any` for opposite action.
         """
         # We cannot appeal to _get_current_manager_bases here, because new name

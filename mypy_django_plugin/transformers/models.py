@@ -168,8 +168,7 @@ class AddRelatedModelsId(ModelClassInitializer):
                 )
                 self.add_new_node_to_model_class(field.attname, AnyType(TypeOfAny.explicit))
                 continue
-
-            if related_model_cls._meta.abstract:
+            elif related_model_cls._meta.abstract:
                 continue
 
             rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
@@ -375,8 +374,7 @@ class AddRelatedManagers(ModelClassInitializer):
             if isinstance(relation, OneToOneRel):
                 self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
                 continue
-
-            if not isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+            elif not isinstance(relation, (ManyToOneRel, ManyToManyRel)):
                 continue
 
             related_manager_info = None

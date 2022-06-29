@@ -51,13 +51,13 @@ def get_method_type_from_dynamic_manager(
             return definition.func
         return None
 
-    meth = get_funcdef(queryset_info.get_method(method_name))
-    if meth is None:
+    method_node = get_funcdef(queryset_info.get_method(method_name))
+    if method_node is None:
         return None
-    method_type = meth.type
+    method_type = method_node.type
 
     assert isinstance(method_type, CallableType)
-    if meth.is_static:
+    if method_node.is_static:
         return method_type
 
     # Drop any 'self' argument as our manager is already initialized
