@@ -385,3 +385,47 @@
                 MyManager = BaseManager.from_queryset(MyQuerySet)
                 class MyModel(models.Model):
                     objects = MyManager()
+
+-   case: from_queryset_select_for_update
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.select_for_update())  # N: Revealed type is "myapp.managers.ModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.select_for_update().queryset_method())  # N: Revealed type is "myapp.managers.ModelQuerySet"
+        reveal_type(MyModel.objects.all().select_for_update())  # N: Revealed type is "myapp.managers.ModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.managers.ModelQuerySet[myapp.models.MyModel]"
+    custom_settings: |
+        AUTH_USER_MODEL = "users.User"
+        INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "users", "myapp")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.conf import settings
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from .managers import ModelQuerySet
+
+                NewManager = BaseManager.from_queryset(ModelQuerySet)
+                class MyModel(models.Model):
+                    created_by = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+                    objects = NewManager()
+        -   path: myapp/managers.py
+            content: |
+                from __future__ import annotations
+                from typing import TYPE_CHECKING
+                from django.db import models
+
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                class ModelQuerySet(models.QuerySet["MyModel"]):
+                    def queryset_method(self) -> ModelQuerySet:
+                        return self.all()
+        -   path: users/__init__.py
+        -   path: users/models.py
+            content: |
+                from django.contrib.auth.models import AbstractBaseUser
+                from django.db import models
+                class User(AbstractBaseUser):
+                    email = models.EmailField(unique=True)
+                    USERNAME_FIELD = "email"

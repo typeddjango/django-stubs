@@ -663,9 +663,10 @@
                 Transaction().test()
 
 
--   case: foreign_key_relationship_for_models_with_custom_manager_unsolvable
+-   case: reverse_for_manager_defined_in_class_body_falls_back_to_default_relatedmanager
     main: |
         from myapp.models import Transaction
+        reveal_type(Transaction.objects.get().transactionlog_set)
     installed_apps:
         - myapp
     files:
@@ -678,24 +679,15 @@
                     def custom(self) -> None:
                         pass
 
-                # Note, that we cannot resolve dynamic calls for custom managers:
                 class Transaction(models.Model):
-                    objects = BaseManager.from_queryset(TransactionQuerySet)
-                    def test(self) -> None:
-                        reveal_type(self.transactionlog_set)
-                        # We use a fallback Any type:
-                        reveal_type(Transaction.objects)
-                        reveal_type(Transaction.objects.get())
-                        reveal_type(Transaction.objects.custom())
+                    x = models.IntegerField()
 
                 class TransactionLog(models.Model):
+                    objects = BaseManager.from_queryset(TransactionQuerySet)
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
-        myapp/models:9: error: `.from_queryset` called from inside model class body
-        myapp/models:11: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
-        myapp/models:13: note: Revealed type is "Any"
-        myapp/models:14: note: Revealed type is "Any"
-        myapp/models:15: note: Revealed type is "Any"
+        myapp/models:11: error: `.from_queryset` called from inside model class body
+        main:2: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
 
 
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
