@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -152,10 +152,6 @@ def parse_bool(expr: Expression) -> Optional[bool]:
         if expr.fullname == "builtins.False":
             return False
     return None
-
-
-def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
-    return any(map(info.has_base, bases))
 
 
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:

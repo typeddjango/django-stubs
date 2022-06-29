@@ -39,8 +39,9 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         else:
             lookup_type = django_context.resolve_lookup_expected_type(ctx, model_cls, lookup_kwarg)
         # Managers as provided_type is not supported yet
-        if isinstance(provided_type, Instance) and helpers.has_any_of_bases(
-            provided_type.type, (fullnames.MANAGER_CLASS_FULLNAME, fullnames.QUERYSET_CLASS_FULLNAME)
+        if isinstance(provided_type, Instance) and (
+            provided_type.type.has_base(fullnames.MANAGER_CLASS_FULLNAME)
+            or provided_type.type.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
         ):
             return ctx.default_return_type
 
