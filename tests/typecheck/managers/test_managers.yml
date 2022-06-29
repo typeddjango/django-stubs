@@ -405,14 +405,14 @@
 
 -   case: regression_manager_scope_foreign
     main: |
-        from myapp.models import MyModel
-        reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[myapp.models.MyModel]"
+        from mysitesapp.models import MyModel
+        reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[mysitesapp.models.MyModel]"
     installed_apps:
-        - myapp
+        - mysitesapp
         - django.contrib.sites
     files:
-        -   path: myapp/__init__.py
-        -   path: myapp/models.py
+        -   path: mysitesapp/__init__.py
+        -   path: mysitesapp/models.py
             content: |
                 from django.db import models
                 from django.contrib.sites.models import Site
