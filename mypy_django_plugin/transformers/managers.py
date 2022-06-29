@@ -52,13 +52,13 @@ MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
 
 
 def get_method_type_from_dynamic_manager(
-    api: TypeChecker, method_name: str, manager_type: Instance
+    api: TypeChecker, method_name: str, manager_instance: Instance
 ) -> Optional[ProperType]:
     """
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
 
-    manager_type_info = manager_type.type
+    manager_type_info = manager_instance.type
 
     if (
         "django" not in manager_type_info.metadata
@@ -93,7 +93,7 @@ def get_method_type_from_dynamic_manager(
     # return type to be the actual queryset class, not the base QuerySet that's
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
-        ret_type = Instance(queryset_info, manager_type.args)
+        ret_type = Instance(queryset_info, manager_instance.args)
         variables = []
 
     # Drop any 'self' argument as our manager is already initialized
