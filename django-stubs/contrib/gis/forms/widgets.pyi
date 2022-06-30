@@ -1,8 +1,9 @@
+from logging import Logger
 from typing import Any, Optional
 
 from django.forms.widgets import Widget as Widget
 
-logger: Any
+logger: Logger
 
 class BaseGeometryWidget(Widget):
     geom_type: str = ...

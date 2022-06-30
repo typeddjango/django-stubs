@@ -248,11 +248,16 @@ class AddManagers(ModelClassInitializer):
             except helpers.IncompleteDefnException:
                 # Check if manager is a generated (dynamic class) manager
                 base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                if manager_fullname not in self.get_generated_manager_mappings(base_manager_fullname):
+                generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
+                if manager_fullname not in generated_managers:
                     # Manager doesn't appear to be generated. Track that we encountered an
                     # incomplete definition and skip
                     incomplete_manager_defs.add(manager_name)
-                continue
+                    continue
+
+                manager_info = self.lookup_typeinfo(generated_managers[manager_fullname])
+                if manager_info is None:
+                    continue
 
             if manager_name not in self.model_classdef.info.names:
                 manager_type = self.model_parametrize(manager_info)

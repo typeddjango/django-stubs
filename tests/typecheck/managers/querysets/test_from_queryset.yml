@@ -71,6 +71,55 @@
                 class MyModel(models.Model):
                     objects = NewManager()
 
+-   case: from_queryset_generated_manager_imported_from_other_module
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.querysets.NewManager[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
+        reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
+        reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.queryset_method_4([]))  # N: Revealed type is "None"
+        reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "myapp.querysets.ModelQuerySet"
+        reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.querysets.ModelQuerySet[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/querysets.py
+            content: |
+                from typing import TYPE_CHECKING, Iterable, Sequence
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                class Custom:
+                    ...
+
+                class ModelQuerySet(models.QuerySet["MyModel"]):
+                    def queryset_method(self) -> "ModelQuerySet":
+                        return self.filter()
+
+                    def queryset_method_2(self) -> Iterable[Custom]:
+                        return []
+
+                    def queryset_method_3(self) -> str:
+                        return 'hello'
+
+                    def queryset_method_4(self, arg: Sequence) -> None:
+                        return None
+
+                NewManager = BaseManager.from_queryset(ModelQuerySet)
+
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from .querysets import NewManager
+
+                class MyModel(models.Model):
+                    objects = NewManager()
+
 -   case: from_queryset_with_manager
     main: |
         from myapp.models import MyModel
@@ -351,24 +400,25 @@
 -   case: from_queryset_includes_methods_returning_queryset
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, *, all: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.defer)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: Union[builtins.dict[builtins.str, Any], None] =, where: Union[builtins.list[builtins.str], None] =, params: Union[builtins.list[Any], None] =, tables: Union[builtins.list[builtins.str], None] =, order_by: Union[typing.Sequence[builtins.str], None] =, select_params: Union[typing.Sequence[Any], None] =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "def (*lookups: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.select_related)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "def (*lookups: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.defer)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, *, all: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: Union[builtins.str, None]) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -429,3 +479,43 @@
                 class User(AbstractBaseUser):
                     email = models.EmailField(unique=True)
                     USERNAME_FIELD = "email"
+
+# This tests a regression where mypy would generate phantom warnings about
+# undefined types due to unresolved types when copying methods from QuerySet to
+# a manager dynamically created using Manager.from_queryset().
+#
+# For details see: https://github.com/typeddjango/django-stubs/issues/1022
+-   case: from_queryset_custom_auth_user_model
+    # Cache needs to be disabled to consistenly reproduce the bug
+    disable_cache: true
+    main: |
+        from users.models import User
+    custom_settings: |
+        AUTH_USER_MODEL = "users.User"
+        INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "users")
+    files:
+        -   path: users/__init__.py
+        -   path: users/models.py
+            content: |
+                from django.contrib.auth.models import AbstractBaseUser
+                from django.db import models
+
+                from .querysets import UserQuerySet
+
+                UserManager = models.Manager.from_queryset(UserQuerySet)
+
+                class User(AbstractBaseUser):
+                    email = models.EmailField(unique=True)
+                    objects = UserManager()
+                    USERNAME_FIELD = "email"
+
+        -   path: users/querysets.py
+            content: |
+                from django.db import models
+                from typing import Optional, TYPE_CHECKING
+
+                if TYPE_CHECKING:
+                    from .models import User
+
+                class UserQuerySet(models.QuerySet["User"]):
+                    pass

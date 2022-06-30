@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Any, ContextManager, List, Optional, Sequence, Tuple, Type, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -6,7 +7,7 @@ from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 
-logger: Any
+logger: Logger
 
 class BaseDatabaseSchemaEditor(ContextManager[Any]):
     sql_create_table: str = ...

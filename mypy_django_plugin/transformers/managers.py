@@ -19,18 +19,47 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny, TypeVarType, UnboundType, get_proper_type
+from mypy.types import TypeOfAny
+from typing_extensions import Final
 
 from mypy_django_plugin import errorcodes
 from mypy_django_plugin.lib import fullnames, helpers
 
+MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
+    (
+        "alias",
+        "all",
+        "annotate",
+        "complex_filter",
+        "defer",
+        "difference",
+        "distinct",
+        "exclude",
+        "extra",
+        "filter",
+        "intersection",
+        "none",
+        "only",
+        "order_by",
+        "prefetch_related",
+        "reverse",
+        "select_for_update",
+        "select_related",
+        "union",
+        "using",
+    )
+)
+
 
 def get_method_type_from_dynamic_manager(
-    api: TypeChecker, method_name: str, manager_type_info: TypeInfo
+    api: TypeChecker, method_name: str, manager_instance: Instance
 ) -> Optional[ProperType]:
     """
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
+
+    manager_type_info = manager_instance.type
+
     if (
         "django" not in manager_type_info.metadata
         or "from_queryset_manager" not in manager_type_info.metadata["django"]
@@ -60,11 +89,23 @@ def get_method_type_from_dynamic_manager(
     if method_node.is_static:
         return method_type
 
+    variables = method_type.variables
+    ret_type = method_type.ret_type
+
+    # For methods on the manager that return a queryset we need to override the
+    # return type to be the actual queryset class, not the base QuerySet that's
+    # used by the typing stubs.
+    if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
+        ret_type = Instance(queryset_info, manager_instance.args)
+        variables = []
+
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
         arg_types=method_type.arg_types[1:],
         arg_kinds=method_type.arg_kinds[1:],
         arg_names=method_type.arg_names[1:],
+        variables=variables,
+        ret_type=ret_type,
     )
 
 
@@ -94,7 +135,7 @@ def get_method_type_from_reverse_manager(
     assert isinstance(model_info.names["_default_manager"].node, Var)
     manager_instance = model_info.names["_default_manager"].node.type
     return (
-        get_method_type_from_dynamic_manager(api, method_name, manager_instance.type)
+        get_method_type_from_dynamic_manager(api, method_name, manager_instance)
         # TODO: Can we assert on None and Instance?
         if manager_instance is not None and isinstance(manager_instance, Instance)
         else None
@@ -102,9 +143,10 @@ def get_method_type_from_reverse_manager(
 
 
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
+
     api = helpers.get_typechecker_api(ctx)
     method_type = get_method_type_from_dynamic_manager(
-        api, method_name, instance.type
+        api, method_name, instance
     ) or get_method_type_from_reverse_manager(api, method_name, instance.type)
 
     return method_type if method_type is not None else ctx.default_attr_type
@@ -245,60 +287,17 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
                 sym_type=AnyType(TypeOfAny.special_form),
             )
 
-    # we need to copy all methods in MRO before django.db.models.query.QuerySet
-    # Gather names of all BaseManager methods
-    manager_method_names = []
-    for manager_mro_info in new_manager_info.mro:
-        if manager_mro_info.fullname == fullnames.BASE_MANAGER_CLASS_FULLNAME:
-            for name, sym in manager_mro_info.names.items():
-                manager_method_names.append(name)
-
-    # Copy/alter all methods in common between BaseManager/QuerySet over to the new manager if their return type is
-    # the QuerySet's self-type. Alter the return type to be the custom queryset, parameterized by the manager's model
-    # type variable.
-    for class_mro_info in derived_queryset_info.mro:
-        if class_mro_info.fullname != fullnames.QUERYSET_CLASS_FULLNAME:
-            continue
-        for name, sym in class_mro_info.names.items():
-            if name not in manager_method_names:
-                continue
-
-            if isinstance(sym.node, FuncDef):
-                func_node = sym.node
-            elif isinstance(sym.node, Decorator):
-                func_node = sym.node.func
-            else:
-                continue
-
-            method_type = func_node.type
-            if not isinstance(method_type, CallableType):
-                if not semanal_api.final_iteration:
-                    semanal_api.defer()
-                return None
-            original_return_type = method_type.ret_type
-
-            # Skip any method that doesn't return _QS
-            original_return_type = get_proper_type(original_return_type)
-            if isinstance(original_return_type, UnboundType):
-                if original_return_type.name != "_QS":
-                    continue
-            elif isinstance(original_return_type, TypeVarType):
-                if original_return_type.name != "_QS":
-                    continue
-            else:
-                continue
-
-            # Return the custom queryset parameterized by the manager's type vars
-            return_type = Instance(derived_queryset_info, self_type.args)
-
-            helpers.copy_method_to_another_class(
-                class_def_context,
-                self_type,
-                new_method_name=name,
-                method_node=func_node,
-                return_type=return_type,
-                original_module_name=class_mro_info.module_name,
-            )
+    # For methods on BaseManager that return a queryset we need to update the
+    # return type to be the actual queryset subclass used. This is done by
+    # adding the methods as attributes with type Any to the manager class,
+    # similar to how custom queryset methods are handled above. The actual type
+    # of these methods are resolved in resolve_manager_method.
+    for name in MANAGER_METHODS_RETURNING_QUERYSET:
+        helpers.add_new_sym_for_info(
+            new_manager_info,
+            name=name,
+            sym_type=AnyType(TypeOfAny.special_form),
+        )
 
     # Insert the new manager (dynamic) class
     assert semanal_api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, new_manager_info, plugin_generated=True))

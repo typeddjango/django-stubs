@@ -4,6 +4,16 @@
       with connection.cursor() as cursor:
         reveal_type(cursor)  # N: Revealed type is "django.db.backends.utils.CursorWrapper"
         cursor.execute("SELECT %s", [123])
+
+
+-   case: raw_connection_psycopg2_composable
+    main: |
+      from django.db import connection
+      from psycopg2.sql import SQL, Identifier
+      with connection.cursor() as cursor:
+        cursor.execute(SQL("INSERT INTO {} VALUES (%s)").format(Identifier("my_table")), [123])
+
+
 -   case: raw_connections
     main: |
       from django.db import connections

@@ -1,7 +1,8 @@
 from ctypes import Structure
+from logging import Logger
 from typing import Any, Optional
 
-logger: Any
+logger: Logger
 
 def load_geos(): ...
 
