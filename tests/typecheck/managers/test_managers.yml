@@ -404,6 +404,7 @@
                    objects = MyModelManager()
 
 -   case: regression_manager_scope_foreign
+    disable_cache: true
     main: |
         from mysitesapp.models import MyModel
         reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[mysitesapp.models.MyModel]"
