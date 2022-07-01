@@ -519,3 +519,23 @@
 
                 class UserQuerySet(models.QuerySet["User"]):
                     pass
+
+-   case: regression_untyped_queryset_method_in_from_from_queryset
+    main: |
+        from myapp.models import MyModel
+        MyModel.objects.untyped()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyQS(models.QuerySet):
+                    def untyped(self):
+                        return 1
+
+                MyManager = models.Manager.from_queryset(MyQS)
+
+                class MyModel(models.Model):
+                    objects = MyManager()
