@@ -84,6 +84,9 @@ def get_method_type_from_dynamic_manager(
     if method_node is None:
         return None
     method_type = method_node.type
+    if method_type is None:
+        # We end here most probably because of untyped definition
+        return None
 
     assert isinstance(method_type, CallableType)
     if method_node.is_static:
