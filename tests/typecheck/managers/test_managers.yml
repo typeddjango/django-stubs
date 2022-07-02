@@ -329,19 +329,19 @@
 #                class MyUser(MyBaseUser):
 #                    objects = MyManager()
 
--   case: custom_manager_returns_proper_model_types
+-   case: custom_manager_without_typevar_returns_any_model_types
     main: |
         from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is "myapp.models.User_MyManager2[myapp.models.User]"
-        reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
-        reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
+        reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[Any, Any]"
+        reveal_type(User.objects.get())  # N: Revealed type is "Any"
         reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
-        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.ChildUser_MyManager2[myapp.models.ChildUser]"
-        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
-        reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
+        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[Any, Any]"
+        reveal_type(ChildUser.objects.get())  # N: Revealed type is "Any"
         reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
     installed_apps:
@@ -361,10 +361,44 @@
                 class ChildUser(models.Model):
                     objects = MyManager()
 
+-   case: custom_manager_with_typevars_returns_proper_model_types
+    main: |
+        from myapp.models import User
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
+        reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
+        reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
+        reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
+
+        from myapp.models import ChildUser
+        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
+        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+                T = TypeVar("T", bound=models.Model)
+                class MyManager(models.Manager[T]):
+                    def get_instance(self) -> int:
+                        pass
+                    def get_instance_untyped(self, name):
+                        pass
+                class User(models.Model):
+                    objects = MyManager()
+                class ChildUser(models.Model):
+                    objects = MyManager()
+
 -   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
-        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA1[myapp.models.ModelA]"
+        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ManagerA[myapp.models.ModelA]"
         reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
     installed_apps:
         - myapp
@@ -383,7 +417,7 @@
                     movie = models.TextField()
 
 
--   case: override_manager_create1
+-   case: override_manager_create_missing_generic
     main: |
         from myapp.models import MyModel
         MyModel.objects.create()
@@ -397,14 +431,14 @@
                 class MyModelManager(models.Manager):
 
                     def create(self, **kwargs) -> 'MyModel':
-                          return super().create(**kwargs)
+                        return super().create(**kwargs)
 
 
                 class MyModel(models.Model):
 
                    objects = MyModelManager()
 
--   case: override_manager_create2
+-   case: override_manager_create_with_generic
     main: |
         from myapp.models import MyModel
         MyModel.objects.create()
@@ -427,7 +461,7 @@
 -   case: regression_manager_scope_foreign
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.on_site)  # N: Revealed type is "myapp.models.MyModel_CurrentSiteManager[myapp.models.MyModel]"
+        reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[myapp.models.MyModel]"
     installed_apps:
         - myapp
         - django.contrib.sites

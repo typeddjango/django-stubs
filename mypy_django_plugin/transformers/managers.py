@@ -182,6 +182,9 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     """
     semanal_api = helpers.get_semanal_api(ctx)
 
+    if semanal_api.is_class_scope():
+        return
+
     # Don't redeclare the manager class if we've already defined it.
     manager_node = semanal_api.lookup_current_scope(ctx.name)
     if manager_node and isinstance(manager_node.node, TypeInfo):

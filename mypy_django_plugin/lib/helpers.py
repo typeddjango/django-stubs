@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -10,11 +10,9 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
     MDEF,
-    Argument,
     Block,
     ClassDef,
     Expression,
-    FuncDef,
     MemberExpr,
     MypyFile,
     NameExpr,
@@ -34,11 +32,10 @@ from mypy.plugin import (
     MethodContext,
     SemanticAnalyzerPluginInterface,
 )
-from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, CallableType, Instance, NoneTyp, TupleType
+from mypy.types import AnyType, Instance, NoneTyp, TupleType
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, UnboundType, UnionType
+from mypy.types import TypedDictType, TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
@@ -348,92 +345,6 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_se
     var.is_initialized_in_class = True
     var.is_inferred = True
     info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
-
-
-def build_unannotated_method_args(method_node: FuncDef) -> Tuple[List[Argument], MypyType]:
-    prepared_arguments = []
-    try:
-        arguments = method_node.arguments[1:]
-    except AttributeError:
-        arguments = []
-    for argument in arguments:
-        argument.type_annotation = AnyType(TypeOfAny.unannotated)
-        prepared_arguments.append(argument)
-    return_type = AnyType(TypeOfAny.unannotated)
-    return prepared_arguments, return_type
-
-
-def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Optional[str] = None) -> Optional[MypyType]:
-    """Analyze a type. If an unbound type, try to look it up in the given module name.
-
-    That should hopefully give a bound type."""
-    if isinstance(t, UnboundType) and module_name is not None:
-        node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
-        if node is not None and node.type is not None:
-            return node.type
-
-    return api.anal_type(t)
-
-
-def copy_method_to_another_class(
-    ctx: ClassDefContext,
-    self_type: Instance,
-    new_method_name: str,
-    method_node: FuncDef,
-    return_type: Optional[MypyType] = None,
-    original_module_name: Optional[str] = None,
-) -> None:
-    semanal_api = get_semanal_api(ctx)
-    if method_node.type is None:
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
-            return
-
-        arguments, return_type = build_unannotated_method_args(method_node)
-        add_method_to_class(
-            semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
-        )
-        return
-
-    method_type = method_node.type
-    if not isinstance(method_type, CallableType):
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
-        return
-
-    if return_type is None:
-        return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
-    if return_type is None:
-        return
-
-    # We build the arguments from the method signature (`CallableType`), because if we were to
-    # use the arguments from the method node (`FuncDef.arguments`) we're not compatible with
-    # a method loaded from cache. As mypy doesn't serialize `FuncDef.arguments` when caching
-    arguments = []
-    # Note that the first argument is excluded, as that's `self`
-    for pos, (arg_type, arg_kind, arg_name) in enumerate(
-        zip(method_type.arg_types[1:], method_type.arg_kinds[1:], method_type.arg_names[1:]),
-        start=1,
-    ):
-        bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
-        if bound_arg_type is None:
-            return
-        if arg_name is None and hasattr(method_node, "arguments"):
-            arg_name = method_node.arguments[pos].variable.name
-        arguments.append(
-            Argument(
-                # Positional only arguments can have name as `None`, if we can't find a name, we just invent one..
-                variable=Var(name=arg_name if arg_name is not None else str(pos), type=arg_type),
-                type_annotation=bound_arg_type,
-                initializer=None,
-                kind=arg_kind,
-                pos_only=arg_name is None,
-            )
-        )
-
-    add_method_to_class(
-        semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
-    )
 
 
 def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:

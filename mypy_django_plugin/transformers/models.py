@@ -5,7 +5,7 @@ from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, FuncDef, NameExpr, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
@@ -185,52 +185,6 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 
 class AddManagers(ModelClassInitializer):
-    def has_any_parametrized_manager_as_base(self, info: TypeInfo) -> bool:
-        for base in helpers.iter_bases(info):
-            if self.is_any_parametrized_manager(base):
-                return True
-        return False
-
-    def is_any_parametrized_manager(self, typ: Instance) -> bool:
-        return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
-
-    def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
-        bases = []
-        for original_base in base_manager_info.bases:
-            if self.is_any_parametrized_manager(original_base):
-                if original_base.type is None:
-                    raise helpers.IncompleteDefnException()
-
-                original_base = helpers.reparametrize_instance(original_base, [Instance(self.model_classdef.info, [])])
-            bases.append(original_base)
-
-        new_manager_info = self.add_new_class_for_current_module(name, bases)
-        # copy fields to a new manager
-        new_cls_def_context = ClassDefContext(cls=new_manager_info.defn, reason=self.ctx.reason, api=self.api)
-        custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
-
-        for name, sym in base_manager_info.names.items():
-            # replace self type with new class, if copying method
-            if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(
-                    new_cls_def_context,
-                    self_type=custom_manager_type,
-                    new_method_name=name,
-                    method_node=sym.node,
-                    original_module_name=base_manager_info.module_name,
-                )
-                continue
-
-            new_sym = sym.copy()
-            if isinstance(new_sym.node, Var):
-                new_var = Var(name, type=sym.type)
-                new_var.info = new_manager_info
-                new_var._fullname = new_manager_info.fullname + "." + name
-                new_sym.node = new_var
-            new_manager_info.names[name] = new_sym
-
-        return custom_manager_type
-
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
 
@@ -254,40 +208,30 @@ class AddManagers(ModelClassInitializer):
                 if manager_info is None:
                     continue
 
-            is_dynamically_generated = manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
-            if manager_name not in self.model_classdef.info.names or is_dynamically_generated:
-                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-                self.add_new_node_to_model_class(manager_name, manager_type)
-            elif self.has_any_parametrized_manager_as_base(manager_info):
-                # Ending up here could for instance be due to having a custom _Manager_
-                # that is not built from a custom QuerySet. Another example is a
-                # related manager.
-                custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
-                try:
-                    custom_manager_type = self.create_new_model_parametrized_manager(
-                        custom_model_manager_name, base_manager_info=manager_info
-                    )
-                except helpers.IncompleteDefnException:
-                    continue
+            manager_node = self.model_classdef.info.names.get(manager_name, None)
+            if manager_node and manager_node.type is not None:
+                continue
 
-                self.add_new_node_to_model_class(manager_name, custom_manager_type)
+            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            self.add_new_node_to_model_class(manager_name, manager_type)
 
-        if incomplete_manager_defs and not self.api.final_iteration:
-            #  Unless we're on the final round, see if another round could figure out all manager types
-            raise helpers.IncompleteDefnException()
-        elif self.api.final_iteration:
+        if incomplete_manager_defs:
+            #  Unless we're on the final round, see if another round could
+            #  figure out all manager types
+            if not self.api.final_iteration:
+                raise helpers.IncompleteDefnException()
+
             for manager_name in incomplete_manager_defs:
                 # We act graceful and set the type as the bare minimum we know of
                 # (Django's default) before finishing. And emit an error, to allow for
                 # ignoring a more specialised manager not being resolved while still
                 # setting _some_ type
                 django_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
-                assert (
-                    django_manager_info is not None
-                ), f"Type info for Django's {fullnames.MANAGER_CLASS_FULLNAME} missing"
+                assert django_manager_info, f"Type info for {fullnames.MANAGER_CLASS_FULLNAME} missing"
                 self.add_new_node_to_model_class(
                     manager_name, Instance(django_manager_info, [Instance(self.model_classdef.info, [])])
                 )
+
                 # Find expression for e.g. `objects = SomeManager()`
                 manager_expr = [
                     expr
