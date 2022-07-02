@@ -15,9 +15,7 @@ from mypy.plugin import (
     MethodContext,
     Plugin,
 )
-from mypy.types import AnyType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
 
 import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.config import DjangoPluginConfig
@@ -27,6 +25,7 @@ from mypy_django_plugin.transformers import fields, forms, init_create, meta, qu
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
     fail_if_manager_type_created_in_model_body,
+    reparametrize_manager_base_hook,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -60,30 +59,6 @@ def transform_form_class(ctx: ClassDefContext) -> None:
 
 def add_new_manager_base_hook(ctx: ClassDefContext) -> None:
     helpers.add_new_manager_base(ctx.api, ctx.cls.fullname)
-
-
-def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
-    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
-    if manager is None or manager.node is None:
-        return
-    assert isinstance(manager.node, TypeInfo)
-
-    should_reparametrize = (
-        manager.node.bases
-        and manager.node.bases[0].args
-        and isinstance(manager.node.bases[0].args[0], AnyType)
-        and manager.node.bases[0].args[0].type_of_any != TypeOfAny.explicit
-        and manager.node.bases[0].type.defn.type_vars
-    )
-    if not should_reparametrize:
-        return
-
-    tvars = tuple(manager.node.bases[0].type.defn.type_vars)
-    manager.node.bases[0].args = tvars
-    manager.node.defn.type_vars = list(tvars)
-    manager.node.add_type_vars()
-    if not ctx.api.final_iteration:
-        ctx.api.defer()
 
 
 class NewSemanalDjangoPlugin(Plugin):

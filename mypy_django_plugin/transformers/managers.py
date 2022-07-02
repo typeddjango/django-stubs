@@ -321,3 +321,33 @@ def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:
 
     api.fail("`.from_queryset` called from inside model class body", ctx.context, code=errorcodes.MANAGER_UNTYPED)
     return ctx.default_return_type
+
+
+def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
+    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if manager is None or manager.node is None:
+        return
+    assert isinstance(manager.node, TypeInfo)
+
+    parent_manager = next(
+        (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
+        None,
+    )
+    if parent_manager is None:
+        return
+
+    preserve_typevars = (
+        not parent_manager.args
+        or not isinstance(parent_manager.args[0], AnyType)
+        or parent_manager.args[0].type_of_any == TypeOfAny.explicit
+    )
+    if preserve_typevars:
+        return
+
+    tvars = tuple(parent_manager.type.defn.type_vars)
+    parent_manager.args = tvars
+    manager.node.type_vars = []
+    manager.node.defn.type_vars = list(tvars)
+    manager.node.add_type_vars()
+    if not ctx.api.final_iteration:
+        ctx.api.defer()

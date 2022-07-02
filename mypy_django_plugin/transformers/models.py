@@ -187,10 +187,7 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 
 class AddManagers(ModelClassInitializer):
-    def has_any_parametrized_manager_as_base(self, info: TypeInfo) -> bool:
-        return any(map(self.is_any_parametrized_manager, helpers.iter_bases(info)))
-
-    def is_any_parametrized_manager(self, typ: Instance) -> bool:
+    def is_manager_with_implicit_any_parameter(self, typ: Instance) -> bool:
         return bool(
             typ.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
             and typ.args
@@ -234,7 +231,7 @@ class AddManagers(ModelClassInitializer):
         """
 
         is_dynamic = manager.metadata.get("django", {}).get("from_queryset_manager")
-        return self.has_any_parametrized_manager_as_base(manager) and not is_dynamic
+        return any(map(self.is_manager_with_implicit_any_parameter, helpers.iter_bases(manager))) and not is_dynamic
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
