@@ -116,6 +116,10 @@ class ModelClassInitializer:
         manager_info = self.add_new_class_for_current_module(name, [base_manager])
         manager_info.fallback_to_any = True
 
+        manager_info.type_vars = base_manager_info.type_vars
+        manager_info.defn.type_vars = base_manager_info.defn.type_vars
+        manager_info.metaclass_type = manager_info.calculate_metaclass_type()
+
         # For methods on BaseManager that return a queryset we need to update
         # the return type to be the actual queryset subclass used. This is done
         # by adding the methods as attributes with type Any to the manager
@@ -128,10 +132,6 @@ class ModelClassInitializer:
             "any_fallback_manager": True,
             "from_queryset_manager": fallback_queryset.fullname,
         }
-        if not related_manager:
-            django_metadata["from_queryset_managers"] = {
-                f"django.db.models.manager.{manager_info.fullname}": manager_info.fullname,
-            }
 
         return manager_info
 
@@ -159,6 +159,10 @@ class ModelClassInitializer:
             "any_fallback_queryset": True,
         }
         queryset_info.fallback_to_any = True
+
+        queryset_info.type_vars = base_queryset_info.type_vars
+        queryset_info.defn.type_vars = base_queryset_info.defn.type_vars
+        queryset_info.metaclass_type = queryset_info.calculate_metaclass_type()
 
         return queryset_info
 
