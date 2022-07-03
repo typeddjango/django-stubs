@@ -7,7 +7,7 @@ from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel,
 from mypy.checker import TypeChecker
 from mypy.nodes import (
     ARG_STAR2,
-    GDEF,
+    MDEF,
     Argument,
     AssignmentStmt,
     CallExpr,
@@ -24,7 +24,6 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny
-from typing_extensions import reveal_type
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
@@ -317,18 +316,15 @@ class AddManagers(ModelClassInitializer):
 
     def get_manager_expression(self, name: str) -> Optional[AssignmentStmt]:
         # TODO: What happens if the manager is defined multiple times?
-        return next(
-            (
-                expr
-                for expr in self.ctx.cls.defs.body
-                if (
-                    isinstance(expr, AssignmentStmt)
-                    and isinstance(expr.lvalues[0], NameExpr)
-                    and expr.lvalues[0].name == name
-                )
-            ),
-            None,
-        )
+        for expr in self.ctx.cls.defs.body:
+            if (
+                isinstance(expr, AssignmentStmt)
+                and isinstance(expr.lvalues[0], NameExpr)
+                and expr.lvalues[0].name == name
+            ):
+                return expr
+
+        return None
 
     def get_dynamic_manager(self, fullname: str, manager: Manager) -> Optional[TypeInfo]:
         """
@@ -361,7 +357,7 @@ class AddManagers(ModelClassInitializer):
         if not isinstance(expr, CallExpr) or not isinstance(expr.callee, CallExpr):
             return None
 
-        new_manager_info, _ = create_manager_info_from_from_queryset_call(self.api, expr.callee)
+        new_manager_info = create_manager_info_from_from_queryset_call(self.api, expr.callee)
 
         if new_manager_info:
             assert self.api.add_symbol_table_node(
@@ -369,7 +365,7 @@ class AddManagers(ModelClassInitializer):
                 # to handle possible name collisions, as it's unique.
                 new_manager_info.name,
                 # Note that the generated manager type is always inserted at module level
-                SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
+                SymbolTableNode(MDEF, new_manager_info, plugin_generated=True),
             )
 
         return new_manager_info
@@ -382,6 +378,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
 
         default_manager_cls = model_cls._meta.default_manager.__class__
         default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
+
         try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
         except helpers.IncompleteDefnException as exc:

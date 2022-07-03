@@ -1,6 +1,5 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
-from django.db.models import base, manager
 from mypy.checker import TypeChecker, fill_typevars
 from mypy.nodes import (
     GDEF,
@@ -9,7 +8,6 @@ from mypy.nodes import (
     FuncBase,
     FuncDef,
     MemberExpr,
-    NameExpr,
     OverloadedFuncDef,
     RefExpr,
     StrExpr,
@@ -17,7 +15,7 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, SemanticAnalyzerPluginInterface
+from mypy.plugin import AttributeContext, DynamicClassDefContext, SemanticAnalyzerPluginInterface
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
@@ -192,18 +190,11 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
         # This is just a deferral run where our work is already finished
         return
 
-    new_manager_info, generated_name = create_manager_info_from_from_queryset_call(ctx.api, ctx.call, ctx.name)
+    new_manager_info = create_manager_info_from_from_queryset_call(ctx.api, ctx.call, ctx.name)
     if new_manager_info is None:
         if not ctx.api.final_iteration:
             ctx.api.defer()
         return
-
-    assert generated_name
-    manager_fullname = ".".join(["django.db.models.manager", generated_name])
-
-    base_manager_info = new_manager_info.mro[1]
-    base_manager_info.metadata.setdefault("from_queryset_managers", {})
-    base_manager_info.metadata["from_queryset_managers"][manager_fullname] = new_manager_info.fullname
 
     # So that the plugin will reparameterize the manager when it is constructed inside of a Model definition
     helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
@@ -217,7 +208,7 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
 
 def create_manager_info_from_from_queryset_call(
     api: SemanticAnalyzerPluginInterface, call_expr: CallExpr, name: Optional[str] = None
-) -> Tuple[Optional[TypeInfo], Optional[str]]:
+) -> Optional[TypeInfo]:
     """
     Extract manager and queryset TypeInfo from a from_queryset call.
     """
@@ -236,14 +227,14 @@ def create_manager_info_from_from_queryset_call(
         or not isinstance(call_expr.args[0].node, TypeInfo)
         or not call_expr.args[0].node.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
     ):
-        return None, None
+        return None
 
     base_manager_info, queryset_info = call_expr.callee.expr.node, call_expr.args[0].node
     if queryset_info.fullname is None:
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
         # so this isn't a problem.
-        return None, None
+        return None
 
     if len(call_expr.args) == 2 and isinstance(call_expr.args[1], StrExpr):
         manager_name = call_expr.args[1].value
@@ -254,7 +245,13 @@ def create_manager_info_from_from_queryset_call(
 
     popuplate_manager_from_queryset(new_manager_info, queryset_info)
 
-    return new_manager_info, manager_name
+    manager_fullname = ".".join(["django.db.models.manager", manager_name])
+
+    base_manager_info = new_manager_info.mro[1]
+    base_manager_info.metadata.setdefault("from_queryset_managers", {})
+    base_manager_info.metadata["from_queryset_managers"][manager_fullname] = new_manager_info.fullname
+
+    return new_manager_info
 
 
 def create_manager_class(
