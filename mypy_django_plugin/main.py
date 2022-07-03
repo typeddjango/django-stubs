@@ -24,7 +24,6 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
-    fail_if_manager_type_created_in_model_body,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -236,11 +235,6 @@ class NewSemanalDjangoPlugin(Plugin):
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
             )
-
-        elif method_name == "from_queryset":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-                return fail_if_manager_type_created_in_model_body
 
         return None
 
