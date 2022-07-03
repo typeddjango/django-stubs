@@ -382,29 +382,25 @@ def copy_method_to_another_class(
     method_node: FuncDef,
     return_type: Optional[MypyType] = None,
     original_module_name: Optional[str] = None,
-) -> None:
+) -> bool:
     semanal_api = get_semanal_api(ctx)
     if method_node.type is None:
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
-            return
-
         arguments, return_type = build_unannotated_method_args(method_node)
         add_method_to_class(
             semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
         )
-        return
+        return True
 
     method_type = method_node.type
     if not isinstance(method_type, CallableType):
         if not semanal_api.final_iteration:
             semanal_api.defer()
-        return
+        return False
 
     if return_type is None:
         return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
     if return_type is None:
-        return
+        return False
 
     # We build the arguments from the method signature (`CallableType`), because if we were to
     # use the arguments from the method node (`FuncDef.arguments`) we're not compatible with
@@ -417,7 +413,7 @@ def copy_method_to_another_class(
     ):
         bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
         if bound_arg_type is None:
-            return
+            return False
         if arg_name is None and hasattr(method_node, "arguments"):
             arg_name = method_node.arguments[pos].variable.name
         arguments.append(
@@ -434,6 +430,8 @@ def copy_method_to_another_class(
     add_method_to_class(
         semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
     )
+
+    return True
 
 
 def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:

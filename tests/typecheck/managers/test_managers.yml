@@ -364,7 +364,7 @@
 -   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
-        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA[myapp.models.ModelA]"
+        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA1[myapp.models.ModelA]"
         reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
     installed_apps:
         - myapp

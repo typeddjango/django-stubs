@@ -24,6 +24,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny
+from typing_extensions import reveal_type
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
@@ -211,12 +212,12 @@ class AddManagers(ModelClassInitializer):
         bases = []
         for original_base in base_manager_info.bases:
             if self.is_any_parametrized_manager(original_base):
-                if original_base.type is None:
-                    raise helpers.IncompleteDefnException()
-
                 original_base = helpers.reparametrize_instance(original_base, [Instance(self.model_classdef.info, [])])
             bases.append(original_base)
 
+        # TODO: This adds the manager to the module, even if we end up
+        # deferring. That can be avoided by not adding it to the module first,
+        # but rather waiting until we know we won't defer
         new_manager_info = self.add_new_class_for_current_module(name, bases)
         # copy fields to a new manager
         new_cls_def_context = ClassDefContext(cls=new_manager_info.defn, reason=self.ctx.reason, api=self.api)
@@ -225,13 +226,15 @@ class AddManagers(ModelClassInitializer):
         for name, sym in base_manager_info.names.items():
             # replace self type with new class, if copying method
             if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(
+                copied_method = helpers.copy_method_to_another_class(
                     new_cls_def_context,
                     self_type=custom_manager_type,
                     new_method_name=name,
                     method_node=sym.node,
                     original_module_name=base_manager_info.module_name,
                 )
+                if not copied_method and not self.api.final_iteration:
+                    raise helpers.IncompleteDefnException()
                 continue
 
             new_sym = sym.copy()
