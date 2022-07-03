@@ -5,19 +5,7 @@ from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import (
-    ARG_STAR2,
-    MDEF,
-    Argument,
-    AssignmentStmt,
-    CallExpr,
-    Context,
-    FuncDef,
-    NameExpr,
-    SymbolTableNode,
-    TypeInfo,
-    Var,
-)
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, FuncDef, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
@@ -29,7 +17,6 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME, MODEL_CLASS_FULLNAME
-from mypy_django_plugin.lib.helpers import add_new_class_for_module
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 from mypy_django_plugin.transformers.managers import create_manager_info_from_from_queryset_call
@@ -357,18 +344,7 @@ class AddManagers(ModelClassInitializer):
         if not isinstance(expr, CallExpr) or not isinstance(expr.callee, CallExpr):
             return None
 
-        new_manager_info = create_manager_info_from_from_queryset_call(self.api, expr.callee)
-
-        if new_manager_info:
-            assert self.api.add_symbol_table_node(
-                # We'll use `new_manager_info.name` instead of `manager_class_name` here
-                # to handle possible name collisions, as it's unique.
-                new_manager_info.name,
-                # Note that the generated manager type is always inserted at module level
-                SymbolTableNode(MDEF, new_manager_info, plugin_generated=True),
-            )
-
-        return new_manager_info
+        return create_manager_info_from_from_queryset_call(self.api, expr.callee)
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
@@ -646,7 +622,7 @@ def get_or_create_annotated_type(
         else:
             annotated_model_type = api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
 
-        annotated_typeinfo = add_new_class_for_module(
+        annotated_typeinfo = helpers.add_new_class_for_module(
             model_module_file,
             type_name,
             bases=[model_type] if fields_dict is not None else [model_type, annotated_model_type],

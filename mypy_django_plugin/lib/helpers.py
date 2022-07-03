@@ -208,6 +208,23 @@ def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
     return model_cls_fullname.startswith(WITH_ANNOTATIONS_FULLNAME + "[")
 
 
+def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
+
+    # make new class expression
+    classdef = ClassDef(name, Block([]))
+    classdef.fullname = module + "." + name
+
+    # make new TypeInfo
+    new_typeinfo = TypeInfo(SymbolTable(), classdef, module)
+    new_typeinfo.bases = bases
+    calculate_mro(new_typeinfo)
+    new_typeinfo.calculate_metaclass_type()
+
+    classdef.info = new_typeinfo
+
+    return new_typeinfo
+
+
 def add_new_class_for_module(
     module: MypyFile,
     name: str,
@@ -217,15 +234,7 @@ def add_new_class_for_module(
 ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
 
-    # make new class expression
-    classdef = ClassDef(new_class_unique_name, Block([]))
-    classdef.fullname = module.fullname + "." + new_class_unique_name
-
-    # make new TypeInfo
-    new_typeinfo = TypeInfo(SymbolTable(), classdef, module.fullname)
-    new_typeinfo.bases = bases
-    calculate_mro(new_typeinfo)
-    new_typeinfo.calculate_metaclass_type()
+    new_typeinfo = create_type_info(new_class_unique_name, module.fullname, bases)
 
     # add fields
     if fields:
@@ -237,7 +246,6 @@ def add_new_class_for_module(
                 MDEF, var, plugin_generated=True, no_serialize=no_serialize
             )
 
-    classdef.info = new_typeinfo
     module.names[new_class_unique_name] = SymbolTableNode(
         GDEF, new_typeinfo, plugin_generated=True, no_serialize=no_serialize
     )

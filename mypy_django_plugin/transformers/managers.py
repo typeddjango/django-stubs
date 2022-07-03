@@ -199,12 +199,6 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     # So that the plugin will reparameterize the manager when it is constructed inside of a Model definition
     helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
 
-    # Insert the new manager (dynamic) class
-    assert semanal_api.add_symbol_table_node(
-        ctx.name,
-        SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
-    )
-
 
 def create_manager_info_from_from_queryset_call(
     api: SemanticAnalyzerPluginInterface, call_expr: CallExpr, name: Optional[str] = None
@@ -251,6 +245,12 @@ def create_manager_info_from_from_queryset_call(
     base_manager_info.metadata.setdefault("from_queryset_managers", {})
     base_manager_info.metadata["from_queryset_managers"][manager_fullname] = new_manager_info.fullname
 
+    # Add the new manager to the current module
+    module = api.modules[api.cur_mod_id]
+    module.names[name or manager_name] = SymbolTableNode(
+        GDEF, new_manager_info, plugin_generated=True, no_serialize=False
+    )
+
     return new_manager_info
 
 
@@ -261,7 +261,7 @@ def create_manager_class(
     base_manager_instance = fill_typevars(base_manager_info)
     assert isinstance(base_manager_instance, Instance)
 
-    manager_info = api.basic_new_typeinfo(name, basetype_or_fallback=base_manager_instance, line=line)
+    manager_info = helpers.create_type_info(name, api.cur_mod_id, bases=[base_manager_instance])
     manager_info.line = line
     manager_info.type_vars = base_manager_info.type_vars
     manager_info.defn.type_vars = base_manager_info.defn.type_vars
