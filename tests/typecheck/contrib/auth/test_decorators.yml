@@ -27,14 +27,14 @@
 -   case: user_passes_test
     main: |
         from django.contrib.auth.decorators import user_passes_test
-        @user_passes_test(lambda u: u.username.startswith('super'))
+        @user_passes_test(lambda u: u.get_username().startswith('super'))
         def view_func(request): ...
         reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
 -   case: user_passes_test_bare_is_error
     main: |
         from django.http.response import HttpResponse
         from django.contrib.auth.decorators import user_passes_test
-        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[Any], HttpResponse]"; expected "Callable[[AbstractUser], bool]"
+        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[Any], HttpResponse]"; expected "Callable[[Union[AbstractBaseUser, AnonymousUser]], bool]"
         def view_func(request) -> HttpResponse: ...
 -   case: permission_required
     main: |
