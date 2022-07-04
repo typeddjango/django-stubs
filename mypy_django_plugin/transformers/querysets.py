@@ -30,6 +30,14 @@ def _extract_model_type_from_queryset(queryset_type: Instance) -> Optional[Insta
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
+    """
+    This hook parametrizes manager on model with model itself, so that code::
+
+        class MyModel(models.Model):
+            objects = MyManager()
+
+    has `objects` replaced with `MyManager[MyModel]` type.
+    """
     default_return_type = ctx.default_return_type
     assert isinstance(default_return_type, Instance)
 

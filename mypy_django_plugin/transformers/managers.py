@@ -146,7 +146,6 @@ def get_method_type_from_reverse_manager(
 
 
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
-
     api = helpers.get_typechecker_api(ctx)
     method_type = get_method_type_from_dynamic_manager(
         api, method_name, instance
@@ -324,6 +323,19 @@ def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:
 
 
 def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
+    """
+    This hook fixes `Managers` that are missing type vars::
+
+        class MyManager(models.Manager): ...
+
+    is interpreted as::
+
+        _T = TypeVar('_T', covariant=True)
+        class MyManager(models.Manager[_T]): ...
+
+    This hook **does not** affect checking stage. Parametrization with model class
+    is done in other place (`querysets.determine_proper_manager_type`).
+    """
     manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
     if manager is None or manager.node is None:
         return
