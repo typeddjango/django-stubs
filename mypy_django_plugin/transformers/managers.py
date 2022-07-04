@@ -344,7 +344,14 @@ def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
     if preserve_typevars:
         return
 
-    tvars = tuple(parent_manager.type.defn.type_vars)
+    base_manager = ctx.api.lookup_fully_qualified_or_none(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+    if base_manager is None:
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+        return
+    assert isinstance(base_manager.node, TypeInfo)
+
+    tvars = tuple(base_manager.node.defn.type_vars)
     parent_manager.args = tvars
     manager.node.type_vars = []
     manager.node.defn.type_vars = list(tvars)
