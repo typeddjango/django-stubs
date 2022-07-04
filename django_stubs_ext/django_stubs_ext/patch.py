@@ -7,6 +7,7 @@ from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
 from django.core.paginator import Paginator
 from django.db.models.fields import Field
+from django.db.models.fields.related import ForeignKey
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
@@ -59,6 +60,8 @@ _need_generic: List[MPGeneric[Any]] = [
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
+    # These types do have native `__class_getitem__` method since django 4.1:
+    MPGeneric(ForeignKey, (4, 1)),
 ]
 
 
