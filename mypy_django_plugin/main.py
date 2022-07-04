@@ -174,17 +174,17 @@ class NewSemanalDjangoPlugin(Plugin):
         if fullname == "django.contrib.auth.get_user_model":
             return partial(settings.get_user_model_hook, django_context=self.django_context)
 
-        manager_bases = self._get_current_manager_bases()
-        if fullname in manager_bases:
-            return querysets.determine_proper_manager_type
-
         info = self._get_typeinfo_or_none(fullname)
         if info:
+            if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return querysets.determine_proper_manager_type
+
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
             if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+
         return None
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:

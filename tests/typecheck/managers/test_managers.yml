@@ -629,3 +629,28 @@
         main:3: note: Revealed type is "Any"
         main:4: note: Revealed type is "Any"
         main:5: note: Revealed type is "Any"
+
+-   case: manager_and_basemanager_reparametrized
+    main: |
+        from myapp.models import MyModel
+
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.MyModel]"
+        reveal_type(MyModel.base_objects)  # N: Revealed type is "myapp.models.MyBaseManager[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db.models import Model
+                from django.db.models.manager import Manager, BaseManager
+
+                class MyBaseManager(BaseManager):
+                    pass
+
+                class MyManager(Manager):
+                    pass
+
+                class MyModel(Model):
+                    objects = MyManager()
+                    base_objects = MyBaseManager()

@@ -196,7 +196,7 @@ class AddManagers(ModelClassInitializer):
         )
 
     def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
-        parent_manager = self.api.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME).node
+        parent_manager = self.api.lookup_fully_qualified(fullnames.BASE_MANAGER_CLASS_FULLNAME).node
         assert isinstance(parent_manager, TypeInfo)
         tvars = parent_manager.defn.type_vars
 
