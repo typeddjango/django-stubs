@@ -4,6 +4,7 @@ from django import VERSION as VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.syndication.views import Feed
+from django.core.files.utils import FileProxyMixin
 from django.core.paginator import Paginator
 from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
@@ -54,6 +55,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(BaseModelForm),
     MPGeneric(BaseModelFormSet),
     MPGeneric(Feed),
+    MPGeneric(FileProxyMixin),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
