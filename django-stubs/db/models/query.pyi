@@ -115,9 +115,9 @@ class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     def extra(
         self,
         select: Optional[Dict[str, Any]] = ...,
-        where: Optional[List[str]] = ...,
-        params: Optional[List[Any]] = ...,
-        tables: Optional[List[str]] = ...,
+        where: Optional[Sequence[str]] = ...,
+        params: Optional[Sequence[Any]] = ...,
+        tables: Optional[Sequence[str]] = ...,
         order_by: Optional[Sequence[str]] = ...,
         select_params: Optional[Sequence[Any]] = ...,
     ) -> _QuerySet[Any, Any]: ...

@@ -1,11 +1,11 @@
 from typing import Any, Optional
 
+from django.http import FileResponse
 from django.http.request import HttpRequest
-from django.http.response import HttpResponseBase
 
 def serve(
     request: HttpRequest, path: str, document_root: Optional[str] = ..., show_indexes: bool = ...
-) -> HttpResponseBase: ...
+) -> FileResponse: ...
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE: str
 template_translatable: Any
