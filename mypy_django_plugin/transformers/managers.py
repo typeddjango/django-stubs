@@ -87,11 +87,21 @@ def get_method_type_from_dynamic_manager(
     variables = method_type.variables
     ret_type = method_type.ret_type
 
+    is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
+
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
-        ret_type = Instance(queryset_info, manager_instance.args)
+        if not is_fallback_queryset:
+            ret_type = Instance(queryset_info, manager_instance.args)
+        else:
+            # The fallback queryset inherits _QuerySet, which has two generics
+            # instead of the one exposed on QuerySet. That means that we need
+            # to add the model twice. In real code it's not possible to inherit
+            # from _QuerySet, as it doesn't exist at runtime, so this fix is
+            # only needed for pluign-generated querysets.
+            ret_type = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
         variables = []
 
     # Drop any 'self' argument as our manager is already initialized

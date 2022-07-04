@@ -160,8 +160,8 @@ class ModelClassInitializer:
         }
         queryset_info.fallback_to_any = True
 
-        queryset_info.type_vars = base_queryset_info.type_vars
-        queryset_info.defn.type_vars = base_queryset_info.defn.type_vars
+        queryset_info.type_vars = base_queryset_info.type_vars.copy()
+        queryset_info.defn.type_vars = base_queryset_info.defn.type_vars.copy()
         queryset_info.metaclass_type = queryset_info.calculate_metaclass_type()
 
         return queryset_info
