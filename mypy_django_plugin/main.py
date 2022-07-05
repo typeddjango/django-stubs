@@ -325,10 +325,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
         """
-        Create a new manager class from manager's `.from_queryset` method
-
-        Create a new manager class definition when a manager's `.from_queryset`
-        classmethod is called
+        Create a new manager class definition when a manager's `.from_queryset` classmethod is called
         """
         if fullname.endswith("from_queryset"):
             class_name, _, _ = fullname.rpartition(".")
