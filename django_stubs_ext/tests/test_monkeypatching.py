@@ -82,6 +82,8 @@ def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasse
         (3, 0),
         (3, 1),
         (3, 2),
+        (4, 0),
+        (4, 1),
     ],
 )
 def test_patched_version_specific(
