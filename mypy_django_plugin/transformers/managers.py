@@ -17,6 +17,7 @@ from mypy.nodes import (
     Var,
 )
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
+from mypy.semanal import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
@@ -341,6 +342,10 @@ def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
         return
     assert isinstance(manager.node, TypeInfo)
 
+    if manager.node.type_vars:
+        # We've already been here
+        return
+
     parent_manager = next(
         (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
         None,
@@ -349,9 +354,12 @@ def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
         return
 
     preserve_typevars = (
-        not parent_manager.args
-        or not isinstance(parent_manager.args[0], AnyType)
-        or parent_manager.args[0].type_of_any == TypeOfAny.explicit
+        # If args are missing, but tvars present, don't ignore: we have to reparametrize
+        not parent_manager.type.type_vars
+        or parent_manager.args
+        and (
+            not isinstance(parent_manager.args[0], AnyType) or parent_manager.args[0].type_of_any == TypeOfAny.explicit
+        )
     )
     if preserve_typevars:
         return
@@ -364,9 +372,13 @@ def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
     assert isinstance(base_manager.node, TypeInfo)
 
     tvars = tuple(base_manager.node.defn.type_vars)
+    # For some reason, we have to defer now, otherwise `defer` is called in other place
+    # on final iteration (`SemanticAnalyzer.analyze_func_def`).
+    if any(map(has_placeholder, tvars)):
+        assert not ctx.api.final_iteration, "Too late to reparametrize"
+        ctx.api.defer()
+
     parent_manager.args = tvars
     manager.node.type_vars = []
     manager.node.defn.type_vars = list(tvars)
     manager.node.add_type_vars()
-    if not ctx.api.final_iteration:
-        ctx.api.defer()
