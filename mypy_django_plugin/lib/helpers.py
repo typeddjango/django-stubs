@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -63,8 +63,10 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) 
     if "." not in fullname:
         return None
     if "[" in fullname and "]" in fullname:
-        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
-        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
+        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better
+        # representation to users.
+        # Make sure that we handle lookups of those types of names correctly
+        # if the part inside [] contains "."
         bracket_start = fullname.index("[")
         fullname_without_bracket = fullname[:bracket_start]
         module, cls_name = fullname_without_bracket.rsplit(".", 1)
@@ -152,13 +154,6 @@ def parse_bool(expr: Expression) -> Optional[bool]:
     return None
 
 
-def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
-    for base_fullname in bases:
-        if info.has_base(base_fullname):
-            return True
-    return False
-
-
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:
     for base in info.bases:
         yield base
@@ -166,7 +161,9 @@ def iter_bases(info: TypeInfo) -> Iterator[Instance]:
 
 
 def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
-    """Return declared type of type_info's private_field_name (used for private Field attributes)"""
+    """
+    Return declared type of type_info's private_field_name (used for private Field attributes)
+    """
     sym = type_info.get(private_field_name)
     if sym is None:
         return AnyType(TypeOfAny.explicit)
@@ -308,9 +305,12 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
     # support extracting from settings, in general case it's unresolvable yet
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
-        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
-            if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)
+        if (
+            isinstance(attr_expr.expr, NameExpr)
+            and attr_expr.expr.fullname == "django.conf.settings"
+            and hasattr(django_context.settings, member_name)
+        ):
+            return getattr(django_context.settings, member_name)
     return None
 
 
@@ -368,10 +368,21 @@ def bind_or_analyze_type(t: MypyType, api: SemanticAnalyzer, module_name: Option
 
     That should hopefully give a bound type."""
     if isinstance(t, UnboundType) and module_name is not None:
-        node = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
-        if node is not None and node.type is not None:
-            return node.type
+        sym = api.lookup_fully_qualified_or_none(module_name + "." + t.name)
+        if sym is not None:
+            if isinstance(sym.node, TypeInfo):
+                args = []
+                for type_arg in t.args:
+                    arg = bind_or_analyze_type(type_arg, api, module_name)
+                    if arg is None:
+                        return None
+                    args.append(arg)
+                return Instance(sym.node, args)
+            elif isinstance(sym.node, Var):
+                return sym.node.type
+            assert False, f"Unknown node: {sym.node.__class__}"
 
+    # If lookup failed or type was bound, analyze type. May be `None` too.
     return api.anal_type(t)
 
 
@@ -404,11 +415,13 @@ def copy_method_to_another_class(
     if return_type is None:
         return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
     if return_type is None:
+        if not semanal_api.final_iteration:
+            semanal_api.defer()
         return
 
     # We build the arguments from the method signature (`CallableType`), because if we were to
     # use the arguments from the method node (`FuncDef.arguments`) we're not compatible with
-    # a method loaded from cache. As mypy doesn't serialize `FuncDef.arguments` when caching
+    # a method loaded from cache, as `mypy` doesn't serialize `FuncDef.arguments` when caching
     arguments = []
     # Note that the first argument is excluded, as that's `self`
     for pos, (arg_type, arg_kind, arg_name) in enumerate(
@@ -417,6 +430,8 @@ def copy_method_to_another_class(
     ):
         bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
         if bound_arg_type is None:
+            if not semanal_api.final_iteration:
+                semanal_api.defer()
             return
         if arg_name is None and hasattr(method_node, "arguments"):
             arg_name = method_node.arguments[pos].variable.name

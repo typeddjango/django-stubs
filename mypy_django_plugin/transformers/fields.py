@@ -93,11 +93,12 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         related_model_type = Instance(related_model_info, [])  # type: ignore
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
+    related_model_to_set_type: MypyType
     if related_model_to_set_info is None:
         # maybe no type stub
         related_model_to_set_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
+        related_model_to_set_type = Instance(related_model_to_set_info, [])
 
     # replace Any with referred_to_type
     return reparametrize_related_field_type(
@@ -206,7 +207,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     assert isinstance(outer_model_info, TypeInfo)
 
-    if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
+    if any(map(default_return_type.type.has_base, fullnames.RELATED_FIELDS_CLASSES)):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 
     if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):

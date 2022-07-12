@@ -25,6 +25,7 @@ from mypy_django_plugin.transformers import fields, forms, init_create, meta, qu
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
     fail_if_manager_type_created_in_model_body,
+    reparametrize_manager_base_hook,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -173,17 +174,17 @@ class NewSemanalDjangoPlugin(Plugin):
         if fullname == "django.contrib.auth.get_user_model":
             return partial(settings.get_user_model_hook, django_context=self.django_context)
 
-        manager_bases = self._get_current_manager_bases()
-        if fullname in manager_bases:
-            return querysets.determine_proper_manager_type
-
         info = self._get_typeinfo_or_none(fullname)
         if info:
+            if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return querysets.determine_proper_manager_type
+
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
             if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+
         return None
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
@@ -244,6 +245,24 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
+    def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        """
+        Reparametrize `Manager`'s with type variable if they miss type argument
+
+        We now always assume that ``class MyManager(Manager)`` is a mistake and
+        should be interpreted as ``class MyManager(Manager[_T])`` and not be
+        Any-parametrized. Use explicit `Any` for opposite action.
+        """
+        # We cannot appeal to _get_current_manager_bases here, because new name
+        # is not added there yet
+        manager = self.lookup_fully_qualified(fullname)
+        if (
+            manager is not None
+            and isinstance(manager.node, TypeInfo)
+            and manager.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        ):
+            return reparametrize_manager_base_hook
+
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
         if (
@@ -294,6 +313,9 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_type_analyze_hook(self, fullname: str) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
+        """
+        Support `typing.Annotated` to add fields to the model instance.
+        """
         if fullname in (
             "typing.Annotated",
             "typing_extensions.Annotated",
@@ -302,7 +324,9 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(handle_annotated_type, django_context=self.django_context)
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
-        # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
+        """
+        Create a new manager class definition when a manager's `.from_queryset` classmethod is called
+        """
         if fullname.endswith("from_queryset"):
             class_name, _, _ = fullname.rpartition(".")
             info = self._get_typeinfo_or_none(class_name)

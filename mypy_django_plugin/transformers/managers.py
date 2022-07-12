@@ -17,6 +17,7 @@ from mypy.nodes import (
     Var,
 )
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
+from mypy.semanal import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
@@ -72,19 +73,25 @@ def get_method_type_from_dynamic_manager(
     queryset_info = helpers.lookup_fully_qualified_typeinfo(api, queryset_fullname)
     assert queryset_info is not None
 
-    def get_funcdef_type(definition: Union[FuncBase, Decorator, None]) -> Optional[ProperType]:
+    def get_funcdef(definition: Union[FuncBase, Decorator, None]) -> Optional[FuncBase]:
         # TODO: Handle @overload?
         if isinstance(definition, FuncBase) and not isinstance(definition, OverloadedFuncDef):
-            return definition.type
+            return definition
         elif isinstance(definition, Decorator):
-            return definition.func.type
+            return definition.func
         return None
 
-    method_type = get_funcdef_type(queryset_info.get_method(method_name))
+    method_node = get_funcdef(queryset_info.get_method(method_name))
+    if method_node is None:
+        return None
+    method_type = method_node.type
     if method_type is None:
+        # We end here most probably because of untyped definition
         return None
 
     assert isinstance(method_type, CallableType)
+    if method_node.is_static:
+        return method_type
 
     variables = method_type.variables
     ret_type = method_type.ret_type
@@ -140,7 +147,6 @@ def get_method_type_from_reverse_manager(
 
 
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
-
     api = helpers.get_typechecker_api(ctx)
     method_type = get_method_type_from_dynamic_manager(
         api, method_name, instance
@@ -181,6 +187,15 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     When the assignment expression lives at module level.
     """
     semanal_api = helpers.get_semanal_api(ctx)
+
+    # Do not interfere with `fail_if_manager_type_created_in_model_body`:
+    # stop adding new manager, if we are inside, and fall back to any
+    if semanal_api.scope.classes:
+        any_type = AnyType(TypeOfAny.implementation_artifact)
+        info = semanal_api.lookup_fully_qualified(semanal_api.scope.current_full_target()).node
+        assert isinstance(info, TypeInfo)
+        helpers.add_new_sym_for_info(info=info, name=ctx.name, sym_type=any_type)
+        return
 
     # Don't redeclare the manager class if we've already defined it.
     manager_node = semanal_api.lookup_current_scope(ctx.name)
@@ -306,3 +321,64 @@ def fail_if_manager_type_created_in_model_body(ctx: MethodContext) -> MypyType:
 
     api.fail("`.from_queryset` called from inside model class body", ctx.context, code=errorcodes.MANAGER_UNTYPED)
     return ctx.default_return_type
+
+
+def reparametrize_manager_base_hook(ctx: ClassDefContext) -> None:
+    """
+    This hook fixes `Managers` that are missing type vars::
+
+        class MyManager(models.Manager): ...
+
+    is interpreted as::
+
+        _T = TypeVar('_T', covariant=True)
+        class MyManager(models.Manager[_T]): ...
+
+    This hook **does not** affect checking stage. Parametrization with model class
+    is done in other place (`querysets.determine_proper_manager_type`).
+    """
+    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if manager is None or manager.node is None:
+        return
+    assert isinstance(manager.node, TypeInfo)
+
+    if manager.node.type_vars:
+        # We've already been here
+        return
+
+    parent_manager = next(
+        (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
+        None,
+    )
+    if parent_manager is None:
+        return
+
+    preserve_typevars = (
+        # If args are missing, but tvars present, don't ignore: we have to reparametrize
+        not parent_manager.type.type_vars
+        or parent_manager.args
+        and (
+            not isinstance(parent_manager.args[0], AnyType) or parent_manager.args[0].type_of_any == TypeOfAny.explicit
+        )
+    )
+    if preserve_typevars:
+        return
+
+    base_manager = ctx.api.lookup_fully_qualified_or_none(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+    if base_manager is None:
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+        return
+    assert isinstance(base_manager.node, TypeInfo)
+
+    tvars = tuple(base_manager.node.defn.type_vars)
+    # For some reason, we have to defer now, otherwise `defer` is called in other place
+    # on final iteration (`SemanticAnalyzer.analyze_func_def`).
+    if any(map(has_placeholder, tvars)):
+        assert not ctx.api.final_iteration, "Too late to reparametrize"
+        ctx.api.defer()
+
+    parent_manager.args = tvars
+    manager.node.type_vars = []
+    manager.node.defn.type_vars = list(tvars)
+    manager.node.add_type_vars()

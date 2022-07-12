@@ -40,7 +40,7 @@ class Group(models.Model):
     permissions = models.ManyToManyField(Permission)
     def natural_key(self) -> Tuple[str]: ...
 
-_T = TypeVar("_T", bound=Model)
+_T = TypeVar("_T", bound=Model, covariant=True)
 
 class UserManager(BaseUserManager[_T]):
     def create_user(

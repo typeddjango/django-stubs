@@ -125,7 +125,7 @@
 -   case: test_leave_as_is_if_objects_is_set_and_fill_typevars_with_outer_class
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.UserManager[myapp.models.MyUser]"
+        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.UserManager"
         reveal_type(MyUser.objects.get())  # N: Revealed type is "myapp.models.MyUser"
         reveal_type(MyUser.objects.get_or_404())  # N: Revealed type is "myapp.models.MyUser"
     installed_apps:
@@ -168,9 +168,9 @@
     main: |
         from myapp.models import AbstractPerson, Book
         reveal_type(AbstractPerson.abstract_persons)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.AbstractPerson]"
-        reveal_type(Book.published_objects)  # N: Revealed type is "myapp.models.PublishedBookManager[myapp.models.Book]"
+        reveal_type(Book.published_objects)  # N: Revealed type is "myapp.models.PublishedBookManager"
         Book.published_objects.create(title='hello')
-        reveal_type(Book.annotated_objects)  # N: Revealed type is "myapp.models.AnnotatedBookManager[myapp.models.Book]"
+        reveal_type(Book.annotated_objects)  # N: Revealed type is "myapp.models.AnnotatedBookManager"
         Book.annotated_objects.create(title='hello')
     installed_apps:
         - myapp
@@ -302,44 +302,46 @@
                 class MyModel4(ParentOfMyModel4):
                     objects = models.Manager['MyModel4']()
 
-# TODO: make it work someday
-#-   case: inheritance_of_two_models_with_custom_objects_manager
-#    main: |
-#        from myapp.models import MyBaseUser, MyUser
-#        reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseManager[myapp.models.MyBaseUser]"
-#        reveal_type(MyBaseUser.objects.get())  # N: Revealed type is "myapp.models.MyBaseUser"
-#
-#        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.MyUser]"
-#        reveal_type(MyUser.objects.get())  # N: Revealed type is "myapp.models.MyUser"
-#    installed_apps:
-#        - myapp
-#    files:
-#        -   path: myapp/__init__.py
-#        -   path: myapp/models.py
-#            content: |
-#                from django.db import models
-#
-#                class MyBaseManager(models.Manager):
-#                    pass
-#                class MyBaseUser(models.Model):
-#                    objects = MyBaseManager()
-#
-#                class MyManager(models.Manager):
-#                    pass
-#                class MyUser(MyBaseUser):
-#                    objects = MyManager()
+-   case: inheritance_of_two_models_with_custom_objects_manager
+    main: |
+        from myapp.models import MyBaseUser, MyUser
+        reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseManager[myapp.models.MyBaseUser]"
+        reveal_type(MyBaseUser.objects.get())  # N: Revealed type is "myapp.models.MyBaseUser"
+
+        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.MyUser]"
+        reveal_type(MyUser.objects.get())  # N: Revealed type is "myapp.models.MyUser"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyBaseManager(models.Manager):
+                    pass
+                class MyBaseUser(models.Model):
+                    objects = MyBaseManager()
+
+                class MyManager(models.Manager):
+                    pass
+                class MyUser(MyBaseUser):
+                    objects = MyManager()
+    out: |
+        myapp/models:11: error: Incompatible types in assignment (expression has type "MyManager[MyUser]", base class "MyBaseUser" defined the type as "MyBaseManager[MyBaseUser]")
 
 -   case: custom_manager_returns_proper_model_types
     main: |
-        from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is "myapp.models.User_MyManager2[myapp.models.User]"
+        from myapp.models import User, MyManager
+        reveal_type(MyManager())  # N: Revealed type is "myapp.models.MyManager[<nothing>]"
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
         reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
         reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
         reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
-        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.ChildUser_MyManager2[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
         reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
@@ -363,8 +365,8 @@
 
 -   case: custom_manager_annotate_method_before_type_declaration
     main: |
-        from myapp.models import ModelA, ModelB, ManagerA
-        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA1[myapp.models.ModelA]"
+        from myapp.models import ModelA, ModelB
+        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ManagerA[myapp.models.ModelA]"
         reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
     installed_apps:
         - myapp
@@ -382,8 +384,7 @@
                 class ModelB(models.Model):
                     movie = models.TextField()
 
-
--   case: override_manager_create1
+-   case: override_manager_create
     main: |
         from myapp.models import MyModel
         MyModel.objects.create()
@@ -394,46 +395,25 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                class MyModelManager(models.Manager):
 
-                    def create(self, **kwargs) -> 'MyModel':
-                          return super().create(**kwargs)
-
-
-                class MyModel(models.Model):
-
-                   objects = MyModelManager()
-
--   case: override_manager_create2
-    main: |
-        from myapp.models import MyModel
-        MyModel.objects.create()
-    installed_apps:
-        - myapp
-    files:
-        -   path: myapp/__init__.py
-        -   path: myapp/models.py
-            content: |
-                from django.db import models
                 class MyModelManager(models.Manager['MyModel']):
-
                     def create(self, **kwargs) -> 'MyModel':
                           return super().create(**kwargs)
 
                 class MyModel(models.Model):
-
                    objects = MyModelManager()
 
 -   case: regression_manager_scope_foreign
+    disable_cache: true
     main: |
-        from myapp.models import MyModel
-        reveal_type(MyModel.on_site)  # N: Revealed type is "myapp.models.MyModel_CurrentSiteManager[myapp.models.MyModel]"
+        from mysitesapp.models import MyModel
+        reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[mysitesapp.models.MyModel]"
     installed_apps:
-        - myapp
         - django.contrib.sites
+        - mysitesapp
     files:
-        -   path: myapp/__init__.py
-        -   path: myapp/models.py
+        -   path: mysitesapp/__init__.py
+        -   path: mysitesapp/models.py
             content: |
                 from django.db import models
                 from django.contrib.sites.models import Site
@@ -503,8 +483,8 @@
                     reveal_type(user.bookingowner_set)
                     reveal_type(user.booking_set)
     out: |
-        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
-        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
+        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking - myapp.Booking.renter).
+        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking - myapp.Booking.owner).
         myapp/models:20: error: Could not resolve manager type for "myapp.models.Booking.objects"
         myapp/models:23: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.objects"
         myapp/models:24: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.second_objects"
@@ -521,3 +501,156 @@
         myapp/models:47: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.InvisibleUnresolvable]"
         myapp/models:49: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
         myapp/models:50: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
+
+# Note that manager doesn't have type args here, since it is not generic
+-   case: manager_explicit_any
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManager"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "Any"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any
+                from django.db import models
+
+                class MyManager(models.Manager[Any]):
+                    pass
+
+                class MyModel(models.Model):
+                    objects = MyManager()
+
+-   case: manager_explicit_any_inherited
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyChildManager"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "Any"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any
+                from django.db import models
+
+                class MyManager(models.Manager[Any]):
+                    pass
+                class MyChildManager(MyManager):
+                    pass
+                class MyModel(models.Model):
+                    objects = MyChildManager()
+
+-   case: manager_inheritance_different_files_missing_type_args
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyModelManager[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.bar())  # N: Revealed type is "typing.Sequence[builtins.str]"
+        reveal_type(MyModel.objects.foo())  # N: Revealed type is "builtins.int"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/managers.py
+            content: |
+                from typing import Sequence
+                from django.db import models
+
+                class MyBaseManager(models.Manager):
+                    def bar(self) -> Sequence[str]:
+                        return ['bar']
+
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from myapp.managers import MyBaseManager
+
+                class MyModelManager(MyBaseManager):
+                    def foo(self) -> int:
+                        return 1
+
+                class MyModel(models.Model):
+                    objects = MyModelManager()
+
+-   case: queryset_staticmethod
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.do_something())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.do_something(2))  # N: Revealed type is "builtins.str"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyQS(models.QuerySet):
+                    @staticmethod
+                    def do_something(x: int = 1) -> str:
+                        return 'something'
+
+                MyManager = models.Manager.from_queryset(MyQS)
+
+                class MyModel(models.Model):
+                    objects = MyManager()
+
+-   case: manager_defined_in_class_body_replaced_with_any
+    main: |
+        from myapp.models import Transaction
+
+        reveal_type(Transaction.objects)
+        reveal_type(Transaction.objects.get())
+        reveal_type(Transaction.objects.custom())
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                class TransactionQuerySet(models.QuerySet):
+                    def custom(self) -> None:
+                        pass
+
+                class Transaction(models.Model):
+                    objects = BaseManager.from_queryset(TransactionQuerySet)
+
+                class TransactionLog(models.Model):
+                    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+    out: |
+        myapp/models:8: error: `.from_queryset` called from inside model class body
+        main:3: note: Revealed type is "Any"
+        main:4: note: Revealed type is "Any"
+        main:5: note: Revealed type is "Any"
+
+-   case: manager_and_basemanager_reparametrized
+    main: |
+        from myapp.models import MyModel
+
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.MyModel]"
+        reveal_type(MyModel.base_objects)  # N: Revealed type is "myapp.models.MyBaseManager[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db.models import Model
+                from django.db.models.manager import Manager, BaseManager
+
+                class MyBaseManager(BaseManager):
+                    pass
+
+                class MyManager(Manager):
+                    pass
+
+                class MyModel(Model):
+                    objects = MyManager()
+                    base_objects = MyBaseManager()

@@ -1,11 +1,11 @@
-from typing import Dict, List, Optional, Type, Union, cast
+from typing import Dict, List, Optional, Set, Type, Union, cast
 
 from django.db.models.base import Model
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, FuncDef, NameExpr, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
@@ -45,16 +45,6 @@ class ModelClassInitializer:
         field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
         return field_info
 
-    def create_new_var(self, name: str, typ: MypyType) -> Var:
-        # type=: type of the variable itself
-        var = Var(name=name, type=typ)
-        # var.info: type of the object variable is bound to
-        var.info = self.model_classdef.info
-        var._fullname = self.model_classdef.info.fullname + "." + name
-        var.is_initialized_in_class = True
-        var.is_inferred = True
-        return var
-
     def add_new_node_to_model_class(self, name: str, typ: MypyType, no_serialize: bool = False) -> None:
         helpers.add_new_sym_for_info(self.model_classdef.info, name=name, sym_type=typ, no_serialize=no_serialize)
 
@@ -82,6 +72,18 @@ class ModelClassInitializer:
             return self.lookup_typeinfo(real_manager_fullname)
         # Not a generated manager
         return None
+
+    def model_parametrize(
+        self,
+        manager: TypeInfo,
+        model: Optional[TypeInfo] = None,
+    ) -> Instance:
+        model = model or self.model_classdef.info
+        # TODO: any way to handle generic models?
+        return Instance(
+            manager,
+            [Instance(model, [])] if manager.type_vars else [],
+        )
 
     def run_with_model_cls(self, model_cls):
         raise NotImplementedError("Implement this in subclasses")
@@ -151,85 +153,85 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
 class AddRelatedModelsId(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for field in model_cls._meta.get_fields():
-            if isinstance(field, ForeignKey):
-                related_model_cls = self.django_context.get_field_related_model_cls(field)
-                if related_model_cls is None:
-                    error_context: Context = self.ctx.cls
-                    field_sym = self.ctx.cls.info.get(field.name)
-                    if field_sym is not None and field_sym.node is not None:
-                        error_context = field_sym.node
-                    self.api.fail(
-                        f"Cannot find model {field.related_model!r} referenced in field {field.name!r}",
-                        ctx=error_context,
-                    )
-                    self.add_new_node_to_model_class(field.attname, AnyType(TypeOfAny.explicit))
-                    continue
+            if not isinstance(field, ForeignKey):
+                continue
 
-                if related_model_cls._meta.abstract:
-                    continue
-
-                rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
-                try:
-                    field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
-                except helpers.IncompleteDefnException as exc:
-                    if not self.api.final_iteration:
-                        raise exc
-                    else:
-                        continue
-
-                is_nullable = self.django_context.get_field_nullability(field, None)
-                set_type, get_type = get_field_descriptor_types(
-                    field_info, is_set_nullable=is_nullable, is_get_nullable=is_nullable
+            related_model_cls = self.django_context.get_field_related_model_cls(field)
+            if related_model_cls is None:
+                error_context: Context = self.ctx.cls
+                field_sym = self.ctx.cls.info.get(field.name)
+                if field_sym is not None and field_sym.node is not None:
+                    error_context = field_sym.node
+                self.api.fail(
+                    f"Cannot find model {field.related_model!r} referenced in field {field.name!r}",
+                    ctx=error_context,
                 )
-                self.add_new_node_to_model_class(field.attname, Instance(field_info, [set_type, get_type]))
+                self.add_new_node_to_model_class(field.attname, AnyType(TypeOfAny.explicit))
+                continue
+            elif related_model_cls._meta.abstract:
+                continue
+
+            rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
+            try:
+                field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+            except helpers.IncompleteDefnException:
+                if not self.api.final_iteration:
+                    raise
+                continue
+
+            is_nullable = self.django_context.get_field_nullability(field, None)
+            set_type, get_type = get_field_descriptor_types(
+                field_info, is_set_nullable=is_nullable, is_get_nullable=is_nullable
+            )
+            self.add_new_node_to_model_class(field.attname, Instance(field_info, [set_type, get_type]))
 
 
 class AddManagers(ModelClassInitializer):
-    def has_any_parametrized_manager_as_base(self, info: TypeInfo) -> bool:
-        for base in helpers.iter_bases(info):
-            if self.is_any_parametrized_manager(base):
-                return True
-        return False
-
-    def is_any_parametrized_manager(self, typ: Instance) -> bool:
-        return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
+    def is_manager_with_implicit_any_parameter(self, typ: Instance) -> bool:
+        return bool(
+            typ.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+            and typ.args
+            and isinstance(typ.args[0], AnyType)
+            and typ.args[0].type_of_any != TypeOfAny.explicit
+        )
 
     def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
-        bases = []
-        for original_base in base_manager_info.bases:
-            if self.is_any_parametrized_manager(original_base):
-                if original_base.type is None:
-                    raise helpers.IncompleteDefnException()
+        parent_manager = self.api.lookup_fully_qualified(fullnames.BASE_MANAGER_CLASS_FULLNAME).node
+        assert isinstance(parent_manager, TypeInfo)
+        tvars = parent_manager.defn.type_vars
 
-                original_base = helpers.reparametrize_instance(original_base, [Instance(self.model_classdef.info, [])])
-            bases.append(original_base)
+        base = Instance(base_manager_info, tvars)
 
-        new_manager_info = self.add_new_class_for_current_module(name, bases)
-        # copy fields to a new manager
-        new_cls_def_context = ClassDefContext(cls=new_manager_info.defn, reason=self.ctx.reason, api=self.api)
-        custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
+        new_manager_info = self.add_new_class_for_current_module(name, [base])
+        new_manager_info.defn.type_vars = tvars
+        new_manager_info.add_type_vars()
 
-        for name, sym in base_manager_info.names.items():
-            # replace self type with new class, if copying method
-            if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(
-                    new_cls_def_context,
-                    self_type=custom_manager_type,
-                    new_method_name=name,
-                    method_node=sym.node,
-                    original_module_name=base_manager_info.module_name,
-                )
-                continue
+        return self.model_parametrize(new_manager_info)
 
-            new_sym = sym.copy()
-            if isinstance(new_sym.node, Var):
-                new_var = Var(name, type=sym.type)
-                new_var.info = new_manager_info
-                new_var._fullname = new_manager_info.fullname + "." + name
-                new_sym.node = new_var
-            new_manager_info.names[name] = new_sym
+    def _is_declared_inside_class(self, manager_name: str) -> bool:
+        """
+        Ignore managers from wrong scope.
 
-        return custom_manager_type
+        Check what do we have currently. If it is `AnyType`, then
+        it has to be generated by our plugin
+        (see `create_new_manager_class_from_from_queryset_method`
+        and `fail_if_manager_type_created_in_model_body` hooks)
+        """
+        type_now = self.model_classdef.info.names[manager_name].type
+        return isinstance(type_now, AnyType) and type_now.type_of_any == TypeOfAny.implementation_artifact
+
+    def _should_subclass_manager(self, manager: TypeInfo) -> bool:
+        """
+        Check if new manager instance should be created.
+
+        Ending up here could for instance be due to having a custom _Manager_
+        that is not built from a custom QuerySet. Another example is a
+        related manager.
+        Don't interfere with dynamically generated manager classes
+        """
+
+        is_dynamic = manager.metadata.get("django", {}).get("from_queryset_manager")
+        return any(map(self.is_manager_with_implicit_any_parameter, helpers.iter_bases(manager))) and not is_dynamic
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
@@ -240,7 +242,7 @@ class AddManagers(ModelClassInitializer):
             manager_fullname = helpers.get_class_fullname(manager.__class__)
             try:
                 manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
-            except helpers.IncompleteDefnException as exc:
+            except helpers.IncompleteDefnException:
                 # Check if manager is a generated (dynamic class) manager
                 base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
                 generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
@@ -254,42 +256,46 @@ class AddManagers(ModelClassInitializer):
                 if manager_info is None:
                     continue
 
-            is_dynamically_generated = manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
-            if manager_name not in self.model_classdef.info.names or is_dynamically_generated:
-                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            if manager_name not in self.model_classdef.info.names:
+                manager_type = self.model_parametrize(manager_info)
                 self.add_new_node_to_model_class(manager_name, manager_type)
-            elif self.has_any_parametrized_manager_as_base(manager_info):
-                # Ending up here could for instance be due to having a custom _Manager_
-                # that is not built from a custom QuerySet. Another example is a
-                # related manager.
-                custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
-                try:
-                    custom_manager_type = self.create_new_model_parametrized_manager(
-                        custom_model_manager_name, base_manager_info=manager_info
-                    )
-                except helpers.IncompleteDefnException:
-                    continue
+                continue
+            elif self._is_declared_inside_class(manager_name):
+                continue
+            elif not self._should_subclass_manager(manager_info):
+                self.add_new_node_to_model_class(manager_name, self.model_parametrize(manager_info))
+                continue
 
-                self.add_new_node_to_model_class(manager_name, custom_manager_type)
-
-        if incomplete_manager_defs and not self.api.final_iteration:
-            #  Unless we're on the final round, see if another round could figure out all manager types
-            raise helpers.IncompleteDefnException()
-        elif self.api.final_iteration:
-            for manager_name in incomplete_manager_defs:
-                # We act graceful and set the type as the bare minimum we know of
-                # (Django's default) before finishing. And emit an error, to allow for
-                # ignoring a more specialised manager not being resolved while still
-                # setting _some_ type
-                django_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
-                assert (
-                    django_manager_info is not None
-                ), f"Type info for Django's {fullnames.MANAGER_CLASS_FULLNAME} missing"
-                self.add_new_node_to_model_class(
-                    manager_name, Instance(django_manager_info, [Instance(self.model_classdef.info, [])])
+            custom_manager_name = f"{manager.model.__name__}_{manager_class_name}"
+            try:
+                custom_manager_type = self.create_new_model_parametrized_manager(
+                    custom_manager_name, base_manager_info=manager_info
                 )
-                # Find expression for e.g. `objects = SomeManager()`
-                manager_expr = [
+            except helpers.IncompleteDefnException:
+                continue
+
+            self.add_new_node_to_model_class(manager_name, custom_manager_type)
+
+        if incomplete_manager_defs:
+            if not self.api.final_iteration:
+                # Unless we're on the final round, see if another round could figure out
+                # all manager types
+                raise helpers.IncompleteDefnException()
+            else:
+                self._report_incomplete_defs(incomplete_manager_defs)
+
+    def _report_incomplete_defs(self, incomplete_defs: Set[str]) -> None:
+        for manager_name in incomplete_defs:
+            # We act graceful and set the type as the bare minimum we know of
+            # (Django's default) before finishing. And emit an error, to allow for
+            # ignoring a more specialised manager not being resolved while still
+            # setting _some_ type
+            django_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
+            assert django_manager_info is not None, f"Type info for Django's {fullnames.MANAGER_CLASS_FULLNAME} missing"
+            self.add_new_node_to_model_class(manager_name, self.model_parametrize(django_manager_info))
+            # Find expression for e.g. `objects = SomeManager()`
+            manager_expr = next(
+                (
                     expr
                     for expr in self.ctx.cls.defs.body
                     if (
@@ -297,13 +303,15 @@ class AddManagers(ModelClassInitializer):
                         and isinstance(expr.lvalues[0], NameExpr)
                         and expr.lvalues[0].name == manager_name
                     )
-                ]
-                manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
-                self.api.fail(
-                    f'Could not resolve manager type for "{manager_fullname}"',
-                    manager_expr[0] if manager_expr else self.ctx.cls,
-                    code=MANAGER_MISSING,
-                )
+                ),
+                self.ctx.cls,
+            )
+            manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
+            self.api.fail(
+                f'Could not resolve manager type for "{manager_fullname}"',
+                manager_expr,
+                code=MANAGER_MISSING,
+            )
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
@@ -315,7 +323,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
         default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
         try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
-        except helpers.IncompleteDefnException as exc:
+        except helpers.IncompleteDefnException:
             # Check if default manager could be a generated manager
             base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
             generated_manager_info = self.get_generated_manager_info(default_manager_fullname, base_manager_fullname)
@@ -323,12 +331,11 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                 # Manager doesn't appear to be generated. Unless we're on the final round,
                 # see if another round could help figuring out the default manager type
                 if not self.api.final_iteration:
-                    raise exc
-                else:
-                    return None
+                    raise
+                return None
             default_manager_info = generated_manager_info
 
-        default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+        default_manager = self.model_parametrize(default_manager_info)
         self.add_new_node_to_model_class("_default_manager", default_manager)
 
 
@@ -347,7 +354,7 @@ class AddRelatedManagers(ModelClassInitializer):
         helpers.get_django_metadata(model_info).setdefault("reverse_managers", {})[derived_from] = fullname
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
-        # add related managers
+        """Add related managers"""
         for relation in self.django_context.get_model_relations(model_cls):
             attname = relation.get_accessor_name()
             if attname is None or attname in self.model_classdef.info.names:
@@ -361,91 +368,96 @@ class AddRelatedManagers(ModelClassInitializer):
 
             try:
                 related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
-            except helpers.IncompleteDefnException as exc:
+            except helpers.IncompleteDefnException:
                 if not self.api.final_iteration:
-                    raise exc
-                else:
-                    continue
+                    raise
+                continue
 
             if isinstance(relation, OneToOneRel):
                 self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
                 continue
+            elif not isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+                continue
 
-            if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
-                related_manager_info = None
-                try:
-                    related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
-                        fullnames.RELATED_MANAGER_CLASS
-                    )  # noqa: E501
-                    default_manager = related_model_info.names.get("_default_manager")
-                    if not default_manager:
-                        raise helpers.IncompleteDefnException()
-                except helpers.IncompleteDefnException as exc:
-                    if not self.api.final_iteration:
-                        raise exc
-                    else:
-                        if related_manager_info:
-                            """
-                            If a django model has a Manager class that cannot be
-                            resolved statically (if it is generated in a way
-                            where we cannot import it, like `objects = my_manager_factory()`),
-                            we fallback to the default related manager, so you
-                            at least get a base level of working type checking.
+            related_manager_info = None
+            try:
+                related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
+                default_manager = related_model_info.names.get("_default_manager")
+                if not default_manager:
+                    raise helpers.IncompleteDefnException()
+            except helpers.IncompleteDefnException:
+                if not self.api.final_iteration:
+                    raise
 
-                            See https://github.com/typeddjango/django-stubs/pull/993
-                            for more information on when this error can occur.
-                            """
-                            self.add_new_node_to_model_class(
-                                attname, Instance(related_manager_info, [Instance(related_model_info, [])])
-                            )
-                            related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
-                            self.ctx.api.fail(
-                                f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname}.{relation.field}).",
-                                self.ctx.cls,
-                                code=MANAGER_MISSING,
-                            )
-                        continue
+                if not related_manager_info:
+                    continue
 
-                # Check if the related model has a related manager subclassed from the default manager
-                # TODO: Support other reverse managers than `_default_manager`
-                default_reverse_manager_info = self.get_reverse_manager_info(
-                    model_info=related_model_info, derived_from="_default_manager"
+                # If a django model has a Manager class that cannot be
+                # resolved statically (if it is generated in a way
+                # where we cannot import it, like `objects = my_manager_factory()`),
+                # we fallback to the default related manager, so you
+                # at least get a base level of working type checking.
+
+                # See https://github.com/typeddjango/django-stubs/pull/993
+                # for more information on when this error can occur.
+                self.add_new_node_to_model_class(
+                    attname,
+                    self.model_parametrize(related_manager_info, related_model_info),
                 )
-                if default_reverse_manager_info:
-                    self.add_new_node_to_model_class(
-                        attname, Instance(default_reverse_manager_info, []), no_serialize=True
-                    )
-                    continue
+                self.ctx.api.fail(
+                    (
+                        f"Couldn't resolve related manager for relation {relation.name!r}"
+                        f" (from {related_model_info.fullname} - {relation.field})."
+                    ),
+                    self.ctx.cls,
+                    code=MANAGER_MISSING,
+                )
+                continue
 
-                # The reverse manager we're looking for doesn't exist. So we create it.
-                # The (default) reverse manager type is built from a RelatedManager and the default manager on the related model
-                parametrized_related_manager_type = Instance(related_manager_info, [Instance(related_model_info, [])])
-                default_manager_type = default_manager.type
-                assert default_manager_type is not None
-                assert isinstance(default_manager_type, Instance)
-                # When the default manager isn't custom there's no need to create a new type
-                # as `RelatedManager` has `models.Manager` as base
-                if default_manager_type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME:
-                    self.add_new_node_to_model_class(attname, parametrized_related_manager_type)
-                    continue
-
-                # The reverse manager is based on the related model's manager, so it makes most sense to add the new
-                # related manager in that module
-                new_related_manager_info = helpers.add_new_class_for_module(
-                    module=self.api.modules[related_model_info.module_name],
-                    name=f"{related_model_cls.__name__}_RelatedManager",
-                    bases=[parametrized_related_manager_type, default_manager_type],
+            # Check if the related model has a related manager subclassed
+            # from the default manager
+            # TODO: Support other reverse managers than `_default_manager`
+            default_reverse_manager_info = self.get_reverse_manager_info(
+                model_info=related_model_info, derived_from="_default_manager"
+            )
+            if default_reverse_manager_info:
+                self.add_new_node_to_model_class(
+                    attname,
+                    Instance(default_reverse_manager_info, []),
                     no_serialize=True,
                 )
-                new_related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_info.fullname}
-                # Stash the new reverse manager type fullname on the related model, so we don't duplicate
-                # or have to create it again for other reverse relations
-                self.set_reverse_manager_info(
-                    related_model_info,
-                    derived_from="_default_manager",
-                    fullname=new_related_manager_info.fullname,
-                )
-                self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []), no_serialize=True)
+                continue
+
+            # The reverse manager we're looking for doesn't exist. So we create it.
+            # The (default) reverse manager type is built from a RelatedManager
+            # and the default manager on the related model
+            parametrized_related_manager_type = self.model_parametrize(related_manager_info, related_model_info)
+
+            assert isinstance(default_manager.type, Instance)
+            # When the default manager isn't custom there's no need to create a new
+            # type as `RelatedManager` has `models.Manager` as base
+            if default_manager.type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME:
+                self.add_new_node_to_model_class(attname, parametrized_related_manager_type)
+                continue
+
+            # The reverse manager is based on the related model's manager, so
+            # it makes most sense to add the new related manager in that module
+            new_related_manager_info = helpers.add_new_class_for_module(
+                module=self.api.modules[related_model_info.module_name],
+                name=f"{related_model_cls.__name__}_RelatedManager",
+                bases=[parametrized_related_manager_type, default_manager.type],
+                no_serialize=True,
+            )
+            new_related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_info.fullname}
+            # Stash the new reverse manager type fullname on the related model,
+            # so we don't duplicate or have to create it again for other
+            # reverse relations
+            self.set_reverse_manager_info(
+                related_model_info,
+                derived_from="_default_manager",
+                fullname=new_related_manager_info.fullname,
+            )
+            self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []), no_serialize=True)
 
 
 class AddExtraFieldMethods(ModelClassInitializer):
@@ -455,45 +467,52 @@ class AddExtraFieldMethods(ModelClassInitializer):
             if field.choices:
                 info = self.lookup_typeinfo_or_incomplete_defn_error("builtins.str")
                 return_type = Instance(info, [])
-                common.add_method(self.ctx, name=f"get_{field.attname}_display", args=[], return_type=return_type)
+                common.add_method(
+                    self.ctx,
+                    name=f"get_{field.attname}_display",
+                    args=[],
+                    return_type=return_type,
+                )
 
         # get_next_by, get_previous_by for Date, DateTime
         for field in self.django_context.get_model_fields(model_cls):
-            if isinstance(field, (DateField, DateTimeField)) and not field.null:
-                return_type = Instance(self.model_classdef.info, [])
-                common.add_method(
-                    self.ctx,
-                    name=f"get_next_by_{field.attname}",
-                    args=[
-                        Argument(
-                            Var("kwargs", AnyType(TypeOfAny.explicit)),
-                            AnyType(TypeOfAny.explicit),
-                            initializer=None,
-                            kind=ARG_STAR2,
-                        )
-                    ],
-                    return_type=return_type,
-                )
-                common.add_method(
-                    self.ctx,
-                    name=f"get_previous_by_{field.attname}",
-                    args=[
-                        Argument(
-                            Var("kwargs", AnyType(TypeOfAny.explicit)),
-                            AnyType(TypeOfAny.explicit),
-                            initializer=None,
-                            kind=ARG_STAR2,
-                        )
-                    ],
-                    return_type=return_type,
-                )
+            if not isinstance(field, (DateField, DateTimeField)) or field.null:
+                continue
+
+            return_type = Instance(self.model_classdef.info, [])
+            common.add_method(
+                self.ctx,
+                name=f"get_next_by_{field.attname}",
+                args=[
+                    Argument(
+                        Var("kwargs", AnyType(TypeOfAny.explicit)),
+                        AnyType(TypeOfAny.explicit),
+                        initializer=None,
+                        kind=ARG_STAR2,
+                    )
+                ],
+                return_type=return_type,
+            )
+            common.add_method(
+                self.ctx,
+                name=f"get_previous_by_{field.attname}",
+                args=[
+                    Argument(
+                        Var("kwargs", AnyType(TypeOfAny.explicit)),
+                        AnyType(TypeOfAny.explicit),
+                        initializer=None,
+                        kind=ARG_STAR2,
+                    )
+                ],
+                return_type=return_type,
+            )
 
 
 class AddMetaOptionsAttribute(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         if "_meta" not in self.model_classdef.info.names:
             options_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OPTIONS_CLASS_FULLNAME)
-            self.add_new_node_to_model_class("_meta", Instance(options_info, [Instance(self.model_classdef.info, [])]))
+            self.add_new_node_to_model_class("_meta", self.model_parametrize(options_info))
 
 
 def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
@@ -563,10 +582,11 @@ def get_or_create_annotated_type(
         # If it's already a generated class, we want to use the original model as a base
         model_type = model_type.type.bases[0]
 
+    model_name_under = model_type.type.fullname.replace(".", "__")
     if fields_dict is not None:
-        type_name = f"WithAnnotations[{model_type.type.fullname.replace('.', '__')}, {fields_dict}]"
+        type_name = f"WithAnnotations[{model_name_under}, {fields_dict}]"
     else:
-        type_name = f"WithAnnotations[{model_type.type.fullname.replace('.', '__')}]"
+        type_name = f"WithAnnotations[{model_name_under}]"
 
     annotated_typeinfo = helpers.lookup_fully_qualified_typeinfo(
         cast(TypeChecker, api), model_module_name + "." + type_name
@@ -583,7 +603,7 @@ def get_or_create_annotated_type(
         annotated_typeinfo = add_new_class_for_module(
             model_module_file,
             type_name,
-            bases=[model_type] if fields_dict is not None else [model_type, annotated_model_type],
+            bases=([model_type] if fields_dict is not None else [model_type, annotated_model_type]),
             fields=fields_dict.items if fields_dict is not None else None,
             no_serialize=True,
         )
@@ -592,5 +612,6 @@ def get_or_create_annotated_type(
             annotated_typeinfo.is_protocol = True
             # Save for later to easily find which field types were annotated
             annotated_typeinfo.metadata["annotated_field_types"] = fields_dict.items
+
     annotated_type = Instance(annotated_typeinfo, [])
     return annotated_type
