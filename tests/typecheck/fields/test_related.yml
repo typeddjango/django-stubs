@@ -678,7 +678,6 @@
                     def custom(self) -> None:
                         pass
 
-                # Note, that we cannot resolve dynamic calls for custom managers:
                 class Transaction(models.Model):
                     objects = BaseManager.from_queryset(TransactionQuerySet)
                     def test(self) -> None:
@@ -689,9 +688,8 @@
                 class TransactionLog(models.Model):
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
-        myapp/models:9: error: `.from_queryset` called from inside model class body
-        myapp/models:11: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
-        myapp/models:13: note: Revealed type is "Any"
+        myapp/models:10: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
+        myapp/models:12: note: Revealed type is "Any"
 
 
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model

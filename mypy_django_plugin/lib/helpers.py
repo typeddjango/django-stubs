@@ -208,6 +208,23 @@ def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
     return model_cls_fullname.startswith(WITH_ANNOTATIONS_FULLNAME + "[")
 
 
+def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
+
+    # make new class expression
+    classdef = ClassDef(name, Block([]))
+    classdef.fullname = module + "." + name
+
+    # make new TypeInfo
+    new_typeinfo = TypeInfo(SymbolTable(), classdef, module)
+    new_typeinfo.bases = bases
+    calculate_mro(new_typeinfo)
+    new_typeinfo.calculate_metaclass_type()
+
+    classdef.info = new_typeinfo
+
+    return new_typeinfo
+
+
 def add_new_class_for_module(
     module: MypyFile,
     name: str,
@@ -217,15 +234,7 @@ def add_new_class_for_module(
 ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
 
-    # make new class expression
-    classdef = ClassDef(new_class_unique_name, Block([]))
-    classdef.fullname = module.fullname + "." + new_class_unique_name
-
-    # make new TypeInfo
-    new_typeinfo = TypeInfo(SymbolTable(), classdef, module.fullname)
-    new_typeinfo.bases = bases
-    calculate_mro(new_typeinfo)
-    new_typeinfo.calculate_metaclass_type()
+    new_typeinfo = create_type_info(new_class_unique_name, module.fullname, bases)
 
     # add fields
     if fields:
@@ -237,7 +246,6 @@ def add_new_class_for_module(
                 MDEF, var, plugin_generated=True, no_serialize=no_serialize
             )
 
-    classdef.info = new_typeinfo
     module.names[new_class_unique_name] = SymbolTableNode(
         GDEF, new_typeinfo, plugin_generated=True, no_serialize=no_serialize
     )
@@ -382,29 +390,25 @@ def copy_method_to_another_class(
     method_node: FuncDef,
     return_type: Optional[MypyType] = None,
     original_module_name: Optional[str] = None,
-) -> None:
+) -> bool:
     semanal_api = get_semanal_api(ctx)
     if method_node.type is None:
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
-            return
-
         arguments, return_type = build_unannotated_method_args(method_node)
         add_method_to_class(
             semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
         )
-        return
+        return True
 
     method_type = method_node.type
     if not isinstance(method_type, CallableType):
         if not semanal_api.final_iteration:
             semanal_api.defer()
-        return
+        return False
 
     if return_type is None:
         return_type = bind_or_analyze_type(method_type.ret_type, semanal_api, original_module_name)
     if return_type is None:
-        return
+        return False
 
     # We build the arguments from the method signature (`CallableType`), because if we were to
     # use the arguments from the method node (`FuncDef.arguments`) we're not compatible with
@@ -417,7 +421,7 @@ def copy_method_to_another_class(
     ):
         bound_arg_type = bind_or_analyze_type(arg_type, semanal_api, original_module_name)
         if bound_arg_type is None:
-            return
+            return False
         if arg_name is None and hasattr(method_node, "arguments"):
             arg_name = method_node.arguments[pos].variable.name
         arguments.append(
@@ -434,6 +438,8 @@ def copy_method_to_another_class(
     add_method_to_class(
         semanal_api, ctx.cls, new_method_name, args=arguments, return_type=return_type, self_type=self_type
     )
+
+    return True
 
 
 def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:

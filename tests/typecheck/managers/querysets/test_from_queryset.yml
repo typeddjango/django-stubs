@@ -359,12 +359,17 @@
                 class MyModel(models.Model):
                     objects = NewManager()
 
--   case: from_queryset_in_model_class_body_yields_message
+-   case: test_queryset_in_model_class_body
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.base_manager)  # N: Revealed type is "myapp.models.BaseManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.manager)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.custom_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.custom)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.custom().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -372,29 +377,42 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
+
+                class MyManager(models.Manager["MyModel"]):
+                    pass
 
                 class MyQuerySet(models.QuerySet["MyModel"]):
-                    def queryset_method(self) -> int:
-                        return 1
+                    def custom(self) -> "MyQuerySet":
+                        pass
 
-                class MyManager(BaseManager):
-                    ...
-
-                BaseManagerFromMyQuerySet = BaseManager.from_queryset(MyQuerySet)
-                ManagerFromMyQuerySet = models.Manager.from_queryset(MyQuerySet)
-                MyManagerFromMyQuerySet = MyManager.from_queryset(MyQuerySet)
                 class MyModel(models.Model):
-                    objects1 = BaseManager.from_queryset(MyQuerySet)()  # E: `.from_queryset` called from inside model class body
-                    objects2 = BaseManager.from_queryset(MyQuerySet)  # E: `.from_queryset` called from inside model class body
-                    objects3 = models.Manager.from_queryset(MyQuerySet)()  # E: `.from_queryset` called from inside model class body
-                    objects4 = models.Manager.from_queryset(MyQuerySet)  # E: `.from_queryset` called from inside model class body
-                    objects5 = MyManager.from_queryset(MyQuerySet)  # E: `.from_queryset` called from inside model class body
-                    objects6 = MyManager.from_queryset(MyQuerySet)()  # E: `.from_queryset` called from inside model class body
-                    # Initiating the manager type is fine
-                    base_manager = BaseManagerFromMyQuerySet()
-                    manager = ManagerFromMyQuerySet()
-                    custom_manager = MyManagerFromMyQuerySet()
+                    objects = MyManager.from_queryset(MyQuerySet)()
+                    objects2 = MyManager.from_queryset(MyQuerySet)()
+
+-   case: test_queryset_in_model_class_body_subclass
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class BaseManager(models.Manager["BaseModel"]):
+                    pass
+
+                class BaseQuerySet(models.QuerySet["BaseModel"]):
+                    def custom(self) -> "BaseQuerySet":
+                        pass
+
+                class BaseModel(models.Model):
+                    objects = BaseManager.from_queryset(BaseQuerySet)()
+
+                class MyModel(BaseModel):
+                    pass
 
 -   case: from_queryset_includes_methods_returning_queryset
     main: |

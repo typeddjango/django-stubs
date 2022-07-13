@@ -1,11 +1,11 @@
 from typing import Dict, List, Optional, Type, Union, cast
 
-from django.db.models.base import Model
+from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, Context, FuncDef, NameExpr, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, FuncDef, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
@@ -17,9 +17,9 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME, MODEL_CLASS_FULLNAME
-from mypy_django_plugin.lib.helpers import add_new_class_for_module
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
+from mypy_django_plugin.transformers.managers import create_manager_info_from_from_queryset_call
 
 
 class ModelClassInitializer:
@@ -198,12 +198,12 @@ class AddManagers(ModelClassInitializer):
         bases = []
         for original_base in base_manager_info.bases:
             if self.is_any_parametrized_manager(original_base):
-                if original_base.type is None:
-                    raise helpers.IncompleteDefnException()
-
                 original_base = helpers.reparametrize_instance(original_base, [Instance(self.model_classdef.info, [])])
             bases.append(original_base)
 
+        # TODO: This adds the manager to the module, even if we end up
+        # deferring. That can be avoided by not adding it to the module first,
+        # but rather waiting until we know we won't defer
         new_manager_info = self.add_new_class_for_current_module(name, bases)
         # copy fields to a new manager
         new_cls_def_context = ClassDefContext(cls=new_manager_info.defn, reason=self.ctx.reason, api=self.api)
@@ -212,13 +212,15 @@ class AddManagers(ModelClassInitializer):
         for name, sym in base_manager_info.names.items():
             # replace self type with new class, if copying method
             if isinstance(sym.node, FuncDef):
-                helpers.copy_method_to_another_class(
+                copied_method = helpers.copy_method_to_another_class(
                     new_cls_def_context,
                     self_type=custom_manager_type,
                     new_method_name=name,
                     method_node=sym.node,
                     original_module_name=base_manager_info.module_name,
                 )
+                if not copied_method and not self.api.final_iteration:
+                    raise helpers.IncompleteDefnException()
                 continue
 
             new_sym = sym.copy()
@@ -236,23 +238,23 @@ class AddManagers(ModelClassInitializer):
 
         incomplete_manager_defs = set()
         for manager_name, manager in model_cls._meta.managers_map.items():
+            # If the manager is already typed do nothing
+            manager_node = self.model_classdef.info.names.get(manager_name, None)
+            if manager_node and manager_node.type is not None:
+                continue
+
             manager_class_name = manager.__class__.__name__
             manager_fullname = helpers.get_class_fullname(manager.__class__)
-            try:
-                manager_info = self.lookup_typeinfo_or_incomplete_defn_error(manager_fullname)
-            except helpers.IncompleteDefnException as exc:
-                # Check if manager is a generated (dynamic class) manager
-                base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
-                generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
-                if manager_fullname not in generated_managers:
-                    # Manager doesn't appear to be generated. Track that we encountered an
-                    # incomplete definition and skip
-                    incomplete_manager_defs.add(manager_name)
-                    continue
 
-                manager_info = self.lookup_typeinfo(generated_managers[manager_fullname])
-                if manager_info is None:
-                    continue
+            manager_info = self.lookup_typeinfo(manager_fullname)
+            if manager_info is None:
+                manager_info = self.create_manager_from_from_queryset(manager_name)
+            if manager_info is None:
+                manager_info = self.get_dynamic_manager(manager_fullname, manager)
+
+            if manager_info is None:
+                incomplete_manager_defs.add(manager_name)
+                continue
 
             is_dynamically_generated = manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
             if manager_name not in self.model_classdef.info.names or is_dynamically_generated:
@@ -264,18 +266,20 @@ class AddManagers(ModelClassInitializer):
                 # related manager.
                 custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
                 try:
-                    custom_manager_type = self.create_new_model_parametrized_manager(
+                    manager_type = self.create_new_model_parametrized_manager(
                         custom_model_manager_name, base_manager_info=manager_info
                     )
                 except helpers.IncompleteDefnException:
                     continue
 
-                self.add_new_node_to_model_class(manager_name, custom_manager_type)
+                self.add_new_node_to_model_class(manager_name, manager_type)
 
-        if incomplete_manager_defs and not self.api.final_iteration:
-            #  Unless we're on the final round, see if another round could figure out all manager types
-            raise helpers.IncompleteDefnException()
-        elif self.api.final_iteration:
+        if incomplete_manager_defs:
+            if not self.api.final_iteration:
+                #  Unless we're on the final round, see if another round could
+                #  figure out all manager types
+                raise helpers.IncompleteDefnException()
+
             for manager_name in incomplete_manager_defs:
                 # We act graceful and set the type as the bare minimum we know of
                 # (Django's default) before finishing. And emit an error, to allow for
@@ -289,21 +293,58 @@ class AddManagers(ModelClassInitializer):
                     manager_name, Instance(django_manager_info, [Instance(self.model_classdef.info, [])])
                 )
                 # Find expression for e.g. `objects = SomeManager()`
-                manager_expr = [
-                    expr
-                    for expr in self.ctx.cls.defs.body
-                    if (
-                        isinstance(expr, AssignmentStmt)
-                        and isinstance(expr.lvalues[0], NameExpr)
-                        and expr.lvalues[0].name == manager_name
-                    )
-                ]
+                manager_expr = self.get_manager_expression(manager_name)
                 manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
                 self.api.fail(
                     f'Could not resolve manager type for "{manager_fullname}"',
-                    manager_expr[0] if manager_expr else self.ctx.cls,
+                    manager_expr if manager_expr else self.ctx.cls,
                     code=MANAGER_MISSING,
                 )
+
+    def get_manager_expression(self, name: str) -> Optional[AssignmentStmt]:
+        # TODO: What happens if the manager is defined multiple times?
+        for expr in self.ctx.cls.defs.body:
+            if (
+                isinstance(expr, AssignmentStmt)
+                and isinstance(expr.lvalues[0], NameExpr)
+                and expr.lvalues[0].name == name
+            ):
+                return expr
+
+        return None
+
+    def get_dynamic_manager(self, fullname: str, manager: Manager) -> Optional[TypeInfo]:
+        """
+        Try to get a dynamically defined manager
+        """
+
+        # Check if manager is a generated (dynamic class) manager
+        base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
+        generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
+
+        generated_manager_name: Optional[str] = generated_managers.get(fullname, None)
+        if generated_manager_name is None:
+            return None
+
+        return self.lookup_typeinfo(generated_manager_name)
+
+    def create_manager_from_from_queryset(self, name: str) -> Optional[TypeInfo]:
+        """
+        Try to create a manager from a .from_queryset call:
+
+            class MyModel(models.Model):
+                objects = MyManager.from_queryset(MyQuerySet)()
+        """
+
+        assign_statement = self.get_manager_expression(name)
+        if assign_statement is None:
+            return None
+
+        expr = assign_statement.rvalue
+        if not isinstance(expr, CallExpr) or not isinstance(expr.callee, CallExpr):
+            return None
+
+        return create_manager_info_from_from_queryset_call(self.api, expr.callee)
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
@@ -313,6 +354,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
 
         default_manager_cls = model_cls._meta.default_manager.__class__
         default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
+
         try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
         except helpers.IncompleteDefnException as exc:
@@ -580,7 +622,7 @@ def get_or_create_annotated_type(
         else:
             annotated_model_type = api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
 
-        annotated_typeinfo = add_new_class_for_module(
+        annotated_typeinfo = helpers.add_new_class_for_module(
             model_module_file,
             type_name,
             bases=[model_type] if fields_dict is not None else [model_type, annotated_model_type],
