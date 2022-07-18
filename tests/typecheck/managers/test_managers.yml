@@ -502,6 +502,24 @@
 
                     reveal_type(user.bookingowner_set)
                     reveal_type(user.booking_set)
+
+                    # Check QuerySet methods on UnknownManager
+                    reveal_type(Booking.objects.all)
+                    reveal_type(Booking.objects.custom)
+                    reveal_type(Booking.objects.all().filter)
+                    reveal_type(Booking.objects.all().custom)
+                    reveal_type(Booking.objects.first())
+                    reveal_type(Booking.objects.get())
+                    reveal_type([booking for booking in Booking.objects.all()])
+                    reveal_type([booking for booking in Booking.objects.all().filter()])
+
+
+                    # Check QuerySet methods on UnknownRelatedManager
+                    reveal_type(user.booking_set.all)
+                    reveal_type(user.booking_set.custom)
+                    reveal_type(user.booking_set.all().filter)
+                    reveal_type(user.booking_set.all().custom)
+                    reveal_type(user.booking_set.all().first())
     out: |
         myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
         myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
@@ -512,12 +530,25 @@
         myapp/models:32: error: Could not resolve manager type for "myapp.models.InvisibleUnresolvable.objects"
         myapp/models:36: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
         myapp/models:37: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
-        myapp/models:39: note: Revealed type is "django.db.models.manager.Manager[myapp.models.Booking]"
+        myapp/models:39: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Booking]"
         myapp/models:40: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.Booking]"
-        myapp/models:42: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
-        myapp/models:43: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
+        myapp/models:42: note: Revealed type is "myapp.models.UnknownManager[myapp.models.TwoUnresolvable]"
+        myapp/models:43: note: Revealed type is "myapp.models.UnknownManager[myapp.models.TwoUnresolvable]"
         myapp/models:44: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.TwoUnresolvable]"
-        myapp/models:46: note: Revealed type is "django.db.models.manager.Manager[myapp.models.InvisibleUnresolvable]"
+        myapp/models:46: note: Revealed type is "myapp.models.UnknownManager[myapp.models.InvisibleUnresolvable]"
         myapp/models:47: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.InvisibleUnresolvable]"
-        myapp/models:49: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
-        myapp/models:50: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Booking]"
+        myapp/models:49: note: Revealed type is "myapp.models.UnknownRelatedManager[myapp.models.Booking]"
+        myapp/models:50: note: Revealed type is "myapp.models.UnknownRelatedManager[myapp.models.Booking]"
+        myapp/models:53: note: Revealed type is "def () -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:54: note: Revealed type is "Any"
+        myapp/models:55: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:56: note: Revealed type is "Any"
+        myapp/models:57: note: Revealed type is "Union[myapp.models.Booking, None]"
+        myapp/models:58: note: Revealed type is "myapp.models.Booking"
+        myapp/models:59: note: Revealed type is "builtins.list[myapp.models.Booking]"
+        myapp/models:60: note: Revealed type is "builtins.list[myapp.models.Booking]"
+        myapp/models:64: note: Revealed type is "def () -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:65: note: Revealed type is "Any"
+        myapp/models:66: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:67: note: Revealed type is "Any"
+        myapp/models:68: note: Revealed type is "Union[myapp.models.Booking, None]"

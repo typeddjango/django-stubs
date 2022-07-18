@@ -12,6 +12,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypedDictType, TypeOfAny
+from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
@@ -19,7 +20,10 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME, MODEL_CLASS_FULLNAME
 from mypy_django_plugin.transformers import fields
 from mypy_django_plugin.transformers.fields import get_field_descriptor_types
-from mypy_django_plugin.transformers.managers import create_manager_info_from_from_queryset_call
+from mypy_django_plugin.transformers.managers import (
+    MANAGER_METHODS_RETURNING_QUERYSET,
+    create_manager_info_from_from_queryset_call,
+)
 
 
 class ModelClassInitializer:
@@ -82,6 +86,85 @@ class ModelClassInitializer:
             return self.lookup_typeinfo(real_manager_fullname)
         # Not a generated manager
         return None
+
+    def get_or_create_manager_with_any_fallback(self, related_manager: bool = False) -> TypeInfo:
+        """
+        Create a Manager subclass with fallback to Any for unknown attributes
+        and methods. This is used for unresolved managers, where we don't know
+        the actual type of the manager.
+
+        The created class is reused if multiple unknown managers are encountered.
+        """
+
+        name = "UnknownManager" if not related_manager else "UnknownRelatedManager"
+
+        # Check if we've already created a fallback manager class for this
+        # module, and if so reuse that.
+        manager_info = self.lookup_typeinfo(f"{self.model_classdef.info.module_name}.{name}")
+        if manager_info and manager_info.metadata.get("django", {}).get("any_fallback_manager"):
+            return manager_info
+
+        fallback_queryset = self.get_or_create_queryset_with_any_fallback()
+        base_manager_fullname = (
+            fullnames.MANAGER_CLASS_FULLNAME if not related_manager else fullnames.RELATED_MANAGER_CLASS
+        )
+        base_manager_info = self.lookup_typeinfo(base_manager_fullname)
+        assert base_manager_info, f"Type info for {base_manager_fullname} missing"
+
+        base_manager = fill_typevars(base_manager_info)
+        assert isinstance(base_manager, Instance)
+        manager_info = self.add_new_class_for_current_module(name, [base_manager])
+        manager_info.fallback_to_any = True
+
+        manager_info.type_vars = base_manager_info.type_vars
+        manager_info.defn.type_vars = base_manager_info.defn.type_vars
+        manager_info.metaclass_type = manager_info.calculate_metaclass_type()
+
+        # For methods on BaseManager that return a queryset we need to update
+        # the return type to be the actual queryset subclass used. This is done
+        # by adding the methods as attributes with type Any to the manager
+        # class. The actual type of these methods are resolved in
+        # resolve_manager_method.
+        for method_name in MANAGER_METHODS_RETURNING_QUERYSET:
+            helpers.add_new_sym_for_info(manager_info, name=method_name, sym_type=AnyType(TypeOfAny.special_form))
+
+        manager_info.metadata["django"] = django_metadata = {
+            "any_fallback_manager": True,
+            "from_queryset_manager": fallback_queryset.fullname,
+        }
+
+        return manager_info
+
+    def get_or_create_queryset_with_any_fallback(self) -> TypeInfo:
+        """
+        Create a QuerySet subclass with fallback to Any for unknown attributes
+        and methods. This is used for the manager returned by the method above.
+        """
+
+        name = "UnknownQuerySet"
+
+        # Check if we've already created a fallback queryset class for this
+        # module, and if so reuse that.
+        queryset_info = self.lookup_typeinfo(f"{self.model_classdef.info.module_name}.{name}")
+        if queryset_info and queryset_info.metadata.get("django", {}).get("any_fallback_queryset"):
+            return queryset_info
+
+        base_queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
+        assert base_queryset_info, f"Type info for {fullnames.QUERYSET_CLASS_FULLNAME} missing"
+
+        base_queryset = fill_typevars(base_queryset_info)
+        assert isinstance(base_queryset, Instance)
+        queryset_info = self.add_new_class_for_current_module(name, [base_queryset])
+        queryset_info.metadata["django"] = {
+            "any_fallback_queryset": True,
+        }
+        queryset_info.fallback_to_any = True
+
+        queryset_info.type_vars = base_queryset_info.type_vars.copy()
+        queryset_info.defn.type_vars = base_queryset_info.defn.type_vars.copy()
+        queryset_info.metaclass_type = queryset_info.calculate_metaclass_type()
+
+        return queryset_info
 
     def run_with_model_cls(self, model_cls):
         raise NotImplementedError("Implement this in subclasses")
@@ -285,13 +368,11 @@ class AddManagers(ModelClassInitializer):
                 # (Django's default) before finishing. And emit an error, to allow for
                 # ignoring a more specialised manager not being resolved while still
                 # setting _some_ type
-                django_manager_info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
-                assert (
-                    django_manager_info is not None
-                ), f"Type info for Django's {fullnames.MANAGER_CLASS_FULLNAME} missing"
+                fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 self.add_new_node_to_model_class(
-                    manager_name, Instance(django_manager_info, [Instance(self.model_classdef.info, [])])
+                    manager_name, Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])])
                 )
+
                 # Find expression for e.g. `objects = SomeManager()`
                 manager_expr = self.get_manager_expression(manager_name)
                 manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
@@ -425,28 +506,27 @@ class AddRelatedManagers(ModelClassInitializer):
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
                         raise exc
-                    else:
-                        if related_manager_info:
-                            """
-                            If a django model has a Manager class that cannot be
-                            resolved statically (if it is generated in a way
-                            where we cannot import it, like `objects = my_manager_factory()`),
-                            we fallback to the default related manager, so you
-                            at least get a base level of working type checking.
 
-                            See https://github.com/typeddjango/django-stubs/pull/993
-                            for more information on when this error can occur.
-                            """
-                            self.add_new_node_to_model_class(
-                                attname, Instance(related_manager_info, [Instance(related_model_info, [])])
-                            )
-                            related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
-                            self.ctx.api.fail(
-                                f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname}.{relation.field}).",
-                                self.ctx.cls,
-                                code=MANAGER_MISSING,
-                            )
-                        continue
+                    # If a django model has a Manager class that cannot be
+                    # resolved statically (if it is generated in a way where we
+                    # cannot import it, like `objects = my_manager_factory()`),
+                    # we fallback to the default related manager, so you at
+                    # least get a base level of working type checking.
+                    #
+                    # See https://github.com/typeddjango/django-stubs/pull/993
+                    # for more information on when this error can occur.
+                    fallback_manager = self.get_or_create_manager_with_any_fallback(related_manager=True)
+                    self.add_new_node_to_model_class(
+                        attname, Instance(fallback_manager, [Instance(related_model_info, [])])
+                    )
+                    related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
+                    self.ctx.api.fail(
+                        f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname}.{relation.field}).",
+                        self.ctx.cls,
+                        code=MANAGER_MISSING,
+                    )
+
+                    continue
 
                 # Check if the related model has a related manager subclassed from the default manager
                 # TODO: Support other reverse managers than `_default_manager`
