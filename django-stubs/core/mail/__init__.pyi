@@ -23,7 +23,7 @@ def send_mail(
     html_message: Optional[str] = ...,
 ) -> int: ...
 def send_mass_mail(
-    datatuple: List[Tuple[str, str, str, List[str]]],
+    datatuple: Tuple[Tuple[str, str, str, List[str]], ...],
     fail_silently: bool = ...,
     auth_user: Optional[str] = ...,
     auth_password: Optional[str] = ...,
