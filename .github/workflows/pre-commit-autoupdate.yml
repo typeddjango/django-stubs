@@ -1,6 +1,6 @@
 # Run pre-commit autoupdate every day at midnight
 # and create a pull request if any changes
-# Copied from 
+# Copied from
 # https://github.com/cookiecutter/cookiecutter-django
 
 name: Pre-commit auto-update
