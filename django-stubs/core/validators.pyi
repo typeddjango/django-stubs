@@ -7,7 +7,7 @@ from django.core.files.base import File
 EMPTY_VALUES: Any
 
 _Regex = Union[str, Pattern[str]]
-_ValidatorCallable = Callable[[Any], None]
+_ValidatorCallable = Callable[[Any], object]
 
 class RegexValidator:
     regex: _Regex = ...  # Pattern[str] on instance, but may be str on class definition
