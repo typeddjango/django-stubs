@@ -100,36 +100,39 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
 1. You can go with our [`django_stubs_ext`](https://github.com/typeddjango/django-stubs/tree/master/django_stubs_ext) helper, that patches all the types we use as Generic in django.
 
-Install it:
+   Install it:
 
-```bash
-pip install django-stubs-ext  # as a production dependency
-```
+   ```bash
+   pip install django-stubs-ext  # as a production dependency
+   ```
 
-And then place in your top-level settings:
+   And then place in your top-level settings:
 
-```python
-import django_stubs_ext
+   ```python
+   import django_stubs_ext
+   
+   django_stubs_ext.monkeypatch()
+   ```
 
-django_stubs_ext.monkeypatch()
-```
-
-Note: This monkey patching approach will only work when using Python 3.7 and higher, when the `__class_getitem__` magic method was introduced.
+   Note: This monkey patching approach will only work when using Python 3.7 and higher, when the `__class_getitem__` magic method was introduced.
 
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
-Django's built in `HttpRequest` has the attribute `user` that resolves to the type
+Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.0/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
+
 ```python
 Union[User, AnonymousUser]
 ```
 where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
 If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
+
 ```python
 from django.http import HttpRequest
 from my_user_app.models import MyUser
+
 
 class AuthenticatedHttpRequest(HttpRequest):
     user: MyUser
@@ -150,15 +153,17 @@ Example:
 from django.db import models
 
 class MyModelQuerySet(models.QuerySet):
-  pass
+    pass
+
 
 class MyModel(models.Model):
-  bar = models.IntegerField()
-  objects = MyModelQuerySet.as_manager()
+    bar = models.IntegerField()
+    objects = MyModelQuerySet.as_manager()
+
 
 def use_my_model():
-  foo = MyModel.objects.get(id=1) # This is `Any` but it should be `MyModel`
-  return foo.xyz # No error, but there should be
+    foo = MyModel.objects.get(id=1) # This is `Any` but it should be `MyModel`
+    return foo.xyz # No error, but there should be
 ```
 
 There is a workaround: use `Manager.from_queryset` instead.
@@ -168,18 +173,22 @@ Example:
 ```python
 from django.db import models
 
+
 class MyModelQuerySet(models.QuerySet):
-  pass
+    pass
+
 
 MyModelManager = models.Manager.from_queryset(MyModelQuerySet)
 
+
 class MyModel(models.Model):
-  bar = models.IntegerField()
-  objects = MyModelManager()
+    bar = models.IntegerField()
+    objects = MyModelManager()
+
 
 def use_my_model():
-  foo = MyModel.objects.get(id=1)
-  return foo.xyz # Gives an error
+    foo = MyModel.objects.get(id=1)
+    return foo.xyz  # Gives an error
 ```
 
 ### How do I annotate cases where I called QuerySet.annotate?
@@ -203,23 +212,29 @@ from django_stubs_ext import WithAnnotations
 from django.db import models
 from django.db.models.expressions import Value
 
+
 class MyModel(models.Model):
     username = models.CharField(max_length=100)
 
 
 def func(m: WithAnnotations[MyModel]) -> str:
-    return m.asdf # OK, since the model is annotated as allowing any attribute
+    return m.asdf  # OK, since the model is annotated as allowing any attribute
+
 
 func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
-func(MyModel.objects.get(id=1))  # Error, since this model will not allow access to any attribute
+func(
+    MyModel.objects.get(id=1)
+)  # Error, since this model will not allow access to any attribute
 
 
 class MyTypedDict(TypedDict):
     foo: str
 
+
 def func2(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
-    print(m.bar) # Error, since field "bar" is not in MyModel or MyTypedDict.
-    return m.foo # OK, since we said field "foo" was allowed
+    print(m.bar)  # Error, since field "bar" is not in MyModel or MyTypedDict.
+    return m.foo  # OK, since we said field "foo" was allowed
+
 
 func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
