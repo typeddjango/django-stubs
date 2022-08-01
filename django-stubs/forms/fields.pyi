@@ -115,6 +115,23 @@ class IntegerField(Field):
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
 class FloatField(IntegerField):
+    def __init__(
+        self,
+        *,
+        max_value: Union[int, float, None] = ...,
+        min_value: Union[int, float, None] = ...,
+        required: bool = ...,
+        widget: Optional[Union[Widget, Type[Widget]]] = ...,
+        label: Optional[str] = ...,
+        initial: Optional[Any] = ...,
+        help_text: str = ...,
+        error_messages: Optional[_ErrorMessagesT] = ...,
+        show_hidden_initial: bool = ...,
+        validators: Sequence[_ValidatorCallable] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: Optional[str] = ...,
+    ) -> None: ...
     def to_python(self, value: Optional[Any]) -> Optional[float]: ...  # type: ignore
     def validate(self, value: float) -> None: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
