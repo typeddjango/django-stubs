@@ -110,7 +110,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
    ```python
    import django_stubs_ext
-   
+
    django_stubs_ext.monkeypatch()
    ```
 
