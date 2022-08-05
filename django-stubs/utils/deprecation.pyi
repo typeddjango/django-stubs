@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional, Type
+from typing import Any, Callable, Optional, Protocol, Type
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
@@ -27,7 +27,8 @@ class DeprecationInstanceCheck(type):
     deprecation_warning: Type[Warning]
     def __instancecheck__(self, instance: Any): ...
 
-GetResponseCallable = Callable[[HttpRequest], HttpResponse]
+class GetResponseCallable(Protocol):
+    def __call__(self, __request: HttpRequest) -> HttpResponse: ...
 
 class MiddlewareMixin:
     get_response: GetResponseCallable = ...
