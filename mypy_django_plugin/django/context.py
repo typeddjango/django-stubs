@@ -189,7 +189,7 @@ class DjangoContext:
 
         model_info = helpers.lookup_class_typeinfo(api, model_cls)
         for field in model_cls._meta.get_fields():
-            if isinstance(field, Field):
+            if isinstance(field, Field) and hasattr(field, 'attname'):
                 field_name = field.attname
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
                 # from django-stubs own declaration. This is to align with the setter types declared for
