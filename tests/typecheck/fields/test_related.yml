@@ -654,6 +654,7 @@
                     pass
                 TransactionManager = BaseManager.from_queryset(TransactionQuerySet)
                 class Transaction(models.Model):
+                    pk = 0
                     objects = TransactionManager()
                     def test(self) -> None:
                         self.transactionlog_set
