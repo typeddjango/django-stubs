@@ -13,13 +13,13 @@ from ..utils import prefix_validation_error as prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages: _ErrorMessagesT = ...
-    base_field: Type[forms.Field]
+    base_field: forms.Field
     delimiter: str
     min_length: Optional[int]
     max_length: Optional[int]
     def __init__(
         self,
-        base_field: Type[forms.Field],
+        base_field: forms.Field,
         *,
         delimiter: str = ...,
         max_length: Optional[int] = ...,
@@ -51,11 +51,11 @@ class SplitArrayWidget(forms.Widget):
 
 class SplitArrayField(forms.Field):
     default_error_messages: _ErrorMessagesT = ...
-    base_field: Type[forms.Field]
+    base_field: forms.Field
     size: int
     remove_trailing_nulls: bool
     def __init__(
-        self, base_field: Type[forms.Field], size: int, *, remove_trailing_nulls: bool = ..., **kwargs: Any
+        self, base_field: forms.Field, size: int, *, remove_trailing_nulls: bool = ..., **kwargs: Any
     ) -> None: ...
     def to_python(self, value: Any) -> Sequence[Any]: ...
     def clean(self, value: Any) -> Sequence[Any]: ...
