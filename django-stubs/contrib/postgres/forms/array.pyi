@@ -13,7 +13,7 @@ from ..utils import prefix_validation_error as prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
     default_error_messages: _ErrorMessagesT = ...
-    base_field: Type[forms.Field]
+    base_field: forms.Field
     delimiter: str
     min_length: Optional[int]
     max_length: Optional[int]
