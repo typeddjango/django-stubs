@@ -17,3 +17,18 @@
 
                 class MyModel(models.Model):
                     array = ArrayField(base_field=models.TextField())
+-   case: postgres_forms_simple_array_field
+    main: |
+        from myapp.forms import MyForm
+        MyForm()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/forms.py
+            content: |
+                from django import forms
+                from django.contrib.postgres.forms import SimpleArrayField
+
+                class MyForm(forms.Form):
+                    lots_of_dates = SimpleArrayField(forms.DateField(), required=False)
