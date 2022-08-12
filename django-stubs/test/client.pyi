@@ -28,6 +28,7 @@ from django.http.cookie import SimpleCookie
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from django.template.base import Template
+from django.test.utils import ContextList
 from django.urls import ResolverMatch
 
 BOUNDARY: str = ...
@@ -125,7 +126,7 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     request: Dict[str, Any]
     client: Client
     templates: List[Template]
-    context: List[Dict[str, Any]]
+    context: ContextList | Dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
 
@@ -134,7 +135,7 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
     request: Dict[str, Any]
     client: AsyncClient
     templates: List[Template]
-    context: List[Dict[str, Any]]
+    context: ContextList | Dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
 
