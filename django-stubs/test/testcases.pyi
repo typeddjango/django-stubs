@@ -82,6 +82,12 @@ class SimpleTestCase(unittest.TestCase):
         msg_prefix: str = ...,
         fetch_redirect_response: bool = ...,
     ) -> None: ...
+    def assertURLEqual(
+        self,
+        url1: str | Any,  # Any for reverse_lazy() support
+        url2: str | Any,
+        msg_prefix: str = ...,
+    ) -> None: ...
     def assertContains(
         self,
         response: HttpResponseBase,
