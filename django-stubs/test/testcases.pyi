@@ -25,6 +25,7 @@ from django.db import connections as connections  # noqa: F401
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
+from django.forms import BaseFormSet, Form
 from django.forms.fields import EmailField
 from django.http.response import FileResponse, HttpResponseBase
 from django.template.base import Template
@@ -105,6 +106,15 @@ class SimpleTestCase(unittest.TestCase):
         msg_prefix: str = ...,
         html: bool = ...,
     ) -> None: ...
+    @overload
+    def assertFormError(
+        self,
+        form: Form,
+        field: Optional[str],
+        errors: Union[List[str], str],
+        msg_prefix: str = ...,
+    ) -> None: ...
+    @overload
     def assertFormError(
         self,
         response: HttpResponseBase,
@@ -113,6 +123,16 @@ class SimpleTestCase(unittest.TestCase):
         errors: Union[List[str], str],
         msg_prefix: str = ...,
     ) -> None: ...
+    @overload
+    def assertFormsetError(
+        self,
+        formset: BaseFormSet,
+        form_index: Optional[int],
+        field: Optional[str],
+        errors: Union[List[str], str],
+        msg_prefix: str = ...,
+    ) -> None: ...
+    @overload
     def assertFormsetError(
         self,
         response: HttpResponseBase,
