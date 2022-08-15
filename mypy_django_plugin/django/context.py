@@ -58,8 +58,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_models.cache_clear()
-        apps.get_swappable_settings_name.cache_clear()
+        apps.get_models.cache_clear()  # type: ignore
+        apps.get_swappable_settings_name.cache_clear()  # type: ignore
 
         if not settings.configured:
             settings._setup()
@@ -314,7 +314,7 @@ class DjangoContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":
+            if related_model_cls == "self":  # type: ignore
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:
