@@ -1,4 +1,3 @@
-import builtins
 import os
 import sys
 from collections import defaultdict
@@ -67,8 +66,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
 
         apps.populate(settings.INSTALLED_APPS)
 
-    assert apps.apps_ready, 'Apps are not ready'
-    assert settings.configured, 'Settings are not configured'
+    assert apps.apps_ready, "Apps are not ready"
+    assert settings.configured, "Settings are not configured"
 
     return apps, settings
 
