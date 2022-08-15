@@ -95,7 +95,10 @@ def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], f
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: type) -> Optional[TypeInfo]:
+def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type]) -> Optional[TypeInfo]:
+    if klass is None:
+        return None
+
     fullname = get_class_fullname(klass)
     field_info = lookup_fully_qualified_typeinfo(api, fullname)
     return field_info

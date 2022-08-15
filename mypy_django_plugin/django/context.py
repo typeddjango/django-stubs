@@ -212,8 +212,6 @@ class DjangoContext:
                         expected_types[field_name] = AnyType(TypeOfAny.from_error)
                         continue
 
-                    assert related_model is not None  # need for mypy
-
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
 

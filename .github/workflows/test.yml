@@ -27,6 +27,27 @@ jobs:
       - name: Run pre-commit
         run: pre-commit install && pre-commit run --all-files
 
+  mypy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -U pip setuptools wheel
+          pip install -r ./requirements.txt
+
+      - name: Run mypy on our code
+        run: |
+          mypy --config=mypy.ini --cache-dir=/dev/null --no-incremental
+            django-stubs mypy_django_plugin scripts django_stubs_ext
+
   test:
     runs-on: ubuntu-latest
     strategy:

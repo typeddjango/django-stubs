@@ -7,7 +7,6 @@ from _pytest.fixtures import FixtureRequest
 from _pytest.monkeypatch import MonkeyPatch
 from django.db.models import Model
 from django.forms.models import ModelForm
-from django.views import View
 from typing_extensions import Protocol
 
 import django_stubs_ext
@@ -64,14 +63,16 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
 
 def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasses) -> None:
     """Test that the generics actually get patched for extra classes."""
-    extra_classes = [View]
+    class _NotGeneric:
+        pass
 
+    extra_classes = [_NotGeneric]
     make_generic_classes(django_version=None, extra_classes=extra_classes)
 
     for cls in extra_classes:
-        assert cls[type] is cls
+        assert cls[type] is cls  # type: ignore[misc]
 
-    class TestView(View[Model]):  # type: ignore
+    class _TestGeneric(_NotGeneric[Model]):  # type: ignore[type-args]
         pass
 
 
