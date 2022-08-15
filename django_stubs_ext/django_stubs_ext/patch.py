@@ -1,3 +1,4 @@
+import builtins
 from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION as VERSION
@@ -69,7 +70,7 @@ _need_generic: List[MPGeneric[Any]] = [
 ]
 
 
-def monkeypatch(extra_classes: Optional[Iterable[type]] = None) -> None:
+def monkeypatch(extra_classes: Optional[Iterable[type]] = None, include_builtins: bool = True) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
 
     # Add the __class_getitem__ dunder.
@@ -82,3 +83,8 @@ def monkeypatch(extra_classes: Optional[Iterable[type]] = None) -> None:
     if extra_classes:
         for cls in extra_classes:
             cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
+
+    # Add `reveal_type` and `reveal_locals` helpers if needed:
+    if include_builtins:
+        builtins.reveal_type = lambda _: None
+        builtins.reveal_locals = lambda: None

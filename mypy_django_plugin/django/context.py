@@ -1,5 +1,6 @@
 import builtins
 import os
+import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union
@@ -55,19 +56,6 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         # add current directory to sys.path
         sys.path.append(os.getcwd())
 
-        def noop_class_getitem(cls, key):
-            return cls
-
-        from django.db import models
-
-        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)
-        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)
-
-        # Define mypy builtins, to not cause NameError during setting up Django.
-        # TODO: temporary/unpatch
-        builtins.reveal_type = lambda _: None
-        builtins.reveal_locals = lambda: None
-
         from django.apps import apps
         from django.conf import settings
 
@@ -79,8 +67,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
 
         apps.populate(settings.INSTALLED_APPS)
 
-    assert apps.apps_ready
-    assert settings.configured
+    assert apps.apps_ready, 'Apps are not ready'
+    assert settings.configured, 'Settings are not configured'
 
     return apps, settings
 

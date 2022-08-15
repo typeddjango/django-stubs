@@ -33,13 +33,13 @@ class IntegerRangeField(RangeField):
     def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
 
 class BigIntegerRangeField(RangeField):
-    def __get__(self, instance, owner) -> NumericRange: ...
+    def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
 
 class DecimalRangeField(RangeField):
-    def __get__(self, instance, owner) -> NumericRange: ...
+    def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
 
 class DateTimeRangeField(RangeField):
-    def __get__(self, instance, owner) -> DateTimeTZRange: ...
+    def __get__(self, instance, owner) -> DateTimeTZRange: ...  # type: ignore[override]
 
 class DateRangeField(RangeField):
     def __get__(self, instance, owner) -> DateRange: ...  # type: ignore[override]

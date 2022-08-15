@@ -18,7 +18,10 @@ class _MakeGenericClasses(Protocol):
     """Used to represent a type of ``make_generic_classes`` fixture."""
 
     def __call__(
-        self, django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None
+        self,
+        django_version: Optional[_VersionSpec] = None,
+        extra_classes: Optional[Iterable[type]] = None,
+        include_builtins: bool = True,
     ) -> None:
         ...
 
@@ -38,12 +41,16 @@ def make_generic_classes(
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
 
-    def factory(django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None) -> None:
+    def factory(
+        django_version: Optional[_VersionSpec] = None,
+        extra_classes: Optional[Iterable[type]] = None,
+        include_builtins: bool = True,
+    ) -> None:
         if extra_classes:
             _extra_classes.extend(extra_classes)
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
-        django_stubs_ext.monkeypatch(extra_classes)
+        django_stubs_ext.monkeypatch(extra_classes=extra_classes, include_builtins=include_builtins)
 
     request.addfinalizer(fin)
     return factory
@@ -108,7 +115,17 @@ def test_mypy_builtins_not_patched_globally(
     This should only happend during `django.setup()`
     (https://github.com/typeddjango/django-stubs/issues/609).
     """
-    make_generic_classes()
+    make_generic_classes(include_builtins=False)
 
     assert not hasattr(builtins, "reveal_type")
     assert not hasattr(builtins, "reveal_locals")
+
+
+def test_mypy_builtins_patched(
+    make_generic_classes: _MakeGenericClasses,
+) -> None:
+    """Ensures that builtins are patched by default."""
+    make_generic_classes()
+
+    assert hasattr(builtins, "reveal_type")
+    assert hasattr(builtins, "reveal_locals")
