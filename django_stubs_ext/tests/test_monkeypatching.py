@@ -63,6 +63,7 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
 
 def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasses) -> None:
     """Test that the generics actually get patched for extra classes."""
+
     class _NotGeneric:
         pass
 
