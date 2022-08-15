@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from mypy.checker import TypeChecker, fill_typevars
+from mypy.checker import TypeChecker
 from mypy.nodes import (
     GDEF,
     CallExpr,
@@ -19,6 +19,7 @@ from mypy.plugin import AttributeContext, DynamicClassDefContext, SemanticAnalyz
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
+from mypy.typevars import fill_typevars
 from typing_extensions import Final
 
 from mypy_django_plugin.lib import fullnames, helpers

@@ -2,7 +2,7 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union
 
 from django.core.exceptions import FieldError
 from django.db import models
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def temp_environ():
+def temp_environ() -> Iterator[None]:
     """Allow the ability to set os.environ temporarily"""
     environ = dict(os.environ)
     try:
@@ -113,7 +113,7 @@ class DjangoContext:
                 return model_cls
         return None
 
-    def get_model_fields(self, model_cls: Type[Model]) -> Iterator[Field]:
+    def get_model_fields(self, model_cls: Type[Model]) -> Iterator["Field[Any, Any]"]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 yield field
@@ -123,7 +123,9 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 yield field
 
-    def get_field_lookup_exact_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel]) -> MypyType:
+    def get_field_lookup_exact_type(
+        self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel]
+    ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
             related_model_cls = field.related_model
             primary_key_field = self.get_primary_key_field(related_model_cls)
@@ -141,7 +143,7 @@ class DjangoContext:
             return AnyType(TypeOfAny.explicit)
         return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
-    def get_primary_key_field(self, model_cls: Type[Model]) -> Field:
+    def get_primary_key_field(self, model_cls: Type[Model]) -> "Field[Any, Any]":
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 if field.primary_key:
@@ -244,11 +246,11 @@ class DjangoContext:
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
 
-    def get_attname(self, field: Field) -> str:
+    def get_attname(self, field: "Field[Any, Any]") -> str:
         attname = field.attname
         return attname
 
-    def get_field_nullability(self, field: Union[Field, ForeignObjectRel], method: Optional[str]) -> bool:
+    def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: Optional[str]) -> bool:
         if method in ("values", "values_list"):
             return field.null
 
@@ -265,7 +267,9 @@ class DjangoContext:
             return True
         return nullable
 
-    def get_field_set_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
+    def get_field_set_type(
+        self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel], *, method: str
+    ) -> MypyType:
         """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
@@ -283,7 +287,9 @@ class DjangoContext:
             field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
         return field_set_type
 
-    def get_field_get_type(self, api: TypeChecker, field: Union[Field, ForeignObjectRel], *, method: str) -> MypyType:
+    def get_field_get_type(
+        self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel], *, method: str
+    ) -> MypyType:
         """Get a type of __get__ for this specific Django field."""
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
@@ -307,7 +313,9 @@ class DjangoContext:
         else:
             return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
-    def get_field_related_model_cls(self, field: Union[RelatedField, ForeignObjectRel]) -> Optional[Type[Model]]:
+    def get_field_related_model_cls(
+        self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]
+    ) -> Optional[Type[Model]]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:
@@ -328,9 +336,9 @@ class DjangoContext:
 
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: Type[Model]
-    ) -> Union[Field, ForeignObjectRel]:
+    ) -> Union["Field[Any, Any]", ForeignObjectRel]:
         currently_observed_model = model_cls
-        field: Union[Field, ForeignObjectRel, GenericForeignKey, None] = None
+        field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
@@ -350,7 +358,9 @@ class DjangoContext:
         assert isinstance(field, (Field, ForeignObjectRel))
         return field
 
-    def resolve_lookup_into_field(self, model_cls: Type[Model], lookup: str) -> Union[Field, ForeignObjectRel]:
+    def resolve_lookup_into_field(
+        self, model_cls: Type[Model], lookup: str
+    ) -> Union["Field[Any, Any]", ForeignObjectRel]:
         query = Query(model_cls)
         lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
 

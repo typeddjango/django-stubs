@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Type, Union, cast
+from typing import Any, Dict, List, Optional, Type, Union, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
@@ -166,7 +166,7 @@ class ModelClassInitializer:
 
         return queryset_info
 
-    def run_with_model_cls(self, model_cls):
+    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         raise NotImplementedError("Implement this in subclasses")
 
 
@@ -202,7 +202,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
     def create_autofield(
         self,
-        auto_field: Field,
+        auto_field: "Field[Any, Any]",
         dest_name: str,
         existing_field: bool,
     ) -> None:
@@ -394,7 +394,7 @@ class AddManagers(ModelClassInitializer):
 
         return None
 
-    def get_dynamic_manager(self, fullname: str, manager: Manager) -> Optional[TypeInfo]:
+    def get_dynamic_manager(self, fullname: str, manager: "Manager[Any]") -> Optional[TypeInfo]:
         """
         Try to get a dynamically defined manager
         """

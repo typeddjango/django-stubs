@@ -45,7 +45,7 @@ jobs:
 
       - name: Run mypy on our code
         run: |
-          mypy --config=mypy.ini mypy_django_plugin scripts django_stubs_ext
+          mypy --config=mypy.ini --strict mypy_django_plugin scripts django_stubs_ext
       # TODO: run this check on versions, not only 3.10
       - name: Run mypy on stubs
         if: ${{ matrix.python-version }} == '3.10'

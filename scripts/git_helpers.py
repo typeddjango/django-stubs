@@ -1,7 +1,8 @@
 import shutil
-from typing import Optional
+from typing import Optional, Union
 
-from git import RemoteProgress, Repo
+from git.remote import RemoteProgress
+from git.repo import Repo
 
 from scripts.paths import DJANGO_SOURCE_DIRECTORY
 
@@ -10,7 +11,9 @@ class ProgressPrinter(RemoteProgress):
     def line_dropped(self, line: str) -> None:
         print(line)
 
-    def update(self, op_code, cur_count, max_count=None, message=""):
+    def update(
+        self, op_code: int, cur_count: Union[str, float], max_count: Union[str, float, None] = None, message: str = ""
+    ) -> None:
         print(self._cur_line)
 
 

@@ -18,7 +18,7 @@ DJANGO_COMMIT_REFS = {
 }
 DEFAULT_DJANGO_VERSION = "3.2"
 
-_DictToSearch = DefaultDict[str, DefaultDict[Union[str, Pattern], int]]
+_DictToSearch = DefaultDict[str, DefaultDict[Union[str, Pattern[str]], int]]
 
 
 def get_unused_ignores(ignored_message_freq: _DictToSearch) -> List[str]:
@@ -32,7 +32,7 @@ def get_unused_ignores(ignored_message_freq: _DictToSearch) -> List[str]:
     return unused_ignores
 
 
-def does_pattern_fit(pattern: Union[Pattern, str], line: str):
+def does_pattern_fit(pattern: Union[Pattern[str], str], line: str) -> bool:
     if isinstance(pattern, Pattern):
         if pattern.search(line):
             return True

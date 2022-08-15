@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, cast
 
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 def _get_current_field_from_assignment(
     ctx: FunctionContext, django_context: DjangoContext
-) -> Optional[Union[Field, ForeignObjectRel, "GenericForeignKey"]]:
+) -> Optional[Union["Field[Any, Any]", ForeignObjectRel, "GenericForeignKey"]]:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
         return None
@@ -42,7 +42,7 @@ def _get_current_field_from_assignment(
     return current_field
 
 
-def reparametrize_related_field_type(related_field_type: Instance, set_type, get_type) -> Instance:
+def reparametrize_related_field_type(related_field_type: Instance, set_type: MypyType, get_type: MypyType) -> Instance:
     args = [
         helpers.convert_any_to_type(related_field_type.args[0], set_type),
         helpers.convert_any_to_type(related_field_type.args[1], get_type),
