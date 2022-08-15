@@ -22,7 +22,7 @@ with open("README.md") as f:
 dependencies = [
     "mypy>=0.930",
     "django",
-    "django-stubs-ext>=0.4.0",
+    "django-stubs-ext>=0.6.0",
     "tomli",
     # Types:
     "typing-extensions",
