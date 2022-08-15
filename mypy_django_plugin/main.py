@@ -3,6 +3,11 @@ from functools import partial
 from typing import Callable, Dict, List, Optional, Tuple, Type
 
 from django.db.models.fields.related import RelatedField
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    x: RelatedField
+    reveal_type(x)
+    reveal_type(RelatedField)
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
