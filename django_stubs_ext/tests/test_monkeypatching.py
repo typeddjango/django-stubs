@@ -40,6 +40,11 @@ def make_generic_classes(
         for cls in _extra_classes:
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
+        _extra_classes.clear()
+        with suppress(AttributeError):
+            del builtins.reveal_type
+        with suppress(AttributeError):
+            del builtins.reveal_locals
 
     def factory(
         django_version: Optional[_VersionSpec] = None,
