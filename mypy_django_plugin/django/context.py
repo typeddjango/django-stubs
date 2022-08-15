@@ -61,8 +61,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
 
         from django.db import models
 
-        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
-        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)  # type: ignore
+        models.QuerySet.__class_getitem__ = classmethod(noop_class_getitem)
+        models.Manager.__class_getitem__ = classmethod(noop_class_getitem)
 
         # Define mypy builtins, to not cause NameError during setting up Django.
         # TODO: temporary/unpatch
@@ -72,8 +72,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_models.cache_clear()  # type: ignore
-        apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.get_models.cache_clear()
+        apps.get_swappable_settings_name.cache_clear()
 
         if not settings.configured:
             settings._setup()
@@ -212,6 +212,8 @@ class DjangoContext:
                         expected_types[field_name] = AnyType(TypeOfAny.from_error)
                         continue
 
+                    assert related_model is not None  # need for mypy
+
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
 
@@ -328,7 +330,7 @@ class DjangoContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":  # type: ignore[unreachable]
+            if related_model_cls == "self":
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:

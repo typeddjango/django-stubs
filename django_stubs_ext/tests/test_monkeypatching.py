@@ -69,9 +69,9 @@ def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasse
     make_generic_classes(django_version=None, extra_classes=extra_classes)
 
     for cls in extra_classes:
-        assert cls[type] is cls  # type: ignore[misc]
+        assert cls[type] is cls
 
-    class TestView(View[Model]):  # type: ignore[type-arg]
+    class TestView(View[Model]):  # type: ignore
         pass
 
 

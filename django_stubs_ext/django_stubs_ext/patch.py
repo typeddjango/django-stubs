@@ -17,6 +17,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
 
+__all__ = ["monkeypatch"]
+
 _T = TypeVar("_T")
 _VersionSpec = Tuple[int, int]
 
@@ -80,6 +82,3 @@ def monkeypatch(extra_classes: Optional[Iterable[type]] = None) -> None:
     if extra_classes:
         for cls in extra_classes:
             cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
-
-
-__all__ = ["monkeypatch"]
