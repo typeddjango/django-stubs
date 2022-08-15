@@ -44,11 +44,7 @@ jobs:
           pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
-        run: MYPYPATH=".:./django-stubs" mypy --strict mypy_django_plugin || true
-      - name: Run mypy on plugin code
-        run: MYPYPATH="./django-stubs" mypy --strict mypy_django_plugin || true
-      - name: Run mypy on plugin code
-        run: MYPYPATH="." mypy --strict mypy_django_plugin
+        run: mypy --strict mypy_django_plugin --python-version=${{ matrix.python-version }}
 
       - name: Run mypy on ext code
         run: mypy --strict django_stubs_ext
