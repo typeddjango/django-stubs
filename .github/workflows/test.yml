@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10']  # TODO: enable other versions later
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -47,7 +47,9 @@ jobs:
         run: |
           mypy --config=mypy.ini --cache-dir=/dev/null --no-incremental \
             mypy_django_plugin scripts django_stubs_ext
+      # TODO: run this check on versions, not only 3.10
       - name: Run mypy on stubs
+        if: ${{ matrix.python-version }} == '3.10'
         run: |
           mypy --config=mypy.ini --cache-dir=/dev/null --no-incremental \
             django-stubs
