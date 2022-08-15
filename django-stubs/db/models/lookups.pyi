@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Generic, Iterable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper

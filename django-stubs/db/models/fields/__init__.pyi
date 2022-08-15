@@ -1,5 +1,4 @@
 import decimal
-import sys
 import uuid
 from datetime import date
 from datetime import datetime as real_datetime

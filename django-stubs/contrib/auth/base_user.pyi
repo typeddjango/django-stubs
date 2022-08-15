@@ -1,4 +1,3 @@
-import sys
 from typing import Any, List, Optional, Tuple, TypeVar, Union, overload
 
 from django.db import models

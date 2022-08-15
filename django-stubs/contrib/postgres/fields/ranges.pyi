@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, Optional, Type
 
 from django.db import models

@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Type, overload
 
 from django.core.checks.messages import CheckMessage

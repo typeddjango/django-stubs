@@ -1,4 +1,3 @@
-import sys
 from datetime import date
 from datetime import datetime as builtin_datetime
 from datetime import time as builtin_time

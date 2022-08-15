@@ -1,11 +1,9 @@
-import sys
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Callable, List, Optional, Sequence, Tuple, Type, Union
 
-from django.db.models import Q
 from django.db.models.base import Model
 from django.db.models.fields import AutoField, Field, _AllLimitChoicesTo, _ChoicesList, _LimitChoicesTo
 from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToManyField, OneToOneField
-from django.db.models.lookups import BuiltinLookup, Lookup, StartsWith
+from django.db.models.lookups import Lookup, StartsWith
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from typing_extensions import Literal

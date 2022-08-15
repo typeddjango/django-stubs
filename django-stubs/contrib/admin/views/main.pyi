@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, Union
 
 from django.contrib.admin.filters import ListFilter

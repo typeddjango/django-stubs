@@ -1,5 +1,4 @@
 import datetime
-import sys
 from typing import Any, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 from django.core.files.base import File

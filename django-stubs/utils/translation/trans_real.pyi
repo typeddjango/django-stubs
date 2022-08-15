@@ -1,7 +1,6 @@
 import gettext as gettext_module
-import sys
 from gettext import NullTranslations
-from typing import Any, Callable, Dict, Iterator, List, Optional, Pattern, Protocol, Tuple, TypeVar, Union
+from typing import Any, Dict, Iterator, List, Optional, Pattern, Protocol, Tuple, TypeVar, Union
 
 from django.http.request import HttpRequest
 from typing_extensions import Literal

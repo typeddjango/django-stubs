@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Callable, List, Optional, Sequence, Set, TypeVar, Union
 
 from django.apps.config import AppConfig

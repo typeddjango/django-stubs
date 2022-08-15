@@ -1,6 +1,5 @@
 import builtins
 import os
-import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union

@@ -1,4 +1,3 @@
-import sys
 import types
 from contextlib import ContextDecorator
 from datetime import date

@@ -1,5 +1,3 @@
-import sys
-from pathlib import Path
 from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, overload
 
 from django.core import validators  # due to weird mypy.stubtest error

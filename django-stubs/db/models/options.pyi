@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, Generic, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, overload
 
 from django.apps.config import AppConfig

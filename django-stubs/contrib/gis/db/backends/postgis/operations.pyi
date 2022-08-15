@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Union
 
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations

@@ -1,5 +1,4 @@
 import collections
-import sys
 from collections import namedtuple
 from typing import Any, Callable, Dict, FrozenSet, Iterable, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union
 

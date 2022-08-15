@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Callable, List, Mapping, Optional, Protocol, Sequence, Type, TypeVar, Union, overload
 
 from django.db.models import Manager, QuerySet

@@ -1,4 +1,3 @@
-import sys
 from typing import List, Optional, Sequence, Set, Tuple, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper

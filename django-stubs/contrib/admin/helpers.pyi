@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
 
 from django import forms

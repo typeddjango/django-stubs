@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from typing_extensions import Literal

@@ -1,4 +1,3 @@
-import sys
 from functools import wraps as wraps  # noqa: F401
 from typing import Any, Callable, Generic, List, Optional, Tuple, Type, TypeVar, Union, overload
 

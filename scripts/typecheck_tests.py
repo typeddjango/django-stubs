@@ -1,7 +1,6 @@
 import itertools
 import shutil
 import subprocess
-import sys
 from argparse import ArgumentParser
 from collections import defaultdict
 from distutils import spawn

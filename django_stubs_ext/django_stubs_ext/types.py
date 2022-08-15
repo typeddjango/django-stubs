@@ -1,7 +1,7 @@
-import sys
 from typing import Any
 
 from typing_extensions import Protocol
+
 
 # Used internally by mypy_django_plugin.
 class AnyAttrAllowed(Protocol):

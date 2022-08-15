@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, Mapping, Optional, Sequence, Tuple, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor

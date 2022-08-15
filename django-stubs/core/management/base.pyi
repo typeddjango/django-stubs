@@ -1,4 +1,3 @@
-import sys
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from io import TextIOBase
 from typing import Any, Callable, Iterable, List, Optional, Sequence, Set, TextIO, Tuple, Union

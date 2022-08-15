@@ -1,4 +1,3 @@
-import sys
 from collections import namedtuple
 from typing import (
     Any,

@@ -1,4 +1,3 @@
-import sys
 from typing import Dict, Final, Pattern, Tuple
 
 from typing_extensions import Literal

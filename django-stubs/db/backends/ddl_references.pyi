@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, List, Sequence
 
 from typing_extensions import Protocol

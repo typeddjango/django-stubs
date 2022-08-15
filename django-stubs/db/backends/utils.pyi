@@ -1,5 +1,4 @@
 import datetime
-import sys
 import types
 from contextlib import contextmanager
 from decimal import Decimal

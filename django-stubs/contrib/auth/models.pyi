@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Iterable, Optional, Set, Tuple, Type, TypeVar, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
