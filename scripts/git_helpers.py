@@ -22,7 +22,7 @@ def checkout_django_branch(django_version: str, commit_sha: Optional[str]) -> Re
     repo = Repo.clone_from(
         "https://github.com/django/django.git",
         DJANGO_SOURCE_DIRECTORY,
-        progress=ProgressPrinter(),
+        progress=ProgressPrinter(),  # type: ignore
         branch=branch,
         depth=100,
     )

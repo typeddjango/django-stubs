@@ -5,7 +5,7 @@ import sys
 from argparse import ArgumentParser
 from collections import defaultdict
 from distutils import spawn
-from typing import Dict, List, Pattern, Union
+from typing import DefaultDict, List, Pattern, Union
 
 from scripts.enabled_test_modules import EXTERNAL_MODULES, IGNORED_ERRORS, IGNORED_MODULES, MOCK_OBJECTS
 from scripts.git_helpers import checkout_django_branch
@@ -18,8 +18,10 @@ DJANGO_COMMIT_REFS = {
 }
 DEFAULT_DJANGO_VERSION = "3.2"
 
+_DictToSearch = DefaultDict[str, DefaultDict[Union[str, Pattern], int]]
 
-def get_unused_ignores(ignored_message_freq: Dict[str, Dict[Union[str, Pattern], int]]) -> List[str]:
+
+def get_unused_ignores(ignored_message_freq: _DictToSearch) -> List[str]:
     unused_ignores = []
     for root_key, patterns in IGNORED_ERRORS.items():
         for pattern in patterns:
@@ -40,7 +42,7 @@ def does_pattern_fit(pattern: Union[Pattern, str], line: str):
     return False
 
 
-def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: Dict[str, Dict[str, int]]) -> bool:
+def is_ignored(line: str, test_folder_name: str, *, ignored_message_freqs: _DictToSearch) -> bool:
     if "runtests" in line:
         return True
 
@@ -86,14 +88,14 @@ if __name__ == "__main__":
         mypy_executable = spawn.find_executable("mypy")
         mypy_argv = [mypy_executable, *mypy_options]
         completed = subprocess.run(
-            mypy_argv,
+            mypy_argv,  # type: ignore
             env={"PYTHONPATH": str(tests_root), "TYPECHECK_TESTS": "1"},
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
         output = completed.stdout.decode()
 
-        ignored_message_freqs = defaultdict(lambda: defaultdict(int))
+        ignored_message_freqs: _DictToSearch = defaultdict(lambda: defaultdict(int))
 
         sorted_lines = sorted(output.splitlines())
         for line in sorted_lines:

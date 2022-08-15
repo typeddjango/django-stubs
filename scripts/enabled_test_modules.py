@@ -1,6 +1,7 @@
 # Some errors occur for the test suite itself, and cannot be addressed via django-stubs. They should be ignored
 # using this constant.
 import re
+from typing import Any, Dict, List
 
 IGNORED_MODULES = {
     "schema",
@@ -56,7 +57,7 @@ EXTERNAL_MODULES = [
     "argon2",
     "xml.dom",
 ]
-IGNORED_ERRORS = {
+IGNORED_ERRORS: Dict[str, List[Any]] = {
     "__common__": [
         *MOCK_OBJECTS,
         *EXTERNAL_MODULES,
