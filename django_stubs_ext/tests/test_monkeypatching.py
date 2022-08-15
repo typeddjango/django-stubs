@@ -1,6 +1,6 @@
 import builtins
 from contextlib import suppress
-from typing import Iterable, Optional
+from typing import Iterable, List, Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -28,7 +28,7 @@ def make_generic_classes(
     request: FixtureRequest,
     monkeypatch: MonkeyPatch,
 ) -> _MakeGenericClasses:
-    _extra_classes: list[type] = []
+    _extra_classes: List[type] = []
 
     def fin() -> None:
         for el in _need_generic:
@@ -73,7 +73,7 @@ def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasse
     for cls in extra_classes:
         assert cls[type] is cls  # type: ignore[misc]
 
-    class _TestGeneric(_NotGeneric[Model]):  # type: ignore[type-args]
+    class _TestGeneric(_NotGeneric[Model]):  # type: ignore
         pass
 
 
