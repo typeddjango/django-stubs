@@ -73,6 +73,9 @@ jobs:
           pip install -U pip setuptools wheel
           pip install -r ./requirements.txt
 
+      - run: pwd && ls
+      - run: python -c 'import scripts'
+
       - name: Run tests
         run: PYTHONPATH='./scripts' pytest --mypy-ini-file=mypy.ini
 
