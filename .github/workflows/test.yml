@@ -45,7 +45,7 @@ jobs:
 
       - name: Run mypy on our code
         run: |
-          mypy --config=mypy.ini --cache-dir=/dev/null --no-incremental
+          mypy --config=mypy.ini --cache-dir=/dev/null --no-incremental \
             django-stubs mypy_django_plugin scripts django_stubs_ext
 
   test:
