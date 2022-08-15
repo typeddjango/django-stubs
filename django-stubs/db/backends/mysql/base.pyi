@@ -2,6 +2,7 @@ import sys
 from typing import Any, Dict, Optional, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
+from typing_extensions import Literal
 
 from .client import DatabaseClient
 from .creation import DatabaseCreation
@@ -9,11 +10,6 @@ from .features import DatabaseFeatures
 from .introspection import DatabaseIntrospection
 from .operations import DatabaseOperations
 from .validation import DatabaseValidation
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
 
 version: Any
 django_conversions: Any

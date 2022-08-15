@@ -7,11 +7,7 @@ from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
 from django.http.response import HttpResponsePermanentRedirect as HttpResponsePermanentRedirect
 from django.http.response import HttpResponseRedirect as HttpResponseRedirect
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 def render(
     request: HttpRequest,

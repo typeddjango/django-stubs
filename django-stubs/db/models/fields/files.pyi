@@ -10,11 +10,7 @@ from django.db.models.base import Model
 from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
+from typing_extensions import Protocol
 
 class FieldFile(File):
     instance: Model = ...

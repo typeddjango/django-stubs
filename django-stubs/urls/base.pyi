@@ -2,11 +2,7 @@ import sys
 from typing import Any, Callable, Dict, Optional, Sequence, Union
 
 from django.urls.resolvers import ResolverMatch
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 def resolve(path: str, urlconf: Optional[str] = ...) -> ResolverMatch: ...
 def reverse(

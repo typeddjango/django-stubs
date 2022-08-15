@@ -2,11 +2,6 @@ import sys
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
 from uuid import UUID
 
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
-
 from django.core import validators  # due to weird mypy.stubtest error
 from django.db import models
 from django.db.models.base import Model
@@ -14,9 +9,9 @@ from django.db.models.expressions import Combinable
 from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesT, _FieldChoices, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
-from django.db.models.fields.related_descriptors import (  # noqa: F401
+from django.db.models.fields.related_descriptors import (
     ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
-)
+)  # noqa: F401
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor as ManyToManyDescriptor
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor as ReverseManyToOneDescriptor
 from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor as ReverseOneToOneDescriptor
@@ -26,6 +21,7 @@ from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
 from django.db.models.manager import RelatedManager
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
+from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=models.Model)
 _F = TypeVar("_F", bound=models.Field)

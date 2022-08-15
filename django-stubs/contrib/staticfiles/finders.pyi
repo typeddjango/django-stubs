@@ -3,11 +3,7 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tupl
 
 from django.core.checks.messages import CheckMessage
 from django.core.files.storage import FileSystemStorage, Storage
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 searched_locations: Any
 

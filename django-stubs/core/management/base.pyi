@@ -6,11 +6,7 @@ from typing import Any, Callable, Iterable, List, Optional, Sequence, Set, TextI
 from django.apps.config import AppConfig
 from django.core.management.color import Style
 from django.utils.datastructures import _ListOrTuple
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 class CommandError(Exception):
     def __init__(self, *args: Any, returncode: int = ..., **kwargs: Any) -> None: ...

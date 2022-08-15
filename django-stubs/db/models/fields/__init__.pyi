@@ -32,11 +32,7 @@ from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
+from typing_extensions import Protocol
 
 class Empty: ...
 class NOT_PROVIDED: ...

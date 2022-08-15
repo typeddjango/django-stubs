@@ -4,11 +4,7 @@ from gettext import NullTranslations
 from typing import Any, Callable, Dict, Iterator, List, Optional, Pattern, Protocol, Tuple, TypeVar, Union
 
 from django.http.request import HttpRequest
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 CONTEXT_SEPARATOR: Literal["\x04"]
 accept_language_re: Pattern[str]

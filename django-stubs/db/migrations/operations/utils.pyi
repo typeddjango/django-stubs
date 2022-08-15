@@ -4,11 +4,7 @@ from typing import Iterator, Optional, Tuple, Union
 
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models import Field
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 def resolve_relation(model, app_label: Optional[str] = ..., model_name: Optional[str] = ...) -> Tuple[str, str]: ...
 

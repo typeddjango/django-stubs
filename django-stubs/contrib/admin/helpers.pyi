@@ -10,11 +10,7 @@ from django.forms.models import ModelForm
 from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, Widget
 from django.utils.safestring import SafeString
-
-if sys.version_info < (3, 8):
-    from typing_extensions import TypedDict
-else:
-    from typing import TypedDict
+from typing_extensions import TypedDict
 
 ACTION_CHECKBOX_NAME: str
 

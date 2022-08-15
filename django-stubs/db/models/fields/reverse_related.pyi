@@ -8,13 +8,9 @@ from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToMan
 from django.db.models.lookups import BuiltinLookup, Lookup, StartsWith
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
+from typing_extensions import Literal
 
 from .mixins import FieldCacheMixin
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
 
 # Common note: `model` and `through` can be of type `str` when passed to `__init__`.
 # When parent's `contribute_to_class` is called (during startup),

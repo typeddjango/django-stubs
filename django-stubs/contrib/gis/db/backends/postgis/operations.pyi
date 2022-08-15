@@ -5,11 +5,7 @@ from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 BILATERAL: Literal["bilateral"]
 

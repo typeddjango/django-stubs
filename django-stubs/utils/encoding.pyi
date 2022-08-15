@@ -3,13 +3,8 @@ import sys
 from decimal import Decimal
 from typing import Any, TypeVar, Union, overload
 
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeGuard
-else:
-    from typing import TypeGuard
-
 from django.utils.functional import Promise
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeGuard
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     obj: bytes = ...

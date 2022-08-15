@@ -3,15 +3,11 @@ from typing import List, Optional, Sequence, Set, Tuple, Union
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
+from typing_extensions import Protocol
 
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
 
 class _ProgressCallbackT(Protocol):
     def __call__(self, __action: str, __migration: Optional[Migration] = ..., __fake: Optional[bool] = ...) -> None: ...

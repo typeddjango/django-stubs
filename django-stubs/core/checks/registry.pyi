@@ -3,11 +3,7 @@ from typing import Any, Callable, List, Optional, Sequence, Set, TypeVar, Union
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
+from typing_extensions import Protocol
 
 class Tags:
     admin: str = ...

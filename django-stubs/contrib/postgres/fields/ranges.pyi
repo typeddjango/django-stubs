@@ -4,11 +4,7 @@ from typing import Any, Dict, Optional, Type
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 class RangeBoundary(models.Expression):
     lower: str
@@ -35,7 +31,7 @@ class RangeField(models.Field):
     def to_python(self, value: Any) -> Any: ...
 
 class IntegerRangeField(RangeField):
-    def __get__(self, instance, owner) -> NumericRange: ...
+    def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
 
 class BigIntegerRangeField(RangeField):
     def __get__(self, instance, owner) -> NumericRange: ...
@@ -47,7 +43,7 @@ class DateTimeRangeField(RangeField):
     def __get__(self, instance, owner) -> DateTimeTZRange: ...
 
 class DateRangeField(RangeField):
-    def __get__(self, instance, owner) -> DateRange: ...
+    def __get__(self, instance, owner) -> DateRange: ...  # type: ignore[override]
 
 class DateTimeRangeContains(PostgresOperatorLookup):
     lookup_name: str = ...

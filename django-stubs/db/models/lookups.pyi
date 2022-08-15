@@ -1,16 +1,12 @@
 import sys
 from typing import Any, Generic, Iterable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
-
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression, Func
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
 from django.utils.datastructures import OrderedSet
+from typing_extensions import Literal
 
 _L = TypeVar("_L", bound="Lookup")
 _T = TypeVar("_T")
