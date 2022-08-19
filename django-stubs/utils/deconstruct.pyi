@@ -1,3 +1,14 @@
-from typing import Any, Optional
+from typing import Any, Callable, Optional, TypeVar, overload
 
-def deconstructible(*args: Any, path: Optional[Any] = ...) -> Any: ...
+_T = TypeVar('_T')
+_TCallable = TypeVar('_TCallable', bound=Callable[..., Any])
+
+
+@overload
+def deconstructible(_type: type[_T]) -> type[_T]: ...
+
+
+@overload
+def deconstructible(
+    *, path: Optional[str] = ...
+) -> Callable[[_TCallable], _TCallable]: ...
