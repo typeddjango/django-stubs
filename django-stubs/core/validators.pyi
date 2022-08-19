@@ -3,6 +3,7 @@ from re import RegexFlag
 from typing import Any, Callable, Collection, Dict, List, Optional, Pattern, Sequence, Sized, Tuple, Union
 
 from django.core.files.base import File
+from django.utils.functional import _StrPromise
 
 EMPTY_VALUES: Any
 
@@ -11,14 +12,14 @@ _ValidatorCallable = Callable[[Any], None]
 
 class RegexValidator:
     regex: _Regex = ...  # Pattern[str] on instance, but may be str on class definition
-    message: str = ...
+    message: Union[str, _StrPromise] = ...
     code: str = ...
     inverse_match: bool = ...
     flags: int = ...
     def __init__(
         self,
         regex: Optional[_Regex] = ...,
-        message: Optional[str] = ...,
+        message: Union[str, _StrPromise, None] = ...,
         code: Optional[str] = ...,
         inverse_match: Optional[bool] = ...,
         flags: Optional[RegexFlag] = ...,
