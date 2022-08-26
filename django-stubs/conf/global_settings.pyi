@@ -5,7 +5,9 @@ by the DJANGO_SETTINGS_MODULE environment variable.
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Dict, List, Literal, Optional, Pattern, Protocol, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Pattern, Protocol, Sequence, Tuple, Union
+
+from typing_extensions import Literal
 
 ####################
 # CORE             #
