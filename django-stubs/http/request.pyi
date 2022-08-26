@@ -1,4 +1,3 @@
-import sys
 from io import BytesIO
 from typing import (
     Any,
@@ -25,11 +24,7 @@ from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 RAISE_ERROR: object = ...
 host_validation_re: Pattern[str] = ...

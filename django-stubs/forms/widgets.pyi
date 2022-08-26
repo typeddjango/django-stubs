@@ -1,5 +1,4 @@
 import datetime
-import sys
 from typing import Any, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 from django.core.files.base import File
@@ -9,12 +8,7 @@ from django.forms.utils import _DataT, _FilesT
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _Getter
 from django.utils.safestring import SafeString
-from typing_extensions import Literal
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
+from typing_extensions import Literal, Protocol
 
 _OptAttrs = Dict[str, Any]
 

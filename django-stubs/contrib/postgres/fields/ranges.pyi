@@ -1,14 +1,9 @@
-import sys
 from typing import Any, Dict, Optional, Type
 
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 class RangeBoundary(models.Expression):
     lower: str

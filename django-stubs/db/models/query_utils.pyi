@@ -1,4 +1,3 @@
-import sys
 from collections import namedtuple
 from typing import (
     Any,
@@ -17,23 +16,17 @@ from typing import (
     Union,
 )
 
-from django.db.models.sql.compiler import _AsSqlType
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
-
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.lookups import Lookup, Transform
-from django.db.models.sql.compiler import SQLCompiler
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 from django.utils import tree
+from typing_extensions import Literal
 
 PathInfo = namedtuple(
     "PathInfo", ["from_opts", "to_opts", "target_fields", "join_field", "m2m", "direct", "filtered_relation"]

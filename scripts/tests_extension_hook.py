@@ -5,6 +5,7 @@ from pytest_mypy_plugins.item import YamlTestItem
 def django_plugin_hook(test_item: YamlTestItem) -> None:
     custom_settings = test_item.parsed_test_data.get("custom_settings", "")
     installed_apps = test_item.parsed_test_data.get("installed_apps", None)
+    monkeypatch = test_item.parsed_test_data.get("monkeypatch", False)
 
     if installed_apps and custom_settings:
         raise ValueError('"installed_apps" and "custom_settings" are not compatible, please use one or the other')
@@ -17,6 +18,9 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
 
     if "SECRET_KEY" not in custom_settings:
         custom_settings = 'SECRET_KEY = "1"\n' + custom_settings
+
+    if monkeypatch:
+        custom_settings = "import django_stubs_ext\ndjango_stubs_ext.monkeypatch()\n" + custom_settings
 
     django_settings_section = "\n[mypy.plugins.django-stubs]\n" "django_settings_module = mysettings"
     if not test_item.additional_mypy_config:

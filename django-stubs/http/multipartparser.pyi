@@ -1,20 +1,15 @@
-import sys
 from typing import IO, Any, Dict, Iterator, List, Mapping, Optional, Tuple, Union
 
 from django.http.request import QueryDict
 from django.utils.datastructures import ImmutableList, MultiValueDict
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 class MultiPartParserError(Exception): ...
 class InputStreamExhausted(Exception): ...
 
-RAW: Literal["raw"] = "raw"
-FILE: Literal["file"] = "file"
-FIELD: Literal["field"] = "field"
+RAW: Literal["raw"]
+FILE: Literal["file"]
+FIELD: Literal["field"]
 
 class MultiPartParser:
     def __init__(

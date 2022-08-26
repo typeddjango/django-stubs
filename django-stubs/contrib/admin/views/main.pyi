@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, Union
 
 from django.contrib.admin.filters import ListFilter
@@ -11,11 +10,7 @@ from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 ALL_VAR: str
 ORDER_VAR: str

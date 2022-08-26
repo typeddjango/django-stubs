@@ -1,5 +1,4 @@
 import datetime
-import sys
 import types
 from contextlib import contextmanager
 from decimal import Decimal
@@ -21,10 +20,7 @@ from typing import (
 )
 from uuid import UUID
 
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 logger: Logger
 

@@ -1,13 +1,12 @@
 import builtins
 from contextlib import suppress
-from typing import Iterable, Optional
+from typing import Iterable, List, Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.monkeypatch import MonkeyPatch
 from django.db.models import Model
 from django.forms.models import ModelForm
-from django.views import View
 from typing_extensions import Protocol
 
 import django_stubs_ext
@@ -19,7 +18,10 @@ class _MakeGenericClasses(Protocol):
     """Used to represent a type of ``make_generic_classes`` fixture."""
 
     def __call__(
-        self, django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None
+        self,
+        django_version: Optional[_VersionSpec] = None,
+        extra_classes: Optional[Iterable[type]] = None,
+        include_builtins: bool = True,
     ) -> None:
         ...
 
@@ -29,7 +31,7 @@ def make_generic_classes(
     request: FixtureRequest,
     monkeypatch: MonkeyPatch,
 ) -> _MakeGenericClasses:
-    _extra_classes: list[type] = []
+    _extra_classes: List[type] = []
 
     def fin() -> None:
         for el in _need_generic:
@@ -38,13 +40,22 @@ def make_generic_classes(
         for cls in _extra_classes:
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
+        _extra_classes.clear()
+        with suppress(AttributeError):
+            del builtins.reveal_type
+        with suppress(AttributeError):
+            del builtins.reveal_locals
 
-    def factory(django_version: Optional[_VersionSpec] = None, extra_classes: Optional[Iterable[type]] = None) -> None:
+    def factory(
+        django_version: Optional[_VersionSpec] = None,
+        extra_classes: Optional[Iterable[type]] = None,
+        include_builtins: bool = True,
+    ) -> None:
         if extra_classes:
             _extra_classes.extend(extra_classes)
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
-        django_stubs_ext.monkeypatch(extra_classes)
+        django_stubs_ext.monkeypatch(extra_classes=extra_classes, include_builtins=include_builtins)
 
     request.addfinalizer(fin)
     return factory
@@ -64,14 +75,17 @@ def test_patched_generics(make_generic_classes: _MakeGenericClasses) -> None:
 
 def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasses) -> None:
     """Test that the generics actually get patched for extra classes."""
-    extra_classes = [View]
 
+    class _NotGeneric:
+        pass
+
+    extra_classes = [_NotGeneric]
     make_generic_classes(django_version=None, extra_classes=extra_classes)
 
     for cls in extra_classes:
         assert cls[type] is cls  # type: ignore[misc]
 
-    class TestView(View[Model]):  # type: ignore[type-arg]
+    class _TestGeneric(_NotGeneric[Model]):  # type: ignore
         pass
 
 
@@ -106,7 +120,17 @@ def test_mypy_builtins_not_patched_globally(
     This should only happend during `django.setup()`
     (https://github.com/typeddjango/django-stubs/issues/609).
     """
-    make_generic_classes()
+    make_generic_classes(include_builtins=False)
 
     assert not hasattr(builtins, "reveal_type")
     assert not hasattr(builtins, "reveal_locals")
+
+
+def test_mypy_builtins_patched(
+    make_generic_classes: _MakeGenericClasses,
+) -> None:
+    """Ensures that builtins are patched by default."""
+    make_generic_classes()
+
+    assert hasattr(builtins, "reveal_type")
+    assert hasattr(builtins, "reveal_locals")

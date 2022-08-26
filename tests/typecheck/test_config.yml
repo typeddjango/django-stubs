@@ -58,8 +58,6 @@
     mypy_config: |
         [mypy.plugins.django-stubs]
         django_settings_module = mysettings
-    env:
-      - MYPYPATH=./extras
     files:
         -   path: extras/extra_module.py
             content: |

@@ -1,15 +1,10 @@
-import sys
 from typing import Any, List, Optional, Tuple, TypeVar, Union, overload
 
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import BooleanField
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=Model)
 

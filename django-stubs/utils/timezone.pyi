@@ -1,4 +1,3 @@
-import sys
 import types
 from contextlib import ContextDecorator
 from datetime import date
@@ -9,18 +8,9 @@ from datetime import timezone
 from datetime import tzinfo as tzinfo
 from typing import Any, Optional, Type, Union, overload
 
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
-
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeGuard
-else:
-    from typing import TypeGuard
-
 import pytz
 from pytz import BaseTzInfo
+from typing_extensions import Literal, TypeGuard
 
 _PytzTzInfoT = Union[pytz.tzinfo.BaseTzInfo, pytz._FixedOffset]
 _TzInfoT = Union[_PytzTzInfoT, tzinfo]

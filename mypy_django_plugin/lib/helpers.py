@@ -95,7 +95,10 @@ def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], f
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: type) -> Optional[TypeInfo]:
+def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type]) -> Optional[TypeInfo]:
+    if klass is None:
+        return None
+
     fullname = get_class_fullname(klass)
     field_info = lookup_fully_qualified_typeinfo(api, fullname)
     return field_info
@@ -183,7 +186,7 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.explicit)
 
 
-def get_field_lookup_exact_type(api: TypeChecker, field: Field) -> MypyType:
+def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> MypyType:
     if isinstance(field, (RelatedField, ForeignObjectRel)):
         lookup_type_class = field.related_model
         rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
@@ -318,7 +321,7 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
         member_name = attr_expr.name
         if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
             if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)
+                return getattr(django_context.settings, member_name)  # type: ignore
     return None
 
 

@@ -1,4 +1,3 @@
-import sys
 from typing import (
     Any,
     Callable,
@@ -43,11 +42,7 @@ from django.template.response import _TemplateForResponseT
 from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal, TypedDict
-else:
-    from typing import Literal, TypedDict
+from typing_extensions import Literal, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str

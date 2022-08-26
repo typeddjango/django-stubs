@@ -1,16 +1,11 @@
-import sys
 from typing import Any, Dict, Mapping, Optional, Sequence, Tuple, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
 from django.utils.datastructures import _ListOrTuple
+from typing_extensions import Literal, Protocol
 
 from .base import Operation
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal, Protocol
-else:
-    from typing import Literal, Protocol
 
 class SeparateDatabaseAndState(Operation):
     database_operations: Sequence[Operation] = ...

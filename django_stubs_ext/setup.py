@@ -12,7 +12,7 @@ dependencies = [
 
 setup(
     name="django-stubs-ext",
-    version="0.5.0",
+    version="0.6.0",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -23,7 +23,7 @@ setup(
     maintainer="Nikita Sobolev",
     maintainer_email="mail@sobolevn.me",
     py_modules=[],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=dependencies,
     packages=["django_stubs_ext", *find_packages(exclude=["scripts"])],
     package_data={"django_stubs_ext": ["py.typed"]},
@@ -33,6 +33,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Typing :: Typed",
         "Framework :: Django",
         "Framework :: Django :: 2.2",

@@ -1,10 +1,6 @@
-import sys
-from typing import Dict, Final, Pattern, Tuple
+from typing import Dict, Pattern, Tuple
 
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Final, Literal
 
 GET_ITERATOR_CHUNK_SIZE: Final[int] = ...
 

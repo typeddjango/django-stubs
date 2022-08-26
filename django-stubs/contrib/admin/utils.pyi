@@ -1,5 +1,4 @@
 import datetime
-import sys
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, Union, overload
 from uuid import UUID
 
@@ -15,11 +14,7 @@ from django.forms.forms import BaseForm
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 

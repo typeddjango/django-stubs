@@ -2,7 +2,7 @@ from typing import Any
 
 from django.utils.connection import ConnectionProxy
 
-from . import migrations
+from . import migrations as migrations
 from .backends.base.base import BaseDatabaseWrapper
 from .utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS  # Not exported in __all__
 from .utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY

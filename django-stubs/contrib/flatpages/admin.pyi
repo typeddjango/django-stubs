@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.contrib import admin as admin
+from django.contrib import admin
 
 class FlatPageAdmin(admin.ModelAdmin):
     form: Any = ...

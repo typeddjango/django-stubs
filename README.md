@@ -116,6 +116,8 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
    Note: This monkey patching approach will only work when using Python 3.7 and higher, when the `__class_getitem__` magic method was introduced.
 
+   You can add extra types to patch with `django_stubs_ext.monkeypatch(extra_classes=[YourDesiredType])`
+
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?

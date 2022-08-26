@@ -22,7 +22,7 @@ with open("README.md") as f:
 dependencies = [
     "mypy>=0.930",
     "django",
-    "django-stubs-ext>=0.4.0",
+    "django-stubs-ext>=0.6.0",
     "tomli",
     # Types:
     "typing-extensions",
@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 extras_require = {
-    "compatible-mypy": ["mypy>=0.930,<0.970"],
+    "compatible-mypy": ["mypy>=0.930,<0.980"],
 }
 
 setup(
@@ -61,6 +61,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Typing :: Typed",
         "Framework :: Django",
         "Framework :: Django :: 2.2",

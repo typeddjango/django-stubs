@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, Generic, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, overload
 
 from django.apps.config import AppConfig
@@ -13,11 +12,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, _ListOrTuple
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
+from typing_extensions import Literal
 
 PROXY_PARENTS: object
 EMPTY_RELATION_TREE: Any
