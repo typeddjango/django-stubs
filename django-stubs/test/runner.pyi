@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from io import StringIO
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union
 from unittest import TestCase, TestLoader, TestSuite, TextTestResult, TextTestRunner
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -136,7 +136,7 @@ class DiscoverRunner:
     def setup_test_environment(self, **kwargs: Any) -> None: ...
     def setup_shuffler(self) -> None: ...
     @contextmanager
-    def load_with_patterns(self) -> None: ...
+    def load_with_patterns(self) -> Iterator[None]: ...
     def load_tests_for_label(self, label: str, discover_kwargs: Dict[str, str]) -> TestSuite: ...
     def build_suite(
         self, test_labels: Sequence[str] = ..., extra_tests: Optional[List[Any]] = ..., **kwargs: Any
