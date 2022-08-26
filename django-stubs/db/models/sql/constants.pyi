@@ -1,6 +1,6 @@
-from typing import Dict, Final, Pattern, Tuple
+from typing import Dict, Pattern, Tuple
 
-from typing_extensions import Literal
+from typing_extensions import Final, Literal
 
 GET_ITERATOR_CHUNK_SIZE: Final[int] = ...
 
