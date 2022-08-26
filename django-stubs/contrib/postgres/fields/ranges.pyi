@@ -30,19 +30,19 @@ class RangeField(models.Field):
     def to_python(self, value: Any) -> Any: ...
 
 class IntegerRangeField(RangeField):
-    def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
+    def __get__(self, instance, owner) -> NumericRange: ...
 
 class BigIntegerRangeField(RangeField):
-    def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
+    def __get__(self, instance, owner) -> NumericRange: ...
 
 class DecimalRangeField(RangeField):
-    def __get__(self, instance, owner) -> NumericRange: ...  # type: ignore[override]
+    def __get__(self, instance, owner) -> NumericRange: ...
 
 class DateTimeRangeField(RangeField):
-    def __get__(self, instance, owner) -> DateTimeTZRange: ...  # type: ignore[override]
+    def __get__(self, instance, owner) -> DateTimeTZRange: ...
 
 class DateRangeField(RangeField):
-    def __get__(self, instance, owner) -> DateRange: ...  # type: ignore[override]
+    def __get__(self, instance, owner) -> DateRange: ...
 
 class DateTimeRangeContains(PostgresOperatorLookup):
     lookup_name: str = ...
