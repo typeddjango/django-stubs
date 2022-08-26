@@ -129,6 +129,7 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     context: ContextList | Dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
+    redirect_chain: List[Tuple[str, int]]
 
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
     def json(self) -> Any: ...
@@ -138,6 +139,7 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
     context: ContextList | Dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
+    redirect_chain: List[Tuple[str, int]]
 
 class ClientMixin:
     def store_exc_info(self, **kwargs: Any) -> None: ...
