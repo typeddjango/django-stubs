@@ -53,10 +53,18 @@ class HttpRequest(BytesIO):
     resolver_match: Optional[ResolverMatch] = ...
     content_type: Optional[str] = ...
     content_params: Optional[Dict[str, str]] = ...
-    user: Union[AbstractBaseUser, AnonymousUser]
-    site: Site
-    session: SessionBase
     _stream: BinaryIO
+    # Attributes added by optional parts of Django
+    # django.contrib.admin views:
+    current_app: str
+    # django.contrib.auth.middleware.AuthenticationMiddleware:
+    user: Union[AbstractBaseUser, AnonymousUser]
+    # django.middleware.locale.LocaleMiddleware:
+    LANGUAGE_CODE: str
+    # django.contrib.sites.middleware.CurrentSiteMiddleware
+    site: Site
+    # django.contrib.sessions.middleware.SessionMiddleware
+    session: SessionBase
     # The magic. If we instantiate HttpRequest directly somewhere, it has
     # mutable GET and POST. However, both ASGIRequest and WSGIRequest have immutable,
     # so when we use HttpRequest to refer to any of them we want exactly this.
