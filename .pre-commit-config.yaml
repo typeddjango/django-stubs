@@ -22,11 +22,9 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-        args: ["--profile", "black"]
       - id: isort
         name: isort (pyi)
         types: [pyi]
-        args: ["--profile", "black"]
   - repo: https://github.com/psf/black
     rev: 22.6.0
     hooks:
