@@ -5,6 +5,7 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Type, T
 
 from django.http.cookie import SimpleCookie
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
+from typing_extensions import Literal
 
 class BadHeaderError(ValueError): ...
 
@@ -62,12 +63,16 @@ class HttpResponseBase:
         domain: Optional[str] = ...,
         secure: bool = ...,
         httponly: bool = ...,
-        samesite: str = ...,
+        samesite: Optional[Literal["Lax", "Strict", "None"]] = ...,
     ) -> None: ...
     def setdefault(self, key: str, value: str) -> None: ...
     def set_signed_cookie(self, key: str, value: str, salt: str = ..., **kwargs: Any) -> None: ...
     def delete_cookie(
-        self, key: str, path: str = ..., domain: Optional[str] = ..., samesite: Optional[str] = ...
+        self,
+        key: str,
+        path: str = ...,
+        domain: Optional[str] = ...,
+        samesite: Optional[Literal["Lax", "Strict", "None"]] = ...,
     ) -> None: ...
     def make_bytes(self, value: object) -> bytes: ...
     def close(self) -> None: ...
