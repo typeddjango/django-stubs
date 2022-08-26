@@ -6,3 +6,6 @@ include = '\.pyi?$'
 line_length = 120
 multi_line_output = 3
 include_trailing_comma = true
+
+[build-system]
+requires = ["setuptools<64", "wheel"]
