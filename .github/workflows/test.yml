@@ -50,11 +50,8 @@ jobs:
         run: mypy --strict django_stubs_ext
       - name: Run mypy on scripts and utils
         run: mypy --strict scripts
-      # TODO: run this check on versions, not only 3.10
       - name: Run mypy on stubs
-        if: ${{ matrix.python-version }} == '3.10'
-        run: |
-          mypy --cache-dir=/dev/null --no-incremental django-stubs
+        run: mypy --cache-dir=/dev/null --no-incremental django-stubs
 
   test:
     runs-on: ubuntu-latest
