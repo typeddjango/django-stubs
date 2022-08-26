@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from io import StringIO
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Type
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 from unittest import TestCase, TestLoader, TestSuite, TextTestResult, TextTestRunner
 
 from django.db.backends.base.base import BaseDatabaseWrapper
