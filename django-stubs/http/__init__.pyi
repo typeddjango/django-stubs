@@ -9,6 +9,7 @@ from .response import FileResponse as FileResponse
 from .response import Http404 as Http404
 from .response import HttpResponse as HttpResponse
 from .response import HttpResponseBadRequest as HttpResponseBadRequest
+from .response import HttpResponseBase as HttpResponseBase
 from .response import HttpResponseForbidden as HttpResponseForbidden
 from .response import HttpResponseGone as HttpResponseGone
 from .response import HttpResponseNotAllowed as HttpResponseNotAllowed
