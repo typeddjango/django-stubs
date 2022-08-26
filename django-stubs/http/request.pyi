@@ -57,6 +57,8 @@ class HttpRequest(BytesIO):
     site: Site
     session: SessionBase
     _stream: BinaryIO
+    # django.contrib.admin uses this attribute:
+    current_app: str = ...
     # The magic. If we instantiate HttpRequest directly somewhere, it has
     # mutable GET and POST. However, both ASGIRequest and WSGIRequest have immutable,
     # so when we use HttpRequest to refer to any of them we want exactly this.
