@@ -155,7 +155,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     hidden: bool
     system_check_removed_details: Optional[Any]
     system_check_deprecated_details: Optional[Any]
-    non_db_attrs: Tuple[str]
+    non_db_attrs: Tuple[str, ...]
     def __init__(
         self,
         verbose_name: Optional[str] = ...,
