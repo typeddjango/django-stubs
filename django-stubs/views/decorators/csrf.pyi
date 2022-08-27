@@ -8,9 +8,7 @@ class _EnsureCsrfToken(CsrfViewMiddleware): ...
 
 requires_csrf_token: Any
 
-class _EnsureCsrfCookie(CsrfViewMiddleware):
-    get_response: None
-    def process_view(self, request: Any, callback: Any, callback_args: Any, callback_kwargs: Any): ...
+class _EnsureCsrfCookie(CsrfViewMiddleware): ...
 
 ensure_csrf_cookie: Any
 
