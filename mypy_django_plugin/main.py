@@ -22,6 +22,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
+from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_from_queryset_method,
     resolve_manager_method,
@@ -284,6 +285,9 @@ class NewSemanalDjangoPlugin(Plugin):
             and "from_queryset_manager" in helpers.get_django_metadata(info)
         ):
             return resolve_manager_method
+
+        if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
+            return resolve_str_promise_attribute
 
         return None
 

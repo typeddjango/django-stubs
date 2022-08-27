@@ -16,3 +16,36 @@
       f = Foo()
       reveal_type(f.attr)        # N: Revealed type is "builtins.list[builtins.str]"
       f.attr.name                # E: "List[str]" has no attribute "name"
+
+-   case: str_promise_proxy
+    main:  |
+      from typing import Union
+
+      from django.utils.functional import Promise, lazystr, _StrPromise
+
+      s = lazystr("asd")
+
+      reveal_type(s)                 # N: Revealed type is "django.utils.functional._StrPromise"
+
+      reveal_type(s.format("asd"))   # N: Revealed type is "builtins.str"
+      reveal_type(s.capitalize())    # N: Revealed type is "builtins.str"
+      reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
+      reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> Tuple[builtins.str]"
+      s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"
+      f: Union[_StrPromise, str]
+      reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
+      reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
+      reveal_type("asd" + f)         # N: Revealed type is "Union[Any, builtins.str]"
+
+      reveal_type(s + "bar")         # N: Revealed type is "builtins.str"
+      reveal_type("foo" + s)         # N: Revealed type is "Any"
+      reveal_type(s % "asd")         # N: Revealed type is "builtins.str"
+
+      def foo(content: str) -> None:
+        ...
+
+      def bar(content: Promise) -> None:
+        ...
+
+      foo(s)                         # E: Argument 1 to "foo" has incompatible type "_StrPromise"; expected "str"
+      bar(s)

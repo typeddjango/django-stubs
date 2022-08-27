@@ -41,3 +41,5 @@ COMBINABLE_EXPRESSION_FULLNAME = "django.db.models.expressions.Combinable"
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 
 ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
+
+STR_PROMISE_FULLNAME = "django.utils.functional._StrPromise"
