@@ -2,17 +2,15 @@ from typing import Any, Callable, TypeVar
 
 from django.middleware.csrf import CsrfViewMiddleware
 
-csrf_protect: Any
+csrf_protect: Callable[[_F], _F]
 
 class _EnsureCsrfToken(CsrfViewMiddleware): ...
 
-requires_csrf_token: Any
+requires_csrf_token: Callable[[_F], _F]
 
-class _EnsureCsrfCookie(CsrfViewMiddleware):
-    get_response: None
-    def process_view(self, request: Any, callback: Any, callback_args: Any, callback_kwargs: Any): ...
+class _EnsureCsrfCookie(CsrfViewMiddleware): ...
 
-ensure_csrf_cookie: Any
+ensure_csrf_cookie: Callable[[_F], _F]
 
 _F = TypeVar("_F", bound=Callable[..., Any])
 
