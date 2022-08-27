@@ -31,9 +31,11 @@
       reveal_type(s.capitalize())    # N: Revealed type is "builtins.str"
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
       reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> Tuple[builtins.str]"
-      s.nonsense                     # E: "django.utils.functional._StrPromise" has no attribute "nonsense"
+      s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"
       f: Union[_StrPromise, str]
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
+      reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
+      reveal_type("asd" + f)         # N: Revealed type is "Union[Any, builtins.str]"
 
       reveal_type(s + "bar")         # N: Revealed type is "builtins.str"
       reveal_type("foo" + s)         # N: Revealed type is "Any"

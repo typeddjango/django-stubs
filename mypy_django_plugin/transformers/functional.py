@@ -1,7 +1,8 @@
+from mypy.checkmember import analyze_member_access
 from mypy.errorcodes import ATTR_DEFINED
 from mypy.nodes import CallExpr, MemberExpr
 from mypy.plugin import AttributeContext
-from mypy.types import AnyType, CallableType
+from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
 
@@ -19,22 +20,16 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
 
     str_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), f"builtins.str")
     assert str_info is not None
-    method = str_info.get(method_name)
-
-    if method is None or method.type is None:
-        ctx.api.fail(f'"{ctx.type}" has no attribute "{method_name}"', ctx.context, code=ATTR_DEFINED)
-        return AnyType(TypeOfAny.from_error)
-
-    if isinstance(method.type, CallableType):
-        # The proxied str methods are only meant to be used as instance methods.
-        # We need to drop the first `self` argument in them.
-        assert method.type.arg_names[0] == "self"
-        return method.type.copy_modified(
-            arg_kinds=method.type.arg_kinds[1:],
-            arg_names=method.type.arg_names[1:],
-            arg_types=method.type.arg_types[1:],
-        )
-    else:
-        # Not possible with `builtins.str`, but we have error handling for this anyway.
-        ctx.api.fail(f'"{method_name}" on "{ctx.type}" is not a method', ctx.context)
-        return AnyType(TypeOfAny.from_error)
+    str_type = Instance(str_info, [])
+    return analyze_member_access(
+        method_name,
+        str_type,
+        ctx.context,
+        is_lvalue=False,
+        is_super=False,
+        # operators are already handled with magic methods defined in the stubs for _StrPromise
+        is_operator=False,
+        msg=ctx.api.msg,
+        original_type=ctx.type,
+        chk=helpers.get_typechecker_api(ctx),
+    )
