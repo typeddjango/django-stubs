@@ -1,4 +1,4 @@
-from typing import Any, Container, Dict, Optional, Type
+from typing import Any, Container, Dict, Optional, Tuple, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
 from typing_extensions import Literal
@@ -57,9 +57,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def check_constraints(self, table_names: Optional[Any] = ...) -> None: ...
     def is_usable(self) -> bool: ...
     @property
-    def display_name(self) -> str: ...  # type: ignore
+    def display_name(self) -> str: ...  # type: ignore [override]
     @property
-    def data_type_check_constraints(self) -> Dict[str, str]: ...
+    def data_type_check_constraints(self) -> Dict[str, str]: ...  # type: ignore [override]
     @property
     def mysql_server_data(self) -> Dict[str, Any]: ...
     @property
