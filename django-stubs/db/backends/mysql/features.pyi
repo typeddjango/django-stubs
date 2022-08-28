@@ -48,7 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @property
     def can_introspect_foreign_keys(self) -> bool: ...  # type: ignore
     @property
-    def introspected_field_types(self) -> Dict[str, str]: ...
+    def introspected_field_types(self) -> Dict[str, str]: ...  # type: ignore [override]
     @property
     def can_return_columns_from_insert(self) -> bool: ...  # type: ignore
     @property

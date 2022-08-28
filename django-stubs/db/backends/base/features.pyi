@@ -1,14 +1,16 @@
-from typing import Any, Dict, Optional, Set, Type
+from typing import Any, Dict, Optional, Sequence, Set, Tuple, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
+from django.db.utils import DatabaseError
 
 class BaseDatabaseFeatures:
+    minimum_database_version: Optional[Tuple[int, ...]]
     gis_enabled: bool
     allows_group_by_lob: bool
     allows_group_by_pk: bool
     allows_group_by_selected_pks: bool
-    empty_fetchmany_value: Any
+    empty_fetchmany_value: Sequence[Any]
     update_can_self_select: bool
     interprets_empty_strings_as_nulls: bool
     supports_nullable_unique_constraints: bool
@@ -45,15 +47,14 @@ class BaseDatabaseFeatures:
     nulls_order_largest: bool
     supports_order_by_nulls_modifier: bool
     order_by_nulls_first: bool
-    max_query_params: Any
+    max_query_params: Optional[int]
     allows_auto_pk_0: bool
     can_defer_constraint_checks: bool
-    supports_mixed_date_datetime_comparisons: bool
     supports_tablespaces: bool
     supports_sequence_reset: bool
     can_introspect_default: bool
     can_introspect_foreign_keys: bool
-    introspected_field_types: Any
+    introspected_field_types: Dict[str, str]
     supports_index_column_ordering: bool
     can_introspect_materialized_views: bool
     can_distinct_on_fields: bool
@@ -63,6 +64,7 @@ class BaseDatabaseFeatures:
     supports_combined_alters: bool
     supports_foreign_keys: bool
     can_create_inline_fk: bool
+    can_rename_index: bool
     indexes_foreign_keys: bool
     supports_column_check_constraints: bool
     supports_table_check_constraints: bool
@@ -70,7 +72,7 @@ class BaseDatabaseFeatures:
     supports_paramstyle_pyformat: bool
     requires_literal_defaults: bool
     connection_persists_old_columns: bool
-    closed_cursor_error_class: Any
+    closed_cursor_error_class: Type[DatabaseError]
     has_case_insensitive_like: bool
     bare_select_suffix: str
     implied_column_null: bool
@@ -94,10 +96,11 @@ class BaseDatabaseFeatures:
     create_test_procedure_without_params_sql: Optional[str]
     create_test_procedure_with_int_param_sql: Optional[str]
     supports_callproc_kwargs: bool
-    supported_explain_formats: Set[Any]
-    validates_explain_options: bool
+    supported_explain_formats: Set[str]
     supports_default_in_lead_lag: bool
     supports_ignore_conflicts: bool
+    supports_update_conflicts: bool
+    supports_update_conflicts_with_target: bool
     requires_casted_case_in_updates: bool
     supports_partial_indexes: bool
     supports_functions_in_partial_indexes: bool
@@ -118,6 +121,7 @@ class BaseDatabaseFeatures:
     supports_collation_on_textfield: bool
     supports_non_deterministic_collations: bool
     test_collations: Dict[str, Optional[str]]
+    test_now_utc_template: Optional[str]
     django_test_expected_failures: Set[str]
     django_test_skips: Dict[str, Set[str]]
     connection: BaseDatabaseWrapper
