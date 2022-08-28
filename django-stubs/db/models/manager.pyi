@@ -1,6 +1,7 @@
 import datetime
 from typing import (
     Any,
+    Callable,
     Dict,
     Generic,
     Iterable,
@@ -153,10 +154,23 @@ class Manager(BaseManager[_T]): ...
 # Fake to make ManyToMany work
 class RelatedManager(Manager[_T]):
     related_val: Tuple[int, ...]
-    def add(self, *objs: Union[_T, int], bulk: bool = ...) -> None: ...
+    def add(
+        self,
+        *objs: Union[_T, int],
+        bulk: bool = ...,
+        through_defaults: Optional[Union[Dict[str, Any], Callable]] = None...,
+    ) -> None: ...
+    def create(
+        self, **kwargs: Any, through_defaults: Optional[Union[Dict[str, Any], Callable]] = None...,
+    ) -> None: ...
     def remove(self, *objs: Union[_T, int], bulk: bool = ...) -> None: ...
     def set(
-        self, objs: Union[QuerySet[_T], Iterable[Union[_T, int]]], *, bulk: bool = ..., clear: bool = ...
+        self,
+        objs: Union[QuerySet[_T], Iterable[Union[_T, int]]],
+        *,
+        bulk: bool = ...,
+        clear: bool = ..., 
+        through_defaults: Optional[Union[Dict[str, Any], Callable]] = None...,
     ) -> None: ...
     def clear(self) -> None: ...
 
