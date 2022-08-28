@@ -1,0 +1,33 @@
+-   case: sync_for
+    main: |
+        from myapp.models import User
+
+        for user in User.objects.all():
+            reveal_type(user)  # N: Revealed type is "myapp.models.User"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+
+
+-   case: async_for
+    main: |
+        from myapp.models import User
+
+        async def main():
+            async for user in User.objects.all():
+                reveal_type(user)  # N: Revealed type is "myapp.models.User"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
