@@ -19,7 +19,6 @@ from typing import (
     overload,
 )
 
-from django.db import models
 from django.db.models import Manager
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable as Combinable  # noqa: F401
@@ -27,7 +26,7 @@ from django.db.models.expressions import F as F
 from django.db.models.query_utils import Q as Q  # noqa: F401
 from django.db.models.sql.query import Query, RawQuery
 
-_T = TypeVar("_T", bound=models.Model, covariant=True)
+_T = TypeVar("_T", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True)
 _QS = TypeVar("_QS", bound="_QuerySet")
 
@@ -39,10 +38,10 @@ class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     query: Query
     def __init__(
         self,
-        model: Optional[Type[models.Model]] = ...,
+        model: Optional[Type[Model]] = ...,
         query: Optional[Query] = ...,
         using: Optional[str] = ...,
-        hints: Optional[Dict[str, models.Model]] = ...,
+        hints: Optional[Dict[str, Model]] = ...,
     ) -> None: ...
     @classmethod
     def as_manager(cls) -> Manager[Any]: ...
@@ -110,8 +109,8 @@ class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     async def aexists(self) -> bool: ...
     def explain(self, *, format: Optional[Any] = ..., **options: Any) -> str: ...
     async def aexplain(self, *, format: Optional[Any] = ..., **options: Any) -> str: ...
-    def contains(self, obj: models.Model) -> bool: ...
-    async def acontains(self, obj: models.Model) -> bool: ...
+    def contains(self, obj: Model) -> bool: ...
+    async def acontains(self, obj: Model) -> bool: ...
     def raw(
         self,
         raw_query: str,
@@ -180,12 +179,12 @@ class RawQuerySet(Iterable[_T], Sized):
     def __init__(
         self,
         raw_query: Union[RawQuery, str],
-        model: Optional[Type[models.Model]] = ...,
+        model: Optional[Type[Model]] = ...,
         query: Optional[Query] = ...,
         params: Tuple[Any] = ...,
         translations: Optional[Dict[str, str]] = ...,
         using: str = ...,
-        hints: Optional[Dict[str, models.Model]] = ...,
+        hints: Optional[Dict[str, Model]] = ...,
     ) -> None: ...
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_T]: ...
