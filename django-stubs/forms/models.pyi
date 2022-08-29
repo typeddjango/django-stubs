@@ -275,7 +275,7 @@ class ModelChoiceField(ChoiceField):
     validators: List[Any]
     default_error_messages: Dict[str, str] = ...
     iterator: Type[ModelChoiceIterator] = ...
-    empty_label: Optional[str] = ...
+    empty_label: Optional[_StrOrPromise] = ...
     queryset: Optional[QuerySet[models.Model]] = ...
     limit_choices_to: Optional[_AllLimitChoicesTo] = ...
     to_field_name: Optional[str] = ...
@@ -283,10 +283,10 @@ class ModelChoiceField(ChoiceField):
         self,
         queryset: Union[None, Manager[models.Model], QuerySet[models.Model]],
         *,
-        empty_label: Optional[str] = ...,
+        empty_label: Optional[_StrOrPromise] = ...,
         required: bool = ...,
         widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[str] = ...,
+        label: Optional[_StrOrPromise] = ...,
         initial: Optional[Any] = ...,
         help_text: _StrOrPromise = ...,
         to_field_name: Optional[str] = ...,
@@ -307,7 +307,7 @@ class ModelChoiceField(ChoiceField):
 
 class ModelMultipleChoiceField(ModelChoiceField):
     disabled: bool
-    empty_label: Optional[str]
+    empty_label: Optional[_StrOrPromise]
     help_text: _StrOrPromise
     required: bool
     show_hidden_initial: bool
