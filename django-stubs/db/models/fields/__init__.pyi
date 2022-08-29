@@ -30,7 +30,7 @@ from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
-from django.utils.functional import _Getter
+from django.utils.functional import _Getter, _StrOrPromise
 from typing_extensions import Protocol
 
 class Empty: ...
@@ -134,7 +134,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     max_length: Optional[int]
     model: Type[Model]
     name: str
-    verbose_name: str
+    verbose_name: _StrOrPromise
     description: Union[str, _Getter[str]]
     blank: bool
     null: bool
@@ -158,7 +158,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     non_db_attrs: Tuple[str, ...]
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -260,7 +260,7 @@ class DecimalField(Field[_ST, _GT]):
     decimal_places: int = ...
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         max_digits: Optional[int] = ...,
         decimal_places: Optional[int] = ...,
@@ -289,7 +289,7 @@ class CharField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: Any
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -319,7 +319,7 @@ class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
 class SlugField(CharField[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         unique: bool = ...,
@@ -349,7 +349,7 @@ class EmailField(CharField[_ST, _GT]): ...
 class URLField(CharField[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         *,
         primary_key: bool = ...,
@@ -381,7 +381,7 @@ class TextField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: Any
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -458,7 +458,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_lookup_exact_type: Union[str, date]
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
@@ -486,7 +486,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_get_type: time
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
@@ -518,7 +518,7 @@ class UUIDField(Field[_ST, _GT]):
     _pyi_private_get_type: uuid.UUID
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         *,
         name: Optional[str] = ...,
         primary_key: bool = ...,
@@ -551,7 +551,7 @@ class FilePathField(Field[_ST, _GT]):
     allow_folders: bool = ...
     def __init__(
         self,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         path: Union[str, Callable[..., str]] = ...,
         match: Optional[str] = ...,
