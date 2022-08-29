@@ -65,7 +65,7 @@ class FileField(Field):
         unique_for_month: Optional[str] = ...,
         unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
