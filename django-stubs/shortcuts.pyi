@@ -21,8 +21,8 @@ class SupportsGetAbsoluteUrl(Protocol):
     def get_absolute_url(self) -> str: ...
 
 @overload
-def redirect(  # type: ignore
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True] = ..., **kwargs: Any
+def redirect(
+    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True], **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
@@ -30,7 +30,7 @@ def redirect(
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool = ..., **kwargs: Any
+    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool, **kwargs: Any
 ) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]: ...
 
 _T = TypeVar("_T", bound=Model)
