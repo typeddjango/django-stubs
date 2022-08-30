@@ -54,6 +54,7 @@
         from django.shortcuts import redirect
         reveal_type(redirect(to = '', permanent = True)) # N: Revealed type is "django.http.response.HttpResponsePermanentRedirect"
         reveal_type(redirect(to = '', permanent = False)) # N: Revealed type is "django.http.response.HttpResponseRedirect"
+        reveal_type(redirect(to = '')) # N: Revealed type is "django.http.response.HttpResponseRedirect"
 
         var = True
         reveal_type(redirect(to = '', permanent = var)) # N: Revealed type is "Union[django.http.response.HttpResponseRedirect, django.http.response.HttpResponsePermanentRedirect]"
