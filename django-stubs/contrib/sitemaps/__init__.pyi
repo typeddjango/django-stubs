@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
 
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
@@ -36,7 +36,7 @@ class GenericSitemap(Sitemap):
     protocol: Optional[str] = ...
     def __init__(
         self,
-        info_dict: Dict[str, Union[datetime, QuerySet[Model], str]],
+        info_dict: Mapping[str, Union[datetime, QuerySet[Model], str]],
         priority: Optional[float] = ...,
         changefreq: Optional[str] = ...,
         protocol: Optional[str] = ...,
