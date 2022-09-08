@@ -109,7 +109,7 @@ class EmailMultiAlternatives(EmailMessage):
     def __init__(
         self,
         subject: str = ...,
-        body: str = ...,
+        body: Optional[str] = ...,
         from_email: Optional[str] = ...,
         to: Optional[Sequence[str]] = ...,
         bcc: Optional[Sequence[str]] = ...,
