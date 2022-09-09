@@ -18,7 +18,7 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
         ctx.api.fail(f'Cannot resolve the attribute of "{ctx.type}"', ctx.context, code=ATTR_DEFINED)
         return AnyType(TypeOfAny.from_error)
 
-    str_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), f"builtins.str")
+    str_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), "builtins.str")
     assert str_info is not None
     str_type = Instance(str_info, [])
     return analyze_member_access(
