@@ -128,7 +128,7 @@ class ModelClassInitializer:
         for method_name in MANAGER_METHODS_RETURNING_QUERYSET:
             helpers.add_new_sym_for_info(manager_info, name=method_name, sym_type=AnyType(TypeOfAny.special_form))
 
-        manager_info.metadata["django"] = django_metadata = {
+        manager_info.metadata["django"] = {
             "any_fallback_manager": True,
             "from_queryset_manager": fallback_queryset.fullname,
         }
@@ -521,7 +521,11 @@ class AddRelatedManagers(ModelClassInitializer):
                     )
                     related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
                     self.ctx.api.fail(
-                        f"Couldn't resolve related manager for relation {relation.name!r} (from {related_model_fullname}.{relation.field}).",
+                        (
+                            "Couldn't resolve related manager for relation "
+                            f"{relation.name!r} (from {related_model_fullname}."
+                            f"{relation.field})."
+                        ),
                         self.ctx.cls,
                         code=MANAGER_MISSING,
                     )
@@ -539,8 +543,9 @@ class AddRelatedManagers(ModelClassInitializer):
                     )
                     continue
 
-                # The reverse manager we're looking for doesn't exist. So we create it.
-                # The (default) reverse manager type is built from a RelatedManager and the default manager on the related model
+                # The reverse manager we're looking for doesn't exist. So we
+                # create it. The (default) reverse manager type is built from a
+                # RelatedManager and the default manager on the related model
                 parametrized_related_manager_type = Instance(related_manager_info, [Instance(related_model_info, [])])
                 default_manager_type = default_manager.type
                 assert default_manager_type is not None
