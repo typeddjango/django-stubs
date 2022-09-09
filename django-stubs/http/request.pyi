@@ -200,6 +200,9 @@ class _ImmutableQueryDict(QueryDict):
     def dict(self) -> Dict[str, str]: ...  # type: ignore[override]
 
 class MediaType:
+    main_type: str
+    sub_type: str
+    params: Dict[str, bytes]
     def __init__(self, media_type_raw_line: str) -> None: ...
     @property
     def is_all_types(self) -> bool: ...
