@@ -7,6 +7,7 @@ from django.db.models.manager import BaseManager
 from django.db.models.options import Options
 
 _Self = TypeVar("_Self", bound="Model")
+_Model = TypeVar("_Model")
 
 class ModelStateFieldsCacheDescriptor: ...
 
@@ -17,9 +18,9 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def _default_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...
+    def _default_manager(cls: Type[_Model]) -> BaseManager[_Model]: ...
     @property
-    def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...
+    def _base_manager(cls: Type[_Model]) -> BaseManager[_Model]: ...
 
 class Model(metaclass=ModelBase):
     class DoesNotExist(ObjectDoesNotExist): ...
