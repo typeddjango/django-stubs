@@ -17,11 +17,11 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def objects(cls: Type[_Self]) -> BaseManager[_Self]: ... # type: ignore
+    def objects(cls: Type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
     @property
-    def _default_manager(cls: Type[_Self]) -> BaseManager[_Self]: ... # type: ignore
+    def _default_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
     @property
-    def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ... # type: ignore
+    def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
     class DoesNotExist(ObjectDoesNotExist): ...
