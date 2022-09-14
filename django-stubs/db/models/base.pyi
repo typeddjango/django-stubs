@@ -7,7 +7,6 @@ from django.db.models.manager import BaseManager
 from django.db.models.options import Options
 
 _Self = TypeVar("_Self", bound="Model")
-_Model = TypeVar("_Model")
 
 class ModelStateFieldsCacheDescriptor: ...
 
@@ -18,16 +17,17 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def _default_manager(cls: Type[_Model]) -> BaseManager[_Model]: ...
+    def objects(cls: Type[_Self]) -> BaseManager[_Self]: ... # type: ignore
     @property
-    def _base_manager(cls: Type[_Model]) -> BaseManager[_Model]: ...
+    def _default_manager(cls: Type[_Self]) -> BaseManager[_Self]: ... # type: ignore
+    @property
+    def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ... # type: ignore
 
 class Model(metaclass=ModelBase):
     class DoesNotExist(ObjectDoesNotExist): ...
     class MultipleObjectsReturned(BaseMultipleObjectsReturned): ...
     class Meta: ...
     _meta: Options[Any]
-    objects: BaseManager[Any]
     pk: Any = ...
     _state: ModelState
     def __init__(self: _Self, *args, **kwargs) -> None: ...
