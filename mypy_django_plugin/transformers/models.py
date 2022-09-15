@@ -538,9 +538,7 @@ class AddRelatedManagers(ModelClassInitializer):
                     model_info=related_model_info, derived_from="_default_manager"
                 )
                 if default_reverse_manager_info:
-                    self.add_new_node_to_model_class(
-                        attname, Instance(default_reverse_manager_info, []), no_serialize=True
-                    )
+                    self.add_new_node_to_model_class(attname, Instance(default_reverse_manager_info, []))
                     continue
 
                 # The reverse manager we're looking for doesn't exist. So we
@@ -562,7 +560,6 @@ class AddRelatedManagers(ModelClassInitializer):
                     module=self.api.modules[related_model_info.module_name],
                     name=f"{related_model_cls.__name__}_RelatedManager",
                     bases=[parametrized_related_manager_type, default_manager_type],
-                    no_serialize=True,
                 )
                 new_related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_info.fullname}
                 # Stash the new reverse manager type fullname on the related model, so we don't duplicate
@@ -572,7 +569,7 @@ class AddRelatedManagers(ModelClassInitializer):
                     derived_from="_default_manager",
                     fullname=new_related_manager_info.fullname,
                 )
-                self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []), no_serialize=True)
+                self.add_new_node_to_model_class(attname, Instance(new_related_manager_info, []))
 
 
 class AddExtraFieldMethods(ModelClassInitializer):
