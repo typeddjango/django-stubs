@@ -2,6 +2,7 @@ from typing import Any, Iterable, NamedTuple, Optional, Tuple, TypeVar, Union
 
 from django.core.validators import _ValidatorCallable
 from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+from django.utils.functional import _StrOrPromise
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -19,7 +20,7 @@ def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 class BaseSpatialField(Field[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
         srid: int = ...,
         spatial_index: bool = ...,
         *,
@@ -38,7 +39,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         unique_for_month: Optional[str] = ...,
         unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,
@@ -65,7 +66,7 @@ class GeometryField(BaseSpatialField):
     geography: Any = ...
     def __init__(
         self,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
         dim: int = ...,
         geography: bool = ...,
         *,
@@ -88,7 +89,7 @@ class GeometryField(BaseSpatialField):
         unique_for_month: Optional[str] = ...,
         unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[_ValidatorCallable] = ...,

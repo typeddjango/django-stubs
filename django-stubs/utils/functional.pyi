@@ -43,6 +43,7 @@ class _StrPromise(Promise, Sequence[str]):
     # Mypy requires this for the attribute hook to take effect
     def __getattribute__(self, __name: str) -> Any: ...
 
+_StrOrPromise = Union[str, _StrPromise]
 _C = TypeVar("_C", bound=Callable)
 
 def lazy(func: _C, *resultclasses: Any) -> _C: ...

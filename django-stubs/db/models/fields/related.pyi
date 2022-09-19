@@ -20,6 +20,7 @@ from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
 from django.db.models.manager import RelatedManager
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
+from django.utils.functional import _StrOrPromise
 from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=models.Model)
@@ -75,7 +76,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
         swappable: bool = ...,
         *,
         db_constraint: bool = ...,
-        verbose_name: Optional[str] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         unique: bool = ...,
@@ -87,7 +88,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
         auto_created: bool = ...,
         serialize: bool = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
@@ -120,7 +121,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         to_field: Optional[str] = ...,
         db_constraint: bool = ...,
         *,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -136,7 +137,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         unique_for_month: Optional[str] = ...,
         unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
@@ -169,7 +170,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
         parent_link: bool = ...,
         db_constraint: bool = ...,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -185,7 +186,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         unique_for_month: Optional[str] = ...,
         unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
@@ -229,7 +230,7 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         db_table: Optional[str] = ...,
         swappable: bool = ...,
         *,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
@@ -245,7 +246,7 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         unique_for_month: Optional[str] = ...,
         unique_for_year: Optional[str] = ...,
         choices: Optional[_FieldChoices] = ...,
-        help_text: str = ...,
+        help_text: _StrOrPromise = ...,
         db_column: Optional[str] = ...,
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,

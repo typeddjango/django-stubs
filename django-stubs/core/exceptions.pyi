@@ -1,5 +1,6 @@
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
+from django.utils.functional import _StrPromise
 from typing_extensions import Literal
 
 class FieldDoesNotExist(Exception): ...
@@ -35,7 +36,7 @@ class ValidationError(Exception):
     def __init__(
         self,
         # Accepts arbitrarily nested data structure, mypy doesn't allow describing it accurately.
-        message: Union[str, ValidationError, Dict[str, Any], List[Any]],
+        message: Union[str, _StrPromise, ValidationError, Dict[str, Any], List[Any]],
         code: Optional[str] = ...,
         params: Optional[Dict[str, Any]] = ...,
     ) -> None: ...
