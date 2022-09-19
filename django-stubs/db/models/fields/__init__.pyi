@@ -41,7 +41,7 @@ BLANK_CHOICE_DASH: List[Tuple[str, str]] = ...
 _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
-_ChoicesList = List[Union[_Choice, _ChoiceNamedGroup]]
+_ChoicesList = Union[Sequence[_Choice], Sequence[_ChoiceNamedGroup]]
 _LimitChoicesTo = Union[Q, Dict[str, Any]]
 
 class _ChoicesCallable(Protocol):
