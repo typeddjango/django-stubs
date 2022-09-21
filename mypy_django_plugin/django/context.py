@@ -62,7 +62,7 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         apps.get_swappable_settings_name.cache_clear()  # type: ignore
 
         if not settings.configured:
-            settings._setup()
+            settings._setup()  # type: ignore
 
         apps.populate(settings.INSTALLED_APPS)
 
