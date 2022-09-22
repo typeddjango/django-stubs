@@ -45,3 +45,28 @@
             content: |
                 from pathlib import Path
                 MEDIA_ROOT = Path()
+
+-   case: imported_from_models
+    disable_cache: true
+    custom_settings: |
+        from other import other
+        AUTH_USER_MODEL = "my_app.MyUser"
+        INSTALLED_APPS = ["my_app"]
+        MY_LIST = [1]
+    main: |
+        from typing import TYPE_CHECKING
+        from django.conf import settings
+        if TYPE_CHECKING:
+            reveal_type(settings.MY_LIST)  # N: Revealed type is "builtins.list[builtins.int]"
+    files:
+        -   path: my_app/__init__.py
+        -   path: my_app/models.py
+            content: |
+                from django.db import models
+                import main
+                class MyUser(models.Model):
+                    pass
+        -   path: other.py
+            content: |
+                from django_stubs_ext import ValuesQuerySet
+                other = ()
