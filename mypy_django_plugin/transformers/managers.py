@@ -16,6 +16,7 @@ from mypy.nodes import (
     Var,
 )
 from mypy.plugin import AttributeContext, DynamicClassDefContext, SemanticAnalyzerPluginInterface
+from mypy.semanal import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny
@@ -246,7 +247,10 @@ def create_manager_info_from_from_queryset_call(
     else:
         manager_name = f"{base_manager_info.name}From{queryset_info.name}"
 
-    new_manager_info = create_manager_class(api, base_manager_info, name or manager_name, call_expr.line)
+    try:
+        new_manager_info = create_manager_class(api, base_manager_info, name or manager_name, call_expr.line)
+    except helpers.IncompleteDefnException:
+        return None
 
     popuplate_manager_from_queryset(new_manager_info, queryset_info)
 
@@ -271,6 +275,10 @@ def create_manager_class(
 
     base_manager_instance = fill_typevars(base_manager_info)
     assert isinstance(base_manager_instance, Instance)
+
+    # If any of the type vars are undefined we need to defer. This is handled by the caller
+    if any(has_placeholder(type_var) for type_var in base_manager_info.defn.type_vars):
+        raise helpers.IncompleteDefnException
 
     manager_info = helpers.create_type_info(name, api.cur_mod_id, bases=[base_manager_instance])
     manager_info.line = line
