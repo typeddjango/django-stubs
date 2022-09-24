@@ -23,9 +23,6 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
 def get_type_of_settings_attribute(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.context, MemberExpr)
     setting_name = ctx.context.name
-    if not hasattr(django_context.settings, setting_name):
-        ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)
-        return ctx.default_attr_type
 
     typechecker_api = helpers.get_typechecker_api(ctx)
 
@@ -35,15 +32,14 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
     for module in [settings_module, global_settings_module]:
         if module is not None:
             sym = module.names.get(setting_name)
-            if sym is not None and sym.type is not None:
+            if sym is not None:
+                if sym.type is None:
+                    ctx.api.fail(
+                        f"Import cycle from Django settings module prevents type inference for {setting_name!r}",
+                        ctx.context,
+                    )
+                    return ctx.default_attr_type
                 return sym.type
 
-    # if by any reason it isn't present there, get type from django settings
-    value = getattr(django_context.settings, setting_name)
-    value_fullname = helpers.get_class_fullname(value.__class__)
-
-    value_info = helpers.lookup_fully_qualified_typeinfo(typechecker_api, value_fullname)
-    if value_info is None:
-        return ctx.default_attr_type
-
-    return Instance(value_info, [])
+    ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)
+    return ctx.default_attr_type
