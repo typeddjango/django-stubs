@@ -131,7 +131,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for `get_user_model()`
         if self.django_context.settings:
-            if file.fullname == "django.contrib.auth" or file.fullname in {"django.http", "django.http.request"}:
+            if file.fullname == "django.contrib.auth":
                 auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
                 try:
                     auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
