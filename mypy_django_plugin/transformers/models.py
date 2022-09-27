@@ -5,7 +5,7 @@ from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, FuncDef, NameExpr, TypeInfo, Var
+from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer

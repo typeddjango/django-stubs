@@ -20,7 +20,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny, TypeVarLikeType, TypeVarType
+from mypy.types import TypeOfAny
 from mypy.typevars import fill_typevars
 from typing_extensions import Final
 
