@@ -11,7 +11,7 @@ from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny
+from mypy.types import TypedDictType, TypeOfAny, get_proper_type
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -656,11 +656,11 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext
 
     fields_dict = None
     if len(args) > 1:
-        second_arg_type = ctx.api.analyze_type(args[1])
+        second_arg_type = get_proper_type(ctx.api.analyze_type(args[1]))
         if isinstance(second_arg_type, TypedDictType):
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
-            annotations_type_arg = second_arg_type.args[0]
+            annotations_type_arg = get_proper_type(second_arg_type.args[0])
             if isinstance(annotations_type_arg, TypedDictType):
                 fields_dict = annotations_type_arg
             elif not isinstance(annotations_type_arg, AnyType):

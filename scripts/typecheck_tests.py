@@ -68,7 +68,7 @@ if __name__ == "__main__":
     django_version = parser.parse_args().django_version
     subprocess.check_call([sys.executable, "-m", "pip", "install", f"Django=={django_version}.*"])
     commit_sha = DJANGO_COMMIT_REFS[django_version]
-    repo = checkout_django_branch(django_version, commit_sha)
+    checkout_django_branch(django_version, commit_sha)
     mypy_config_file = (PROJECT_DIRECTORY / "mypy.ini").absolute()
     mypy_cache_dir = PROJECT_DIRECTORY / ".mypy_cache"
     tests_root = DJANGO_SOURCE_DIRECTORY / "tests"

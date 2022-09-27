@@ -20,7 +20,7 @@ with open("README.md") as f:
     readme = f.read()
 
 dependencies = [
-    "mypy>=0.930",
+    "mypy>=0.980",
     "django",
     "django-stubs-ext>=0.6.0",
     "tomli",
@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 extras_require = {
-    "compatible-mypy": ["mypy>=0.930,<0.980"],
+    "compatible-mypy": ["mypy>=0.980,<0.990"],
 }
 
 setup(
@@ -69,6 +69,7 @@ setup(
         "Framework :: Django :: 3.1",
         "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.0",
+        "Framework :: Django :: 4.1",
     ],
     project_urls={
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",

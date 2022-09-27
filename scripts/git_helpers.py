@@ -17,7 +17,7 @@ class ProgressPrinter(RemoteProgress):
         print(self._cur_line)
 
 
-def checkout_django_branch(django_version: str, commit_sha: Optional[str]) -> Repo:
+def checkout_django_branch(django_version: str, commit_sha: Optional[str]) -> None:
     branch = f"stable/{django_version}.x"
     if DJANGO_SOURCE_DIRECTORY.exists():
         shutil.rmtree(DJANGO_SOURCE_DIRECTORY)
