@@ -332,14 +332,14 @@
 -   case: custom_manager_returns_proper_model_types
     main: |
         from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is "myapp.models.User_MyManager[myapp.models.User]"
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
         reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
         reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
         reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
-        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.ChildUser_MyManager[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
         reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
@@ -364,7 +364,7 @@
 -   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
-        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA1[myapp.models.ModelA]"
+        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ManagerA[myapp.models.ModelA]"
         reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
     installed_apps:
         - myapp
@@ -427,7 +427,7 @@
 -   case: regression_manager_scope_foreign
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.on_site)  # N: Revealed type is "myapp.models.MyModel_CurrentSiteManager[myapp.models.MyModel]"
+        reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[myapp.models.MyModel]"
     installed_apps:
         - myapp
         - django.contrib.sites

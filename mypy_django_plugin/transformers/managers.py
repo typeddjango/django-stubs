@@ -15,7 +15,7 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugin import AttributeContext, DynamicClassDefContext
+from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
@@ -466,3 +466,63 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
         # Note that the generated manager type is always inserted at module level
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
     )
+
+
+def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
+    """
+    Add explicit generics to manager classes that are defined without generic.
+
+    Eg.
+
+        class MyManager(models.Manager): ...
+
+    is interpreted as::
+        _T = TypeVar('_T', covariant=True)
+        class MyManager(models.Manager[_T]): ...
+    """
+
+    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if manager is None or manager.node is None:
+        return
+    assert isinstance(manager.node, TypeInfo)
+
+    if manager.node.type_vars:
+        # We've already been here
+        return
+
+    parent_manager = next(
+        (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
+        None,
+    )
+    if parent_manager is None:
+        return
+
+    preserve_typevars = (
+        # If args are missing, but tvars present, don't ignore: we have to reparametrize
+        not parent_manager.type.type_vars
+        or parent_manager.args
+        and (
+            not isinstance(parent_manager.args[0], AnyType) or parent_manager.args[0].type_of_any == TypeOfAny.explicit
+        )
+    )
+    if preserve_typevars:
+        return
+
+    base_manager = ctx.api.lookup_fully_qualified_or_none(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+    if base_manager is None:
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+        return
+    assert isinstance(base_manager.node, TypeInfo)
+
+    tvars = tuple(base_manager.node.defn.type_vars)
+    # For some reason, we have to defer now, otherwise `defer` is called in other place
+    # on final iteration (`SemanticAnalyzer.analyze_func_def`).
+    if any(has_placeholder(tvar) for tvar in tvars):
+        assert not ctx.api.final_iteration, "Too late to reparametrize"
+        ctx.api.defer()
+
+    parent_manager.args = tvars
+    manager.node.type_vars = []
+    manager.node.defn.type_vars = list(tvars)
+    manager.node.add_type_vars()

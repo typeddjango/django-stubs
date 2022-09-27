@@ -26,6 +26,7 @@ from mypy_django_plugin.transformers.functional import resolve_str_promise_attri
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_as_manager_method,
     create_new_manager_class_from_from_queryset_method,
+    reparametrize_any_manager_hook,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -239,6 +240,15 @@ class NewSemanalDjangoPlugin(Plugin):
             )
 
         return None
+
+    def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        sym = self.lookup_fully_qualified(fullname)
+        if (
+            sym is not None
+            and isinstance(sym.node, TypeInfo)
+            and sym.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        ):
+            return reparametrize_any_manager_hook
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition

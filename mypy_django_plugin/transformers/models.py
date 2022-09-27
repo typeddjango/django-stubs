@@ -282,45 +282,6 @@ class AddManagers(ModelClassInitializer):
     def is_any_parametrized_manager(self, typ: Instance) -> bool:
         return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
 
-    def create_new_model_parametrized_manager(self, name: str, base_manager_info: TypeInfo) -> Instance:
-        bases = []
-        for original_base in base_manager_info.bases:
-            if self.is_any_parametrized_manager(original_base):
-                original_base = helpers.reparametrize_instance(original_base, [Instance(self.model_classdef.info, [])])
-            bases.append(original_base)
-
-        # TODO: This adds the manager to the module, even if we end up
-        # deferring. That can be avoided by not adding it to the module first,
-        # but rather waiting until we know we won't defer
-        new_manager_info = self.add_new_class_for_current_module(name, bases)
-        # copy fields to a new manager
-        custom_manager_type = Instance(new_manager_info, [Instance(self.model_classdef.info, [])])
-
-        for name, sym in base_manager_info.names.items():
-            # replace self type with new class, if copying method
-            if isinstance(sym.node, FuncDef):
-                copied_method = helpers.copy_method_to_another_class(
-                    api=self.api,
-                    cls=new_manager_info.defn,
-                    self_type=custom_manager_type,
-                    new_method_name=name,
-                    method_node=sym.node,
-                    original_module_name=base_manager_info.module_name,
-                )
-                if not copied_method and not self.api.final_iteration:
-                    raise helpers.IncompleteDefnException()
-                continue
-
-            new_sym = sym.copy()
-            if isinstance(new_sym.node, Var):
-                new_var = Var(name, type=sym.type)
-                new_var.info = new_manager_info
-                new_var._fullname = new_manager_info.fullname + "." + name
-                new_sym.node = new_var
-            new_manager_info.names[name] = new_sym
-
-        return custom_manager_type
-
     def lookup_manager(self, fullname: str, manager: "Manager[Any]") -> Optional[TypeInfo]:
         manager_info = self.lookup_typeinfo(fullname)
         if manager_info is None:
@@ -354,7 +315,8 @@ class AddManagers(ModelClassInitializer):
                 # Manager is already typed -> do nothing unless it's a dynamically generated manager
                 self.reparametrize_dynamically_created_manager(manager_name, manager_info)
                 continue
-            elif manager_info is None:
+
+            if manager_info is None:
                 # We couldn't find a manager type, see if we should create one
                 manager_info = self.create_manager_from_from_queryset(manager_name)
 
@@ -362,25 +324,8 @@ class AddManagers(ModelClassInitializer):
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            if manager_name not in self.model_classdef.info.names or self.is_manager_dynamically_generated(
-                manager_info
-            ):
-                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-                self.add_new_node_to_model_class(manager_name, manager_type)
-            elif self.has_any_parametrized_manager_as_base(manager_info):
-                # Ending up here could for instance be due to having a custom _Manager_
-                # that is not built from a custom QuerySet. Another example is a
-                # related manager.
-                manager_class_name = manager.__class__.__name__
-                custom_model_manager_name = manager.model.__name__ + "_" + manager_class_name
-                try:
-                    manager_type = self.create_new_model_parametrized_manager(
-                        custom_model_manager_name, base_manager_info=manager_info
-                    )
-                except helpers.IncompleteDefnException:
-                    continue
-
-                self.add_new_node_to_model_class(manager_name, manager_type)
+            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            self.add_new_node_to_model_class(manager_name, manager_type)
 
         if incomplete_manager_defs:
             if not self.api.final_iteration:
