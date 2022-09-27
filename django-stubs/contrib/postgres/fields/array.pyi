@@ -27,7 +27,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         base_field: Field,
         size: Optional[int] = ...,
         *,
-        verbose_name: Optional[Union[str, bytes]] = ...,
+        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
         name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
