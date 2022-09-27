@@ -1,6 +1,6 @@
 import datetime
 from typing import Any, Dict, List, Optional, Tuple, Union
-from xml.sax import ContentHandler  # type: ignore
+from xml.sax import ContentHandler
 
 def rfc2822_date(date: datetime.date) -> str: ...
 def rfc3339_date(date: datetime.date) -> str: ...
