@@ -508,19 +508,12 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     if preserve_typevars:
         return
 
-    base_manager = ctx.api.lookup_fully_qualified_or_none(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-    if base_manager is None:
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-        return
-    assert isinstance(base_manager.node, TypeInfo)
-
-    tvars = tuple(base_manager.node.defn.type_vars)
+    tvars = tuple(parent_manager.type.defn.type_vars)
     # For some reason, we have to defer now, otherwise `defer` is called in other place
     # on final iteration (`SemanticAnalyzer.analyze_func_def`).
     if any(has_placeholder(tvar) for tvar in tvars):
-        assert not ctx.api.final_iteration, "Too late to reparametrize"
-        ctx.api.defer()
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
 
     parent_manager.args = tvars
     manager.node.type_vars = []
