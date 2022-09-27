@@ -20,7 +20,7 @@ def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 class BaseSpatialField(Field[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         srid: int = ...,
         spatial_index: bool = ...,
         *,
@@ -66,7 +66,7 @@ class GeometryField(BaseSpatialField):
     geography: Any = ...
     def __init__(
         self,
-        verbose_name: Optional[Union[_StrOrPromise, bytes]] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         dim: int = ...,
         geography: bool = ...,
         *,
