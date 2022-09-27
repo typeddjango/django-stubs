@@ -429,7 +429,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
     protocol: str = ...
     def __init__(
         self,
-        verbose_name: Optional[Any] = ...,
+        verbose_name: Optional[_StrOrPromise] = ...,
         name: Optional[Any] = ...,
         protocol: str = ...,
         unpack_ipv4: bool = ...,
