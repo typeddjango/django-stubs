@@ -386,9 +386,11 @@
 -   case: override_manager_create1
     main: |
         from myapp.models import MyModel
-        MyModel.objects.create()
     installed_apps:
         - myapp
+    out: |
+        myapp/models:4: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
+        myapp/models:5: error: Incompatible return value type (got "_T", expected "MyModel")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
