@@ -20,7 +20,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
+from mypy.types import TypeOfAny, TypeVarLikeType, TypeVarType
 from mypy.typevars import fill_typevars
 from typing_extensions import Final
 
@@ -497,25 +497,24 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     if parent_manager is None:
         return
 
-    preserve_typevars = (
-        # If args are missing, but tvars present, don't ignore: we have to reparametrize
-        not parent_manager.type.type_vars
-        or parent_manager.args
-        and (
-            not isinstance(parent_manager.args[0], AnyType) or parent_manager.args[0].type_of_any == TypeOfAny.explicit
-        )
+    is_missing_params = (
+        len(parent_manager.args) == 1
+        and isinstance(parent_manager.args[0], AnyType)
+        and parent_manager.args[0].type_of_any is not TypeOfAny.explicit
     )
-    if preserve_typevars:
+    if not is_missing_params:
         return
 
-    tvars = tuple(parent_manager.type.defn.type_vars)
-    # For some reason, we have to defer now, otherwise `defer` is called in other place
-    # on final iteration (`SemanticAnalyzer.analyze_func_def`).
-    if any(has_placeholder(tvar) for tvar in tvars):
+    type_vars = tuple(parent_manager.type.defn.type_vars)
+
+    # If we end up with placeholders we need to defer so the placeholders are
+    # resolved in a future iteration
+    if any(has_placeholder(type_var) for type_var in type_vars):
         if not ctx.api.final_iteration:
             ctx.api.defer()
+        else:
+            return
 
-    parent_manager.args = tvars
-    manager.node.type_vars = []
-    manager.node.defn.type_vars = list(tvars)
+    parent_manager.args = type_vars
+    manager.node.defn.type_vars = list(type_vars)
     manager.node.add_type_vars()

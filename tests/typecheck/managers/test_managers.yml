@@ -552,3 +552,31 @@
         myapp/models:66: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:67: note: Revealed type is "Any"
         myapp/models:68: note: Revealed type is "Union[myapp.models.Booking, None]"
+
+-   case: subclass_manager_without_type_parameters
+    main: |
+        from myapp.models import MySubModel
+        reveal_type(MySubModel.objects) # N: Revealed type is "myapp.models.MySubManager[myapp.models.MySubModel]"
+        reveal_type(MySubModel.objects.get()) # N: Revealed type is "myapp.models.MySubModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                T = TypeVar("T", bound="MyModel")
+
+                class MyManager(models.Manager[T]):
+                    pass
+
+                class MySubManager(MyManager):
+                    pass
+
+                class MyModel(models.Model):
+                    pass
+
+                class MySubModel(MyModel):
+                    objects = MySubManager()
