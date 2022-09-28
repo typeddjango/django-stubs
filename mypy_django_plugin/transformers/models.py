@@ -126,7 +126,9 @@ class ModelClassInitializer:
         # class. The actual type of these methods are resolved in
         # resolve_manager_method.
         for method_name in MANAGER_METHODS_RETURNING_QUERYSET:
-            helpers.add_new_sym_for_info(manager_info, name=method_name, sym_type=AnyType(TypeOfAny.special_form))
+            helpers.add_new_sym_for_info(
+                manager_info, name=method_name, sym_type=AnyType(TypeOfAny.implementation_artifact)
+            )
 
         manager_info.metadata["django"] = {
             "any_fallback_manager": True,
