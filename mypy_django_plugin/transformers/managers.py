@@ -429,8 +429,8 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
                 with_unique_name=True,
             )
         except helpers.IncompleteDefnException:
-            if not ctx.api.final_iteration:
-                ctx.api.defer()
+            if not semanal_api.final_iteration:
+                semanal_api.defer()
             return
 
         populate_manager_from_queryset(new_manager_info, queryset_info)
