@@ -28,7 +28,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         size: Optional[int] = ...,
         *,
         verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[_StrOrPromise] = ...,
+        name: Optional[str] = ...,
         primary_key: bool = ...,
         max_length: Optional[int] = ...,
         unique: bool = ...,
