@@ -470,13 +470,14 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     """
-    Add explicit generics to manager classes that are defined without generic.
+    Add implicit generics to manager classes that are defined without generic.
 
     Eg.
 
         class MyManager(models.Manager): ...
 
-    is interpreted as::
+    is interpreted as:
+
         _T = TypeVar('_T', covariant=True)
         class MyManager(models.Manager[_T]): ...
     """
