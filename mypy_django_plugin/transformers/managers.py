@@ -500,7 +500,7 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     is_missing_params = (
         len(parent_manager.args) == 1
         and isinstance(parent_manager.args[0], AnyType)
-        and parent_manager.args[0].type_of_any is not TypeOfAny.explicit
+        and parent_manager.args[0].type_of_any is TypeOfAny.from_omitted_generics
     )
     if not is_missing_params:
         return
