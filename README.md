@@ -145,9 +145,7 @@ And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` fo
 
 ### My QuerySet methods are returning Any rather than my Model
 
-`QuerySet.as_manager()` is not currently supported.
-
-If you are using `MyQuerySet.as_manager()`, then your `Manager`/`QuerySet` methods will all not be linked to your model.
+If you are using `MyQuerySet.as_manager()`:
 
 Example:
 
@@ -163,12 +161,12 @@ class MyModel(models.Model):
     objects = MyModelQuerySet.as_manager()
 
 
-def use_my_model():
-    foo = MyModel.objects.get(id=1) # This is `Any` but it should be `MyModel`
-    return foo.xyz # No error, but there should be
+def use_my_model() -> int:
+    foo = MyModel.objects.get(id=1) # Should now be `MyModel`
+    return foo.xyz # Gives an error
 ```
 
-There is a workaround: use `Manager.from_queryset` instead.
+Or if you're using `Manager.from_queryset`:
 
 Example:
 
@@ -188,9 +186,9 @@ class MyModel(models.Model):
     objects = MyModelManager()
 
 
-def use_my_model():
-    foo = MyModel.objects.get(id=1)
-    return foo.xyz  # Gives an error
+def use_my_model() -> int:
+    foo = MyModel.objects.get(id=1) # Should now be `MyModel`
+    return foo.xyz # Gives an error
 ```
 
 ### How do I annotate cases where I called QuerySet.annotate?
