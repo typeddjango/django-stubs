@@ -253,9 +253,10 @@ class AddRelatedModelsId(ModelClassInitializer):
                 if related_model_cls._meta.abstract:
                     continue
 
-                rel_primary_key_field = self.django_context.get_primary_key_field(related_model_cls)
+                rel_target_field = self.django_context.get_related_target_field(related_model_cls, field)
+
                 try:
-                    field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_primary_key_field.__class__)
+                    field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_target_field.__class__)
                 except helpers.IncompleteDefnException as exc:
                     if not self.api.final_iteration:
                         raise exc
