@@ -254,6 +254,8 @@ class AddRelatedModelsId(ModelClassInitializer):
                     continue
 
                 rel_target_field = self.django_context.get_related_target_field(related_model_cls, field)
+                if not rel_target_field:
+                    continue
 
                 try:
                     field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_target_field.__class__)
