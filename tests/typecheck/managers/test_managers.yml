@@ -403,8 +403,8 @@
 
 
                 class MyModel(models.Model):
-
                    objects = MyModelManager()
+
 
 -   case: override_manager_create2
     main: |
@@ -562,6 +562,41 @@
         reveal_type(MySubModel.objects.get()) # N: Revealed type is "myapp.models.MySubModel"
     installed_apps:
         - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                T = TypeVar("T", bound="MyModel")
+
+                class MyManager(models.Manager[T]):
+                    pass
+
+                class MySubManager(MyManager):
+                    pass
+
+                class MyModel(models.Model):
+                    pass
+
+                class MySubModel(MyModel):
+                    objects = MySubManager()
+
+-   case: subclass_manager_without_type_parameters_disallow_any_generics
+    main: |
+        from myapp.models import MySubModel
+        reveal_type(MySubModel.objects)
+        reveal_type(MySubModel.objects.get())
+    installed_apps:
+        - myapp
+    mypy_config: |
+        [mypy-myapp.models]
+        disallow_any_generics = true
+    out: |
+        main:2: note: Revealed type is "myapp.models.MySubManager[myapp.models.MySubModel]"
+        main:3: note: Revealed type is "Any"
+        myapp/models:9: error: Missing type parameters for generic type "MyManager"
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
