@@ -61,6 +61,8 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
 class ForeignObject(RelatedField[_ST, _GT]):
     remote_field: ForeignObjectRel
     rel_class: Type[ForeignObjectRel]
+    from_fields: Sequence[str]
+    to_fields: Sequence[str | None]  # None occurs in ForeignKey, where to_field defaults to None
     swappable: bool
     def __init__(
         self,

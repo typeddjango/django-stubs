@@ -38,6 +38,30 @@
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE)
                     owner = models.ForeignKey(db_column='model_id', to='auth.User', on_delete=models.CASCADE)
 
+-   case: foreign_key_field_custom_to_field
+    main: |
+        from myapp.models import Book, Publisher
+        from uuid import UUID
+        book = Book()
+        book.publisher = Publisher()
+        reveal_type(book.publisher_id)  # N: Revealed type is "uuid.UUID"
+        book.publisher_id = '821850bb-c105-426f-b340-3974419d00ca'
+        book.publisher_id = UUID('821850bb-c105-426f-b340-3974419d00ca')
+        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "List[int]", variable has type "Union[str, UUID]")
+        book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "Union[str, UUID]")
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Publisher(models.Model):
+                    id = models.BigAutoField(primary_key=True)
+                    uuid = models.UUIDField(unique=True)
+                class Book(models.Model):
+                    publisher = models.ForeignKey(to=Publisher, to_field='uuid', on_delete=models.CASCADE)
+
 -   case: foreign_key_field_different_order_of_params
     main: |
         from myapp.models import Book, Publisher
