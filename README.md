@@ -1,3 +1,4 @@
+<div align='center'>
 <img src="http://mypy-lang.org/static/mypy_light.svg" alt="mypy logo" width="300px"/>
 
 # pep484 stubs for Django
@@ -7,6 +8,7 @@
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 [![StackOverflow](https://img.shields.io/stackexchange/stackoverflow/t/django-stubs)](https://stackoverflow.com/questions/tagged/django-stubs)
 
+</div>
 
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
 
@@ -68,37 +70,40 @@ We rely on different `django` and `mypy` versions:
 | 0.12.x       | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
 
 
-## FAQ
+# FAQ
 
-### Is this an official Django project?
+### **Question:** Is this an official Django project?
 
-No, it is not. We are independent from Django at the moment.
+**Answer:** No, it is not. We are independent from Django at the moment.
 There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
 You can show your support by liking the PR.
 
-### Is it safe to use this in production?
+##
 
-Yes, it is! This project does not affect your runtime at all.
+### **Question:** Is it safe to use this in production?
+
+**Answer:** Yes, it is! This project does not affect your runtime at all.
 It only affects `mypy` type checking process.
-
 But, it does not make any sense to use this project without `mypy`.
 
-### mypy crashes when I run it with this plugin installed
+##
 
-The current implementation uses Django's runtime to extract information about models, so it might crash if your installed apps or `models.py` are broken.
+### **Question:** mypy crashes when I run it with this plugin installed
 
+**Answer:** The current implementation uses Django's runtime to extract information about models, so it might crash if your installed apps or `models.py` are broken.
 In other words, if your `manage.py runserver` crashes, mypy will crash too.
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
 option to get extra information about the error.
 
-### I cannot use QuerySet or Manager with type annotations
+##
 
-You can get a `TypeError: 'type' object is not subscriptable`
+### **Question:** I cannot use QuerySet or Manager with type annotations
+
+**Answer:** You can get a `TypeError: 'type' object is not subscriptable`
 when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other Django-based Generic types.
-
 This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
 
-1. You can go with our [`django_stubs_ext`](https://github.com/typeddjango/django-stubs/tree/master/django_stubs_ext) helper, that patches all the types we use as Generic in django.
+- You can go with our [`django_stubs_ext`](https://github.com/typeddjango/django-stubs/tree/master/django_stubs_ext) helper, that patches all the types we use as Generic in django.
 
    Install it:
 
@@ -118,11 +123,13 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
    You can add extra types to patch with `django_stubs_ext.monkeypatch(extra_classes=[YourDesiredType])`
 
-2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
+- You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
-### How can I create a HttpRequest that's guaranteed to have an authenticated user?
+##
 
-Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.0/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
+### **Question:** How can I create a HttpRequest that's guaranteed to have an authenticated user?
+
+**Answer:** Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.0/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
 
 ```python
 Union[User, AnonymousUser]
@@ -142,10 +149,11 @@ class AuthenticatedHttpRequest(HttpRequest):
 
 And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
 
+##
 
-### My QuerySet methods are returning Any rather than my Model
+### **Question:** My QuerySet methods are returning Any rather than my Model
 
-If you are using `MyQuerySet.as_manager()`:
+**Answer:** If you are using `MyQuerySet.as_manager()`:
 
 Example:
 
@@ -191,9 +199,11 @@ def use_my_model() -> int:
     return foo.xyz # Gives an error
 ```
 
-### How do I annotate cases where I called QuerySet.annotate?
+##
 
-Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model]`, which indicates that the `Model` has
+### **Question:** How do I annotate cases where I called QuerySet.annotate?
+
+**Answer:** Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model]`, which indicates that the `Model` has
 been annotated, meaning it allows getting/setting extra attributes on the model instance.
 
 Optionally, you can provide a `TypedDict` of these attributes,
@@ -239,6 +249,7 @@ def func2(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
 func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 ```
+##
 
 ## Related projects
 
@@ -258,9 +269,9 @@ If you think you have more generic typing issue, please refer to <https://github
 
 This project is open source and community driven. As such we encourage contributions big and small. You can contribute by doing any of the following:
 
-1. Contribute code (e.g. improve stubs, add plugin capabilities, write tests etc) - to do so please follow the [contribution guide](./CONTRIBUTING.md).
-2. Assist in code reviews and discussions in issues.
-3. Identify bugs and issues and report these
-4. Ask and answer questions on [StackOverflow](https://stackoverflow.com/questions/tagged/django-stubs)
+- Contribute code (e.g. improve stubs, add plugin capabilities, write tests etc) - to do so please follow the [contribution guide](./CONTRIBUTING.md).
+- Assist in code reviews and discussions in issues.
+- Identify bugs and issues and report these
+- Ask and answer questions on [StackOverflow](https://stackoverflow.com/questions/tagged/django-stubs)
 
 You can always also reach out in gitter to discuss your contributions!
