@@ -516,6 +516,7 @@ class DateTimeField(DateField[_ST, _GT]):
 class UUIDField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, uuid.UUID]
     _pyi_private_get_type: uuid.UUID
+    _pyi_lookup_exact_type: Union[uuid.UUID, str]
     def __init__(
         self,
         verbose_name: Optional[_StrOrPromise] = ...,
