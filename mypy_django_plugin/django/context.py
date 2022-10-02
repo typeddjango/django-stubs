@@ -124,19 +124,27 @@ class DjangoContext:
                 yield field
 
     def get_field_lookup_exact_type(
-        self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel]
+        self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel], using_field_id: bool
     ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
             related_model_cls = field.related_model
-            primary_key_field = self.get_primary_key_field(related_model_cls)
-            primary_key_type = self.get_field_get_type(api, primary_key_field, method="init")
+            rel_target_field = self.get_related_target_field(related_model_cls, field)
+            if not rel_target_field:
+                return AnyType(TypeOfAny.explicit)
+
+            field_info = helpers.lookup_class_typeinfo(api, rel_target_field.__class__)
+            rel_target_type = helpers.get_private_descriptor_type(
+                field_info, "_pyi_lookup_exact_type", is_nullable=field.null
+            )
+            if using_field_id:
+                return rel_target_type
 
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
             if rel_model_info is None:
                 return AnyType(TypeOfAny.explicit)
 
-            model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
-            return helpers.make_optional(model_and_primary_key_type)
+            model_and_target_field_type = UnionType.make_union([Instance(rel_model_info, []), rel_target_type])
+            return helpers.make_optional(model_and_target_field_type)
 
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
@@ -144,18 +152,19 @@ class DjangoContext:
         return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
     def get_related_target_field(
-        self, related_model_cls: Type[Model], field: "ForeignKey[Any, Any]"
+        self, related_model_cls: Type[Model], field: "Union[RelatedField, ForeignObjectRel]"
     ) -> "Optional[Field[Any, Any]]":
-        # ForeginKey only supports one `to_fields` item (ForeignObject supports many)
-        assert len(field.to_fields) == 1
-        to_field_name = field.to_fields[0]
-        if to_field_name:
-            rel_field = related_model_cls._meta.get_field(to_field_name)
-            if not isinstance(rel_field, Field):
-                return None  # Not supported
-            return rel_field
-        else:
-            return self.get_primary_key_field(related_model_cls)
+        if isinstance(field, ForeignKey):
+            # ForeginKey only supports one `to_fields` item (ForeignObject supports many)
+            assert len(field.to_fields) == 1
+            to_field_name = field.to_fields[0]
+            if to_field_name:
+                rel_field = related_model_cls._meta.get_field(to_field_name)
+                if not isinstance(rel_field, Field):
+                    return None  # Not supported
+                return rel_field
+
+        return self.get_primary_key_field(related_model_cls)
 
     def get_primary_key_field(self, model_cls: Type[Model]) -> "Field[Any, Any]":
         for field in model_cls._meta.get_fields():
@@ -350,27 +359,24 @@ class DjangoContext:
 
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: Type[Model]
-    ) -> Union["Field[Any, Any]", ForeignObjectRel]:
+    ) -> Tuple[Union["Field[Any, Any]", ForeignObjectRel], bool]:
         currently_observed_model = model_cls
         field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
+        using_field_id = False
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
                 continue
 
             field = currently_observed_model._meta.get_field(field_part)
-            if isinstance(field, RelatedField):
+            if isinstance(field, (RelatedField, ForeignObjectRel)):
                 currently_observed_model = field.related_model
-                model_name = currently_observed_model._meta.model_name
-                if model_name is not None and field_part == (model_name + "_id"):
-                    field = self.get_primary_key_field(currently_observed_model)
-
-            if isinstance(field, ForeignObjectRel):
-                currently_observed_model = field.related_model
+                if field_part == field.name + "_id":
+                    using_field_id = True
 
         # Guaranteed by `query.solve_lookup_type` before.
         assert isinstance(field, (Field, ForeignObjectRel))
-        return field
+        return field, using_field_id
 
     def resolve_lookup_into_field(
         self, model_cls: Type[Model], lookup: str
@@ -380,7 +386,8 @@ class DjangoContext:
 
         if lookup_parts:
             raise LookupsAreUnsupported()
-        return self._resolve_field_from_parts(field_parts, model_cls)
+        field, _ = self._resolve_field_from_parts(field_parts, model_cls)
+        return field
 
     def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
         query = Query(model_cls)
@@ -392,7 +399,7 @@ class DjangoContext:
             ctx.api.fail(exc.args[0], ctx.context)
             return AnyType(TypeOfAny.from_error)
 
-        field = self._resolve_field_from_parts(field_parts, model_cls)
+        field, using_field_id = self._resolve_field_from_parts(field_parts, model_cls)
 
         lookup_cls = None
         if lookup_parts:
@@ -403,7 +410,7 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
         if lookup_cls is None or isinstance(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, using_field_id)
 
         assert lookup_cls is not None
 

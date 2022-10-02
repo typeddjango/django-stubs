@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Sequence, Type
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
-from django.db.models.fields.related import RelatedField
+from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
@@ -58,13 +58,13 @@ def get_field_type_from_lookup(
     except LookupsAreUnsupported:
         return AnyType(TypeOfAny.explicit)
 
-    if (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
-        lookup_field, ForeignObjectRel
-    ):
+    if isinstance(lookup_field, (RelatedField, ForeignObjectRel)):
         related_model_cls = django_context.get_field_related_model_cls(lookup_field)
         if related_model_cls is None:
             return AnyType(TypeOfAny.from_error)
-        lookup_field = django_context.get_primary_key_field(related_model_cls)
+        lookup_field = django_context.get_related_target_field(related_model_cls, lookup_field)
+        if not lookup_field:
+            return None
 
     field_get_type = django_context.get_field_get_type(helpers.get_typechecker_api(ctx), lookup_field, method=method)
     return field_get_type

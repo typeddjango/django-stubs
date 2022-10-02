@@ -128,7 +128,7 @@
         Blog.objects.filter(publisher__id=1)
 
         Blog.objects.filter(publisher=blog)  # E: Incompatible type for lookup 'publisher': (got "Blog", expected "Union[Publisher, int, None]")
-        Blog.objects.filter(publisher_id=blog)  # E: Incompatible type for lookup 'publisher_id': (got "Blog", expected "Union[str, int]")
+        Blog.objects.filter(publisher_id=blog)  # E: Incompatible type for lookup 'publisher_id': (got "Blog", expected "Union[Publisher, int, None]")
     installed_apps:
         - myapp
     files:
