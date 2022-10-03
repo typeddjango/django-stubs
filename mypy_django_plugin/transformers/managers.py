@@ -480,6 +480,9 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
 
         _T = TypeVar('_T', covariant=True)
         class MyManager(models.Manager[_T]): ...
+
+    Note that this does not happen if mypy is run with disallow_any_generics = True,
+    as not specifying the generic type is then considered an error.
     """
 
     manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
