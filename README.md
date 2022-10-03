@@ -191,6 +191,36 @@ def use_my_model() -> int:
     return foo.xyz # Gives an error
 ```
 
+### Why am I getting incompatible return type errors on my custom managers?
+
+If you declare your custom managers without generics and override built-in
+methods you might see an error message about incompatible error messages,
+something like this:
+
+```python
+from django.db import models
+
+class MyManager(model.Manager):
+    def create(self, **kwargs) -> "MyModel":
+        pass
+```
+
+will cause this error message:
+
+```
+error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
+```
+
+This is happening because the `Manager` class is generic, but without
+specifying generics the built-in manager methods are expected to return the
+generic type of the base manager, which is any model. To fix this issue you
+should declare your manager with your model as the type variable:
+
+```python
+class MyManager(models.Manager["MyModel"]):
+    ...
+```
+
 ### How do I annotate cases where I called QuerySet.annotate?
 
 Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model]`, which indicates that the `Model` has

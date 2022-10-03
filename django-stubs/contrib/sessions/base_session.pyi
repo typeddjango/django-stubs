@@ -1,12 +1,14 @@
 from datetime import datetime
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional, Type, TypeVar
 
 from django.contrib.sessions.backends.base import SessionBase
 from django.db import models
 
-class BaseSessionManager(models.Manager):
+_T = TypeVar("_T", bound="AbstractBaseSession")
+
+class BaseSessionManager(models.Manager[_T]):
     def encode(self, session_dict: Dict[str, int]) -> str: ...
-    def save(self, session_key: str, session_dict: Dict[str, int], expire_date: datetime) -> AbstractBaseSession: ...
+    def save(self, session_key: str, session_dict: Dict[str, int], expire_date: datetime) -> _T: ...
 
 class AbstractBaseSession(models.Model):
     expire_date: datetime

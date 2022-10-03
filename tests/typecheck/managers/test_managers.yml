@@ -332,14 +332,14 @@
 -   case: custom_manager_returns_proper_model_types
     main: |
         from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is "myapp.models.User_MyManager[myapp.models.User]"
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
         reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
         reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
         reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
-        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.ChildUser_MyManager[myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
         reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
@@ -364,7 +364,7 @@
 -   case: custom_manager_annotate_method_before_type_declaration
     main: |
         from myapp.models import ModelA, ModelB, ManagerA
-        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ModelA_ManagerA1[myapp.models.ModelA]"
+        reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ManagerA[myapp.models.ModelA]"
         reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
     installed_apps:
         - myapp
@@ -386,9 +386,11 @@
 -   case: override_manager_create1
     main: |
         from myapp.models import MyModel
-        MyModel.objects.create()
     installed_apps:
         - myapp
+    out: |
+        myapp/models:4: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
+        myapp/models:5: error: Incompatible return value type (got "_T", expected "MyModel")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -401,8 +403,8 @@
 
 
                 class MyModel(models.Model):
-
                    objects = MyModelManager()
+
 
 -   case: override_manager_create2
     main: |
@@ -427,7 +429,7 @@
 -   case: regression_manager_scope_foreign
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.on_site)  # N: Revealed type is "myapp.models.MyModel_CurrentSiteManager[myapp.models.MyModel]"
+        reveal_type(MyModel.on_site)  # N: Revealed type is "django.contrib.sites.managers.CurrentSiteManager[myapp.models.MyModel]"
     installed_apps:
         - myapp
         - django.contrib.sites
@@ -552,3 +554,66 @@
         myapp/models:66: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:67: note: Revealed type is "Any"
         myapp/models:68: note: Revealed type is "Union[myapp.models.Booking, None]"
+
+-   case: subclass_manager_without_type_parameters
+    main: |
+        from myapp.models import MySubModel
+        reveal_type(MySubModel.objects) # N: Revealed type is "myapp.models.MySubManager[myapp.models.MySubModel]"
+        reveal_type(MySubModel.objects.get()) # N: Revealed type is "myapp.models.MySubModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                T = TypeVar("T", bound="MyModel")
+
+                class MyManager(models.Manager[T]):
+                    pass
+
+                class MySubManager(MyManager):
+                    pass
+
+                class MyModel(models.Model):
+                    pass
+
+                class MySubModel(MyModel):
+                    objects = MySubManager()
+
+-   case: subclass_manager_without_type_parameters_disallow_any_generics
+    main: |
+        from myapp.models import MySubModel
+        reveal_type(MySubModel.objects)
+        reveal_type(MySubModel.objects.get())
+    installed_apps:
+        - myapp
+    mypy_config: |
+        [mypy-myapp.models]
+        disallow_any_generics = true
+    out: |
+        main:2: note: Revealed type is "myapp.models.MySubManager[myapp.models.MySubModel]"
+        main:3: note: Revealed type is "Any"
+        myapp/models:9: error: Missing type parameters for generic type "MyManager"
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                T = TypeVar("T", bound="MyModel")
+
+                class MyManager(models.Manager[T]):
+                    pass
+
+                class MySubManager(MyManager):
+                    pass
+
+                class MyModel(models.Model):
+                    pass
+
+                class MySubModel(MyModel):
+                    objects = MySubManager()

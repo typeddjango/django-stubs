@@ -15,7 +15,7 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugin import AttributeContext, DynamicClassDefContext
+from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.types import AnyType, CallableType, Instance, ProperType
@@ -466,3 +466,59 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
         # Note that the generated manager type is always inserted at module level
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
     )
+
+
+def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
+    """
+    Add implicit generics to manager classes that are defined without generic.
+
+    Eg.
+
+        class MyManager(models.Manager): ...
+
+    is interpreted as:
+
+        _T = TypeVar('_T', covariant=True)
+        class MyManager(models.Manager[_T]): ...
+
+    Note that this does not happen if mypy is run with disallow_any_generics = True,
+    as not specifying the generic type is then considered an error.
+    """
+
+    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if manager is None or manager.node is None:
+        return
+    assert isinstance(manager.node, TypeInfo)
+
+    if manager.node.type_vars:
+        # We've already been here
+        return
+
+    parent_manager = next(
+        (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
+        None,
+    )
+    if parent_manager is None:
+        return
+
+    is_missing_params = (
+        len(parent_manager.args) == 1
+        and isinstance(parent_manager.args[0], AnyType)
+        and parent_manager.args[0].type_of_any is TypeOfAny.from_omitted_generics
+    )
+    if not is_missing_params:
+        return
+
+    type_vars = tuple(parent_manager.type.defn.type_vars)
+
+    # If we end up with placeholders we need to defer so the placeholders are
+    # resolved in a future iteration
+    if any(has_placeholder(type_var) for type_var in type_vars):
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+        else:
+            return
+
+    parent_manager.args = type_vars
+    manager.node.defn.type_vars = list(type_vars)
+    manager.node.add_type_vars()
