@@ -2,6 +2,7 @@ from .comparison import Cast as Cast
 from .comparison import Coalesce as Coalesce
 from .comparison import Collate as Collate
 from .comparison import Greatest as Greatest
+from .comparison import JSONObject as JSONObject
 from .comparison import Least as Least
 from .comparison import NullIf as NullIf
 from .datetime import Extract as Extract
