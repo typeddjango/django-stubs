@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Type
+from typing import Any, Dict, Iterable, List, Optional, Type
 
 from django.apps import AppConfig
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -24,7 +24,10 @@ class DatabaseErrorWrapper:
     def __init__(self, wrapper: Any) -> None: ...
     def __enter__(self) -> None: ...
     def __exit__(
-        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: TracebackType
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
     ) -> None: ...
 
 def load_backend(backend_name: str) -> Any: ...

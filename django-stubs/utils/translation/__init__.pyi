@@ -1,6 +1,6 @@
 import functools
-import types
 from contextlib import ContextDecorator
+from types import TracebackType
 from typing import Any, Callable, Optional, Type, Union
 
 from django.http.request import HttpRequest
@@ -60,7 +60,7 @@ class override(ContextDecorator):
         self,
         exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
-        traceback: Optional[types.TracebackType],
+        exc_tb: Optional[TracebackType],
     ) -> None: ...
 
 def get_language() -> str: ...

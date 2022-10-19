@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from types import TracebackType
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Type, TypeVar, Union
 
 from django.http.request import HttpRequest
@@ -16,7 +17,12 @@ class ContextDict(dict):
     context: BaseContext = ...
     def __init__(self, context: BaseContext, *args: Any, **kwargs: Any) -> None: ...
     def __enter__(self) -> ContextDict: ...
-    def __exit__(self, *args: Any, **kwargs: Any) -> None: ...
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None: ...
 
 class BaseContext(Iterable[Any]):
     def __init__(self, dict_: Any = ...) -> None: ...

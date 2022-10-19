@@ -1,4 +1,3 @@
-import types
 from contextlib import ContextDecorator
 from datetime import date
 from datetime import datetime as datetime
@@ -6,6 +5,7 @@ from datetime import time
 from datetime import timedelta as timedelta
 from datetime import timezone
 from datetime import tzinfo as tzinfo
+from types import TracebackType
 from typing import Any, Optional, Type, Union, overload
 
 import pytz
@@ -38,7 +38,7 @@ class override(ContextDecorator):
         self,
         exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
-        traceback: Optional[types.TracebackType],
+        exc_tb: Optional[TracebackType],
     ) -> None: ...
 
 def localtime(value: Optional[datetime] = ..., timezone: Optional[_TzInfoT] = ...) -> datetime: ...
