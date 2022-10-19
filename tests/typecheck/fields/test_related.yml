@@ -908,3 +908,23 @@
         from django.db import models
         T = TypeVar("T", bound=models.Model)
         ManyToManyFieldAlias = Union["models.ManyToManyField[Sequence[T], models.manager.RelatedManager[T]]"]
+
+-   case: callable_reverse_manager
+    main: |
+        from myapp.models import SalesMan
+        sales_man = SalesMan()
+        reveal_type(sales_man.client) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.CustomUser]"
+        reveal_type(sales_man.client(manager="staffs")) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.CustomUser]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class CustomUser(models.Model):
+                    staffs = models.Manager()
+
+                class SalesMan(models.Model):
+                    client = models.ManyToManyField(CustomUser)
