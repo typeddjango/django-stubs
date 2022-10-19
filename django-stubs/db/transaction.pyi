@@ -1,4 +1,4 @@
-from contextlib import ContextDecorator, contextmanager
+from contextlib import contextmanager
 from types import TracebackType
 from typing import Any, Callable, Iterator, Optional, Type, TypeVar, overload
 
@@ -35,7 +35,7 @@ class Atomic:
         self,
         exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_tb: Optional[TracebackType],
     ) -> None: ...
 
 # Bare decorator

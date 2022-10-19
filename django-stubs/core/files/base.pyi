@@ -1,5 +1,4 @@
-import os
-import types
+from types import TracebackType
 from typing import IO, AnyStr, Iterator, Optional, Type, TypeVar, Union, type_check_only
 
 from django.core.files.utils import FileProxyMixin
@@ -26,7 +25,7 @@ class File(FileProxyMixin[AnyStr], IO[AnyStr]):
         self,
         exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
-        tb: Optional[types.TracebackType],
+        exc_tb: Optional[TracebackType],
     ) -> None: ...
     def open(self: _T, mode: Optional[str] = ...) -> _T: ...
     def close(self) -> None: ...

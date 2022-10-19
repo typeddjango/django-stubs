@@ -1,8 +1,8 @@
 import datetime
-import types
 from contextlib import contextmanager
 from decimal import Decimal
 from logging import Logger
+from types import TracebackType
 from typing import (
     Any,
     Dict,
@@ -48,9 +48,9 @@ class CursorWrapper:
     def __enter__(self) -> CursorWrapper: ...
     def __exit__(
         self,
-        type: Optional[Type[BaseException]],
-        value: Optional[BaseException],
-        traceback: Optional[types.TracebackType],
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
     ) -> None: ...
     def callproc(
         self, procname: str, params: Optional[Sequence[Any]] = ..., kparams: Optional[Dict[str, int]] = ...
