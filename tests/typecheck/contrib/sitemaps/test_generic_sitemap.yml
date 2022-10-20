@@ -1,0 +1,49 @@
+-   case: test_items_custom_model
+    main: |
+        from django.contrib.sitemaps import Sitemap
+        from django.db.models import QuerySet
+        from django.urls import reverse
+        from myapp.models import Offer
+
+        class OfferSitemap(Sitemap):
+            priority = 1
+            changefreq = "always"
+
+            def items(self) -> QuerySet[Offer]:
+                return Offer.objects.all()
+
+            def location(self, item: Offer) -> str:
+                return reverse(
+                    "myapp:detail-offer",
+                    kwargs={
+                        "provider_name": item.provider,
+                        "offer_name": item.trc, # E: "Offer" has no attribute "trc"
+                    },
+                )
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Offer(models.Model):
+                    provider = models.ForeignKey("self", on_delete=models.CASCADE)
+                    url_name = models.CharField()
+
+-   case: test_items_string_sequence
+    main: |
+        from django.contrib.sitemaps import Sitemap
+        from typing import List
+        from django.urls import reverse
+
+        class StaticViewSitemap(Sitemap):
+            priority = 1
+            changefreq = "always"
+
+            def items(self) -> List[str]:
+                return ["home", "about", "contact", "recommendations", "privacy-policy", "blog"]
+
+            def location(self, item: str) -> str:
+                return reverse(item)
