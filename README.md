@@ -270,6 +270,32 @@ func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 ```
 
+### How do I check if something is an instance of QuerySet in runtime?
+
+A limitation of making `QuerySet` generic is that you can not use
+it for `isinstance` checks.
+
+```python
+from django.db.models.query import QuerySet
+
+def foo(obj: object) -> None:
+    if isinstance(obj, QuerySet): # Error: Parameterized generics cannot be used with class or instance checks
+        ...
+```
+
+To get around with this issue without making `QuerySet` non-generic,
+Django-stubs provides `django_stubs_ext.QuerySetAny`, a non-generic
+variant of `QuerySet` suitable for runtime type checking:
+
+```python
+from django_stubs_ext import QuerySetAny
+
+def foo(obj: object) -> None:
+    if isinstance(obj, QuerySetAny):  # OK
+        ...
+```
+
+
 ## Related projects
 
 - [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
