@@ -1,8 +1,9 @@
 -   case: test_items_custom_model
     main: |
-        from django.contrib.sitemaps import Sitemap
+        from django.contrib.sitemaps import GenericSitemap, Sitemap
+        from django.contrib.sitemaps.views import sitemap
         from django.db.models import QuerySet
-        from django.urls import reverse
+        from django.urls import path, reverse
         from myapp.models import Offer
 
         class OfferSitemap(Sitemap[Offer]):
@@ -26,12 +27,29 @@
                 return "Yes"
             def location(self, item: str) -> int:
                 return 1
+
+        info_dict = {"queryset": Offer.objects.all()}
+        broken_info_dict = {"queryset": [1, 2]}
+
+        urlpatterns = [
+            path(
+                'sitemap.xml', sitemap,
+                {'sitemaps': {'offers': GenericSitemap[Offer](info_dict, priority=0.6)}},
+                name='django.contrib.sitemaps.views.sitemap'
+            ),
+            path(
+                'broken_sitemap.xml', sitemap,
+                {'sitemaps': {'offers': GenericSitemap[Offer](broken_info_dict, priority=0.6)}},
+                name='django.contrib.sitemaps.views.broken_sitemap'
+            ),
+        ]
     out: |
-        main:23: error: Return type "str" of "items" incompatible with return type "Iterable[Offer]" in supertype "Sitemap"
-        main:25: error: Argument 1 of "location" is incompatible with supertype "Sitemap"; supertype defines the argument type as "Offer"
-        main:25: note: This violates the Liskov substitution principle
-        main:25: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
-        main:25: error: Return type "int" of "location" incompatible with return type "str" in supertype "Sitemap"
+        main:24: error: Return type "str" of "items" incompatible with return type "Iterable[Offer]" in supertype "Sitemap"
+        main:26: error: Argument 1 of "location" is incompatible with supertype "Sitemap"; supertype defines the argument type as "Offer"
+        main:26: note: This violates the Liskov substitution principle
+        main:26: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
+        main:26: error: Return type "int" of "location" incompatible with return type "str" in supertype "Sitemap"
+        main:40: error: Argument 1 to "GenericSitemap" has incompatible type "Dict[str, List[int]]"; expected "Mapping[str, Union[datetime, _QuerySet[Offer, Offer], str]]"
 
     installed_apps:
         - myapp
