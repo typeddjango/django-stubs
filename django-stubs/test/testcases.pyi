@@ -5,6 +5,7 @@ from types import TracebackType
 from typing import (
     Any,
     Callable,
+    Collection,
     Dict,
     Iterable,
     Iterator,
@@ -200,8 +201,8 @@ class TransactionTestCase(SimpleTestCase):
     def assertQuerysetEqual(
         self,
         qs: Union[Iterator[Any], List[Model], QuerySet, RawQuerySet],
-        values: Union[List[None], List[Tuple[str, str]], List[date], List[int], List[str], Set[str], QuerySet],
-        transform: Union[Callable, Type[str]] = ...,
+        values: Collection[Any],
+        transform: Union[Callable[[Model], Any], Type[str]] = ...,
         ordered: bool = ...,
         msg: Optional[str] = ...,
     ) -> None: ...
