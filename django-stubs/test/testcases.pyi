@@ -7,6 +7,7 @@ from typing import (
     Callable,
     Collection,
     Dict,
+    Generator,
     Iterable,
     Iterator,
     List,
@@ -216,7 +217,11 @@ class TransactionTestCase(SimpleTestCase):
 class TestCase(TransactionTestCase):
     @classmethod
     def setUpTestData(cls) -> None: ...
-    def captureOnCommitCallbacks(cls, *, using: Optional[str] = ..., execute: bool = ...): ...
+    @classmethod
+    @contextmanager
+    def captureOnCommitCallbacks(
+        cls, *, using: Optional[str] = ..., execute: bool = ...
+    ) -> Generator[Sequence[Callable[[], ...]], None, None]: ...
 
 class CheckCondition:
     conditions: Sequence[Tuple[Callable, str]] = ...
