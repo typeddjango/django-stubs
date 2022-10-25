@@ -1,5 +1,6 @@
 import threading
 import unittest
+from contextlib import contextmanager
 from datetime import date
 from types import TracebackType
 from typing import (
@@ -7,6 +8,7 @@ from typing import (
     Callable,
     Collection,
     Dict,
+    Generator,
     Iterable,
     Iterator,
     List,
@@ -216,7 +218,11 @@ class TransactionTestCase(SimpleTestCase):
 class TestCase(TransactionTestCase):
     @classmethod
     def setUpTestData(cls) -> None: ...
-    def captureOnCommitCallbacks(cls, *, using: Optional[str] = ..., execute: bool = ...): ...
+    @classmethod
+    @contextmanager
+    def captureOnCommitCallbacks(
+        cls, *, using: str = ..., execute: bool = ...
+    ) -> Generator[List[Callable[[], Any]], None, None]: ...
 
 class CheckCondition:
     conditions: Sequence[Tuple[Callable, str]] = ...
