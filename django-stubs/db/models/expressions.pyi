@@ -118,8 +118,21 @@ class F(Combinable):
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> F: ...
-    def asc(self, **kwargs) -> OrderBy: ...
-    def desc(self, **kwargs) -> OrderBy: ...
+    def asc(
+        self,
+        *,
+        expression: Union[Expression, F, Subquery],
+        descending: bool = ...,
+        nulls_first: bool = ...,
+        nulls_last: bool = ...,
+    ) -> OrderBy: ...
+    def desc(
+        self,
+        *,
+        expression: Union[Expression, F, Subquery],
+        nulls_first: bool = ...,
+        nulls_last: bool = ...,
+    ) -> OrderBy: ...
     def deconstruct(self) -> Any: ...  # fake
 
 class ResolvedOuterRef(F): ...

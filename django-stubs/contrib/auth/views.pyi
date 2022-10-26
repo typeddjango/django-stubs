@@ -1,4 +1,4 @@
-from typing import Any, Optional, Set
+from typing import Any, Dict, Optional, Set
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import AuthenticationForm
@@ -35,7 +35,7 @@ def redirect_to_login(
 
 class PasswordContextMixin:
     extra_context: Any = ...
-    def get_context_data(self, **kwargs: Any): ...
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]: ...
 
 class PasswordResetView(PasswordContextMixin, FormView):
     email_template_name: str = ...

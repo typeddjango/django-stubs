@@ -2,6 +2,7 @@ from typing import Any, Optional, Set, TypeVar, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.http.request import HttpRequest
 
@@ -33,7 +34,7 @@ class ModelBackend(BaseBackend):
         is_active: bool = ...,
         include_superusers: bool = ...,
         obj: Optional[Model] = ...,
-    ): ...
+    ) -> QuerySet[AbstractBaseUser]: ...
 
 class AllowAllUsersModelBackend(ModelBackend): ...
 

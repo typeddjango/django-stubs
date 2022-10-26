@@ -1,11 +1,13 @@
 from collections import namedtuple
-from typing import Iterator, Optional, Tuple, Union
+from typing import Iterator, Optional, Tuple, Type, Union
 
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models import Field
+from django.db.models import Field, Model
 from typing_extensions import Literal
 
-def resolve_relation(model, app_label: Optional[str] = ..., model_name: Optional[str] = ...) -> Tuple[str, str]: ...
+def resolve_relation(
+    model: Union[str, Type[Model]], app_label: Optional[str] = ..., model_name: Optional[str] = ...
+) -> Tuple[str, str]: ...
 
 FieldReference = namedtuple("FieldReference", ["to", "through"])
 
