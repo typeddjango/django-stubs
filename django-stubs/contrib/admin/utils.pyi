@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypedDict, Union, overload
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, Union, overload
 from uuid import UUID
 
 from django.contrib.admin.options import BaseModelAdmin
@@ -14,7 +14,8 @@ from django.forms.forms import BaseForm
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
-from typing_extensions import Literal
+from typing_extensions import Literal, TypedDict
+
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 
