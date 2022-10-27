@@ -57,14 +57,6 @@ class ExceptionReporter:
     def get_exception_traceback_frames(
         self, exc_value: Optional[BaseException], tb: Optional[TracebackType]
     ) -> Iterator[Dict[str, Any]]: ...
-    def _get_lines_from_file(
-        self,
-        filename: str,
-        lineno: int,
-        context_lines: int,
-        loader: Optional[SourceLoader] = ...,
-        module_name: Optional[str] = ...,
-    ): ...
 
 def technical_404_response(request: HttpRequest, exception: Http404) -> HttpResponse: ...
 def default_urlconf(request: Optional[HttpResponse]) -> HttpResponse: ...
