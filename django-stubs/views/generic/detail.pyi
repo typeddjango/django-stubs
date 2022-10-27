@@ -20,6 +20,7 @@ class SingleObjectMixin(Generic[_M], ContextMixin):
     def get_context_object_name(self, obj: _M) -> Optional[str]: ...
 
 class BaseDetailView(SingleObjectMixin[_M], View):
+    object: _M
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
 
 class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
