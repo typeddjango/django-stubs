@@ -52,7 +52,7 @@ class UserManager(BaseUserManager[_T]):
         include_superusers: bool = ...,
         backend: Optional[str] = ...,
         obj: Optional[Model] = ...,
-    ) -> QuerySet[AbstractBaseUser]: ...
+    ) -> QuerySet[_T]: ...
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()

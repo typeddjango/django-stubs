@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, Union, overload
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypedDict, Union, overload
 from uuid import UUID
 
 from django.contrib.admin.options import BaseModelAdmin
@@ -45,7 +45,11 @@ class NestedObjects(Collector):
     def nested(self, format_callback: Callable = ...) -> List[Any]: ...
     def can_fast_delete(self, *args: Any, **kwargs: Any) -> bool: ...
 
-def model_format_dict(obj: Union[Model, Type[Model], QuerySet, Options[Model]]) -> Dict[str, str]: ...
+class ModelFormatDict(TypedDict):
+    verbose_name: str
+    verbose_name_plural: str
+
+def model_format_dict(obj: Union[Model, Type[Model], QuerySet, Options[Model]]) -> ModelFormatDict: ...
 def model_ngettext(obj: Union[Options, QuerySet], n: Optional[int] = ...) -> str: ...
 def lookup_field(
     name: Union[Callable, str], obj: Model, model_admin: Optional[BaseModelAdmin] = ...
