@@ -16,7 +16,6 @@ from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
 from typing_extensions import Literal, TypedDict
 
-
 class FieldIsAForeignKeyColumnName(Exception): ...
 
 def lookup_needs_distinct(opts: Options, lookup_path: str) -> bool: ...
