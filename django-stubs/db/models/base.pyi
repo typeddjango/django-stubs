@@ -1,4 +1,4 @@
-from typing import Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar
+from typing import Any, Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Type, TypeVar, Union
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
@@ -65,3 +65,5 @@ class Model(metaclass=ModelBase):
     @classmethod
     def check(cls, **kwargs: Any) -> List[CheckMessage]: ...
     def __getstate__(self) -> dict: ...
+
+def model_unpickle(model_id: Union[Tuple[str, str], type[Model]]) -> Model: ...
