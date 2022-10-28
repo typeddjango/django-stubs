@@ -121,7 +121,6 @@ class F(Combinable):
     def asc(
         self,
         *,
-        expression: Union[Expression, F, Subquery],
         descending: bool = ...,
         nulls_first: bool = ...,
         nulls_last: bool = ...,
@@ -129,7 +128,6 @@ class F(Combinable):
     def desc(
         self,
         *,
-        expression: Union[Expression, F, Subquery],
         nulls_first: bool = ...,
         nulls_last: bool = ...,
     ) -> OrderBy: ...
