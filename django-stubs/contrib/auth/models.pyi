@@ -5,6 +5,7 @@ from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 from typing_extensions import Literal
@@ -51,7 +52,7 @@ class UserManager(BaseUserManager[_T]):
         include_superusers: bool = ...,
         backend: Optional[str] = ...,
         obj: Optional[Model] = ...,
-    ): ...
+    ) -> QuerySet[_T]: ...
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()

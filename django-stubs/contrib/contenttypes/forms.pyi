@@ -1,8 +1,12 @@
-from typing import Any, Optional
+from typing import Any, Optional, Type, TypeVar
 
-from django.forms.models import BaseModelFormSet
+from django.db.models import Model
+from django.forms.models import BaseModelFormSet, ModelForm
 
-class BaseGenericInlineFormSet(BaseModelFormSet):
+_M = TypeVar("_M", bound=Model)
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
+
+class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
     instance: Any = ...
     rel_name: Any = ...
     save_as_new: Any = ...
@@ -16,14 +20,14 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
         queryset: Optional[Any] = ...,
         **kwargs: Any
     ) -> None: ...
-    def initial_form_count(self): ...
+    def initial_form_count(self) -> int: ...
     @classmethod
-    def get_default_prefix(cls): ...
-    def save_new(self, form: Any, commit: bool = ...): ...
+    def get_default_prefix(cls) -> str: ...
+    def save_new(self, form: Any, commit: bool = ...) -> _M: ...
 
 def generic_inlineformset_factory(
-    model: Any,
-    form: Any = ...,
+    model: Type[_M],
+    form: Type[_ModelFormT] = ...,
     formset: Any = ...,
     ct_field: str = ...,
     fk_field: str = ...,
@@ -40,4 +44,4 @@ def generic_inlineformset_factory(
     validate_min: bool = ...,
     absolute_max: Optional[int] = ...,
     can_delete_extra: bool = ...,
-): ...
+) -> Type[BaseGenericInlineFormSet[_M, _ModelFormT]]: ...

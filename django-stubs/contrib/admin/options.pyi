@@ -34,7 +34,13 @@ from django.forms.fields import Field as FormField
 from django.forms.fields import TypedChoiceField
 from django.forms.forms import BaseForm
 from django.forms.formsets import BaseFormSet
-from django.forms.models import BaseInlineFormSet, ModelChoiceField, ModelMultipleChoiceField
+from django.forms.models import (
+    BaseInlineFormSet,
+    BaseModelFormSet,
+    ModelChoiceField,
+    ModelForm,
+    ModelMultipleChoiceField,
+)
 from django.forms.widgets import Media
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -191,8 +197,10 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def get_object(
         self, request: HttpRequest, object_id: str, from_field: Optional[str] = ...
     ) -> Optional[_ModelT]: ...
-    def get_changelist_form(self, request: Any, **kwargs: Any): ...
-    def get_changelist_formset(self, request: Any, **kwargs: Any): ...
+    def get_changelist_form(self, request: Any, **kwargs: Any) -> Type[ModelForm[_ModelT]]: ...
+    def get_changelist_formset(
+        self, request: Any, **kwargs: Any
+    ) -> Type[BaseModelFormSet[_ModelT, ModelForm[_ModelT]]]: ...
     def get_formsets_with_inlines(self, request: HttpRequest, obj: Optional[_ModelT] = ...) -> Iterator[Any]: ...
     def get_paginator(
         self,

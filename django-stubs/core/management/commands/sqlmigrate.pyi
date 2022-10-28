@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from django.apps import apps as apps
 from django.core.management.base import BaseCommand as BaseCommand
@@ -10,4 +10,4 @@ from django.db.migrations.loader import MigrationLoader as MigrationLoader
 
 class Command(BaseCommand):
     output_transaction: bool = ...
-    def execute(self, *args: Any, **options: Any): ...
+    def execute(self, *args: Any, **options: Any) -> Optional[str]: ...
