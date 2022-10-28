@@ -90,8 +90,19 @@ class BaseExpression:
     def copy(self: _SelfB) -> _SelfB: ...
     def get_group_by_cols(self: _SelfB, alias: Optional[str] = ...) -> List[_SelfB]: ...
     def get_source_fields(self) -> List[Optional[Field]]: ...
-    def asc(self, **kwargs: Any) -> OrderBy: ...
-    def desc(self, **kwargs: Any) -> OrderBy: ...
+    def asc(
+        self,
+        *,
+        descending: bool = ...,
+        nulls_first: bool = ...,
+        nulls_last: bool = ...,
+    ) -> OrderBy: ...
+    def desc(
+        self,
+        *,
+        nulls_first: bool = ...,
+        nulls_last: bool = ...,
+    ) -> OrderBy: ...
     def reverse_ordering(self) -> BaseExpression: ...
     def flatten(self) -> Iterator[BaseExpression]: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
@@ -121,7 +132,6 @@ class F(Combinable):
     def asc(
         self,
         *,
-        expression: Union[Expression, F, Subquery],
         descending: bool = ...,
         nulls_first: bool = ...,
         nulls_last: bool = ...,
@@ -129,7 +139,6 @@ class F(Combinable):
     def desc(
         self,
         *,
-        expression: Union[Expression, F, Subquery],
         nulls_first: bool = ...,
         nulls_last: bool = ...,
     ) -> OrderBy: ...
