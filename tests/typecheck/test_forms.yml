@@ -45,6 +45,7 @@
                 reveal_type(self.get_form())  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form(form_class))  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form(MyForm2))  # N: Revealed type is "main.MyForm2"
+                return HttpResponse()
 
 -   case: updateview_form_valid_has_form_save
     main: |

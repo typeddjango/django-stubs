@@ -17,6 +17,7 @@
             def __str__(self) -> str:
                 reveal_type(self.id)  # N: Revealed type is "builtins.int"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.int"
+                return ''
 
 
 - case: test_access_to_id_field_through_self_if_primary_key_is_defined
@@ -39,6 +40,7 @@
             def __str__(self) -> str:
                 reveal_type(self.id)  # N: Revealed type is "builtins.str"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.str"
+                return self.id
 
 
 - case: test_access_to_id_field_through_self_if_primary_key_has_different_name
@@ -64,3 +66,4 @@
                 reveal_type(self.primary)  # N: Revealed type is "builtins.str"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.str"
                 self.id  # E: "MyModel" has no attribute "id"
+                return self.primary

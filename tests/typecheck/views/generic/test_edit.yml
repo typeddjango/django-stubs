@@ -14,6 +14,7 @@
 
 -   case: dispatch_http_response
     main: |
+        from typing import Any
         from django.http import HttpRequest, HttpResponse
         from django.views.generic.base import View
 
@@ -25,6 +26,7 @@
 
 -   case: dispatch_streaming_http_response
     main: |
+        from typing import Any
         from django.http import HttpRequest, StreamingHttpResponse
         from django.views.generic.base import View
 
