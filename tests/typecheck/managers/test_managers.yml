@@ -423,10 +423,10 @@
                 class MyModelManager(models.Manager['MyModel']):
 
                     def create(self, **kwargs: Any) -> 'MyModel':
-                          return super().create(**kwargs)
+                        return super().create(**kwargs)
 
                 class MyModel(models.Model):
-                   objects = MyModelManager()
+                    objects = MyModelManager()
 
 -   case: regression_manager_scope_foreign
     main: |
