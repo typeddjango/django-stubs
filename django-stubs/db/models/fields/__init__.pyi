@@ -180,7 +180,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
@@ -282,7 +282,7 @@ class DecimalField(Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
 
 class CharField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, int, Combinable]
@@ -314,7 +314,7 @@ class CharField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
         *,
         db_collation: Optional[str] = ...,
-    ): ...
+    ) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
 
@@ -344,7 +344,7 @@ class SlugField(CharField[_ST, _GT]):
         max_length: Optional[int] = ...,
         db_index: bool = ...,
         allow_unicode: bool = ...,
-    ): ...
+    ) -> None: ...
 
 class EmailField(CharField[_ST, _GT]): ...
 
@@ -374,7 +374,7 @@ class URLField(CharField[_ST, _GT]):
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
 
 class TextField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, Combinable]
@@ -406,7 +406,7 @@ class TextField(Field[_ST, _GT]):
         error_messages: Optional[_ErrorMessagesT] = ...,
         *,
         db_collation: Optional[str] = ...,
-    ): ...
+    ) -> None: ...
 
 class BooleanField(Field[_ST, _GT]):
     _pyi_private_set_type: Union[bool, Combinable]
@@ -483,7 +483,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
 
 class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_set_type: Union[str, time, real_datetime, Combinable]
@@ -512,7 +512,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
 
 class DateTimeField(DateField[_ST, _GT]):
     _pyi_private_set_type: Union[str, real_datetime, date, Combinable]
@@ -548,7 +548,7 @@ class UUIDField(Field[_ST, _GT]):
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
     path: Any = ...
@@ -582,7 +582,7 @@ class FilePathField(Field[_ST, _GT]):
         db_tablespace: Optional[str] = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+    ) -> None: ...
 
 class BinaryField(Field[_ST, _GT]):
     _pyi_private_get_type: Union[bytes, memoryview]
