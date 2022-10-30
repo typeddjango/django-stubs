@@ -29,7 +29,7 @@ from mypy_django_plugin.transformers.managers import (
 class ModelClassInitializer:
     api: SemanticAnalyzer
 
-    def __init__(self, ctx: ClassDefContext, django_context: DjangoContext):
+    def __init__(self, ctx: ClassDefContext, django_context: DjangoContext) -> None:
         self.api = cast(SemanticAnalyzer, ctx.api)
         self.model_classdef = ctx.cls
         self.django_context = django_context
