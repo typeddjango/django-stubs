@@ -12,9 +12,10 @@
       reveal_type(func)  # N: Revealed type is "def (x: builtins.int) -> builtins.list[Any]"
 -   case: non_atomic_requests_bare
     main: |
+      from typing import Any
       from django.db.transaction import non_atomic_requests
       @non_atomic_requests
-      def view_func(request): ...
+      def view_func(request: Any) -> Any: ...
       reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
 
 -   case: non_atomic_requests_args

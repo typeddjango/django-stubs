@@ -124,7 +124,7 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                def return_int():
+                def return_int() -> int:
                     return 0
                 class MyModel(models.Model):
                     id = models.IntegerField(primary_key=True, default=return_int)

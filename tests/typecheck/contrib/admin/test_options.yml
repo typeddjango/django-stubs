@@ -79,7 +79,7 @@
           # this will fail if `model` has a type other than the generic specified in the class declaration
           model = TestModel
 
-          def a_method_action(self, request, queryset):
+          def a_method_action(self, request: HttpRequest, queryset: QuerySet) -> None:
               pass
 
 # This test is here to make sure we're not running into a mypy issue which is

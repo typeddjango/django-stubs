@@ -14,7 +14,7 @@
 -   case: async_client_methods
     main: |
       from django.test.client import AsyncClient
-      async def main():
+      async def main() -> None:
         client = AsyncClient()
         response = await client.get('foo')
         reveal_type(response.asgi_request)  # N: Revealed type is "django.core.handlers.asgi.ASGIRequest"

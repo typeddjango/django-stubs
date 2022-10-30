@@ -29,6 +29,7 @@
     main: |
         from typing import Any
         from django import forms
+        from django.http import HttpRequest, HttpResponse
         from django.views.generic.edit import FormView
 
         class MyForm(forms.ModelForm):
@@ -37,7 +38,7 @@
             pass
         class MyView(FormView):
             form_class = MyForm
-            def post(self, request, *args: Any, **kwds: Any):
+            def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
                 reveal_type(form_class)  # N: Revealed type is "Type[main.MyForm]"
                 reveal_type(self.get_form(None))  # N: Revealed type is "main.MyForm"
@@ -48,14 +49,16 @@
 -   case: updateview_form_valid_has_form_save
     main: |
         from django import forms
+        from django.http import HttpResponse
         from django.views.generic.edit import UpdateView
 
         class MyForm(forms.ModelForm):
             pass
         class MyView(UpdateView):
             form_class = MyForm
-            def form_valid(self, form: forms.BaseModelForm):
+            def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
                 reveal_type(form.save)  # N: Revealed type is "def (commit: builtins.bool =) -> Any"
+                return HttpResponse()
 
 -   case: successmessagemixin_compatible_with_formmixin
     main: |

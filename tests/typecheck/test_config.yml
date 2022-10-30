@@ -49,7 +49,7 @@
     files:
         -   path: extras/extra_module.py
             content: |
-                def extra_fn():
+                def extra_fn() -> None:
                   pass
 
 -   case: add_mypypath_env_var_to_package_search
@@ -61,5 +61,5 @@
     files:
         -   path: extras/extra_module.py
             content: |
-                def extra_fn():
+                def extra_fn() -> None:
                   pass

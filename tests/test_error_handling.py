@@ -1,7 +1,7 @@
 import tempfile
-import typing
 import uuid
 from contextlib import contextmanager
+from typing import Any, Generator, List, Optional
 
 import pytest
 
@@ -27,7 +27,7 @@ django_settings_module = str (required)
 
 
 @contextmanager
-def write_to_file(file_contents: str, suffix: typing.Optional[str] = None) -> typing.Generator[str, None, None]:
+def write_to_file(file_contents: str, suffix: Optional[str] = None) -> Generator[str, None, None]:
     with tempfile.NamedTemporaryFile(mode="w+", suffix=suffix) as config_file:
         config_file.write(file_contents)
         config_file.seek(0)
@@ -54,8 +54,7 @@ def write_to_file(file_contents: str, suffix: typing.Optional[str] = None) -> ty
         ),
     ],
 )
-def test_misconfiguration_handling(capsys, config_file_contents, message_part):
-    #  type: (typing.Any, typing.List[str], str) -> None
+def test_misconfiguration_handling(capsys: Any, config_file_contents: List[str], message_part: str) -> None:
     """Invalid configuration raises `SystemExit` with a precise error message."""
     contents = "\n".join(config_file_contents).expandtabs(4)
     with write_to_file(contents) as filename:
@@ -74,7 +73,7 @@ def test_misconfiguration_handling(capsys, config_file_contents, message_part):
         pytest.param(None, id="as none"),
     ],
 )
-def test_handles_filename(capsys, filename: str):
+def test_handles_filename(capsys: Any, filename: str) -> None:
     with pytest.raises(SystemExit, match="2"):
         DjangoPluginConfig(filename)
 
@@ -116,7 +115,7 @@ def test_handles_filename(capsys, filename: str):
         ),
     ],
 )
-def test_toml_misconfiguration_handling(capsys, config_file_contents, message_part):
+def test_toml_misconfiguration_handling(capsys: Any, config_file_contents, message_part) -> None:
     with write_to_file(config_file_contents, suffix=".toml") as filename:
         with pytest.raises(SystemExit, match="2"):
             DjangoPluginConfig(filename)

@@ -32,7 +32,7 @@
             def atomic_method1(self, abc: int) -> str:
                 pass
             @transaction.atomic(savepoint=True)
-            def atomic_method2(self):
+            def atomic_method2(self) -> None:
                 pass
             @transaction.atomic(using="db", savepoint=True)
             def atomic_method3(self, myparam: str) -> int:
