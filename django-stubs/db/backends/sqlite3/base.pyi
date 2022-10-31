@@ -26,6 +26,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection_class: Type[DatabaseIntrospection]
     ops_class: Type[DatabaseOperations]
 
+    def is_in_memory_db(self) -> bool: ...
+
 FORMAT_QMARK_REGEX: Any
 
 class SQLiteCursorWrapper(Database.Cursor): ...
