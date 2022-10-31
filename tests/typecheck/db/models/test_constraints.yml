@@ -1,0 +1,37 @@
+-   case: unique_constraint_expressions
+    main: |
+        from django.db.models import Q, UniqueConstraint
+        from django.db.models.functions import Lower
+
+        UniqueConstraint(
+            Lower('name').desc(),
+            'category',
+            name='unique_lower_name_category',
+        )
+
+-   case: unique_constraint_fields
+    main: |
+        from django.db.models import Q, UniqueConstraint
+        from django.db.models.functions import Lower
+
+        UniqueConstraint(
+            fields=['name'],
+            name='unqiue_name',
+        )
+
+-   case: unique_constraint_expressions_fields
+    main: |
+        from django.db.models import Q, UniqueConstraint
+        from django.db.models.functions import Lower
+
+        UniqueConstraint(
+            Lower('name'),
+            fields=['name'],
+            name='unique_mess',
+        )
+    regex: true
+    out: |
+        main:4: error: No overload variant of "UniqueConstraint" matches argument types "Lower", "List\[str\]", "str"
+        main:4: note: Possible overload variants:
+        main:4: note:     .*
+        main:4: note:     .*
