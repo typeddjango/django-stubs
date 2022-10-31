@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import Any, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
@@ -32,14 +32,23 @@ class UniqueConstraint(BaseConstraint):
     fields: Tuple[str, ...]
     condition: Optional[Q]
     deferrable: Optional[Deferrable]
+
+    @overload
+    def __init__(
+        self,
+        *expressions: Union[str, Combinable],
+        fields: None = ...,
+        name: str,
+        condition: Optional[Q] = ...,
+        deferrable: Optional[Deferrable] = ...,
+        include: Optional[Sequence[str]] = ...,
+        opclasses: Sequence[Any] = ...,
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         *,
-        # For 4.0:
-        # *expressions: Union[str, Combinable],
-        # fields: Optional[Sequence[str]] = ...,
-        # name: str = ...,
-        fields: Optional[Sequence[str]],
+        fields: Sequence[str],
         name: str,
         condition: Optional[Q] = ...,
         deferrable: Optional[Deferrable] = ...,
