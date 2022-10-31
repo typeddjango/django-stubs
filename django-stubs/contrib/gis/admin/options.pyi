@@ -1,7 +1,6 @@
 from typing import Any, Union
 
 from django.contrib.admin import ModelAdmin as ModelAdmin
-from django.http import HttpRequest
 
 spherical_mercator_srid: int
 
@@ -37,7 +36,6 @@ class GeoModelAdmin(ModelAdmin):
     widget: Any = ...
     @property
     def media(self) -> Any: ...
-    def formfield_for_dbfield(self, db_field: Any, request: HttpRequest, **kwargs: Any) -> Any: ...
     def get_map_widget(self, db_field: Any) -> Any: ...
 
 class OSMGeoAdmin(GeoModelAdmin):
