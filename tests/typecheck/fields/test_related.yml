@@ -543,7 +543,7 @@
                 from django.db import models
                 class User(models.Model):
                     pass
-                def get_user_model_name():
+                def get_user_model_name() -> str:
                     return 'myapp.User'
                 class Profile(models.Model):
                     user = models.ForeignKey(to=get_user_model_name(), on_delete=models.CASCADE)
@@ -703,7 +703,7 @@
                     def custom(self) -> None:
                         pass
 
-                def TransactionManager():
+                def TransactionManager() -> BaseManager:
                     return BaseManager.from_queryset(TransactionQuerySet)()
 
                 class Transaction(models.Model):

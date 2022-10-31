@@ -8,6 +8,7 @@
       reveal_type(TestView())  # N: Revealed type is "main.TestView"
 -   case: method_decorator_function
     main: |
+      from typing import Any
       from django.views.generic.base import View
       from django.utils.decorators import method_decorator
       from django.contrib.auth.decorators import login_required
@@ -15,6 +16,6 @@
       from django.http.request import HttpRequest
       class TestView(View):
           @method_decorator(login_required)
-          def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
+          def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
               return super().dispatch(request, *args, **kwargs)
           reveal_type(dispatch)  # N: Revealed type is "def (self: main.TestView, request: django.http.request.HttpRequest, *args: Any, **kwargs: Any) -> django.http.response.HttpResponseBase"

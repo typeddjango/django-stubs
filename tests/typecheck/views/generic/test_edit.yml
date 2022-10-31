@@ -14,22 +14,24 @@
 
 -   case: dispatch_http_response
     main: |
-        from django.http import HttpResponse
+        from typing import Any
+        from django.http import HttpRequest, HttpResponse
         from django.views.generic.base import View
 
         class MyView(View):
-            def dispatch(self, request, *args, **kwargs) -> HttpResponse:
+            def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
                 response: HttpResponse
                 return response
 
 
 -   case: dispatch_streaming_http_response
     main: |
-        from django.http import StreamingHttpResponse
+        from typing import Any
+        from django.http import HttpRequest, StreamingHttpResponse
         from django.views.generic.base import View
 
         class MyView(View):
-            def dispatch(self, request, *args, **kwargs) -> StreamingHttpResponse:
+            def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> StreamingHttpResponse:
                 response: StreamingHttpResponse
                 return response
 

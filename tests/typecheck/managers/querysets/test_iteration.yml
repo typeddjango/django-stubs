@@ -19,7 +19,7 @@
     main: |
         from myapp.models import User
 
-        async def main():
+        async def main() -> None:
             async for user in User.objects.all():
                 reveal_type(user)  # N: Revealed type is "myapp.models.User"
     installed_apps:

@@ -14,9 +14,10 @@
       content: |
         from django.db import models
         class MyModel(models.Model):
-            def __str__(self):
+            def __str__(self) -> str:
                 reveal_type(self.id)  # N: Revealed type is "builtins.int"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.int"
+                return ''
 
 
 - case: test_access_to_id_field_through_self_if_primary_key_is_defined
@@ -36,9 +37,10 @@
         from django.db import models
         class MyModel(models.Model):
             id = models.CharField(max_length=10, primary_key=True)
-            def __str__(self):
+            def __str__(self) -> str:
                 reveal_type(self.id)  # N: Revealed type is "builtins.str"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.str"
+                return self.id
 
 
 - case: test_access_to_id_field_through_self_if_primary_key_has_different_name
@@ -60,7 +62,8 @@
         from django.db import models
         class MyModel(models.Model):
             primary = models.CharField(max_length=10, primary_key=True)
-            def __str__(self):
+            def __str__(self) -> str:
                 reveal_type(self.primary)  # N: Revealed type is "builtins.str"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.str"
                 self.id  # E: "MyModel" has no attribute "id"
+                return self.primary

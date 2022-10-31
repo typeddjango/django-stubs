@@ -1,9 +1,11 @@
 -   case: login_required_bare
     main: |
+        from typing import Any
         from django.contrib.auth.decorators import login_required
+        from django.http import HttpRequest, HttpResponse
         @login_required
-        def view_func(request): ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
+        def view_func(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 -   case: login_required_fancy
     main: |
         from django.contrib.auth.decorators import login_required
@@ -15,29 +17,33 @@
 -   case: login_required_weird
     main: |
         from django.contrib.auth.decorators import login_required
+        from django.http import HttpRequest, HttpResponse
         # This is non-conventional usage, but covered in Django tests, so we allow it.
-        def view_func(request): ...
+        def view_func(request: HttpRequest) -> HttpResponse: ...
         wrapped_view = login_required(view_func, redirect_field_name='a', login_url='b')
-        reveal_type(wrapped_view)  # N: Revealed type is "def (request: Any) -> Any"
+        reveal_type(wrapped_view)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 -   case: login_required_incorrect_return
     main: |
+        from typing import Any
         from django.contrib.auth.decorators import login_required
         @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"
-        def view_func2(request) -> str: ...
+        def view_func2(request: Any) -> str: ...
 -   case: user_passes_test
     main: |
         from django.contrib.auth.decorators import user_passes_test
+        from django.http import HttpRequest, HttpResponse
         @user_passes_test(lambda u: u.get_username().startswith('super'))
-        def view_func(request): ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
+        def view_func(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 -   case: user_passes_test_bare_is_error
     main: |
-        from django.http.response import HttpResponse
+        from django.http import HttpRequest, HttpResponse
         from django.contrib.auth.decorators import user_passes_test
-        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[Any], HttpResponse]"; expected "Callable[[Union[AbstractBaseUser, AnonymousUser]], bool]"
-        def view_func(request) -> HttpResponse: ...
+        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[Union[AbstractBaseUser, AnonymousUser]], bool]"
+        def view_func(request: HttpRequest) -> HttpResponse: ...
 -   case: permission_required
     main: |
         from django.contrib.auth.decorators import permission_required
+        from django.http import HttpRequest, HttpResponse
         @permission_required('polls.can_vote')
-        def view_func(request): ...
+        def view_func(request: HttpRequest) -> HttpResponse: ...
