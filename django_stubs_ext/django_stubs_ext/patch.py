@@ -35,7 +35,7 @@ class MPGeneric(Generic[_T]):
     possible issues we may run into with this method.
     """
 
-    def __init__(self, cls: Type[_T], version: Optional[_VersionSpec] = None):
+    def __init__(self, cls: Type[_T], version: Optional[_VersionSpec] = None) -> None:
         """Set the data fields, basic constructor."""
         self.version = version
         self.cls = cls
