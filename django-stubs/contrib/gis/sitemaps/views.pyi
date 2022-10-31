@@ -1,6 +1,15 @@
-from typing import Any, Optional
+from typing import Optional
+
+from django.http import HttpRequest, HttpResponse
 
 def kml(
-    request: Any, label: Any, model: Any, field_name: Optional[Any] = ..., compress: bool = ..., using: Any = ...
-) -> Any: ...
-def kmz(request: Any, label: Any, model: Any, field_name: Optional[Any] = ..., using: Any = ...) -> Any: ...
+    request: HttpRequest,
+    label: str,
+    model: str,
+    field_name: Optional[str] = ...,
+    compress: bool = ...,
+    using: str = ...,
+) -> HttpResponse: ...
+def kmz(
+    request: HttpRequest, label: str, model: str, field_name: Optional[str] = ..., using: str = ...
+) -> HttpResponse: ...

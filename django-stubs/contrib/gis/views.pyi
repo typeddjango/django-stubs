@@ -1,3 +1,6 @@
-from typing import Any, Optional
+from typing import Dict, Optional, Type
 
-def feed(request: Any, url: Any, feed_dict: Optional[Any] = ...) -> Any: ...
+from django.contrib.gis.feeds import Feed
+from django.http import HttpRequest, HttpResponse
+
+def feed(request: HttpRequest, url: str, feed_dict: Optional[Dict[str, Type[Feed]]] = ...) -> HttpResponse: ...
