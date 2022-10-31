@@ -3,7 +3,7 @@ from typing import Any, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
+from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query_utils import Q
 
 _T = TypeVar("_T", bound="BaseConstraint")
@@ -24,8 +24,8 @@ class BaseConstraint:
     def clone(self: _T) -> _T: ...
 
 class CheckConstraint(BaseConstraint):
-    check: Q
-    def __init__(self, *, check: Q, name: str) -> None: ...
+    check: Union[Q, BaseExpression]
+    def __init__(self, *, check: Union[Q, BaseExpression], name: str) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
     expressions: Tuple[Combinable, ...]
