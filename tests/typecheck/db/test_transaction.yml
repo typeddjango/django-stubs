@@ -14,9 +14,10 @@
     main: |
       from typing import Any
       from django.db.transaction import non_atomic_requests
+      from django.http import HttpRequest, HttpResponse
       @non_atomic_requests
-      def view_func(request: Any) -> Any: ...
-      reveal_type(view_func)  # N: Revealed type is "def (request: Any) -> Any"
+      def view_func(request: HttpRequest) -> HttpResponse: ...
+      reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 
 -   case: non_atomic_requests_args
     main: |

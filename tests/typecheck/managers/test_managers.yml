@@ -355,7 +355,7 @@
                 class MyManager(models.Manager):
                     def get_instance(self) -> int:
                         pass
-                    def get_instance_untyped(self, name: str) -> Any:
+                    def get_instance_untyped(self, name: str):
                         pass
                 class User(models.Model):
                     objects = MyManager()
