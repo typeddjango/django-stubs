@@ -51,7 +51,6 @@ class TemplateResponse(SimpleTemplateResponse):
     cookies: SimpleCookie[str]
     csrf_cookie_set: bool
     json: functools.partial
-    redirect_chain: List[Tuple[str, int]]
     _request: HttpRequest
     status_code: int
     template_name: _TemplateForResponseT

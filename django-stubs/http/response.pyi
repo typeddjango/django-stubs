@@ -93,7 +93,6 @@ class HttpResponseBase:
 class HttpResponse(HttpResponseBase, Iterable[bytes]):
     content = _PropertyDescriptor[object, bytes]()
     csrf_cookie_set: bool
-    redirect_chain: List[Tuple[str, int]]
     sameorigin: bool
     test_server_port: str
     test_was_secure_request: bool
