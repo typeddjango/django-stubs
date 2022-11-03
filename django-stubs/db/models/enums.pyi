@@ -1,5 +1,11 @@
 import enum
+import sys
 from typing import Any, List, Tuple
+
+if sys.version_info >= (3, 11):
+    enum_property = enum.property
+else:
+    enum_property = property
 
 class ChoicesMeta(enum.EnumMeta):
     names: List[str] = ...
@@ -12,7 +18,7 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
     def __str__(self) -> str: ...
     @property
     def label(self) -> str: ...
-    @property
+    @enum_property
     def value(self) -> Any: ...
 
 # fake
@@ -23,7 +29,7 @@ class _IntegerChoicesMeta(ChoicesMeta):
     values: List[int] = ...
 
 class IntegerChoices(int, Choices, metaclass=_IntegerChoicesMeta):
-    @property
+    @enum_property
     def value(self) -> int: ...
 
 # fake
@@ -34,5 +40,5 @@ class _TextChoicesMeta(ChoicesMeta):
     values: List[str] = ...
 
 class TextChoices(str, Choices, metaclass=_TextChoicesMeta):
-    @property
+    @enum_property
     def value(self) -> str: ...
