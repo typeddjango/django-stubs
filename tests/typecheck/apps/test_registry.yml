@@ -1,0 +1,15 @@
+-   case: apps_get_model
+    main: |
+        from django.apps.registry import apps
+
+        model = apps.get_model("myapp", "MyUser")
+        reveal_type(model)  # N: Revealed type is "Type[django.db.models.base.Model]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
