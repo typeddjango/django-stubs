@@ -33,3 +33,11 @@ repos:
     rev: 3.9.2
     hooks:
       - id: flake8
+
+ci:
+    autofix_commit_msg: '[pre-commit.ci] auto fixes from pre-commit.com hooks'
+    autofix_prs: true
+    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+    autoupdate_schedule: weekly
+    skip: [flake8]
+    submodules: false
