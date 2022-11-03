@@ -209,6 +209,8 @@ class RawQuerySet(Iterable[_T], Sized):
     def resolve_model_init_order(self) -> Tuple[List[str], List[int], List[Tuple[str, int]]]: ...
     def using(self, alias: Optional[str]) -> RawQuerySet[_T]: ...
 
+_QuerySetAny = _QuerySet
+
 QuerySet = _QuerySet[_T, _T]
 
 class Prefetch:
