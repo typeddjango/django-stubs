@@ -12,9 +12,11 @@ from mypy.plugin import (
     ClassDefContext,
     DynamicClassDefContext,
     FunctionContext,
+    FunctionSigContext,
     MethodContext,
     Plugin,
 )
+from mypy.types import FunctionLike
 from mypy.types import Type as MypyType
 
 import mypy_django_plugin.transformers.orm_lookups
@@ -22,6 +24,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
+from mypy_django_plugin.transformers.auth import transform_user_passes_test
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_as_manager_method,
@@ -186,6 +189,12 @@ class NewSemanalDjangoPlugin(Plugin):
 
             if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+        return None
+
+    def get_function_signature_hook(self, fullname: str) -> Optional[Callable[[FunctionSigContext], FunctionLike]]:
+        if fullname == "django.contrib.auth.decorators.user_passes_test":
+            return partial(transform_user_passes_test, django_context=self.django_context)
+
         return None
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:

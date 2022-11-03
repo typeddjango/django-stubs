@@ -35,6 +35,28 @@
         @user_passes_test(lambda u: u.get_username().startswith('super'))
         def view_func(request: HttpRequest) -> HttpResponse: ...
         reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
+-   case: user_passes_test_custom_user_model
+    main: |
+        from typing import Union
+        from django.contrib.auth.decorators import user_passes_test
+        from django.contrib.auth.models import AnonymousUser
+        from django.http import HttpRequest, HttpResponse
+        from users.models import User
+        def check_user(user: Union[User, AnonymousUser]) -> bool: ...
+        @user_passes_test(check_user)
+        def view_func(request: HttpRequest) -> HttpResponse: ...
+    custom_settings: |
+        AUTH_USER_MODEL = "users.User"
+        INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "users")
+    files:
+        -   path: users/__init__.py
+        -   path: users/models.py
+            content: |
+                from django.contrib.auth.models import AbstractBaseUser
+                from django.db import models
+                class User(AbstractBaseUser):
+                    email = models.EmailField(unique=True)
+                    USERNAME_FIELD = "email"
 -   case: user_passes_test_bare_is_error
     main: |
         from django.http import HttpRequest, HttpResponse

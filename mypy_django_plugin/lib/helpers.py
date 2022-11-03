@@ -29,6 +29,7 @@ from mypy.plugin import (
     ClassDefContext,
     DynamicClassDefContext,
     FunctionContext,
+    FunctionSigContext,
     MethodContext,
     SemanticAnalyzerPluginInterface,
 )
@@ -328,7 +329,9 @@ def get_semanal_api(ctx: Union[ClassDefContext, DynamicClassDefContext]) -> Sema
     return ctx.api
 
 
-def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionContext]) -> TypeChecker:
+def get_typechecker_api(
+    ctx: Union[AttributeContext, MethodContext, FunctionContext, FunctionSigContext]
+) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
         raise ValueError("Not a TypeChecker")
     return ctx.api
