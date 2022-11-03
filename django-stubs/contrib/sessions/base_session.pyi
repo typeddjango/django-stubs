@@ -10,7 +10,6 @@ class BaseSessionManager(models.Manager[_T]):
     def encode(self, session_dict: Dict[str, Any]) -> str: ...
     def save(self, session_key: str, session_dict: Dict[str, Any], expire_date: datetime) -> _T: ...
 
-
 class AbstractBaseSession(models.Model):
     expire_date: datetime
     session_data: str
