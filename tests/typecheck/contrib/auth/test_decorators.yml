@@ -39,12 +39,18 @@
     main: |
         from typing import Union
         from django.contrib.auth.decorators import user_passes_test
-        from django.contrib.auth.models import AnonymousUser
+        from django.contrib.auth.models import AnonymousUser, AbstractBaseUser
         from django.http import HttpRequest, HttpResponse
         from users.models import User
-        def check_user(user: Union[User, AnonymousUser]) -> bool: ...
-        @user_passes_test(check_user)
-        def view_func(request: HttpRequest) -> HttpResponse: ...
+
+        def check_user1(user: Union[User, AnonymousUser]) -> bool: ...
+        user_passes_test(check_user1)
+        def check_user2(user: User) -> bool: ...
+        user_passes_test(check_user2) # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[User], bool]"; expected "Callable[[Union[User, AnonymousUser]], bool]"
+        def check_user3(user: Union[AnonymousUser, User]) -> bool: ...
+        user_passes_test(check_user3)
+        def check_user4(user: Union[AnonymousUser, AbstractBaseUser]) -> bool: ...
+        user_passes_test(check_user4)
     custom_settings: |
         AUTH_USER_MODEL = "users.User"
         INSTALLED_APPS = ("django.contrib.auth", "django.contrib.contenttypes", "users")
