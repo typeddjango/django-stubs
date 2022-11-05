@@ -5,7 +5,6 @@ from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObject
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.manager import BaseManager
 from django.db.models.options import Options
-from django.utils.functional import classproperty
 
 _Self = TypeVar("_Self", bound="Model")
 
@@ -16,20 +15,19 @@ class ModelState:
     adding: bool = ...
     fields_cache: ModelStateFieldsCacheDescriptor = ...
 
-class ModelBase(type): ...
+class ModelBase(type):
+    @property
+    def objects(cls: Type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    @property
+    def _default_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    @property
+    def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
     class DoesNotExist(ObjectDoesNotExist): ...
     class MultipleObjectsReturned(BaseMultipleObjectsReturned): ...
     class Meta: ...
     _meta: Options[Any]
-    @classproperty
-    @classmethod
-    def _default_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...
-    @classproperty
-    @classmethod
-    def _base_manager(cls: Type[_Self]) -> BaseManager[_Self]: ...
-    objects: BaseManager[Any]
     pk: Any = ...
     _state: ModelState
     def __init__(self: _Self, *args: Any, **kwargs: Any) -> None: ...
