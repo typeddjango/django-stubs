@@ -10,6 +10,7 @@
       from django.db.models.options import Options
       from django.http.request import HttpRequest
       from django.db.models.query import QuerySet
+      from django.utils.translation import gettext_lazy as _
 
       def an_action(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
           pass
@@ -29,6 +30,7 @@
           fieldsets = [
               (None, {"fields": ["a", "b"]}),
               ("group", {"fields": ("c",), "classes": ("a",), "description": "foo"}),
+              (_("lazy"), {"fields": ["bar"]})
           ]
           form = ModelForm
           filter_vertical = ("fields",)
