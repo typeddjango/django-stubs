@@ -214,6 +214,10 @@ _QuerySetAny = _QuerySet
 QuerySet = _QuerySet[_T, _T]
 
 class Prefetch:
+    prefetch_through: str
+    prefetch_to: str
+    queryset: Optional[QuerySet]
+    to_attr: Optional[str]
     def __init__(self, lookup: str, queryset: Optional[QuerySet] = ..., to_attr: Optional[str] = ...) -> None: ...
     def __getstate__(self) -> Dict[str, Any]: ...
     def add_prefix(self, prefix: str) -> None: ...
