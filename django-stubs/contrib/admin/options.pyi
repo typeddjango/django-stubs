@@ -78,7 +78,7 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # Workaround for mypy issue, a Sequence type should be preferred here.
 # https://github.com/python/mypy/issues/8921
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
-_FieldsetSpec = _ListOrTuple[Tuple[Optional[str], _FieldOpts]]
+_FieldsetSpec = _ListOrTuple[Tuple[Optional[_StrOrPromise], _FieldOpts]]
 _ListFilterT = Union[
     Type[ListFilter],
     Field,
