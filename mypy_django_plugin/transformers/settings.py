@@ -21,7 +21,9 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
 
 
 def get_type_of_settings_attribute(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
-    assert isinstance(ctx.context, MemberExpr)
+    if not isinstance(ctx.context, MemberExpr):
+        return ctx.default_attr_type
+
     setting_name = ctx.context.name
 
     typechecker_api = helpers.get_typechecker_api(ctx)
