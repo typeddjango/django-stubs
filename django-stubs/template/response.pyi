@@ -1,6 +1,6 @@
 import functools
 from http.cookies import SimpleCookie
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
@@ -41,7 +41,7 @@ class SimpleTemplateResponse(HttpResponse):
     def render(self) -> SimpleTemplateResponse: ...
     @property
     def is_rendered(self) -> bool: ...
-    def __iter__(self) -> Any: ...
+    def __iter__(self) -> Iterator[Any]: ...
 
 class TemplateResponse(SimpleTemplateResponse):
     client: Client
