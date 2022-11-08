@@ -31,7 +31,7 @@ from django.db.models.sql.query import Query, RawQuery
 _T = TypeVar("_T", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True)
 _QS = TypeVar("_QS", bound="_QuerySet")
-_TupleT = TypeVar("_TupleT", bound=tuple[Any], covariant=True)
+_TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
 
 MAX_GET_RESULTS: int = ...
 REPR_OUTPUT_SIZE: int = ...
@@ -54,7 +54,7 @@ class ValuesIterable(BaseIterable[dict[str, Any]]):
 class ValuesListIterable(BaseIterable[_TupleT]):
     def __iter__(self) -> Iterator[_TupleT]: ...
 
-class NamedValuesListIterable(ValuesListIterable[NamedTuple]):  # type: ignore[type-var]
+class NamedValuesListIterable(ValuesListIterable[NamedTuple]):
     def __iter__(self) -> Iterator[NamedTuple]: ...
 
 class FlatValuesListIterable(BaseIterable[_Row]):
