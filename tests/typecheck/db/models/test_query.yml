@@ -1,0 +1,21 @@
+-   case: django_db_models_query_module_has_ModelIterable
+    main: |
+        from django.db.models.query import ModelIterable
+        from django.db.models import Model
+
+        class IntModelIterable(ModelIterable[int]):
+            pass
+
+        class NoTypeParameterModelIterable(ModelIterable):
+            pass
+
+        class ModelModelIterable(ModelIterable[Model]):
+            pass
+
+        class MyModel(Model):
+            pass
+
+        class MyModelModelIterable(ModelIterable[MyModel]):
+            pass
+    out: |
+        main:4: error: Type argument "int" of "ModelIterable" must be a subtype of "Model"
