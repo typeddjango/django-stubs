@@ -115,6 +115,12 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
     rhs: Combinable
     def __init__(self, lhs: Combinable, connector: str, rhs: Combinable, output_field: Field | None = ...) -> None: ...
 
+class DurationExpression(CombinedExpression):
+    def compile(self, side: Combinable, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
+
+class TemporalSubtraction(CombinedExpression):
+    def __init__(self, lhs: Combinable, rhs: Combinable) -> None: ...
+
 class F(Combinable):
     name: str
     def __init__(self, name: str) -> None: ...
@@ -148,6 +154,70 @@ class OuterRef(F):
     contains_aggregate: bool
     def relabeled_clone(self: Self, relabels: Any) -> Self: ...
 
+class Func(SQLiteNumericMixin, Expression):
+    function: str
+    name: str
+    template: str
+    arg_joiner: str
+    arity: int | None
+    source_expressions: list[Expression]
+    extra: dict[Any, Any]
+    def __init__(self, *expressions: Any, output_field: Field | None = ..., **extra: Any) -> None: ...
+    def as_sql(
+        self,
+        compiler: SQLCompiler,
+        connection: BaseDatabaseWrapper,
+        function: str | None = None,
+        template: str | None = None,
+        arg_joiner: str | None = None,
+        **extra_context: Any,
+    ) -> _AsSqlType: ...
+
+class Value(Expression):
+    value: Any
+    def __init__(self, value: Any, output_field: Field | None = ...) -> None: ...
+
+class RawSQL(Expression):
+    params: list[Any]
+    sql: str
+    def __init__(self, sql: str, params: Sequence[Any], output_field: Field | None = ...) -> None: ...
+
+class Star(Expression): ...
+
+class Col(Expression):
+    target: Field
+    alias: str
+    contains_column_references: Literal[True]
+    possibly_multivalued: Literal[False]
+    def __init__(self, alias: str, target: Field, output_field: Field | None = ...) -> None: ...
+
+class Ref(Expression):
+    def __init__(self, refs: str, source: Expression) -> None: ...
+
+class ExpressionList(Func):
+    def __init__(self, *expressions: BaseExpression | Combinable, **extra: Any) -> None: ...
+
+class OrderByList(Func): ...
+
+class ExpressionWrapper(Expression):
+    def __init__(self, expression: Q | Combinable, output_field: Field) -> None: ...
+
+class When(Expression):
+    template: str
+    condition: Any
+    result: Any
+    def __init__(self, condition: Any = ..., then: Any = ..., **lookups: Any) -> None: ...
+
+class Case(Expression):
+    template: str
+    case_joiner: str
+    cases: Any
+    default: Any
+    extra: Any
+    def __init__(
+        self, *cases: Any, default: Any | None = ..., output_field: Field | None = ..., **extra: Any
+    ) -> None: ...
+
 class Subquery(BaseExpression, Combinable):
     template: str
     query: Query
@@ -173,56 +243,6 @@ class OrderBy(Expression):
         nulls_last: bool = ...,
     ) -> None: ...
 
-class Value(Expression):
-    value: Any
-    def __init__(self, value: Any, output_field: Field | None = ...) -> None: ...
-
-class RawSQL(Expression):
-    params: list[Any]
-    sql: str
-    def __init__(self, sql: str, params: Sequence[Any], output_field: Field | None = ...) -> None: ...
-
-class Func(SQLiteNumericMixin, Expression):
-    function: str
-    name: str
-    template: str
-    arg_joiner: str
-    arity: int | None
-    source_expressions: list[Expression]
-    extra: dict[Any, Any]
-    def __init__(self, *expressions: Any, output_field: Field | None = ..., **extra: Any) -> None: ...
-
-class When(Expression):
-    template: str
-    condition: Any
-    result: Any
-    def __init__(self, condition: Any = ..., then: Any = ..., **lookups: Any) -> None: ...
-
-class Case(Expression):
-    template: str
-    case_joiner: str
-    cases: Any
-    default: Any
-    extra: Any
-    def __init__(
-        self, *cases: Any, default: Any | None = ..., output_field: Field | None = ..., **extra: Any
-    ) -> None: ...
-
-class ExpressionWrapper(Expression):
-    def __init__(self, expression: Q | Combinable, output_field: Field) -> None: ...
-
-class Col(Expression):
-    target: Field
-    alias: str
-    contains_column_references: Literal[True]
-    possibly_multivalued: Literal[False]
-    def __init__(self, alias: str, target: Field, output_field: Field | None = ...) -> None: ...
-
-class Ref(Expression):
-    def __init__(self, refs: str, source: Expression) -> None: ...
-
-class ExpressionList(Func):
-    def __init__(self, *expressions: BaseExpression | Combinable, **extra: Any) -> None: ...
 
 class Window(SQLiteNumericMixin, Expression):
     template: str
