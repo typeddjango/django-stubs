@@ -38,3 +38,12 @@
     main: |
         from django.db.models.query import NamedValuesListIterable
     out: |
+-   case: QuerySet_has__iterable_class_defined
+    main: |
+        from django.db.models.query import QuerySet, ValuesIterable, ModelIterable
+        iterable_class = QuerySet._iterable_class
+        QuerySet._iterable_class = ValuesIterable
+        QuerySet._iterable_class = ModelIterable
+        QuerySet._iterable_class = int
+    out: |
+        main:5: error: Incompatible types in assignment (expression has type "Type[int]", variable has type "Type[BaseIterable[Any]]")

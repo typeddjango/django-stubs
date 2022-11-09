@@ -63,6 +63,7 @@ class FlatValuesListIterable(BaseIterable[_Row]):
 class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     model: Type[_T]
     query: Query
+    _iterable_class: Type[BaseIterable]
     def __init__(
         self,
         model: Optional[Type[Model]] = ...,
