@@ -13,7 +13,7 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
     @property
     def label(self) -> str: ...
     @property
-    def value(self) -> Any: ...
+    def value(self) -> Any: ...  # type: ignore[override]
 
 # fake
 class _IntegerChoicesMeta(ChoicesMeta):
@@ -24,7 +24,7 @@ class _IntegerChoicesMeta(ChoicesMeta):
 
 class IntegerChoices(int, Choices, metaclass=_IntegerChoicesMeta):
     @property
-    def value(self) -> int: ...
+    def value(self) -> int: ...  # type: ignore[override]
 
 # fake
 class _TextChoicesMeta(ChoicesMeta):
@@ -35,4 +35,4 @@ class _TextChoicesMeta(ChoicesMeta):
 
 class TextChoices(str, Choices, metaclass=_TextChoicesMeta):
     @property
-    def value(self) -> str: ...
+    def value(self) -> str: ...  # type: ignore[override]

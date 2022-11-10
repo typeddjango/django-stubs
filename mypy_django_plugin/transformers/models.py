@@ -643,7 +643,6 @@ def get_or_create_annotated_type(
     api: Union[SemanticAnalyzer, CheckerPluginInterface], model_type: Instance, fields_dict: Optional[TypedDictType]
 ) -> Instance:
     """
-
     Get or create the type for a model for which you getting/setting any attr is allowed.
 
     The generated type is an subclass of the model and django._AnyAttrAllowed.
