@@ -9,6 +9,7 @@ from typing import (
     Iterator,
     List,
     MutableMapping,
+    NamedTuple,
     Optional,
     Reversible,
     Sequence,
@@ -30,13 +31,39 @@ from django.db.models.sql.query import Query, RawQuery
 _T = TypeVar("_T", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True)
 _QS = TypeVar("_QS", bound="_QuerySet")
+_TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
 
 MAX_GET_RESULTS: int = ...
 REPR_OUTPUT_SIZE: int = ...
 
+class BaseIterable(Generic[_Row]):
+    queryset: QuerySet[Model]
+    chunked_fetch: bool
+    chunk_size: int
+    def __init__(self, queryset: QuerySet[Model], chunked_fetch: bool = ..., chunk_size: int = ...) -> None: ...
+
+class ModelIterable(Generic[_T], BaseIterable[_T]):
+    def __iter__(self) -> Iterator[_T]: ...
+
+class RawModelIterable(BaseIterable[dict[str, Any]]):
+    def __iter__(self) -> Iterator[dict[str, Any]]: ...
+
+class ValuesIterable(BaseIterable[dict[str, Any]]):
+    def __iter__(self) -> Iterator[dict[str, Any]]: ...
+
+class ValuesListIterable(BaseIterable[_TupleT]):
+    def __iter__(self) -> Iterator[_TupleT]: ...
+
+class NamedValuesListIterable(ValuesListIterable[NamedTuple]):
+    def __iter__(self) -> Iterator[NamedTuple]: ...
+
+class FlatValuesListIterable(BaseIterable[_Row]):
+    def __iter__(self) -> Iterator[_Row]: ...
+
 class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     model: Type[_T]
     query: Query
+    _iterable_class: Type[BaseIterable]
     def __init__(
         self,
         model: Optional[Type[Model]] = ...,
