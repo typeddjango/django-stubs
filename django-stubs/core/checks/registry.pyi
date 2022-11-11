@@ -1,9 +1,8 @@
-from collections.abc import Callable, Sequence
-from typing import Any, Protocol, TypeVar
+from typing import Any, Callable, Protocol, Sequence, TypeVar, overload
 
 from django.apps.config import AppConfig
+from django.apps.registry import Apps
 from django.core.checks.messages import CheckMessage
-from typing_extensions import TypeAlias
 
 class Tags:
     admin: str
@@ -19,7 +18,8 @@ class Tags:
     translation: str
     urls: str
 
-_CheckCallable: TypeAlias = Callable[..., Sequence[CheckMessage]]
+class _CheckCallable(Protocol):
+    def __call__(self, app_configs: Apps, **kwargs: Any) -> Sequence[CheckMessage]: ...
 
 _C = TypeVar("_C", bound=_CheckCallable)
 
@@ -31,9 +31,10 @@ class CheckRegistry:
     registered_checks: set[_ProcessedCheckCallable]
     deployment_checks: set[_ProcessedCheckCallable]
     def __init__(self) -> None: ...
-    def register(
-        self, check: _CheckCallable | str | None = ..., *tags: str, **kwargs: Any
-    ) -> Callable[[_CheckCallable], _ProcessedCheckCallable] | _ProcessedCheckCallable: ...
+    @overload
+    def register(self, __check: _C) -> _ProcessedCheckCallable[_C]: ...
+    @overload
+    def register(self, *tags: str, **kwargs: Any) -> Callable[[_C], _ProcessedCheckCallable[_C]]: ...
     def run_checks(
         self,
         app_configs: Sequence[AppConfig] | None = ...,
@@ -46,6 +47,6 @@ class CheckRegistry:
     def get_checks(self, include_deployment_checks: bool = ...) -> list[_ProcessedCheckCallable]: ...
 
 registry: CheckRegistry
-register: Any
-run_checks: Any
-tag_exists: Any
+register = registry.register
+run_checks = registry.run_checks
+tag_exists = registry.tag_exists

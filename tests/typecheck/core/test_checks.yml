@@ -1,0 +1,20 @@
+- case: test_checks_register
+  main: |
+    from typing import Any, List, Sequence
+
+    from django.apps.registry import Apps
+    from django.core.checks import register, Warning, CheckMessage
+
+    @register("foo", deploy=True)
+    def check_foo(app_configs: Apps, **kwargs: Any) -> List[Warning]: ...
+
+    reveal_type(check_foo)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (app_configs: django.apps.registry.Apps, **kwargs: Any) -> builtins.list[django.core.checks.messages.Warning]]"
+    reveal_type(check_foo.tags)  # N: Revealed type is "typing.Sequence[builtins.str]"
+
+    @register
+    def check_bar(app_configs: Apps, **kwargs: Any) -> Sequence[CheckMessage]: ...
+
+    reveal_type(check_bar)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (app_configs: django.apps.registry.Apps, **kwargs: Any) -> typing.Sequence[django.core.checks.messages.CheckMessage]]"
+
+    @register()  # E: Value of type variable "_C" of function cannot be "Callable[[int], Sequence[CheckMessage]]"
+    def wrong_args(bla: int) -> Sequence[CheckMessage]: ...
