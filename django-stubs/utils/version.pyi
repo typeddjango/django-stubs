@@ -4,6 +4,8 @@ PY36: bool
 PY37: bool
 PY38: bool
 PY39: bool
+PY310: bool
+PY311: bool
 
 _VT = Tuple[int, int, int, str, int]
 

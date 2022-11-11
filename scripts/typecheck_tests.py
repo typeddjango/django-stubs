@@ -15,6 +15,7 @@ DJANGO_COMMIT_REFS = {
     "2.2": "44e7cca62382f2535ed0f5d2842b433f0bd23a57",
     "3.2": "0153a63a674937e4a56d9d5e4ca2d629b011fbde",
     "4.0": "67d0c4644acfd7707be4a31e8976f865509b09ac",
+    "4.1": "7dfd29b84e5a27d61ae62cb5ed9122d5a99ee1be",
 }
 DEFAULT_DJANGO_VERSION = "3.2"
 

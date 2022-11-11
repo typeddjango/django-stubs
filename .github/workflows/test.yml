@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -71,6 +71,8 @@ jobs:
         include:
           - python-version: '3.7'
             django-version: '2.2'
+          - python-version: '3.11'
+            django-version: '4.1'
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
