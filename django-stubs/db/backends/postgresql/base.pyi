@@ -13,7 +13,7 @@ from .operations import DatabaseOperations
 
 def psycopg2_version() -> Tuple[int, ...]: ...
 
-PSYCOPG2_VERSION: Tuple[int, ...] = ...
+PSYCOPG2_VERSION: Tuple[int, ...]
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     client: DatabaseClient
@@ -28,12 +28,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection_class: Type[DatabaseIntrospection]
     ops_class: Type[DatabaseOperations]
 
-    operators: Dict[str, str] = ...
-    pattern_esc: str = ...
-    pattern_ops: Dict[str, str] = ...
+    operators: Dict[str, str]
+    pattern_esc: str
+    pattern_ops: Dict[str, str]
 
     # PostgreSQL backend-specific attributes.
-    _named_cursor_idx: int = ...
+    _named_cursor_idx: int
     @property
     def pg_version(self) -> int: ...
 

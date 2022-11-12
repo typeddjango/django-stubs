@@ -22,7 +22,7 @@ class ErrorDict(dict):
 
 class ErrorList(UserList):
     data: List[ValidationError | str]
-    error_class: str = ...
+    error_class: str
     def __init__(
         self,
         initlist: ErrorList | Sequence[str | Exception] | None = ...,

@@ -5,10 +5,10 @@ from django.http.response import HttpResponse, HttpResponseBase
 from django.urls import URLPattern, URLResolver
 from django.urls import include as include
 
-handler400: str | Callable[..., HttpResponse] = ...
-handler403: str | Callable[..., HttpResponse] = ...
-handler404: str | Callable[..., HttpResponse] = ...
-handler500: str | Callable[..., HttpResponse] = ...
+handler400: str | Callable[..., HttpResponse]
+handler403: str | Callable[..., HttpResponse]
+handler404: str | Callable[..., HttpResponse]
+handler500: str | Callable[..., HttpResponse]
 
 IncludedURLConf = Tuple[Sequence[URLResolver | URLPattern], str | None, str | None]
 

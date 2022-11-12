@@ -15,14 +15,14 @@ _TemplateForResponseT = Union[_ListOrTuple[str], Template, str]
 class ContentNotRenderedError(Exception): ...
 
 class SimpleTemplateResponse(HttpResponse):
-    content: Any = ...
+    content: Any
     closed: bool
     cookies: SimpleCookie[str]
     status_code: int
-    rendering_attrs: Any = ...
-    template_name: _TemplateForResponseT = ...
-    context_data: Dict[str, Any] | None = ...
-    using: str | None = ...
+    rendering_attrs: Any
+    template_name: _TemplateForResponseT
+    context_data: Dict[str, Any] | None
+    using: str | None
     def __init__(
         self,
         template: _TemplateForResponseT,
@@ -57,7 +57,7 @@ class TemplateResponse(SimpleTemplateResponse):
     templates: List[Template]
     using: str | None
     wsgi_request: WSGIRequest
-    rendering_attrs: Any = ...
+    rendering_attrs: Any
     def __init__(
         self,
         request: HttpRequest,

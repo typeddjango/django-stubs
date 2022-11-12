@@ -4,9 +4,9 @@ from django.template.backends.base import BaseEngine
 from django.template.base import Origin
 
 class TemplateDoesNotExist(Exception):
-    backend: BaseEngine | None = ...
-    tried: List[Tuple[Origin, str]] = ...
-    chain: List[TemplateDoesNotExist] = ...
+    backend: BaseEngine | None
+    tried: List[Tuple[Origin, str]]
+    chain: List[TemplateDoesNotExist]
     def __init__(
         self,
         msg: Origin | str,

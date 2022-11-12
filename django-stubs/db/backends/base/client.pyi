@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterable, Sequence, Tuple
 from django.db.backends.base.base import BaseDatabaseWrapper
 
 class BaseDatabaseClient:
-    executable_name: str | None = ...
+    executable_name: str | None
     connection: BaseDatabaseWrapper
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
     @classmethod

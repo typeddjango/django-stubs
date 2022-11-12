@@ -23,7 +23,7 @@ class Storage:
     def get_modified_time(self, name: str) -> datetime: ...
 
 class FileSystemStorage(Storage):
-    OS_OPEN_FLAGS: int = ...
+    OS_OPEN_FLAGS: int
     def __init__(
         self,
         location: _PathCompatible | None = ...,

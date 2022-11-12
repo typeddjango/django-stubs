@@ -9,5 +9,5 @@ from django.db.migrations.loader import AmbiguityError as AmbiguityError
 from django.db.migrations.loader import MigrationLoader as MigrationLoader
 
 class Command(BaseCommand):
-    output_transaction: bool = ...
+    output_transaction: bool
     def execute(self, *args: Any, **options: Any) -> str | None: ...

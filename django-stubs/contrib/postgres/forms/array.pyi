@@ -12,7 +12,7 @@ from django.forms.widgets import Media, _OptAttrs
 from ..utils import prefix_validation_error as prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
-    default_error_messages: _ErrorMessagesT = ...
+    default_error_messages: _ErrorMessagesT
     base_field: forms.Field
     delimiter: str
     min_length: int | None
@@ -50,7 +50,7 @@ class SplitArrayWidget(forms.Widget):
     def needs_multipart_form(self) -> bool: ...  # type: ignore
 
 class SplitArrayField(forms.Field):
-    default_error_messages: _ErrorMessagesT = ...
+    default_error_messages: _ErrorMessagesT
     base_field: forms.Field
     size: int
     remove_trailing_nulls: bool

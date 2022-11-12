@@ -8,7 +8,7 @@ from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponseBase
 
 class StaticFilesHandlerMixin:
-    handles_files: bool = ...
+    handles_files: bool
     application: BaseHandler
     base_url: ParseResult
     def load_middleware(self) -> None: ...

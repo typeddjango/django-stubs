@@ -13,9 +13,9 @@ class ModelState:
     name: str
     app_label: str
     fields: Dict[str, Field]
-    options: Dict[str, Any] = ...
-    bases: Sequence[Type[Model] | str] = ...
-    managers: List[Tuple[str, Manager]] = ...
+    options: Dict[str, Any]
+    bases: Sequence[Type[Model] | str]
+    managers: List[Tuple[str, Manager]]
     def __init__(
         self,
         app_label: str,

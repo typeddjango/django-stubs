@@ -18,7 +18,7 @@ class EngineMixin:
     def engine(self) -> BaseEngine: ...
 
 class DjangoTemplates(EngineMixin, BaseRenderer):
-    backend: Type[DjangoTemplatesR] = ...
+    backend: Type[DjangoTemplatesR]
 
 class Jinja2(EngineMixin, BaseRenderer):
     @property

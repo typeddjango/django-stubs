@@ -11,5 +11,5 @@ from django.db import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
 from django.db import connections as connections
 
 class Command(BaseCommand):
-    stealth_options: Tuple[str] = ...
-    style: Style = ...
+    stealth_options: Tuple[str]
+    style: Style

@@ -5,7 +5,7 @@ from django.db.backends.sqlite3.base import DatabaseWrapper
 
 class DatabaseClient(BaseDatabaseClient):
     connection: DatabaseWrapper
-    executable_name: str = ...
+    executable_name: str
     @classmethod
     def settings_to_cmd_args_env(
         cls, settings_dict: Dict[str, Any], parameters: Iterable[str]

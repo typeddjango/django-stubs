@@ -25,19 +25,19 @@ class Field:
     initial: Any
     label: _StrOrPromise | None
     required: bool
-    widget: _ClassLevelWidgetT = ...
-    hidden_widget: Type[Widget] = ...
-    default_validators: List[_ValidatorCallable] = ...
-    default_error_messages: _ErrorMessagesT = ...
-    empty_values: Sequence[Any] = ...
-    show_hidden_initial: bool = ...
-    help_text: _StrOrPromise = ...
-    disabled: bool = ...
-    label_suffix: str | None = ...
-    localize: bool = ...
-    error_messages: _ErrorMessagesT = ...
-    validators: List[_ValidatorCallable] = ...
-    max_length: int | None = ...
+    widget: _ClassLevelWidgetT
+    hidden_widget: Type[Widget]
+    default_validators: List[_ValidatorCallable]
+    default_error_messages: _ErrorMessagesT
+    empty_values: Sequence[Any]
+    show_hidden_initial: bool
+    help_text: _StrOrPromise
+    disabled: bool
+    label_suffix: str | None
+    localize: bool
+    error_messages: _ErrorMessagesT
+    validators: List[_ValidatorCallable]
+    max_length: int | None
     def __init__(
         self,
         *,
@@ -65,10 +65,10 @@ class Field:
     def deconstruct(self) -> Any: ...
 
 class CharField(Field):
-    max_length: int | None = ...
-    min_length: int | None = ...
-    strip: bool = ...
-    empty_value: str | None = ...
+    max_length: int | None
+    min_length: int | None
+    strip: bool
+    empty_value: str | None
     def __init__(
         self,
         *,
@@ -94,7 +94,7 @@ class CharField(Field):
 class IntegerField(Field):
     max_value: int | None
     min_value: int | None
-    re_decimal: Any = ...
+    re_decimal: Any
     def __init__(
         self,
         *,
@@ -164,7 +164,7 @@ class DecimalField(IntegerField):
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
 class BaseTemporalField(Field):
-    input_formats: Any = ...
+    input_formats: Any
     def __init__(
         self,
         *,
@@ -204,7 +204,7 @@ class DurationField(Field):
     def to_python(self, value: Any | None) -> datetime.timedelta | None: ...
 
 class RegexField(CharField):
-    regex: _PropertyDescriptor[str | Pattern[str], Pattern[str]] = ...
+    regex: _PropertyDescriptor[str | Pattern[str], Pattern[str]]
     def __init__(
         self,
         regex: str | Pattern[str],
@@ -248,7 +248,7 @@ class EmailField(CharField):
     ) -> None: ...
 
 class FileField(Field):
-    allow_empty_file: bool = ...
+    allow_empty_file: bool
     def __init__(
         self,
         *,
@@ -307,7 +307,7 @@ class NullBooleanField(BooleanField):
     def validate(self, value: Any) -> None: ...
 
 class CallableChoiceIterator:
-    choices_func: _ChoicesCallable = ...
+    choices_func: _ChoicesCallable
     def __init__(self, choices_func: _ChoicesCallable) -> None: ...
     def __iter__(self) -> Iterator[_Choice | _ChoiceNamedGroup]: ...
 
@@ -315,7 +315,7 @@ class ChoiceField(Field):
     choices: _PropertyDescriptor[
         _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
         _FieldChoices | CallableChoiceIterator,
-    ] = ...
+    ]
     widget: _ClassLevelWidgetT
     def __init__(
         self,
@@ -343,8 +343,8 @@ class _CoerceCallable(Protocol):
     def __call__(self, __value: Any) -> Any: ...
 
 class TypedChoiceField(ChoiceField):
-    coerce: _CoerceCallable = ...
-    empty_value: str | None = ...
+    coerce: _CoerceCallable
+    empty_value: str | None
     def __init__(
         self,
         *,
@@ -371,8 +371,8 @@ class MultipleChoiceField(ChoiceField):
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...
 
 class TypedMultipleChoiceField(MultipleChoiceField):
-    coerce: _CoerceCallable = ...
-    empty_value: List[Any] | None = ...
+    coerce: _CoerceCallable
+    empty_value: List[Any] | None
     def __init__(
         self,
         *,
@@ -395,7 +395,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
     def validate(self, value: Any) -> None: ...
 
 class ComboField(Field):
-    fields: Sequence[Field] = ...
+    fields: Sequence[Field]
     def __init__(
         self,
         fields: Sequence[Field],
@@ -415,8 +415,8 @@ class ComboField(Field):
     def clean(self, value: Any) -> Any: ...
 
 class MultiValueField(Field):
-    require_all_fields: bool = ...
-    fields: Sequence[Field] = ...
+    require_all_fields: bool
+    fields: Sequence[Field]
     def __init__(
         self,
         fields: Sequence[Field],
@@ -445,7 +445,7 @@ class FilePathField(ChoiceField):
     match: str | None
     path: str
     recursive: bool
-    match_re: Pattern[str] | None = ...
+    match_re: Pattern[str] | None
     def __init__(
         self,
         path: str,
@@ -491,7 +491,7 @@ class SplitDateTimeField(MultiValueField):
     def compress(self, data_list: Tuple[datetime.date, datetime.time] | None) -> datetime.datetime | None: ...
 
 class GenericIPAddressField(CharField):
-    unpack_ipv4: bool = ...
+    unpack_ipv4: bool
     def __init__(
         self,
         *,
@@ -512,7 +512,7 @@ class GenericIPAddressField(CharField):
     def to_python(self, value: Any) -> str: ...
 
 class SlugField(CharField):
-    allow_unicode: bool = ...
+    allow_unicode: bool
     def __init__(
         self,
         *,
@@ -542,10 +542,10 @@ class InvalidJSONInput(str): ...
 class JSONString(str): ...
 
 class JSONField(CharField):
-    default_error_messages: _ErrorMessagesT = ...
-    widget: _ClassLevelWidgetT = ...
-    encoder: Any = ...
-    decoder: Any = ...
+    default_error_messages: _ErrorMessagesT
+    widget: _ClassLevelWidgetT
+    encoder: Any
+    decoder: Any
     def __init__(self, encoder: Any | None = ..., decoder: Any | None = ..., **kwargs: Any) -> None: ...
     def to_python(self, value: Any) -> Any: ...
     def bound_data(self, data: Any, initial: Any) -> Any: ...

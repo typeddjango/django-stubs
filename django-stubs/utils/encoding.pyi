@@ -6,7 +6,7 @@ from django.utils.functional import Promise
 from typing_extensions import Literal, TypeGuard
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
-    obj: bytes = ...
+    obj: bytes
     def __init__(self, obj: bytes, *args: Any) -> None: ...
 
 _P = TypeVar("_P", bound=Promise)

@@ -5,8 +5,8 @@ from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseClient(BaseDatabaseClient):
     connection: DatabaseWrapper
-    executable_name: str = ...
-    wrapper_name: str = ...
+    executable_name: str
+    wrapper_name: str
     @staticmethod
     def connect_string(settings_dict: Dict[str, Any]) -> str: ...
     @classmethod

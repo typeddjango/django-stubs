@@ -3,9 +3,9 @@ from typing import IO, Dict, Type, TypeVar
 from django.core.files.base import File
 
 class UploadedFile(File):
-    content_type: str | None = ...
-    charset: str | None = ...
-    content_type_extra: Dict[str, str] | None = ...
+    content_type: str | None
+    charset: str | None
+    content_type_extra: Dict[str, str] | None
     size: int | None  # type: ignore[assignment]
     name: str | None
     def __init__(
@@ -30,7 +30,7 @@ class TemporaryUploadedFile(UploadedFile):
     def temporary_file_path(self) -> str: ...
 
 class InMemoryUploadedFile(UploadedFile):
-    field_name: str | None = ...
+    field_name: str | None
     def __init__(
         self,
         file: IO,

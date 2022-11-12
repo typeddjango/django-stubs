@@ -17,10 +17,10 @@ class _SupportsPagination(Protocol[_T], Sized, Iterable):
     def __getitem__(self, __index: slice) -> _SupportsPagination[_T]: ...
 
 class Paginator(Generic[_T]):
-    object_list: _SupportsPagination[_T] = ...
-    per_page: int = ...
-    orphans: int = ...
-    allow_empty_first_page: bool = ...
+    object_list: _SupportsPagination[_T]
+    per_page: int
+    orphans: int
+    allow_empty_first_page: bool
     def __init__(
         self,
         object_list: _SupportsPagination[_T],
@@ -45,9 +45,9 @@ class Paginator(Generic[_T]):
 QuerySetPaginator = Paginator
 
 class Page(Sequence[_T]):
-    object_list: _SupportsPagination[_T] = ...
-    number: int = ...
-    paginator: Paginator = ...
+    object_list: _SupportsPagination[_T]
+    number: int
+    paginator: Paginator
     def __init__(
         self,
         object_list: _SupportsPagination[_T],

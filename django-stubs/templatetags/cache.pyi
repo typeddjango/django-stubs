@@ -6,11 +6,11 @@ from django.template.base import FilterExpression, NodeList, Parser, Token
 register: Any
 
 class CacheNode(Node):
-    nodelist: NodeList = ...
-    expire_time_var: FilterExpression = ...
-    fragment_name: str = ...
-    vary_on: List[FilterExpression] = ...
-    cache_name: FilterExpression | None = ...
+    nodelist: NodeList
+    expire_time_var: FilterExpression
+    fragment_name: str
+    vary_on: List[FilterExpression]
+    cache_name: FilterExpression | None
     def __init__(
         self,
         nodelist: NodeList,

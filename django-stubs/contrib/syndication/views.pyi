@@ -14,10 +14,10 @@ _Item = TypeVar("_Item", bound=Model)
 _Object = TypeVar("_Object")
 
 class Feed(Generic[_Item, _Object]):
-    feed_type: Type[SyndicationFeed] = ...
-    title_template: str | None = ...
-    description_template: str | None = ...
-    language: str | None = ...
+    feed_type: Type[SyndicationFeed]
+    title_template: str | None
+    description_template: str | None
+    language: str | None
 
     # Dynamic attributes:
     title: Any

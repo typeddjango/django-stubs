@@ -5,7 +5,7 @@ from django.db.backends.mysql.base import DatabaseWrapper
 
 class DatabaseClient(BaseDatabaseClient):
     connection: DatabaseWrapper
-    executable_name: str = ...
+    executable_name: str
     @classmethod
     def settings_to_cmd_args_env(
         cls,

@@ -4,9 +4,9 @@ from django.db.migrations.state import ModelState
 from django.db.models.fields import Field
 
 class MigrationQuestioner:
-    defaults: Dict[str, Any] = ...
-    specified_apps: Set[str] = ...
-    dry_run: bool | None = ...
+    defaults: Dict[str, Any]
+    specified_apps: Set[str]
+    dry_run: bool | None
     def __init__(
         self,
         defaults: Dict[str, bool] | None = ...,

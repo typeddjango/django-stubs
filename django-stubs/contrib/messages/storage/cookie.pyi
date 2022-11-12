@@ -9,12 +9,12 @@ class MessageEncoder(json.JSONEncoder):
     ensure_ascii: bool
     skipkeys: bool
     sort_keys: bool
-    message_key: str = ...
+    message_key: str
 
 class MessageDecoder(json.JSONDecoder):
     def process_messages(self, obj: Any) -> Any: ...
 
 class CookieStorage(BaseStorage):
-    cookie_name: str = ...
-    max_cookie_size: int = ...
-    not_finished: str = ...
+    cookie_name: str
+    max_cookie_size: int
+    not_finished: str

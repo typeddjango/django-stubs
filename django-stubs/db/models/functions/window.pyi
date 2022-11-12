@@ -4,10 +4,10 @@ from django.db import models
 from django.db.models.expressions import Func
 
 class CumeDist(Func):
-    output_field: models.FloatField = ...
+    output_field: models.FloatField
 
 class DenseRank(Func):
-    output_field: models.IntegerField = ...
+    output_field: models.IntegerField
 
 class FirstValue(Func): ...
 
@@ -23,13 +23,13 @@ class NthValue(Func):
 
 class Ntile(Func):
     def __init__(self, num_buckets: int = ..., **extra: Any) -> None: ...
-    output_field: models.IntegerField = ...
+    output_field: models.IntegerField
 
 class PercentRank(Func):
-    output_field: models.FloatField = ...
+    output_field: models.FloatField
 
 class Rank(Func):
-    output_field: models.IntegerField = ...
+    output_field: models.IntegerField
 
 class RowNumber(Func):
-    output_field: models.IntegerField = ...
+    output_field: models.IntegerField

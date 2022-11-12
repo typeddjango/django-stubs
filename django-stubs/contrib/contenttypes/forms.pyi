@@ -7,9 +7,9 @@ _M = TypeVar("_M", bound=Model)
 _ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
 
 class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
-    instance: Any = ...
-    rel_name: Any = ...
-    save_as_new: Any = ...
+    instance: Any
+    rel_name: Any
+    save_as_new: Any
     def __init__(
         self,
         data: Any | None = ...,

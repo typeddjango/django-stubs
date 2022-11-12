@@ -8,8 +8,8 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.constants import LOOKUP_SEP as LOOKUP_SEP
 
 class Command(BaseCommand):
-    stealth_options: Tuple[str] = ...
-    db_module: str = ...
+    stealth_options: Tuple[str]
+    db_module: str
     def handle_inspection(self, options: Dict[str, Any]) -> Iterable[str]: ...
     def normalize_col_name(
         self, col_name: str, used_column_names: List[str], is_relation: bool

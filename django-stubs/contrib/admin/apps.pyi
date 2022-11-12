@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 class SimpleAdminConfig(AppConfig):
-    default_site: str = ...
+    default_site: str
 
 class AdminConfig(SimpleAdminConfig): ...

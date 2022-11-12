@@ -22,7 +22,7 @@ from typing_extensions import Protocol
 class Empty: ...
 class NOT_PROVIDED: ...
 
-BLANK_CHOICE_DASH: List[Tuple[str, str]] = ...
+BLANK_CHOICE_DASH: List[Tuple[str, str]]
 
 _Choice = Tuple[Any, Any]
 _ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
@@ -113,10 +113,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     remote_field: ForeignObjectRel | None
     is_relation: bool
     related_model: Type[Model] | None
-    one_to_many: bool | None = ...
-    one_to_one: bool | None = ...
-    many_to_many: bool | None = ...
-    many_to_one: bool | None = ...
+    one_to_many: bool | None
+    one_to_one: bool | None
+    many_to_many: bool | None
+    many_to_one: bool | None
     max_length: int | None
     model: Type[Model]
     name: str
@@ -126,14 +126,14 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     null: bool
     unique: bool
     editable: bool
-    empty_strings_allowed: bool = ...
-    choices: _ChoicesList | None = ...
+    empty_strings_allowed: bool
+    choices: _ChoicesList | None
     db_column: str | None
     column: str
     concrete: bool
     default: Any
     error_messages: _ErrorMessagesT
-    empty_values: Sequence[Any] = ...
+    empty_values: Sequence[Any]
     creation_counter: int
     auto_creation_counter: int
     default_validators: Sequence[validators._ValidatorCallable]
@@ -242,8 +242,8 @@ class DecimalField(Field[_ST, _GT]):
     _pyi_private_get_type: decimal.Decimal
     _pyi_lookup_exact_type: str | decimal.Decimal
     # attributes
-    max_digits: int = ...
-    decimal_places: int = ...
+    max_digits: int
+    decimal_places: int
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -410,9 +410,9 @@ class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
-    default_error_messages: Dict[str, str] = ...
-    unpack_ipv4: bool = ...
-    protocol: str = ...
+    default_error_messages: Dict[str, str]
+    unpack_ipv4: bool
+    protocol: str
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -535,11 +535,11 @@ class UUIDField(Field[_ST, _GT]):
     ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
-    path: Any = ...
-    match: str | None = ...
-    recursive: bool = ...
-    allow_files: bool = ...
-    allow_folders: bool = ...
+    path: Any
+    match: str | None
+    recursive: bool
+    allow_files: bool
+    allow_folders: bool
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -575,7 +575,7 @@ class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta
 
 class AutoFieldMixin:
-    db_returning: bool = ...
+    db_returning: bool
 
 class AutoFieldMeta(type): ...
 

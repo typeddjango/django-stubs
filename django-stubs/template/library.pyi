@@ -11,8 +11,8 @@ class InvalidTemplateLibrary(Exception): ...
 _C = TypeVar("_C", bound=Callable[..., Any])
 
 class Library:
-    filters: Dict[str, Callable] = ...
-    tags: Dict[str, Callable] = ...
+    filters: Dict[str, Callable]
+    tags: Dict[str, Callable]
     def __init__(self) -> None: ...
     @overload
     def tag(self, name: _C) -> _C: ...
@@ -40,10 +40,10 @@ class Library:
     ) -> Callable[[_C], _C]: ...
 
 class TagHelperNode(Node):
-    func: Any = ...
-    takes_context: Any = ...
-    args: Any = ...
-    kwargs: Any = ...
+    func: Any
+    takes_context: Any
+    args: Any
+    kwargs: Any
     def __init__(
         self,
         func: Callable,
@@ -60,7 +60,7 @@ class SimpleNode(TagHelperNode):
     origin: Origin
     takes_context: bool | None
     token: Token
-    target_var: str | None = ...
+    target_var: str | None
     def __init__(
         self,
         func: Callable,
@@ -77,7 +77,7 @@ class InclusionNode(TagHelperNode):
     origin: Origin
     takes_context: bool | None
     token: Token
-    filename: Template | str = ...
+    filename: Template | str
     def __init__(
         self,
         func: Callable,

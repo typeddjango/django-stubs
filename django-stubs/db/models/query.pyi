@@ -31,8 +31,8 @@ _Row = TypeVar("_Row", covariant=True)
 _QS = TypeVar("_QS", bound="_QuerySet")
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
 
-MAX_GET_RESULTS: int = ...
-REPR_OUTPUT_SIZE: int = ...
+MAX_GET_RESULTS: int
+REPR_OUTPUT_SIZE: int
 
 class BaseIterable(Generic[_Row]):
     queryset: QuerySet[Model]

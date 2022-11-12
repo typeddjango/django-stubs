@@ -26,7 +26,7 @@ from typing_extensions import Literal
 _T = TypeVar("_T", bound=models.Model)
 _F = TypeVar("_F", bound=models.Field)
 
-RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"] = ...
+RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
 def resolve_relation(scope_model: Type[Model], relation: str | Type[Model]) -> str | Type[Model]: ...
 
@@ -36,11 +36,11 @@ _ST = TypeVar("_ST")
 _GT = TypeVar("_GT")
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
-    one_to_many: bool = ...
-    one_to_one: bool = ...
-    many_to_many: bool = ...
-    many_to_one: bool = ...
-    opts: Any = ...
+    one_to_many: bool
+    one_to_one: bool
+    many_to_many: bool
+    many_to_one: bool
+    opts: Any
 
     remote_field: ForeignObjectRel
     rel_class: Type[ForeignObjectRel]
@@ -208,9 +208,9 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any]
     _pyi_private_get_type: RelatedManager[Any]
 
-    description: str = ...
-    has_null_arg: bool = ...
-    swappable: bool = ...
+    description: str
+    has_null_arg: bool
+    swappable: bool
 
     many_to_many: Literal[True]
     many_to_one: Literal[False]
