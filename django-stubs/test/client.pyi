@@ -11,7 +11,6 @@ from typing import (
     Iterable,
     Iterator,
     List,
-    Literal,
     NoReturn,
     Optional,
     Pattern,
