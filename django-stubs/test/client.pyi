@@ -1,3 +1,4 @@
+import sys
 from io import BytesIO
 from json import JSONEncoder
 from types import TracebackType
@@ -32,6 +33,11 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 BOUNDARY: str = ...
 MULTIPART_CONTENT: str = ...
