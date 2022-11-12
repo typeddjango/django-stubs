@@ -1,4 +1,3 @@
-import sys
 from io import BytesIO
 from json import JSONEncoder
 from types import TracebackType
@@ -32,11 +31,7 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
+from typing_extensions import Literal
 
 BOUNDARY: str = ...
 MULTIPART_CONTENT: str = ...
@@ -176,6 +171,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def get(
         self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def get(
+        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
     @overload  # type: ignore
     def post(
         self,
@@ -196,6 +195,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def post(
+        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
     @overload  # type: ignore
     def head(
         self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
@@ -204,6 +207,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def head(
         self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def head(
+        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
     @overload  # type: ignore
     def trace(
         self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
@@ -212,6 +219,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def trace(
         self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def trace(
+        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
     @overload  # type: ignore
     def put(
         self,
@@ -232,6 +243,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def put(
+        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
     @overload  # type: ignore
     def patch(
         self,
@@ -252,6 +267,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def patch(
+        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
     @overload  # type: ignore
     def delete(
         self,
@@ -272,6 +291,10 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def delete(
+        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
 
 class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGIResponse]]):
     handler: AsyncClientHandler

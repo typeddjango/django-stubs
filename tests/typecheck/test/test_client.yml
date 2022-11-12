@@ -9,10 +9,7 @@
       reveal_type(response.client)  # N: Revealed type is "django.test.client.Client"
       reveal_type(response.context)  # N: Revealed type is "Union[django.test.utils.ContextList, builtins.dict[builtins.str, Any]]"
       reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
-      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
       response.json()
-      redirected_response = client.get('foo', follow=True)
-      reveal_type(redirected_response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
 -   case: async_client_methods
     main: |
       from django.test.client import AsyncClient
@@ -37,3 +34,76 @@
       async_factory = AsyncRequestFactory()
       async_request = async_factory.get('foo')
       reveal_type(async_request)  # N: Revealed type is "django.core.handlers.asgi.ASGIRequest"
+-   case: client_follow_flag
+    main: |
+      from django.test.client import Client
+      client = Client()
+      response = client.get('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.get('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.get('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.get('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+
+      response = client.post('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.post('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.post('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.post('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+
+      response = client.head('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.head('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.head('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.head('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+
+      response = client.trace('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.trace('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.trace('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.trace('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+
+      response = client.put('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.put('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.put('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.put('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+
+      response = client.patch('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.patch('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.patch('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.patch('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+
+      response = client.delete('foo')
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.delete('foo', follow=False)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
+      response = client.delete('foo', follow=True)
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      x: bool
+      response = client.delete('foo', follow=x)
+      response.redirect_chain  # E: "_MonkeyPatchedWSGIResponse" has no attribute "redirect_chain"
