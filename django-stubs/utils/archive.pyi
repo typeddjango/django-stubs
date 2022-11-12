@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import Any, Dict, Iterable, Optional, Sequence, Type
+from typing import Any, Dict, Iterable, Sequence, Type
 
 class ArchiveException(Exception): ...
 class UnrecognizedArchiveFormat(ArchiveException): ...
@@ -11,9 +11,9 @@ class Archive:
     def __enter__(self) -> Archive: ...
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None: ...
     def extract(self, to_path: str) -> None: ...
     def list(self) -> None: ...

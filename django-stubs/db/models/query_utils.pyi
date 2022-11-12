@@ -1,20 +1,5 @@
 from collections import namedtuple
-from typing import (
-    Any,
-    Collection,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Collection, Dict, Iterable, Iterator, List, Mapping, Sequence, Set, Tuple, Type, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
@@ -51,7 +36,7 @@ class Q(tree.Node):
         self,
         query: Query = ...,
         allow_joins: bool = ...,
-        reuse: Optional[Set[str]] = ...,
+        reuse: Set[str] | None = ...,
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> WhereNode: ...
@@ -69,20 +54,20 @@ class RegisterLookupMixin:
     lookup_name: str
     @classmethod
     def get_lookups(cls) -> Dict[str, Any]: ...
-    def get_lookup(self, lookup_name: str) -> Optional[Type[Lookup]]: ...
-    def get_transform(self, lookup_name: str) -> Optional[Type[Transform]]: ...
+    def get_lookup(self, lookup_name: str) -> Type[Lookup] | None: ...
+    def get_transform(self, lookup_name: str) -> Type[Transform] | None: ...
     @staticmethod
     def merge_dicts(dicts: Iterable[Dict[str, Any]]) -> Dict[str, Any]: ...
     @classmethod
-    def register_lookup(cls, lookup: _R, lookup_name: Optional[str] = ...) -> _R: ...
+    def register_lookup(cls, lookup: _R, lookup_name: str | None = ...) -> _R: ...
     @classmethod
-    def _unregister_lookup(cls, lookup: Type[Lookup], lookup_name: Optional[str] = ...) -> None: ...
+    def _unregister_lookup(cls, lookup: Type[Lookup], lookup_name: str | None = ...) -> None: ...
 
 def select_related_descend(
     field: Field,
     restricted: bool,
-    requested: Optional[Mapping[str, Any]],
-    load_fields: Optional[Collection[str]],
+    requested: Mapping[str, Any] | None,
+    load_fields: Collection[str] | None,
     reverse: bool = ...,
 ) -> bool: ...
 
@@ -90,12 +75,12 @@ _E = TypeVar("_E", bound=BaseExpression)
 
 def refs_expression(
     lookup_parts: Sequence[str], annotations: Mapping[str, _E]
-) -> Tuple[Union[Literal[False], _E], Sequence[str]]: ...
+) -> Tuple[Literal[False] | _E, Sequence[str]]: ...
 def check_rel_lookup_compatibility(model: Type[Model], target_opts: Any, field: FieldCacheMixin) -> bool: ...
 
 class FilteredRelation:
     relation_name: str = ...
-    alias: Optional[str] = ...
+    alias: str | None = ...
     condition: Q = ...
     path: List[str] = ...
     def __init__(self, relation_name: str, *, condition: Q = ...) -> None: ...

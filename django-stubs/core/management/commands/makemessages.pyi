@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Pattern, Type
+from typing import Any, List, Pattern, Type
 
 from django.core.management.base import BaseCommand
 
@@ -12,7 +12,7 @@ class TranslatableFile:
     dirpath: str
     file_name: str
     locale_dir: str
-    def __init__(self, dirpath: str, file_name: str, locale_dir: Optional[str]) -> None: ...
+    def __init__(self, dirpath: str, file_name: str, locale_dir: str | None) -> None: ...
 
 class BuildFile:
     """

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 from django.core.management.base import BaseCommand as BaseCommand
 from django.core.management.base import CommandError as CommandError

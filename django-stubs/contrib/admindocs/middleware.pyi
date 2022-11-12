@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Tuple
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
@@ -11,4 +11,4 @@ class XViewMiddleware(MiddlewareMixin):
         view_func: Callable[..., HttpResponseBase],
         view_args: Tuple,
         view_kwargs: Dict[Any, Any],
-    ) -> Optional[HttpResponse]: ...
+    ) -> HttpResponse | None: ...

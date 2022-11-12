@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List, Mapping, Optional, Protocol, Tuple, Union
+from typing import Any, Dict, Iterator, List, Mapping, Protocol, Tuple
 
 from django.http.request import HttpRequest
 from django.template import TemplateDoesNotExist
@@ -11,7 +11,7 @@ class BaseEngine:
     app_dirs: bool = ...
     def __init__(self, params: Mapping[str, Any]) -> None: ...
     @property
-    def app_dirname(self) -> Optional[str]: ...
+    def app_dirname(self) -> str | None: ...
     def from_string(self, template_code: str) -> _EngineTemplate: ...
     def get_template(self, template_name: str) -> _EngineTemplate: ...
     @property
@@ -21,6 +21,6 @@ class BaseEngine:
 class _EngineTemplate(Protocol):
     def render(
         self,
-        context: Optional[Union[Context, Dict[str, Any]]] = ...,
-        request: Optional[HttpRequest] = ...,
+        context: Context | Dict[str, Any] | None = ...,
+        request: HttpRequest | None = ...,
     ) -> SafeString: ...

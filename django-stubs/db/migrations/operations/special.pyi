@@ -29,7 +29,7 @@ class RunSQL(Operation):
             Union[str, _ListOrTuple[Union[str, Tuple[str, Union[Dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
         ] = ...,
         state_operations: Sequence[Operation] = ...,
-        hints: Optional[Mapping[str, Any]] = ...,
+        hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
     ) -> None: ...
 
@@ -38,14 +38,14 @@ class _CodeCallable(Protocol):
 
 class RunPython(Operation):
     code: _CodeCallable = ...
-    reverse_code: Optional[_CodeCallable] = ...
+    reverse_code: _CodeCallable | None = ...
     hints: Mapping[str, Any] = ...
     def __init__(
         self,
         code: _CodeCallable,
-        reverse_code: Optional[_CodeCallable] = ...,
-        atomic: Optional[bool] = ...,
-        hints: Optional[Mapping[str, Any]] = ...,
+        reverse_code: _CodeCallable | None = ...,
+        atomic: bool | None = ...,
+        hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
     ) -> None: ...
     @staticmethod

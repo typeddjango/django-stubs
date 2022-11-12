@@ -1,4 +1,4 @@
-from typing import IO, Any, Iterator, Union
+from typing import IO, Any, Iterator
 
 from django.core.serializers.base import DeserializedObject
 from django.core.serializers.python import Serializer as PythonSerializer
@@ -17,5 +17,5 @@ class Serializer(PythonSerializer):
     def getvalue(self) -> Any: ...
 
 def Deserializer(
-    stream_or_string: Union[bytes, str, IO[bytes], IO[str]], **options: Any
+    stream_or_string: bytes | str | IO[bytes] | IO[str], **options: Any
 ) -> Iterator[DeserializedObject]: ...

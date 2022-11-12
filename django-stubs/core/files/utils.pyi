@@ -1,11 +1,11 @@
-from typing import IO, Any, AnyStr, Generic, Iterator, Optional
+from typing import IO, Any, AnyStr, Generic, Iterator
 
 from django.utils._os import _PathCompatible
 
 def validate_file_name(name: _PathCompatible, allow_relative_path: bool = ...) -> _PathCompatible: ...
 
 class FileProxyMixin(Generic[AnyStr]):
-    file: Optional[IO[AnyStr]]
+    file: IO[AnyStr] | None
     encoding: Any = ...
     fileno: Any = ...
     flush: Any = ...

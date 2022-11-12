@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Set, Tuple, Type
 
 class BaseSerializer:
     value: Any = ...
@@ -14,7 +14,7 @@ class DecimalSerializer(BaseSerializer): ...
 class DeconstructableSerializer(BaseSerializer):
     @staticmethod
     def serialize_deconstructed(
-        path: str, args: List[Any], kwargs: Dict[str, Union[Callable, int, str]]
+        path: str, args: List[Any], kwargs: Dict[str, Callable | int | str]
     ) -> Tuple[str, Set[str]]: ...
 
 class DictionarySerializer(BaseSerializer): ...

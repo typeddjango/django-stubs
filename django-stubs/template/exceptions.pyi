@@ -1,18 +1,18 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple
 
 from django.template.backends.base import BaseEngine
 from django.template.base import Origin
 
 class TemplateDoesNotExist(Exception):
-    backend: Optional[BaseEngine] = ...
+    backend: BaseEngine | None = ...
     tried: List[Tuple[Origin, str]] = ...
     chain: List[TemplateDoesNotExist] = ...
     def __init__(
         self,
-        msg: Union[Origin, str],
-        tried: Optional[List[Tuple[Origin, str]]] = ...,
-        backend: Optional[BaseEngine] = ...,
-        chain: Optional[List[TemplateDoesNotExist]] = ...,
+        msg: Origin | str,
+        tried: List[Tuple[Origin, str]] | None = ...,
+        backend: BaseEngine | None = ...,
+        chain: List[TemplateDoesNotExist] | None = ...,
     ) -> None: ...
 
 class TemplateSyntaxError(Exception): ...

@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterator, List, Sequence, Set, Tuple, Type
 
 from django.apps import AppConfig
 from django.apps.registry import Apps
@@ -14,16 +14,16 @@ class ModelState:
     app_label: str
     fields: Dict[str, Field]
     options: Dict[str, Any] = ...
-    bases: Sequence[Union[Type[Model], str]] = ...
+    bases: Sequence[Type[Model] | str] = ...
     managers: List[Tuple[str, Manager]] = ...
     def __init__(
         self,
         app_label: str,
         name: str,
-        fields: Union[List[Tuple[str, Field]], Dict[str, Field]],
-        options: Optional[Dict[str, Any]] = ...,
-        bases: Optional[Sequence[Union[Type[Model], str]]] = ...,
-        managers: Optional[List[Tuple[str, Manager]]] = ...,
+        fields: List[Tuple[str, Field]] | Dict[str, Field],
+        options: Dict[str, Any] | None = ...,
+        bases: Sequence[Type[Model] | str] | None = ...,
+        managers: List[Tuple[str, Manager]] | None = ...,
     ) -> None: ...
     def clone(self) -> ModelState: ...
     def construct_managers(self) -> Iterator[Tuple[str, Manager]]: ...
@@ -46,7 +46,7 @@ class ProjectState:
     models: Dict[Any, Any]
     real_apps: List[str]
     def __init__(
-        self, models: Optional[Dict[Tuple[str, str], ModelState]] = ..., real_apps: Optional[List[str]] = ...
+        self, models: Dict[Tuple[str, str], ModelState] | None = ..., real_apps: List[str] | None = ...
     ) -> None: ...
     def add_model(self, model_state: ModelState) -> None: ...
     @property

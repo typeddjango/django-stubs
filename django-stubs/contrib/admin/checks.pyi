@@ -1,10 +1,10 @@
-from typing import Any, List, Optional, Sequence
+from typing import Any, List, Sequence
 
 from django.apps.config import AppConfig
 from django.contrib.admin.options import BaseModelAdmin
 from django.core.checks.messages import CheckMessage, Error
 
-def check_admin_app(app_configs: Optional[Sequence[AppConfig]], **kwargs: Any) -> List[CheckMessage]: ...
+def check_admin_app(app_configs: Sequence[AppConfig] | None, **kwargs: Any) -> List[CheckMessage]: ...
 def check_dependencies(**kwargs: Any) -> List[CheckMessage]: ...
 
 class BaseModelAdminChecks:

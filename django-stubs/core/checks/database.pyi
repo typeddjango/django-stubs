@@ -1,5 +1,5 @@
-from typing import Any, Iterable, Optional, Sequence
+from typing import Any, Iterable, Sequence
 
 from django.core.checks import CheckMessage
 
-def check_database_backends(databases: Optional[Iterable[str]] = ..., **kwargs: Any) -> Sequence[CheckMessage]: ...
+def check_database_backends(databases: Iterable[str] | None = ..., **kwargs: Any) -> Sequence[CheckMessage]: ...

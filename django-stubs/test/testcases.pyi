@@ -13,12 +13,10 @@ from typing import (
     Iterator,
     List,
     Mapping,
-    Optional,
     Sequence,
     Set,
     Tuple,
     Type,
-    Union,
     overload,
 )
 
@@ -60,9 +58,9 @@ class _AssertTemplateUsedContext:
     def __enter__(self) -> _AssertTemplateUsedContext: ...
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None: ...
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext): ...
@@ -80,8 +78,8 @@ class SimpleTestCase(unittest.TestCase):
     async_client: AsyncClient
     allow_database_queries: bool = ...
     # TODO: str -> Literal['__all__']
-    databases: Union[Set[str], str] = ...
-    def __call__(self, result: Optional[unittest.TestResult] = ...) -> None: ...
+    databases: Set[str] | str = ...
+    def __call__(self, result: unittest.TestResult | None = ...) -> None: ...
     def settings(self, **kwargs: Any) -> Any: ...
     def modify_settings(self, **kwargs: Any) -> Any: ...
     def assertRedirects(
@@ -102,8 +100,8 @@ class SimpleTestCase(unittest.TestCase):
     def assertContains(
         self,
         response: HttpResponseBase,
-        text: Union[bytes, int, str],
-        count: Optional[int] = ...,
+        text: bytes | int | str,
+        count: int | None = ...,
         status_code: int = ...,
         msg_prefix: str = ...,
         html: bool = ...,
@@ -111,7 +109,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertNotContains(
         self,
         response: HttpResponseBase,
-        text: Union[bytes, str],
+        text: bytes | str,
         status_code: int = ...,
         msg_prefix: str = ...,
         html: bool = ...,
@@ -120,8 +118,8 @@ class SimpleTestCase(unittest.TestCase):
     def assertFormError(
         self,
         form: Form,
-        field: Optional[str],
-        errors: Union[List[str], str],
+        field: str | None,
+        errors: List[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
@@ -129,17 +127,17 @@ class SimpleTestCase(unittest.TestCase):
         self,
         response: HttpResponseBase,
         form: str,
-        field: Optional[str],
-        errors: Union[List[str], str],
+        field: str | None,
+        errors: List[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
     def assertFormsetError(
         self,
         formset: BaseFormSet,
-        form_index: Optional[int],
-        field: Optional[str],
-        errors: Union[List[str], str],
+        form_index: int | None,
+        field: str | None,
+        errors: List[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
@@ -147,21 +145,21 @@ class SimpleTestCase(unittest.TestCase):
         self,
         response: HttpResponseBase,
         formset: str,
-        form_index: Optional[int],
-        field: Optional[str],
-        errors: Union[List[str], str],
+        form_index: int | None,
+        field: str | None,
+        errors: List[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     def assertTemplateUsed(
         self,
-        response: Optional[Union[HttpResponseBase, str]] = ...,
-        template_name: Optional[str] = ...,
+        response: HttpResponseBase | str | None = ...,
+        template_name: str | None = ...,
         msg_prefix: str = ...,
-        count: Optional[int] = ...,
-    ) -> Optional[_AssertTemplateUsedContext]: ...
+        count: int | None = ...,
+    ) -> _AssertTemplateUsedContext | None: ...
     def assertTemplateNotUsed(
-        self, response: Union[HttpResponseBase, str] = ..., template_name: Optional[str] = ..., msg_prefix: str = ...
-    ) -> Optional[_AssertTemplateNotUsedContext]: ...
+        self, response: HttpResponseBase | str = ..., template_name: str | None = ..., msg_prefix: str = ...
+    ) -> _AssertTemplateNotUsedContext | None: ...
     def assertRaisesMessage(
         self, expected_exception: Type[Exception], expected_message: str, *args: Any, **kwargs: Any
     ) -> Any: ...
@@ -173,27 +171,27 @@ class SimpleTestCase(unittest.TestCase):
         fieldclass: Type[EmailField],
         valid: Dict[str, str],
         invalid: Dict[str, List[str]],
-        field_args: Optional[Iterable[Any]] = ...,
-        field_kwargs: Optional[Mapping[str, Any]] = ...,
+        field_args: Iterable[Any] | None = ...,
+        field_kwargs: Mapping[str, Any] | None = ...,
         empty_value: str = ...,
     ) -> Any: ...
-    def assertHTMLEqual(self, html1: str, html2: str, msg: Optional[str] = ...) -> None: ...
-    def assertHTMLNotEqual(self, html1: str, html2: str, msg: Optional[str] = ...) -> None: ...
-    def assertInHTML(self, needle: str, haystack: str, count: Optional[int] = ..., msg_prefix: str = ...) -> None: ...
+    def assertHTMLEqual(self, html1: str, html2: str, msg: str | None = ...) -> None: ...
+    def assertHTMLNotEqual(self, html1: str, html2: str, msg: str | None = ...) -> None: ...
+    def assertInHTML(self, needle: str, haystack: str, count: int | None = ..., msg_prefix: str = ...) -> None: ...
     def assertJSONEqual(
         self,
         raw: str,
-        expected_data: Union[Dict[str, Any], List[Any], str, int, float, bool, None],
-        msg: Optional[str] = ...,
+        expected_data: Dict[str, Any] | List[Any] | str | int | float | bool | None,
+        msg: str | None = ...,
     ) -> None: ...
     def assertJSONNotEqual(
         self,
         raw: str,
-        expected_data: Union[Dict[str, Any], List[Any], str, int, float, bool, None],
-        msg: Optional[str] = ...,
+        expected_data: Dict[str, Any] | List[Any] | str | int | float | bool | None,
+        msg: str | None = ...,
     ) -> None: ...
-    def assertXMLEqual(self, xml1: str, xml2: str, msg: Optional[str] = ...) -> None: ...
-    def assertXMLNotEqual(self, xml1: str, xml2: str, msg: Optional[str] = ...) -> None: ...
+    def assertXMLEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
+    def assertXMLNotEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
 
 class TransactionTestCase(SimpleTestCase):
     reset_sequences: bool = ...
@@ -203,11 +201,11 @@ class TransactionTestCase(SimpleTestCase):
     serialized_rollback: bool = ...
     def assertQuerysetEqual(
         self,
-        qs: Union[Iterator[Any], List[Model], QuerySet, RawQuerySet],
+        qs: Iterator[Any] | List[Model] | QuerySet | RawQuerySet,
         values: Collection[Any],
-        transform: Union[Callable[[Model], Any], Type[str]] = ...,
+        transform: Callable[[Model], Any] | Type[str] = ...,
         ordered: bool = ...,
-        msg: Optional[str] = ...,
+        msg: str | None = ...,
     ) -> None: ...
     @overload
     def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore
@@ -229,7 +227,7 @@ class CheckCondition:
     conditions: Sequence[Tuple[Callable, str]] = ...
     def __init__(self, *conditions: Tuple[Callable, str]) -> None: ...
     def add_condition(self, condition: Callable, reason: str) -> CheckCondition: ...
-    def __get__(self, instance: None, cls: Optional[Type[TransactionTestCase]] = ...) -> bool: ...
+    def __get__(self, instance: None, cls: Type[TransactionTestCase] | None = ...) -> bool: ...
 
 def skipIfDBFeature(*features: Any) -> Callable: ...
 def skipUnlessDBFeature(*features: Any) -> Callable: ...
@@ -256,7 +254,7 @@ class LiveServerThread(threading.Thread):
     host: str = ...
     port: int = ...
     is_ready: threading.Event = ...
-    error: Optional[ImproperlyConfigured] = ...
+    error: ImproperlyConfigured | None = ...
     static_handler: Type[WSGIHandler] = ...
     connections_override: Dict[str, BaseDatabaseWrapper] = ...
     def __init__(
@@ -287,4 +285,4 @@ class SerializeMixin:
     @classmethod
     def tearDownClass(cls) -> None: ...
 
-def connections_support_transactions(aliases: Optional[Iterable[str]] = ...) -> bool: ...
+def connections_support_transactions(aliases: Iterable[str] | None = ...) -> bool: ...

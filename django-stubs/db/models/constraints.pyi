@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
+from typing import Any, Sequence, Tuple, Type, TypeVar, overload
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
@@ -15,11 +15,9 @@ class Deferrable(Enum):
 class BaseConstraint:
     name: str
     def __init__(self, name: str) -> None: ...
-    def constraint_sql(
-        self, model: Optional[Type[Model]], schema_editor: Optional[BaseDatabaseSchemaEditor]
-    ) -> str: ...
-    def create_sql(self, model: Optional[Type[Model]], schema_editor: Optional[BaseDatabaseSchemaEditor]) -> str: ...
-    def remove_sql(self, model: Optional[Type[Model]], schema_editor: Optional[BaseDatabaseSchemaEditor]) -> str: ...
+    def constraint_sql(self, model: Type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
+    def create_sql(self, model: Type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
+    def remove_sql(self, model: Type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
     def deconstruct(self) -> Any: ...
     def clone(self: _T) -> _T: ...
 
@@ -30,18 +28,18 @@ class CheckConstraint(BaseConstraint):
 class UniqueConstraint(BaseConstraint):
     expressions: Tuple[Combinable, ...]
     fields: Tuple[str, ...]
-    condition: Optional[Q]
-    deferrable: Optional[Deferrable]
+    condition: Q | None
+    deferrable: Deferrable | None
 
     @overload
     def __init__(
         self,
-        *expressions: Union[str, Combinable],
+        *expressions: str | Combinable,
         fields: None = ...,
         name: str,
-        condition: Optional[Q] = ...,
-        deferrable: Optional[Deferrable] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        deferrable: Deferrable | None = ...,
+        include: Sequence[str] | None = ...,
         opclasses: Sequence[Any] = ...,
     ) -> None: ...
     @overload
@@ -50,8 +48,8 @@ class UniqueConstraint(BaseConstraint):
         *,
         fields: Sequence[str],
         name: str,
-        condition: Optional[Q] = ...,
-        deferrable: Optional[Deferrable] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        deferrable: Deferrable | None = ...,
+        include: Sequence[str] | None = ...,
         opclasses: Sequence[Any] = ...,
     ) -> None: ...

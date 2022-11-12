@@ -1,10 +1,10 @@
 import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple
 from xml.sax import ContentHandler
 
 def rfc2822_date(date: datetime.date) -> str: ...
 def rfc3339_date(date: datetime.date) -> str: ...
-def get_tag_uri(url: str, date: Optional[datetime.date]) -> str: ...
+def get_tag_uri(url: str, date: datetime.date | None) -> str: ...
 
 class SyndicationFeed:
     feed: Dict[str, Any] = ...
@@ -13,17 +13,17 @@ class SyndicationFeed:
         self,
         title: str,
         link: str,
-        description: Optional[str],
-        language: Optional[str] = ...,
-        author_email: Optional[str] = ...,
-        author_name: Optional[str] = ...,
-        author_link: Optional[str] = ...,
-        subtitle: Optional[str] = ...,
-        categories: Optional[Tuple[str, str]] = ...,
-        feed_url: Optional[str] = ...,
-        feed_copyright: Optional[str] = ...,
-        feed_guid: Optional[str] = ...,
-        ttl: Optional[int] = ...,
+        description: str | None,
+        language: str | None = ...,
+        author_email: str | None = ...,
+        author_name: str | None = ...,
+        author_link: str | None = ...,
+        subtitle: str | None = ...,
+        categories: Tuple[str, str] | None = ...,
+        feed_url: str | None = ...,
+        feed_copyright: str | None = ...,
+        feed_guid: str | None = ...,
+        ttl: int | None = ...,
         **kwargs: Any
     ) -> None: ...
     def add_item(
@@ -31,18 +31,18 @@ class SyndicationFeed:
         title: str,
         link: str,
         description: str,
-        author_email: Optional[str] = ...,
-        author_name: Optional[str] = ...,
-        author_link: Optional[str] = ...,
-        pubdate: Optional[datetime.datetime] = ...,
-        comments: Optional[str] = ...,
-        unique_id: Optional[str] = ...,
-        unique_id_is_permalink: Optional[bool] = ...,
-        categories: Optional[Tuple] = ...,
-        item_copyright: Optional[str] = ...,
-        ttl: Optional[int] = ...,
-        updateddate: Optional[datetime.datetime] = ...,
-        enclosures: Optional[List[Enclosure]] = ...,
+        author_email: str | None = ...,
+        author_name: str | None = ...,
+        author_link: str | None = ...,
+        pubdate: datetime.datetime | None = ...,
+        comments: str | None = ...,
+        unique_id: str | None = ...,
+        unique_id_is_permalink: bool | None = ...,
+        categories: Tuple | None = ...,
+        item_copyright: str | None = ...,
+        ttl: int | None = ...,
+        updateddate: datetime.datetime | None = ...,
+        enclosures: List[Enclosure] | None = ...,
         **kwargs: Any
     ) -> None: ...
     def num_items(self) -> int: ...
@@ -58,7 +58,7 @@ class Enclosure:
     length: Any
     mime_type: str
     url: str = ...
-    def __init__(self, url: str, length: Union[int, str], mime_type: str) -> None: ...
+    def __init__(self, url: str, length: int | str, mime_type: str) -> None: ...
 
 class RssFeed(SyndicationFeed):
     content_type: str = ...

@@ -1,4 +1,4 @@
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from django.contrib.gis.gdal.raster.base import GDALRasterBase as GDALRasterBase
 
@@ -30,10 +30,10 @@ class GDALBand(GDALRasterBase):
     def color_interp(self, as_string: bool = ...) -> Any: ...
     def data(
         self,
-        data: Optional[Any] = ...,
-        offset: Optional[Any] = ...,
-        size: Optional[Any] = ...,
-        shape: Optional[Any] = ...,
+        data: Any | None = ...,
+        offset: Any | None = ...,
+        size: Any | None = ...,
+        shape: Any | None = ...,
         as_memoryview: bool = ...,
     ) -> Any: ...
 

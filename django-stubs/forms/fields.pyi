@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import Any, Collection, Dict, Iterator, List, Optional, Pattern, Protocol, Sequence, Tuple, Type, Union
+from typing import Any, Collection, Dict, Iterator, List, Pattern, Protocol, Sequence, Tuple, Type
 from uuid import UUID
 
 from django.core.files import File
@@ -23,7 +23,7 @@ _ClassLevelWidgetT = Any
 
 class Field:
     initial: Any
-    label: Optional[_StrOrPromise]
+    label: _StrOrPromise | None
     required: bool
     widget: _ClassLevelWidgetT = ...
     hidden_widget: Type[Widget] = ...
@@ -33,133 +33,133 @@ class Field:
     show_hidden_initial: bool = ...
     help_text: _StrOrPromise = ...
     disabled: bool = ...
-    label_suffix: Optional[str] = ...
+    label_suffix: str | None = ...
     localize: bool = ...
     error_messages: _ErrorMessagesT = ...
     validators: List[_ValidatorCallable] = ...
-    max_length: Optional[int] = ...
+    max_length: int | None = ...
     def __init__(
         self,
         *,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     def prepare_value(self, value: Any) -> Any: ...
-    def to_python(self, value: Optional[Any]) -> Optional[Any]: ...
+    def to_python(self, value: Any | None) -> Any | None: ...
     def validate(self, value: Any) -> None: ...
     def run_validators(self, value: Any) -> None: ...
     def clean(self, value: Any) -> Any: ...
     def bound_data(self, data: Any, initial: Any) -> Any: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
-    def has_changed(self, initial: Optional[Any], data: Optional[Any]) -> bool: ...
+    def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
     def get_bound_field(self, form: BaseForm, field_name: str) -> BoundField: ...
     def deconstruct(self) -> Any: ...
 
 class CharField(Field):
-    max_length: Optional[int] = ...
-    min_length: Optional[int] = ...
+    max_length: int | None = ...
+    min_length: int | None = ...
     strip: bool = ...
-    empty_value: Optional[str] = ...
+    empty_value: str | None = ...
     def __init__(
         self,
         *,
-        max_length: Optional[int] = ...,
-        min_length: Optional[int] = ...,
+        max_length: int | None = ...,
+        min_length: int | None = ...,
         strip: bool = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: str | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Optional[Any]) -> Optional[str]: ...
+    def to_python(self, value: Any | None) -> str | None: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
 class IntegerField(Field):
-    max_value: Optional[int]
-    min_value: Optional[int]
+    max_value: int | None
+    min_value: int | None
     re_decimal: Any = ...
     def __init__(
         self,
         *,
-        max_value: Optional[int] = ...,
-        min_value: Optional[int] = ...,
+        max_value: int | None = ...,
+        min_value: int | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Optional[Any]) -> Optional[int]: ...
+    def to_python(self, value: Any | None) -> int | None: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
 class FloatField(IntegerField):
     def __init__(
         self,
         *,
-        max_value: Union[int, float, None] = ...,
-        min_value: Union[int, float, None] = ...,
+        max_value: int | float | None = ...,
+        min_value: int | float | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Optional[Any]) -> Optional[float]: ...  # type: ignore
+    def to_python(self, value: Any | None) -> float | None: ...  # type: ignore
     def validate(self, value: float) -> None: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
 class DecimalField(IntegerField):
-    decimal_places: Optional[int]
-    max_digits: Optional[int]
+    decimal_places: int | None
+    max_digits: int | None
     def __init__(
         self,
         *,
-        max_value: Union[Decimal, int, float, None] = ...,
-        min_value: Union[Decimal, int, float, None] = ...,
-        max_digits: Optional[int] = ...,
-        decimal_places: Optional[int] = ...,
+        max_value: Decimal | int | float | None = ...,
+        min_value: Decimal | int | float | None = ...,
+        max_digits: int | None = ...,
+        decimal_places: int | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Optional[Any]) -> Optional[Decimal]: ...  # type: ignore
+    def to_python(self, value: Any | None) -> Decimal | None: ...  # type: ignore
     def validate(self, value: Decimal) -> None: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
@@ -168,83 +168,83 @@ class BaseTemporalField(Field):
     def __init__(
         self,
         *,
-        input_formats: Optional[Any] = ...,
+        input_formats: Any | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Optional[str]) -> Optional[Any]: ...
+    def to_python(self, value: str | None) -> Any | None: ...
     def strptime(self, value: str, format: str) -> Any: ...
 
 class DateField(BaseTemporalField):
-    def to_python(self, value: Union[None, str, datetime.datetime, datetime.date]) -> Optional[datetime.date]: ...
+    def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.date | None: ...
     def strptime(self, value: str, format: str) -> datetime.date: ...
 
 class TimeField(BaseTemporalField):
-    def to_python(self, value: Union[None, str, datetime.time]) -> Optional[datetime.time]: ...
+    def to_python(self, value: None | str | datetime.time) -> datetime.time | None: ...
     def strptime(self, value: str, format: str) -> datetime.time: ...
 
 class DateTimeFormatsIterator:
     def __iter__(self) -> Iterator[str]: ...
 
 class DateTimeField(BaseTemporalField):
-    def to_python(self, value: Union[None, str, datetime.datetime, datetime.date]) -> Optional[datetime.datetime]: ...
+    def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.datetime | None: ...
     def strptime(self, value: str, format: str) -> datetime.datetime: ...
 
 class DurationField(Field):
-    def prepare_value(self, value: Optional[Union[datetime.timedelta, str]]) -> Optional[str]: ...
-    def to_python(self, value: Optional[Any]) -> Optional[datetime.timedelta]: ...
+    def prepare_value(self, value: datetime.timedelta | str | None) -> str | None: ...
+    def to_python(self, value: Any | None) -> datetime.timedelta | None: ...
 
 class RegexField(CharField):
-    regex: _PropertyDescriptor[Union[str, Pattern[str]], Pattern[str]] = ...
+    regex: _PropertyDescriptor[str | Pattern[str], Pattern[str]] = ...
     def __init__(
         self,
-        regex: Union[str, Pattern[str]],
+        regex: str | Pattern[str],
         *,
-        max_length: Optional[int] = ...,
-        min_length: Optional[int] = ...,
+        max_length: int | None = ...,
+        min_length: int | None = ...,
         strip: bool = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: str | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
 
 class EmailField(CharField):
     def __init__(
         self,
         *,
-        max_length: Optional[int] = ...,
-        min_length: Optional[int] = ...,
+        max_length: int | None = ...,
+        min_length: int | None = ...,
         strip: bool = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: str | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
 
 class FileField(Field):
@@ -252,90 +252,90 @@ class FileField(Field):
     def __init__(
         self,
         *,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         allow_empty_file: bool = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def clean(self, data: Any, initial: Optional[Any] = ...) -> Any: ...
-    def to_python(self, data: Optional[File]) -> Optional[File]: ...
-    def bound_data(self, data: Optional[Any], initial: Any) -> Any: ...
-    def has_changed(self, initial: Optional[Any], data: Optional[Any]) -> bool: ...
+    def clean(self, data: Any, initial: Any | None = ...) -> Any: ...
+    def to_python(self, data: File | None) -> File | None: ...
+    def bound_data(self, data: Any | None, initial: Any) -> Any: ...
+    def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class ImageField(FileField):
-    def to_python(self, data: Optional[File]) -> Optional[File]: ...
+    def to_python(self, data: File | None) -> File | None: ...
     def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
 
 class URLField(CharField):
     def __init__(
         self,
         *,
-        max_length: Optional[int] = ...,
-        min_length: Optional[int] = ...,
+        max_length: int | None = ...,
+        min_length: int | None = ...,
         strip: bool = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: str | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Optional[Any]) -> Optional[str]: ...
+    def to_python(self, value: Any | None) -> str | None: ...
 
 class BooleanField(Field):
-    def to_python(self, value: Optional[Any]) -> bool: ...
+    def to_python(self, value: Any | None) -> bool: ...
     def validate(self, value: Any) -> None: ...
-    def has_changed(self, initial: Optional[Any], data: Optional[Any]) -> bool: ...
+    def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class NullBooleanField(BooleanField):
-    def to_python(self, value: Optional[Any]) -> Optional[bool]: ...  # type: ignore
+    def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore
     def validate(self, value: Any) -> None: ...
 
 class CallableChoiceIterator:
     choices_func: _ChoicesCallable = ...
     def __init__(self, choices_func: _ChoicesCallable) -> None: ...
-    def __iter__(self) -> Iterator[Union[_Choice, _ChoiceNamedGroup]]: ...
+    def __iter__(self) -> Iterator[_Choice | _ChoiceNamedGroup]: ...
 
 class ChoiceField(Field):
     choices: _PropertyDescriptor[
-        Union[_FieldChoices, _ChoicesCallable, CallableChoiceIterator],
-        Union[_FieldChoices, CallableChoiceIterator],
+        _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
+        _FieldChoices | CallableChoiceIterator,
     ] = ...
     widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
-        choices: Union[_FieldChoices, _ChoicesCallable] = ...,
+        choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     # Real return type of `to_python` is `str`, but it results in errors when
     # subclassing `ModelChoiceField`: `# type: ignore[override]` is not inherited
-    def to_python(self, value: Optional[Any]) -> Any: ...
+    def to_python(self, value: Any | None) -> Any: ...
     def validate(self, value: Any) -> None: ...
     def valid_value(self, value: Any) -> bool: ...
 
@@ -344,52 +344,52 @@ class _CoerceCallable(Protocol):
 
 class TypedChoiceField(ChoiceField):
     coerce: _CoerceCallable = ...
-    empty_value: Optional[str] = ...
+    empty_value: str | None = ...
     def __init__(
         self,
         *,
         coerce: _CoerceCallable = ...,
-        empty_value: Optional[str] = ...,
-        choices: Union[_FieldChoices, _ChoicesCallable] = ...,
+        empty_value: str | None = ...,
+        choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     def clean(self, value: Any) -> Any: ...
 
 class MultipleChoiceField(ChoiceField):
-    def to_python(self, value: Optional[Any]) -> List[str]: ...
+    def to_python(self, value: Any | None) -> List[str]: ...
     def validate(self, value: Any) -> None: ...
-    def has_changed(self, initial: Optional[Collection[Any]], data: Optional[Collection[Any]]) -> bool: ...
+    def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...
 
 class TypedMultipleChoiceField(MultipleChoiceField):
     coerce: _CoerceCallable = ...
-    empty_value: Optional[List[Any]] = ...
+    empty_value: List[Any] | None = ...
     def __init__(
         self,
         *,
         coerce: _CoerceCallable = ...,
-        empty_value: Optional[List[Any]] = ...,
-        choices: Union[_FieldChoices, _ChoicesCallable] = ...,
+        empty_value: List[Any] | None = ...,
+        choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     def clean(self, value: Any) -> Any: ...
     def validate(self, value: Any) -> None: ...
@@ -401,16 +401,16 @@ class ComboField(Field):
         fields: Sequence[Field],
         *,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     def clean(self, value: Any) -> Any: ...
 
@@ -423,72 +423,72 @@ class MultiValueField(Field):
         *,
         require_all_fields: bool = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     def compress(self, data_list: Any) -> Any: ...
-    def has_changed(self, initial: Optional[Any], data: Optional[Any]) -> bool: ...
+    def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
     def clean(self, value: Any) -> Any: ...
     def validate(self, value: Any) -> None: ...
 
 class FilePathField(ChoiceField):
     allow_files: bool
     allow_folders: bool
-    match: Optional[str]
+    match: str | None
     path: str
     recursive: bool
-    match_re: Optional[Pattern[str]] = ...
+    match_re: Pattern[str] | None = ...
     def __init__(
         self,
         path: str,
         *,
-        match: Optional[str] = ...,
+        match: str | None = ...,
         recursive: bool = ...,
         allow_files: bool = ...,
         allow_folders: bool = ...,
-        choices: Union[_FieldChoices, _ChoicesCallable] = ...,
+        choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
 
 class SplitDateTimeField(MultiValueField):
     def __init__(
         self,
         *,
-        input_date_formats: Optional[Any] = ...,
-        input_time_formats: Optional[Any] = ...,
+        input_date_formats: Any | None = ...,
+        input_time_formats: Any | None = ...,
         fields: Sequence[Field] = ...,
         require_all_fields: bool = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
-    def compress(self, data_list: Optional[Tuple[datetime.date, datetime.time]]) -> Optional[datetime.datetime]: ...
+    def compress(self, data_list: Tuple[datetime.date, datetime.time] | None) -> datetime.datetime | None: ...
 
 class GenericIPAddressField(CharField):
     unpack_ipv4: bool = ...
@@ -498,16 +498,16 @@ class GenericIPAddressField(CharField):
         protocol: str = ...,
         unpack_ipv4: bool = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
     def to_python(self, value: Any) -> str: ...
 
@@ -517,26 +517,26 @@ class SlugField(CharField):
         self,
         *,
         allow_unicode: bool = ...,
-        max_length: Optional[Any] = ...,
-        min_length: Optional[Any] = ...,
+        max_length: Any | None = ...,
+        min_length: Any | None = ...,
         strip: bool = ...,
-        empty_value: Optional[str] = ...,
+        empty_value: str | None = ...,
         required: bool = ...,
-        widget: Optional[Union[Widget, Type[Widget]]] = ...,
-        label: Optional[_StrOrPromise] = ...,
-        initial: Optional[Any] = ...,
+        widget: Widget | Type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
         disabled: bool = ...,
-        label_suffix: Optional[str] = ...,
+        label_suffix: str | None = ...,
     ) -> None: ...
 
 class UUIDField(CharField):
-    def prepare_value(self, value: Optional[Any]) -> Optional[Any]: ...
-    def to_python(self, value: Any) -> Optional[UUID]: ...  # type: ignore
+    def prepare_value(self, value: Any | None) -> Any | None: ...
+    def to_python(self, value: Any) -> UUID | None: ...  # type: ignore
 
 class InvalidJSONInput(str): ...
 class JSONString(str): ...
@@ -546,8 +546,8 @@ class JSONField(CharField):
     widget: _ClassLevelWidgetT = ...
     encoder: Any = ...
     decoder: Any = ...
-    def __init__(self, encoder: Optional[Any] = ..., decoder: Optional[Any] = ..., **kwargs: Any) -> None: ...
+    def __init__(self, encoder: Any | None = ..., decoder: Any | None = ..., **kwargs: Any) -> None: ...
     def to_python(self, value: Any) -> Any: ...
     def bound_data(self, data: Any, initial: Any) -> Any: ...
     def prepare_value(self, value: Any) -> str: ...
-    def has_changed(self, initial: Optional[Any], data: Optional[Any]) -> bool: ...
+    def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...

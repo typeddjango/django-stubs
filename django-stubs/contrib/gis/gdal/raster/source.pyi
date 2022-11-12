@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.contrib.gis.gdal.raster.base import GDALRasterBase as GDALRasterBase
 
@@ -56,8 +56,8 @@ class GDALRaster(GDALRasterBase):
     def transform(
         self,
         srs: Any,
-        driver: Optional[Any] = ...,
-        name: Optional[Any] = ...,
+        driver: Any | None = ...,
+        name: Any | None = ...,
         resampling: str = ...,
         max_error: float = ...,
     ) -> Any: ...

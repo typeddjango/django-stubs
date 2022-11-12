@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import Any, Dict, Iterable, List, Optional, Type
+from typing import Any, Dict, Iterable, List, Type
 
 from django.apps import AppConfig
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -25,9 +25,9 @@ class DatabaseErrorWrapper:
     def __enter__(self) -> None: ...
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None: ...
 
 def load_backend(backend_name: str) -> Any: ...
@@ -41,7 +41,7 @@ class ConnectionHandler(BaseConnectionHandler[BaseDatabaseWrapper]):
     def close_all(self) -> None: ...
 
 class ConnectionRouter:
-    def __init__(self, routers: Optional[Iterable[Any]] = ...) -> None: ...
+    def __init__(self, routers: Iterable[Any] | None = ...) -> None: ...
     @property
     def routers(self) -> List[Any]: ...
     def db_for_read(self, model: Type[Model], **hints: Any) -> str: ...

@@ -1,6 +1,6 @@
 import functools
 from http.cookies import SimpleCookie
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Sequence, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
@@ -21,20 +21,20 @@ class SimpleTemplateResponse(HttpResponse):
     status_code: int
     rendering_attrs: Any = ...
     template_name: _TemplateForResponseT = ...
-    context_data: Optional[Dict[str, Any]] = ...
-    using: Optional[str] = ...
+    context_data: Dict[str, Any] | None = ...
+    using: str | None = ...
     def __init__(
         self,
         template: _TemplateForResponseT,
-        context: Optional[Dict[str, Any]] = ...,
-        content_type: Optional[str] = ...,
-        status: Optional[int] = ...,
-        charset: Optional[str] = ...,
-        using: Optional[str] = ...,
-        headers: Optional[Dict[str, Any]] = ...,
+        context: Dict[str, Any] | None = ...,
+        content_type: str | None = ...,
+        status: int | None = ...,
+        charset: str | None = ...,
+        using: str | None = ...,
+        headers: Dict[str, Any] | None = ...,
     ) -> None: ...
-    def resolve_template(self, template: Union[Sequence[str], Template, str]) -> Template: ...
-    def resolve_context(self, context: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]: ...
+    def resolve_template(self, template: Sequence[str] | Template | str) -> Template: ...
+    def resolve_context(self, context: Dict[str, Any] | None) -> Dict[str, Any] | None: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
@@ -47,7 +47,7 @@ class TemplateResponse(SimpleTemplateResponse):
     client: Client
     closed: bool
     context: RequestContext
-    context_data: Optional[Dict[str, Any]]
+    context_data: Dict[str, Any] | None
     cookies: SimpleCookie[str]
     csrf_cookie_set: bool
     json: functools.partial
@@ -55,17 +55,17 @@ class TemplateResponse(SimpleTemplateResponse):
     status_code: int
     template_name: _TemplateForResponseT
     templates: List[Template]
-    using: Optional[str]
+    using: str | None
     wsgi_request: WSGIRequest
     rendering_attrs: Any = ...
     def __init__(
         self,
         request: HttpRequest,
         template: _TemplateForResponseT,
-        context: Optional[Dict[str, Any]] = ...,
-        content_type: Optional[str] = ...,
-        status: Optional[int] = ...,
-        charset: Optional[str] = ...,
-        using: Optional[str] = ...,
-        headers: Optional[Dict[str, Any]] = ...,
+        context: Dict[str, Any] | None = ...,
+        content_type: str | None = ...,
+        status: int | None = ...,
+        charset: str | None = ...,
+        using: str | None = ...,
+        headers: Dict[str, Any] | None = ...,
     ) -> None: ...

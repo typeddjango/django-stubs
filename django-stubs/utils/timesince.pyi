@@ -1,16 +1,14 @@
 from datetime import date
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 TIME_STRINGS: Dict[str, str]
 TIMESINCE_CHUNKS: Any
 
 def timesince(
     d: date,
-    now: Optional[date] = ...,
+    now: date | None = ...,
     reversed: bool = ...,
-    time_strings: Optional[Dict[str, str]] = ...,
+    time_strings: Dict[str, str] | None = ...,
     depth: int = ...,
 ) -> str: ...
-def timeuntil(
-    d: date, now: Optional[date] = ..., time_strings: Optional[Dict[str, str]] = ..., depth: int = ...
-) -> str: ...
+def timeuntil(d: date, now: date | None = ..., time_strings: Dict[str, str] | None = ..., depth: int = ...) -> str: ...

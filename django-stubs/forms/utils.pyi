@@ -1,6 +1,6 @@
 from collections import UserList
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Union
+from typing import Any, Dict, Iterable, List, Mapping, Sequence
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
@@ -21,12 +21,12 @@ class ErrorDict(dict):
     def as_text(self) -> str: ...
 
 class ErrorList(UserList):
-    data: List[Union[ValidationError, str]]
+    data: List[ValidationError | str]
     error_class: str = ...
     def __init__(
         self,
-        initlist: Optional[Union[ErrorList, Sequence[Union[str, Exception]]]] = ...,
-        error_class: Optional[str] = ...,
+        initlist: ErrorList | Sequence[str | Exception] | None = ...,
+        error_class: str | None = ...,
     ) -> None: ...
     def as_data(self) -> List[ValidationError]: ...
     def get_json_data(self, escape_html: bool = ...) -> List[Dict[str, str]]: ...

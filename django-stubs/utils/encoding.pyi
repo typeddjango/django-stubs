@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import Any, TypeVar, Union, overload
+from typing import Any, TypeVar, overload
 
 from django.utils.functional import Promise
 from typing_extensions import Literal, TypeGuard
@@ -64,7 +64,7 @@ def force_bytes(s: Any, encoding: str = ..., strings_only: bool = ..., errors: s
 @overload
 def iri_to_uri(iri: None) -> None: ...
 @overload
-def iri_to_uri(iri: Union[str, Promise]) -> str: ...
+def iri_to_uri(iri: str | Promise) -> str: ...
 @overload
 def uri_to_iri(uri: None) -> None: ...  # type: ignore
 @overload

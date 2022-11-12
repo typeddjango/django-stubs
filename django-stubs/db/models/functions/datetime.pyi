@@ -1,17 +1,17 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.db import models
 from django.db.models import Func, Transform
 
 class TimezoneMixin:
     tzinfo: Any = ...
-    def get_tzname(self) -> Optional[str]: ...
+    def get_tzname(self) -> str | None: ...
 
 class Extract(TimezoneMixin, Transform):
     lookup_name: str
     output_field: models.IntegerField
     def __init__(
-        self, expression: Any, lookup_name: Optional[str] = ..., tzinfo: Optional[Any] = ..., **extra: Any
+        self, expression: Any, lookup_name: str | None = ..., tzinfo: Any | None = ..., **extra: Any
     ) -> None: ...
 
 class ExtractYear(Extract): ...

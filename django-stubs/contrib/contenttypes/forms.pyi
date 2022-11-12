@@ -1,4 +1,4 @@
-from typing import Any, Optional, Type, TypeVar
+from typing import Any, Type, TypeVar
 
 from django.db.models import Model
 from django.forms.models import BaseModelFormSet, ModelForm
@@ -12,12 +12,12 @@ class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
     save_as_new: Any = ...
     def __init__(
         self,
-        data: Optional[Any] = ...,
-        files: Optional[Any] = ...,
-        instance: Optional[Any] = ...,
+        data: Any | None = ...,
+        files: Any | None = ...,
+        instance: Any | None = ...,
         save_as_new: bool = ...,
-        prefix: Optional[Any] = ...,
-        queryset: Optional[Any] = ...,
+        prefix: Any | None = ...,
+        queryset: Any | None = ...,
         **kwargs: Any
     ) -> None: ...
     def initial_form_count(self) -> int: ...
@@ -31,17 +31,17 @@ def generic_inlineformset_factory(
     formset: Any = ...,
     ct_field: str = ...,
     fk_field: str = ...,
-    fields: Optional[Any] = ...,
-    exclude: Optional[Any] = ...,
+    fields: Any | None = ...,
+    exclude: Any | None = ...,
     extra: int = ...,
     can_order: bool = ...,
     can_delete: bool = ...,
-    max_num: Optional[Any] = ...,
-    formfield_callback: Optional[Any] = ...,
+    max_num: Any | None = ...,
+    formfield_callback: Any | None = ...,
     validate_max: bool = ...,
     for_concrete_model: bool = ...,
-    min_num: Optional[Any] = ...,
+    min_num: Any | None = ...,
     validate_min: bool = ...,
-    absolute_max: Optional[int] = ...,
+    absolute_max: int | None = ...,
     can_delete_extra: bool = ...,
 ) -> Type[BaseGenericInlineFormSet[_M, _ModelFormT]]: ...

@@ -11,12 +11,10 @@ from typing import (
     Iterator,
     List,
     NoReturn,
-    Optional,
     Pattern,
     Tuple,
     Type,
     TypeVar,
-    Union,
     overload,
 )
 
@@ -45,10 +43,10 @@ class RedirectCycleError(Exception):
 
 class FakePayload:
     read_started: bool = ...
-    def __init__(self, content: Optional[Union[bytes, str]] = ...) -> None: ...
+    def __init__(self, content: bytes | str | None = ...) -> None: ...
     def __len__(self) -> int: ...
     def read(self, num_bytes: int = ...) -> bytes: ...
-    def write(self, content: Union[bytes, str]) -> None: ...
+    def write(self, content: bytes | str) -> None: ...
 
 _T = TypeVar("_T")
 
@@ -86,24 +84,13 @@ class _RequestFactory(Generic[_T]):
     def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def trace(self, path: str, secure: bool = ..., **extra: Any) -> _T: ...
     def options(
-        self,
-        path: str,
-        data: Union[Dict[str, str], str] = ...,
-        content_type: str = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: Dict[str, str] | str = ..., content_type: str = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
     def put(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def patch(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def delete(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def generic(
-        self,
-        method: str,
-        path: str,
-        data: Any = ...,
-        content_type: Optional[str] = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, method: str, path: str, data: Any = ..., content_type: str | None = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
 
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
@@ -111,13 +98,7 @@ class RequestFactory(_RequestFactory[WSGIRequest]): ...
 class _AsyncRequestFactory(_RequestFactory[_T]):
     def request(self, **request: Any) -> _T: ...
     def generic(
-        self,
-        method: str,
-        path: str,
-        data: Any = ...,
-        content_type: Optional[str] = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, method: str, path: str, data: Any = ..., content_type: str | None = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
 
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
@@ -151,13 +132,13 @@ class ClientMixin:
     @property
     def session(self) -> SessionBase: ...
     def login(self, **credentials: Any) -> bool: ...
-    def force_login(self, user: AbstractBaseUser, backend: Optional[str] = ...) -> None: ...
+    def force_login(self, user: AbstractBaseUser, backend: str | None = ...) -> None: ...
     def logout(self) -> None: ...
 
 class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     handler: ClientHandler
     raise_request_exception: bool
-    exc_info: Optional[Tuple[Type[BaseException], BaseException, TracebackType]]
+    exc_info: Tuple[Type[BaseException], BaseException, TracebackType] | None
     def __init__(
         self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
     ) -> None: ...

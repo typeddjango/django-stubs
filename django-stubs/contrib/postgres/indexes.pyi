@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Sequence, Tuple, Type, Union
+from typing import Any, List, Sequence, Tuple, Type
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
@@ -19,101 +19,101 @@ class PostgresIndex(Index):
 class BloomIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        length: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        length: int | None = ...,
         columns: _ListOrTuple[int] = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class BrinIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        autosummarize: Optional[bool] = ...,
-        pages_per_range: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        autosummarize: bool | None = ...,
+        pages_per_range: int | None = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class BTreeIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        fillfactor: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        fillfactor: int | None = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class GinIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        fastupdate: Optional[bool] = ...,
-        gin_pending_list_limit: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        fastupdate: bool | None = ...,
+        gin_pending_list_limit: int | None = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class GistIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        buffering: Optional[bool] = ...,
-        fillfactor: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        buffering: bool | None = ...,
+        fillfactor: int | None = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class HashIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        fillfactor: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        fillfactor: int | None = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class SpGistIndex(PostgresIndex):
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
-        fillfactor: Optional[int] = ...,
+        *expressions: BaseExpression | Combinable | str,
+        fillfactor: int | None = ...,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
 
 class OpClass(Func):
     def __init__(
         self,
-        expression: Union[BaseExpression, Combinable, str],
+        expression: BaseExpression | Combinable | str,
         name: str,
     ) -> None: ...

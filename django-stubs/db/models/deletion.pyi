@@ -1,18 +1,4 @@
-from typing import (
-    Any,
-    Callable,
-    Collection,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Callable, Collection, Dict, Iterable, Iterator, List, Sequence, Set, Tuple, Type
 
 from django.db import IntegrityError
 from django.db.models.base import Model
@@ -79,7 +65,7 @@ class Collector:
     def add(
         self,
         objs: _IndexableCollection[Model],
-        source: Optional[Type[Model]] = ...,
+        source: Type[Model] | None = ...,
         nullable: bool = ...,
         reverse_dependency: bool = ...,
     ) -> List[Model]: ...
@@ -88,17 +74,17 @@ class Collector:
     def add_restricted_objects(self, field: Field, objs: _IndexableCollection[Model]) -> None: ...
     def clear_restricted_objects_from_set(self, model: Type[Model], objs: Set[Model]) -> None: ...
     def clear_restricted_objects_from_queryset(self, model: Type[Model], qs: QuerySet[Model]) -> None: ...
-    def can_fast_delete(self, objs: Union[Model, Iterable[Model]], from_field: Optional[Field] = ...) -> bool: ...
+    def can_fast_delete(self, objs: Model | Iterable[Model], from_field: Field | None = ...) -> bool: ...
     def get_del_batches(
         self, objs: _IndexableCollection[Model], fields: Iterable[Field]
     ) -> Sequence[Sequence[Model]]: ...
     def collect(
         self,
-        objs: _IndexableCollection[Optional[Model]],
-        source: Optional[Type[Model]] = ...,
+        objs: _IndexableCollection[Model | None],
+        source: Type[Model] | None = ...,
         nullable: bool = ...,
         collect_related: bool = ...,
-        source_attr: Optional[str] = ...,
+        source_attr: str | None = ...,
         reverse_dependency: bool = ...,
         keep_parents: bool = ...,
         fail_on_restricted: bool = ...,

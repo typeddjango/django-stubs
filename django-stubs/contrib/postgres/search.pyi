@@ -1,31 +1,31 @@
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, Dict, TypeVar
 
 from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
 from django.db.models.lookups import Lookup
 
-_Expression = Union[str, Combinable, "SearchQueryCombinable"]
+_Expression = str | Combinable | "SearchQueryCombinable"
 
 class SearchVectorExact(Lookup): ...
 class SearchVectorField(Field): ...
 class SearchQueryField(Field): ...
 
 class SearchConfig(Expression):
-    config: Optional[_Expression] = ...
+    config: _Expression | None = ...
     def __init__(self, config: _Expression) -> None: ...
     @classmethod
-    def from_parameter(cls, config: Optional[_Expression]) -> SearchConfig: ...
+    def from_parameter(cls, config: _Expression | None) -> SearchConfig: ...
 
 class SearchVectorCombinable:
     ADD: str = ...
 
 class SearchVector(SearchVectorCombinable, Func):
-    config: Optional[_Expression] = ...
+    config: _Expression | None = ...
     function: str = ...
     arg_joiner: str = ...
     output_field: Field
     def __init__(
-        self, *expressions: _Expression, config: Optional[_Expression] = ..., weight: Optional[Any] = ...
+        self, *expressions: _Expression, config: _Expression | None = ..., weight: Any | None = ...
     ) -> None: ...
 
 class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
@@ -34,8 +34,8 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         lhs: Combinable,
         connector: str,
         rhs: Combinable,
-        config: Optional[_Expression],
-        output_field: Optional[Field] = None,
+        config: _Expression | None,
+        output_field: Field | None = None,
     ) -> None: ...
 
 _T = TypeVar("_T", bound="SearchQueryCombinable")
@@ -53,9 +53,9 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
     def __init__(
         self,
         value: _Expression,
-        output_field: Optional[Field] = ...,
+        output_field: Field | None = ...,
         *,
-        config: Optional[_Expression] = ...,
+        config: _Expression | None = ...,
         invert: bool = ...,
         search_type: str = ...,
     ) -> None: ...
@@ -67,17 +67,17 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
         lhs: Combinable,
         connector: str,
         rhs: Combinable,
-        config: Optional[_Expression],
-        output_field: Optional[Field] = None,
+        config: _Expression | None,
+        output_field: Field | None = None,
     ) -> None: ...
 
 class SearchRank(Func):
     def __init__(
         self,
-        vector: Union[SearchVector, _Expression],
-        query: Union[SearchQuery, _Expression],
-        weights: Optional[Any] = ...,
-        normalization: Optional[Any] = ...,
+        vector: SearchVector | _Expression,
+        query: SearchQuery | _Expression,
+        weights: Any | None = ...,
+        normalization: Any | None = ...,
         cover_density: bool = ...,
     ) -> None: ...
 
@@ -90,15 +90,15 @@ class SearchHeadline(Func):
         expression: _Expression,
         query: _Expression,
         *,
-        config: Optional[_Expression] = ...,
-        start_sel: Optional[Any] = ...,
-        stop_sel: Optional[Any] = ...,
-        max_words: Optional[int] = ...,
-        min_words: Optional[int] = ...,
-        short_word: Optional[str] = ...,
-        highlight_all: Optional[bool] = ...,
-        max_fragments: Optional[int] = ...,
-        fragment_delimiter: Optional[str] = ...,
+        config: _Expression | None = ...,
+        start_sel: Any | None = ...,
+        stop_sel: Any | None = ...,
+        max_words: int | None = ...,
+        min_words: int | None = ...,
+        short_word: str | None = ...,
+        highlight_all: bool | None = ...,
+        max_fragments: int | None = ...,
+        fragment_delimiter: str | None = ...,
     ) -> None: ...
 
 class TrigramBase(Func):

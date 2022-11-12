@@ -1,11 +1,11 @@
-from typing import Any, Dict, Optional, Sequence, Set, Tuple, Type
+from typing import Any, Dict, Sequence, Set, Tuple, Type
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.utils import DatabaseError
 
 class BaseDatabaseFeatures:
-    minimum_database_version: Optional[Tuple[int, ...]]
+    minimum_database_version: Tuple[int, ...] | None
     gis_enabled: bool
     allows_group_by_lob: bool
     allows_group_by_pk: bool
@@ -47,7 +47,7 @@ class BaseDatabaseFeatures:
     nulls_order_largest: bool
     supports_order_by_nulls_modifier: bool
     order_by_nulls_first: bool
-    max_query_params: Optional[int]
+    max_query_params: int | None
     allows_auto_pk_0: bool
     can_defer_constraint_checks: bool
     supports_tablespaces: bool
@@ -93,8 +93,8 @@ class BaseDatabaseFeatures:
     only_supports_unbounded_with_preceding_and_following: bool
     supports_cast_with_precision: bool
     time_cast_precision: int
-    create_test_procedure_without_params_sql: Optional[str]
-    create_test_procedure_with_int_param_sql: Optional[str]
+    create_test_procedure_without_params_sql: str | None
+    create_test_procedure_with_int_param_sql: str | None
     supports_callproc_kwargs: bool
     supported_explain_formats: Set[str]
     supports_default_in_lead_lag: bool
@@ -120,8 +120,8 @@ class BaseDatabaseFeatures:
     supports_collation_on_charfield: bool
     supports_collation_on_textfield: bool
     supports_non_deterministic_collations: bool
-    test_collations: Dict[str, Optional[str]]
-    test_now_utc_template: Optional[str]
+    test_collations: Dict[str, str | None]
+    test_now_utc_template: str | None
     django_test_expected_failures: Set[str]
     django_test_skips: Dict[str, Set[str]]
     connection: BaseDatabaseWrapper

@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional, Protocol, Type
+from typing import Any, Callable, Protocol, Type
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse

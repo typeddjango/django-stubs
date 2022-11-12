@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 class LayerMapError(Exception): ...
 class InvalidString(LayerMapError): ...
@@ -28,12 +28,12 @@ class LayerMapping:
         data: Any,
         mapping: Any,
         layer: int = ...,
-        source_srs: Optional[Any] = ...,
+        source_srs: Any | None = ...,
         encoding: str = ...,
         transaction_mode: str = ...,
         transform: bool = ...,
-        unique: Optional[Any] = ...,
-        using: Optional[Any] = ...,
+        unique: Any | None = ...,
+        using: Any | None = ...,
     ) -> None: ...
     def check_fid_range(self, fid_range: Any) -> Any: ...
     geom_field: str = ...

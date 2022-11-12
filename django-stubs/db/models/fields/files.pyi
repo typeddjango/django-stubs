@@ -1,4 +1,4 @@
-from typing import Any, Callable, Iterable, Optional, Type, TypeVar, Union, overload
+from typing import Any, Callable, Iterable, Type, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
@@ -15,8 +15,8 @@ class FieldFile(File):
     instance: Model = ...
     field: FileField = ...
     storage: Storage = ...
-    name: Optional[str]
-    def __init__(self, instance: Model, field: FileField, name: Optional[str]) -> None: ...
+    name: str | None
+    def __init__(self, instance: Model, field: FileField, name: str | None) -> None: ...
     file: Any = ...
     @property
     def path(self) -> str: ...
@@ -31,10 +31,8 @@ class FieldFile(File):
 
 class FileDescriptor(DeferredAttribute):
     field: FileField = ...
-    def __set__(self, instance: Model, value: Optional[Any]) -> None: ...
-    def __get__(
-        self, instance: Optional[Model], cls: Optional[Type[Model]] = ...
-    ) -> Union[FieldFile, FileDescriptor]: ...
+    def __set__(self, instance: Model, value: Any | None) -> None: ...
+    def __get__(self, instance: Model | None, cls: Type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
 
 _T = TypeVar("_T", bound="Field")
 _M = TypeVar("_M", bound=Model, contravariant=True)
@@ -44,15 +42,15 @@ class _UploadToCallable(Protocol[_M]):
 
 class FileField(Field):
     storage: Storage = ...
-    upload_to: Union[_PathCompatible, _UploadToCallable] = ...
+    upload_to: _PathCompatible | _UploadToCallable = ...
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
-        upload_to: Union[_PathCompatible, _UploadToCallable] = ...,
-        storage: Optional[Union[Storage, Callable[[], Storage]]] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        upload_to: _PathCompatible | _UploadToCallable = ...,
+        storage: Storage | Callable[[], Storage] | None = ...,
         *,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -61,15 +59,15 @@ class FileField(Field):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     # class access
     @overload  # type: ignore
@@ -80,11 +78,11 @@ class FileField(Field):
     # non-Model instances
     @overload
     def __get__(self: _T, instance: Any, owner: Any) -> _T: ...
-    def generate_filename(self, instance: Optional[Model], filename: _PathCompatible) -> str: ...
+    def generate_filename(self, instance: Model | None, filename: _PathCompatible) -> str: ...
 
 class ImageFileDescriptor(FileDescriptor):
     field: ImageField
-    def __set__(self, instance: Model, value: Optional[str]) -> None: ...
+    def __set__(self, instance: Model, value: str | None) -> None: ...
 
 class ImageFieldFile(ImageFile, FieldFile):
     field: ImageField
@@ -93,10 +91,10 @@ class ImageFieldFile(ImageFile, FieldFile):
 class ImageField(FileField):
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
-        width_field: Optional[str] = ...,
-        height_field: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        width_field: str | None = ...,
+        height_field: str | None = ...,
         **kwargs: Any,
     ) -> None: ...
     # class access

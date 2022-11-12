@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.mysql.base import DatabaseWrapper
@@ -11,4 +11,4 @@ class DatabaseClient(BaseDatabaseClient):
         cls,
         settings_dict: Dict[str, Any],
         parameters: Iterable[str],
-    ) -> Tuple[List[str], Optional[Dict[str, str]]]: ...
+    ) -> Tuple[List[str], Dict[str, str] | None]: ...
