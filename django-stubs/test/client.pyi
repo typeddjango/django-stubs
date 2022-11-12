@@ -10,6 +10,7 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    Literal,
     NoReturn,
     Optional,
     Pattern,
@@ -17,6 +18,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    overload,
 )
 
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -129,6 +131,8 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     context: ContextList | Dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
+
+class _MonkeyPatchedWSGIResponseRedirect(_MonkeyPatchedWSGIResponse):
     redirect_chain: List[Tuple[str, int]]
 
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
@@ -159,36 +163,110 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> None: ...
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
-    def get(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    @overload  # type: ignore
+    def get(
+        self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def post(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> _MonkeyPatchedWSGIResponse: ...
-    def head(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> _MonkeyPatchedWSGIResponse: ...
-    def trace(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> _MonkeyPatchedWSGIResponse: ...
-    def options(  # type: ignore
+    @overload
+    def get(
+        self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload  # type: ignore
+    def post(
         self,
         path: str,
-        data: Union[Dict[str, str], str] = ...,
+        data: Any = ...,
         content_type: str = ...,
-        follow: bool = ...,
+        follow: Literal[False] = ...,
         secure: bool = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def put(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    @overload
+    def post(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload  # type: ignore
+    def head(
+        self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def patch(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    @overload
+    def head(
+        self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload  # type: ignore
+    def trace(
+        self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def delete(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+    @overload
+    def trace(
+        self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload  # type: ignore
+    def put(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def put(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload  # type: ignore
+    def patch(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def patch(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload  # type: ignore
+    def delete(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def delete(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
 
 class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGIResponse]]):
     handler: AsyncClientHandler
