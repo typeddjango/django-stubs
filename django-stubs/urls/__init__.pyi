@@ -1,3 +1,5 @@
+from typing_extensions import TypeAlias
+
 # noinspection PyUnresolvedReferences
 from .base import clear_script_prefix as clear_script_prefix
 from .base import clear_url_caches as clear_url_caches
@@ -35,4 +37,4 @@ from .resolvers import get_resolver as get_resolver
 from .utils import get_callable as get_callable
 from .utils import get_mod_func as get_mod_func
 
-_AnyURL = URLPattern | URLResolver
+_AnyURL: TypeAlias = URLPattern | URLResolver

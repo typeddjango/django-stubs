@@ -1,4 +1,5 @@
-from typing import Any, Container
+from collections.abc import Container
+from typing import Any
 
 from django.apps import apps as apps
 from django.core.management.base import BaseCommand as BaseCommand

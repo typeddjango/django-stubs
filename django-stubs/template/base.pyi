@@ -1,7 +1,8 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from enum import Enum
 from logging import Logger
-from typing import Any, Pattern
+from re import Pattern
+from typing import Any
 
 from django.template.context import Context as Context
 from django.template.engine import Engine

@@ -18,24 +18,25 @@ from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise
-from typing_extensions import Protocol
+from typing_extensions import Protocol, TypeAlias
 
 class Empty: ...
 class NOT_PROVIDED: ...
 
 BLANK_CHOICE_DASH: list[tuple[str, str]]
 
-_Choice = tuple[Any, Any]
-_ChoiceNamedGroup = tuple[str, Iterable[_Choice]]
-_FieldChoices = Iterable[_Choice | _ChoiceNamedGroup]
-_ChoicesList = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
-_LimitChoicesTo = Q | dict[str, Any]
+_Choice: TypeAlias = tuple[Any, Any]
+
+_ChoiceNamedGroup: TypeAlias = tuple[str, Iterable[_Choice]]
+_FieldChoices: TypeAlias = Iterable[_Choice | _ChoiceNamedGroup]
+_ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
+_LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
-_AllLimitChoicesTo = _LimitChoicesTo | _ChoicesCallable
-_ErrorMessagesT = dict[str, Any]
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable
+_ErrorMessagesT: TypeAlias = dict[str, Any]
 
 _T = TypeVar("_T", bound="Field")
 # __set__ value type

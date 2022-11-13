@@ -1,14 +1,16 @@
-from collections.abc import Callable, Iterator, Mapping, Sequence
-from typing import IO, Any, Awaitable, TypeVar
+from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
+from typing import IO, Any, TypeVar
 
 from django.core.handlers import base as base
 from django.http.request import HttpRequest, _ImmutableQueryDict
 from django.http.response import HttpResponseBase
 from django.urls.resolvers import ResolverMatch, URLResolver
 from django.utils.datastructures import MultiValueDict
+from typing_extensions import TypeAlias
 
-_ReceiveCallback = Callable[[], Awaitable[Mapping[str, Any]]]
-_SendCallback = Callable[[Mapping[str, Any]], Awaitable[None]]
+_ReceiveCallback: TypeAlias = Callable[[], Awaitable[Mapping[str, Any]]]
+
+_SendCallback: TypeAlias = Callable[[Mapping[str, Any]], Awaitable[None]]
 
 class ASGIRequest(HttpRequest):
     body_receive_timeout: int

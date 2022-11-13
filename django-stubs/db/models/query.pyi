@@ -8,6 +8,7 @@ from django.db.models.expressions import Combinable as Combinable  # noqa: F401
 from django.db.models.expressions import F as F
 from django.db.models.query_utils import Q as Q  # noqa: F401
 from django.db.models.sql.query import Query, RawQuery
+from typing_extensions import TypeAlias
 
 _T = TypeVar("_T", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True)
@@ -213,9 +214,9 @@ class RawQuerySet(Iterable[_T], Sized):
     def resolve_model_init_order(self) -> tuple[list[str], list[int], list[tuple[str, int]]]: ...
     def using(self, alias: str | None) -> RawQuerySet[_T]: ...
 
-_QuerySetAny = _QuerySet
+_QuerySetAny: TypeAlias = _QuerySet
 
-QuerySet = _QuerySet[_T, _T]
+QuerySet: TypeAlias = _QuerySet[_T, _T]
 
 class Prefetch:
     prefetch_through: str

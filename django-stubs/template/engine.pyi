@@ -5,10 +5,11 @@ from django.template.base import Origin
 from django.template.library import Library
 from django.template.loaders.base import Loader
 from django.utils.safestring import SafeString
+from typing_extensions import TypeAlias
 
 from .base import Template
 
-_Loader = Any
+_Loader: TypeAlias = Any
 
 class Engine:
     default_builtins: Any

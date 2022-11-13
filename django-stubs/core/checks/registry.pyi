@@ -3,7 +3,7 @@ from typing import Any, TypeVar
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
-from typing_extensions import Protocol
+from typing_extensions import Protocol, TypeAlias
 
 class Tags:
     admin: str
@@ -19,7 +19,8 @@ class Tags:
     translation: str
     urls: str
 
-_CheckCallable = Callable[..., Sequence[CheckMessage]]
+_CheckCallable: TypeAlias = Callable[..., Sequence[CheckMessage]]
+
 _C = TypeVar("_C", bound=_CheckCallable)
 
 class _ProcessedCheckCallable(Protocol[_C]):

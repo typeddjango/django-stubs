@@ -6,8 +6,9 @@ from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers import base
 from django.http import HttpRequest
 from django.http.response import HttpResponseBase
+from typing_extensions import TypeAlias
 
-_WSGIEnviron = dict[str, Any]
+_WSGIEnviron: TypeAlias = dict[str, Any]
 
 class LimitedStream:
     stream: BytesIO

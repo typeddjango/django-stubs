@@ -9,9 +9,9 @@ from django.forms.utils import _DataT, _FilesT
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _Getter
 from django.utils.safestring import SafeString
-from typing_extensions import Literal, Protocol
+from typing_extensions import Literal, Protocol, TypeAlias
 
-_OptAttrs = dict[str, Any]
+_OptAttrs: TypeAlias = dict[str, Any]
 
 class MediaOrderConflictWarning(RuntimeWarning): ...
 

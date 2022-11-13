@@ -7,9 +7,11 @@ from django.http.request import HttpRequest
 from django.template.base import Node, Origin, Template
 from django.template.defaulttags import IfChangedNode
 from django.template.loader_tags import IncludeNode
+from typing_extensions import TypeAlias
 
-_ContextKeys = int | str | Node
-_ContextValues = dict[str, Any] | "Context"
+_ContextKeys: TypeAlias = int | str | Node
+
+_ContextValues: TypeAlias = dict[str, Any] | "Context"
 _ContextCopy = TypeVar("_ContextCopy", bound="BaseContext")
 
 class ContextPopException(Exception): ...

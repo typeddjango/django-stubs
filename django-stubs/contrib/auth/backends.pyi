@@ -5,8 +5,9 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.http.request import HttpRequest
+from typing_extensions import TypeAlias
 
-_AnyUser = AbstractBaseUser | AnonymousUser
+_AnyUser: TypeAlias = AbstractBaseUser | AnonymousUser
 
 UserModel: Any
 

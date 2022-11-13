@@ -1,7 +1,8 @@
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from logging import Logger
 from types import TracebackType
-from typing import Any, ContextManager
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.ddl_references import Statement
@@ -11,7 +12,7 @@ from django.db.models.indexes import Index
 
 logger: Logger
 
-class BaseDatabaseSchemaEditor(ContextManager[Any]):
+class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
     sql_create_table: str
     sql_rename_table: str
     sql_retablespace_table: str

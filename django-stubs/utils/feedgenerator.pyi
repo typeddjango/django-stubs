@@ -2,6 +2,8 @@ import datetime
 from typing import Any
 from xml.sax import ContentHandler
 
+from typing_extensions import TypeAlias
+
 def rfc2822_date(date: datetime.date) -> str: ...
 def rfc3339_date(date: datetime.date) -> str: ...
 def get_tag_uri(url: str, date: datetime.date | None) -> str: ...
@@ -73,4 +75,4 @@ class Atom1Feed(SyndicationFeed):
     ns: str
     def write_items(self, handler: ContentHandler) -> None: ...
 
-DefaultFeed = Rss201rev2Feed
+DefaultFeed: TypeAlias = Rss201rev2Feed

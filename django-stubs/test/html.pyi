@@ -2,13 +2,15 @@ from collections.abc import Sequence
 from html.parser import HTMLParser
 from typing import Any, TypeVar
 
+from typing_extensions import TypeAlias
+
 _Self = TypeVar("_Self")
 
 WHITESPACE: Any
 
 def normalize_whitespace(string: str) -> str: ...
 
-_ElementAttribute = tuple[str, str | None]
+_ElementAttribute: TypeAlias = tuple[str, str | None]
 
 class Element:
     name: str | None

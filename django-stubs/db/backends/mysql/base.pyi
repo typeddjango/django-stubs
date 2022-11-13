@@ -1,5 +1,5 @@
-from collections.abc import Iterator
-from typing import Any, Container
+from collections.abc import Container, Iterator
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
 from typing_extensions import Literal

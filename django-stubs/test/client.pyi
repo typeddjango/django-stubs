@@ -1,8 +1,9 @@
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Awaitable, Callable, Iterable, Iterator
 from io import BytesIO
 from json import JSONEncoder
+from re import Pattern
 from types import TracebackType
-from typing import Any, Awaitable, Generic, NoReturn, Pattern, TypeVar, overload
+from typing import Any, Generic, NoReturn, TypeVar, overload
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase

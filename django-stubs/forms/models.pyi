@@ -1,5 +1,5 @@
-from collections.abc import Callable, Collection, Iterator, Mapping, Sequence
-from typing import Any, ClassVar, Container, Generic, TypeAlias, TypeVar, Union, overload
+from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
+from typing import Any, ClassVar, Generic, TypeAlias, TypeVar, Union, overload
 from uuid import UUID
 
 from django.db import models
@@ -17,16 +17,17 @@ from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import ChoiceWidget, Input, Widget
 from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
 _Fields: TypeAlias = Union[_ListOrTuple[str], Literal["__all__"]]  # https://github.com/python/mypy/issues/12211
-_Widgets = dict[str, Union[type[Widget], Widget]]
-_Labels = dict[str, str]
-_HelpTexts = dict[str, str]
-_ErrorMessages = dict[str, dict[str, str]]
-_FormFieldCallback = Callable[[models.Field], Field]
+_Widgets: TypeAlias = dict[str, Union[type[Widget], Widget]]
+
+_Labels: TypeAlias = dict[str, str]
+_HelpTexts: TypeAlias = dict[str, str]
+_ErrorMessages: TypeAlias = dict[str, dict[str, str]]
+_FormFieldCallback: TypeAlias = Callable[[models.Field], Field]
 
 _M = TypeVar("_M", bound=Model)
 _ParentM = TypeVar("_ParentM", bound=Model)

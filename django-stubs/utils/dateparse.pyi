@@ -1,7 +1,7 @@
 from datetime import date
 from datetime import datetime as builtin_datetime
 from datetime import time, timedelta
-from typing import Pattern
+from re import Pattern
 
 date_re: Pattern[str]
 time_re: Pattern[str]

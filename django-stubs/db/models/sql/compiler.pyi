@@ -10,11 +10,12 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression
 from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
-_ParamT = str | int
-_ParamsT = list[_ParamT]
-_AsSqlType = tuple[str, _ParamsT]
+_ParamT: TypeAlias = str | int
+
+_ParamsT: TypeAlias = list[_ParamT]
+_AsSqlType: TypeAlias = tuple[str, _ParamsT]
 
 class SQLCompiler:
     query: Query

@@ -3,8 +3,9 @@ from typing import Any, TypeVar
 from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
 from django.db.models.lookups import Lookup
+from typing_extensions import TypeAlias
 
-_Expression = str | Combinable | "SearchQueryCombinable"
+_Expression: TypeAlias = str | Combinable | "SearchQueryCombinable"
 
 class SearchVectorExact(Lookup): ...
 class SearchVectorField(Field): ...

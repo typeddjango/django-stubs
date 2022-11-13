@@ -1,11 +1,13 @@
 from collections.abc import Callable, Iterator, Sequence
+from re import Pattern
 from types import ModuleType
-from typing import Any, Pattern, overload
+from typing import Any, overload
 
 from django.core.checks.messages import CheckMessage
 from django.urls import _AnyURL
 from django.urls.converters import UUIDConverter
 from django.utils.datastructures import MultiValueDict
+from typing_extensions import TypeAlias
 
 class ResolverMatch:
     func: Callable
@@ -38,7 +40,7 @@ class ResolverMatch:
 def get_resolver(urlconf: str | None = ...) -> URLResolver: ...
 def get_ns_resolver(ns_pattern: str, resolver: URLResolver, converters: tuple) -> URLResolver: ...
 
-_Pattern = RegexPattern | RoutePattern | LocalePrefixPattern
+_Pattern: TypeAlias = RegexPattern | RoutePattern | LocalePrefixPattern
 
 class LocaleRegexDescriptor:
     attr: str

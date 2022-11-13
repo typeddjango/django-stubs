@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from html.parser import HTMLParser
-from typing import Any, Pattern
+from re import Pattern
+from typing import Any
 
 from django.utils.safestring import SafeString
 

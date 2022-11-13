@@ -1,15 +1,17 @@
 from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
-from re import RegexFlag
-from typing import Any, Pattern
+from re import Pattern, RegexFlag
+from typing import Any
 
 from django.core.files.base import File
 from django.utils.functional import _StrPromise
+from typing_extensions import TypeAlias
 
 EMPTY_VALUES: Any
 
-_Regex = str | Pattern[str]
-_ValidatorCallable = Callable[[Any], None]
+_Regex: TypeAlias = str | Pattern[str]
+
+_ValidatorCallable: TypeAlias = Callable[[Any], None]
 
 class RegexValidator:
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition
@@ -76,7 +78,7 @@ def validate_ipv4_address(value: str) -> None: ...
 def validate_ipv6_address(value: str) -> None: ...
 def validate_ipv46_address(value: str) -> None: ...
 
-_IPValidator = tuple[list[Callable[[Any], None]], str]
+_IPValidator: TypeAlias = tuple[list[Callable[[Any], None]], str]
 ip_address_validator_map: dict[str, _IPValidator]
 
 def ip_address_validators(protocol: str, unpack_ipv4: bool) -> _IPValidator: ...

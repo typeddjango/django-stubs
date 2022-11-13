@@ -3,11 +3,12 @@ from types import ModuleType
 from typing import Any, overload
 
 from django.urls import URLPattern, URLResolver, _AnyURL
+from typing_extensions import TypeAlias
 
 from ..conf.urls import IncludedURLConf
 from ..http.response import HttpResponseBase
 
-_URLConf = str | ModuleType | Sequence[_AnyURL]
+_URLConf: TypeAlias = str | ModuleType | Sequence[_AnyURL]
 
 def include(
     arg: _URLConf | tuple[_URLConf, str], namespace: str | None = ...

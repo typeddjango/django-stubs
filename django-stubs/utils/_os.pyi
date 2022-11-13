@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 
-_PathCompatible = str | os.PathLike[str]
+from typing_extensions import TypeAlias
+
+_PathCompatible: TypeAlias = str | os.PathLike[str]
 
 def safe_join(base: _PathCompatible, *paths: _PathCompatible) -> str: ...
 def symlinks_supported() -> bool: ...

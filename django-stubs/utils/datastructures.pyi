@@ -1,7 +1,7 @@
-from collections.abc import Collection, Iterable, Iterator, Mapping
-from typing import Any, Generic, MutableSet, TypeVar, overload
+from collections.abc import Collection, Iterable, Iterator, Mapping, MutableSet
+from typing import Any, Generic, Tuple, TypeVar, overload
 
-from typing_extensions import Protocol
+from typing_extensions import Protocol, TypeAlias
 
 _K = TypeVar("_K")
 _V = TypeVar("_V")
@@ -10,7 +10,7 @@ _I = TypeVar("_I", covariant=True)
 
 # Unfortunately, there's often check `if isinstance(var, (list, tuple))` in django
 # codebase. So we need sometimes to declare exactly list or tuple.
-_ListOrTuple = list[_K] | tuple[_K, ...] | tuple[()]
+_ListOrTuple: TypeAlias = list[_K] | tuple[_K, ...] | Tuple[()]
 
 class _PropertyDescriptor(Generic[_K, _V]):
     """

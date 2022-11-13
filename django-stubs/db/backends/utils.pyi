@@ -7,7 +7,7 @@ from types import TracebackType
 from typing import Any, Protocol, overload
 from uuid import UUID
 
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 logger: Logger
 
@@ -17,10 +17,10 @@ class _Composable(Protocol):
     def __add__(self, other: _Composable) -> _Composable: ...
     def __mul__(self, n: int) -> _Composable: ...
 
-_ExecuteQuery = str | _Composable
+_ExecuteQuery: TypeAlias = str | _Composable
 
 # Python types that can be adapted to SQL.
-_SQLType = (
+_SQLType: TypeAlias = (
     None
     | bool
     | int
@@ -34,7 +34,7 @@ _SQLType = (
     | tuple[Any, ...]
     | list[Any]
 )
-_ExecuteParameters = Sequence[_SQLType] | Mapping[str, _SQLType] | None
+_ExecuteParameters: TypeAlias = Sequence[_SQLType] | Mapping[str, _SQLType] | None
 
 class CursorWrapper:
     cursor: Any

@@ -3,8 +3,9 @@ from pathlib import Path, PosixPath
 from typing import Any, Protocol
 
 from django.db.models.base import Model
+from typing_extensions import TypeAlias
 
-_UserModel = Model
+_UserModel: TypeAlias = Model
 
 class PasswordValidator(Protocol):
     def validate(self, __password: str, __user: _UserModel | None = ...) -> None: ...

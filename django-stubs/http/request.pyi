@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Mapping
 from io import BytesIO
-from typing import Any, BinaryIO, NoReturn, Pattern, TypeVar, overload
+from re import Pattern
+from typing import Any, BinaryIO, NoReturn, TypeVar, overload
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
@@ -9,7 +10,7 @@ from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
@@ -17,7 +18,7 @@ host_validation_re: Pattern[str]
 class UnreadablePostError(OSError): ...
 class RawPostDataException(Exception): ...
 
-UploadHandlerList = list[uploadhandler.FileUploadHandler] | ImmutableList[uploadhandler.FileUploadHandler]
+UploadHandlerList: TypeAlias = list[uploadhandler.FileUploadHandler] | ImmutableList[uploadhandler.FileUploadHandler]
 
 class HttpHeaders(CaseInsensitiveMapping[str]):
     HTTP_PREFIX: str

@@ -8,8 +8,9 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import Widget
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
+from typing_extensions import TypeAlias
 
-_AttrsT = dict[str, str | bool]
+_AttrsT: TypeAlias = dict[str, str | bool]
 
 class BoundField:
     form: BaseForm

@@ -3,7 +3,7 @@ from functools import wraps as wraps  # noqa: F401
 from typing import Any, Generic, TypeVar, overload
 
 from django.db.models.base import Model
-from typing_extensions import Protocol, SupportsIndex
+from typing_extensions import Protocol, SupportsIndex, TypeAlias
 
 _T = TypeVar("_T")
 
@@ -44,7 +44,7 @@ class _StrPromise(Promise, Sequence[str]):
     # Mypy requires this for the attribute hook to take effect
     def __getattribute__(self, __name: str) -> Any: ...
 
-_StrOrPromise = str | _StrPromise
+_StrOrPromise: TypeAlias = str | _StrPromise
 _C = TypeVar("_C", bound=Callable)
 
 def lazy(func: _C, *resultclasses: Any) -> _C: ...

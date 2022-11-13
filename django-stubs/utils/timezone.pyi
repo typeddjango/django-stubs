@@ -10,10 +10,11 @@ from typing import Any, overload
 
 import pytz
 from pytz import BaseTzInfo
-from typing_extensions import Literal, TypeGuard
+from typing_extensions import Literal, TypeAlias, TypeGuard
 
-_PytzTzInfoT = pytz.tzinfo.BaseTzInfo | pytz._FixedOffset
-_TzInfoT = _PytzTzInfoT | tzinfo
+_PytzTzInfoT: TypeAlias = pytz.tzinfo.BaseTzInfo | pytz._FixedOffset
+
+_TzInfoT: TypeAlias = _PytzTzInfoT | tzinfo
 
 utc: Any
 

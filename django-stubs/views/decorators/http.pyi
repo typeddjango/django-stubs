@@ -1,5 +1,5 @@
-from collections.abc import Callable
-from typing import Any, Container, TypeVar
+from collections.abc import Callable, Container
+from typing import Any, TypeVar
 
 _F = TypeVar("_F", bound=Callable[..., Any])
 

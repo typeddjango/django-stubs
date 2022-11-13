@@ -7,9 +7,11 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeString
+from typing_extensions import TypeAlias
 
-_DataT = Mapping[str, Any]
-_FilesT = MultiValueDict[str, UploadedFile]
+_DataT: TypeAlias = Mapping[str, Any]
+
+_FilesT: TypeAlias = MultiValueDict[str, UploadedFile]
 
 def pretty_name(name: str) -> str: ...
 def flatatt(attrs: dict[str, Any]) -> SafeString: ...

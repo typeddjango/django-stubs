@@ -1,5 +1,6 @@
 from collections.abc import Iterable
-from typing import Any, Pattern
+from re import Pattern
+from typing import Any
 
 ETAG_MATCH: Pattern[str]
 MONTHS: list[str]

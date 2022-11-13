@@ -3,11 +3,12 @@ from typing import Any, Protocol
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
+from typing_extensions import TypeAlias
 
 class RemovedInDjango40Warning(DeprecationWarning): ...
 class RemovedInDjango41Warning(PendingDeprecationWarning): ...
 
-RemovedInNextVersionWarning = RemovedInDjango40Warning
+RemovedInNextVersionWarning: TypeAlias = RemovedInDjango40Warning
 
 class warn_about_renamed_method:
     class_name: str

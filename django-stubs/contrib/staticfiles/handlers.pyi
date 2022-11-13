@@ -1,5 +1,5 @@
-from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Awaitable
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from typing import Any
 from urllib.parse import ParseResult
 
 from django.core.handlers.asgi import ASGIHandler

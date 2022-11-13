@@ -1,7 +1,8 @@
 from datetime import date
 from datetime import datetime as builtin_datetime
 from datetime import time as builtin_time
-from typing import Any, Pattern
+from re import Pattern
+from typing import Any
 
 from django.utils.timezone import _TzInfoT
 from typing_extensions import Literal

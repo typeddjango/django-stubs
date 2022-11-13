@@ -6,7 +6,9 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, overload
+from typing import Any, Tuple, overload
+
+from typing_extensions import TypeAlias
 
 utf8_charset: Any
 utf8_charset_qp: Any
@@ -59,9 +61,10 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore
     ) -> None: ...
     def __setitem__(self, name: str, val: str) -> None: ...
 
-_AttachmentContent = bytes | EmailMessage | Message | SafeMIMEText | str
-_AttachmentTuple = (
-    tuple[str, _AttachmentContent] | tuple[str | None, _AttachmentContent, str] | tuple[str, _AttachmentContent, None]
+_AttachmentContent: TypeAlias = bytes | EmailMessage | Message | SafeMIMEText | str
+# switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
+_AttachmentTuple: TypeAlias = (
+    Tuple[str, _AttachmentContent] | Tuple[str | None, _AttachmentContent, str] | Tuple[str, _AttachmentContent, None]
 )
 
 class EmailMessage:

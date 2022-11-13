@@ -11,12 +11,15 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
+from typing_extensions import TypeAlias
 
 NO_DB_ALIAS: str
 RAN_DB_VERSION_CHECK: set[str]
 
 _T = TypeVar("_T", bound="BaseDatabaseWrapper")
-_ExecuteWrapper = Callable[[Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any]
+_ExecuteWrapper: TypeAlias = Callable[
+    [Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any
+]
 
 class BaseDatabaseWrapper:
     data_types: dict[str, str]

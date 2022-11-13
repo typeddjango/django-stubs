@@ -34,14 +34,14 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Literal, TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
 HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
 
-_Direction = Union[Literal[1], Literal[2]]
+_Direction: TypeAlias = Union[Literal[1], Literal[2]]
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -51,7 +51,7 @@ class IncorrectLookupParameters(Exception): ...
 FORMFIELD_FOR_DBFIELD_DEFAULTS: Any
 csrf_protect_m: Any
 
-_FieldGroups = Sequence[Union[str, Sequence[str]]]
+_FieldGroups: TypeAlias = Sequence[Union[str, Sequence[str]]]
 
 class _OptionalFieldOpts(TypedDict, total=False):
     classes: Sequence[str]
@@ -63,8 +63,8 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # Workaround for mypy issue, a Sequence type should be preferred here.
 # https://github.com/python/mypy/issues/8921
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
-_FieldsetSpec = _ListOrTuple[tuple[Optional[_StrOrPromise], _FieldOpts]]
-_ListFilterT = Union[
+_FieldsetSpec: TypeAlias = _ListOrTuple[tuple[Optional[_StrOrPromise], _FieldOpts]]
+_ListFilterT: TypeAlias = Union[
     type[ListFilter],
     Field,
     str,
@@ -129,7 +129,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     def has_view_or_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_module_permission(self, request: HttpRequest) -> bool: ...
 
-_DisplayT = _ListOrTuple[str | Callable[[_ModelT], str]]
+_DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str]]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_display: _DisplayT

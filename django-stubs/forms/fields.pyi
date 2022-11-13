@@ -1,7 +1,8 @@
 import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
-from typing import Any, Pattern, Protocol
+from re import Pattern
+from typing import Any, Protocol
 from uuid import UUID
 
 from django.core.files import File
@@ -12,6 +13,7 @@ from django.forms.forms import BaseForm
 from django.forms.widgets import ChoiceWidget, Widget
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
+from typing_extensions import TypeAlias
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
 # However, on class level it can be set to `Type[Widget]` too.
@@ -20,7 +22,7 @@ from django.utils.functional import _StrOrPromise
 # If we annotate it as `Widget`, any widget subclasses that do e.g.
 # `widget = Select` will not typecheck.
 # `Any` gives too much freedom, but does not create false positives.
-_ClassLevelWidgetT = Any
+_ClassLevelWidgetT: TypeAlias = Any
 
 class Field:
     initial: Any

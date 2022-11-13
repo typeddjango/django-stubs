@@ -1,5 +1,7 @@
 from typing import Any
 
+from typing_extensions import TypeAlias
+
 class MeasureBase:
     STANDARD_UNIT: Any
     ALIAS: Any
@@ -38,5 +40,6 @@ class Area(MeasureBase):
     LALIAS: Any
     def __truediv__(self, other: Any) -> Any: ...
 
-D = Distance
-A = Area
+D: TypeAlias = Distance
+
+A: TypeAlias = Area

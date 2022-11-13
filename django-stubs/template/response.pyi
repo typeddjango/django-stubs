@@ -10,8 +10,9 @@ from django.template.base import Template
 from django.template.context import RequestContext
 from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
+from typing_extensions import TypeAlias
 
-_TemplateForResponseT = Union[_ListOrTuple[str], Template, str]
+_TemplateForResponseT: TypeAlias = Union[_ListOrTuple[str], Template, str]
 
 class ContentNotRenderedError(Exception): ...
 

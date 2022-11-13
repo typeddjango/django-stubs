@@ -7,6 +7,7 @@ from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 
 TableInfo = namedtuple("TableInfo", ["name", "type"])
+
 FieldInfo = namedtuple(
     "FieldInfo",
     ["name", "type_code", "display_size", "internal_size", "precision", "scale", "null_ok", "default", "collation"],

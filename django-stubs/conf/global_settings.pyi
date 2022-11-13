@@ -3,12 +3,13 @@ Default Django settings. Override these with settings in the module pointed to
 by the DJANGO_SETTINGS_MODULE environment variable.
 """
 from collections.abc import Sequence
+from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Pattern, Protocol
+from typing import Any, Protocol
 
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 ####################
 # CORE             #

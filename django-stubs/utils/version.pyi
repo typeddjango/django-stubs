@@ -1,3 +1,5 @@
+from typing_extensions import TypeAlias
+
 PY36: bool
 PY37: bool
 PY38: bool
@@ -5,7 +7,7 @@ PY39: bool
 PY310: bool
 PY311: bool
 
-_VT = tuple[int, int, int, str, int]
+_VT: TypeAlias = tuple[int, int, int, str, int]
 
 def get_version(version: _VT | None = ...) -> str: ...
 def get_main_version(version: _VT = ...) -> str: ...

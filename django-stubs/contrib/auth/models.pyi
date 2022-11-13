@@ -9,9 +9,9 @@ from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
-_AnyUser = Model | "AnonymousUser"
+_AnyUser: TypeAlias = Model | "AnonymousUser"
 
 def update_last_login(sender: type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
 

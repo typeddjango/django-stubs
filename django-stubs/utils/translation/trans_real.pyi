@@ -1,10 +1,11 @@
 import gettext as gettext_module
 from collections.abc import Iterator
 from gettext import NullTranslations
-from typing import Any, Pattern, Protocol, TypeVar
+from re import Pattern
+from typing import Any, Protocol, Tuple, TypeVar
 
 from django.http.request import HttpRequest
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 CONTEXT_SEPARATOR: Literal["\x04"]
 accept_language_re: Pattern[str]
@@ -16,7 +17,9 @@ class _PluralCallable(Protocol):
 
 def reset_cache(**kwargs: Any) -> None: ...
 
-_KeyT = str | tuple[str, int]
+# switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
+_KeyT: TypeAlias = str | Tuple[str, int]
+
 _Z = TypeVar("_Z")
 
 class TranslationCatalog:

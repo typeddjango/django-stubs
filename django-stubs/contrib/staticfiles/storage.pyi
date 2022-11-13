@@ -5,8 +5,9 @@ from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage, Storage
 from django.utils._os import _PathCompatible
 from django.utils.functional import LazyObject
+from typing_extensions import TypeAlias
 
-_PostProcessT = Iterator[tuple[str, str, bool] | tuple[str, None, RuntimeError]]
+_PostProcessT: TypeAlias = Iterator[tuple[str, str, bool] | tuple[str, None, RuntimeError]]
 
 class StaticFilesStorage(FileSystemStorage):
     base_location: str

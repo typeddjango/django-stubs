@@ -1,8 +1,8 @@
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, ItemsView, Iterator
 from importlib.abc import SourceLoader
 from pathlib import Path
 from types import TracebackType
-from typing import Any, ItemsView
+from typing import Any
 
 from django.http.request import HttpRequest, QueryDict
 from django.http.response import Http404, HttpResponse

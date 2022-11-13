@@ -3,6 +3,7 @@ from typing import Generic, Protocol, TypeVar, overload
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
+from typing_extensions import TypeAlias
 
 class UnorderedObjectListWarning(RuntimeWarning): ...
 class InvalidPage(Exception): ...
@@ -43,7 +44,7 @@ class Paginator(Generic[_T]):
         self, number: int | float | str = ..., *, on_each_side: int = ..., on_ends: int = ...
     ) -> Iterator[str | int]: ...
 
-QuerySetPaginator = Paginator
+QuerySetPaginator: TypeAlias = Paginator
 
 class Page(Sequence[_T]):
     object_list: _SupportsPagination[_T]

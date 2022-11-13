@@ -1,11 +1,11 @@
 import decimal
 from collections.abc import Callable, Iterable, Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import AbstractContextManager, contextmanager
 from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, ContextManager, Protocol, TypeVar
+from typing import Any, Protocol, TypeVar
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
@@ -15,10 +15,11 @@ from django.db.models.lookups import Lookup, Transform
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
-from typing_extensions import SupportsIndex
+from typing_extensions import SupportsIndex, TypeAlias
 
-_TestClass = type[SimpleTestCase]
-_DecoratedTest = Callable | _TestClass
+_TestClass: TypeAlias = type[SimpleTestCase]
+
+_DecoratedTest: TypeAlias = Callable | _TestClass
 _C = TypeVar("_C", bound=Callable)  # Any callable
 
 TZ_SUPPORT: bool
@@ -102,7 +103,7 @@ class ignore_warnings(TestContextDecorator):
     ignore_kwargs: dict[str, Any]
     filter_func: Callable
     def __init__(self, **kwargs: Any) -> None: ...
-    catch_warnings: ContextManager[list | None]
+    catch_warnings: AbstractContextManager[list | None]
 
 requires_tz_support: Any
 
@@ -130,15 +131,15 @@ class isolate_apps(TestContextDecorator):
 def extend_sys_path(*paths: str) -> Iterator[None]: ...
 @contextmanager
 def captured_output(stream_name: str) -> Iterator[StringIO]: ...
-def captured_stdin() -> ContextManager: ...
-def captured_stdout() -> ContextManager: ...
-def captured_stderr() -> ContextManager: ...
+def captured_stdin() -> AbstractContextManager: ...
+def captured_stdout() -> AbstractContextManager: ...
+def captured_stderr() -> AbstractContextManager: ...
 @contextmanager
 def freeze_time(t: float) -> Iterator[None]: ...
 def tag(*tags: str) -> Callable[[_C], _C]: ...
 
-_Signature = str
-_TestDatabase = tuple[str, list[str]]
+_Signature: TypeAlias = str
+_TestDatabase: TypeAlias = tuple[str, list[str]]
 
 class TimeKeeperProtocol(Protocol):
     @contextmanager

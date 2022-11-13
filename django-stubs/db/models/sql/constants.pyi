@@ -1,4 +1,4 @@
-from typing import Pattern
+from re import Pattern
 
 from typing_extensions import Final, Literal
 

@@ -9,6 +9,7 @@ from django.utils.datastructures import _IndexableCollection
 from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
+from typing_extensions import TypeAlias
 
 _M = TypeVar("_M", bound=models.Model)
 
@@ -52,7 +53,7 @@ class DateMixin:
     @property
     def uses_datetime_field(self) -> bool: ...
 
-DatedItems = tuple[_IndexableCollection[datetime.date] | None, _IndexableCollection[_M], dict[str, Any]]
+DatedItems: TypeAlias = tuple[_IndexableCollection[datetime.date] | None, _IndexableCollection[_M], dict[str, Any]]
 
 class BaseDateListView(MultipleObjectMixin[_M], DateMixin, View):
     date_list_period: str

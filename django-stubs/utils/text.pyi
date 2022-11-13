@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable, Iterator
 from io import BytesIO
-from typing import Pattern
+from re import Pattern
 
 from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject

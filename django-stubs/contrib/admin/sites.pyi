@@ -13,17 +13,18 @@ from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject, _StrOrPromise
+from typing_extensions import TypeAlias
 
 if sys.version_info >= (3, 9):
     from weakref import WeakSet
 
     all_sites: WeakSet[AdminSite]
 else:
-    from typing import MutableSet
+    from collections.abc import MutableSet
 
     all_sites: MutableSet[AdminSite]
 
-_ActionCallback = Callable[[ModelAdmin, HttpRequest, QuerySet], TemplateResponse | None]
+_ActionCallback: TypeAlias = Callable[[ModelAdmin, HttpRequest, QuerySet], TemplateResponse | None]
 
 class AlreadyRegistered(Exception): ...
 class NotRegistered(Exception): ...

@@ -10,13 +10,13 @@ from django.db.models.lookups import Lookup, Transform
 from django.db.models.query import QuerySet
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 class SQLiteNumericMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 _Self = TypeVar("_Self")
-_Numeric = float | Decimal
+_Numeric: TypeAlias = float | Decimal
 
 class Combinable:
     ADD: str

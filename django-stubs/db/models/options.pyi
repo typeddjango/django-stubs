@@ -14,14 +14,14 @@ from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, _ListOrTuple
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 PROXY_PARENTS: object
 EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
-_OptionTogetherT = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], set[tuple[str, ...]]]
+_OptionTogetherT: TypeAlias = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], set[tuple[str, ...]]]
 
 @overload
 def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> tuple[tuple[str, ...], ...]: ...
