@@ -1,6 +1,7 @@
 import logging.config
+from collections.abc import Callable
 from logging import Logger, LogRecord
-from typing import Any, Callable, Dict
+from typing import Any
 
 from django.core.management.color import Style
 from django.http import HttpRequest, HttpResponse
@@ -8,7 +9,7 @@ from django.http import HttpRequest, HttpResponse
 request_logger: Logger
 DEFAULT_LOGGING: Any
 
-def configure_logging(logging_config: str, logging_settings: Dict[str, Any]) -> None: ...
+def configure_logging(logging_config: str, logging_settings: dict[str, Any]) -> None: ...
 
 class AdminEmailHandler(logging.Handler):
     include_html: bool

@@ -1,14 +1,15 @@
-from typing import Any, Callable, Dict, List, Tuple
+from collections.abc import Callable
+from typing import Any
 
 from django.utils.safestring import SafeString
 
 docutils_is_available: bool
 
 def get_view_name(view_func: Callable) -> str: ...
-def parse_docstring(docstring: str) -> Tuple[str, str, Dict[str, str]]: ...
+def parse_docstring(docstring: str) -> tuple[str, str, dict[str, str]]: ...
 def parse_rst(text: str, default_reference_context: Any, thing_being_parsed: Any | None = ...) -> SafeString: ...
 
-ROLES: Dict[str, str]
+ROLES: dict[str, str]
 
 def create_reference_role(rolename: str, urlbase: str) -> None: ...
 def default_reference_role(
@@ -19,7 +20,7 @@ def default_reference_role(
     inliner: Any,
     options: Any | None = ...,
     content: Any | None = ...,
-) -> Tuple[List[Any], List[Any]]: ...
+) -> tuple[list[Any], list[Any]]: ...
 
 named_group_matcher: Any
 unnamed_group_matcher: Any

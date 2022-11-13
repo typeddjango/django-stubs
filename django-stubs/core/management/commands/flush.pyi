@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from django.apps import apps as apps
 from django.core.management.base import BaseCommand as BaseCommand
 from django.core.management.base import CommandError as CommandError
@@ -11,5 +9,5 @@ from django.db import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
 from django.db import connections as connections
 
 class Command(BaseCommand):
-    stealth_options: Tuple[str]
+    stealth_options: tuple[str]
     style: Style

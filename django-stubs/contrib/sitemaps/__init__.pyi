@@ -1,5 +1,6 @@
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime
-from typing import Any, Dict, Generic, Iterable, List, Mapping, Sequence, TypeVar
+from typing import Any, Generic, TypeVar
 
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
@@ -28,7 +29,7 @@ class Sitemap(Generic[_ItemT]):
     def paginator(self) -> Paginator: ...
     def get_urls(
         self, page: int | str = ..., site: Site | RequestSite | None = ..., protocol: str | None = ...
-    ) -> List[Dict[str, Any]]: ...
+    ) -> list[dict[str, Any]]: ...
     def get_latest_lastmod(self) -> datetime | None: ...
 
 _ModelT = TypeVar("_ModelT", bound=Model)

@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterator, List, Tuple
+from collections.abc import Iterator
+from typing import Any
 
 class Tok:
     num: int
@@ -12,15 +13,15 @@ def literals(choices: str, prefix: str = ..., suffix: str = ...) -> str: ...
 
 class Lexer:
     regexes: Any
-    toks: Dict[str, Tok]
+    toks: dict[str, Tok]
     state: str
-    def __init__(self, states: Dict[str, List[Tok]], first: str) -> None: ...
-    def lex(self, text: str) -> Iterator[Tuple[str, str]]: ...
+    def __init__(self, states: dict[str, list[Tok]], first: str) -> None: ...
+    def lex(self, text: str) -> Iterator[tuple[str, str]]: ...
 
 class JsLexer(Lexer):
-    both_before: List[Tok]
-    both_after: List[Tok]
-    states: Dict[str, List[Tok]]
+    both_before: list[Tok]
+    both_after: list[Tok]
+    states: dict[str, list[Tok]]
     def __init__(self) -> None: ...
 
 def prepare_js_for_gettext(js: str) -> str: ...

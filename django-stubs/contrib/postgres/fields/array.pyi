@@ -1,4 +1,5 @@
-from typing import Any, Iterable, List, Sequence, Type, TypeVar
+from collections.abc import Iterable, Sequence
+from typing import Any, TypeVar
 
 from django.core.validators import _ValidatorCallable
 from django.db.models import Field, Transform
@@ -14,7 +15,7 @@ _GT = TypeVar("_GT")
 
 class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any] | Combinable
-    _pyi_private_get_type: List[Any]
+    _pyi_private_get_type: list[Any]
 
     empty_strings_allowed: bool
     default_error_messages: _ErrorMessagesT
@@ -51,4 +52,4 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     ) -> None: ...
     @property
     def description(self) -> str: ...  # type: ignore
-    def get_transform(self, name: Any) -> Type[Transform] | None: ...
+    def get_transform(self, name: Any) -> type[Transform] | None: ...

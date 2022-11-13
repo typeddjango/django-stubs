@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from django.core.cache.backends.base import BaseCache
 from django.utils.functional import _StrOrPromise
@@ -18,6 +18,6 @@ class Options:
 
 class BaseDatabaseCache(BaseCache):
     cache_model_class: Any
-    def __init__(self, table: str, params: Dict[str, Any]) -> None: ...
+    def __init__(self, table: str, params: dict[str, Any]) -> None: ...
 
 class DatabaseCache(BaseDatabaseCache): ...

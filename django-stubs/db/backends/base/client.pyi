@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterable, Sequence, Tuple
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 
@@ -9,7 +10,7 @@ class BaseDatabaseClient:
     @classmethod
     def settings_to_cmd_args_env(
         cls,
-        settings_dict: Dict[str, Any],
+        settings_dict: dict[str, Any],
         parameters: Iterable[str],
-    ) -> Tuple[Sequence[str], Dict[str, str] | None]: ...
+    ) -> tuple[Sequence[str], dict[str, str] | None]: ...
     def runshell(self, parameters: Iterable[str]) -> None: ...

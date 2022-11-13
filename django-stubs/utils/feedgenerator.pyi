@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Tuple
+from typing import Any
 from xml.sax import ContentHandler
 
 def rfc2822_date(date: datetime.date) -> str: ...
@@ -7,8 +7,8 @@ def rfc3339_date(date: datetime.date) -> str: ...
 def get_tag_uri(url: str, date: datetime.date | None) -> str: ...
 
 class SyndicationFeed:
-    feed: Dict[str, Any]
-    items: List[Dict[str, Any]]
+    feed: dict[str, Any]
+    items: list[dict[str, Any]]
     def __init__(
         self,
         title: str,
@@ -19,7 +19,7 @@ class SyndicationFeed:
         author_name: str | None = ...,
         author_link: str | None = ...,
         subtitle: str | None = ...,
-        categories: Tuple[str, str] | None = ...,
+        categories: tuple[str, str] | None = ...,
         feed_url: str | None = ...,
         feed_copyright: str | None = ...,
         feed_guid: str | None = ...,
@@ -38,18 +38,18 @@ class SyndicationFeed:
         comments: str | None = ...,
         unique_id: str | None = ...,
         unique_id_is_permalink: bool | None = ...,
-        categories: Tuple | None = ...,
+        categories: tuple | None = ...,
         item_copyright: str | None = ...,
         ttl: int | None = ...,
         updateddate: datetime.datetime | None = ...,
-        enclosures: List[Enclosure] | None = ...,
+        enclosures: list[Enclosure] | None = ...,
         **kwargs: Any
     ) -> None: ...
     def num_items(self) -> int: ...
-    def root_attributes(self) -> Dict[Any, Any]: ...
+    def root_attributes(self) -> dict[Any, Any]: ...
     def add_root_elements(self, handler: ContentHandler) -> None: ...
-    def item_attributes(self, item: Dict[str, Any]) -> Dict[Any, Any]: ...
-    def add_item_elements(self, handler: ContentHandler, item: Dict[str, Any]) -> None: ...
+    def item_attributes(self, item: dict[str, Any]) -> dict[Any, Any]: ...
+    def add_item_elements(self, handler: ContentHandler, item: dict[str, Any]) -> None: ...
     def write(self, outfile: Any, encoding: Any) -> None: ...
     def writeString(self, encoding: str) -> str: ...
     def latest_post_date(self) -> datetime.datetime: ...

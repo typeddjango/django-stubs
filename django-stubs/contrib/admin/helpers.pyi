@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Mapping, Sequence, Tuple
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from typing import Any
 
 from django import forms
 from django.contrib.admin.options import ModelAdmin
@@ -22,18 +23,18 @@ checkbox: Any
 
 class _PrepopulatedDict(TypedDict):
     field: BoundField
-    dependencies: List[BoundField]
+    dependencies: list[BoundField]
 
 class AdminForm:
-    prepopulated_fields: List[_PrepopulatedDict]
+    prepopulated_fields: list[_PrepopulatedDict]
     model_admin: ModelAdmin | None
     readonly_fields: Sequence[str]
     form: ModelForm
-    fieldsets: List[Tuple[Any, Dict[str, List[str]]]]
+    fieldsets: list[tuple[Any, dict[str, list[str]]]]
     def __init__(
         self,
         form: ModelForm,
-        fieldsets: List[Tuple[Any, Dict[str, List[str]]]],
+        fieldsets: list[tuple[Any, dict[str, list[str]]]],
         prepopulated_fields: Mapping[str, Iterable[str]],
         readonly_fields: Sequence[str] | None = ...,
         model_admin: ModelAdmin | None = ...,
@@ -121,7 +122,7 @@ class InlineAdminFormSet:
     fieldsets: Any
     model_admin: ModelAdmin | None
     readonly_fields: Sequence[str]
-    prepopulated_fields: Dict[str, Any]
+    prepopulated_fields: dict[str, Any]
     classes: str
     has_add_permission: bool
     has_change_permission: bool
@@ -132,7 +133,7 @@ class InlineAdminFormSet:
         inline: Any,
         formset: Any,
         fieldsets: Any,
-        prepopulated_fields: Dict[str, Any] | None = ...,
+        prepopulated_fields: dict[str, Any] | None = ...,
         readonly_fields: Sequence[str] | None = ...,
         model_admin: ModelAdmin | None = ...,
         has_add_permission: bool = ...,
@@ -141,10 +142,10 @@ class InlineAdminFormSet:
         has_view_permission: bool = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[InlineAdminForm]: ...
-    def fields(self) -> Iterator[Dict[str, Dict[str, bool] | bool | Widget | str]]: ...
+    def fields(self) -> Iterator[dict[str, dict[str, bool] | bool | Widget | str]]: ...
     def inline_formset_data(self) -> str: ...
     @property
-    def forms(self) -> List[BaseForm]: ...
+    def forms(self) -> list[BaseForm]: ...
     @property
     def non_form_errors(self) -> Callable[[], ErrorList]: ...
     @property

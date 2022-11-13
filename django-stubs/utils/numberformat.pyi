@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from decimal import Decimal
-from typing import Iterable
 
 def format(
     number: Decimal | float | str,

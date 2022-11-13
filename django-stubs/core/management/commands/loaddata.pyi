@@ -1,5 +1,5 @@
 import zipfile
-from typing import List, Sequence, Set, Tuple, Type
+from collections.abc import Sequence
 
 from django.apps.config import AppConfig
 from django.core.management.base import BaseCommand
@@ -12,16 +12,16 @@ class Command(BaseCommand):
     using: str
     app_label: str
     verbosity: int
-    excluded_models: Set[Type[Model]]
-    excluded_apps: Set[AppConfig]
+    excluded_models: set[type[Model]]
+    excluded_apps: set[AppConfig]
     format: str
     missing_args_message: str
     def loaddata(self, fixture_labels: Sequence[str]) -> None: ...
     def load_label(self, fixture_label: str) -> None: ...
-    def find_fixtures(self, fixture_label: str) -> List[Tuple[str, str | None, str | None]]: ...
+    def find_fixtures(self, fixture_label: str) -> list[tuple[str, str | None, str | None]]: ...
     @property
-    def fixture_dirs(self) -> List[str]: ...
-    def parse_name(self, fixture_name: str) -> Tuple[str, str | None, str | None]: ...
+    def fixture_dirs(self) -> list[str]: ...
+    def parse_name(self, fixture_name: str) -> tuple[str, str | None, str | None]: ...
 
 class SingleZipReader(zipfile.ZipFile):
     # Incompatible override

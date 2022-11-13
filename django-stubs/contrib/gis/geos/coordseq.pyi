@@ -1,4 +1,5 @@
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from django.contrib.gis.geos.base import GEOSBase as GEOSBase
 

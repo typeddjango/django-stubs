@@ -1,4 +1,5 @@
-from typing import Any, Iterable, NamedTuple, Tuple, TypeVar
+from collections.abc import Iterable
+from typing import Any, NamedTuple, TypeVar
 
 from django.core.validators import _ValidatorCallable
 from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
@@ -70,7 +71,7 @@ class GeometryField(BaseSpatialField):
         dim: int = ...,
         geography: bool = ...,
         *,
-        extent: Tuple[float, float, float, float] = ...,
+        extent: tuple[float, float, float, float] = ...,
         tolerance: float = ...,
         srid: int = ...,
         spatial_index: bool = ...,

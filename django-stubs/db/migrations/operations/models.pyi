@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Sequence, Set, Tuple, Type
+from collections.abc import Sequence
+from typing import Any
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
@@ -16,17 +17,17 @@ class ModelOperation(Operation):
     def name_lower(self) -> str: ...
 
 class CreateModel(ModelOperation):
-    fields: List[Tuple[str, Field]]
-    options: Dict[str, Any]
-    bases: Sequence[Type[Model] | str] | None
-    managers: Sequence[Tuple[str, Manager]] | None
+    fields: list[tuple[str, Field]]
+    options: dict[str, Any]
+    bases: Sequence[type[Model] | str] | None
+    managers: Sequence[tuple[str, Manager]] | None
     def __init__(
         self,
         name: str,
-        fields: List[Tuple[str, Field]],
-        options: Dict[str, Any] | None = ...,
-        bases: Sequence[Type[Model] | str] | None = ...,
-        managers: Sequence[Tuple[str, Manager]] | None = ...,
+        fields: list[tuple[str, Field]],
+        options: dict[str, Any] | None = ...,
+        bases: Sequence[type[Model] | str] | None = ...,
+        managers: Sequence[tuple[str, Manager]] | None = ...,
     ) -> None: ...
 
 class DeleteModel(ModelOperation): ...
@@ -54,8 +55,8 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         option_value: _OptionTogetherT | None,
     ) -> None: ...
     @property
-    def option_value(self) -> Set[Tuple[str, ...]] | None: ...
-    def deconstruct(self) -> Tuple[str, Sequence[Any], Dict[str, Any]]: ...
+    def option_value(self) -> set[tuple[str, ...]] | None: ...
+    def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
     def state_forwards(self, app_label: str, state: Any) -> None: ...
     def database_forwards(
         self, app_label: str, schema_editor: BaseDatabaseSchemaEditor, from_state: Any, to_state: Any
@@ -70,12 +71,12 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
 
 class AlterUniqueTogether(AlterTogetherOptionOperation):
     option_name: str
-    unique_together: Set[Tuple[str, ...]] | None
+    unique_together: set[tuple[str, ...]] | None
     def __init__(self, name: str, unique_together: _OptionTogetherT | None) -> None: ...
 
 class AlterIndexTogether(AlterTogetherOptionOperation):
     option_name: str
-    index_together: Set[Tuple[str, ...]] | None
+    index_together: set[tuple[str, ...]] | None
     def __init__(self, name: str, index_together: _OptionTogetherT | None) -> None: ...
 
 class AlterOrderWithRespectTo(ModelOptionOperation):
@@ -83,13 +84,13 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
     def __init__(self, name: str, order_with_respect_to: str) -> None: ...
 
 class AlterModelOptions(ModelOptionOperation):
-    ALTER_OPTION_KEYS: List[str]
-    options: Dict[str, Any]
-    def __init__(self, name: str, options: Dict[str, Any]) -> None: ...
+    ALTER_OPTION_KEYS: list[str]
+    options: dict[str, Any]
+    def __init__(self, name: str, options: dict[str, Any]) -> None: ...
 
 class AlterModelManagers(ModelOptionOperation):
-    managers: Sequence[Tuple[str, Manager]]
-    def __init__(self, name: str, managers: Sequence[Tuple[str, Manager]]) -> None: ...
+    managers: Sequence[tuple[str, Manager]]
+    def __init__(self, name: str, managers: Sequence[tuple[str, Manager]]) -> None: ...
 
 class IndexOperation(Operation):
     option_name: str

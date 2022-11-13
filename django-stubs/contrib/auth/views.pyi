@@ -1,4 +1,4 @@
-from typing import Any, Dict, Set
+from typing import Any
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import AuthenticationForm
@@ -11,7 +11,7 @@ UserModel: Any
 
 class SuccessURLAllowedHostsMixin:
     success_url_allowed_hosts: Any
-    def get_success_url_allowed_hosts(self) -> Set[str]: ...
+    def get_success_url_allowed_hosts(self) -> set[str]: ...
 
 class LoginView(SuccessURLAllowedHostsMixin, FormView[AuthenticationForm]):
     authentication_form: Any
@@ -35,7 +35,7 @@ def redirect_to_login(
 
 class PasswordContextMixin:
     extra_context: Any
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]: ...
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
 class PasswordResetView(PasswordContextMixin, FormView):
     email_template_name: str

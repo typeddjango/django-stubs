@@ -1,4 +1,4 @@
-from typing import Any, Dict, TypeVar
+from typing import Any, TypeVar
 
 from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
@@ -49,7 +49,7 @@ class SearchQueryCombinable:
     def __rand__(self: _T, other: SearchQueryCombinable) -> _T: ...
 
 class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
-    SEARCH_TYPES: Dict[str, str]
+    SEARCH_TYPES: dict[str, str]
     def __init__(
         self,
         value: _Expression,

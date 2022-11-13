@@ -1,4 +1,5 @@
-from typing import Any, ClassVar, Dict, Iterable, Iterator, List, Mapping, Sequence, Type
+from collections.abc import Iterable, Iterator, Mapping, Sequence
+from typing import Any, ClassVar
 
 from django.core.exceptions import ValidationError as ValidationError
 from django.forms.boundfield import BoundField
@@ -13,7 +14,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 class BaseForm:
     class Meta:
         fields: Sequence[str]
-    default_renderer: BaseRenderer | Type[BaseRenderer] | None
+    default_renderer: BaseRenderer | type[BaseRenderer] | None
     field_order: Iterable[str] | None
     use_required_attribute: bool
     is_bound: bool
@@ -21,13 +22,13 @@ class BaseForm:
     files: _FilesT
     auto_id: bool | str
     initial: Mapping[str, Any]
-    error_class: Type[ErrorList]
+    error_class: type[ErrorList]
     prefix: str | None
     label_suffix: str
     empty_permitted: bool
-    fields: Dict[str, Field]
+    fields: dict[str, Field]
     renderer: BaseRenderer
-    cleaned_data: Dict[str, Any]
+    cleaned_data: dict[str, Any]
     def __init__(
         self,
         data: _DataT | None = ...,
@@ -35,7 +36,7 @@ class BaseForm:
         auto_id: bool | str = ...,
         prefix: str | None = ...,
         initial: Mapping[str, Any] | None = ...,
-        error_class: Type[ErrorList] = ...,
+        error_class: type[ErrorList] = ...,
         label_suffix: str | None = ...,
         empty_permitted: bool = ...,
         field_order: Iterable[str] | None = ...,
@@ -57,15 +58,15 @@ class BaseForm:
     def add_error(self, field: str | None, error: ValidationError | str) -> None: ...
     def has_error(self, field: str | None, code: str | None = ...) -> bool: ...
     def full_clean(self) -> None: ...
-    def clean(self) -> Dict[str, Any] | None: ...
+    def clean(self) -> dict[str, Any] | None: ...
     def has_changed(self) -> bool: ...
     @property
-    def changed_data(self) -> List[str]: ...
+    def changed_data(self) -> list[str]: ...
     @property
     def media(self) -> Media: ...
     def is_multipart(self) -> bool: ...
-    def hidden_fields(self) -> List[BoundField]: ...
-    def visible_fields(self) -> List[BoundField]: ...
+    def hidden_fields(self) -> list[BoundField]: ...
+    def visible_fields(self) -> list[BoundField]: ...
     def get_initial_for_field(self, field: Field, field_name: str) -> Any: ...
     def _html_output(
         self,
@@ -77,5 +78,5 @@ class BaseForm:
     ) -> SafeString: ...
 
 class Form(BaseForm):
-    base_fields: ClassVar[Dict[str, Field]]
-    declared_fields: ClassVar[Dict[str, Field]]
+    base_fields: ClassVar[dict[str, Field]]
+    declared_fields: ClassVar[dict[str, Field]]

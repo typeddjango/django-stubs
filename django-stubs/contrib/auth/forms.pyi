@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterable, List, Type, TypeVar
+from collections.abc import Iterable
+from typing import Any, TypeVar
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -10,13 +11,13 @@ from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
 
-UserModel: Type[AbstractBaseUser]
+UserModel: type[AbstractBaseUser]
 _User = TypeVar("_User", bound=AbstractBaseUser)
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name: str
     read_only: bool
-    def get_context(self, name: str, value: Any, attrs: Dict[str, Any] | None) -> Dict[str, Any]: ...
+    def get_context(self, name: str, value: Any, attrs: dict[str, Any] | None) -> dict[str, Any]: ...
 
 class ReadOnlyPasswordHashField(forms.Field):
     widget: _ClassLevelWidgetT
@@ -24,7 +25,7 @@ class ReadOnlyPasswordHashField(forms.Field):
 
 class UsernameField(forms.CharField):
     def to_python(self, value: Any | None) -> Any | None: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class UserCreationForm(forms.ModelForm[_User]):
     error_messages: _ErrorMessagesT
@@ -49,7 +50,7 @@ class AuthenticationForm(forms.Form):
     def confirm_login_allowed(self, user: AbstractBaseUser) -> None: ...
     def get_user(self) -> AbstractBaseUser: ...
     def get_invalid_login_error(self) -> ValidationError: ...
-    def clean(self) -> Dict[str, Any]: ...
+    def clean(self) -> dict[str, Any]: ...
 
 class PasswordResetForm(forms.Form):
     email: forms.Field
@@ -57,7 +58,7 @@ class PasswordResetForm(forms.Form):
         self,
         subject_template_name: str,
         email_template_name: str,
-        context: Dict[str, Any],
+        context: dict[str, Any],
         from_email: str | None,
         to_email: str,
         html_email_template_name: str | None = ...,
@@ -73,7 +74,7 @@ class PasswordResetForm(forms.Form):
         from_email: str | None = ...,
         request: HttpRequest | None = ...,
         html_email_template_name: str | None = ...,
-        extra_email_context: Dict[str, str] | None = ...,
+        extra_email_context: dict[str, str] | None = ...,
     ) -> None: ...
 
 class SetPasswordForm(forms.Form):
@@ -100,4 +101,4 @@ class AdminPasswordChangeForm(forms.Form):
     def clean_password2(self) -> str: ...
     def save(self, commit: bool = ...) -> AbstractBaseUser: ...
     @property
-    def changed_data(self) -> List[str]: ...
+    def changed_data(self) -> list[str]: ...

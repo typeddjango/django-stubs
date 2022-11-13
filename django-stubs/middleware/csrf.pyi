@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from logging import Logger
-from typing import Any, Callable, Dict, Tuple
+from typing import Any
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase, HttpResponseForbidden
@@ -23,7 +24,7 @@ def rotate_token(request: HttpRequest) -> None: ...
 class CsrfViewMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest) -> None: ...
     def process_view(
-        self, request: HttpRequest, callback: Callable | None, callback_args: Tuple, callback_kwargs: Dict[str, Any]
+        self, request: HttpRequest, callback: Callable | None, callback_args: tuple, callback_kwargs: dict[str, Any]
     ) -> HttpResponseForbidden | None: ...
     def process_response(self, request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
 

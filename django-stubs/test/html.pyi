@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from html.parser import HTMLParser
-from typing import Any, List, Sequence, Tuple, TypeVar
+from typing import Any, TypeVar
 
 _Self = TypeVar("_Self")
 
@@ -7,12 +8,12 @@ WHITESPACE: Any
 
 def normalize_whitespace(string: str) -> str: ...
 
-_ElementAttribute = Tuple[str, str | None]
+_ElementAttribute = tuple[str, str | None]
 
 class Element:
     name: str | None
-    attributes: List[_ElementAttribute]
-    children: List[Any]
+    attributes: list[_ElementAttribute]
+    children: list[Any]
     def __init__(self, name: str | None, attributes: Sequence[_ElementAttribute]) -> None: ...
     def append(self, element: Element | str) -> None: ...
     def finalize(self) -> None: ...

@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generic, Iterable, List, Sequence, Set, Tuple, Type, TypeVar, Union, overload
+from collections.abc import Iterable, Sequence
+from typing import Any, Generic, TypeVar, Union, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -18,16 +19,16 @@ from typing_extensions import Literal
 PROXY_PARENTS: object
 EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
-DEFAULT_NAMES: Tuple[str, ...]
+DEFAULT_NAMES: tuple[str, ...]
 
-_OptionTogetherT = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], Set[Tuple[str, ...]]]
+_OptionTogetherT = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], set[tuple[str, ...]]]
 
 @overload
-def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> Tuple[Tuple[str, ...], ...]: ...
+def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> tuple[tuple[str, ...], ...]: ...
 
 # Any other value will be returned unchanged, but probably only set is semantically allowed
 @overload
-def normalize_together(option_together: Set[Tuple[str, ...]]) -> Set[Tuple[str, ...]]: ...
+def normalize_together(option_together: set[tuple[str, ...]]) -> set[tuple[str, ...]]: ...
 
 _T = TypeVar("_T")
 
@@ -36,14 +37,14 @@ def make_immutable_fields_list(name: str, data: Iterable[_T]) -> ImmutableList[_
 _M = TypeVar("_M", bound="Model")
 
 class Options(Generic[_M]):
-    constraints: List[BaseConstraint]
-    FORWARD_PROPERTIES: Set[str]
-    REVERSE_PROPERTIES: Set[str]
+    constraints: list[BaseConstraint]
+    FORWARD_PROPERTIES: set[str]
+    REVERSE_PROPERTIES: set[str]
     default_apps: Any
-    local_fields: List[Field]
-    local_many_to_many: List[ManyToManyField]
-    private_fields: List[Any]
-    local_managers: List[Manager]
+    local_fields: list[Field]
+    local_many_to_many: list[ManyToManyField]
+    private_fields: list[Any]
+    local_managers: list[Manager]
     base_manager_name: str | None
     default_manager_name: str | None
     model_name: str | None
@@ -51,18 +52,18 @@ class Options(Generic[_M]):
     verbose_name_plural: _StrOrPromise | None
     db_table: str
     ordering: Sequence[str] | None
-    indexes: List[Any]
-    unique_together: Sequence[Tuple[str]]  # Are always normalized
-    index_together: Sequence[Tuple[str]]  # Are always normalized
+    indexes: list[Any]
+    unique_together: Sequence[tuple[str]]  # Are always normalized
+    index_together: Sequence[tuple[str]]  # Are always normalized
     select_on_save: bool
     default_permissions: Sequence[str]
-    permissions: List[Any]
+    permissions: list[Any]
     object_name: str | None
     app_label: str
     get_latest_by: Sequence[str] | None
     order_with_respect_to: str | None
     db_tablespace: str
-    required_db_features: List[str]
+    required_db_features: list[str]
     required_db_vendor: Literal["sqlite", "postgresql", "mysql", "oracle"] | None
     meta: type | None
     pk: Field | None
@@ -70,16 +71,16 @@ class Options(Generic[_M]):
     abstract: bool
     managed: bool
     proxy: bool
-    proxy_for_model: Type[Model] | None
-    concrete_model: Type[Model] | None
+    proxy_for_model: type[Model] | None
+    concrete_model: type[Model] | None
     swappable: str | None
-    parents: Dict[Type[Model], GenericForeignKey | Field]
+    parents: dict[type[Model], GenericForeignKey | Field]
     auto_created: bool
-    related_fkey_lookups: List[Any]
+    related_fkey_lookups: list[Any]
     apps: Apps
     default_related_name: str | None
-    model: Type[Model]
-    original_attrs: Dict[str, Any]
+    model: type[Model]
+    original_attrs: dict[str, Any]
     def __init__(self, meta: type | None, app_label: str | None = ...) -> None: ...
     @property
     def label(self) -> str: ...
@@ -89,23 +90,23 @@ class Options(Generic[_M]):
     def app_config(self) -> AppConfig: ...
     @property
     def installed(self) -> bool: ...
-    def contribute_to_class(self, cls: Type[Model], name: str) -> None: ...
+    def contribute_to_class(self, cls: type[Model], name: str) -> None: ...
     def add_manager(self, manager: Manager) -> None: ...
     def add_field(self, field: GenericForeignKey | Field[Any, Any], private: bool = ...) -> None: ...
     # if GenericForeignKey is passed as argument, it has primary_key = True set before
     def setup_pk(self, field: GenericForeignKey | Field[Any, Any]) -> None: ...
-    def setup_proxy(self, target: Type[Model]) -> None: ...
+    def setup_proxy(self, target: type[Model]) -> None: ...
     def can_migrate(self, connection: BaseDatabaseWrapper | str) -> bool: ...
     @property
     def verbose_name_raw(self) -> str: ...
     @property
     def swapped(self) -> str | None: ...
     @property
-    def fields_map(self) -> Dict[str, Field[Any, Any] | ForeignObjectRel]: ...
+    def fields_map(self) -> dict[str, Field[Any, Any] | ForeignObjectRel]: ...
     @property
     def managers(self) -> ImmutableList[Manager]: ...
     @property
-    def managers_map(self) -> Dict[str, Manager]: ...
+    def managers_map(self) -> dict[str, Manager]: ...
     @property
     def base_manager(self) -> Manager: ...
     @property
@@ -113,15 +114,15 @@ class Options(Generic[_M]):
     @property
     def fields(self) -> ImmutableList[Field[Any, Any]]: ...
     def get_field(self, field_name: str) -> Field | ForeignObjectRel | GenericForeignKey: ...
-    def get_base_chain(self, model: Type[Model]) -> List[Type[Model]]: ...
-    def get_parent_list(self) -> List[Type[Model]]: ...
-    def get_ancestor_link(self, ancestor: Type[Model]) -> OneToOneField | None: ...
-    def get_path_to_parent(self, parent: Type[Model]) -> List[PathInfo]: ...
-    def get_path_from_parent(self, parent: Type[Model]) -> List[PathInfo]: ...
+    def get_base_chain(self, model: type[Model]) -> list[type[Model]]: ...
+    def get_parent_list(self) -> list[type[Model]]: ...
+    def get_ancestor_link(self, ancestor: type[Model]) -> OneToOneField | None: ...
+    def get_path_to_parent(self, parent: type[Model]) -> list[PathInfo]: ...
+    def get_path_from_parent(self, parent: type[Model]) -> list[PathInfo]: ...
     def get_fields(
         self, include_parents: bool = ..., include_hidden: bool = ...
-    ) -> List[Field[Any, Any] | ForeignObjectRel | GenericForeignKey]: ...
+    ) -> list[Field[Any, Any] | ForeignObjectRel | GenericForeignKey]: ...
     @property
-    def total_unique_constraints(self) -> List[UniqueConstraint]: ...
+    def total_unique_constraints(self) -> list[UniqueConstraint]: ...
     @property
-    def db_returning_fields(self) -> List[Field[Any, Any]]: ...
+    def db_returning_fields(self) -> list[Field[Any, Any]]: ...

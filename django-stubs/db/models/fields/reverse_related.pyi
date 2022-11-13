@@ -1,4 +1,5 @@
-from typing import Any, Callable, List, Sequence, Tuple, Type
+from collections.abc import Callable, Sequence
+from typing import Any
 
 from django.db.models.base import Model
 from django.db.models.fields import AutoField, Field, _AllLimitChoicesTo, _ChoicesList, _LimitChoicesTo
@@ -23,7 +24,7 @@ class ForeignObjectRel(FieldCacheMixin):
     is_relation: bool
     null: bool
     field: ForeignObject
-    model: Type[Model]
+    model: type[Model]
     related_name: str | None
     related_query_name: str | None
     limit_choices_to: _AllLimitChoicesTo | None
@@ -35,7 +36,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def __init__(
         self,
         field: ForeignObject,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
@@ -51,7 +52,7 @@ class ForeignObjectRel(FieldCacheMixin):
     @property
     def target_field(self) -> AutoField: ...
     @property
-    def related_model(self) -> Type[Model]: ...
+    def related_model(self) -> type[Model]: ...
     @property
     def many_to_many(self) -> bool: ...
     @property
@@ -60,7 +61,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def one_to_many(self) -> bool: ...
     @property
     def one_to_one(self) -> bool: ...
-    def get_lookup(self, lookup_name: str) -> Type[Lookup] | None: ...
+    def get_lookup(self, lookup_name: str) -> type[Lookup] | None: ...
     def get_internal_type(self) -> str: ...
     @property
     def db_type(self) -> Any: ...
@@ -74,20 +75,20 @@ class ForeignObjectRel(FieldCacheMixin):
         ordering: Sequence[str] = ...,
     ) -> _ChoicesList: ...
     def is_hidden(self) -> bool: ...
-    def get_joining_columns(self) -> Tuple: ...
+    def get_joining_columns(self) -> tuple: ...
     def get_extra_restriction(
-        self, where_class: Type[WhereNode], alias: str, related_alias: str
+        self, where_class: type[WhereNode], alias: str, related_alias: str
     ) -> StartsWith | WhereNode | None: ...
     def set_field_name(self) -> None: ...
-    def get_accessor_name(self, model: Type[Model] | None = ...) -> str | None: ...
-    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> List[PathInfo]: ...
+    def get_accessor_name(self, model: type[Model] | None = ...) -> str | None: ...
+    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
     field: ForeignKey
     def __init__(
         self,
         field: ForeignKey,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         field_name: str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
@@ -102,7 +103,7 @@ class OneToOneRel(ManyToOneRel):
     def __init__(
         self,
         field: OneToOneField,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         field_name: str | None,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
@@ -113,19 +114,19 @@ class OneToOneRel(ManyToOneRel):
 
 class ManyToManyRel(ForeignObjectRel):
     field: ManyToManyField  # type: ignore
-    through: Type[Model] | None
-    through_fields: Tuple[str, str] | None
+    through: type[Model] | None
+    through_fields: tuple[str, str] | None
     db_constraint: bool
     def __init__(
         self,
         field: ManyToManyField,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         symmetrical: bool = ...,
-        through: Type[Model] | str | None = ...,
-        through_fields: Tuple[str, str] | None = ...,
+        through: type[Model] | str | None = ...,
+        through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
     ) -> None: ...
     def get_related_field(self) -> Field: ...

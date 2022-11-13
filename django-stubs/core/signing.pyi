@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any, Dict, Protocol, Type
+from typing import Any, Protocol
 
 class BadSignature(Exception): ...
 class SignatureExpired(BadSignature): ...
@@ -21,14 +21,14 @@ def dumps(
     obj: Any,
     key: bytes | str | None = ...,
     salt: str = ...,
-    serializer: Type[Serializer] = ...,
+    serializer: type[Serializer] = ...,
     compress: bool = ...,
 ) -> str: ...
 def loads(
     s: str,
     key: bytes | str | None = ...,
     salt: str = ...,
-    serializer: Type[Serializer] = ...,
+    serializer: type[Serializer] = ...,
     max_age: int | timedelta | None = ...,
 ) -> Any: ...
 
@@ -50,13 +50,13 @@ class Signer:
     def sign_object(
         self,
         obj: Any,
-        serializer: Type[Serializer] = ...,
+        serializer: type[Serializer] = ...,
         compress: bool = ...,
     ) -> str: ...
     def unsign_object(
         self,
         signed_obj: str,
-        serializer: Type[Serializer] = ...,
+        serializer: type[Serializer] = ...,
         **kwargs: Any,
     ) -> Any: ...
 

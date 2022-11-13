@@ -1,5 +1,5 @@
 import json
-from typing import Any, Type
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
@@ -11,14 +11,14 @@ from . import Field
 from .mixins import CheckFieldDefaultMixin
 
 class JSONField(CheckFieldDefaultMixin, Field):
-    encoder: Type[json.JSONEncoder] | None
-    decoder: Type[json.JSONDecoder] | None
+    encoder: type[json.JSONEncoder] | None
+    decoder: type[json.JSONDecoder] | None
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
-        encoder: Type[json.JSONEncoder] | None = ...,
-        decoder: Type[json.JSONDecoder] | None = ...,
+        encoder: type[json.JSONEncoder] | None = ...,
+        decoder: type[json.JSONDecoder] | None = ...,
         **kwargs: Any
     ) -> None: ...
 

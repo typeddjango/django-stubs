@@ -1,6 +1,7 @@
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from types import TracebackType
-from typing import Any, Callable, Iterator, Type, TypeVar, overload
+from typing import Any, TypeVar, overload
 
 from django.db import ProgrammingError
 
@@ -33,7 +34,7 @@ class Atomic:
     def __enter__(self) -> None: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...

@@ -1,5 +1,6 @@
+from collections.abc import Generator, Iterator
 from contextlib import contextmanager
-from typing import Any, Generator, Iterator, Type
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
 
@@ -24,12 +25,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     validation: DatabaseValidation
     ops: DatabaseOperations
 
-    client_class: Type[DatabaseClient]
-    creation_class: Type[DatabaseCreation]
-    features_class: Type[DatabaseFeatures]
-    introspection_class: Type[DatabaseIntrospection]
-    ops_class: Type[DatabaseOperations]
-    validation_class: Type[DatabaseValidation]
+    client_class: type[DatabaseClient]
+    creation_class: type[DatabaseCreation]
+    features_class: type[DatabaseFeatures]
+    introspection_class: type[DatabaseIntrospection]
+    ops_class: type[DatabaseOperations]
+    validation_class: type[DatabaseValidation]
 
     vendor: str
     display_name: str

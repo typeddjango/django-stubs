@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Dict, Sequence, Tuple, TypeVar
+from collections.abc import Sequence
+from typing import Any, TypeVar
 
 from django.db import models
 from django.db.models.query import QuerySet
@@ -51,7 +52,7 @@ class DateMixin:
     @property
     def uses_datetime_field(self) -> bool: ...
 
-DatedItems = Tuple[_IndexableCollection[datetime.date] | None, _IndexableCollection[_M], Dict[str, Any]]
+DatedItems = tuple[_IndexableCollection[datetime.date] | None, _IndexableCollection[_M], dict[str, Any]]
 
 class BaseDateListView(MultipleObjectMixin[_M], DateMixin, View):
     date_list_period: str

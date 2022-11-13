@@ -1,16 +1,17 @@
 import types
+from collections.abc import Iterator
 from datetime import date
 from datetime import datetime as builtin_datetime
 from datetime import time
 from decimal import Decimal
-from typing import Any, Dict, FrozenSet, Iterator, List, TypeVar, overload
+from typing import Any, TypeVar, overload
 
-ISO_INPUT_FORMATS: Dict[str, List[str]]
-FORMAT_SETTINGS: FrozenSet[str]
+ISO_INPUT_FORMATS: dict[str, list[str]]
+FORMAT_SETTINGS: frozenset[str]
 
 def reset_format_cache() -> None: ...
-def iter_format_modules(lang: str, format_module_path: List[str] | str | None = ...) -> Iterator[types.ModuleType]: ...
-def get_format_modules(lang: str | None = ..., reverse: bool = ...) -> List[types.ModuleType]: ...
+def iter_format_modules(lang: str, format_module_path: list[str] | str | None = ...) -> Iterator[types.ModuleType]: ...
+def get_format_modules(lang: str | None = ..., reverse: bool = ...) -> list[types.ModuleType]: ...
 def get_format(format_type: str, lang: str | None = ..., use_l10n: bool | None = ...) -> Any: ...
 
 get_format_lazy: Any

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponsePermanentRedirect
@@ -12,6 +12,6 @@ class SecurityMiddleware(MiddlewareMixin):
     xss_filter: bool
     redirect: bool
     redirect_host: str | None
-    redirect_exempt: List[Any]
+    redirect_exempt: list[Any]
     def process_request(self, request: HttpRequest) -> HttpResponsePermanentRedirect | None: ...
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse: ...

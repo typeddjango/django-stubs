@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from django.template import Node
 from django.template.base import FilterExpression, NodeList, Parser, Token
@@ -49,9 +49,9 @@ class TranslateNode(Node):
     def render(self, context: Context) -> str: ...
 
 class BlockTranslateNode(Node):
-    extra_context: Dict[str, FilterExpression]
-    singular: List[Token]
-    plural: List[Token]
+    extra_context: dict[str, FilterExpression]
+    singular: list[Token]
+    plural: list[Token]
     countervar: str | None
     counter: FilterExpression | None
     message_context: FilterExpression | None
@@ -59,9 +59,9 @@ class BlockTranslateNode(Node):
     asvar: str | None
     def __init__(
         self,
-        extra_context: Dict[str, FilterExpression],
-        singular: List[Token],
-        plural: List[Token] = ...,
+        extra_context: dict[str, FilterExpression],
+        singular: list[Token],
+        plural: list[Token] = ...,
         countervar: str | None = ...,
         counter: FilterExpression | None = ...,
         message_context: FilterExpression | None = ...,
@@ -69,7 +69,7 @@ class BlockTranslateNode(Node):
         asvar: str | None = ...,
         tag_name: str = ...,
     ) -> None: ...
-    def render_token_list(self, tokens: List[Token]) -> Tuple[str, List[str]]: ...
+    def render_token_list(self, tokens: list[Token]) -> tuple[str, list[str]]: ...
     def render(self, context: Context, nested: bool = ...) -> str: ...
 
 class LanguageNode(Node):

@@ -1,22 +1,8 @@
+from collections.abc import Callable, Iterable, Iterator
 from io import BytesIO
 from json import JSONEncoder
 from types import TracebackType
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Dict,
-    Generic,
-    Iterable,
-    Iterator,
-    List,
-    NoReturn,
-    Pattern,
-    Tuple,
-    Type,
-    TypeVar,
-    overload,
-)
+from typing import Any, Awaitable, Generic, NoReturn, Pattern, TypeVar, overload
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -38,7 +24,7 @@ JSON_CONTENT_TYPE_RE: Pattern
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
-    redirect_chain: List[Tuple[str, int]]
+    redirect_chain: list[tuple[str, int]]
     def __init__(self, message: str, last_response: HttpResponseBase) -> None: ...
 
 class FakePayload:
@@ -62,29 +48,29 @@ class _ASGIResponse(HttpResponseBase):
 class ClientHandler(BaseHandler):
     enforce_csrf_checks: bool
     def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
-    def __call__(self, environ: Dict[str, Any]) -> _WSGIResponse: ...
+    def __call__(self, environ: dict[str, Any]) -> _WSGIResponse: ...
 
 class AsyncClientHandler(BaseHandler):
     enforce_csrf_checks: bool
     def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
-    async def __call__(self, scope: Dict[str, Any]) -> _ASGIResponse: ...
+    async def __call__(self, scope: dict[str, Any]) -> _ASGIResponse: ...
 
-def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
-def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
+def encode_multipart(boundary: str, data: dict[str, Any]) -> bytes: ...
+def encode_file(boundary: str, key: str, file: Any) -> list[bytes]: ...
 
 class _RequestFactory(Generic[_T]):
-    json_encoder: Type[JSONEncoder]
-    defaults: Dict[str, str]
+    json_encoder: type[JSONEncoder]
+    defaults: dict[str, str]
     cookies: SimpleCookie
     errors: BytesIO
-    def __init__(self, *, json_encoder: Type[JSONEncoder] = ..., **defaults: Any) -> None: ...
+    def __init__(self, *, json_encoder: type[JSONEncoder] = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> _T: ...
     def get(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def post(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def trace(self, path: str, secure: bool = ..., **extra: Any) -> _T: ...
     def options(
-        self, path: str, data: Dict[str, str] | str = ..., content_type: str = ..., secure: bool = ..., **extra: Any
+        self, path: str, data: dict[str, str] | str = ..., content_type: str = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
     def put(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def patch(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
@@ -106,25 +92,25 @@ class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 # fakes to distinguish WSGIRequest and ASGIRequest
 class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     def json(self) -> Any: ...
-    request: Dict[str, Any]
+    request: dict[str, Any]
     client: Client
-    templates: List[Template]
-    context: ContextList | Dict[str, Any]
+    templates: list[Template]
+    context: ContextList | dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
 
 class _MonkeyPatchedWSGIResponseRedirect(_MonkeyPatchedWSGIResponse):
-    redirect_chain: List[Tuple[str, int]]
+    redirect_chain: list[tuple[str, int]]
 
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
     def json(self) -> Any: ...
-    request: Dict[str, Any]
+    request: dict[str, Any]
     client: AsyncClient
-    templates: List[Template]
-    context: ContextList | Dict[str, Any]
+    templates: list[Template]
+    context: ContextList | dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
-    redirect_chain: List[Tuple[str, int]]
+    redirect_chain: list[tuple[str, int]]
 
 class ClientMixin:
     def store_exc_info(self, **kwargs: Any) -> None: ...
@@ -138,7 +124,7 @@ class ClientMixin:
 class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     handler: ClientHandler
     raise_request_exception: bool
-    exc_info: Tuple[Type[BaseException], BaseException, TracebackType] | None
+    exc_info: tuple[type[BaseException], BaseException, TracebackType] | None
     def __init__(
         self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
     ) -> None: ...

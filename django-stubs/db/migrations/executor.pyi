@@ -1,4 +1,4 @@
-from typing import List, Sequence, Set, Tuple
+from collections.abc import Sequence
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
@@ -22,12 +22,12 @@ class MigrationExecutor:
         progress_callback: _ProgressCallbackT | None = ...,
     ) -> None: ...
     def migration_plan(
-        self, targets: Sequence[Tuple[str, str | None]] | Set[Tuple[str, str]], clean_start: bool = ...
-    ) -> List[Tuple[Migration, bool]]: ...
+        self, targets: Sequence[tuple[str, str | None]] | set[tuple[str, str]], clean_start: bool = ...
+    ) -> list[tuple[Migration, bool]]: ...
     def migrate(
         self,
-        targets: Sequence[Tuple[str, str | None]] | None,
-        plan: Sequence[Tuple[Migration, bool]] | None = ...,
+        targets: Sequence[tuple[str, str | None]] | None,
+        plan: Sequence[tuple[Migration, bool]] | None = ...,
         state: ProjectState | None = ...,
         fake: bool = ...,
         fake_initial: bool = ...,
@@ -40,4 +40,4 @@ class MigrationExecutor:
     def check_replacements(self) -> None: ...
     def detect_soft_applied(
         self, project_state: ProjectState | None, migration: Migration
-    ) -> Tuple[bool, ProjectState]: ...
+    ) -> tuple[bool, ProjectState]: ...

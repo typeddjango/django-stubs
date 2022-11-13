@@ -1,24 +1,11 @@
 import decimal
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from contextlib import contextmanager
 from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import (
-    Any,
-    Callable,
-    ContextManager,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
-    Protocol,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-)
+from typing import Any, ContextManager, Protocol, TypeVar
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
@@ -30,7 +17,7 @@ from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
 from typing_extensions import SupportsIndex
 
-_TestClass = Type[SimpleTestCase]
+_TestClass = type[SimpleTestCase]
 _DecoratedTest = Callable | _TestClass
 _C = TypeVar("_C", bound=Callable)  # Any callable
 
@@ -41,17 +28,17 @@ class Approximate:
     places: int
     def __init__(self, val: Decimal | float, places: int = ...) -> None: ...
 
-class ContextList(List[Dict[str, Any]]):
+class ContextList(list[dict[str, Any]]):
     def __getitem__(self, key: str | SupportsIndex | slice) -> Any: ...
     def get(self, key: str, default: Any | None = ...) -> Any: ...
     def __contains__(self, key: object) -> bool: ...
-    def keys(self) -> Set[str]: ...
+    def keys(self) -> set[str]: ...
 
 class _TestState: ...
 
 def setup_test_environment(debug: bool | None = ...) -> None: ...
 def teardown_test_environment() -> None: ...
-def get_runner(settings: LazySettings, test_runner_class: str | None = ...) -> Type[DiscoverRunner]: ...
+def get_runner(settings: LazySettings, test_runner_class: str | None = ...) -> type[DiscoverRunner]: ...
 
 class TestContextDecorator:
     attr_name: str | None
@@ -62,7 +49,7 @@ class TestContextDecorator:
     def __enter__(self) -> Apps | None: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...
@@ -71,7 +58,7 @@ class TestContextDecorator:
     def __call__(self, decorated: _DecoratedTest) -> Any: ...
 
 class override_settings(TestContextDecorator):
-    options: Dict[str, Any]
+    options: dict[str, Any]
     def __init__(self, **kwargs: Any) -> None: ...
     wrapped: Settings
     def save_options(self, test_func: _DecoratedTest) -> None: ...
@@ -79,18 +66,18 @@ class override_settings(TestContextDecorator):
 
 class modify_settings(override_settings):
     wrapped: Settings
-    operations: List[Tuple[str, Dict[str, List[str] | str]]]
+    operations: list[tuple[str, dict[str, list[str] | str]]]
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def save_options(self, test_func: _DecoratedTest) -> None: ...
-    options: Dict[str, List[Tuple[str, str] | str]]
+    options: dict[str, list[tuple[str, str] | str]]
 
 class override_system_checks(TestContextDecorator):
     registry: CheckRegistry
-    new_checks: List[Callable]
-    deployment_checks: List[Callable] | None
-    def __init__(self, new_checks: List[Callable], deployment_checks: List[Callable] | None = ...) -> None: ...
-    old_checks: Set[Callable]
-    old_deployment_checks: Set[Callable]
+    new_checks: list[Callable]
+    deployment_checks: list[Callable] | None
+    def __init__(self, new_checks: list[Callable], deployment_checks: list[Callable] | None = ...) -> None: ...
+    old_checks: set[Callable]
+    old_deployment_checks: set[Callable]
 
 class CaptureQueriesContext:
     connection: BaseDatabaseWrapper
@@ -98,21 +85,21 @@ class CaptureQueriesContext:
     initial_queries: int
     final_queries: int | None
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
-    def __iter__(self) -> Iterator[Dict[str, str]]: ...
-    def __getitem__(self, index: int) -> Dict[str, str]: ...
+    def __iter__(self) -> Iterator[dict[str, str]]: ...
+    def __getitem__(self, index: int) -> dict[str, str]: ...
     def __len__(self) -> int: ...
     @property
-    def captured_queries(self) -> List[Dict[str, str]]: ...
+    def captured_queries(self) -> list[dict[str, str]]: ...
     def __enter__(self) -> CaptureQueriesContext: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...
 
 class ignore_warnings(TestContextDecorator):
-    ignore_kwargs: Dict[str, Any]
+    ignore_kwargs: dict[str, Any]
     filter_func: Callable
     def __init__(self, **kwargs: Any) -> None: ...
     catch_warnings: ContextManager[list | None]
@@ -135,7 +122,7 @@ class LoggingCaptureMixin:
     def tearDown(self) -> None: ...
 
 class isolate_apps(TestContextDecorator):
-    installed_apps: Tuple[str]
+    installed_apps: tuple[str]
     def __init__(self, *installed_apps: Any, **kwargs: Any) -> None: ...
     old_apps: Apps
 
@@ -151,7 +138,7 @@ def freeze_time(t: float) -> Iterator[None]: ...
 def tag(*tags: str) -> Callable[[_C], _C]: ...
 
 _Signature = str
-_TestDatabase = Tuple[str, List[str]]
+_TestDatabase = tuple[str, list[str]]
 
 class TimeKeeperProtocol(Protocol):
     @contextmanager
@@ -159,11 +146,11 @@ class TimeKeeperProtocol(Protocol):
     def print_results(self) -> None: ...
 
 def dependency_ordered(
-    test_databases: Iterable[Tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, List[str]]
-) -> List[Tuple[_Signature, _TestDatabase]]: ...
+    test_databases: Iterable[tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, list[str]]
+) -> list[tuple[_Signature, _TestDatabase]]: ...
 def get_unique_databases_and_mirrors(
-    aliases: Set[str] | None = ...,
-) -> Tuple[Dict[_Signature, _TestDatabase], Dict[str, Any]]: ...
+    aliases: set[str] | None = ...,
+) -> tuple[dict[_Signature, _TestDatabase], dict[str, Any]]: ...
 def setup_databases(
     verbosity: int,
     interactive: bool,
@@ -174,12 +161,12 @@ def setup_databases(
     parallel: int = ...,
     aliases: Mapping[str, Any] | None = ...,
     **kwargs: Any
-) -> List[Tuple[BaseDatabaseWrapper, str, bool]]: ...
+) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
 def teardown_databases(
-    old_config: Iterable[Tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
+    old_config: Iterable[tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
 ) -> None: ...
 def require_jinja2(test_func: _C) -> _C: ...
 @contextmanager
 def register_lookup(
-    field: Type[RegisterLookupMixin], *lookups: Type[Lookup | Transform], lookup_name: str | None = ...
+    field: type[RegisterLookupMixin], *lookups: type[Lookup | Transform], lookup_name: str | None = ...
 ) -> Iterator[None]: ...

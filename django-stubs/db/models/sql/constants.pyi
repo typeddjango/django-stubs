@@ -1,4 +1,4 @@
-from typing import Dict, Pattern, Tuple
+from typing import Pattern
 
 from typing_extensions import Final, Literal
 
@@ -10,7 +10,7 @@ CURSOR: Literal["cursor"]
 NO_RESULTS: Literal["no results"]
 
 ORDER_PATTERN: Pattern
-ORDER_DIR: Dict[str, Tuple[str, str]]
+ORDER_DIR: dict[str, tuple[str, str]]
 
 INNER: Literal["INNER JOIN"]
 LOUTER: Literal["LEFT OUTER JOIN"]

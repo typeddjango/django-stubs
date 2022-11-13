@@ -1,12 +1,13 @@
+from collections.abc import Callable, Sequence
 from io import BytesIO
-from typing import Any, Callable, Dict, Sequence, Tuple, Type
+from typing import Any
 
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers import base
 from django.http import HttpRequest
 from django.http.response import HttpResponseBase
 
-_WSGIEnviron = Dict[str, Any]
+_WSGIEnviron = dict[str, Any]
 
 class LimitedStream:
     stream: BytesIO
@@ -24,12 +25,12 @@ class WSGIRequest(HttpRequest):
     def __init__(self, environ: _WSGIEnviron) -> None: ...
 
 class WSGIHandler(base.BaseHandler):
-    request_class: Type[WSGIRequest]
+    request_class: type[WSGIRequest]
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def __call__(
         self,
         environ: _WSGIEnviron,
-        start_response: Callable[[str, Sequence[Tuple[str, str]]], None],
+        start_response: Callable[[str, Sequence[tuple[str, str]]], None],
     ) -> HttpResponseBase: ...
 
 def get_path_info(environ: _WSGIEnviron) -> str: ...

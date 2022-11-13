@@ -1,4 +1,5 @@
-from typing import Any, Callable, Sequence, Type, TypeVar
+from collections.abc import Callable, Sequence
+from typing import Any, TypeVar
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.sites import AdminSite
@@ -23,4 +24,4 @@ def display(
     description: str | None = ...,
     empty_value: str | None = ...,
 ) -> Callable: ...
-def register(*models: Type[Model], site: AdminSite | None = ...) -> Callable: ...
+def register(*models: type[Model], site: AdminSite | None = ...) -> Callable: ...

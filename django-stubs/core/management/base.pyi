@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, HelpFormatter, Namespace
+from collections.abc import Callable, Iterable, Sequence
 from io import TextIOBase
-from typing import Any, Callable, Iterable, List, Sequence, Set, TextIO, Tuple
+from typing import Any, TextIO
 
 from django.apps.config import AppConfig
 from django.core.management.color import Style
@@ -24,7 +25,7 @@ def handle_default_options(options: Namespace) -> None: ...
 def no_translations(handle_func: Callable) -> Callable: ...
 
 class DjangoHelpFormatter(HelpFormatter):
-    show_last: Set[str]
+    show_last: set[str]
     def add_usage(self, usage: str | None, actions: Iterable[Any], *args: Any, **kwargs: Any) -> Any: ...
     def add_arguments(self, actions: Any) -> Any: ...
 
@@ -47,8 +48,8 @@ class BaseCommand:
     output_transaction: bool
     requires_migrations_checks: bool
     requires_system_checks: _ListOrTuple[str] | Literal["__all__"]
-    base_stealth_options: Tuple[str, ...]
-    stealth_options: Tuple[str, ...]
+    base_stealth_options: tuple[str, ...]
+    stealth_options: tuple[str, ...]
     stdout: OutputWrapper
     stderr: OutputWrapper
     style: Style
@@ -63,7 +64,7 @@ class BaseCommand:
     def create_parser(self, prog_name: str, subcommand: str, **kwargs: Any) -> CommandParser: ...
     def add_arguments(self, parser: CommandParser) -> None: ...
     def print_help(self, prog_name: str, subcommand: str) -> None: ...
-    def run_from_argv(self, argv: List[str]) -> None: ...
+    def run_from_argv(self, argv: list[str]) -> None: ...
     def execute(self, *args: Any, **options: Any) -> str | None: ...
     def check(
         self,

@@ -1,4 +1,5 @@
-from typing import IO, Any, Iterator
+from collections.abc import Iterator
+from typing import IO, Any
 
 from django.core.serializers.base import DeserializedObject
 from django.core.serializers.python import Serializer as PythonSerializer

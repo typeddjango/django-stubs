@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterator, List, Tuple
+from collections.abc import Iterator
+from typing import Any
 
 from django.utils.functional import _StrPromise
 from typing_extensions import Literal
@@ -28,24 +29,24 @@ class FieldError(Exception): ...
 NON_FIELD_ERRORS: Literal["__all__"]
 
 class ValidationError(Exception):
-    error_dict: Dict[str, List[ValidationError]]
-    error_list: List[ValidationError]
+    error_dict: dict[str, list[ValidationError]]
+    error_list: list[ValidationError]
     message: str
     code: str | None
-    params: Dict[str, Any] | None
+    params: dict[str, Any] | None
     def __init__(
         self,
         # Accepts arbitrarily nested data structure, mypy doesn't allow describing it accurately.
-        message: str | _StrPromise | ValidationError | Dict[str, Any] | List[Any],
+        message: str | _StrPromise | ValidationError | dict[str, Any] | list[Any],
         code: str | None = ...,
-        params: Dict[str, Any] | None = ...,
+        params: dict[str, Any] | None = ...,
     ) -> None: ...
     @property
-    def message_dict(self) -> Dict[str, List[str]]: ...
+    def message_dict(self) -> dict[str, list[str]]: ...
     @property
-    def messages(self) -> List[str]: ...
-    def update_error_dict(self, error_dict: Dict[str, List[ValidationError]]) -> Dict[str, List[ValidationError]]: ...
-    def __iter__(self) -> Iterator[Tuple[str, List[str]] | str]: ...
+    def messages(self) -> list[str]: ...
+    def update_error_dict(self, error_dict: dict[str, list[ValidationError]]) -> dict[str, list[ValidationError]]: ...
+    def __iter__(self) -> Iterator[tuple[str, list[str]] | str]: ...
 
 class EmptyResultSet(Exception): ...
 class SynchronousOnlyOperation(Exception): ...

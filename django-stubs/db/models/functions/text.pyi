@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple
+from typing import Any
 
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper

@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any
 
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
 
@@ -10,9 +10,9 @@ DEFAULT_CACHE_ALIAS: str
 
 class CacheHandler(BaseConnectionHandler):
     settings_name: str
-    exception_class: Type[Exception]
+    exception_class: type[Exception]
     def create_connection(self, alias: str) -> BaseCache: ...
-    def all(self, initialized_only: bool = ...) -> List[BaseCache]: ...
+    def all(self, initialized_only: bool = ...) -> list[BaseCache]: ...
 
 def close_caches(**kwargs: Any) -> None: ...
 

@@ -1,14 +1,12 @@
-from typing import List, Tuple
-
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
 
 class Migration:
-    operations: List[Operation]
-    dependencies: List[Tuple[str, str]]
-    run_before: List[Tuple[str, str]]
-    replaces: List[Tuple[str, str]]
+    operations: list[Operation]
+    dependencies: list[tuple[str, str]]
+    run_before: list[tuple[str, str]]
+    replaces: list[tuple[str, str]]
     initial: bool | None
     atomic: bool
     name: str
@@ -22,8 +20,8 @@ class Migration:
         self, project_state: ProjectState, schema_editor: BaseDatabaseSchemaEditor, collect_sql: bool = ...
     ) -> ProjectState: ...
 
-class SwappableTuple(Tuple[str, str]):
+class SwappableTuple(tuple[str, str]):
     setting: str
-    def __new__(cls, value: Tuple[str, str], setting: str) -> SwappableTuple: ...
+    def __new__(cls, value: tuple[str, str], setting: str) -> SwappableTuple: ...
 
 def swappable_dependency(value: str) -> SwappableTuple: ...

@@ -1,4 +1,5 @@
-from typing import Generic, Iterable, Iterator, Protocol, Sequence, Sized, TypeVar, overload
+from collections.abc import Iterable, Iterator, Sequence, Sized
+from typing import Generic, Protocol, TypeVar, overload
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet

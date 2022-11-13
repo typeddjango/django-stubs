@@ -1,14 +1,14 @@
 import string
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from django.http.request import HttpRequest
 
 from .base import BaseEngine
 
 class TemplateStrings(BaseEngine):
-    template_dirs: Tuple[str]
-    def __init__(self, params: Dict[str, Dict[Any, Any] | List[Any] | bool | str]) -> None: ...
+    template_dirs: tuple[str]
+    def __init__(self, params: dict[str, dict[Any, Any] | list[Any] | bool | str]) -> None: ...
 
 class Template(string.Template):
     template: str
-    def render(self, context: Dict[str, str] | None = ..., request: HttpRequest | None = ...) -> str: ...
+    def render(self, context: dict[str, str] | None = ..., request: HttpRequest | None = ...) -> str: ...

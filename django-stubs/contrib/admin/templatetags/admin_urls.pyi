@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 from django.db.models.options import Options
@@ -10,7 +10,7 @@ register: Any
 def admin_urlname(value: Options, arg: SafeString) -> str: ...
 def admin_urlquote(value: int | str | UUID) -> int | str | UUID: ...
 def add_preserved_filters(
-    context: Dict[str, Options | str] | RequestContext,
+    context: dict[str, Options | str] | RequestContext,
     url: str,
     popup: bool = ...,
     to_field: str | None = ...,

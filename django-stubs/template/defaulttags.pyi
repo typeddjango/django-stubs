@@ -1,6 +1,7 @@
 from collections import namedtuple
+from collections.abc import Iterator, Sequence
 from datetime import date as real_date
-from typing import Any, Dict, Iterator, List, Sequence, Tuple
+from typing import Any
 
 from django.template.base import FilterExpression, Parser, Token
 from django.template.context import Context
@@ -21,11 +22,11 @@ class CommentNode(Node): ...
 class CsrfTokenNode(Node): ...
 
 class CycleNode(Node):
-    cyclevars: List[FilterExpression]
+    cyclevars: list[FilterExpression]
     variable_name: str | None
     silent: bool
     def __init__(
-        self, cyclevars: List[FilterExpression], variable_name: str | None = ..., silent: bool = ...
+        self, cyclevars: list[FilterExpression], variable_name: str | None = ..., silent: bool = ...
     ) -> None: ...
     def reset(self, context: Context) -> None: ...
 
@@ -37,24 +38,24 @@ class FilterNode(Node):
     def __init__(self, filter_expr: FilterExpression, nodelist: NodeList) -> None: ...
 
 class FirstOfNode(Node):
-    vars: List[FilterExpression]
+    vars: list[FilterExpression]
     asvar: str | None
-    def __init__(self, variables: List[FilterExpression], asvar: str | None = ...) -> None: ...
+    def __init__(self, variables: list[FilterExpression], asvar: str | None = ...) -> None: ...
 
 class ForNode(Node):
-    loopvars: List[str] | str
+    loopvars: list[str] | str
     sequence: FilterExpression | str
     child_nodelists: Any
     is_reversed: bool
-    nodelist_loop: List[str] | NodeList
-    nodelist_empty: List[str] | NodeList
+    nodelist_loop: list[str] | NodeList
+    nodelist_empty: list[str] | NodeList
     def __init__(
         self,
-        loopvars: List[str] | str,
+        loopvars: list[str] | str,
         sequence: FilterExpression | str,
         is_reversed: bool,
-        nodelist_loop: List[str] | NodeList,
-        nodelist_empty: List[str] | NodeList | None = ...,
+        nodelist_loop: list[str] | NodeList,
+        nodelist_empty: list[str] | NodeList | None = ...,
     ) -> None: ...
 
 class IfChangedNode(Node):
@@ -64,8 +65,8 @@ class IfChangedNode(Node):
     def __init__(self, nodelist_true: NodeList, nodelist_false: NodeList, *varlist: Any) -> None: ...
 
 class IfEqualNode(Node):
-    nodelist_false: List[Any] | NodeList
-    nodelist_true: List[Any] | NodeList
+    nodelist_false: list[Any] | NodeList
+    nodelist_true: list[Any] | NodeList
     var1: FilterExpression | str
     var2: FilterExpression | str
     child_nodelists: Any
@@ -74,14 +75,14 @@ class IfEqualNode(Node):
         self,
         var1: FilterExpression | str,
         var2: FilterExpression | str,
-        nodelist_true: List[Any] | NodeList,
-        nodelist_false: List[Any] | NodeList,
+        nodelist_true: list[Any] | NodeList,
+        nodelist_false: list[Any] | NodeList,
         negate: bool,
     ) -> None: ...
 
 class IfNode(Node):
-    conditions_nodelists: List[Tuple[TemplateLiteral | None, NodeList]]
-    def __init__(self, conditions_nodelists: List[Tuple[TemplateLiteral | None, NodeList]]) -> None: ...
+    conditions_nodelists: list[tuple[TemplateLiteral | None, NodeList]]
+    def __init__(self, conditions_nodelists: list[tuple[TemplateLiteral | None, NodeList]]) -> None: ...
     def __iter__(self) -> Iterator[Node]: ...
     @property
     def nodelist(self) -> NodeList: ...
@@ -99,7 +100,7 @@ class RegroupNode(Node):
     target: FilterExpression
     var_name: str
     def __init__(self, target: FilterExpression, expression: FilterExpression, var_name: str) -> None: ...
-    def resolve_expression(self, obj: Dict[str, real_date], context: Context) -> int | str: ...
+    def resolve_expression(self, obj: dict[str, real_date], context: Context) -> int | str: ...
 
 class LoadNode(Node): ...
 
@@ -123,14 +124,14 @@ class TemplateTagNode(Node):
 
 class URLNode(Node):
     view_name: FilterExpression
-    args: List[FilterExpression]
-    kwargs: Dict[str, FilterExpression]
+    args: list[FilterExpression]
+    kwargs: dict[str, FilterExpression]
     asvar: str | None
     def __init__(
         self,
         view_name: FilterExpression,
-        args: List[FilterExpression],
-        kwargs: Dict[str, FilterExpression],
+        args: list[FilterExpression],
+        kwargs: dict[str, FilterExpression],
         asvar: str | None,
     ) -> None: ...
 
@@ -153,13 +154,13 @@ class WidthRatioNode(Node):
 
 class WithNode(Node):
     nodelist: NodeList
-    extra_context: Dict[str, Any]
+    extra_context: dict[str, Any]
     def __init__(
         self,
         var: str | None,
         name: str | None,
         nodelist: NodeList | Sequence[Node],
-        extra_context: Dict[str, Any] | None = ...,
+        extra_context: dict[str, Any] | None = ...,
     ) -> None: ...
 
 def autoescape(parser: Parser, token: Token) -> AutoEscapeControlNode: ...
@@ -182,7 +183,7 @@ class TemplateLiteral(Literal):
 class TemplateIfParser(IfParser):
     current_token: TemplateLiteral
     pos: int
-    tokens: List[TemplateLiteral]
+    tokens: list[TemplateLiteral]
     error_class: Any
     template_parser: Parser
     def __init__(self, parser: Parser, *args: Any, **kwargs: Any) -> None: ...
@@ -190,7 +191,7 @@ class TemplateIfParser(IfParser):
 def do_if(parser: Parser, token: Token) -> IfNode: ...
 def ifchanged(parser: Parser, token: Token) -> IfChangedNode: ...
 def find_library(parser: Parser, name: str) -> Library: ...
-def load_from_library(library: Library, label: str, names: List[str]) -> Library: ...
+def load_from_library(library: Library, label: str, names: list[str]) -> Library: ...
 def load(parser: Parser, token: Token) -> LoadNode: ...
 def lorem(parser: Parser, token: Token) -> LoremNode: ...
 def now(parser: Parser, token: Token) -> NowNode: ...

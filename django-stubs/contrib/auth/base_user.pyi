@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, TypeVar, overload
+from typing import Any, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model
@@ -15,13 +15,13 @@ class BaseUserManager(models.Manager[_T]):
     def get_by_natural_key(self, username: str | None) -> _T: ...
 
 class AbstractBaseUser(models.Model):
-    REQUIRED_FIELDS: List[str]
+    REQUIRED_FIELDS: list[str]
 
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_active: bool | BooleanField[bool | Combinable, bool]
     def get_username(self) -> str: ...
-    def natural_key(self) -> Tuple[str]: ...
+    def natural_key(self) -> tuple[str]: ...
     @property
     def is_anonymous(self) -> Literal[False]: ...
     @property

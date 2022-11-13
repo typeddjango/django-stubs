@@ -1,6 +1,7 @@
+from collections.abc import Callable, Generator, Iterator, MutableMapping
 from contextlib import contextmanager
 from datetime import tzinfo
-from typing import Any, Callable, Dict, Generator, Iterator, List, MutableMapping, Set, Tuple, Type, TypeVar
+from typing import Any, TypeVar
 
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
@@ -12,42 +13,42 @@ from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
 
 NO_DB_ALIAS: str
-RAN_DB_VERSION_CHECK: Set[str]
+RAN_DB_VERSION_CHECK: set[str]
 
 _T = TypeVar("_T", bound="BaseDatabaseWrapper")
-_ExecuteWrapper = Callable[[Callable[[str, Any, bool, Dict[str, Any]], Any], str, Any, bool, Dict[str, Any]], Any]
+_ExecuteWrapper = Callable[[Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any]
 
 class BaseDatabaseWrapper:
-    data_types: Dict[str, str]
-    data_types_suffix: Dict[str, str]
-    data_type_check_constraints: Dict[str, str]
+    data_types: dict[str, str]
+    data_types_suffix: dict[str, str]
+    data_type_check_constraints: dict[str, str]
     vendor: str
     display_name: str
-    SchemaEditorClass: Type[BaseDatabaseSchemaEditor]
-    client_class: Type[BaseDatabaseClient]
-    creation_class: Type[BaseDatabaseCreation]
-    features_class: Type[BaseDatabaseFeatures]
-    introspection_class: Type[BaseDatabaseIntrospection]
-    ops_class: Type[BaseDatabaseOperations]
-    validation_class: Type[BaseDatabaseValidation]
+    SchemaEditorClass: type[BaseDatabaseSchemaEditor]
+    client_class: type[BaseDatabaseClient]
+    creation_class: type[BaseDatabaseCreation]
+    features_class: type[BaseDatabaseFeatures]
+    introspection_class: type[BaseDatabaseIntrospection]
+    ops_class: type[BaseDatabaseOperations]
+    validation_class: type[BaseDatabaseValidation]
     queries_limit: int
     connection: Any
-    settings_dict: Dict[str, Any]
+    settings_dict: dict[str, Any]
     alias: str
     queries_log: Any
     force_debug_cursor: bool
     autocommit: bool
     in_atomic_block: bool
     savepoint_state: int
-    savepoint_ids: List[str]
+    savepoint_ids: list[str]
     commit_on_exit: bool
     needs_rollback: bool
     close_at: float | None
     closed_in_transaction: bool
     errors_occurred: bool
-    run_on_commit: List[Tuple[Set[str], Callable[[], None]]]
+    run_on_commit: list[tuple[set[str], Callable[[], None]]]
     run_commit_hooks_on_set_autocommit_on: bool
-    execute_wrappers: List[_ExecuteWrapper]
+    execute_wrappers: list[_ExecuteWrapper]
     client: BaseDatabaseClient
     creation: BaseDatabaseCreation
     features: BaseDatabaseFeatures
@@ -55,7 +56,7 @@ class BaseDatabaseWrapper:
     ops: BaseDatabaseOperations
     validation: BaseDatabaseValidation
     operators: MutableMapping[str, str]
-    def __init__(self, settings_dict: Dict[str, Any], alias: str = ...) -> None: ...
+    def __init__(self, settings_dict: dict[str, Any], alias: str = ...) -> None: ...
     def ensure_timezone(self) -> bool: ...
     @property
     def timezone(self) -> tzinfo | None: ...
@@ -64,10 +65,10 @@ class BaseDatabaseWrapper:
     @property
     def queries_logged(self) -> bool: ...
     @property
-    def queries(self) -> List[Dict[str, str]]: ...
-    def get_database_version(self) -> Tuple[int, ...]: ...
+    def queries(self) -> list[dict[str, str]]: ...
+    def get_database_version(self) -> tuple[int, ...]: ...
     def check_database_version_supported(self) -> None: ...
-    def get_connection_params(self) -> Dict[str, Any]: ...
+    def get_connection_params(self) -> dict[str, Any]: ...
     def get_new_connection(self, conn_params: Any) -> Any: ...
     def init_connection_state(self) -> None: ...
     def create_cursor(self, name: Any | None = ...) -> Any: ...

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from django.db.backends.base.operations import BaseDatabaseOperations as BaseDatabaseOperations
 from django.db.backends.mysql.base import DatabaseWrapper
@@ -6,8 +6,8 @@ from django.db.backends.mysql.base import DatabaseWrapper
 class DatabaseOperations(BaseDatabaseOperations):
     connection: DatabaseWrapper
     compiler_module: str
-    integer_field_ranges: Dict[str, Tuple[int, int]]
-    cast_data_types: Dict[str, str]
+    integer_field_ranges: dict[str, tuple[int, int]]
+    cast_data_types: dict[str, str]
     cast_char_field_without_max_length: str
     explain_prefix: str
     def date_extract_sql(self, lookup_type: str, field_name: str) -> Any: ...

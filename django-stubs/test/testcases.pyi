@@ -1,24 +1,10 @@
 import threading
 import unittest
+from collections.abc import Callable, Collection, Generator, Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import date
 from types import TracebackType
-from typing import (
-    Any,
-    Callable,
-    Collection,
-    Dict,
-    Generator,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    overload,
-)
+from typing import Any, overload
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
@@ -48,8 +34,8 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
 class _AssertTemplateUsedContext:
     test_case: SimpleTestCase
     template_name: str
-    rendered_templates: List[Template]
-    rendered_template_names: List[str]
+    rendered_templates: list[Template]
+    rendered_template_names: list[str]
     context: ContextList
     def __init__(self, test_case: Any, template_name: Any) -> None: ...
     def on_template_render(self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any) -> None: ...
@@ -58,7 +44,7 @@ class _AssertTemplateUsedContext:
     def __enter__(self) -> _AssertTemplateUsedContext: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...
@@ -72,13 +58,13 @@ class _DatabaseFailure:
     def __call__(self) -> None: ...
 
 class SimpleTestCase(unittest.TestCase):
-    client_class: Type[Client]
+    client_class: type[Client]
     client: Client
-    async_client_class: Type[AsyncClient]
+    async_client_class: type[AsyncClient]
     async_client: AsyncClient
     allow_database_queries: bool
     # TODO: str -> Literal['__all__']
-    databases: Set[str] | str
+    databases: set[str] | str
     def __call__(self, result: unittest.TestResult | None = ...) -> None: ...
     def settings(self, **kwargs: Any) -> Any: ...
     def modify_settings(self, **kwargs: Any) -> Any: ...
@@ -119,7 +105,7 @@ class SimpleTestCase(unittest.TestCase):
         self,
         form: Form,
         field: str | None,
-        errors: List[str] | str,
+        errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
@@ -128,7 +114,7 @@ class SimpleTestCase(unittest.TestCase):
         response: HttpResponseBase,
         form: str,
         field: str | None,
-        errors: List[str] | str,
+        errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
@@ -137,7 +123,7 @@ class SimpleTestCase(unittest.TestCase):
         formset: BaseFormSet,
         form_index: int | None,
         field: str | None,
-        errors: List[str] | str,
+        errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
@@ -147,7 +133,7 @@ class SimpleTestCase(unittest.TestCase):
         formset: str,
         form_index: int | None,
         field: str | None,
-        errors: List[str] | str,
+        errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
     def assertTemplateUsed(
@@ -161,16 +147,16 @@ class SimpleTestCase(unittest.TestCase):
         self, response: HttpResponseBase | str = ..., template_name: str | None = ..., msg_prefix: str = ...
     ) -> _AssertTemplateNotUsedContext | None: ...
     def assertRaisesMessage(
-        self, expected_exception: Type[Exception], expected_message: str, *args: Any, **kwargs: Any
+        self, expected_exception: type[Exception], expected_message: str, *args: Any, **kwargs: Any
     ) -> Any: ...
     def assertWarnsMessage(
-        self, expected_warning: Type[Exception], expected_message: str, *args: Any, **kwargs: Any
+        self, expected_warning: type[Exception], expected_message: str, *args: Any, **kwargs: Any
     ) -> Any: ...
     def assertFieldOutput(
         self,
-        fieldclass: Type[EmailField],
-        valid: Dict[str, str],
-        invalid: Dict[str, List[str]],
+        fieldclass: type[EmailField],
+        valid: dict[str, str],
+        invalid: dict[str, list[str]],
         field_args: Iterable[Any] | None = ...,
         field_kwargs: Mapping[str, Any] | None = ...,
         empty_value: str = ...,
@@ -181,13 +167,13 @@ class SimpleTestCase(unittest.TestCase):
     def assertJSONEqual(
         self,
         raw: str,
-        expected_data: Dict[str, Any] | List[Any] | str | int | float | bool | None,
+        expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertJSONNotEqual(
         self,
         raw: str,
-        expected_data: Dict[str, Any] | List[Any] | str | int | float | bool | None,
+        expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertXMLEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
@@ -201,9 +187,9 @@ class TransactionTestCase(SimpleTestCase):
     serialized_rollback: bool
     def assertQuerysetEqual(
         self,
-        qs: Iterator[Any] | List[Model] | QuerySet | RawQuerySet,
+        qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
         values: Collection[Any],
-        transform: Callable[[Model], Any] | Type[str] = ...,
+        transform: Callable[[Model], Any] | type[str] = ...,
         ordered: bool = ...,
         msg: str | None = ...,
     ) -> None: ...
@@ -221,13 +207,13 @@ class TestCase(TransactionTestCase):
     @contextmanager
     def captureOnCommitCallbacks(
         cls, *, using: str = ..., execute: bool = ...
-    ) -> Generator[List[Callable[[], Any]], None, None]: ...
+    ) -> Generator[list[Callable[[], Any]], None, None]: ...
 
 class CheckCondition:
-    conditions: Sequence[Tuple[Callable, str]]
-    def __init__(self, *conditions: Tuple[Callable, str]) -> None: ...
+    conditions: Sequence[tuple[Callable, str]]
+    def __init__(self, *conditions: tuple[Callable, str]) -> None: ...
     def add_condition(self, condition: Callable, reason: str) -> CheckCondition: ...
-    def __get__(self, instance: None, cls: Type[TransactionTestCase] | None = ...) -> bool: ...
+    def __get__(self, instance: None, cls: type[TransactionTestCase] | None = ...) -> bool: ...
 
 def skipIfDBFeature(*features: Any) -> Callable: ...
 def skipUnlessDBFeature(*features: Any) -> Callable: ...
@@ -255,13 +241,13 @@ class LiveServerThread(threading.Thread):
     port: int
     is_ready: threading.Event
     error: ImproperlyConfigured | None
-    static_handler: Type[WSGIHandler]
-    connections_override: Dict[str, BaseDatabaseWrapper]
+    static_handler: type[WSGIHandler]
+    connections_override: dict[str, BaseDatabaseWrapper]
     def __init__(
         self,
         host: str,
-        static_handler: Type[WSGIHandler],
-        connections_override: Dict[str, BaseDatabaseWrapper] = ...,
+        static_handler: type[WSGIHandler],
+        connections_override: dict[str, BaseDatabaseWrapper] = ...,
         port: int = ...,
     ) -> None: ...
     httpd: ThreadedWSGIServer
@@ -270,7 +256,7 @@ class LiveServerThread(threading.Thread):
 class LiveServerTestCase(TransactionTestCase):
     host: str
     port: int
-    server_thread_class: Type[Any]
+    server_thread_class: type[Any]
     server_thread: Any
     static_handler: Any
     @classproperty

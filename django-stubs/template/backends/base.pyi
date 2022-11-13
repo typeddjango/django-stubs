@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterator, List, Mapping, Protocol, Tuple
+from collections.abc import Iterator, Mapping
+from typing import Any, Protocol
 
 from django.http.request import HttpRequest
 from django.template import TemplateDoesNotExist
@@ -7,7 +8,7 @@ from django.utils.safestring import SafeString
 
 class BaseEngine:
     name: str
-    dirs: List[str]
+    dirs: list[str]
     app_dirs: bool
     def __init__(self, params: Mapping[str, Any]) -> None: ...
     @property
@@ -15,12 +16,12 @@ class BaseEngine:
     def from_string(self, template_code: str) -> _EngineTemplate: ...
     def get_template(self, template_name: str) -> _EngineTemplate: ...
     @property
-    def template_dirs(self) -> Tuple[str]: ...
+    def template_dirs(self) -> tuple[str]: ...
     def iter_template_filenames(self, template_name: str) -> Iterator[str]: ...
 
 class _EngineTemplate(Protocol):
     def render(
         self,
-        context: Context | Dict[str, Any] | None = ...,
+        context: Context | dict[str, Any] | None = ...,
         request: HttpRequest | None = ...,
     ) -> SafeString: ...

@@ -1,6 +1,7 @@
 import datetime
+from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
-from typing import Any, Collection, Dict, Iterator, List, Pattern, Protocol, Sequence, Tuple, Type
+from typing import Any, Pattern, Protocol
 from uuid import UUID
 
 from django.core.files import File
@@ -26,8 +27,8 @@ class Field:
     label: _StrOrPromise | None
     required: bool
     widget: _ClassLevelWidgetT
-    hidden_widget: Type[Widget]
-    default_validators: List[_ValidatorCallable]
+    hidden_widget: type[Widget]
+    default_validators: list[_ValidatorCallable]
     default_error_messages: _ErrorMessagesT
     empty_values: Sequence[Any]
     show_hidden_initial: bool
@@ -36,13 +37,13 @@ class Field:
     label_suffix: str | None
     localize: bool
     error_messages: _ErrorMessagesT
-    validators: List[_ValidatorCallable]
+    validators: list[_ValidatorCallable]
     max_length: int | None
     def __init__(
         self,
         *,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -59,7 +60,7 @@ class Field:
     def run_validators(self, value: Any) -> None: ...
     def clean(self, value: Any) -> Any: ...
     def bound_data(self, data: Any, initial: Any) -> Any: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
     def get_bound_field(self, form: BaseForm, field_name: str) -> BoundField: ...
     def deconstruct(self) -> Any: ...
@@ -77,7 +78,7 @@ class CharField(Field):
         strip: bool = ...,
         empty_value: str | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -89,7 +90,7 @@ class CharField(Field):
         label_suffix: str | None = ...,
     ) -> None: ...
     def to_python(self, value: Any | None) -> str | None: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class IntegerField(Field):
     max_value: int | None
@@ -101,7 +102,7 @@ class IntegerField(Field):
         max_value: int | None = ...,
         min_value: int | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -113,7 +114,7 @@ class IntegerField(Field):
         label_suffix: str | None = ...,
     ) -> None: ...
     def to_python(self, value: Any | None) -> int | None: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class FloatField(IntegerField):
     def __init__(
@@ -122,7 +123,7 @@ class FloatField(IntegerField):
         max_value: int | float | None = ...,
         min_value: int | float | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -135,7 +136,7 @@ class FloatField(IntegerField):
     ) -> None: ...
     def to_python(self, value: Any | None) -> float | None: ...  # type: ignore
     def validate(self, value: float) -> None: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class DecimalField(IntegerField):
     decimal_places: int | None
@@ -148,7 +149,7 @@ class DecimalField(IntegerField):
         max_digits: int | None = ...,
         decimal_places: int | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -161,7 +162,7 @@ class DecimalField(IntegerField):
     ) -> None: ...
     def to_python(self, value: Any | None) -> Decimal | None: ...  # type: ignore
     def validate(self, value: Decimal) -> None: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class BaseTemporalField(Field):
     input_formats: Any
@@ -170,7 +171,7 @@ class BaseTemporalField(Field):
         *,
         input_formats: Any | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -214,7 +215,7 @@ class RegexField(CharField):
         strip: bool = ...,
         empty_value: str | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -235,7 +236,7 @@ class EmailField(CharField):
         strip: bool = ...,
         empty_value: str | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -255,7 +256,7 @@ class FileField(Field):
         max_length: int | None = ...,
         allow_empty_file: bool = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -273,7 +274,7 @@ class FileField(Field):
 
 class ImageField(FileField):
     def to_python(self, data: File | None) -> File | None: ...
-    def widget_attrs(self, widget: Widget) -> Dict[str, Any]: ...
+    def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class URLField(CharField):
     def __init__(
@@ -284,7 +285,7 @@ class URLField(CharField):
         strip: bool = ...,
         empty_value: str | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -322,7 +323,7 @@ class ChoiceField(Field):
         *,
         choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -352,7 +353,7 @@ class TypedChoiceField(ChoiceField):
         empty_value: str | None = ...,
         choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -366,21 +367,21 @@ class TypedChoiceField(ChoiceField):
     def clean(self, value: Any) -> Any: ...
 
 class MultipleChoiceField(ChoiceField):
-    def to_python(self, value: Any | None) -> List[str]: ...
+    def to_python(self, value: Any | None) -> list[str]: ...
     def validate(self, value: Any) -> None: ...
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...
 
 class TypedMultipleChoiceField(MultipleChoiceField):
     coerce: _CoerceCallable
-    empty_value: List[Any] | None
+    empty_value: list[Any] | None
     def __init__(
         self,
         *,
         coerce: _CoerceCallable = ...,
-        empty_value: List[Any] | None = ...,
+        empty_value: list[Any] | None = ...,
         choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -401,7 +402,7 @@ class ComboField(Field):
         fields: Sequence[Field],
         *,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -423,7 +424,7 @@ class MultiValueField(Field):
         *,
         require_all_fields: bool = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -456,7 +457,7 @@ class FilePathField(ChoiceField):
         allow_folders: bool = ...,
         choices: _FieldChoices | _ChoicesCallable = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -477,7 +478,7 @@ class SplitDateTimeField(MultiValueField):
         fields: Sequence[Field] = ...,
         require_all_fields: bool = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -488,7 +489,7 @@ class SplitDateTimeField(MultiValueField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
-    def compress(self, data_list: Tuple[datetime.date, datetime.time] | None) -> datetime.datetime | None: ...
+    def compress(self, data_list: tuple[datetime.date, datetime.time] | None) -> datetime.datetime | None: ...
 
 class GenericIPAddressField(CharField):
     unpack_ipv4: bool
@@ -498,7 +499,7 @@ class GenericIPAddressField(CharField):
         protocol: str = ...,
         unpack_ipv4: bool = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
@@ -522,7 +523,7 @@ class SlugField(CharField):
         strip: bool = ...,
         empty_value: str | None = ...,
         required: bool = ...,
-        widget: Widget | Type[Widget] | None = ...,
+        widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,

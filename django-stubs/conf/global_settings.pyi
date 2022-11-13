@@ -2,10 +2,11 @@
 Default Django settings. Override these with settings in the module pointed to
 by the DJANGO_SETTINGS_MODULE environment variable.
 """
+from collections.abc import Sequence
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Dict, List, Pattern, Protocol, Sequence, Tuple
+from typing import Any, Pattern, Protocol
 
 from typing_extensions import Literal
 
@@ -21,16 +22,16 @@ DEBUG_PROPAGATE_EXCEPTIONS: bool
 
 # People who get code error notifications.
 # In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
-ADMINS: List[Tuple[str, str]]
+ADMINS: list[tuple[str, str]]
 
 # List of IP addresses, as strings, that:
 #   * See debug comments, when DEBUG is true
 #   * Receive x-headers
-INTERNAL_IPS: List[str]
+INTERNAL_IPS: list[str]
 
 # Hosts/domain names that are valid for this site.
 # "*" matches anything, ".example.com" matches example.com and all subdomains
-ALLOWED_HOSTS: List[str]
+ALLOWED_HOSTS: list[str]
 
 # Local time zone for this installation. All choices can be found here:
 # https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
@@ -46,15 +47,15 @@ USE_TZ: bool
 LANGUAGE_CODE: str
 
 # Languages we provide translations for, out of the box.
-LANGUAGES: List[Tuple[str, str]]
+LANGUAGES: list[tuple[str, str]]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI: List[str]
+LANGUAGES_BIDI: list[str]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N: bool
-LOCALE_PATHS: List[str]
+LOCALE_PATHS: list[str]
 
 # Settings for language cookie
 LANGUAGE_COOKIE_NAME: str
@@ -81,13 +82,13 @@ DEFAULT_CHARSET: str
 SERVER_EMAIL: str
 
 # Database connection info. If left empty, will default to the dummy backend.
-DATABASES: Dict[str, Dict[str, Any]]
+DATABASES: dict[str, dict[str, Any]]
 
 # Classes used to implement DB routing behavior.
 class Router(Protocol):
     def allow_migrate(self, db: str, app_label: str, **hints: Any) -> bool | None: ...
 
-DATABASE_ROUTERS: List[str | Router]
+DATABASE_ROUTERS: list[str | Router]
 
 # The email backend to use. For possible shortcuts see django.core.mail.
 # The default is to use the SMTP backend.
@@ -114,9 +115,9 @@ EMAIL_SSL_KEYFILE: str | None
 EMAIL_TIMEOUT: int | None
 
 # List of strings representing installed apps.
-INSTALLED_APPS: List[str]
+INSTALLED_APPS: list[str]
 
-TEMPLATES: List[Dict[str, Any]]
+TEMPLATES: list[dict[str, Any]]
 
 # Default form rendering class.
 FORM_RENDERER: str
@@ -148,9 +149,9 @@ FORCE_SCRIPT_NAME: str | None
 #         re.compile(r'^SiteSucker.*'),
 #         re.compile(r'^sohu-search'),
 #     ]
-DISALLOWED_USER_AGENTS: List[Pattern[str]]
+DISALLOWED_USER_AGENTS: list[Pattern[str]]
 
-ABSOLUTE_URL_OVERRIDES: Dict[str, Any]
+ABSOLUTE_URL_OVERRIDES: dict[str, Any]
 
 # List of compiled regular expression objects representing URLs that need not
 # be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
@@ -162,7 +163,7 @@ ABSOLUTE_URL_OVERRIDES: Dict[str, Any]
 #        re.compile(r'^/phpmyadmin/'),
 #        re.compile(r'\.(cgi|php|pl)$'),
 #    ]
-IGNORABLE_404_URLS: List[Pattern[str]]
+IGNORABLE_404_URLS: list[Pattern[str]]
 
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain
@@ -189,7 +190,7 @@ STATIC_ROOT: str | None
 STATIC_URL: str | None
 
 # List of upload handler classes to be applied in order.
-FILE_UPLOAD_HANDLERS: List[str]
+FILE_UPLOAD_HANDLERS: list[str]
 
 # Maximum size, in bytes, of a request before it will be streamed to the
 # file system instead of into memory.
@@ -258,20 +259,20 @@ SHORT_DATETIME_FORMAT: str
 # See all available format string here:
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-DATE_INPUT_FORMATS: List[str]
+DATE_INPUT_FORMATS: list[str]
 
 # Default formats to be used when parsing times from input boxes, in order
 # See all available format string here:
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-TIME_INPUT_FORMATS: List[str]  # '14:30:59'  # '14:30:59.000200'  # '14:30'
+TIME_INPUT_FORMATS: list[str]  # '14:30:59'  # '14:30:59.000200'  # '14:30'
 
 # Default formats to be used when parsing dates and times from input boxes,
 # in order
 # See all available format string here:
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-DATETIME_INPUT_FORMATS: List[str]
+DATETIME_INPUT_FORMATS: list[str]
 
 # First day of week, to be used on calendars
 # 0 means Sunday, 1 means Monday...
@@ -314,7 +315,7 @@ WSGI_APPLICATION: str | None
 # that header/value, request.is_secure() will return True.
 # WARNING! Only set this if you fully understand what you're doing. Otherwise,
 # you may be opening yourself up to a security risk.
-SECURE_PROXY_SSL_HEADER: Tuple[str, str] | None
+SECURE_PROXY_SSL_HEADER: tuple[str, str] | None
 
 ##############
 # MIDDLEWARE #
@@ -323,7 +324,7 @@ SECURE_PROXY_SSL_HEADER: Tuple[str, str] | None
 # List of middleware to use. Order is important; in the request phase, these
 # middleware will be applied in the order given, and in the response
 # phase the middleware will be applied in reverse order.
-MIDDLEWARE: List[str]
+MIDDLEWARE: list[str]
 
 ############
 # SESSIONS #
@@ -363,7 +364,7 @@ SESSION_SERIALIZER: str
 #########
 
 # The cache backends to use.
-CACHES: Dict[str, Dict[str, Any]]
+CACHES: dict[str, dict[str, Any]]
 CACHE_MIDDLEWARE_KEY_PREFIX: str
 CACHE_MIDDLEWARE_SECONDS: int
 CACHE_MIDDLEWARE_ALIAS: str
@@ -388,9 +389,9 @@ PASSWORD_RESET_TIMEOUT_DAYS: int
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
 # upon login
-PASSWORD_HASHERS: List[str]
+PASSWORD_HASHERS: list[str]
 
-AUTH_PASSWORD_VALIDATORS: List[Dict[str, str]]
+AUTH_PASSWORD_VALIDATORS: list[dict[str, str]]
 
 ###########
 # SIGNING #
@@ -415,7 +416,7 @@ CSRF_COOKIE_SECURE: bool
 CSRF_COOKIE_HTTPONLY: bool
 CSRF_COOKIE_SAMESITE: Literal["Lax", "Strict", "None", False]
 CSRF_HEADER_NAME: str
-CSRF_TRUSTED_ORIGINS: List[str]
+CSRF_TRUSTED_ORIGINS: list[str]
 CSRF_USE_SESSIONS: bool
 
 ############
@@ -436,7 +437,7 @@ MESSAGE_STORAGE: str
 LOGGING_CONFIG: str
 
 # Custom logging configuration.
-LOGGING: Dict[str, Any]
+LOGGING: dict[str, Any]
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
@@ -451,35 +452,35 @@ TEST_RUNNER: str
 
 # Apps that don't need to be serialized at test database creation time
 # (only apps with migrations are to start with)
-TEST_NON_SERIALIZED_APPS: List[str]
+TEST_NON_SERIALIZED_APPS: list[str]
 
 ############
 # FIXTURES #
 ############
 
 # The list of directories to search for fixtures
-FIXTURE_DIRS: List[str]
+FIXTURE_DIRS: list[str]
 
 ###############
 # STATICFILES #
 ###############
 
 # A list of locations of additional static files
-STATICFILES_DIRS: List[str]
+STATICFILES_DIRS: list[str]
 
 # The default file storage backend used during the build process
 STATICFILES_STORAGE: str
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS: List[str]
+STATICFILES_FINDERS: list[str]
 
 ##############
 # MIGRATIONS #
 ##############
 
 # Migration module overrides for apps, by app label.
-MIGRATION_MODULES: Dict[str, str]
+MIGRATION_MODULES: dict[str, str]
 
 #################
 # SYSTEM CHECKS #
@@ -489,7 +490,7 @@ MIGRATION_MODULES: Dict[str, str]
 # issues like warnings, infos or debugs will not generate a message. Silencing
 # serious issues like errors and criticals does not result in hiding the
 # message, but Django will not stop you from e.g. running server.
-SILENCED_SYSTEM_CHECKS: List[str]
+SILENCED_SYSTEM_CHECKS: list[str]
 
 #######################
 # SECURITY MIDDLEWARE #
@@ -499,6 +500,6 @@ SECURE_CONTENT_TYPE_NOSNIFF: bool
 SECURE_HSTS_INCLUDE_SUBDOMAINS: bool
 SECURE_HSTS_PRELOAD: bool
 SECURE_HSTS_SECONDS: int
-SECURE_REDIRECT_EXEMPT: List[str]
+SECURE_REDIRECT_EXEMPT: list[str]
 SECURE_SSL_HOST: str | None
 SECURE_SSL_REDIRECT: bool

@@ -1,6 +1,7 @@
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from enum import Enum
 from logging import Logger
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Mapping, Pattern, Sequence, Tuple, Type
+from typing import Any, Pattern
 
 from django.template.context import Context as Context
 from django.template.engine import Engine
@@ -32,8 +33,8 @@ class TokenType(Enum):
 
 class VariableDoesNotExist(Exception):
     msg: str
-    params: Tuple[Dict[str, str] | str]
-    def __init__(self, msg: str, params: Tuple[Dict[str, str] | str] = ...) -> None: ...
+    params: tuple[dict[str, str] | str]
+    def __init__(self, msg: str, params: tuple[dict[str, str] | str] = ...) -> None: ...
 
 class Origin:
     name: str
@@ -57,9 +58,9 @@ class Template:
         engine: Engine | None = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[Node]: ...
-    def render(self, context: Context | Dict[str, Any] | None) -> SafeString: ...
+    def render(self, context: Context | dict[str, Any] | None) -> SafeString: ...
     def compile_nodelist(self) -> NodeList: ...
-    def get_exception_info(self, exception: Exception, token: Token) -> Dict[str, Any]: ...
+    def get_exception_info(self, exception: Exception, token: Token) -> dict[str, Any]: ...
 
 def linebreak_iter(template_source: str) -> Iterator[int]: ...
 
@@ -67,40 +68,40 @@ class Token:
     contents: str
     token_type: TokenType
     lineno: int | None
-    position: Tuple[int, int] | None
+    position: tuple[int, int] | None
     def __init__(
         self,
         token_type: TokenType,
         contents: str,
-        position: Tuple[int, int] | None = ...,
+        position: tuple[int, int] | None = ...,
         lineno: int | None = ...,
     ) -> None: ...
-    def split_contents(self) -> List[str]: ...
+    def split_contents(self) -> list[str]: ...
 
 class Lexer:
     template_string: str
     verbatim: bool | str
     def __init__(self, template_string: str) -> None: ...
-    def tokenize(self) -> List[Token]: ...
-    def create_token(self, token_string: str, position: Tuple[int, int] | None, lineno: int, in_tag: bool) -> Token: ...
+    def tokenize(self) -> list[Token]: ...
+    def create_token(self, token_string: str, position: tuple[int, int] | None, lineno: int, in_tag: bool) -> Token: ...
 
 class DebugLexer(Lexer):
     template_string: str
     verbatim: bool | str
-    def tokenize(self) -> List[Token]: ...
+    def tokenize(self) -> list[Token]: ...
 
 class Parser:
-    tokens: List[Token] | str
-    tags: Dict[str, Callable]
-    filters: Dict[str, Callable]
-    command_stack: List[Tuple[str, Token]]
-    libraries: Dict[str, Library]
+    tokens: list[Token] | str
+    tags: dict[str, Callable]
+    filters: dict[str, Callable]
+    command_stack: list[tuple[str, Token]]
+    libraries: dict[str, Library]
     origin: Origin | None
     def __init__(
         self,
-        tokens: List[Token] | str,
-        libraries: Dict[str, Library] | None = ...,
-        builtins: List[Library] | None = ...,
+        tokens: list[Token] | str,
+        libraries: dict[str, Library] | None = ...,
+        builtins: list[Library] | None = ...,
         origin: Origin | None = ...,
     ) -> None: ...
     def parse(self, parse_until: Iterable[str] | None = ...) -> NodeList: ...
@@ -122,20 +123,20 @@ filter_re: Pattern[str]
 
 class FilterExpression:
     token: str
-    filters: List[Any]
+    filters: list[Any]
     var: Any
     def __init__(self, token: str, parser: Parser) -> None: ...
     def resolve(self, context: Context, ignore_failures: bool = ...) -> Any: ...
     @staticmethod
-    def args_check(name: str, func: Callable, provided: List[Tuple[bool, Any]]) -> bool: ...
+    def args_check(name: str, func: Callable, provided: list[tuple[bool, Any]]) -> bool: ...
 
 class Variable:
-    var: Dict[Any, Any] | str
+    var: dict[Any, Any] | str
     literal: SafeString | float | None
-    lookups: Tuple[str] | None
+    lookups: tuple[str] | None
     translate: bool
     message_context: str | None
-    def __init__(self, var: Dict[Any, Any] | str) -> None: ...
+    def __init__(self, var: dict[Any, Any] | str) -> None: ...
     def resolve(self, context: Mapping[str, Mapping[str, Any]] | Context | int | str) -> Any: ...
 
 class Node:
@@ -146,12 +147,12 @@ class Node:
     def render(self, context: Context) -> str: ...
     def render_annotated(self, context: Context) -> int | str: ...
     def __iter__(self) -> Iterator[Node]: ...
-    def get_nodes_by_type(self, nodetype: Type[Node]) -> List[Node]: ...
+    def get_nodes_by_type(self, nodetype: type[Node]) -> list[Node]: ...
 
-class NodeList(List[Node]):
+class NodeList(list[Node]):
     contains_nontext: bool
     def render(self, context: Context) -> SafeString: ...
-    def get_nodes_by_type(self, nodetype: Type[Node]) -> List[Node]: ...
+    def get_nodes_by_type(self, nodetype: type[Node]) -> list[Node]: ...
 
 class TextNode(Node):
     s: str
@@ -165,4 +166,4 @@ class VariableNode(Node):
 
 kwarg_re: Pattern[str]
 
-def token_kwargs(bits: Sequence[str], parser: Parser, support_legacy: bool = ...) -> Dict[str, FilterExpression]: ...
+def token_kwargs(bits: Sequence[str], parser: Parser, support_legacy: bool = ...) -> dict[str, FilterExpression]: ...

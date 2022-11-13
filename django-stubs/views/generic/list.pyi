@@ -1,4 +1,5 @@
-from typing import Any, Generic, Sequence, Tuple, Type, TypeVar
+from collections.abc import Sequence
+from typing import Any, Generic, TypeVar
 
 from django.core.paginator import Page, Paginator, _SupportsPagination
 from django.db.models import Model
@@ -10,18 +11,18 @@ _M = TypeVar("_M", bound=Model, covariant=True)
 class MultipleObjectMixin(Generic[_M], ContextMixin):
     allow_empty: bool
     queryset: _SupportsPagination[_M] | None
-    model: Type[_M] | None
+    model: type[_M] | None
     paginate_by: int
     paginate_orphans: int
     context_object_name: str | None
-    paginator_class: Type[Paginator]
+    paginator_class: type[Paginator]
     page_kwarg: str
     ordering: str | Sequence[str] | None
     def get_queryset(self) -> _SupportsPagination[_M]: ...
     def get_ordering(self) -> str | Sequence[str] | None: ...
     def paginate_queryset(
         self, queryset: _SupportsPagination[_M], page_size: int
-    ) -> Tuple[Paginator, Page, _SupportsPagination[_M], bool]: ...
+    ) -> tuple[Paginator, Page, _SupportsPagination[_M], bool]: ...
     def get_paginate_by(self, queryset: _SupportsPagination[_M]) -> int | None: ...
     def get_paginator(
         self,

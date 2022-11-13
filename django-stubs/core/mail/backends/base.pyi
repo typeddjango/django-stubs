@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from types import TracebackType
-from typing import Any, Sequence, Type, TypeVar
+from typing import Any, TypeVar
 
 from django.core.mail.message import EmailMessage
 
@@ -13,7 +14,7 @@ class BaseEmailBackend:
     def __enter__(self: _T) -> _T: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...

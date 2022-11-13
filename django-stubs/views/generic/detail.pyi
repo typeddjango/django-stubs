@@ -1,4 +1,4 @@
-from typing import Any, Generic, Type, TypeVar
+from typing import Any, Generic, TypeVar
 
 from django.db import models
 from django.http import HttpRequest, HttpResponse
@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 _M = TypeVar("_M", bound=models.Model)
 
 class SingleObjectMixin(Generic[_M], ContextMixin):
-    model: Type[_M]
+    model: type[_M]
     queryset: models.query.QuerySet[_M] | None
     slug_field: str
     context_object_name: str | None

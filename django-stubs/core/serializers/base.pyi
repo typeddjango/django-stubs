@@ -1,4 +1,5 @@
-from typing import IO, Any, Collection, Dict, Iterable, Sequence, Type
+from collections.abc import Collection, Iterable, Sequence
+from typing import IO, Any
 
 from django.db.models.base import Model
 from django.db.models.fields import Field
@@ -30,9 +31,9 @@ class ProgressBar:
 
 class Serializer:
     internal_use_only: bool
-    progress_class: Type[ProgressBar]
-    stream_class: Type[IO[str]]
-    options: Dict[str, Any]
+    progress_class: type[ProgressBar]
+    stream_class: type[IO[str]]
+    options: dict[str, Any]
     stream: IO[str]
     selected_fields: Collection[str] | None
     use_natural_foreign_keys: bool
@@ -60,7 +61,7 @@ class Serializer:
     def getvalue(self) -> bytes | str | None: ...
 
 class Deserializer:
-    options: Dict[str, Any]
+    options: dict[str, Any]
     stream: IO[str] | IO[bytes]
     def __init__(self, stream_or_string: bytes | str | IO[bytes] | IO[str], **options: Any) -> None: ...
     def __iter__(self) -> Deserializer: ...
@@ -68,18 +69,18 @@ class Deserializer:
 
 class DeserializedObject:
     object: Any
-    m2m_data: Dict[str, Sequence[Any]] | None
-    deferred_fields: Dict[Field, Any]
+    m2m_data: dict[str, Sequence[Any]] | None
+    deferred_fields: dict[Field, Any]
     def __init__(
         self,
         obj: Model,
-        m2m_data: Dict[str, Sequence[Any]] | None = ...,
-        deferred_fields: Dict[Field, Any] | None = ...,
+        m2m_data: dict[str, Sequence[Any]] | None = ...,
+        deferred_fields: dict[Field, Any] | None = ...,
     ) -> None: ...
     def save(self, save_m2m: bool = ..., using: str | None = ..., **kwargs: Any) -> None: ...
     def save_deferred_fields(self, using: str | None = ...) -> None: ...
 
-def build_instance(Model: Type[Model], data: Dict[str, Any], db: str) -> Model: ...
+def build_instance(Model: type[Model], data: dict[str, Any], db: str) -> Model: ...
 def deserialize_m2m_values(
     field: ManyToManyField, field_value: Iterable[Any], using: str | None, handle_forward_references: bool
 ) -> Sequence[Any] | object: ...

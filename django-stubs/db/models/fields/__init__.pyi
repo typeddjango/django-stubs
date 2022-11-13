@@ -1,9 +1,10 @@
 import decimal
 import uuid
+from collections.abc import Callable, Iterable, Sequence
 from datetime import date
 from datetime import datetime as real_datetime
 from datetime import time, timedelta
-from typing import Any, Callable, Dict, Generic, Iterable, List, Sequence, Tuple, Type, TypeVar, overload
+from typing import Any, Generic, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
@@ -22,19 +23,19 @@ from typing_extensions import Protocol
 class Empty: ...
 class NOT_PROVIDED: ...
 
-BLANK_CHOICE_DASH: List[Tuple[str, str]]
+BLANK_CHOICE_DASH: list[tuple[str, str]]
 
-_Choice = Tuple[Any, Any]
-_ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
+_Choice = tuple[Any, Any]
+_ChoiceNamedGroup = tuple[str, Iterable[_Choice]]
 _FieldChoices = Iterable[_Choice | _ChoiceNamedGroup]
 _ChoicesList = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
-_LimitChoicesTo = Q | Dict[str, Any]
+_LimitChoicesTo = Q | dict[str, Any]
 
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
 _AllLimitChoicesTo = _LimitChoicesTo | _ChoicesCallable
-_ErrorMessagesT = Dict[str, Any]
+_ErrorMessagesT = dict[str, Any]
 
 _T = TypeVar("_T", bound="Field")
 # __set__ value type
@@ -112,13 +113,13 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     primary_key: bool
     remote_field: ForeignObjectRel | None
     is_relation: bool
-    related_model: Type[Model] | None
+    related_model: type[Model] | None
     one_to_many: bool | None
     one_to_one: bool | None
     many_to_many: bool | None
     many_to_one: bool | None
     max_length: int | None
-    model: Type[Model]
+    model: type[Model]
     name: str
     verbose_name: _StrOrPromise
     description: str | _Getter[str]
@@ -137,11 +138,11 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     creation_counter: int
     auto_creation_counter: int
     default_validators: Sequence[validators._ValidatorCallable]
-    default_error_messages: Dict[str, str]
+    default_error_messages: dict[str, str]
     hidden: bool
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
-    non_db_attrs: Tuple[str, ...]
+    non_db_attrs: tuple[str, ...]
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -182,7 +183,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
     def db_check(self, connection: BaseDatabaseWrapper) -> str | None: ...
     def db_type(self, connection: BaseDatabaseWrapper) -> str | None: ...
-    def db_parameters(self, connection: BaseDatabaseWrapper) -> Dict[str, str | None]: ...
+    def db_parameters(self, connection: BaseDatabaseWrapper) -> dict[str, str | None]: ...
     def pre_save(self, model_instance: Model, add: bool) -> Any: ...
     def get_prep_value(self, value: Any) -> Any: ...
     def get_db_prep_value(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool = ...) -> Any: ...
@@ -191,10 +192,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     # TODO: plugin support
     def formfield(self, form_class: Any | None = ..., choices_form_class: Any | None = ..., **kwargs: Any) -> Any: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
-    def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
+    def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
     @property
-    def validators(self) -> List[validators._ValidatorCallable]: ...
+    def validators(self) -> list[validators._ValidatorCallable]: ...
     def run_validators(self, value: Any) -> None: ...
     def validate(self, value: Any, model_instance: Model | None) -> None: ...
     def clean(self, value: Any, model_instance: Model | None) -> Any: ...
@@ -205,12 +206,12 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         limit_choices_to: _LimitChoicesTo | None = ...,
         ordering: Sequence[str] = ...,
     ) -> _ChoicesList: ...
-    def _get_flatchoices(self) -> List[_Choice]: ...
+    def _get_flatchoices(self) -> list[_Choice]: ...
     @property
-    def flatchoices(self) -> List[_Choice]: ...
+    def flatchoices(self) -> list[_Choice]: ...
     def has_default(self) -> bool: ...
     def get_default(self) -> Any: ...
-    def check(self, **kwargs: Any) -> List[CheckMessage]: ...
+    def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     def get_col(self, alias: str, output_field: Field | None = ...) -> Col: ...
     @property
     def cached_col(self) -> Col: ...
@@ -410,7 +411,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
-    default_error_messages: Dict[str, str]
+    default_error_messages: dict[str, str]
     unpack_ipv4: bool
     protocol: str
     def __init__(

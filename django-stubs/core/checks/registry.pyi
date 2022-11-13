@@ -1,4 +1,5 @@
-from typing import Any, Callable, List, Sequence, Set, TypeVar
+from collections.abc import Callable, Sequence
+from typing import Any, TypeVar
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
@@ -26,8 +27,8 @@ class _ProcessedCheckCallable(Protocol[_C]):
     __call__: _C
 
 class CheckRegistry:
-    registered_checks: Set[_ProcessedCheckCallable]
-    deployment_checks: Set[_ProcessedCheckCallable]
+    registered_checks: set[_ProcessedCheckCallable]
+    deployment_checks: set[_ProcessedCheckCallable]
     def __init__(self) -> None: ...
     def register(
         self, check: _CheckCallable | str | None = ..., *tags: str, **kwargs: Any
@@ -38,10 +39,10 @@ class CheckRegistry:
         tags: Sequence[str] | None = ...,
         include_deployment_checks: bool = ...,
         databases: Any | None = ...,
-    ) -> List[CheckMessage]: ...
+    ) -> list[CheckMessage]: ...
     def tag_exists(self, tag: str, include_deployment_checks: bool = ...) -> bool: ...
-    def tags_available(self, deployment_checks: bool = ...) -> Set[str]: ...
-    def get_checks(self, include_deployment_checks: bool = ...) -> List[_ProcessedCheckCallable]: ...
+    def tags_available(self, deployment_checks: bool = ...) -> set[str]: ...
+    def get_checks(self, include_deployment_checks: bool = ...) -> list[_ProcessedCheckCallable]: ...
 
 registry: CheckRegistry
 register: Any

@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, Sequence
+from collections.abc import Callable, Sequence
+from typing import Any
 
 from django.urls.resolvers import ResolverMatch
 from typing_extensions import Literal
@@ -8,7 +9,7 @@ def reverse(
     viewname: Callable | str | None,
     urlconf: str | None = ...,
     args: Sequence[Any] | None = ...,
-    kwargs: Dict[str, Any] | None = ...,
+    kwargs: dict[str, Any] | None = ...,
     current_app: str | None = ...,
 ) -> str: ...
 

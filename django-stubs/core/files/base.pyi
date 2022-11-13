@@ -1,5 +1,6 @@
+from collections.abc import Iterator
 from types import TracebackType
-from typing import IO, AnyStr, Iterator, Type, TypeVar, type_check_only
+from typing import IO, AnyStr, TypeVar, type_check_only
 
 from django.core.files.utils import FileProxyMixin
 
@@ -23,7 +24,7 @@ class File(FileProxyMixin[AnyStr], IO[AnyStr]):
     def __enter__(self: _T) -> _T: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...

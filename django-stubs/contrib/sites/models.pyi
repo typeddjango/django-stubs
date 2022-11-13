@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Type
+from typing import Any
 
 from django.db import models
 from django.http.request import HttpRequest
@@ -15,6 +15,6 @@ class Site(models.Model):
 
     domain = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
-    def natural_key(self) -> Tuple[str]: ...
+    def natural_key(self) -> tuple[str]: ...
 
-def clear_site_cache(sender: Type[Site], **kwargs: Any) -> None: ...
+def clear_site_cache(sender: type[Site], **kwargs: Any) -> None: ...

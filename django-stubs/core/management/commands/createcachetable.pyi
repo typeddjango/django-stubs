@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from django.conf import settings as settings
 from django.core.cache import caches as caches
@@ -14,5 +14,5 @@ from django.db import transaction as transaction
 
 class Command(BaseCommand):
     verbosity: int
-    def handle(self, *tablenames: List[str], **options: Any) -> None: ...
+    def handle(self, *tablenames: list[str], **options: Any) -> None: ...
     def create_table(self, database: str, tablename: str, dry_run: bool) -> None: ...

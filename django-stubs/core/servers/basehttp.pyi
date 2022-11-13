@@ -1,6 +1,6 @@
 import socketserver
 from io import BytesIO
-from typing import Any, Dict
+from typing import Any
 from wsgiref import simple_server
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
@@ -27,7 +27,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     protocol_version: str
     def address_string(self) -> str: ...
     def log_message(self, format: str, *args: Any) -> None: ...
-    def get_environ(self) -> Dict[str, str]: ...
+    def get_environ(self) -> dict[str, str]: ...
     raw_requestline: bytes
     requestline: str
     request_version: str

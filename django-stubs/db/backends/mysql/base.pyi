@@ -1,4 +1,5 @@
-from typing import Any, Container, Dict, Iterator, Tuple, Type
+from collections.abc import Iterator
+from typing import Any, Container
 
 from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
 from typing_extensions import Literal
@@ -31,12 +32,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     validation: DatabaseValidation
     ops: DatabaseOperations
 
-    client_class: Type[DatabaseClient]
-    creation_class: Type[DatabaseCreation]
-    features_class: Type[DatabaseFeatures]
-    introspection_class: Type[DatabaseIntrospection]
-    ops_class: Type[DatabaseOperations]
-    validation_class: Type[DatabaseValidation]
+    client_class: type[DatabaseClient]
+    creation_class: type[DatabaseCreation]
+    features_class: type[DatabaseFeatures]
+    introspection_class: type[DatabaseIntrospection]
+    ops_class: type[DatabaseOperations]
+    validation_class: type[DatabaseValidation]
 
     vendor: str
     data_types: Any
@@ -47,7 +48,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     Database: Any
     SchemaEditorClass: Any
     isolation_level: Any
-    def get_connection_params(self) -> Dict[str, Any]: ...
+    def get_connection_params(self) -> dict[str, Any]: ...
     def get_new_connection(self, conn_params: Any) -> Any: ...
     def init_connection_state(self) -> None: ...
     def create_cursor(self, name: Any | None = ...) -> CursorWrapper: ...
@@ -59,13 +60,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @property
     def display_name(self) -> str: ...  # type: ignore [override]
     @property
-    def data_type_check_constraints(self) -> Dict[str, str]: ...  # type: ignore [override]
+    def data_type_check_constraints(self) -> dict[str, str]: ...  # type: ignore [override]
     @property
-    def mysql_server_data(self) -> Dict[str, Any]: ...
+    def mysql_server_data(self) -> dict[str, Any]: ...
     @property
     def mysql_server_info(self) -> str: ...
     @property
-    def mysql_version(self) -> Tuple[int, ...]: ...
+    def mysql_version(self) -> tuple[int, ...]: ...
     @property
     def mysql_is_mariadb(self) -> bool: ...
     @property

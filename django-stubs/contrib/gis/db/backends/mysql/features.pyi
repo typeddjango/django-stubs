@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures as BaseSpatialFeatures
 from django.db.backends.mysql.features import DatabaseFeatures as MySQLDatabaseFeatures
@@ -17,4 +17,4 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     @property
     def supports_geometry_field_unique_index(self) -> bool: ...  # type: ignore
     @property
-    def django_test_skips(self) -> Dict[str, Any]: ...  # type: ignore
+    def django_test_skips(self) -> dict[str, Any]: ...  # type: ignore

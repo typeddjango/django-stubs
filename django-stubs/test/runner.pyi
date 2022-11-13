@@ -1,8 +1,9 @@
 import logging
 from argparse import ArgumentParser
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from io import StringIO
-from typing import Any, Dict, Iterator, List, Sequence, Set, Tuple, Type
+from typing import Any
 from unittest import TestCase, TestLoader, TestSuite, TextTestResult, TextTestRunner
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -15,14 +16,14 @@ class DebugSQLTextTestResult(TextTestResult):
     buffer: bool
     descriptions: bool
     dots: bool
-    expectedFailures: List[Any]
+    expectedFailures: list[Any]
     failfast: bool
     shouldStop: bool
     showAll: bool
-    skipped: List[Any]
+    skipped: list[Any]
     tb_locals: bool
     testsRun: int
-    unexpectedSuccesses: List[Any]
+    unexpectedSuccesses: list[Any]
     logger: logging.Logger
     # typeshed thinks it's TextIO, but unittest wraps it with _WritelnDecorator
     # adding `writeln` method
@@ -39,7 +40,7 @@ class DebugSQLTextTestResult(TextTestResult):
 class PDBDebugResult(TextTestResult): ...
 
 class RemoteTestResult:
-    events: List[Any]
+    events: list[Any]
     failfast: bool
     shouldStop: bool
     testsRun: int
@@ -76,23 +77,23 @@ class ParallelTestSuite(TestSuite):
     init_worker: Any
     run_subsuite: Any
     runner_class: Any
-    subsuites: List[TestSuite]
+    subsuites: list[TestSuite]
     processes: int
     failfast: bool
     buffer: bool
     initial_settings: Any
     serialized_contents: Any
     def __init__(
-        self, subsuites: List[TestSuite], processes: int, failfast: bool = ..., buffer: bool = ...
+        self, subsuites: list[TestSuite], processes: int, failfast: bool = ..., buffer: bool = ...
     ) -> None: ...
     def run(self, result: Any) -> Any: ...  # type: ignore[override]
 
 class DiscoverRunner:
-    test_suite: Type[TestSuite]
-    parallel_test_suite: Type[ParallelTestSuite]
-    test_runner: Type[TextTestRunner]
+    test_suite: type[TestSuite]
+    parallel_test_suite: type[ParallelTestSuite]
+    test_runner: type[TextTestRunner]
     test_loader: TestLoader
-    reorder_by: Tuple[SimpleTestCase, ...]
+    reorder_by: tuple[SimpleTestCase, ...]
     pattern: str | None
     top_level: str | None
     verbosity: int
@@ -103,11 +104,11 @@ class DiscoverRunner:
     debug_mode: bool
     debug_sql: bool
     parallel: int
-    tags: Set[str]
-    exclude_tags: Set[str]
+    tags: set[str]
+    exclude_tags: set[str]
     pdb: bool
     buffer: bool
-    test_name_patterns: Set[str] | None
+    test_name_patterns: set[str] | None
     time_keeper: TimeKeeperProtocol
     shuffle: int | Literal[False]
     logger: logging.Logger | None
@@ -123,9 +124,9 @@ class DiscoverRunner:
         debug_mode: bool = ...,
         debug_sql: bool = ...,
         parallel: int = ...,
-        tags: List[str] | None = ...,
-        exclude_tags: List[str] | None = ...,
-        test_name_patterns: List[str] | None = ...,
+        tags: list[str] | None = ...,
+        exclude_tags: list[str] | None = ...,
+        test_name_patterns: list[str] | None = ...,
         pdb: bool = ...,
         buffer: bool = ...,
         enable_faulthandler: bool = ...,
@@ -143,28 +144,28 @@ class DiscoverRunner:
     def setup_shuffler(self) -> None: ...
     @contextmanager
     def load_with_patterns(self) -> Iterator[None]: ...
-    def load_tests_for_label(self, label: str, discover_kwargs: Dict[str, str]) -> TestSuite: ...
+    def load_tests_for_label(self, label: str, discover_kwargs: dict[str, str]) -> TestSuite: ...
     def build_suite(
-        self, test_labels: Sequence[str] = ..., extra_tests: List[Any] | None = ..., **kwargs: Any
+        self, test_labels: Sequence[str] = ..., extra_tests: list[Any] | None = ..., **kwargs: Any
     ) -> TestSuite: ...
-    def setup_databases(self, **kwargs: Any) -> List[Tuple[BaseDatabaseWrapper, str, bool]]: ...
-    def get_resultclass(self) -> Type[TextTestResult] | None: ...
-    def get_test_runner_kwargs(self) -> Dict[str, Any]: ...
-    def run_checks(self, databases: Set[str]) -> None: ...
+    def setup_databases(self, **kwargs: Any) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
+    def get_resultclass(self) -> type[TextTestResult] | None: ...
+    def get_test_runner_kwargs(self) -> dict[str, Any]: ...
+    def run_checks(self, databases: set[str]) -> None: ...
     def run_suite(self, suite: TestSuite, **kwargs: Any) -> TextTestResult: ...
-    def teardown_databases(self, old_config: List[Tuple[BaseDatabaseWrapper, str, bool]], **kwargs: Any) -> None: ...
+    def teardown_databases(self, old_config: list[tuple[BaseDatabaseWrapper, str, bool]], **kwargs: Any) -> None: ...
     def teardown_test_environment(self, **kwargs: Any) -> None: ...
     def suite_result(self, suite: TestSuite, result: TextTestResult, **kwargs: Any) -> int: ...
-    def _get_databases(self, suite: TestSuite) -> Set[str]: ...
-    def get_databases(self, suite: TestSuite) -> Set[str]: ...
-    def run_tests(self, test_labels: List[str], extra_tests: List[Any] | None = ..., **kwargs: Any) -> int: ...
+    def _get_databases(self, suite: TestSuite) -> set[str]: ...
+    def get_databases(self, suite: TestSuite) -> set[str]: ...
+    def run_tests(self, test_labels: list[str], extra_tests: list[Any] | None = ..., **kwargs: Any) -> int: ...
 
 def is_discoverable(label: str) -> bool: ...
 def reorder_suite(
-    suite: TestSuite, classes: Tuple[Type[TestCase], Type[SimpleTestCase]], reverse: bool = ...
+    suite: TestSuite, classes: tuple[type[TestCase], type[SimpleTestCase]], reverse: bool = ...
 ) -> TestSuite: ...
 def partition_suite_by_type(
-    suite: TestSuite, classes: Tuple[Type[TestCase], Type[SimpleTestCase]], bins: List[OrderedSet], reverse: bool = ...
+    suite: TestSuite, classes: tuple[type[TestCase], type[SimpleTestCase]], bins: list[OrderedSet], reverse: bool = ...
 ) -> None: ...
-def partition_suite_by_case(suite: Any) -> List[Any]: ...
-def filter_tests_by_tags(suite: TestSuite, tags: Set[str], exclude_tags: Set[str]) -> TestSuite: ...
+def partition_suite_by_case(suite: Any) -> list[Any]: ...
+def filter_tests_by_tags(suite: TestSuite, tags: set[str], exclude_tags: set[str]) -> TestSuite: ...

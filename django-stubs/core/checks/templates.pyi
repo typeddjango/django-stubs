@@ -1,4 +1,5 @@
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import Error

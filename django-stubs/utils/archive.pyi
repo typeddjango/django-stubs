@@ -1,5 +1,6 @@
+from collections.abc import Iterable, Sequence
 from types import TracebackType
-from typing import Any, Dict, Iterable, Sequence, Type
+from typing import Any
 
 class ArchiveException(Exception): ...
 class UnrecognizedArchiveFormat(ArchiveException): ...
@@ -11,7 +12,7 @@ class Archive:
     def __enter__(self) -> Archive: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None: ...
@@ -38,4 +39,4 @@ class ZipArchive(BaseArchive):
     def extract(self, to_path: str) -> None: ...
     def close(self) -> None: ...
 
-extension_map: Dict[str, Type[BaseArchive]]
+extension_map: dict[str, type[BaseArchive]]

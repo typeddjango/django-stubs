@@ -1,6 +1,6 @@
 # Stubs for django.core.files.uploadhandler (Python 3.5)
 
-from typing import IO, Any, Dict, Tuple
+from typing import IO, Any
 
 from django.core.files.uploadedfile import TemporaryUploadedFile, UploadedFile
 from django.http.request import HttpRequest, QueryDict
@@ -22,18 +22,18 @@ class FileUploadHandler:
     content_type: str | None
     content_length: int | None
     charset: str | None
-    content_type_extra: Dict[str, str] | None
+    content_type_extra: dict[str, str] | None
     request: HttpRequest | None
     field_name: str
     def __init__(self, request: HttpRequest | None = ...) -> None: ...
     def handle_raw_input(
         self,
         input_data: IO[bytes],
-        META: Dict[str, str],
+        META: dict[str, str],
         content_length: int,
         boundary: str,
         encoding: str | None = ...,
-    ) -> Tuple[QueryDict, MultiValueDict[str, UploadedFile]] | None: ...
+    ) -> tuple[QueryDict, MultiValueDict[str, UploadedFile]] | None: ...
     def new_file(
         self,
         field_name: str,
@@ -41,7 +41,7 @@ class FileUploadHandler:
         content_type: str,
         content_length: int | None,
         charset: str | None = ...,
-        content_type_extra: Dict[str, str] | None = ...,
+        content_type_extra: dict[str, str] | None = ...,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> bytes | None: ...
     def file_complete(self, file_size: int) -> UploadedFile | None: ...
@@ -57,7 +57,7 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         content_type: str,
         content_length: int | None,
         charset: str | None = ...,
-        content_type_extra: Dict[str, str] | None = ...,
+        content_type_extra: dict[str, str] | None = ...,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> bytes | None: ...
     def file_complete(self, file_size: int) -> UploadedFile | None: ...
@@ -69,11 +69,11 @@ class MemoryFileUploadHandler(FileUploadHandler):
     def handle_raw_input(
         self,
         input_data: IO[bytes],
-        META: Dict[str, str],
+        META: dict[str, str],
         content_length: int,
         boundary: str,
         encoding: str | None = ...,
-    ) -> Tuple[QueryDict, MultiValueDict[str, UploadedFile]] | None: ...
+    ) -> tuple[QueryDict, MultiValueDict[str, UploadedFile]] | None: ...
     def new_file(
         self,
         field_name: str,
@@ -81,7 +81,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         content_type: str,
         content_length: int | None,
         charset: str | None = ...,
-        content_type_extra: Dict[str, str] | None = ...,
+        content_type_extra: dict[str, str] | None = ...,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> bytes | None: ...
     def file_complete(self, file_size: int) -> UploadedFile | None: ...

@@ -1,14 +1,15 @@
-from typing import Any, Callable, Dict, List, Type
+from collections.abc import Callable
+from typing import Any
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
 
 class ContextMixin:
-    extra_context: Dict[str, Any] | None
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]: ...
+    extra_context: dict[str, Any] | None
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
 class View:
-    http_method_names: List[str]
+    http_method_names: list[str]
     request: HttpRequest
     args: Any
     kwargs: Any
@@ -23,11 +24,11 @@ class View:
 class TemplateResponseMixin:
     template_name: str
     template_engine: str | None
-    response_class: Type[HttpResponse]
+    response_class: type[HttpResponse]
     content_type: str | None
     request: HttpRequest
-    def render_to_response(self, context: Dict[str, Any], **response_kwargs: Any) -> HttpResponse: ...
-    def get_template_names(self) -> List[str]: ...
+    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse: ...
+    def get_template_names(self) -> list[str]: ...
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...

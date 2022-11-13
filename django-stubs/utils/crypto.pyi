@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from hmac import HMAC
-from typing import Callable
 
 using_sysrandom: bool
 RANDOM_STRING_CHARS: str

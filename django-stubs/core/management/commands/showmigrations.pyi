@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from django.apps import apps as apps
 from django.core.management.base import BaseCommand as BaseCommand
@@ -9,5 +9,5 @@ from django.db.migrations.loader import MigrationLoader as MigrationLoader
 
 class Command(BaseCommand):
     verbosity: int
-    def show_list(self, connection: BaseDatabaseWrapper, app_names: List[str] | None = ...) -> None: ...
-    def show_plan(self, connection: BaseDatabaseWrapper, app_names: List[str] | None = ...) -> None: ...
+    def show_list(self, connection: BaseDatabaseWrapper, app_names: list[str] | None = ...) -> None: ...
+    def show_plan(self, connection: BaseDatabaseWrapper, app_names: list[str] | None = ...) -> None: ...

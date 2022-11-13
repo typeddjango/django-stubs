@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from django.template import Node
 from django.template.base import FilterExpression, NodeList, Parser, Token
@@ -9,14 +9,14 @@ class CacheNode(Node):
     nodelist: NodeList
     expire_time_var: FilterExpression
     fragment_name: str
-    vary_on: List[FilterExpression]
+    vary_on: list[FilterExpression]
     cache_name: FilterExpression | None
     def __init__(
         self,
         nodelist: NodeList,
         expire_time_var: FilterExpression,
         fragment_name: str,
-        vary_on: List[FilterExpression],
+        vary_on: list[FilterExpression],
         cache_name: FilterExpression | None,
     ) -> None: ...
 

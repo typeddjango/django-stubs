@@ -1,11 +1,12 @@
+from collections.abc import Iterable
 from html.parser import HTMLParser
-from typing import Any, Iterable, List, Pattern, Tuple, Type
+from typing import Any, Pattern
 
 from django.utils.safestring import SafeString
 
 TRAILING_PUNCTUATION_CHARS: str
-WRAPPING_PUNCTUATION: List[Tuple[str, str]]
-DOTS: List[str]
+WRAPPING_PUNCTUATION: list[tuple[str, str]]
+DOTS: list[str]
 word_split_re: Pattern[str]
 simple_url_re: Pattern[str]
 simple_url_2_re: Pattern[str]
@@ -31,4 +32,4 @@ def strip_spaces_between_tags(value: str) -> str: ...
 def smart_urlquote(url: str) -> str: ...
 def urlize(text: str, trim_url_limit: int | None = ..., nofollow: bool = ..., autoescape: bool = ...) -> str: ...
 def avoid_wrapping(value: str) -> str: ...
-def html_safe(klass: Type) -> Type: ...
+def html_safe(klass: type) -> type: ...

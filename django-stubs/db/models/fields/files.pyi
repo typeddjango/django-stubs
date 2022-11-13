@@ -1,4 +1,5 @@
-from typing import Any, Callable, Iterable, Type, TypeVar, overload
+from collections.abc import Callable, Iterable
+from typing import Any, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
@@ -32,7 +33,7 @@ class FieldFile(File):
 class FileDescriptor(DeferredAttribute):
     field: FileField
     def __set__(self, instance: Model, value: Any | None) -> None: ...
-    def __get__(self, instance: Model | None, cls: Type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
+    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
 
 _T = TypeVar("_T", bound="Field")
 _M = TypeVar("_M", bound=Model, contravariant=True)

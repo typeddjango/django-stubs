@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple, Type
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any
 
 from django.contrib.admin.filters import ListFilter
 from django.contrib.admin.options import IS_POPUP_VAR as IS_POPUP_VAR  # noqa: F401
@@ -18,10 +19,10 @@ ORDER_TYPE_VAR: str
 PAGE_VAR: str
 SEARCH_VAR: str
 ERROR_FLAG: str
-IGNORED_PARAMS: Tuple[str, ...]
+IGNORED_PARAMS: tuple[str, ...]
 
 class ChangeList:
-    model: Type[Model]
+    model: type[Model]
     opts: Options
     lookup_opts: Options
     root_queryset: QuerySet
@@ -40,7 +41,7 @@ class ChangeList:
     show_all: bool
     is_popup: bool
     to_field: Any
-    params: Dict[str, Any]
+    params: dict[str, Any]
     list_editable: Sequence[str]
     query: str
     queryset: Any
@@ -50,7 +51,7 @@ class ChangeList:
     def __init__(
         self,
         request: HttpRequest,
-        model: Type[Model],
+        model: type[Model],
         list_display: _DisplayT,
         list_display_links: _DisplayT,
         list_filter: Sequence[_ListFilterT],
@@ -63,9 +64,9 @@ class ChangeList:
         model_admin: ModelAdmin,
         sortable_by: Sequence[str] | None,
     ) -> None: ...
-    def get_filters_params(self, params: Dict[str, Any] | None = ...) -> Dict[str, Any]: ...
-    def get_filters(self, request: HttpRequest) -> Tuple[List[ListFilter], bool, Dict[str, bool | str], bool, bool]: ...
-    def get_query_string(self, new_params: Dict[str, Any] | None = ..., remove: Iterable[str] | None = ...) -> str: ...
+    def get_filters_params(self, params: dict[str, Any] | None = ...) -> dict[str, Any]: ...
+    def get_filters(self, request: HttpRequest) -> tuple[list[ListFilter], bool, dict[str, bool | str], bool, bool]: ...
+    def get_query_string(self, new_params: dict[str, Any] | None = ..., remove: Iterable[str] | None = ...) -> str: ...
     result_count: int
     show_full_result_count: bool
     show_admin_actions: bool
@@ -76,10 +77,10 @@ class ChangeList:
     paginator: Any
     def get_results(self, request: HttpRequest) -> None: ...
     def get_ordering_field(self, field_name: Callable | str) -> Expression | str | None: ...
-    def get_ordering(self, request: HttpRequest, queryset: QuerySet) -> List[Expression | str]: ...
-    def get_ordering_field_columns(self) -> Dict[int, Literal["desc", "asc"]]: ...
+    def get_ordering(self, request: HttpRequest, queryset: QuerySet) -> list[Expression | str]: ...
+    def get_ordering_field_columns(self) -> dict[int, Literal["desc", "asc"]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet: ...
-    filter_specs: List[ListFilter]
+    filter_specs: list[ListFilter]
     has_filters: bool
     has_active_filters: bool
     clear_all_filters_qs: str

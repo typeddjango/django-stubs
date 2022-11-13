@@ -1,6 +1,7 @@
+from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
 from re import RegexFlag
-from typing import Any, Callable, Collection, Dict, List, Pattern, Sequence, Sized, Tuple
+from typing import Any, Pattern
 
 from django.core.files.base import File
 from django.utils.functional import _StrPromise
@@ -75,8 +76,8 @@ def validate_ipv4_address(value: str) -> None: ...
 def validate_ipv6_address(value: str) -> None: ...
 def validate_ipv46_address(value: str) -> None: ...
 
-_IPValidator = Tuple[List[Callable[[Any], None]], str]
-ip_address_validator_map: Dict[str, _IPValidator]
+_IPValidator = tuple[list[Callable[[Any], None]], str]
+ip_address_validator_map: dict[str, _IPValidator]
 
 def ip_address_validators(protocol: str, unpack_ipv4: bool) -> _IPValidator: ...
 def int_list_validator(
@@ -118,7 +119,7 @@ class MaxLengthValidator(BaseValidator):
     def clean(self, x: Sized) -> int: ...
 
 class DecimalValidator:
-    messages: Dict[str, str]
+    messages: dict[str, str]
     max_digits: int | None
     decimal_places: int | None
     def __init__(self, max_digits: int | None, decimal_places: int | None) -> None: ...

@@ -1,4 +1,5 @@
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from django.http.request import HttpRequest
 from django.template.exceptions import TemplateDoesNotExist as TemplateDoesNotExist  # noqa: F401

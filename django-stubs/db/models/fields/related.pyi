@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple, Type, TypeVar, overload
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any, TypeVar, overload
 from uuid import UUID
 
 from django.core import validators  # due to weird mypy.stubtest error
@@ -28,7 +29,7 @@ _F = TypeVar("_F", bound=models.Field)
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
-def resolve_relation(scope_model: Type[Model], relation: str | Type[Model]) -> str | Type[Model]: ...
+def resolve_relation(scope_model: type[Model], relation: str | type[Model]) -> str | type[Model]: ...
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -43,16 +44,16 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     opts: Any
 
     remote_field: ForeignObjectRel
-    rel_class: Type[ForeignObjectRel]
+    rel_class: type[ForeignObjectRel]
     swappable: bool
     @property
-    def related_model(self) -> Type[Model]: ...  # type: ignore
-    def get_forward_related_filter(self, obj: Model) -> Dict[str, int | UUID]: ...
+    def related_model(self) -> type[Model]: ...  # type: ignore
+    def get_forward_related_filter(self, obj: Model) -> dict[str, int | UUID]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
     @property
     def swappable_setting(self) -> str | None: ...
     def set_attributes_from_rel(self) -> None: ...
-    def do_related_class(self, other: Type[Model], cls: Type[Model]) -> None: ...
+    def do_related_class(self, other: type[Model], cls: type[Model]) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def related_query_name(self) -> str: ...
     @property
@@ -60,13 +61,13 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
 
 class ForeignObject(RelatedField[_ST, _GT]):
     remote_field: ForeignObjectRel
-    rel_class: Type[ForeignObjectRel]
+    rel_class: type[ForeignObjectRel]
     from_fields: Sequence[str]
     to_fields: Sequence[str | None]  # None occurs in ForeignKey, where to_field defaults to None
     swappable: bool
     def __init__(
         self,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         on_delete: Callable[..., None],
         from_fields: Sequence[str],
         to_fields: Sequence[str],
@@ -96,25 +97,25 @@ class ForeignObject(RelatedField[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
-    def resolve_related_fields(self) -> List[Tuple[Field, Field]]: ...
+    def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
     @property
-    def related_fields(self) -> List[Tuple[Field, Field]]: ...
+    def related_fields(self) -> list[tuple[Field, Field]]: ...
     @property
-    def reverse_related_fields(self) -> List[Tuple[Field, Field]]: ...
+    def reverse_related_fields(self) -> list[tuple[Field, Field]]: ...
     @property
-    def local_related_fields(self) -> Tuple[Field, ...]: ...
+    def local_related_fields(self) -> tuple[Field, ...]: ...
     @property
-    def foreign_related_fields(self) -> Tuple[Field, ...]: ...
+    def foreign_related_fields(self) -> tuple[Field, ...]: ...
 
 class ForeignKey(ForeignObject[_ST, _GT]):
     _pyi_private_set_type: Any | Combinable
     _pyi_private_get_type: Any
 
     remote_field: ManyToOneRel
-    rel_class: Type[ManyToOneRel]
+    rel_class: type[ManyToOneRel]
     def __init__(
         self,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         on_delete: Callable[..., None],
         related_name: str | None = ...,
         related_query_name: str | None = ...,
@@ -160,10 +161,10 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     _pyi_private_get_type: Any
 
     remote_field: OneToOneRel
-    rel_class: Type[OneToOneRel]
+    rel_class: type[OneToOneRel]
     def __init__(
         self,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         on_delete: Any,
         to_field: str | None = ...,
         *,
@@ -218,16 +219,16 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     one_to_one: Literal[False]
 
     remote_field: ManyToManyRel
-    rel_class: Type[ManyToManyRel]
+    rel_class: type[ManyToManyRel]
     def __init__(
         self,
-        to: Type[Model] | str,
+        to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         symmetrical: bool | None = ...,
-        through: str | Type[Model] | None = ...,
-        through_fields: Tuple[str, str] | None = ...,
+        through: str | type[Model] | None = ...,
+        through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
         db_table: str | None = ...,
         swappable: bool = ...,
@@ -263,9 +264,9 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     # non-Model instances
     @overload
     def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
-    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> List[PathInfo]: ...
-    def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = ...) -> List[PathInfo]: ...
-    def contribute_to_related_class(self, cls: Type[Model], related: RelatedField) -> None: ...
+    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
+    def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
+    def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...
     def m2m_db_table(self) -> str: ...
     def m2m_column_name(self) -> str: ...
     def m2m_reverse_name(self) -> str: ...
@@ -273,4 +274,4 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     def m2m_target_field_name(self) -> str: ...
     def m2m_reverse_target_field_name(self) -> str: ...
 
-def create_many_to_many_intermediary_model(field: ManyToManyField, klass: Type[Model]) -> Type[Model]: ...
+def create_many_to_many_intermediary_model(field: ManyToManyField, klass: type[Model]) -> type[Model]: ...

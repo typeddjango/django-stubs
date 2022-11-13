@@ -1,4 +1,4 @@
-from typing import Any, Dict, Set
+from typing import Any
 
 from django.db.backends.base.features import BaseDatabaseFeatures as BaseDatabaseFeatures
 from django.db.backends.mysql.base import DatabaseWrapper
@@ -48,7 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @property
     def can_introspect_foreign_keys(self) -> bool: ...  # type: ignore
     @property
-    def introspected_field_types(self) -> Dict[str, str]: ...  # type: ignore [override]
+    def introspected_field_types(self) -> dict[str, str]: ...  # type: ignore [override]
     @property
     def can_return_columns_from_insert(self) -> bool: ...  # type: ignore
     @property
@@ -70,7 +70,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @property
     def supports_explain_analyze(self) -> bool: ...
     @property
-    def supported_explain_formats(self) -> Set[str]: ...  # type: ignore
+    def supported_explain_formats(self) -> set[str]: ...  # type: ignore
     @property
     def supports_transactions(self) -> bool: ...
     @property

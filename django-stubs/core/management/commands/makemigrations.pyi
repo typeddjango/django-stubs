@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from django.apps import apps as apps
 from django.conf import settings as settings
@@ -27,5 +27,5 @@ class Command(BaseCommand):
     empty: bool
     migration_name: str
     include_header: bool
-    def write_migration_files(self, changes: Dict[str, Any]) -> None: ...
-    def handle_merge(self, loader: MigrationLoader, conflicts: Dict[str, Any]) -> None: ...
+    def write_migration_files(self, changes: dict[str, Any]) -> None: ...
+    def handle_merge(self, loader: MigrationLoader, conflicts: dict[str, Any]) -> None: ...

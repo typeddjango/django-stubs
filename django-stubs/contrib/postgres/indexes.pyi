@@ -1,4 +1,5 @@
-from typing import Any, List, Sequence, Tuple, Type
+from collections.abc import Sequence
+from typing import Any
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
@@ -11,7 +12,7 @@ class PostgresIndex(Index):
     @property
     def max_name_length(self) -> int: ...  # type: ignore
     def create_sql(
-        self, model: Type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
+        self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
     ) -> Statement: ...
     def check_supported(self, schema_editor: BaseDatabaseSchemaEditor) -> None: ...
     def get_with_params(self) -> Sequence[str]: ...

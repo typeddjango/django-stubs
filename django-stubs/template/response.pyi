@@ -1,6 +1,7 @@
 import functools
+from collections.abc import Callable, Iterator, Sequence
 from http.cookies import SimpleCookie
-from typing import Any, Callable, Dict, Iterator, List, Sequence, Union
+from typing import Any, Union
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
@@ -21,20 +22,20 @@ class SimpleTemplateResponse(HttpResponse):
     status_code: int
     rendering_attrs: Any
     template_name: _TemplateForResponseT
-    context_data: Dict[str, Any] | None
+    context_data: dict[str, Any] | None
     using: str | None
     def __init__(
         self,
         template: _TemplateForResponseT,
-        context: Dict[str, Any] | None = ...,
+        context: dict[str, Any] | None = ...,
         content_type: str | None = ...,
         status: int | None = ...,
         charset: str | None = ...,
         using: str | None = ...,
-        headers: Dict[str, Any] | None = ...,
+        headers: dict[str, Any] | None = ...,
     ) -> None: ...
     def resolve_template(self, template: Sequence[str] | Template | str) -> Template: ...
-    def resolve_context(self, context: Dict[str, Any] | None) -> Dict[str, Any] | None: ...
+    def resolve_context(self, context: dict[str, Any] | None) -> dict[str, Any] | None: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
@@ -47,14 +48,14 @@ class TemplateResponse(SimpleTemplateResponse):
     client: Client
     closed: bool
     context: RequestContext
-    context_data: Dict[str, Any] | None
+    context_data: dict[str, Any] | None
     cookies: SimpleCookie[str]
     csrf_cookie_set: bool
     json: functools.partial
     _request: HttpRequest
     status_code: int
     template_name: _TemplateForResponseT
-    templates: List[Template]
+    templates: list[Template]
     using: str | None
     wsgi_request: WSGIRequest
     rendering_attrs: Any
@@ -62,10 +63,10 @@ class TemplateResponse(SimpleTemplateResponse):
         self,
         request: HttpRequest,
         template: _TemplateForResponseT,
-        context: Dict[str, Any] | None = ...,
+        context: dict[str, Any] | None = ...,
         content_type: str | None = ...,
         status: int | None = ...,
         charset: str | None = ...,
         using: str | None = ...,
-        headers: Dict[str, Any] | None = ...,
+        headers: dict[str, Any] | None = ...,
     ) -> None: ...

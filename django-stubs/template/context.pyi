@@ -1,6 +1,7 @@
+from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from types import TracebackType
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Type, TypeVar
+from typing import Any, TypeVar
 
 from django.http.request import HttpRequest
 from django.template.base import Node, Origin, Template
@@ -8,7 +9,7 @@ from django.template.defaulttags import IfChangedNode
 from django.template.loader_tags import IncludeNode
 
 _ContextKeys = int | str | Node
-_ContextValues = Dict[str, Any] | "Context"
+_ContextValues = dict[str, Any] | "Context"
 _ContextCopy = TypeVar("_ContextCopy", bound="BaseContext")
 
 class ContextPopException(Exception): ...
@@ -19,7 +20,7 @@ class ContextDict(dict):
     def __enter__(self) -> ContextDict: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...
@@ -36,9 +37,9 @@ class BaseContext(Iterable[Any]):
     def __delitem__(self, key: _ContextKeys) -> None: ...
     def __contains__(self, key: _ContextKeys) -> bool: ...
     def get(self, key: _ContextKeys, otherwise: Any | None = ...) -> Any | None: ...
-    def setdefault(self, key: _ContextKeys, default: List[Origin] | int | None = ...) -> List[Origin] | int | None: ...
+    def setdefault(self, key: _ContextKeys, default: list[Origin] | int | None = ...) -> list[Origin] | int | None: ...
     def new(self, values: _ContextValues | None = ...) -> Context: ...
-    def flatten(self) -> Dict[_ContextKeys, Dict[_ContextKeys, Type[Any] | str] | int | str | None]: ...
+    def flatten(self) -> dict[_ContextKeys, dict[_ContextKeys, type[Any] | str] | int | str | None]: ...
 
 class Context(BaseContext):
     dicts: Any
@@ -53,17 +54,17 @@ class Context(BaseContext):
     ) -> None: ...
     @contextmanager
     def bind_template(self, template: Template) -> Iterator[None]: ...
-    def update(self, other_dict: Dict[str, Any] | Context) -> ContextDict: ...
+    def update(self, other_dict: dict[str, Any] | Context) -> ContextDict: ...
 
 class RenderContext(BaseContext):
-    dicts: List[Dict[IncludeNode | str, str]]
+    dicts: list[dict[IncludeNode | str, str]]
     template: Template | None
     @contextmanager
     def push_state(self, template: Template, isolated_context: bool = ...) -> Iterator[None]: ...
 
 class RequestContext(Context):
     autoescape: bool
-    dicts: List[Dict[str, str]]
+    dicts: list[dict[str, str]]
     render_context: RenderContext
     template_name: str | None
     use_l10n: bool | None
@@ -72,8 +73,8 @@ class RequestContext(Context):
     def __init__(
         self,
         request: HttpRequest,
-        dict_: Dict[str, Any] | None = ...,
-        processors: List[Callable] | None = ...,
+        dict_: dict[str, Any] | None = ...,
+        processors: list[Callable] | None = ...,
         use_l10n: bool | None = ...,
         use_tz: bool | None = ...,
         autoescape: bool = ...,

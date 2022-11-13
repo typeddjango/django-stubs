@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import List, Tuple
 
 from django.core.management.base import BaseCommand as BaseCommand
 from django.core.management.base import CommandError as CommandError
@@ -14,7 +13,7 @@ def is_writable(path: _PathCompatible) -> bool: ...
 
 class Command(BaseCommand):
     program: str
-    program_options: List[str]
+    program_options: list[str]
     verbosity: int
     has_errors: bool
-    def compile_messages(self, locations: List[Tuple[_PathCompatible, _PathCompatible]]) -> None: ...
+    def compile_messages(self, locations: list[tuple[_PathCompatible, _PathCompatible]]) -> None: ...

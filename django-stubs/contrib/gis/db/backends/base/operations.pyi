@@ -1,4 +1,4 @@
-from typing import Any, Set
+from typing import Any
 
 class BaseSpatialOperations:
     postgis: bool
@@ -14,7 +14,7 @@ class BaseSpatialOperations:
     disallowed_aggregates: Any
     geom_func_prefix: str
     function_names: Any
-    unsupported_functions: Set[str]
+    unsupported_functions: set[str]
     from_text: bool
     def convert_extent(self, box: Any, srid: Any) -> Any: ...
     def convert_extent3d(self, box: Any, srid: Any) -> Any: ...

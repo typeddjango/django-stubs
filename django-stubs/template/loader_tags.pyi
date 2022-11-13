@@ -1,5 +1,5 @@
 import collections
-from typing import Any, Dict, List
+from typing import Any
 
 from django.template.base import FilterExpression, NodeList, Origin, Parser, Token
 from django.template.context import Context
@@ -13,7 +13,7 @@ BLOCK_CONTEXT_KEY: str
 class BlockContext:
     blocks: collections.defaultdict
     def __init__(self) -> None: ...
-    def add_blocks(self, blocks: Dict[str, BlockNode]) -> None: ...
+    def add_blocks(self, blocks: dict[str, BlockNode]) -> None: ...
     def pop(self, name: str) -> BlockNode: ...
     def push(self, name: str, block: BlockNode) -> None: ...
     def get_block(self, name: str) -> BlockNode: ...
@@ -36,10 +36,10 @@ class ExtendsNode(Node):
     context_key: str
     nodelist: NodeList
     parent_name: FilterExpression | Node
-    template_dirs: List[Any] | None
-    blocks: Dict[str, BlockNode]
+    template_dirs: list[Any] | None
+    blocks: dict[str, BlockNode]
     def __init__(
-        self, nodelist: NodeList, parent_name: FilterExpression | Node, template_dirs: List[Any] | None = ...
+        self, nodelist: NodeList, parent_name: FilterExpression | Node, template_dirs: list[Any] | None = ...
     ) -> None: ...
     def find_template(self, template_name: str, context: Context) -> Template: ...
     def get_parent(self, context: Context) -> Template: ...
@@ -50,7 +50,7 @@ class IncludeNode(Node):
     token: Token
     context_key: str
     template: FilterExpression
-    extra_context: Dict[str, FilterExpression]
+    extra_context: dict[str, FilterExpression]
     isolated_context: bool
     def __init__(
         self,

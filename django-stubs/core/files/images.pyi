@@ -1,4 +1,4 @@
-from typing import IO, Tuple
+from typing import IO
 
 from django.core.files import File
 from django.utils._os import _PathCompatible
@@ -11,4 +11,4 @@ class ImageFile(File[bytes]):
 
 def get_image_dimensions(
     file_or_path: _PathCompatible | IO[bytes], close: bool = ...
-) -> Tuple[int | None, int | None]: ...
+) -> tuple[int | None, int | None]: ...

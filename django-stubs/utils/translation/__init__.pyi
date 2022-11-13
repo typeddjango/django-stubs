@@ -1,7 +1,8 @@
 import functools
+from collections.abc import Callable
 from contextlib import ContextDecorator
 from types import TracebackType
-from typing import Any, Callable, Type
+from typing import Any
 
 from django.http.request import HttpRequest
 from django.utils.functional import _StrPromise
@@ -58,7 +59,7 @@ class override(ContextDecorator):
     def __enter__(self) -> None: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...

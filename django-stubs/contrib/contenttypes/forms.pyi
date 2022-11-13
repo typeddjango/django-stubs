@@ -1,4 +1,4 @@
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
 
 from django.db.models import Model
 from django.forms.models import BaseModelFormSet, ModelForm
@@ -26,8 +26,8 @@ class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
     def save_new(self, form: Any, commit: bool = ...) -> _M: ...
 
 def generic_inlineformset_factory(
-    model: Type[_M],
-    form: Type[_ModelFormT] = ...,
+    model: type[_M],
+    form: type[_ModelFormT] = ...,
     formset: Any = ...,
     ct_field: str = ...,
     fk_field: str = ...,
@@ -44,4 +44,4 @@ def generic_inlineformset_factory(
     validate_min: bool = ...,
     absolute_max: int | None = ...,
     can_delete_extra: bool = ...,
-) -> Type[BaseGenericInlineFormSet[_M, _ModelFormT]]: ...
+) -> type[BaseGenericInlineFormSet[_M, _ModelFormT]]: ...

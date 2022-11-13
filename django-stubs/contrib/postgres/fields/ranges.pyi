@@ -1,4 +1,4 @@
-from typing import Any, Dict, Type
+from typing import Any
 
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
@@ -25,7 +25,7 @@ class RangeOperators:
 class RangeField(models.Field):
     empty_strings_allowed: bool
     base_field: models.Field
-    range_type: Type[Range]
+    range_type: type[Range]
     def get_prep_value(self, value: Any) -> Any | None: ...
     def to_python(self, value: Any) -> Any: ...
 
@@ -50,7 +50,7 @@ class DateTimeRangeContains(PostgresOperatorLookup):
 
 class RangeContainedBy(PostgresOperatorLookup):
     lookup_name: str
-    type_mapping: Dict[str, str]
+    type_mapping: dict[str, str]
     postgres_operator: str
 
 class FullyLessThan(PostgresOperatorLookup):

@@ -6,7 +6,7 @@ from datetime import timedelta as timedelta
 from datetime import timezone
 from datetime import tzinfo as tzinfo
 from types import TracebackType
-from typing import Any, Type, overload
+from typing import Any, overload
 
 import pytz
 from pytz import BaseTzInfo
@@ -36,7 +36,7 @@ class override(ContextDecorator):
     def __enter__(self) -> None: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...

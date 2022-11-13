@@ -1,4 +1,4 @@
-from typing import Any, List, Pattern, Type
+from typing import Any, Pattern
 
 from django.core.management.base import BaseCommand
 
@@ -34,9 +34,9 @@ def normalize_eols(raw_contents: str) -> str: ...
 def write_pot_file(potfile: str, msgs: str) -> None: ...
 
 class Command(BaseCommand):
-    translatable_file_class: Type[TranslatableFile]
-    build_file_class: Type[BuildFile]
-    msgmerge_options: List[str]
-    msguniq_options: List[str]
-    msgattrib_options: List[str]
-    xgettext_options: List[str]
+    translatable_file_class: type[TranslatableFile]
+    build_file_class: type[BuildFile]
+    msgmerge_options: list[str]
+    msguniq_options: list[str]
+    msgattrib_options: list[str]
+    xgettext_options: list[str]

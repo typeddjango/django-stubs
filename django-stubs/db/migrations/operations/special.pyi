@@ -1,4 +1,5 @@
-from typing import Any, Dict, Mapping, Optional, Sequence, Tuple, Union
+from collections.abc import Mapping, Sequence
+from typing import Any, Optional, Union
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
@@ -16,17 +17,17 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""]
-    sql: Union[str, _ListOrTuple[Union[str, Tuple[str, Union[Dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
+    sql: Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
     reverse_sql: Optional[
-        Union[str, _ListOrTuple[Union[str, Tuple[str, Union[Dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
+        Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
     ]
     state_operations: Sequence[Operation]
     hints: Mapping[str, Any]
     def __init__(
         self,
-        sql: Union[str, _ListOrTuple[Union[str, Tuple[str, Union[Dict[str, Any], Optional[_ListOrTuple[str]]]]]]],
+        sql: Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]],
         reverse_sql: Optional[
-            Union[str, _ListOrTuple[Union[str, Tuple[str, Union[Dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
+            Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
         ] = ...,
         state_operations: Sequence[Operation] = ...,
         hints: Mapping[str, Any] | None = ...,
