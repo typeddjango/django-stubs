@@ -43,12 +43,21 @@
         from myapp.models import Book, Publisher
         from uuid import UUID
         book = Book()
-        book.publisher = Publisher()
         reveal_type(book.publisher_id)  # N: Revealed type is "uuid.UUID"
         book.publisher_id = '821850bb-c105-426f-b340-3974419d00ca'
         book.publisher_id = UUID('821850bb-c105-426f-b340-3974419d00ca')
         book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "List[int]", variable has type "Union[str, UUID]")
         book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "Union[str, UUID]")
+        Book.objects.filter(publisher=UUID('821850bb-c105-426f-b340-3974419d00ca'))
+        Book.objects.filter(publisher_id=UUID('821850bb-c105-426f-b340-3974419d00ca'))
+        Book.objects.filter(publisher='821850bb-c105-426f-b340-3974419d00ca')
+        Book.objects.filter(publisher_id='821850bb-c105-426f-b340-3974419d00ca')
+        Book.objects.filter(publisher=Publisher())
+        Book.objects.filter(publisher_id=Publisher())  # E: Incompatible type for lookup 'publisher_id': (got "Publisher", expected "Union[UUID, str]")
+        Book.objects.filter(publisher=1)  # E: Incompatible type for lookup 'publisher': (got "int", expected "Union[Publisher, UUID, str, None]")
+        Book.objects.filter(publisher_id=1)  # E: Incompatible type for lookup 'publisher_id': (got "int", expected "Union[UUID, str]")
+        reveal_type(Book.objects.values_list("publisher", flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, uuid.UUID]"
+        reveal_type(Book.objects.values_list("publisher_id", flat=True))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, uuid.UUID]"
     installed_apps:
         - myapp
     files:
