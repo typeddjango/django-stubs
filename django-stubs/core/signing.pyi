@@ -1,12 +1,12 @@
 from datetime import timedelta
-from typing import Any, Dict, Optional, Protocol, Type, Union
+from typing import Any, Protocol
 
 class BadSignature(Exception): ...
 class SignatureExpired(BadSignature): ...
 
 def b64_encode(s: bytes) -> bytes: ...
 def b64_decode(s: bytes) -> bytes: ...
-def base64_hmac(salt: str, value: Union[bytes, str], key: Union[bytes, str], algorithm: str = ...) -> str: ...
+def base64_hmac(salt: str, value: bytes | str, key: bytes | str, algorithm: str = ...) -> str: ...
 def get_cookie_signer(salt: str = ...) -> TimestampSigner: ...
 
 class Serializer(Protocol):
@@ -19,48 +19,48 @@ class JSONSerializer:
 
 def dumps(
     obj: Any,
-    key: Optional[Union[bytes, str]] = ...,
+    key: bytes | str | None = ...,
     salt: str = ...,
-    serializer: Type[Serializer] = ...,
+    serializer: type[Serializer] = ...,
     compress: bool = ...,
 ) -> str: ...
 def loads(
     s: str,
-    key: Optional[Union[bytes, str]] = ...,
+    key: bytes | str | None = ...,
     salt: str = ...,
-    serializer: Type[Serializer] = ...,
-    max_age: Optional[Union[int, timedelta]] = ...,
+    serializer: type[Serializer] = ...,
+    max_age: int | timedelta | None = ...,
 ) -> Any: ...
 
 class Signer:
-    key: str = ...
-    sep: str = ...
-    salt: str = ...
-    algorithm: str = ...
+    key: str
+    sep: str
+    salt: str
+    algorithm: str
     def __init__(
         self,
-        key: Optional[Union[bytes, str]] = ...,
+        key: bytes | str | None = ...,
         sep: str = ...,
-        salt: Optional[str] = ...,
-        algorithm: Optional[str] = ...,
+        salt: str | None = ...,
+        algorithm: str | None = ...,
     ) -> None: ...
-    def signature(self, value: Union[bytes, str]) -> str: ...
+    def signature(self, value: bytes | str) -> str: ...
     def sign(self, value: str) -> str: ...
     def unsign(self, signed_value: str) -> str: ...
     def sign_object(
         self,
         obj: Any,
-        serializer: Type[Serializer] = ...,
+        serializer: type[Serializer] = ...,
         compress: bool = ...,
     ) -> str: ...
     def unsign_object(
         self,
         signed_obj: str,
-        serializer: Type[Serializer] = ...,
+        serializer: type[Serializer] = ...,
         **kwargs: Any,
     ) -> Any: ...
 
 class TimestampSigner(Signer):
     def timestamp(self) -> str: ...
     def sign(self, value: str) -> str: ...
-    def unsign(self, value: str, max_age: Optional[Union[int, timedelta]] = ...) -> str: ...
+    def unsign(self, value: str, max_age: int | timedelta | None = ...) -> str: ...

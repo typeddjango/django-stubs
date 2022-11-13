@@ -1,4 +1,4 @@
-from typing import Pattern
+from re import Pattern
 
 dot_re: Pattern[str]
 

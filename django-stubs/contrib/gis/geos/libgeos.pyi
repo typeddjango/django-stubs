@@ -1,6 +1,6 @@
 from ctypes import Structure
 from logging import Logger
-from typing import Any, Optional
+from typing import Any
 
 logger: Logger
 
@@ -26,17 +26,12 @@ CONTEXT_PTR: Any
 lgeos: Any
 
 class GEOSFuncFactory:
-    argtypes: Any = ...
-    restype: Any = ...
-    errcheck: Any = ...
-    func_name: Any = ...
+    argtypes: Any
+    restype: Any
+    errcheck: Any
+    func_name: Any
     def __init__(
-        self,
-        func_name: Any,
-        *,
-        restype: Optional[Any] = ...,
-        errcheck: Optional[Any] = ...,
-        argtypes: Optional[Any] = ...
+        self, func_name: Any, *, restype: Any | None = ..., errcheck: Any | None = ..., argtypes: Any | None = ...
     ) -> None: ...
     def __call__(self, *args: Any) -> Any: ...
     @property

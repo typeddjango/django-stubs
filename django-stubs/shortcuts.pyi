@@ -1,4 +1,5 @@
-from typing import Any, Callable, List, Mapping, Optional, Protocol, Sequence, Type, TypeVar, Union, overload
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, Protocol, TypeVar, overload
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
@@ -10,11 +11,11 @@ from typing_extensions import Literal
 
 def render(
     request: HttpRequest,
-    template_name: Union[str, Sequence[str]],
-    context: Optional[Mapping[str, Any]] = ...,
-    content_type: Optional[str] = ...,
-    status: Optional[int] = ...,
-    using: Optional[str] = ...,
+    template_name: str | Sequence[str],
+    context: Mapping[str, Any] | None = ...,
+    content_type: str | None = ...,
+    status: int | None = ...,
+    using: str | None = ...,
 ) -> HttpResponse: ...
 
 class SupportsGetAbsoluteUrl(Protocol):
@@ -22,19 +23,19 @@ class SupportsGetAbsoluteUrl(Protocol):
 
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[True], **kwargs: Any
+    to: Callable | str | SupportsGetAbsoluteUrl, *args: Any, permanent: Literal[True], **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: Literal[False] = ..., **kwargs: Any
+    to: Callable | str | SupportsGetAbsoluteUrl, *args: Any, permanent: Literal[False] = ..., **kwargs: Any
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(
-    to: Union[Callable, str, SupportsGetAbsoluteUrl], *args: Any, permanent: bool, **kwargs: Any
-) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]: ...
+    to: Callable | str | SupportsGetAbsoluteUrl, *args: Any, permanent: bool, **kwargs: Any
+) -> HttpResponseRedirect | HttpResponsePermanentRedirect: ...
 
 _T = TypeVar("_T", bound=Model)
 
-def get_object_or_404(klass: Union[Type[_T], Manager[_T], QuerySet[_T]], *args: Any, **kwargs: Any) -> _T: ...
-def get_list_or_404(klass: Union[Type[_T], Manager[_T], QuerySet[_T]], *args: Any, **kwargs: Any) -> List[_T]: ...
-def resolve_url(to: Union[Callable, Model, str], *args: Any, **kwargs: Any) -> str: ...
+def get_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> _T: ...
+def get_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
+def resolve_url(to: Callable | Model | str, *args: Any, **kwargs: Any) -> str: ...

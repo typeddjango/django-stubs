@@ -1,9 +1,10 @@
-from typing import Any, Iterator, Optional
+from collections.abc import Iterator
+from typing import Any
 
 from django.contrib.gis.gdal.raster.base import GDALRasterBase as GDALRasterBase
 
 class GDALBand(GDALRasterBase):
-    source: Any = ...
+    source: Any
     def __init__(self, source: Any, index: Any) -> None: ...
     @property
     def description(self) -> Any: ...
@@ -30,15 +31,15 @@ class GDALBand(GDALRasterBase):
     def color_interp(self, as_string: bool = ...) -> Any: ...
     def data(
         self,
-        data: Optional[Any] = ...,
-        offset: Optional[Any] = ...,
-        size: Optional[Any] = ...,
-        shape: Optional[Any] = ...,
+        data: Any | None = ...,
+        offset: Any | None = ...,
+        size: Any | None = ...,
+        shape: Any | None = ...,
         as_memoryview: bool = ...,
     ) -> Any: ...
 
 class BandList(list):
-    source: Any = ...
+    source: Any
     def __init__(self, source: Any) -> None: ...
     def __iter__(self) -> Iterator[Any]: ...
     def __len__(self) -> int: ...

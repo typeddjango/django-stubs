@@ -4,4 +4,4 @@ from django.db import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
 from django.db import connections as connections
 
 class Command(BaseCommand):
-    output_transaction: bool = ...
+    output_transaction: bool

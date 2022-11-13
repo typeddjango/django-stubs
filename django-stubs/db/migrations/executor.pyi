@@ -1,34 +1,34 @@
-from typing import List, Optional, Sequence, Set, Tuple, Union
+from collections.abc import Sequence
+from typing import Protocol
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
-from typing_extensions import Protocol
 
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
 
 class _ProgressCallbackT(Protocol):
-    def __call__(self, __action: str, __migration: Optional[Migration] = ..., __fake: Optional[bool] = ...) -> None: ...
+    def __call__(self, __action: str, __migration: Migration | None = ..., __fake: bool | None = ...) -> None: ...
 
 class MigrationExecutor:
-    connection: BaseDatabaseWrapper = ...
-    loader: MigrationLoader = ...
-    recorder: MigrationRecorder = ...
-    progress_callback: Optional[_ProgressCallbackT] = ...
+    connection: BaseDatabaseWrapper
+    loader: MigrationLoader
+    recorder: MigrationRecorder
+    progress_callback: _ProgressCallbackT | None
     def __init__(
         self,
-        connection: Optional[BaseDatabaseWrapper],
-        progress_callback: Optional[_ProgressCallbackT] = ...,
+        connection: BaseDatabaseWrapper | None,
+        progress_callback: _ProgressCallbackT | None = ...,
     ) -> None: ...
     def migration_plan(
-        self, targets: Union[Sequence[Tuple[str, Optional[str]]], Set[Tuple[str, str]]], clean_start: bool = ...
-    ) -> List[Tuple[Migration, bool]]: ...
+        self, targets: Sequence[tuple[str, str | None]] | set[tuple[str, str]], clean_start: bool = ...
+    ) -> list[tuple[Migration, bool]]: ...
     def migrate(
         self,
-        targets: Optional[Sequence[Tuple[str, Optional[str]]]],
-        plan: Optional[Sequence[Tuple[Migration, bool]]] = ...,
-        state: Optional[ProjectState] = ...,
+        targets: Sequence[tuple[str, str | None]] | None,
+        plan: Sequence[tuple[Migration, bool]] | None = ...,
+        state: ProjectState | None = ...,
         fake: bool = ...,
         fake_initial: bool = ...,
     ) -> ProjectState: ...
@@ -39,5 +39,5 @@ class MigrationExecutor:
     def unapply_migration(self, state: ProjectState, migration: Migration, fake: bool = ...) -> ProjectState: ...
     def check_replacements(self) -> None: ...
     def detect_soft_applied(
-        self, project_state: Optional[ProjectState], migration: Migration
-    ) -> Tuple[bool, ProjectState]: ...
+        self, project_state: ProjectState | None, migration: Migration
+    ) -> tuple[bool, ProjectState]: ...

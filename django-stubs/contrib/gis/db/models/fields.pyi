@@ -1,4 +1,5 @@
-from typing import Any, Iterable, NamedTuple, Optional, Tuple, TypeVar, Union
+from collections.abc import Iterable
+from typing import Any, NamedTuple, TypeVar
 
 from django.core.validators import _ValidatorCallable
 from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
@@ -20,13 +21,13 @@ def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 class BaseSpatialField(Field[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
+        verbose_name: _StrOrPromise | None = ...,
         srid: int = ...,
         spatial_index: bool = ...,
         *,
-        name: Optional[str] = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -35,15 +36,15 @@ class BaseSpatialField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     def deconstruct(self) -> Any: ...
     def db_type(self, connection: Any) -> Any: ...
@@ -58,25 +59,25 @@ class BaseSpatialField(Field[_ST, _GT]):
     def get_prep_value(self, value: Any) -> Any: ...
 
 class GeometryField(BaseSpatialField):
-    description: Any = ...
-    form_class: Any = ...
-    geom_type: str = ...
-    geom_class: Any = ...
-    dim: Any = ...
-    geography: Any = ...
+    description: Any
+    form_class: Any
+    geom_type: str
+    geom_class: Any
+    dim: Any
+    geography: Any
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
+        verbose_name: _StrOrPromise | None = ...,
         dim: int = ...,
         geography: bool = ...,
         *,
-        extent: Tuple[float, float, float, float] = ...,
+        extent: tuple[float, float, float, float] = ...,
         tolerance: float = ...,
         srid: int = ...,
         spatial_index: bool = ...,
-        name: Optional[str] = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -85,71 +86,71 @@ class GeometryField(BaseSpatialField):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     def deconstruct(self) -> Any: ...
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 
 class PointField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class LineStringField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class PolygonField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class MultiPointField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class MultiLineStringField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class MultiPolygonField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class GeometryCollectionField(GeometryField):
-    geom_type: str = ...
-    geom_class: Any = ...
-    form_class: Any = ...
-    description: Any = ...
+    geom_type: str
+    geom_class: Any
+    form_class: Any
+    description: Any
 
 class ExtentField(Field):
-    description: Any = ...
+    description: Any
     def get_internal_type(self) -> Any: ...
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 
 class RasterField(BaseSpatialField):
-    description: Any = ...
-    geom_type: str = ...
-    geography: bool = ...
+    description: Any
+    geom_type: str
+    geography: bool
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
     def get_transform(self, name: Any) -> Any: ...

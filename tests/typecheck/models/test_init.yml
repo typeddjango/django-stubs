@@ -37,7 +37,7 @@
         from myapp.models import MyUser
         user = MyUser(name='hello', age=[])
     out: |
-        main:2: error: Incompatible type for "age" of "MyUser" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        main:2: error: Incompatible type for "age" of "MyUser" (got "List[Any]", expected "Union[float, str, Combinable]")
     installed_apps:
         - myapp
     files:
@@ -107,7 +107,7 @@
 -   case: typechecking_of_pk
     main: |
         from myapp.models import MyUser1
-        user = MyUser1(pk=[])  # E: Incompatible type for "pk" of "MyUser1" (got "List[Any]", expected "Union[float, int, str, Combinable, None]")
+        user = MyUser1(pk=[])  # E: Incompatible type for "pk" of "MyUser1" (got "List[Any]", expected "Union[float, str, Combinable, None]")
     installed_apps:
         - myapp
     files:
@@ -155,11 +155,11 @@
         class NotAValid:
             pass
         array_val3: List[NotAValid] = [NotAValid()]
-        MyModel(array=array_val3)  # E: Incompatible type for "array" of "MyModel" (got "List[NotAValid]", expected "Union[Sequence[Union[float, int, str]], Combinable]")
+        MyModel(array=array_val3)  # E: Incompatible type for "array" of "MyModel" (got "List[NotAValid]", expected "Union[Sequence[Union[float, str]], Combinable]")
         non_init = MyModel()
         non_init.array = array_val
         non_init.array = array_val2
-        non_init.array = array_val3  # E: Incompatible types in assignment (expression has type "List[NotAValid]", variable has type "Union[Sequence[Union[float, int, str]], Combinable]")
+        non_init.array = array_val3  # E: Incompatible types in assignment (expression has type "List[NotAValid]", variable has type "Union[Sequence[Union[float, str]], Combinable]")
     installed_apps:
         - myapp
     files:
@@ -191,7 +191,7 @@
         from myapp.models import MyModel, MyModel2
         MyModel(1)
         MyModel2(1, 12)
-        MyModel2(1, [])  # E: Incompatible type for "name" of "MyModel2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        MyModel2(1, [])  # E: Incompatible type for "name" of "MyModel2" (got "List[Any]", expected "Union[float, str, Combinable]")
     installed_apps:
         - myapp
     files:
@@ -291,11 +291,11 @@
         main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int")
         main:10: error: Incompatible types in assignment (expression has type "str", variable has type "Union[int, float]")
         main:12: error: Incompatible types in assignment (expression has type "List[str]", variable has type "Sequence[Union[int, float]]")
-        main:13: error: Incompatible types in assignment (expression has type "List[<nothing>]", variable has type "Union[float, int, str, Combinable]")
+        main:13: error: Incompatible types in assignment (expression has type "List[<nothing>]", variable has type "Union[float, str, Combinable]")
         main:15: error: Incompatible type for "redefined_set_type" of "MyModel" (got "str", expected "int")
         main:15: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "Union[int, float]")
         main:15: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[Union[int, float]]")
-        main:15: error: Incompatible type for "default_set_type" of "MyModel" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        main:15: error: Incompatible type for "default_set_type" of "MyModel" (got "List[Any]", expected "Union[float, str, Combinable]")
     installed_apps:
         - myapp
     files:

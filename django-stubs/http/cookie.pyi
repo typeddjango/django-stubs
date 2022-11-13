@@ -1,5 +1,5 @@
-from typing import Any, Dict
+from typing import Any
 
 SimpleCookie: Any
 
-def parse_cookie(cookie: str) -> Dict[str, str]: ...
+def parse_cookie(cookie: str) -> dict[str, str]: ...

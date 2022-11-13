@@ -1,5 +1,6 @@
-from typing import Any, Callable, List
+from collections.abc import Callable
+from typing import Any
 
 from django.urls.resolvers import URLPattern
 
-def static(prefix: str, view: Callable = ..., **kwargs: Any) -> List[URLPattern]: ...
+def static(prefix: str, view: Callable = ..., **kwargs: Any) -> list[URLPattern]: ...

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Optional, Type
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
@@ -11,14 +11,14 @@ from . import Field
 from .mixins import CheckFieldDefaultMixin
 
 class JSONField(CheckFieldDefaultMixin, Field):
-    encoder: Optional[Type[json.JSONEncoder]]
-    decoder: Optional[Type[json.JSONDecoder]]
+    encoder: type[json.JSONEncoder] | None
+    decoder: type[json.JSONDecoder] | None
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
-        encoder: Optional[Type[json.JSONEncoder]] = ...,
-        decoder: Optional[Type[json.JSONDecoder]] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        encoder: type[json.JSONEncoder] | None = ...,
+        decoder: type[json.JSONDecoder] | None = ...,
         **kwargs: Any
     ) -> None: ...
 
@@ -26,31 +26,31 @@ class DataContains(PostgresOperatorLookup): ...
 class ContainedBy(PostgresOperatorLookup): ...
 
 class HasKeyLookup(PostgresOperatorLookup):
-    logical_operator: Optional[str] = ...
+    logical_operator: str | None
 
 class HasKey(HasKeyLookup):
-    postgres_operator: str = ...
+    postgres_operator: str
 
 class HasKeys(HasKeyLookup):
-    postgres_operator: str = ...
-    logical_operator: str = ...
+    postgres_operator: str
+    logical_operator: str
 
 class HasAnyKeys(HasKeys):
-    postgres_operator: str = ...
-    logical_operator: str = ...
+    postgres_operator: str
+    logical_operator: str
 
 class JSONExact(lookups.Exact): ...
 
 class KeyTransform(Transform):
-    key_name: str = ...
-    postgres_operator: str = ...
-    postgres_nested_operator: str = ...
+    key_name: str
+    postgres_operator: str
+    postgres_nested_operator: str
     def __init__(self, key_name: Any, *args: Any, **kwargs: Any) -> None: ...
     def preprocess_lhs(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> Any: ...
 
 class KeyTextTransform(KeyTransform):
-    postgres_operator: str = ...
-    postgres_nested_operator: str = ...
+    postgres_operator: str
+    postgres_nested_operator: str
 
 class KeyTransformTextLookupMixin:
     def __init__(self, key_transform: Any, *args: Any, **kwargs: Any) -> None: ...
@@ -74,6 +74,6 @@ class KeyTransformGt(KeyTransformNumericLookupMixin, lookups.GreaterThan): ...
 class KeyTransformGte(KeyTransformNumericLookupMixin, lookups.GreaterThanOrEqual): ...
 
 class KeyTransformFactory:
-    key_name: Any = ...
+    key_name: Any
     def __init__(self, key_name: Any) -> None: ...
     def __call__(self, *args: Any, **kwargs: Any) -> KeyTransform: ...

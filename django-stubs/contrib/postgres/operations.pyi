@@ -4,8 +4,8 @@ from django.db.migrations.operations.base import Operation
 from typing_extensions import Literal
 
 class CreateExtension(Operation):
-    reversible: bool = ...
-    name: str = ...
+    reversible: bool
+    name: str
     def __init__(self, name: str) -> None: ...
     def extension_exists(self, schema_editor: BaseDatabaseSchemaEditor, extension: str) -> bool: ...
 
@@ -37,10 +37,10 @@ class NotInTransactionMixin:
     def _ensure_not_in_transaction(self, schema_editor: BaseDatabaseSchemaEditor) -> None: ...
 
 class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
-    atomic: Literal[False] = ...
+    atomic: Literal[False]
 
 class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
-    atomic: Literal[False] = ...
+    atomic: Literal[False]
 
 class CollationOperation(Operation):
     name: str

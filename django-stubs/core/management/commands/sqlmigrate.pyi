@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.apps import apps as apps
 from django.core.management.base import BaseCommand as BaseCommand
@@ -9,5 +9,5 @@ from django.db.migrations.loader import AmbiguityError as AmbiguityError
 from django.db.migrations.loader import MigrationLoader as MigrationLoader
 
 class Command(BaseCommand):
-    output_transaction: bool = ...
-    def execute(self, *args: Any, **options: Any) -> Optional[str]: ...
+    output_transaction: bool
+    def execute(self, *args: Any, **options: Any) -> str | None: ...

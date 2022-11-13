@@ -387,9 +387,9 @@
 
         reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int"
         Book2(publisher_id=1)
-        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, str, Combinable]")
         Book2.objects.create(publisher_id=1)
-        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, str, Combinable]")
     installed_apps:
         - myapp
     files:

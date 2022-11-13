@@ -16,4 +16,4 @@ from .constants import INFO as INFO
 from .constants import SUCCESS as SUCCESS
 from .constants import WARNING as WARNING
 
-default_app_config: str = ...
+default_app_config: str

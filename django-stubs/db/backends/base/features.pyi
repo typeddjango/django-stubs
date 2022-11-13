@@ -1,11 +1,12 @@
-from typing import Any, Dict, Optional, Sequence, Set, Tuple, Type
+from collections.abc import Sequence
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.utils import DatabaseError
 
 class BaseDatabaseFeatures:
-    minimum_database_version: Optional[Tuple[int, ...]]
+    minimum_database_version: tuple[int, ...] | None
     gis_enabled: bool
     allows_group_by_lob: bool
     allows_group_by_pk: bool
@@ -47,14 +48,14 @@ class BaseDatabaseFeatures:
     nulls_order_largest: bool
     supports_order_by_nulls_modifier: bool
     order_by_nulls_first: bool
-    max_query_params: Optional[int]
+    max_query_params: int | None
     allows_auto_pk_0: bool
     can_defer_constraint_checks: bool
     supports_tablespaces: bool
     supports_sequence_reset: bool
     can_introspect_default: bool
     can_introspect_foreign_keys: bool
-    introspected_field_types: Dict[str, str]
+    introspected_field_types: dict[str, str]
     supports_index_column_ordering: bool
     can_introspect_materialized_views: bool
     can_distinct_on_fields: bool
@@ -72,7 +73,7 @@ class BaseDatabaseFeatures:
     supports_paramstyle_pyformat: bool
     requires_literal_defaults: bool
     connection_persists_old_columns: bool
-    closed_cursor_error_class: Type[DatabaseError]
+    closed_cursor_error_class: type[DatabaseError]
     has_case_insensitive_like: bool
     bare_select_suffix: str
     implied_column_null: bool
@@ -93,10 +94,10 @@ class BaseDatabaseFeatures:
     only_supports_unbounded_with_preceding_and_following: bool
     supports_cast_with_precision: bool
     time_cast_precision: int
-    create_test_procedure_without_params_sql: Optional[str]
-    create_test_procedure_with_int_param_sql: Optional[str]
+    create_test_procedure_without_params_sql: str | None
+    create_test_procedure_with_int_param_sql: str | None
     supports_callproc_kwargs: bool
-    supported_explain_formats: Set[str]
+    supported_explain_formats: set[str]
     supports_default_in_lead_lag: bool
     supports_ignore_conflicts: bool
     supports_update_conflicts: bool
@@ -120,14 +121,14 @@ class BaseDatabaseFeatures:
     supports_collation_on_charfield: bool
     supports_collation_on_textfield: bool
     supports_non_deterministic_collations: bool
-    test_collations: Dict[str, Optional[str]]
-    test_now_utc_template: Optional[str]
-    django_test_expected_failures: Set[str]
-    django_test_skips: Dict[str, Set[str]]
+    test_collations: dict[str, str | None]
+    test_now_utc_template: str | None
+    django_test_expected_failures: set[str]
+    django_test_skips: dict[str, set[str]]
     connection: BaseDatabaseWrapper
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
     @property
     def supports_explaining_query_execution(self) -> bool: ...
     @property
     def supports_transactions(self) -> bool: ...
-    def allows_group_by_selected_pks_on_model(self, model: Type[Model]) -> bool: ...
+    def allows_group_by_selected_pks_on_model(self, model: type[Model]) -> bool: ...

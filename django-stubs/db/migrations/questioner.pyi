@@ -1,17 +1,17 @@
-from typing import Any, Dict, Optional, Set
+from typing import Any
 
 from django.db.migrations.state import ModelState
 from django.db.models.fields import Field
 
 class MigrationQuestioner:
-    defaults: Dict[str, Any] = ...
-    specified_apps: Set[str] = ...
-    dry_run: Optional[bool] = ...
+    defaults: dict[str, Any]
+    specified_apps: set[str]
+    dry_run: bool | None
     def __init__(
         self,
-        defaults: Optional[Dict[str, bool]] = ...,
-        specified_apps: Optional[Set[str]] = ...,
-        dry_run: Optional[bool] = ...,
+        defaults: dict[str, bool] | None = ...,
+        specified_apps: set[str] | None = ...,
+        dry_run: bool | None = ...,
     ) -> None: ...
     def ask_initial(self, app_label: str) -> bool: ...
     def ask_not_null_addition(self, field_name: str, model_name: str) -> Any: ...
