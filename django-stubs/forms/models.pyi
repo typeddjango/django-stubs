@@ -244,7 +244,6 @@ class InlineForeignKeyField(Field):
 
 class ModelChoiceIteratorValue:
     def __init__(self, value: Any, instance: Model) -> None: ...
-    def __str__(self) -> str: ...
 
 class ModelChoiceIterator:
     field: ModelChoiceField
