@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import Any, TypeVar, overload
+from typing import Any, Protocol, TypeVar, overload
 
 from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
@@ -11,7 +11,6 @@ from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Protocol
 
 class FieldFile(File):
     instance: Model

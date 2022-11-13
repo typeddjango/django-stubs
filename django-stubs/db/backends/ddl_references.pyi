@@ -1,7 +1,5 @@
 from collections.abc import Sequence
-from typing import Any
-
-from typing_extensions import Protocol
+from typing import Any, Protocol
 
 class _QuoteCallable(Protocol):
     """Get rid of `cannot assign to method`"""

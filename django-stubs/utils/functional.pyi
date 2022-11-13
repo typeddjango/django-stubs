@@ -1,10 +1,10 @@
 from collections.abc import Callable, Sequence
 from functools import wraps as wraps  # noqa: F401
-from typing import Any, Generic, TypeVar, overload
+from typing import Any, Generic, Protocol, TypeVar, overload
 
 from _typeshed import Self
 from django.db.models.base import Model
-from typing_extensions import Protocol, SupportsIndex, TypeAlias
+from typing_extensions import SupportsIndex, TypeAlias
 
 _T = TypeVar("_T")
 

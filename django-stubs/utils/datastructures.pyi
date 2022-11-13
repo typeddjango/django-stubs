@@ -1,8 +1,8 @@
 from collections.abc import Collection, Iterable, Iterator, Mapping, MutableSet
-from typing import Any, Generic, Tuple, TypeVar, overload  # noqa: Y022
+from typing import Any, Generic, Protocol, Tuple, TypeVar, overload  # noqa: Y022
 
 from _typeshed import Self
-from typing_extensions import Protocol, TypeAlias
+from typing_extensions import TypeAlias
 
 _K = TypeVar("_K")
 _V = TypeVar("_V")

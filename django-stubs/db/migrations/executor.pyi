@@ -1,8 +1,8 @@
 from collections.abc import Sequence
+from typing import Protocol
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
-from typing_extensions import Protocol
 
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder

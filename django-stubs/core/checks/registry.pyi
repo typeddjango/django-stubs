@@ -1,9 +1,9 @@
 from collections.abc import Callable, Sequence
-from typing import Any, TypeVar
+from typing import Any, Protocol, TypeVar
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
-from typing_extensions import Protocol, TypeAlias
+from typing_extensions import TypeAlias
 
 class Tags:
     admin: str

@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterable, Sequence
 from datetime import date
 from datetime import datetime as real_datetime
 from datetime import time, timedelta
-from typing import Any, Generic, TypeVar, overload
+from typing import Any, Generic, Protocol, TypeVar, overload
 
 from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
@@ -19,7 +19,7 @@ from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise
-from typing_extensions import Protocol, TypeAlias
+from typing_extensions import TypeAlias
 
 class Empty: ...
 class NOT_PROVIDED: ...

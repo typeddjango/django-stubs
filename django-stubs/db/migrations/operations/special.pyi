@@ -1,10 +1,10 @@
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+from typing import Any, Optional, Protocol  # noqa: Y037  # https://github.com/python/mypy/issues/12211
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
 from django.utils.datastructures import _ListOrTuple
-from typing_extensions import Literal, Protocol
+from typing_extensions import Literal
 
 from .base import Operation
 
