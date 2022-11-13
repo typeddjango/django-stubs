@@ -1,7 +1,3 @@
-"""
-Default Django settings. Override these with settings in the module pointed to
-by the DJANGO_SETTINGS_MODULE environment variable.
-"""
 from collections.abc import Sequence
 from re import Pattern
 
@@ -10,6 +6,8 @@ from re import Pattern
 from typing import Any, Protocol
 
 from typing_extensions import Literal, TypeAlias
+
+_Admins: TypeAlias = list[tuple[str, str]]
 
 ####################
 # CORE             #
@@ -23,7 +21,7 @@ DEBUG_PROPAGATE_EXCEPTIONS: bool
 
 # People who get code error notifications.
 # In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
-ADMINS: list[tuple[str, str]]
+ADMINS: _Admins
 
 # List of IP addresses, as strings, that:
 #   * See debug comments, when DEBUG is true
@@ -72,7 +70,7 @@ USE_L10N: bool
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.
-MANAGERS = ADMINS
+MANAGERS: _Admins
 
 # Default charset to use for all HttpResponse objects, if a
 # MIME type isn't manually specified. These are used to construct the

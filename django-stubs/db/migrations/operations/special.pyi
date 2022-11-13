@@ -1,5 +1,5 @@
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional, Union
+from typing import Any, Optional  # noqa: Y037  # https://github.com/python/mypy/issues/12211
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
@@ -17,25 +17,21 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""]
-    sql: Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
-    reverse_sql: Optional[
-        Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
-    ]
+    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]]
+    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]]
     state_operations: Sequence[Operation]
     hints: Mapping[str, Any]
     def __init__(
         self,
-        sql: Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]],
-        reverse_sql: Optional[
-            Union[str, _ListOrTuple[Union[str, tuple[str, Union[dict[str, Any], Optional[_ListOrTuple[str]]]]]]]
-        ] = ...,
+        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]],
+        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]] = ...,
         state_operations: Sequence[Operation] = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
     ) -> None: ...
 
 class _CodeCallable(Protocol):
-    def __call__(self, __state_apps: StateApps, __shema_editor: BaseDatabaseSchemaEditor) -> None: ...
+    def __call__(self, __state_apps: StateApps, __schema_editor: BaseDatabaseSchemaEditor) -> None: ...
 
 class RunPython(Operation):
     code: _CodeCallable

@@ -3,6 +3,7 @@ from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, NoReturn, TypeVar, overload
 
+from _typeshed import Self
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -98,7 +99,6 @@ class _MutableHttpRequest(HttpRequest):
     GET: QueryDict  # type: ignore[assignment]
     POST: QueryDict  # type: ignore[assignment]
 
-_Q = TypeVar("_Q", bound="QueryDict")
 _Z = TypeVar("_Z")
 
 class QueryDict(MultiValueDict[str, str]):
@@ -133,12 +133,12 @@ class QueryDict(MultiValueDict[str, str]):
     ) -> None: ...
     @classmethod
     def fromkeys(  # type: ignore
-        cls: type[_Q],
+        cls: type[Self],
         iterable: Iterable[bytes | str],
         value: str | bytes = ...,
         mutable: bool = ...,
         encoding: str | None = ...,
-    ) -> _Q: ...
+    ) -> Self: ...
     @property
     def encoding(self) -> str: ...
     @encoding.setter

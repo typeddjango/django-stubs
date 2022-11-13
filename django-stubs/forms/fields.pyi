@@ -122,8 +122,8 @@ class FloatField(IntegerField):
     def __init__(
         self,
         *,
-        max_value: int | float | None = ...,
-        min_value: int | float | None = ...,
+        max_value: float | None = ...,
+        min_value: float | None = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -146,8 +146,8 @@ class DecimalField(IntegerField):
     def __init__(
         self,
         *,
-        max_value: Decimal | int | float | None = ...,
-        min_value: Decimal | int | float | None = ...,
+        max_value: Decimal | float | None = ...,
+        min_value: Decimal | float | None = ...,
         max_digits: int | None = ...,
         decimal_places: int | None = ...,
         required: bool = ...,

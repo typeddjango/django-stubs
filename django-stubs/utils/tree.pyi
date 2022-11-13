@@ -4,7 +4,7 @@ from typing import Any
 from django.db.models.sql.where import NothingNode
 from typing_extensions import TypeAlias
 
-_NodeChildren: TypeAlias = list["Node" | NothingNode | Sequence[Any]]
+_NodeChildren: TypeAlias = list[Node | NothingNode | Sequence[Any]]
 
 class Node:
     children: _NodeChildren

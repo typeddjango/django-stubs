@@ -2,6 +2,7 @@ import datetime
 from collections.abc import Collection, Iterable, Iterator, MutableMapping, Sequence
 from typing import Any, Generic, NoReturn, TypeVar, overload
 
+from _typeshed import Self
 from django.db.models import Combinable
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
@@ -9,7 +10,6 @@ from django.db.models.query import QuerySet, RawQuerySet
 from django_stubs_ext import ValuesQuerySet
 
 _T = TypeVar("_T", bound=Model, covariant=True)
-_M = TypeVar("_M", bound="BaseManager")
 
 class BaseManager(Generic[_T]):
     creation_counter: int
@@ -28,7 +28,7 @@ class BaseManager(Generic[_T]):
     @classmethod
     def _get_queryset_methods(cls, queryset_class: type) -> dict[str, Any]: ...
     def contribute_to_class(self, cls: type[Model], name: str) -> None: ...
-    def db_manager(self: _M, using: str | None = ..., hints: dict[str, Model] | None = ...) -> _M: ...
+    def db_manager(self: Self, using: str | None = ..., hints: dict[str, Model] | None = ...) -> Self: ...
     @property
     def db(self) -> str: ...
     def get_queryset(self) -> QuerySet[_T]: ...

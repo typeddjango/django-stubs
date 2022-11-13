@@ -11,11 +11,11 @@ from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 from typing_extensions import Literal, TypeAlias
 
-_AnyUser: TypeAlias = Model | "AnonymousUser"
+_AnyUser: TypeAlias = Model | AnonymousUser
 
 def update_last_login(sender: type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
 
-class PermissionManager(models.Manager["Permission"]):
+class PermissionManager(models.Manager[Permission]):
     def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...
 
 class Permission(models.Model):
@@ -27,7 +27,7 @@ class Permission(models.Model):
     codename = models.CharField(max_length=100)
     def natural_key(self) -> tuple[str, str, str]: ...
 
-class GroupManager(models.Manager["Group"]):
+class GroupManager(models.Manager[Group]):
     def get_by_natural_key(self, name: str) -> Group: ...
 
 class Group(models.Model):

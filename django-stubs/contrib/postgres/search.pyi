@@ -1,11 +1,12 @@
-from typing import Any, TypeVar
+from typing import Any
 
+from _typeshed import Self
 from django.db.models import Expression, Field
-from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
+from django.db.models.expressions import Combinable, CombinedExpression, Func
 from django.db.models.lookups import Lookup
 from typing_extensions import TypeAlias
 
-_Expression: TypeAlias = str | Combinable | "SearchQueryCombinable"
+_Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 
 class SearchVectorExact(Lookup): ...
 class SearchVectorField(Field): ...
@@ -36,18 +37,16 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field | None = None,
+        output_field: Field | None = ...,
     ) -> None: ...
-
-_T = TypeVar("_T", bound="SearchQueryCombinable")
 
 class SearchQueryCombinable:
     BITAND: str
     BITOR: str
-    def __or__(self: _T, other: SearchQueryCombinable) -> _T: ...
-    def __ror__(self: _T, other: SearchQueryCombinable) -> _T: ...
-    def __and__(self: _T, other: SearchQueryCombinable) -> _T: ...
-    def __rand__(self: _T, other: SearchQueryCombinable) -> _T: ...
+    def __or__(self: Self, other: SearchQueryCombinable) -> Self: ...
+    def __ror__(self: Self, other: SearchQueryCombinable) -> Self: ...
+    def __and__(self: Self, other: SearchQueryCombinable) -> Self: ...
+    def __rand__(self: Self, other: SearchQueryCombinable) -> Self: ...
 
 class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
     SEARCH_TYPES: dict[str, str]
@@ -60,7 +59,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
         invert: bool = ...,
         search_type: str = ...,
     ) -> None: ...
-    def __invert__(self: _T) -> _T: ...
+    def __invert__(self: Self) -> Self: ...
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: ignore
     def __init__(
@@ -69,7 +68,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field | None = None,
+        output_field: Field | None = ...,
     ) -> None: ...
 
 class SearchRank(Func):

@@ -1,8 +1,7 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from typing import Any
 
 from django.contrib.admin.filters import FieldListFilter
-from django.contrib.admin.templatetags.base import InclusionAdminNode
 from django.contrib.admin.views.main import ChangeList
 from django.db.models.base import Model
 from django.forms.boundfield import BoundField

@@ -3,23 +3,22 @@ from contextlib import contextmanager
 from types import TracebackType
 from typing import Any, TypeVar
 
+from _typeshed import Self
 from django.http.request import HttpRequest
 from django.template.base import Node, Origin, Template
-from django.template.defaulttags import IfChangedNode
 from django.template.loader_tags import IncludeNode
 from typing_extensions import TypeAlias
 
 _ContextKeys: TypeAlias = int | str | Node
 
-_ContextValues: TypeAlias = dict[str, Any] | "Context"
-_ContextCopy = TypeVar("_ContextCopy", bound="BaseContext")
+_ContextValues: TypeAlias = dict[str, Any] | Context
 
 class ContextPopException(Exception): ...
 
 class ContextDict(dict):
     context: BaseContext
     def __init__(self, context: BaseContext, *args: Any, **kwargs: Any) -> None: ...
-    def __enter__(self) -> ContextDict: ...
+    def __enter__(self: Self) -> Self: ...
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
@@ -29,7 +28,7 @@ class ContextDict(dict):
 
 class BaseContext(Iterable[Any]):
     def __init__(self, dict_: Any = ...) -> None: ...
-    def __copy__(self: _ContextCopy) -> _ContextCopy: ...
+    def __copy__(self: Self) -> Self: ...
     def __iter__(self) -> Iterator[Any]: ...
     def push(self, *args: Any, **kwargs: Any) -> ContextDict: ...
     def pop(self) -> ContextDict: ...

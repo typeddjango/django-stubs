@@ -1,5 +1,6 @@
 from typing import Any
 
+from _typeshed import Self
 from django.utils.functional import LazyObject
 
 # explicit dependency on standard settings to make it loaded
@@ -35,5 +36,5 @@ class UserSettingsHolder:
     def is_overridden(self, setting: str) -> bool: ...
 
 class SettingsReference(str):
-    def __new__(self, value: Any, setting_name: str) -> SettingsReference: ...
+    def __new__(self: type[Self], value: Any, setting_name: str) -> Self: ...
     def __init__(self, value: str, setting_name: str) -> None: ...

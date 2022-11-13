@@ -1,10 +1,8 @@
 from collections.abc import Sequence
 from html.parser import HTMLParser
-from typing import Any, TypeVar
+from typing import Any
 
 from typing_extensions import TypeAlias
-
-_Self = TypeVar("_Self")
 
 WHITESPACE: Any
 

@@ -1,5 +1,12 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
-from typing import Any, ClassVar, Generic, TypeAlias, TypeVar, Union, overload
+from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+    Any,
+    ClassVar,
+    Generic,
+    TypeVar,
+    Union,
+    overload,
+)
 from uuid import UUID
 
 from django.db import models
@@ -8,21 +15,21 @@ from django.db.models.base import Model
 from django.db.models.fields import _AllLimitChoicesTo, _ChoicesCallable, _FieldChoices, _LimitChoicesTo
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
-from django.db.models.query_utils import Q
 from django.forms.fields import CallableChoiceIterator, ChoiceField, Field, _ClassLevelWidgetT
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
-from django.forms.widgets import ChoiceWidget, Input, Widget
+from django.forms.widgets import Widget
 from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Literal, TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-_Fields: TypeAlias = Union[_ListOrTuple[str], Literal["__all__"]]  # https://github.com/python/mypy/issues/12211
-_Widgets: TypeAlias = dict[str, Union[type[Widget], Widget]]
+# https://github.com/python/mypy/issues/12211
+_Fields: TypeAlias = Union[_ListOrTuple[str], Literal["__all__"]]
+_Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
 _Labels: TypeAlias = dict[str, str]
 _HelpTexts: TypeAlias = dict[str, str]

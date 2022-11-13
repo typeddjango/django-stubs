@@ -2,7 +2,9 @@ import gettext as gettext_module
 from collections.abc import Iterator
 from gettext import NullTranslations
 from re import Pattern
-from typing import Any, Protocol, Tuple, TypeVar
+
+# switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
+from typing import Any, Protocol, Tuple, TypeVar  # noqa: Y022
 
 from django.http.request import HttpRequest
 from typing_extensions import Literal, TypeAlias

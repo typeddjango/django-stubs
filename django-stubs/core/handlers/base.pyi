@@ -12,7 +12,7 @@ class BaseHandler:
         is_async: bool,
         method: Callable[[HttpRequest], HttpResponseBase | Awaitable[HttpResponseBase]],
         method_is_async: bool | None = ...,
-        debug: bool = False,
+        debug: bool = ...,
         name: str | None = ...,
     ) -> Callable[[HttpRequest], HttpResponseBase | Awaitable[HttpResponseBase]]: ...
     def get_response(self, request: HttpRequest) -> HttpResponseBase: ...

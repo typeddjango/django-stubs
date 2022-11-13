@@ -1,8 +1,9 @@
 from collections.abc import Callable, Generator, Iterator, MutableMapping
 from contextlib import contextmanager
 from datetime import tzinfo
-from typing import Any, TypeVar
+from typing import Any
 
+from _typeshed import Self
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -16,7 +17,6 @@ from typing_extensions import TypeAlias
 NO_DB_ALIAS: str
 RAN_DB_VERSION_CHECK: set[str]
 
-_T = TypeVar("_T", bound="BaseDatabaseWrapper")
 _ExecuteWrapper: TypeAlias = Callable[
     [Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any
 ]
@@ -119,4 +119,4 @@ class BaseDatabaseWrapper:
     def run_and_clear_commit_hooks(self) -> None: ...
     @contextmanager
     def execute_wrapper(self, wrapper: _ExecuteWrapper) -> Generator[None, None, None]: ...
-    def copy(self: _T, alias: str | None = ...) -> _T: ...
+    def copy(self: Self, alias: str | None = ...) -> Self: ...

@@ -2,8 +2,8 @@ from collections.abc import Callable, Iterable, Sequence
 from typing import Any, TypeVar, overload
 from uuid import UUID
 
+from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
-from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesT, _FieldChoices, _LimitChoicesTo
@@ -23,9 +23,6 @@ from django.db.models.manager import RelatedManager
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Literal
-
-_T = TypeVar("_T", bound=models.Model)
-_F = TypeVar("_F", bound=models.Field)
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
@@ -154,7 +151,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
 
 class OneToOneField(ForeignKey[_ST, _GT]):
     _pyi_private_set_type: Any | Combinable
@@ -203,7 +200,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
 
 class ManyToManyField(RelatedField[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any]
@@ -263,7 +260,7 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _F, instance: Any, owner: Any) -> _F: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
     def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
     def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
     def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...

@@ -1,5 +1,5 @@
 from collections import UserList
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from typing import Any
 
@@ -9,9 +9,9 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeString
 from typing_extensions import TypeAlias
 
-_DataT: TypeAlias = Mapping[str, Any]
+_DataT: TypeAlias = Mapping[str, Any]  # noqa: Y047
 
-_FilesT: TypeAlias = MultiValueDict[str, UploadedFile]
+_FilesT: TypeAlias = MultiValueDict[str, UploadedFile]  # noqa: Y047
 
 def pretty_name(name: str) -> str: ...
 def flatatt(attrs: dict[str, Any]) -> SafeString: ...

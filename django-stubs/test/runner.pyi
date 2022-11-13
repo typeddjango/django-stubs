@@ -7,7 +7,7 @@ from typing import Any
 from unittest import TestCase, TestLoader, TestSuite, TextTestResult, TextTestRunner
 
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.test.testcases import SimpleTestCase, TestCase
+from django.test.testcases import SimpleTestCase
 from django.test.utils import TimeKeeperProtocol
 from django.utils.datastructures import OrderedSet
 from typing_extensions import Literal

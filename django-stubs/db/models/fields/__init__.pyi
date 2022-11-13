@@ -6,6 +6,7 @@ from datetime import datetime as real_datetime
 from datetime import time, timedelta
 from typing import Any, Generic, TypeVar, overload
 
+from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -35,10 +36,9 @@ _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
 _ErrorMessagesT: TypeAlias = dict[str, Any]
 
-_T = TypeVar("_T", bound="Field")
 # __set__ value type
 _ST = TypeVar("_ST", contravariant=True)
 # __get__ return type
@@ -172,13 +172,13 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
-    def __get__(self: _T, instance: None, owner: Any) -> _T: ...
+    def __get__(self: Self, instance: None, owner: Any) -> Self: ...
     # Model instance access
     @overload
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _T, instance: Any, owner: Any) -> _T: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
     def deconstruct(self) -> Any: ...
     def set_attributes_from_name(self, name: str) -> None: ...
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
@@ -221,7 +221,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_to_string(self, obj: Model) -> str: ...
 
 class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | int | str | Combinable
+    _pyi_private_set_type: float | str | Combinable
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 
@@ -235,7 +235,7 @@ class SmallIntegerField(IntegerField[_ST, _GT]): ...
 class BigIntegerField(IntegerField[_ST, _GT]): ...
 
 class FloatField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | int | str | Combinable
+    _pyi_private_set_type: float | str | Combinable
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
 

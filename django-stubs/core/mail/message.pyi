@@ -6,7 +6,10 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Tuple, overload
+
+# switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
+# remove Optional once python 3.7 is dropped (Tuple[str | None, ...] works with mypy on py3.10)
+from typing import Any, Optional, Tuple, overload  # noqa: Y022, Y037
 
 from typing_extensions import TypeAlias
 
@@ -23,8 +26,8 @@ def forbid_multi_line_headers(name: str, val: str, encoding: str) -> tuple[str, 
 def sanitize_address(addr: tuple[str, str] | str, encoding: str) -> str: ...
 
 class MIMEMixin:
-    def as_string(self, unixfrom: bool = ..., linesep: str = "\n") -> str: ...
-    def as_bytes(self, unixfrom: bool = ..., linesep: str = "\n") -> bytes: ...
+    def as_string(self, unixfrom: bool = ..., linesep: str = ...) -> str: ...
+    def as_bytes(self, unixfrom: bool = ..., linesep: str = ...) -> bytes: ...
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):  # type: ignore
     defects: list[Any]
@@ -63,8 +66,11 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore
 
 _AttachmentContent: TypeAlias = bytes | EmailMessage | Message | SafeMIMEText | str
 # switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
+# remove Optional once python 3.7 is dropped (Tuple[str | None, ...] works with mypy on py3.10)
 _AttachmentTuple: TypeAlias = (
-    Tuple[str, _AttachmentContent] | Tuple[str | None, _AttachmentContent, str] | Tuple[str, _AttachmentContent, None]
+    Tuple[str, _AttachmentContent]
+    | Tuple[Optional[str], _AttachmentContent, str]
+    | Tuple[str, _AttachmentContent, None]
 )
 
 class EmailMessage:

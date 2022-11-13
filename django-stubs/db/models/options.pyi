@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Sequence
-from typing import Any, Generic, TypeVar, Union, overload
+from typing import Any, Generic, TypeVar, Union, overload  # noqa: Y037   # https://github.com/python/mypy/issues/12211
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -21,7 +21,8 @@ EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
-_OptionTogetherT: TypeAlias = Union[_ListOrTuple[Union[_ListOrTuple[str], str]], set[tuple[str, ...]]]
+# https://github.com/python/mypy/issues/12211
+_OptionTogetherT: TypeAlias = Union[_ListOrTuple[_ListOrTuple[str] | str], set[tuple[str, ...]]]  # noqa: Y047
 
 @overload
 def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> tuple[tuple[str, ...], ...]: ...
@@ -34,7 +35,7 @@ _T = TypeVar("_T")
 
 def make_immutable_fields_list(name: str, data: Iterable[_T]) -> ImmutableList[_T]: ...
 
-_M = TypeVar("_M", bound="Model")
+_M = TypeVar("_M", bound=Model)
 
 class Options(Generic[_M]):
     constraints: list[BaseConstraint]

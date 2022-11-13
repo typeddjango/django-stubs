@@ -9,37 +9,37 @@ from django.db.models.query import QuerySet
 from django.utils.datastructures import _IndexableCollection
 
 def CASCADE(
-    collector: "Collector",
+    collector: Collector,
     field: Field[Any, Any],
     sub_objs: QuerySet[Model],
     using: str,
 ) -> None: ...
 def SET_NULL(
-    collector: "Collector",
+    collector: Collector,
     field: Field[Any, Any],
     sub_objs: QuerySet[Model],
     using: str,
 ) -> None: ...
 def SET_DEFAULT(
-    collector: "Collector",
+    collector: Collector,
     field: Field[Any, Any],
     sub_objs: QuerySet[Model],
     using: str,
 ) -> None: ...
 def DO_NOTHING(
-    collector: "Collector",
+    collector: Collector,
     field: Field[Any, Any],
     sub_objs: QuerySet[Model],
     using: str,
 ) -> None: ...
 def PROTECT(
-    collector: "Collector",
+    collector: Collector,
     field: Field[Any, Any],
     sub_objs: QuerySet[Model],
     using: str,
 ) -> None: ...
 def RESTRICT(
-    collector: "Collector",
+    collector: Collector,
     field: Field[Any, Any],
     sub_objs: QuerySet[Model],
     using: str,

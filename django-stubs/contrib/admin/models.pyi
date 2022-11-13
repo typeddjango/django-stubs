@@ -1,7 +1,6 @@
 from typing import Any
 from uuid import UUID
 
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
 
@@ -10,7 +9,7 @@ CHANGE: int
 DELETION: int
 ACTION_FLAG_CHOICES: Any
 
-class LogEntryManager(models.Manager["LogEntry"]):
+class LogEntryManager(models.Manager[LogEntry]):
     def log_action(
         self,
         user_id: int,

@@ -1,5 +1,6 @@
 from typing import IO, TypeVar
 
+from _typeshed import Self
 from django.core.files.base import File
 
 class UploadedFile(File):
@@ -42,9 +43,7 @@ class InMemoryUploadedFile(UploadedFile):
         content_type_extra: dict[str, str] = ...,
     ) -> None: ...
 
-_C = TypeVar("_C", bound="SimpleUploadedFile")
-
 class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name: str, content: bytes | None, content_type: str = ...) -> None: ...
     @classmethod
-    def from_dict(cls: type[_C], file_dict: dict[str, str | bytes]) -> _C: ...
+    def from_dict(cls: type[Self], file_dict: dict[str, str | bytes]) -> Self: ...

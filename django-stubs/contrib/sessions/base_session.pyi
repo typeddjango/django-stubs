@@ -4,7 +4,7 @@ from typing import Any, TypeVar
 from django.contrib.sessions.backends.base import SessionBase
 from django.db import models
 
-_T = TypeVar("_T", bound="AbstractBaseSession")
+_T = TypeVar("_T", bound=AbstractBaseSession)
 
 class BaseSessionManager(models.Manager[_T]):
     def encode(self, session_dict: dict[str, Any]) -> str: ...

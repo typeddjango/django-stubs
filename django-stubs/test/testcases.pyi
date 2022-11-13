@@ -2,10 +2,10 @@ import threading
 import unittest
 from collections.abc import Callable, Collection, Generator, Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
-from datetime import date
 from types import TracebackType
 from typing import Any, overload
 
+from _typeshed import Self
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
@@ -41,7 +41,7 @@ class _AssertTemplateUsedContext:
     def on_template_render(self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any) -> None: ...
     def test(self) -> None: ...
     def message(self) -> str: ...
-    def __enter__(self) -> _AssertTemplateUsedContext: ...
+    def __enter__(self: Self) -> Self: ...
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
@@ -167,13 +167,13 @@ class SimpleTestCase(unittest.TestCase):
     def assertJSONEqual(
         self,
         raw: str,
-        expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
+        expected_data: dict[str, Any] | list[Any] | str | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertJSONNotEqual(
         self,
         raw: str,
-        expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
+        expected_data: dict[str, Any] | list[Any] | str | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertXMLEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
@@ -260,15 +260,15 @@ class LiveServerTestCase(TransactionTestCase):
     server_thread: Any
     static_handler: Any
     @classproperty
-    def live_server_url(cls) -> str: ...
+    def live_server_url(cls: Any) -> str: ...
     @classproperty
-    def allowed_host(cls) -> str: ...
+    def allowed_host(cls: Any) -> str: ...
 
 class SerializeMixin:
     lockfile: Any
     @classmethod
-    def setUpClass(cls) -> None: ...
+    def setUpClass(cls: type[Self]) -> None: ...
     @classmethod
-    def tearDownClass(cls) -> None: ...
+    def tearDownClass(cls: type[Self]) -> None: ...
 
 def connections_support_transactions(aliases: Iterable[str] | None = ...) -> bool: ...

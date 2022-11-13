@@ -1,12 +1,13 @@
 from collections.abc import Callable
 from typing import Any, TypeVar, overload
 
+from _typeshed import Self
 from typing_extensions import TypeAlias
 
-_SD = TypeVar("_SD", bound="SafeData")
+_SD = TypeVar("_SD", bound=SafeData)
 
 class SafeData:
-    def __html__(self: _SD) -> _SD: ...
+    def __html__(self: Self) -> Self: ...
 
 class SafeString(str, SafeData):
     @overload

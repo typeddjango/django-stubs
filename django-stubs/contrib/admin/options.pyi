@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Generic, Optional, TypeVar, Union  # noqa: Y037  # https://github.com/python/mypy/issues/12211
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -17,7 +17,6 @@ from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.fields import Field as FormField
 from django.forms.fields import TypedChoiceField
-from django.forms.forms import BaseForm
 from django.forms.formsets import BaseFormSet
 from django.forms.models import (
     BaseInlineFormSet,
@@ -28,7 +27,7 @@ from django.forms.models import (
 )
 from django.forms.widgets import Media
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.template.response import _TemplateForResponseT
 from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
@@ -41,7 +40,7 @@ TO_FIELD_VAR: str
 HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
 
-_Direction: TypeAlias = Union[Literal[1], Literal[2]]
+_Direction: TypeAlias = Literal[1, 2]
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -51,7 +50,7 @@ class IncorrectLookupParameters(Exception): ...
 FORMFIELD_FOR_DBFIELD_DEFAULTS: Any
 csrf_protect_m: Any
 
-_FieldGroups: TypeAlias = Sequence[Union[str, Sequence[str]]]
+_FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
 
 class _OptionalFieldOpts(TypedDict, total=False):
     classes: Sequence[str]
@@ -63,13 +62,14 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # Workaround for mypy issue, a Sequence type should be preferred here.
 # https://github.com/python/mypy/issues/8921
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
-_FieldsetSpec: TypeAlias = _ListOrTuple[tuple[Optional[_StrOrPromise], _FieldOpts]]
+_FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
+# https://github.com/python/mypy/issues/12211
 _ListFilterT: TypeAlias = Union[
     type[ListFilter],
     Field,
     str,
-    tuple[Union[Field, str], type[FieldListFilter]],
-    list[Union[Field, str, type[FieldListFilter]]],
+    tuple[Field | str, type[FieldListFilter]],
+    list[Field | str | type[FieldListFilter]],
 ]
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
