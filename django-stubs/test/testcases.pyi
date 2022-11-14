@@ -167,13 +167,13 @@ class SimpleTestCase(unittest.TestCase):
     def assertJSONEqual(
         self,
         raw: str,
-        expected_data: dict[str, Any] | list[Any] | str | float | bool | None,
+        expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertJSONNotEqual(
         self,
         raw: str,
-        expected_data: dict[str, Any] | list[Any] | str | float | bool | None,
+        expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertXMLEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
