@@ -249,6 +249,8 @@ class NewSemanalDjangoPlugin(Plugin):
             and sym.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
         ):
             return reparametrize_any_manager_hook
+        else:
+            return None
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
@@ -309,6 +311,8 @@ class NewSemanalDjangoPlugin(Plugin):
             "django_stubs_ext.annotations.WithAnnotations",
         ):
             return partial(handle_annotated_type, django_context=self.django_context)
+        else:
+            return None
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
         # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
