@@ -515,6 +515,11 @@ IGNORED_ERRORS: Dict[str, List[Any]] = {
     "wsgi": [
         '"HttpResponse" has no attribute "block_size"',
     ],
+    # test_runner_apps/tagged/tests_syntax_error.py
+    "test_runner_apps": [
+        "invalid syntax",
+        "invalid decimal literal",
+    ],
 }
 
 
