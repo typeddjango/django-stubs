@@ -113,6 +113,9 @@ IGNORED_ERRORS: Dict[str, List[Any]] = {
         'error: "HttpResponse" has no attribute "streaming_content"',
         'error: "HttpResponse" has no attribute "context_data"',
         'Duplicate module named "apps"',
+        "Function is missing a return type annotation",
+        "Function is missing a type annotation",
+        "Library stubs not installed for ",
     ],
     "admin_checks": ['Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'],
     "admin_default_site": [
