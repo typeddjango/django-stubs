@@ -221,7 +221,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_to_string(self, obj: Model) -> str: ...
 
 class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | str | Combinable
+    _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 
@@ -235,7 +235,7 @@ class SmallIntegerField(IntegerField[_ST, _GT]): ...
 class BigIntegerField(IntegerField[_ST, _GT]): ...
 
 class FloatField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | str | Combinable
+    _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
 

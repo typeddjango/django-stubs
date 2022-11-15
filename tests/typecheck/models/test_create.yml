@@ -2,7 +2,7 @@
     main: |
         from myapp.models import User
         User.objects.create(pk=1, name='Max', age=10)
-        User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, str, Combinable]")
+        User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, int, str, Combinable]")
     installed_apps:
         - myapp
     files:
@@ -62,7 +62,7 @@
     main: |
         from myapp.models import Publisher, Book
 
-        Book.objects.create(id=None)  # E: Incompatible type for "id" of "Book" (got "None", expected "Union[float, str, Combinable]")
+        Book.objects.create(id=None)  # E: Incompatible type for "id" of "Book" (got "None", expected "Union[float, int, str, Combinable]")
         Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Union[Publisher, Combinable]")
         Book.objects.create(publisher_id=None)  # E: Incompatible type for "publisher_id" of "Book" (got "None", expected "Union[Combinable, int, str]")
     installed_apps:
@@ -104,18 +104,18 @@
         reveal_type(first.id)  # N: Revealed type is "builtins.int"
 
         from myapp.models import MyModel2
-        MyModel2(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, str, Combinable]")
-        MyModel2.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, str, Combinable]")
+        MyModel2(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, int, str, Combinable]")
+        MyModel2.objects.create(id=None)  # E: Incompatible type for "id" of "MyModel2" (got "None", expected "Union[float, int, str, Combinable]")
         second = MyModel2()
-        second.id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, str, Combinable]")
+        second.id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, int, str, Combinable]")
         reveal_type(second.id)  # N: Revealed type is "builtins.int"
 
         # default set but no primary key doesn't allow None
         from myapp.models import MyModel3
-        MyModel3(default=None)  # E: Incompatible type for "default" of "MyModel3" (got "None", expected "Union[float, str, Combinable]")
-        MyModel3.objects.create(default=None)  # E: Incompatible type for "default" of "MyModel3" (got "None", expected "Union[float, str, Combinable]")
+        MyModel3(default=None)  # E: Incompatible type for "default" of "MyModel3" (got "None", expected "Union[float, int, str, Combinable]")
+        MyModel3.objects.create(default=None)  # E: Incompatible type for "default" of "MyModel3" (got "None", expected "Union[float, int, str, Combinable]")
         third = MyModel3()
-        third.default = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, str, Combinable]")
+        third.default = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, int, str, Combinable]")
         reveal_type(third.default)  # N: Revealed type is "builtins.int"
     installed_apps:
         - myapp
