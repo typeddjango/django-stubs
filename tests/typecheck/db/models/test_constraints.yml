@@ -35,13 +35,3 @@
         main:4: note: Possible overload variants:
         main:4: note:     .*
         main:4: note:     .*
-
--   case: constraint_violation_error_message
-    main: |
-        from django.db.models import CheckConstraint, Q
-
-        CheckConstraint(
-            check=Q(name__startswith='a'),
-            name='name_starts_with_a',
-            violation_error_message='Name must start with a',
-        )
