@@ -131,7 +131,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> None: ...
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def get(
         self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
@@ -143,7 +143,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def get(
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def post(
         self,
         path: str,
@@ -167,7 +167,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def post(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def head(
         self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
@@ -179,7 +179,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def head(
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def trace(
         self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
@@ -191,7 +191,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def trace(
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def put(
         self,
         path: str,
@@ -215,7 +215,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def put(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def patch(
         self,
         path: str,
@@ -239,7 +239,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def patch(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    @overload  # type: ignore
+    @overload  # type: ignore[override]
     def delete(
         self,
         path: str,
