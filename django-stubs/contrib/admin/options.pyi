@@ -54,7 +54,7 @@ _FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
 
 class _OptionalFieldOpts(TypedDict, total=False):
     classes: Sequence[str]
-    description: str
+    description: _StrOrPromise
 
 class _FieldOpts(_OptionalFieldOpts, total=True):
     fields: _FieldGroups
