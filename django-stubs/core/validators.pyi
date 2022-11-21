@@ -4,7 +4,7 @@ from re import Pattern, RegexFlag
 from typing import Any
 
 from django.core.files.base import File
-from django.utils.functional import _StrPromise
+from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 EMPTY_VALUES: Any
@@ -15,14 +15,14 @@ _ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: Y047
 
 class RegexValidator:
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition
-    message: str | _StrPromise
+    message: _StrOrPromise
     code: str
     inverse_match: bool
     flags: int
     def __init__(
         self,
         regex: _Regex | None = ...,
-        message: str | _StrPromise | None = ...,
+        message: _StrOrPromise | None = ...,
         code: str | None = ...,
         inverse_match: bool | None = ...,
         flags: RegexFlag | None = ...,
@@ -46,7 +46,7 @@ integer_validator: RegexValidator
 def validate_integer(value: float | str | None) -> None: ...
 
 class EmailValidator:
-    message: str
+    message: _StrOrPromise
     code: str
     user_regex: Pattern[str]
     domain_regex: Pattern[str]
@@ -54,7 +54,7 @@ class EmailValidator:
     domain_allowlist: Sequence[str]
     def __init__(
         self,
-        message: str | None = ...,
+        message: _StrOrPromise | None = ...,
         code: str | None = ...,
         allowlist: Sequence[str] | None = ...,
         *,
@@ -83,16 +83,16 @@ ip_address_validator_map: dict[str, _IPValidator]
 
 def ip_address_validators(protocol: str, unpack_ipv4: bool) -> _IPValidator: ...
 def int_list_validator(
-    sep: str = ..., message: str | None = ..., code: str = ..., allow_negative: bool = ...
+    sep: str = ..., message: _StrOrPromise | None = ..., code: str = ..., allow_negative: bool = ...
 ) -> RegexValidator: ...
 
 validate_comma_separated_integer_list: RegexValidator
 
 class BaseValidator:
-    message: str
+    message: _StrOrPromise
     code: str
     limit_value: Any
-    def __init__(self, limit_value: Any, message: str | None = ...) -> None: ...
+    def __init__(self, limit_value: Any, message: _StrOrPromise | None = ...) -> None: ...
     def __call__(self, value: Any) -> None: ...
     def compare(self, a: Any, b: Any) -> bool: ...
     def clean(self, x: Any) -> Any: ...
@@ -116,13 +116,13 @@ class DecimalValidator:
     def __eq__(self, other: object) -> bool: ...
 
 class FileExtensionValidator:
-    message: str
+    message: _StrOrPromise
     code: str
     allowed_extensions: Collection[str] | None
     def __init__(
         self,
         allowed_extensions: Collection[str] | None = ...,
-        message: str | None = ...,
+        message: _StrOrPromise | None = ...,
         code: str | None = ...,
     ) -> None: ...
     def __call__(self, value: File) -> None: ...
@@ -131,7 +131,7 @@ def get_available_image_extensions() -> Sequence[str]: ...
 def validate_image_file_extension(value: File) -> None: ...
 
 class ProhibitNullCharactersValidator:
-    message: str
+    message: _StrOrPromise
     code: str
-    def __init__(self, message: str | None = ..., code: str | None = ...) -> None: ...
+    def __init__(self, message: _StrOrPromise | None = ..., code: str | None = ...) -> None: ...
     def __call__(self, value: Any) -> None: ...
