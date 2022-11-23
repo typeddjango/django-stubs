@@ -4,6 +4,7 @@
         from myapp.models import MyModel
 
         reveal_type(get_object_or_404(MyModel))  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel, django.db.models.query._QuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(get_object_or_404(MyModel.objects))  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(get_object_or_404(MyModel.objects.get_queryset()))  # N: Revealed type is "myapp.models.MyModel"
 
@@ -25,7 +26,7 @@
     main: |
         from django.contrib.auth import get_user_model
         UserModel = get_user_model()
-        reveal_type(UserModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyUser]"
+        reveal_type(UserModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyUser, django.db.models.query._QuerySet[myapp.models.MyUser, myapp.models.MyUser]]"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
         AUTH_USER_MODEL = 'myapp.MyUser'

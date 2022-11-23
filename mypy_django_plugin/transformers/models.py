@@ -299,13 +299,19 @@ class AddManagers(ModelClassInitializer):
 
         assert manager_info is not None
         # Reparameterize dynamically created manager with model type
-        manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+
+        queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
+        model_type = Instance(self.model_classdef.info, [])
+        manager_type = Instance(manager_info, [model_type, Instance(queryset_info, [model_type, model_type])])
         self.add_new_node_to_model_class(manager_name, manager_type)
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
 
+        queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
+        model_type = Instance(self.model_classdef.info, [])
         incomplete_manager_defs = set()
+
         for manager_name, manager in model_cls._meta.managers_map.items():
             manager_node = self.model_classdef.info.names.get(manager_name, None)
             manager_fullname = helpers.get_class_fullname(manager.__class__)
@@ -324,7 +330,7 @@ class AddManagers(ModelClassInitializer):
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            manager_type = Instance(manager_info, [model_type, Instance(queryset_info, [model_type, model_type])])
             self.add_new_node_to_model_class(manager_name, manager_type)
 
         if incomplete_manager_defs:
@@ -339,9 +345,11 @@ class AddManagers(ModelClassInitializer):
                 # ignoring a more specialised manager not being resolved while still
                 # setting _some_ type
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
-                self.add_new_node_to_model_class(
-                    manager_name, Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])])
+
+                manager_type = Instance(
+                    fallback_manager_info, [model_type, Instance(queryset_info, [model_type, model_type])]
                 )
+                self.add_new_node_to_model_class(manager_name, manager_type)
 
                 # Find expression for e.g. `objects = SomeManager()`
                 manager_expr = self.get_manager_expression(manager_name)
@@ -421,7 +429,11 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                     return None
             default_manager_info = generated_manager_info
 
-        default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+        queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
+        model_type = Instance(self.model_classdef.info, [])
+        default_manager = Instance(
+            default_manager_info, [model_type, Instance(queryset_info, [model_type, model_type])]
+        )
         self.add_new_node_to_model_class("_default_manager", default_manager)
 
 
@@ -486,8 +498,14 @@ class AddRelatedManagers(ModelClassInitializer):
                     # See https://github.com/typeddjango/django-stubs/pull/993
                     # for more information on when this error can occur.
                     fallback_manager = self.get_or_create_manager_with_any_fallback(related_manager=True)
+                    queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
+                    related_model_type = Instance(related_model_info, [])
                     self.add_new_node_to_model_class(
-                        attname, Instance(fallback_manager, [Instance(related_model_info, [])])
+                        attname,
+                        Instance(
+                            fallback_manager,
+                            [related_model_type, Instance(queryset_info, [related_model_type, related_model_type])],
+                        ),
                     )
                     related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
                     self.ctx.api.fail(
@@ -507,14 +525,21 @@ class AddRelatedManagers(ModelClassInitializer):
                 default_reverse_manager_info = self.get_reverse_manager_info(
                     model_info=related_model_info, derived_from="_default_manager"
                 )
+
                 if default_reverse_manager_info:
+                    # FIXME: Is this type right here?
                     self.add_new_node_to_model_class(attname, Instance(default_reverse_manager_info, []))
                     continue
 
+                queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
+                related_model_type = Instance(related_model_info, [])
                 # The reverse manager we're looking for doesn't exist. So we
                 # create it. The (default) reverse manager type is built from a
                 # RelatedManager and the default manager on the related model
-                parametrized_related_manager_type = Instance(related_manager_info, [Instance(related_model_info, [])])
+                parametrized_related_manager_type = Instance(
+                    related_manager_info,
+                    [related_model_type, Instance(queryset_info, [related_model_type, related_model_type])],
+                )
                 default_manager_type = default_manager.type
                 assert default_manager_type is not None
                 assert isinstance(default_manager_type, Instance)

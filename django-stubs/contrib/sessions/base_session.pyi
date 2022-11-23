@@ -6,7 +6,7 @@ from django.db import models
 
 _T = TypeVar("_T", bound=AbstractBaseSession)
 
-class BaseSessionManager(models.Manager[_T]):
+class BaseSessionManager(models.Manager[_T, models.QuerySet[_T]]):
     def encode(self, session_dict: dict[str, Any]) -> str: ...
     def save(self, session_key: str, session_dict: dict[str, Any], expire_date: datetime) -> _T: ...
 

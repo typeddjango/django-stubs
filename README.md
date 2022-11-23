@@ -95,7 +95,7 @@ option to get extra information about the error.
 ### I cannot use QuerySet or Manager with type annotations
 
 You can get a `TypeError: 'type' object is not subscriptable`
-when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other Django-based Generic types.
+when you will try to use `QuerySet[MyModel]`, `Manager[MyModel, MyQuerySet]` or some other Django-based Generic types.
 
 This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
 
@@ -215,10 +215,14 @@ error: Return type "MyModel" of "create" incompatible with return type "_T" in s
 This is happening because the `Manager` class is generic, but without
 specifying generics the built-in manager methods are expected to return the
 generic type of the base manager, which is any model. To fix this issue you
-should declare your manager with your model as the type variable:
+should declare your manager with your model as the type variable, and the
+QuerySet type.
 
 ```python
-class MyManager(models.Manager["MyModel"]):
+class MyQuerySet(models.QuerySet["MyModel"]):
+  ...
+
+class MyManager(models.Manager["MyModel", MyQuerySet]):
     ...
 ```
 

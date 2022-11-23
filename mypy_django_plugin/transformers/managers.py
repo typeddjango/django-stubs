@@ -448,7 +448,9 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
     # value of `.as_manager()`. Though model argument is populated as `Any`.
     # `transformers.models.AddManagers` will populate a model's manager(s), when it
     # finds it on class level.
-    var = Var(name=ctx.name, type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]))
+    any_type = AnyType(TypeOfAny.from_omitted_generics)
+    manager_type = Instance(new_manager_info, [any_type, any_type])
+    var = Var(name=ctx.name, type=manager_type)
     var.info = new_manager_info
     var._fullname = f"{current_module.fullname}.{ctx.name}"
     var.is_inferred = True
@@ -479,7 +481,7 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     is interpreted as:
 
         _T = TypeVar('_T', covariant=True)
-        class MyManager(models.Manager[_T]): ...
+        class MyManager(models.Manager[_T, models.QuerySet[_T]]): ...
 
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.
@@ -501,15 +503,16 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     if parent_manager is None:
         return
 
+    type_vars = tuple(parent_manager.type.defn.type_vars)
+
     is_missing_params = (
-        len(parent_manager.args) == 1
+        len(parent_manager.args) == len(type_vars)
         and isinstance(parent_manager.args[0], AnyType)
         and parent_manager.args[0].type_of_any is TypeOfAny.from_omitted_generics
     )
+
     if not is_missing_params:
         return
-
-    type_vars = tuple(parent_manager.type.defn.type_vars)
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration
@@ -519,6 +522,13 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
         else:
             return
 
+    # FIXME: This results in the following error
+    #
+    #   error: Name "_T" is not defined
+    #
+    # This error goes away if you define literally anything named _T in the
+    # scope of the class. We need to fix this so the type var is set
+    # appropriately without conflicting with any names.
     parent_manager.args = type_vars
     manager.node.defn.type_vars = list(type_vars)
     manager.node.add_type_vars()

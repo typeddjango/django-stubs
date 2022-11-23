@@ -4,11 +4,13 @@ from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import BooleanField
+from django.db.models.query import QuerySet
 from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=Model)
+_QS = TypeVar("_QS", bound=QuerySet[_T])  # type: ignore
 
-class BaseUserManager(models.Manager[_T]):
+class BaseUserManager(models.Manager[_T, _QS]):
     @classmethod
     def normalize_email(cls, email: str | None) -> str: ...
     def make_random_password(self, length: int = ..., allowed_chars: str = ...) -> str: ...

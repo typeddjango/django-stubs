@@ -7,6 +7,7 @@ from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObject
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.manager import BaseManager
 from django.db.models.options import Options
+from django.db.models.query import QuerySet
 
 _Self = TypeVar("_Self", bound=Model)
 
@@ -19,11 +20,11 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def objects(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def objects(cls: type[_Self]) -> BaseManager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
     @property
-    def _default_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def _default_manager(cls: type[_Self]) -> BaseManager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
     @property
-    def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def _base_manager(cls: type[_Self]) -> BaseManager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
     class DoesNotExist(ObjectDoesNotExist): ...
