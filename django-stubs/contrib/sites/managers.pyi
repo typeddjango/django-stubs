@@ -5,5 +5,5 @@ from django.db import models
 
 _T = TypeVar("_T", bound=Site)
 
-class CurrentSiteManager(models.Manager[_T]):
+class CurrentSiteManager(models.Manager[_T, models.QuerySet[_T]]):
     def __init__(self, field_name: str | None = ...) -> None: ...

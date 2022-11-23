@@ -269,7 +269,7 @@ class ModelChoiceField(ChoiceField):
     to_field_name: str | None
     def __init__(
         self,
-        queryset: None | Manager[models.Model] | QuerySet[models.Model],
+        queryset: None | Manager[models.Model, QuerySet[models.Model]] | QuerySet[models.Model],
         *,
         empty_label: _StrOrPromise | None = ...,
         required: bool = ...,
@@ -302,7 +302,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
     default_error_messages: dict[str, str]
-    def __init__(self, queryset: None | Manager[Model] | QuerySet[Model], **kwargs: Any) -> None: ...
+    def __init__(self, queryset: None | Manager[Model, QuerySet[Model]] | QuerySet[Model], **kwargs: Any) -> None: ...
     def to_python(self, value: Any) -> list[Model]: ...  # type: ignore[override]
     def clean(self, value: Any) -> QuerySet[Model]: ...
     def prepare_value(self, value: Any) -> Any: ...

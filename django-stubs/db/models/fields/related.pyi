@@ -20,6 +20,7 @@ from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyR
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
 from django.db.models.manager import RelatedManager
+from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Literal
@@ -204,7 +205,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
 
 class ManyToManyField(RelatedField[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: RelatedManager[Any]
+    _pyi_private_get_type: RelatedManager[Any, QuerySet[Any]]
 
     description: str
     has_null_arg: bool

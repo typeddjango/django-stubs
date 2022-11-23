@@ -4,7 +4,7 @@
         mymodel = MyModel(user_id=1)
         reveal_type(mymodel.id)  # N: Revealed type is "builtins.int"
         reveal_type(mymodel.user)  # N: Revealed type is "django.contrib.auth.models.User"
-        reveal_type(mymodel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
+        reveal_type(mymodel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel, django.db.models.query._QuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     mypy_config: |
         [mypy.plugins.django-stubs]
         django_settings_module = mysettings
