@@ -302,10 +302,7 @@ class AddManagers(ModelClassInitializer):
 
         queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
         model_type = Instance(self.model_classdef.info, [])
-        manager_type = Instance(
-            manager_info,
-            [model_type, Instance(queryset_info, [model_type, model_type])]
-        )
+        manager_type = Instance(manager_info, [model_type, Instance(queryset_info, [model_type, model_type])])
         self.add_new_node_to_model_class(manager_name, manager_type)
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
@@ -333,10 +330,7 @@ class AddManagers(ModelClassInitializer):
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            manager_type = Instance(
-                manager_info,
-                [model_type, Instance(queryset_info, [model_type, model_type])]
-            )
+            manager_type = Instance(manager_info, [model_type, Instance(queryset_info, [model_type, model_type])])
             self.add_new_node_to_model_class(manager_name, manager_type)
 
         if incomplete_manager_defs:
@@ -353,8 +347,7 @@ class AddManagers(ModelClassInitializer):
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
 
                 manager_type = Instance(
-                    fallback_manager_info,
-                    [model_type, Instance(queryset_info, [model_type, model_type])]
+                    fallback_manager_info, [model_type, Instance(queryset_info, [model_type, model_type])]
                 )
                 self.add_new_node_to_model_class(manager_name, manager_type)
 
@@ -439,8 +432,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
         queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
         model_type = Instance(self.model_classdef.info, [])
         default_manager = Instance(
-            default_manager_info,
-            [model_type, Instance(queryset_info, [model_type, model_type])]
+            default_manager_info, [model_type, Instance(queryset_info, [model_type, model_type])]
         )
         self.add_new_node_to_model_class("_default_manager", default_manager)
 
@@ -512,14 +504,8 @@ class AddRelatedManagers(ModelClassInitializer):
                         attname,
                         Instance(
                             fallback_manager,
-                            [
-                                related_model_type,
-                                Instance(
-                                    queryset_info,
-                                    [related_model_type, related_model_type]
-                                )
-                            ]
-                        )
+                            [related_model_type, Instance(queryset_info, [related_model_type, related_model_type])],
+                        ),
                     )
                     related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
                     self.ctx.api.fail(
@@ -552,13 +538,7 @@ class AddRelatedManagers(ModelClassInitializer):
                 # RelatedManager and the default manager on the related model
                 parametrized_related_manager_type = Instance(
                     related_manager_info,
-                    [
-                        related_model_type,
-                        Instance(
-                            queryset_info,
-                            [related_model_type, related_model_type]
-                        )
-                    ]
+                    [related_model_type, Instance(queryset_info, [related_model_type, related_model_type])],
                 )
                 default_manager_type = default_manager.type
                 assert default_manager_type is not None
