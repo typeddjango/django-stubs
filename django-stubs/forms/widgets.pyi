@@ -40,7 +40,7 @@ class Widget(metaclass=MediaDefiningClass):
     supports_microseconds: bool
     attrs: _OptAttrs
     template_name: str
-    media: _Getter[Media]
+    media: _Getter[Media] | Media
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
     @property
     def is_hidden(self) -> bool: ...

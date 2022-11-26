@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Any
 
-from django.utils.functional import _StrPromise
+from django.utils.functional import _StrOrPromise
 from typing_extensions import Literal
 
 class FieldDoesNotExist(Exception): ...
@@ -37,7 +37,7 @@ class ValidationError(Exception):
     def __init__(
         self,
         # Accepts arbitrarily nested data structure, mypy doesn't allow describing it accurately.
-        message: str | _StrPromise | ValidationError | dict[str, Any] | list[Any],
+        message: _StrOrPromise | ValidationError | dict[str, Any] | list[Any],
         code: str | None = ...,
         params: dict[str, Any] | None = ...,
     ) -> None: ...

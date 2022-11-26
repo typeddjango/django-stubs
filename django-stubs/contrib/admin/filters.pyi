@@ -7,9 +7,10 @@ from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
+from django.utils.functional import _StrOrPromise
 
 class ListFilter:
-    title: str
+    title: _StrOrPromise | None
     template: str
     used_parameters: Any
     def __init__(
@@ -21,7 +22,7 @@ class ListFilter:
     def expected_parameters(self) -> list[str] | None: ...
 
 class SimpleListFilter(ListFilter):
-    parameter_name: str
+    parameter_name: str | None
     lookup_choices: Any
     def value(self) -> str | None: ...
     def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[Any, str]] | None: ...
