@@ -105,26 +105,11 @@ class TrigramBase(Func):
     def __init__(self, expression: _Expression, string: str, **extra: Any) -> None: ...
 
 class TrigramWordBase(Func):
-    def __init__(self, expression: _Expression, string: str, **extra: Any) -> None: ...
+    def __init__(self, string: str, expression: _Expression, **extra: Any) -> None: ...
 
-class TrigramSimilarity(TrigramBase):
-    function: str
-
-class TrigramDistance(TrigramBase):
-    function: str
-    arg_joiner: str
-
-class TrigramWordDistance(TrigramWordBase):
-    function: str
-    arg_joiner: str
-
-class TrigramStrictWordDistance(TrigramWordBase):
-    function: str
-    arg_joiner: str
-
-class TrigramWordSimilarity(TrigramWordBase):
-    function: str
-
-class TrigramStrictWordSimilarity(TrigramWordBase):
-    function: str
-
+class TrigramSimilarity(TrigramBase): ...
+class TrigramDistance(TrigramBase): ...
+class TrigramWordDistance(TrigramWordBase): ...
+class TrigramStrictWordDistance(TrigramWordBase): ...
+class TrigramWordSimilarity(TrigramWordBase): ...
+class TrigramStrictWordSimilarity(TrigramWordBase): ...
