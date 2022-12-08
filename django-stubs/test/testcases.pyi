@@ -21,7 +21,6 @@ from django.template.base import Template
 from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
-from django.utils.functional import classproperty
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...
@@ -259,10 +258,8 @@ class LiveServerTestCase(TransactionTestCase):
     server_thread_class: type[Any]
     server_thread: Any
     static_handler: Any
-    @classproperty
-    def live_server_url(cls: Any) -> str: ...
-    @classproperty
-    def allowed_host(cls: Any) -> str: ...
+    live_server_url: str
+    allowed_host: str
 
 class SerializeMixin:
     lockfile: Any
