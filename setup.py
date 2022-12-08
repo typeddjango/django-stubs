@@ -36,7 +36,7 @@ extras_require = {
 
 setup(
     name="django-stubs",
-    version="1.13.0",
+    version="1.13.1",
     description="Mypy stubs for Django",
     long_description=readme,
     long_description_content_type="text/markdown",
