@@ -49,3 +49,21 @@
 
       foo(s)                         # E: Argument 1 to "foo" has incompatible type "_StrPromise"; expected "str"
       bar(s)
+
+-   case: classproperty_usage
+    main: |
+      from typing import Any
+      from django.utils.functional import classproperty
+
+      class Foo:
+          @classproperty
+          def attr(cls: Any) -> str: ...
+
+          reveal_type(attr)      # N: Revealed type is "django.utils.functional.classproperty[builtins.str]"
+          reveal_type(attr.getter)  # N: Revealed type is "def (method: def (Any) -> builtins.str) -> django.utils.functional.classproperty[builtins.str]"
+
+      reveal_type(Foo.attr)      # N: Revealed type is "builtins.str"
+
+      class Bar(Foo):
+          def method(self) -> None:
+              reveal_type(self.attr)  # N: Revealed type is "builtins.str"
