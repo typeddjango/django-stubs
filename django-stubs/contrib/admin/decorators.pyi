@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, TypeVar, Union, overload
+from typing import Any, TypeVar, Union, overload  # noqa: Y037
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.sites import AdminSite
