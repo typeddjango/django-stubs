@@ -19,7 +19,9 @@ class Tags:
     urls: str
 
 class _CheckCallable(Protocol):
-    def __call__(self, *, app_configs: Apps, **kwargs: Any) -> Iterable[CheckMessage]: ...
+    def __call__(
+        self, *, app_configs: Apps, databases: Sequence[str] | None, **kwargs: Any
+    ) -> Iterable[CheckMessage]: ...
 
 _C = TypeVar("_C", bound=_CheckCallable)
 
@@ -40,7 +42,7 @@ class CheckRegistry:
         app_configs: Sequence[AppConfig] | None = ...,
         tags: Sequence[str] | None = ...,
         include_deployment_checks: bool = ...,
-        databases: Any | None = ...,
+        databases: Sequence[str] | None = ...,
     ) -> list[CheckMessage]: ...
     def tag_exists(self, tag: str, include_deployment_checks: bool = ...) -> bool: ...
     def tags_available(self, deployment_checks: bool = ...) -> set[str]: ...
