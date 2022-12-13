@@ -1,4 +1,4 @@
-from typing import Any, Callable, Protocol, Sequence, TypeVar, overload
+from typing import Any, Callable, Iterable, Protocol, Sequence, TypeVar, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -19,7 +19,7 @@ class Tags:
     urls: str
 
 class _CheckCallable(Protocol):
-    def __call__(self, app_configs: Apps, **kwargs: Any) -> Sequence[CheckMessage]: ...
+    def __call__(self, *, app_configs: Apps, **kwargs: Any) -> Iterable[CheckMessage]: ...
 
 _C = TypeVar("_C", bound=_CheckCallable)
 
