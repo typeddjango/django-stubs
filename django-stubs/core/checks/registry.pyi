@@ -1,4 +1,5 @@
-from typing import Any, Callable, Iterable, Protocol, Sequence, TypeVar, overload
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any, Protocol, TypeVar, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -48,7 +49,7 @@ class CheckRegistry:
     def tags_available(self, deployment_checks: bool = ...) -> set[str]: ...
     def get_checks(self, include_deployment_checks: bool = ...) -> list[_ProcessedCheckCallable]: ...
 
-registry: CheckRegistry
+registry: CheckRegistry = ...
 register = registry.register
 run_checks = registry.run_checks
 tag_exists = registry.tag_exists
