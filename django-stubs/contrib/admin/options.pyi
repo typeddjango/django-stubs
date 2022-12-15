@@ -129,7 +129,9 @@ class BaseModelAdmin(Generic[_ModelT]):
     def has_view_or_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_module_permission(self, request: HttpRequest) -> bool: ...
 
-_DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str]]
+_DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
+_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
+_ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], None]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_display: _DisplayT
@@ -154,7 +156,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     delete_selected_confirmation_template: _TemplateForResponseT | None
     object_history_template: _TemplateForResponseT | None
     popup_response_template: _TemplateForResponseT | None
-    actions: Sequence[Callable[[ModelAdmin, HttpRequest, QuerySet], None] | str] | None
+    actions: Sequence[_ActionCallable[Any, _ModelT] | str] | None
     action_form: Any
     actions_on_top: bool
     actions_on_bottom: bool
