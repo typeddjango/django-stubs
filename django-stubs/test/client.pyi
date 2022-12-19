@@ -3,7 +3,7 @@ from io import BytesIO
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, NoReturn, TypeVar
+from typing import Any, Generic, NoReturn, TypeVar, overload
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -16,6 +16,7 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
+from typing_extensions import Literal
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
@@ -98,6 +99,8 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     context: ContextList | dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
+
+class _MonkeyPatchedWSGIResponseRedirect(_MonkeyPatchedWSGIResponse):
     redirect_chain: list[tuple[str, int]]
 
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
@@ -128,25 +131,136 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> None: ...
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
-    def get(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def get(
+        self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def get(
+        self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def get(
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def post(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def post(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def post(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def post(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def head(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def head(
+        self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def head(
+        self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def head(
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def trace(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def trace(
+        self, path: str, data: Any = ..., follow: Literal[False] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def trace(
+        self, path: str, data: Any = ..., follow: Literal[True] = ..., secure: bool = ..., **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def trace(
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def put(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def put(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def put(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def put(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def patch(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def patch(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def patch(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def patch(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def delete(  # type: ignore
+    @overload  # type: ignore[misc,override]
+    def delete(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[False] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    @overload
+    def delete(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: Literal[True] = ...,
+        secure: bool = ...,
+        **extra: Any
+    ) -> _MonkeyPatchedWSGIResponseRedirect: ...
+    @overload
+    def delete(
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
 
