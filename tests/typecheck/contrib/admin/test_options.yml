@@ -2,7 +2,7 @@
 # configurations as possible.
 -   case: test_full_admin
     main: |
-      from django.contrib import admin
+      from django.contrib import admin, messages
       from django.forms import Form, ModelForm, Textarea
       from django.db import models
       from django.core.paginator import Paginator
@@ -83,6 +83,9 @@
 
           def a_method_action(self, request: HttpRequest, queryset: QuerySet) -> None:
               pass
+
+          def a_method_action_with_message_user(self, request: HttpRequest, queryset: QuerySet) -> None:
+              self.message_user(request, _("Error message"), messages.ERROR)
 
 # This test is here to make sure we're not running into a mypy issue which is
 # worked around using a somewhat complicated _ListOrTuple union type. Once the

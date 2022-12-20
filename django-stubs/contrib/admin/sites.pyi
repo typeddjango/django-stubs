@@ -30,9 +30,9 @@ class AlreadyRegistered(Exception): ...
 class NotRegistered(Exception): ...
 
 class AdminSite:
-    site_title: str
-    site_header: str
-    index_title: str
+    site_title: _StrOrPromise
+    site_header: _StrOrPromise
+    index_title: _StrOrPromise
     site_url: str
     login_form: type[AuthenticationForm] | None
     index_template: str | None
