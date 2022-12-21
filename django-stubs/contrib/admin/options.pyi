@@ -217,7 +217,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def message_user(
         self,
         request: HttpRequest,
-        message: str,
+        message: _StrOrPromise,
         level: int | str = ...,
         extra_tags: str = ...,
         fail_silently: bool = ...,
