@@ -1,9 +1,9 @@
-from collections.abc import Awaitable, Callable, Iterable, Iterator
+from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
 from io import BytesIO
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, NoReturn, TypeVar
+from typing import Any, Generic, NoReturn, TypeAlias, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -58,6 +58,10 @@ class AsyncClientHandler(BaseHandler):
 def encode_multipart(boundary: str, data: dict[str, Any]) -> bytes: ...
 def encode_file(boundary: str, key: str, file: Any) -> list[bytes]: ...
 
+_GetDataType: TypeAlias = (
+    Mapping[str, str | bytes | Iterable[str | bytes]] | Iterable[tuple[str, str | bytes | Iterable[str | bytes]]] | None
+)
+
 class _RequestFactory(Generic[_T]):
     json_encoder: type[JSONEncoder]
     defaults: dict[str, str]
@@ -65,7 +69,7 @@ class _RequestFactory(Generic[_T]):
     errors: BytesIO
     def __init__(self, *, json_encoder: type[JSONEncoder] = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> _T: ...
-    def get(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
+    def get(self, path: str, data: _GetDataType = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def post(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def trace(self, path: str, secure: bool = ..., **extra: Any) -> _T: ...
@@ -129,7 +133,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
     def get(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self, path: str, data: _GetDataType = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def post(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
