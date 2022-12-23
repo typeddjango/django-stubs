@@ -3,6 +3,7 @@ from typing import Any
 
 from django.http.request import HttpRequest
 
+from ..context import _ContextKeys
 from .base import BaseEngine
 
 class TemplateStrings(BaseEngine):
@@ -11,4 +12,4 @@ class TemplateStrings(BaseEngine):
 
 class Template(string.Template):
     template: str
-    def render(self, context: dict[str, str] | None = ..., request: HttpRequest | None = ...) -> str: ...
+    def render(self, context: dict[_ContextKeys, str] | None = ..., request: HttpRequest | None = ...) -> str: ...

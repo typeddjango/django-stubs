@@ -6,6 +6,8 @@ from django.template import TemplateDoesNotExist
 from django.template.base import Context
 from django.utils.safestring import SafeString
 
+from ..context import _ContextKeys
+
 class BaseEngine:
     name: str
     dirs: list[str]
@@ -22,6 +24,6 @@ class BaseEngine:
 class _EngineTemplate(Protocol):
     def render(
         self,
-        context: Context | dict[str, Any] | None = ...,
+        context: Context | dict[_ContextKeys, Any] | None = ...,
         request: HttpRequest | None = ...,
     ) -> SafeString: ...
