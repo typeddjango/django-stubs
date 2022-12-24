@@ -8,6 +8,7 @@ from django.template.context import Context
 from django.utils.safestring import SafeString
 
 from .base import Node, NodeList
+from .context import _ContextKeys
 from .library import Library
 from .smartif import IfParser, Literal
 
@@ -154,13 +155,13 @@ class WidthRatioNode(Node):
 
 class WithNode(Node):
     nodelist: NodeList
-    extra_context: dict[str, Any]
+    extra_context: dict[_ContextKeys, Any]
     def __init__(
         self,
         var: str | None,
         name: str | None,
         nodelist: NodeList | Sequence[Node],
-        extra_context: dict[str, Any] | None = ...,
+        extra_context: dict[_ContextKeys, Any] | None = ...,
     ) -> None: ...
 
 def autoescape(parser: Parser, token: Token) -> AutoEscapeControlNode: ...

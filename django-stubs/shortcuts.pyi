@@ -9,10 +9,12 @@ from django.http.response import HttpResponsePermanentRedirect as HttpResponsePe
 from django.http.response import HttpResponseRedirect as HttpResponseRedirect
 from typing_extensions import Literal
 
+from .template.context import _ContextKeys
+
 def render(
     request: HttpRequest,
     template_name: str | Sequence[str],
-    context: Mapping[str, Any] | None = ...,
+    context: dict[_ContextKeys, Any] | None = ...,
     content_type: str | None = ...,
     status: int | None = ...,
     using: str | None = ...,
