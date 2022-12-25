@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 from django.contrib.gis.gdal.driver import Driver as Driver
@@ -5,7 +6,7 @@ from django.contrib.gis.gdal.raster.band import BandList as BandList
 from django.contrib.gis.gdal.raster.base import GDALRasterBase as GDALRasterBase
 from django.contrib.gis.gdal.srs import SpatialReference as SpatialReference
 
-class TransformPoint(list):
+class TransformPoint(list[Sequence[float]]):
     indices: dict[str, tuple[int, int]]
     def __init__(self, raster: GDALRaster, prop: str) -> None: ...
     @property

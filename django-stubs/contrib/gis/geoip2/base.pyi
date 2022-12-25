@@ -14,7 +14,7 @@ class GeoIP2:
     MODE_MMAP: int
     MODE_FILE: int
     MODE_MEMORY: int
-    cache_options: frozenset
+    cache_options: frozenset[int]
     def __init__(
         self, path: Path | str | None = ..., cache: int = ..., country: Any | None = ..., city: Any | None = ...
     ) -> None: ...

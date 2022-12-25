@@ -27,7 +27,7 @@ class LayerMapping:
     source_srs: Any
     transform: Any
     encoding: str | None
-    unique: list | tuple | str | None
+    unique: list[str] | tuple[str, ...] | str | None
     transaction_mode: Any
     transaction_decorator: Any
     def __init__(
@@ -40,7 +40,7 @@ class LayerMapping:
         encoding: str = ...,
         transaction_mode: str = ...,
         transform: bool = ...,
-        unique: list | tuple | str | None = ...,
+        unique: list[str] | tuple[str, ...] | str | None = ...,
         using: str | None = ...,
     ) -> None: ...
     def check_fid_range(self, fid_range: Any) -> Any: ...

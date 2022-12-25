@@ -15,5 +15,6 @@ class Polygon(GEOSGeometry):
     exterior_ring: LinearRing
     shell: LinearRing
     @property
+    def coords(self) -> tuple[tuple[tuple[float, ...]]]: ...
+    @property
     def tuple(self) -> tuple[tuple[tuple[float, ...]]]: ...
-    coords: tuple[tuple[tuple[float, ...]]]

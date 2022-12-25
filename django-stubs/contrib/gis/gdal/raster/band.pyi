@@ -1,7 +1,7 @@
-from collections.abc import Iterator
-from typing import Any, Literal, overload
+from typing import Any, overload
 
 from django.contrib.gis.gdal.raster.base import GDALRasterBase as GDALRasterBase
+from typing_extensions import Literal
 
 class GDALBand(GDALRasterBase):
     source: Any
@@ -36,7 +36,7 @@ class GDALBand(GDALRasterBase):
     @overload
     def color_interp(self, as_string: Literal[False] = ...) -> int: ...
     @overload
-    def color_interp(self, as_string: Literal[True] = ...) -> str: ...
+    def color_interp(self, as_string: Literal[True]) -> str: ...
     def data(
         self,
         data: Any | None = ...,
@@ -46,9 +46,6 @@ class GDALBand(GDALRasterBase):
         as_memoryview: bool = ...,
     ) -> Any: ...
 
-class BandList(list):
+class BandList(list[GDALBand]):
     source: Any
     def __init__(self, source: Any) -> None: ...
-    def __iter__(self) -> Iterator[GDALBand]: ...
-    def __len__(self) -> int: ...
-    def __getitem__(self, index: int) -> GDALBand: ...
