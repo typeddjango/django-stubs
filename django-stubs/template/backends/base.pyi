@@ -5,8 +5,7 @@ from django.http.request import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.template.base import Context
 from django.utils.safestring import SafeString
-
-from ..context import _ContextKeys
+from template.context import _ContextKeys
 
 class BaseEngine:
     name: str

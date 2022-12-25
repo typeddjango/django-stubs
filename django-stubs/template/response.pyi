@@ -10,9 +10,8 @@ from django.template.base import Template
 from django.template.context import RequestContext
 from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
+from template.context import _ContextKeys
 from typing_extensions import TypeAlias
-
-from .context import _ContextKeys
 
 # https://github.com/python/mypy/issues/12211
 _TemplateForResponseT: TypeAlias = Union[_ListOrTuple[str], Template, str]

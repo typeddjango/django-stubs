@@ -9,8 +9,7 @@ from django.template.engine import Engine
 from django.template.library import Library
 from django.template.loaders.base import Loader
 from django.utils.safestring import SafeString
-
-from .context import _ContextKeys
+from template.context import _ContextKeys
 
 FILTER_SEPARATOR: str
 FILTER_ARGUMENT_SEPARATOR: str

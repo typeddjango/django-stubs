@@ -1,4 +1,4 @@
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Sequence
 from typing import Any, Protocol, TypeVar, overload
 
 from django.db.models import Manager, QuerySet
@@ -7,9 +7,8 @@ from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
 from django.http.response import HttpResponsePermanentRedirect as HttpResponsePermanentRedirect
 from django.http.response import HttpResponseRedirect as HttpResponseRedirect
+from template.context import _ContextKeys
 from typing_extensions import Literal
-
-from .template.context import _ContextKeys
 
 def render(
     request: HttpRequest,

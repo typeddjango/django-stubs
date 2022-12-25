@@ -33,9 +33,8 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
+from template.context import _ContextKeys
 from typing_extensions import Literal, TypeAlias, TypedDict
-
-from ...template.context import _ContextKeys
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str

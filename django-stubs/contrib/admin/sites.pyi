@@ -13,9 +13,8 @@ from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject, _StrOrPromise
+from template.context import _ContextKeys
 from typing_extensions import TypeAlias
-
-from ...template.context import _ContextKeys
 
 if sys.version_info >= (3, 9):
     from weakref import WeakSet
