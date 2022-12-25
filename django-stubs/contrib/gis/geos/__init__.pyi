@@ -2,6 +2,7 @@ from .collections import GeometryCollection as GeometryCollection
 from .collections import MultiLineString as MultiLineString
 from .collections import MultiPoint as MultiPoint
 from .collections import MultiPolygon as MultiPolygon
+from .error import GEOSException as GEOSException
 from .factory import fromfile as fromfile
 from .factory import fromstr as fromstr
 from .geometry import GEOSGeometry as GEOSGeometry
@@ -11,6 +12,7 @@ from .io import WKBReader as WKBReader
 from .io import WKBWriter as WKBWriter
 from .io import WKTReader as WKTReader
 from .io import WKTWriter as WKTWriter
+from .libgeos import geos_version as geos_version
 from .linestring import LinearRing as LinearRing
 from .linestring import LineString as LineString
 from .point import Point as Point
