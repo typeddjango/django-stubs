@@ -1,10 +1,12 @@
 from collections.abc import Iterator
 from typing import Any, NoReturn
 
+from django.template.base import Origin as _Origin
+from django.template.base import Template as _BaseTemplate
 from django.template.engine import Engine
 from django.template.exceptions import TemplateDoesNotExist
 
-from .base import BaseEngine
+from .base import BaseEngine, _EngineTemplate
 
 class DjangoTemplates(BaseEngine):
     engine: Engine
@@ -15,3 +17,10 @@ def copy_exception(exc: TemplateDoesNotExist, backend: DjangoTemplates | None = 
 def reraise(exc: TemplateDoesNotExist, backend: DjangoTemplates) -> NoReturn: ...
 def get_installed_libraries() -> dict[str, str]: ...
 def get_package_libraries(pkg: Any) -> Iterator[str]: ...
+
+class Template(_EngineTemplate):
+    template: _BaseTemplate
+    backend: DjangoTemplates
+    def __init__(self, template: _BaseTemplate, backend: BaseEngine) -> None: ...
+    @property
+    def origin(self) -> _Origin: ...
