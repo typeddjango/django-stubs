@@ -2,7 +2,7 @@ import string
 from typing import Any
 
 from django.http.request import HttpRequest
-from template.context import _ContextKeys
+from django.template.context import _ContextKeys
 
 from .base import BaseEngine
 

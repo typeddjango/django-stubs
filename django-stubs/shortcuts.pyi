@@ -7,7 +7,7 @@ from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
 from django.http.response import HttpResponsePermanentRedirect as HttpResponsePermanentRedirect
 from django.http.response import HttpResponseRedirect as HttpResponseRedirect
-from template.context import _ContextKeys
+from django.template.context import _ContextKeys
 from typing_extensions import Literal
 
 def render(

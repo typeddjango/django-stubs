@@ -5,7 +5,7 @@ from django.template.backends.base import BaseEngine
 from django.template.backends.django import DjangoTemplates as DjangoTemplatesR
 from django.template.backends.jinja2 import Jinja2 as Jinja2R
 from django.template.base import Template
-from template.context import _ContextKeys
+from django.template.context import _ContextKeys
 
 def get_default_renderer() -> BaseRenderer: ...
 

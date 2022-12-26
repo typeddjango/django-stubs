@@ -4,8 +4,9 @@ from typing import Any, Protocol
 from django.http.request import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.template.base import Context
+from django.template.context import _ContextKeys
 from django.utils.safestring import SafeString
-from template.context import _ContextKeys
+
 
 class BaseEngine:
     name: str

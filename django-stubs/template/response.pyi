@@ -7,10 +7,9 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.template.base import Template
-from django.template.context import RequestContext
+from django.template.context import RequestContext, _ContextKeys
 from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
-from template.context import _ContextKeys
 from typing_extensions import TypeAlias
 
 # https://github.com/python/mypy/issues/12211

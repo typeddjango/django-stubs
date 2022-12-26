@@ -5,11 +5,11 @@ from re import Pattern
 from typing import Any
 
 from django.template.context import Context as Context
+from django.template.context import _ContextKeys
 from django.template.engine import Engine
 from django.template.library import Library
 from django.template.loaders.base import Loader
 from django.utils.safestring import SafeString
-from template.context import _ContextKeys
 
 FILTER_SEPARATOR: str
 FILTER_ARGUMENT_SEPARATOR: str

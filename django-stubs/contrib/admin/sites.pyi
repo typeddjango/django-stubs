@@ -10,10 +10,10 @@ from django.db.models.base import Model
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
+from django.template.context import _ContextKeys
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject, _StrOrPromise
-from template.context import _ContextKeys
 from typing_extensions import TypeAlias
 
 if sys.version_info >= (3, 9):

@@ -28,12 +28,12 @@ from django.forms.models import (
 from django.forms.widgets import Media
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
+from django.template.context import _ContextKeys
 from django.template.response import _TemplateForResponseT
 from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from template.context import _ContextKeys
 from typing_extensions import Literal, TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
