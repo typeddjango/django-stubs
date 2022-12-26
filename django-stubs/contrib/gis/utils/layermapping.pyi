@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any, Protocol
 
 from django.contrib.gis.gdal import DataSource, OGRGeomType
 from django.contrib.gis.gdal.field import Field as OGRField
@@ -13,6 +13,9 @@ class InvalidString(LayerMapError): ...
 class InvalidDecimal(LayerMapError): ...
 class InvalidInteger(LayerMapError): ...
 class MissingForeignKey(LayerMapError): ...
+
+class _Writer(Protocol):
+    def write(self, __s: str) -> Any: ...
 
 class LayerMapping:
     MULTI_TYPES: dict[int, OGRGeomType]
@@ -65,6 +68,6 @@ class LayerMapping:
         step: bool = ...,
         progress: bool = ...,
         silent: bool = ...,
-        stream: TextIO = ...,
+        stream: _Writer = ...,
         strict: bool = ...,
     ) -> Any: ...
