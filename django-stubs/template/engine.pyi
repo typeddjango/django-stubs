@@ -1,4 +1,4 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from django.template.base import Origin
@@ -8,6 +8,7 @@ from django.utils.safestring import SafeString
 from typing_extensions import TypeAlias
 
 from .base import Template
+from .context import _ContextKeys
 
 _Loader: TypeAlias = Any
 
@@ -53,5 +54,5 @@ class Engine:
     ) -> tuple[Template, Origin]: ...
     def from_string(self, template_code: str) -> Template: ...
     def get_template(self, template_name: str) -> Template: ...
-    def render_to_string(self, template_name: str, context: dict[str, Any] | None = ...) -> SafeString: ...
+    def render_to_string(self, template_name: str, context: Mapping[_ContextKeys, Any] | None = ...) -> SafeString: ...
     def select_template(self, template_name_list: list[str]) -> Template: ...

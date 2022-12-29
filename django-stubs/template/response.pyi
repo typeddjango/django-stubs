@@ -1,5 +1,5 @@
 import functools
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from http.cookies import SimpleCookie
 from typing import Any, Union  # noqa: Y037   # https://github.com/python/mypy/issues/12211
 
@@ -7,7 +7,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.template.base import Template
-from django.template.context import RequestContext
+from django.template.context import RequestContext, _ContextKeys
 from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
 from typing_extensions import TypeAlias
@@ -24,12 +24,12 @@ class SimpleTemplateResponse(HttpResponse):
     status_code: int
     rendering_attrs: Any
     template_name: _TemplateForResponseT
-    context_data: dict[str, Any] | None
+    context_data: Mapping[_ContextKeys, Any] | None
     using: str | None
     def __init__(
         self,
         template: _TemplateForResponseT,
-        context: dict[str, Any] | None = ...,
+        context: Mapping[_ContextKeys, Any] | None = ...,
         content_type: str | None = ...,
         status: int | None = ...,
         charset: str | None = ...,
@@ -37,7 +37,7 @@ class SimpleTemplateResponse(HttpResponse):
         headers: dict[str, Any] | None = ...,
     ) -> None: ...
     def resolve_template(self, template: Sequence[str] | Template | str) -> Template: ...
-    def resolve_context(self, context: dict[str, Any] | None) -> dict[str, Any] | None: ...
+    def resolve_context(self, context: Mapping[_ContextKeys, Any] | None) -> Mapping[_ContextKeys, Any] | None: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
@@ -50,7 +50,7 @@ class TemplateResponse(SimpleTemplateResponse):
     client: Client
     closed: bool
     context: RequestContext
-    context_data: dict[str, Any] | None
+    context_data: Mapping[_ContextKeys, Any] | None
     cookies: SimpleCookie[str]
     csrf_cookie_set: bool
     json: functools.partial
@@ -65,7 +65,7 @@ class TemplateResponse(SimpleTemplateResponse):
         self,
         request: HttpRequest,
         template: _TemplateForResponseT,
-        context: dict[str, Any] | None = ...,
+        context: Mapping[_ContextKeys, Any] | None = ...,
         content_type: str | None = ...,
         status: int | None = ...,
         charset: str | None = ...,

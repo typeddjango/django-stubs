@@ -4,6 +4,7 @@ from typing import Any, Protocol
 from django.http.request import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.template.base import Context
+from django.template.context import _ContextKeys
 from django.utils.safestring import SafeString
 
 class BaseEngine:
@@ -22,6 +23,6 @@ class BaseEngine:
 class _EngineTemplate(Protocol):
     def render(
         self,
-        context: Context | dict[str, Any] | None = ...,
+        context: Context | Mapping[_ContextKeys, Any] | None = ...,
         request: HttpRequest | None = ...,
     ) -> SafeString: ...
