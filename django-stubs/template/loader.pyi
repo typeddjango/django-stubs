@@ -13,7 +13,7 @@ def get_template(template_name: str, using: str | None = ...) -> _EngineTemplate
 def select_template(template_name_list: Sequence[str] | str, using: str | None = ...) -> Any: ...
 def render_to_string(
     template_name: Sequence[str] | str,
-    context: dict[_ContextKeys, Any] | None = ...,
+    context: Mapping[_ContextKeys, Any] | None = ...,
     request: HttpRequest | None = ...,
     using: str | None = ...,
 ) -> SafeString: ...

@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, Mapping, Protocol, TypeVar, overload
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
@@ -13,7 +13,7 @@ from typing_extensions import Literal
 def render(
     request: HttpRequest,
     template_name: str | Sequence[str],
-    context: dict[_ContextKeys, Any] | None = ...,
+    context: Mapping[_ContextKeys, Any] | None = ...,
     content_type: str | None = ...,
     status: int | None = ...,
     using: str | None = ...,

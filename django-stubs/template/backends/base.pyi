@@ -23,6 +23,6 @@ class BaseEngine:
 class _EngineTemplate(Protocol):
     def render(
         self,
-        context: Context | dict[_ContextKeys, Any] | None = ...,
+        context: Context | Mapping[_ContextKeys, Any] | None = ...,
         request: HttpRequest | None = ...,
     ) -> SafeString: ...

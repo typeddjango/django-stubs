@@ -1,5 +1,5 @@
 import string
-from typing import Any
+from typing import Any, Mapping
 
 from django.http.request import HttpRequest
 from django.template.context import _ContextKeys
@@ -12,4 +12,4 @@ class TemplateStrings(BaseEngine):
 
 class Template(string.Template):
     template: str
-    def render(self, context: dict[_ContextKeys, Any] | None = ..., request: HttpRequest | None = ...) -> str: ...
+    def render(self, context: Mapping[_ContextKeys, Any] | None = ..., request: HttpRequest | None = ...) -> str: ...
