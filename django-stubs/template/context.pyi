@@ -1,7 +1,7 @@
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from contextlib import contextmanager
 from types import TracebackType
-from typing import Any, Mapping, TypeVar
+from typing import Any, TypeVar
 
 from _typeshed import Self
 from django.http.request import HttpRequest

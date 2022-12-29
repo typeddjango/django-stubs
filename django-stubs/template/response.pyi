@@ -1,7 +1,7 @@
 import functools
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from http.cookies import SimpleCookie
-from typing import Any, Mapping, Union  # noqa: Y037   # https://github.com/python/mypy/issues/12211
+from typing import Any, Union  # noqa: Y037   # https://github.com/python/mypy/issues/12211
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse

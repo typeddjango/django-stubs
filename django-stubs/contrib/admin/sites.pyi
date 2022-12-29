@@ -1,6 +1,6 @@
 import sys
-from collections.abc import Callable, Iterable
-from typing import Any, Mapping
+from collections.abc import Callable, Iterable, Mapping
+from typing import Any
 
 from django.apps.config import AppConfig
 from django.contrib.admin.options import ModelAdmin

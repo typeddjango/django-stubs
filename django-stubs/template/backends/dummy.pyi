@@ -1,5 +1,5 @@
 import string
-from typing import Any, Mapping
+from collections.abc import Mapping
 
 from django.http.request import HttpRequest
 from django.template.context import _ContextKeys

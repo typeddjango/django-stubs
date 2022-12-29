@@ -1,7 +1,6 @@
 from collections import namedtuple
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from datetime import date as real_date
-from typing import Any, Mapping
 
 from django.template.base import FilterExpression, Parser, Token
 from django.template.context import Context

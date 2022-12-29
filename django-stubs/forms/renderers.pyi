@@ -1,4 +1,4 @@
-from typing import Any, Mapping
+from collections.abc import Mapping
 
 from django.http import HttpRequest
 from django.template.backends.base import BaseEngine
