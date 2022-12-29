@@ -1,4 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
+from typing import Any
 
 from django.template.base import Origin
 from django.template.library import Library
