@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Any, NoReturn
 
-from django.template.base import Origin as _Origin
+from django.template.base import Origin
 from django.template.base import Template as _BaseTemplate
 from django.template.engine import Engine
 from django.template.exceptions import TemplateDoesNotExist
@@ -23,4 +23,4 @@ class Template(_EngineTemplate):
     backend: DjangoTemplates
     def __init__(self, template: _BaseTemplate, backend: BaseEngine) -> None: ...
     @property
-    def origin(self) -> _Origin: ...
+    def origin(self) -> Origin: ...
