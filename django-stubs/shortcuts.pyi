@@ -11,7 +11,7 @@ from django.template.context import _ContextKeys
 from typing_extensions import Literal
 
 def render(
-    request: HttpRequest,
+    request: HttpRequest | None,
     template_name: str | Sequence[str],
     context: Mapping[_ContextKeys, Any] | None = ...,
     content_type: str | None = ...,
