@@ -1,4 +1,12 @@
-from typing import Any
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any, Protocol
+
+from django.contrib.gis.gdal import DataSource, OGRGeomType
+from django.contrib.gis.gdal.field import Field as OGRField
+from django.contrib.gis.gdal.layer import Layer
+from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.models import Field, Model
 
 class LayerMapError(Exception): ...
 class InvalidString(LayerMapError): ...
@@ -6,39 +14,42 @@ class InvalidDecimal(LayerMapError): ...
 class InvalidInteger(LayerMapError): ...
 class MissingForeignKey(LayerMapError): ...
 
+class _Writer(Protocol):
+    def write(self, __s: str) -> Any: ...
+
 class LayerMapping:
-    MULTI_TYPES: Any
-    FIELD_TYPES: Any
-    ds: Any
-    layer: Any
-    using: Any
-    spatial_backend: Any
-    mapping: Any
-    model: Any
+    MULTI_TYPES: dict[int, OGRGeomType]
+    FIELD_TYPES: dict[Field, OGRField | tuple[OGRField, ...]]
+    ds: DataSource
+    layer: Layer
+    using: str
+    spatial_backend: BaseDatabaseOperations
+    mapping: Mapping[str, str]
+    model: type[Model]
     geo_field: Any
     source_srs: Any
     transform: Any
-    encoding: Any
-    unique: Any
+    encoding: str | None
+    unique: list[str] | tuple[str, ...] | str | None
     transaction_mode: Any
     transaction_decorator: Any
     def __init__(
         self,
-        model: Any,
-        data: Any,
-        mapping: Any,
+        model: type[Model],
+        data: str | Path | DataSource,
+        mapping: Mapping[str, str],
         layer: int = ...,
         source_srs: Any | None = ...,
         encoding: str = ...,
         transaction_mode: str = ...,
         transform: bool = ...,
-        unique: Any | None = ...,
-        using: Any | None = ...,
+        unique: list[str] | tuple[str, ...] | str | None = ...,
+        using: str | None = ...,
     ) -> None: ...
     def check_fid_range(self, fid_range: Any) -> Any: ...
     geom_field: str
-    fields: Any
-    coord_dim: Any
+    fields: dict[str, Field]
+    coord_dim: int
     def check_layer(self) -> Any: ...
     def check_srs(self, source_srs: Any) -> Any: ...
     def check_unique(self, unique: Any) -> None: ...
@@ -57,6 +68,6 @@ class LayerMapping:
         step: bool = ...,
         progress: bool = ...,
         silent: bool = ...,
-        stream: Any = ...,
+        stream: _Writer = ...,
         strict: bool = ...,
     ) -> Any: ...

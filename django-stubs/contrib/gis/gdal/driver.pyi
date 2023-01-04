@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
+from django.contrib.gis.gdal.base import GDALBase
 
 class Driver(GDALBase):
     ptr: Any
@@ -8,6 +8,6 @@ class Driver(GDALBase):
     @classmethod
     def ensure_registered(cls) -> None: ...
     @classmethod
-    def driver_count(cls) -> Any: ...
+    def driver_count(cls) -> int: ...
     @property
-    def name(self) -> Any: ...
+    def name(self) -> str: ...

@@ -1,6 +1,17 @@
 from collections.abc import Iterable
 from typing import Any, NamedTuple, TypeVar
 
+from django.contrib.gis import forms
+from django.contrib.gis.geos import (
+    GeometryCollection,
+    GEOSGeometry,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+)
 from django.core.validators import _ValidatorCallable
 from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 from django.utils.functional import _StrOrPromise
@@ -19,6 +30,12 @@ class SRIDCacheEntry(NamedTuple):
 def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 
 class BaseSpatialField(Field[_ST, _GT]):
+    form_class: type[forms.GeometryField]
+    geom_type: str
+    geom_class: type[GEOSGeometry] | None
+    geography: bool
+    spatial_index: bool
+    srid: int
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -59,12 +76,7 @@ class BaseSpatialField(Field[_ST, _GT]):
     def get_prep_value(self, value: Any) -> Any: ...
 
 class GeometryField(BaseSpatialField):
-    description: Any
-    form_class: Any
-    geom_type: str
-    geom_class: Any
-    dim: Any
-    geography: Any
+    dim: int
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -101,56 +113,38 @@ class GeometryField(BaseSpatialField):
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 
 class PointField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[Point]
+    form_class: type[forms.PointField]
 
 class LineStringField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[LineString]
+    form_class: type[forms.LineStringField]
 
 class PolygonField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[Polygon]
+    form_class: type[forms.PolygonField]
 
 class MultiPointField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[MultiPoint]
+    form_class: type[forms.MultiPointField]
 
 class MultiLineStringField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[MultiLineString]
+    form_class: type[forms.MultiLineStringField]
 
 class MultiPolygonField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[MultiPolygon]
+    form_class: type[forms.MultiPolygonField]
 
 class GeometryCollectionField(GeometryField):
-    geom_type: str
-    geom_class: Any
-    form_class: Any
-    description: Any
+    geom_class: type[GeometryCollection]
+    form_class: type[forms.GeometryCollectionField]
 
 class ExtentField(Field):
-    description: Any
     def get_internal_type(self) -> Any: ...
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 
 class RasterField(BaseSpatialField):
-    description: Any
-    geom_type: str
-    geography: bool
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
     def get_transform(self, name: Any) -> Any: ...
