@@ -24,8 +24,8 @@ class BaseConstraint:
     def clone(self: _T) -> _T: ...
 
 class CheckConstraint(BaseConstraint):
-    check: Union[Q, BaseExpression]
-    def __init__(self, *, check: Union[Q, BaseExpression], name: str) -> None: ...
+    check: Q | BaseExpression
+    def __init__(self, *, check: Q | BaseExpression, name: str) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
     expressions: Tuple[Combinable, ...]
