@@ -1,6 +1,7 @@
 from typing import Any, TypeVar
 
 from _typeshed import Self
+from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex as hex_regex  # noqa: F401
 from django.contrib.gis.geometry import json_regex as json_regex
 from django.contrib.gis.geometry import wkt_regex as wkt_regex
@@ -92,7 +93,7 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def crs(self) -> Any: ...
     ptr: Any
-    def transform(self, ct: Any, clone: bool = ...) -> Any: ...
+    def transform(self, ct: CoordTransform | SpatialReference | str | int, clone: bool = ...) -> Any: ...
     @property
     def boundary(self) -> Any: ...
     def buffer(self, width: Any, quadsegs: int = ...) -> Any: ...
