@@ -4,13 +4,12 @@ from _typeshed import Self
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.contrib.gis.gdal.geometries import OGRGeometry
 from django.contrib.gis.geometry import hex_regex as hex_regex  # noqa: F401
-from django.contrib.gis.geometry import json_regex as json_regex
 from django.contrib.gis.geometry import wkt_regex as wkt_regex
-from django.contrib.gis.geos.base import GEOSBase as GEOSBase
-from django.contrib.gis.geos.coordseq import GEOSCoordSeq as GEOSCoordSeq
-from django.contrib.gis.geos.mutable_list import ListMixin as ListMixin
+from django.contrib.gis.geos.base import GEOSBase
+from django.contrib.gis.geos.coordseq import GEOSCoordSeq
+from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.point import Point
-from django.contrib.gis.geos.prepared import PreparedGeometry as PreparedGeometry
+from django.contrib.gis.geos.prepared import PreparedGeometry
 
 class GEOSGeometryBase(GEOSBase):
     ptr_type: Any

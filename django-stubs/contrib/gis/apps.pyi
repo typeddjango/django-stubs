@@ -1,3 +1,3 @@
-from django.apps import AppConfig as AppConfig
+from django.apps import AppConfig
 
 class GISConfig(AppConfig): ...

@@ -2,7 +2,7 @@ from enum import IntEnum
 from typing import Any, AnyStr
 
 from _typeshed import Self
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
+from django.contrib.gis.gdal.base import GDALBase
 
 class AxisOrder(IntEnum):
     TRADITIONAL: int

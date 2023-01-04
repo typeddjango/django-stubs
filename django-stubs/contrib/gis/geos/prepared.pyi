@@ -1,7 +1,7 @@
 from typing import Any
 
-from .base import GEOSBase as GEOSBase
-from .geometry import GEOSGeometry as GEOSGeometry
+from .base import GEOSBase
+from .geometry import GEOSGeometry
 
 class PreparedGeometry(GEOSBase):
     ptr_type: Any

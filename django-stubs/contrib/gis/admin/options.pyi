@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.contrib.admin import ModelAdmin as ModelAdmin
+from django.contrib.admin import ModelAdmin
 from django.contrib.gis.forms import BaseGeometryWidget
 
 spherical_mercator_srid: int

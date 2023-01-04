@@ -1,9 +1,9 @@
 from typing import Any, AnyStr
 
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
-from django.contrib.gis.gdal.envelope import Envelope as Envelope
-from django.contrib.gis.gdal.geomtype import OGRGeomType as OGRGeomType
+from django.contrib.gis.gdal.base import GDALBase
+from django.contrib.gis.gdal.envelope import Envelope
+from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.geos import GEOSGeometry
 
 class OGRGeometry(GDALBase):

@@ -1,8 +1,8 @@
 from collections.abc import Iterator
 from typing import Any
 
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
-from django.contrib.gis.geos.linestring import LinearRing as LinearRing
+from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos.linestring import LinearRing
 
 class Polygon(GEOSGeometry):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...

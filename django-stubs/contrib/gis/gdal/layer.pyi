@@ -1,14 +1,14 @@
 from collections.abc import Iterator
 from typing import Any, AnyStr, overload
 
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
-from django.contrib.gis.gdal.envelope import Envelope as Envelope
-from django.contrib.gis.gdal.feature import Feature as Feature
-from django.contrib.gis.gdal.field import Field as Field
-from django.contrib.gis.gdal.geometries import OGRGeometry as OGRGeometry
-from django.contrib.gis.gdal.geomtype import OGRGeomType as OGRGeomType
-from django.contrib.gis.gdal.srs import SpatialReference as SpatialReference
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
+from django.contrib.gis.gdal.base import GDALBase
+from django.contrib.gis.gdal.envelope import Envelope
+from django.contrib.gis.gdal.feature import Feature
+from django.contrib.gis.gdal.field import Field
+from django.contrib.gis.gdal.geometries import OGRGeometry
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.srs import SpatialReference
+from django.contrib.gis.geos.geometry import GEOSGeometry
 from typing_extensions import Literal
 
 class Layer(GDALBase):

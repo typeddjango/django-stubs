@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Any
 
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometry
 
 class Point(GEOSGeometry):
     has_cs: bool

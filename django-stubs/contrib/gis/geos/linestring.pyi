@@ -1,8 +1,7 @@
 from collections.abc import Iterator
 from typing import Any
 
-from django.contrib.gis.geos.geometry import GEOSGeometry as GEOSGeometry
-from django.contrib.gis.geos.geometry import LinearGeometryMixin as LinearGeometryMixin
+from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 
 class LineString(LinearGeometryMixin, GEOSGeometry):
     has_cs: bool

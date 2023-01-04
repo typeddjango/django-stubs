@@ -1,8 +1,8 @@
 from typing import Any
 
-from django.contrib.gis.gdal.base import GDALBase as GDALBase
-from django.contrib.gis.gdal.driver import Driver as Driver
-from django.contrib.gis.gdal.layer import Layer as Layer
+from django.contrib.gis.gdal.base import GDALBase
+from django.contrib.gis.gdal.driver import Driver
+from django.contrib.gis.gdal.layer import Layer
 
 class DataSource(GDALBase):
     destructor: Any
