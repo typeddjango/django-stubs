@@ -3,7 +3,7 @@ from io import BytesIO
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, NoReturn, TypeAlias, TypeVar
+from typing import Any, Generic, NoReturn, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -16,6 +16,7 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
+from typing_extensions import TypeAlias
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
