@@ -7,12 +7,13 @@ from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
 from django.http.response import HttpResponsePermanentRedirect as HttpResponsePermanentRedirect
 from django.http.response import HttpResponseRedirect as HttpResponseRedirect
+from django.template.context import _ContextKeys
 from typing_extensions import Literal
 
 def render(
-    request: HttpRequest,
+    request: HttpRequest | None,
     template_name: str | Sequence[str],
-    context: Mapping[str, Any] | None = ...,
+    context: Mapping[_ContextKeys, Any] | None = ...,
     content_type: str | None = ...,
     status: int | None = ...,
     using: str | None = ...,

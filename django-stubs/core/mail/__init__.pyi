@@ -1,6 +1,8 @@
 from collections.abc import Iterable, Sequence
 from typing import Any
 
+from django.utils.functional import _StrOrPromise
+
 from .message import DEFAULT_ATTACHMENT_MIME_TYPE as DEFAULT_ATTACHMENT_MIME_TYPE
 from .message import BadHeaderError as BadHeaderError
 from .message import EmailMessage as EmailMessage
@@ -13,7 +15,7 @@ from .utils import CachedDnsName as CachedDnsName
 
 def get_connection(backend: str | None = ..., fail_silently: bool = ..., **kwds: Any) -> Any: ...
 def send_mail(
-    subject: str,
+    subject: _StrOrPromise,
     message: str,
     from_email: str | None,
     recipient_list: Sequence[str],
