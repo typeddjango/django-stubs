@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any
 from uuid import UUID
 
 from django.db.models.options import Options
@@ -8,10 +8,10 @@ from django.utils.safestring import SafeString
 register: Any
 
 def admin_urlname(value: Options, arg: SafeString) -> str: ...
-def admin_urlquote(value: Union[int, str, UUID]) -> Union[int, str, UUID]: ...
+def admin_urlquote(value: int | str | UUID) -> int | str | UUID: ...
 def add_preserved_filters(
-    context: Union[Dict[str, Union[Options, str]], RequestContext],
+    context: dict[str, Options | str] | RequestContext,
     url: str,
     popup: bool = ...,
-    to_field: Optional[str] = ...,
+    to_field: str | None = ...,
 ) -> str: ...

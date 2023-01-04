@@ -1,0 +1,49 @@
+-   case: django_db_models_query_module_has_ModelIterable
+    main: |
+        from django.db.models.query import ModelIterable
+        from django.db.models import Model
+
+        class IntModelIterable(ModelIterable[int]):
+            pass
+
+        class NoTypeParameterModelIterable(ModelIterable):
+            pass
+
+        class ModelModelIterable(ModelIterable[Model]):
+            pass
+
+        class MyModel(Model):
+            pass
+
+        class MyModelModelIterable(ModelIterable[MyModel]):
+            pass
+    out: |
+        main:4: error: Type argument "int" of "ModelIterable" must be a subtype of "Model"
+-   case: django_db_models_query_module_has_ValuesListIterable
+    main: |
+        from django.db.models.query import ValuesListIterable
+
+        class IntValuesListIterable(ValuesListIterable[tuple[int,int]]):
+            pass
+        class StringsValuesListIterable(ValuesListIterable[tuple[str,str,str]]):
+            pass
+        class MultiTypeValuesListIterable(ValuesListIterable[tuple[str,int,float]]):
+            pass
+
+        class NonTupleValuesListIterable(ValuesListIterable[int]):
+            pass
+    out: |
+        main:10: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"
+-   case: django_db_models_query_module_has_NamedValuesListIterable
+    main: |
+        from django.db.models.query import NamedValuesListIterable
+    out: |
+-   case: QuerySet_has__iterable_class_defined
+    main: |
+        from django.db.models.query import QuerySet, ValuesIterable, ModelIterable
+        iterable_class = QuerySet._iterable_class
+        QuerySet._iterable_class = ValuesIterable
+        QuerySet._iterable_class = ModelIterable
+        QuerySet._iterable_class = int
+    out: |
+        main:5: error: Incompatible types in assignment (expression has type "Type[int]", variable has type "Type[BaseIterable[Any]]")

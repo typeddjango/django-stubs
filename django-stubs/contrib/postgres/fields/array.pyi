@@ -1,4 +1,5 @@
-from typing import Any, Iterable, List, Optional, Sequence, Type, TypeVar, Union
+from collections.abc import Iterable, Sequence
+from typing import Any, TypeVar
 
 from django.core.validators import _ValidatorCallable
 from django.db.models import Field, Transform
@@ -13,24 +14,24 @@ _ST = TypeVar("_ST")
 _GT = TypeVar("_GT")
 
 class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[Sequence[Any], Combinable]
-    _pyi_private_get_type: List[Any]
+    _pyi_private_set_type: Sequence[Any] | Combinable
+    _pyi_private_get_type: list[Any]
 
-    empty_strings_allowed: bool = ...
-    default_error_messages: _ErrorMessagesT = ...
-    base_field: Field = ...
-    size: Optional[int] = ...
-    default_validators: Sequence[_ValidatorCallable] = ...
-    from_db_value: Any = ...
+    empty_strings_allowed: bool
+    default_error_messages: _ErrorMessagesT
+    base_field: Field
+    size: int | None
+    default_validators: Sequence[_ValidatorCallable]
+    from_db_value: Any
     def __init__(
         self,
         base_field: Field,
-        size: Optional[int] = ...,
+        size: int | None = ...,
         *,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -39,16 +40,16 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     @property
     def description(self) -> str: ...  # type: ignore
-    def get_transform(self, name: Any) -> Optional[Type[Transform]]: ...
+    def get_transform(self, name: Any) -> type[Transform] | None: ...

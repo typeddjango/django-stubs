@@ -1,30 +1,32 @@
 # Stubs for django.conf.urls (Python 3.5)
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, overload
+from collections.abc import Callable, Sequence
+from typing import Any, overload
 
 from django.http.response import HttpResponse, HttpResponseBase
 from django.urls import URLPattern, URLResolver
 from django.urls import include as include
+from typing_extensions import TypeAlias
 
-handler400: Union[str, Callable[..., HttpResponse]] = ...
-handler403: Union[str, Callable[..., HttpResponse]] = ...
-handler404: Union[str, Callable[..., HttpResponse]] = ...
-handler500: Union[str, Callable[..., HttpResponse]] = ...
+handler400: str | Callable[..., HttpResponse]
+handler403: str | Callable[..., HttpResponse]
+handler404: str | Callable[..., HttpResponse]
+handler500: str | Callable[..., HttpResponse]
 
-IncludedURLConf = Tuple[Sequence[Union[URLResolver, URLPattern]], Optional[str], Optional[str]]
+IncludedURLConf: TypeAlias = tuple[Sequence[URLResolver | URLPattern], str | None, str | None]
 
 # Deprecated
 @overload
 def url(
-    regex: str, view: Callable[..., HttpResponseBase], kwargs: Optional[Dict[str, Any]] = ..., name: Optional[str] = ...
+    regex: str, view: Callable[..., HttpResponseBase], kwargs: dict[str, Any] | None = ..., name: str | None = ...
 ) -> URLPattern: ...
 @overload
 def url(
-    regex: str, view: IncludedURLConf, kwargs: Optional[Dict[str, Any]] = ..., name: Optional[str] = ...
+    regex: str, view: IncludedURLConf, kwargs: dict[str, Any] | None = ..., name: str | None = ...
 ) -> URLResolver: ...
 @overload
 def url(
     regex: str,
-    view: Sequence[Union[URLResolver, str]],
-    kwargs: Optional[Dict[str, Any]] = ...,
-    name: Optional[str] = ...,
+    view: Sequence[URLResolver | str],
+    kwargs: dict[str, Any] | None = ...,
+    name: str | None = ...,
 ) -> URLResolver: ...

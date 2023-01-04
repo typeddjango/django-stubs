@@ -1,8 +1,9 @@
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, TypeVar, Union, overload
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any, TypeVar, overload
 from uuid import UUID
 
+from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
-from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesT, _FieldChoices, _LimitChoicesTo
@@ -23,12 +24,9 @@ from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Literal
 
-_T = TypeVar("_T", bound=models.Model)
-_F = TypeVar("_F", bound=models.Field)
+RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
-RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"] = ...
-
-def resolve_relation(scope_model: Type[Model], relation: Union[str, Type[Model]]) -> Union[str, Type[Model]]: ...
+def resolve_relation(scope_model: type[Model], relation: str | type[Model]) -> str | type[Model]: ...
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -36,23 +34,23 @@ _ST = TypeVar("_ST")
 _GT = TypeVar("_GT")
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
-    one_to_many: bool = ...
-    one_to_one: bool = ...
-    many_to_many: bool = ...
-    many_to_one: bool = ...
-    opts: Any = ...
+    one_to_many: bool
+    one_to_one: bool
+    many_to_many: bool
+    many_to_one: bool
+    opts: Any
 
     remote_field: ForeignObjectRel
-    rel_class: Type[ForeignObjectRel]
+    rel_class: type[ForeignObjectRel]
     swappable: bool
     @property
-    def related_model(self) -> Type[Model]: ...  # type: ignore
-    def get_forward_related_filter(self, obj: Model) -> Dict[str, Union[int, UUID]]: ...
+    def related_model(self) -> type[Model]: ...  # type: ignore
+    def get_forward_related_filter(self, obj: Model) -> dict[str, int | UUID]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
     @property
-    def swappable_setting(self) -> Optional[str]: ...
+    def swappable_setting(self) -> str | None: ...
     def set_attributes_from_rel(self) -> None: ...
-    def do_related_class(self, other: Type[Model], cls: Type[Model]) -> None: ...
+    def do_related_class(self, other: type[Model], cls: type[Model]) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def related_query_name(self) -> str: ...
     @property
@@ -60,26 +58,26 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
 
 class ForeignObject(RelatedField[_ST, _GT]):
     remote_field: ForeignObjectRel
-    rel_class: Type[ForeignObjectRel]
+    rel_class: type[ForeignObjectRel]
     from_fields: Sequence[str]
     to_fields: Sequence[str | None]  # None occurs in ForeignKey, where to_field defaults to None
     swappable: bool
     def __init__(
         self,
-        to: Union[Type[Model], str],
+        to: type[Model] | str,
         on_delete: Callable[..., None],
         from_fields: Sequence[str],
         to_fields: Sequence[str],
-        rel: Optional[ForeignObjectRel] = ...,
-        related_name: Optional[str] = ...,
-        related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
+        rel: ForeignObjectRel | None = ...,
+        related_name: str | None = ...,
+        related_query_name: str | None = ...,
+        limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
         swappable: bool = ...,
         *,
         db_constraint: bool = ...,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
@@ -89,44 +87,44 @@ class ForeignObject(RelatedField[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: Optional[_FieldChoices] = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
-    def resolve_related_fields(self) -> List[Tuple[Field, Field]]: ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
+    def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
     @property
-    def related_fields(self) -> List[Tuple[Field, Field]]: ...
+    def related_fields(self) -> list[tuple[Field, Field]]: ...
     @property
-    def reverse_related_fields(self) -> List[Tuple[Field, Field]]: ...
+    def reverse_related_fields(self) -> list[tuple[Field, Field]]: ...
     @property
-    def local_related_fields(self) -> Tuple[Field, ...]: ...
+    def local_related_fields(self) -> tuple[Field, ...]: ...
     @property
-    def foreign_related_fields(self) -> Tuple[Field, ...]: ...
+    def foreign_related_fields(self) -> tuple[Field, ...]: ...
 
 class ForeignKey(ForeignObject[_ST, _GT]):
-    _pyi_private_set_type: Union[Any, Combinable]
+    _pyi_private_set_type: Any | Combinable
     _pyi_private_get_type: Any
 
     remote_field: ManyToOneRel
-    rel_class: Type[ManyToOneRel]
+    rel_class: type[ManyToOneRel]
     def __init__(
         self,
-        to: Union[Type[Model], str],
+        to: type[Model] | str,
         on_delete: Callable[..., None],
-        related_name: Optional[str] = ...,
-        related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
+        related_name: str | None = ...,
+        related_query_name: str | None = ...,
+        limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        to_field: Optional[str] = ...,
+        to_field: str | None = ...,
         db_constraint: bool = ...,
         *,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -135,47 +133,47 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
     # class access
     @overload  # type: ignore
-    def __get__(self, instance: None, owner) -> ForwardManyToOneDescriptor: ...
+    def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _F, instance, owner) -> _F: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
 
 class OneToOneField(ForeignKey[_ST, _GT]):
-    _pyi_private_set_type: Union[Any, Combinable]
+    _pyi_private_set_type: Any | Combinable
     _pyi_private_get_type: Any
 
     remote_field: OneToOneRel
-    rel_class: Type[OneToOneRel]
+    rel_class: type[OneToOneRel]
     def __init__(
         self,
-        to: Union[Type[Model], str],
+        to: type[Model] | str,
         on_delete: Any,
-        to_field: Optional[str] = ...,
+        to_field: str | None = ...,
         *,
-        related_name: Optional[str] = ...,
-        related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
+        related_name: str | None = ...,
+        related_query_name: str | None = ...,
+        limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
         db_constraint: bool = ...,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -184,33 +182,33 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
     # class access
     @overload  # type: ignore
-    def __get__(self, instance: None, owner) -> ForwardOneToOneDescriptor: ...
+    def __get__(self, instance: None, owner: Any) -> ForwardOneToOneDescriptor: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _F, instance, owner) -> _F: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
 
 class ManyToManyField(RelatedField[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any]
     _pyi_private_get_type: RelatedManager[Any]
 
-    description: str = ...
-    has_null_arg: bool = ...
-    swappable: bool = ...
+    description: str
+    has_null_arg: bool
+    swappable: bool
 
     many_to_many: Literal[True]
     many_to_one: Literal[False]
@@ -218,24 +216,24 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     one_to_one: Literal[False]
 
     remote_field: ManyToManyRel
-    rel_class: Type[ManyToManyRel]
+    rel_class: type[ManyToManyRel]
     def __init__(
         self,
-        to: Union[Type[Model], str],
-        related_name: Optional[str] = ...,
-        related_query_name: Optional[str] = ...,
-        limit_choices_to: Optional[_AllLimitChoicesTo] = ...,
-        symmetrical: Optional[bool] = ...,
-        through: Union[str, Type[Model], None] = ...,
-        through_fields: Optional[Tuple[str, str]] = ...,
+        to: type[Model] | str,
+        related_name: str | None = ...,
+        related_query_name: str | None = ...,
+        limit_choices_to: _AllLimitChoicesTo | None = ...,
+        symmetrical: bool | None = ...,
+        through: str | type[Model] | None = ...,
+        through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
-        db_table: Optional[str] = ...,
+        db_table: str | None = ...,
         swappable: bool = ...,
         *,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -244,28 +242,28 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     # class access
     @overload  # type: ignore
-    def __get__(self, instance: None, owner) -> ManyToManyDescriptor: ...
+    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _F, instance, owner) -> _F: ...
-    def get_path_info(self, filtered_relation: Optional[FilteredRelation] = ...) -> List[PathInfo]: ...
-    def get_reverse_path_info(self, filtered_relation: Optional[FilteredRelation] = ...) -> List[PathInfo]: ...
-    def contribute_to_related_class(self, cls: Type[Model], related: RelatedField) -> None: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
+    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
+    def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
+    def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...
     def m2m_db_table(self) -> str: ...
     def m2m_column_name(self) -> str: ...
     def m2m_reverse_name(self) -> str: ...
@@ -273,4 +271,4 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     def m2m_target_field_name(self) -> str: ...
     def m2m_reverse_target_field_name(self) -> str: ...
 
-def create_many_to_many_intermediary_model(field: ManyToManyField, klass: Type[Model]) -> Type[Model]: ...
+def create_many_to_many_intermediary_model(field: ManyToManyField, klass: type[Model]) -> type[Model]: ...

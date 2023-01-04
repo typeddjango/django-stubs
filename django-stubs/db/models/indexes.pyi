@@ -1,4 +1,5 @@
-from typing import Any, List, Optional, Sequence, Set, Tuple, Type, Union
+from collections.abc import Sequence
+from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
@@ -9,48 +10,48 @@ from django.db.models.query_utils import Q
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 class Index:
-    model: Type[Model]
-    suffix: str = ...
-    max_name_length: int = ...
-    fields: Sequence[str] = ...
-    fields_orders: Sequence[Tuple[str, str]] = ...
-    name: str = ...
-    db_tablespace: Optional[str] = ...
-    opclasses: Sequence[str] = ...
-    condition: Optional[Q] = ...
-    expressions: Sequence[Union[Union[BaseExpression, Combinable]]]
+    model: type[Model]
+    suffix: str
+    max_name_length: int
+    fields: Sequence[str]
+    fields_orders: Sequence[tuple[str, str]]
+    name: str
+    db_tablespace: str | None
+    opclasses: Sequence[str]
+    condition: Q | None
+    expressions: Sequence[BaseExpression | Combinable]
     include: Sequence[str]
     def __init__(
         self,
-        *expressions: Union[BaseExpression, Combinable, str],
+        *expressions: BaseExpression | Combinable | str,
         fields: Sequence[str] = ...,
-        name: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        name: str | None = ...,
+        db_tablespace: str | None = ...,
         opclasses: Sequence[str] = ...,
-        condition: Optional[Q] = ...,
-        include: Optional[Sequence[str]] = ...,
+        condition: Q | None = ...,
+        include: Sequence[str] | None = ...,
     ) -> None: ...
     @property
     def contains_expressions(self) -> bool: ...
     def create_sql(
-        self, model: Type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
+        self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
     ) -> Statement: ...
-    def remove_sql(self, model: Type[Model], schema_editor: BaseDatabaseSchemaEditor, **kwargs: Any) -> str: ...
+    def remove_sql(self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, **kwargs: Any) -> str: ...
     def deconstruct(self) -> Any: ...
     def clone(self) -> Index: ...
-    def set_name_with_model(self, model: Type[Model]) -> None: ...
+    def set_name_with_model(self, model: type[Model]) -> None: ...
 
 class IndexExpression(Func):
-    template: str = ...
-    wrapper_classes: Sequence[Expression] = ...
-    def set_wrapper_classes(self, connection: Optional[Any] = ...) -> None: ...
+    template: str
+    wrapper_classes: Sequence[Expression]
+    def set_wrapper_classes(self, connection: Any | None = ...) -> None: ...
     @classmethod
     def register_wrappers(cls, *wrapper_classes: Expression) -> None: ...
     def resolve_expression(
         self,
-        query: Optional[Any] = ...,
+        query: Any | None = ...,
         allow_joins: bool = ...,
-        reuse: Optional[Set[str]] = ...,
+        reuse: set[str] | None = ...,
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> IndexExpression: ...

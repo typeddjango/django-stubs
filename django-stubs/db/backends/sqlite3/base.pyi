@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from sqlite3 import dbapi2 as Database
-from typing import Any, Callable, Type, TypeVar
+from typing import Any, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 
@@ -20,11 +21,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection: DatabaseIntrospection
     ops: DatabaseOperations
 
-    client_class: Type[DatabaseClient]
-    creation_class: Type[DatabaseCreation]
-    features_class: Type[DatabaseFeatures]
-    introspection_class: Type[DatabaseIntrospection]
-    ops_class: Type[DatabaseOperations]
+    client_class: type[DatabaseClient]
+    creation_class: type[DatabaseCreation]
+    features_class: type[DatabaseFeatures]
+    introspection_class: type[DatabaseIntrospection]
+    ops_class: type[DatabaseOperations]
+
+    def is_in_memory_db(self) -> bool: ...
 
 FORMAT_QMARK_REGEX: Any
 

@@ -3,12 +3,12 @@ from typing import Any
 from django.contrib.gis.geos.libgeos import GEOSFuncFactory as GEOSFuncFactory
 
 class UnaryPredicate(GEOSFuncFactory):
-    argtypes: Any = ...
-    restype: Any = ...
-    errcheck: Any = ...
+    argtypes: Any
+    restype: Any
+    errcheck: Any
 
 class BinaryPredicate(UnaryPredicate):
-    argtypes: Any = ...
+    argtypes: Any
 
 geos_hasz: Any
 geos_isclosed: Any

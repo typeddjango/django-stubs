@@ -1,4 +1,4 @@
-from typing import Union
+from typing_extensions import TypeAlias
 
 # noinspection PyUnresolvedReferences
 from .base import clear_script_prefix as clear_script_prefix
@@ -37,4 +37,4 @@ from .resolvers import get_resolver as get_resolver
 from .utils import get_callable as get_callable
 from .utils import get_mod_func as get_mod_func
 
-_AnyURL = Union[URLPattern, URLResolver]
+_AnyURL: TypeAlias = URLPattern | URLResolver  # noqa: Y047

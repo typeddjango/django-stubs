@@ -3,8 +3,8 @@ from typing import Any
 from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 class DblFromGeom(GEOSFuncFactory):
-    restype: Any = ...
-    errcheck: Any = ...
+    restype: Any
+    errcheck: Any
 
 geos_area: Any
 geos_distance: Any

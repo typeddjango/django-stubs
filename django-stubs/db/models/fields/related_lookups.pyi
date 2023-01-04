@@ -1,4 +1,5 @@
-from typing import Any, Iterable, List, Mapping, Optional, Tuple, Type
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 from django.db.models.fields import Field
 from django.db.models.lookups import (
@@ -15,26 +16,26 @@ from django.db.models.lookups import (
 class MultiColSource:
     alias: str
     field: Field
-    sources: Tuple[Field, Field]
-    targets: Tuple[Field, Field]
-    contains_aggregate: bool = ...
-    output_field: Field = ...
+    sources: tuple[Field, Field]
+    targets: tuple[Field, Field]
+    contains_aggregate: bool
+    output_field: Field
     def __init__(
-        self, alias: str, targets: Tuple[Field, Field], sources: Tuple[Field, Field], field: Field
+        self, alias: str, targets: tuple[Field, Field], sources: tuple[Field, Field], field: Field
     ) -> None: ...
     def relabeled_clone(self, relabels: Mapping[str, str]) -> MultiColSource: ...
-    def get_lookup(self, lookup: str) -> Optional[Type[Lookup]]: ...
+    def get_lookup(self, lookup: str) -> type[Lookup] | None: ...
 
-def get_normalized_value(value: Any, lhs: Any) -> Tuple[Any, ...]: ...
+def get_normalized_value(value: Any, lhs: Any) -> tuple[Any, ...]: ...
 
 class RelatedIn(In):
-    bilateral_transforms: List[Any]
+    bilateral_transforms: list[Any]
     lhs: Any
-    rhs: Any = ...
+    rhs: Any
     def get_prep_lookup(self) -> Iterable[Any]: ...
 
 class RelatedLookupMixin:
-    rhs: Any = ...
+    rhs: Any
     def get_prep_lookup(self) -> Any: ...
 
 class RelatedExact(RelatedLookupMixin, Exact): ...

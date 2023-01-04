@@ -1,23 +1,9 @@
+from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
 from io import BytesIO
 from json import JSONEncoder
+from re import Pattern
 from types import TracebackType
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Dict,
-    Generic,
-    Iterable,
-    Iterator,
-    List,
-    NoReturn,
-    Optional,
-    Pattern,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Generic, NoReturn, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -30,23 +16,24 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
+from typing_extensions import TypeAlias
 
-BOUNDARY: str = ...
-MULTIPART_CONTENT: str = ...
-CONTENT_TYPE_RE: Pattern = ...
-JSON_CONTENT_TYPE_RE: Pattern = ...
+BOUNDARY: str
+MULTIPART_CONTENT: str
+CONTENT_TYPE_RE: Pattern
+JSON_CONTENT_TYPE_RE: Pattern
 
 class RedirectCycleError(Exception):
-    last_response: HttpResponseBase = ...
-    redirect_chain: List[Tuple[str, int]] = ...
+    last_response: HttpResponseBase
+    redirect_chain: list[tuple[str, int]]
     def __init__(self, message: str, last_response: HttpResponseBase) -> None: ...
 
 class FakePayload:
-    read_started: bool = ...
-    def __init__(self, content: Optional[Union[bytes, str]] = ...) -> None: ...
+    read_started: bool
+    def __init__(self, content: bytes | str | None = ...) -> None: ...
     def __len__(self) -> int: ...
     def read(self, num_bytes: int = ...) -> bytes: ...
-    def write(self, content: Union[bytes, str]) -> None: ...
+    def write(self, content: bytes | str) -> None: ...
 
 _T = TypeVar("_T")
 
@@ -60,48 +47,41 @@ class _ASGIResponse(HttpResponseBase):
     asgi_request: ASGIRequest
 
 class ClientHandler(BaseHandler):
-    enforce_csrf_checks: bool = ...
+    enforce_csrf_checks: bool
     def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
-    def __call__(self, environ: Dict[str, Any]) -> _WSGIResponse: ...
+    def __call__(self, environ: dict[str, Any]) -> _WSGIResponse: ...
 
 class AsyncClientHandler(BaseHandler):
-    enforce_csrf_checks: bool = ...
+    enforce_csrf_checks: bool
     def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
-    async def __call__(self, scope: Dict[str, Any]) -> _ASGIResponse: ...
+    async def __call__(self, scope: dict[str, Any]) -> _ASGIResponse: ...
 
-def encode_multipart(boundary: str, data: Dict[str, Any]) -> bytes: ...
-def encode_file(boundary: str, key: str, file: Any) -> List[bytes]: ...
+def encode_multipart(boundary: str, data: dict[str, Any]) -> bytes: ...
+def encode_file(boundary: str, key: str, file: Any) -> list[bytes]: ...
+
+_GetDataType: TypeAlias = (
+    Mapping[str, str | bytes | Iterable[str | bytes]] | Iterable[tuple[str, str | bytes | Iterable[str | bytes]]] | None
+)
 
 class _RequestFactory(Generic[_T]):
-    json_encoder: Type[JSONEncoder]
-    defaults: Dict[str, str]
+    json_encoder: type[JSONEncoder]
+    defaults: dict[str, str]
     cookies: SimpleCookie
     errors: BytesIO
-    def __init__(self, *, json_encoder: Type[JSONEncoder] = ..., **defaults: Any) -> None: ...
+    def __init__(self, *, json_encoder: type[JSONEncoder] = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> _T: ...
-    def get(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
+    def get(self, path: str, data: _GetDataType = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def post(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def trace(self, path: str, secure: bool = ..., **extra: Any) -> _T: ...
     def options(
-        self,
-        path: str,
-        data: Union[Dict[str, str], str] = ...,
-        content_type: str = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, path: str, data: dict[str, str] | str = ..., content_type: str = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
     def put(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def patch(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def delete(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
     def generic(
-        self,
-        method: str,
-        path: str,
-        data: Any = ...,
-        content_type: Optional[str] = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, method: str, path: str, data: Any = ..., content_type: str | None = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
 
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
@@ -109,13 +89,7 @@ class RequestFactory(_RequestFactory[WSGIRequest]): ...
 class _AsyncRequestFactory(_RequestFactory[_T]):
     def request(self, **request: Any) -> _T: ...
     def generic(
-        self,
-        method: str,
-        path: str,
-        data: Any = ...,
-        content_type: Optional[str] = ...,
-        secure: bool = ...,
-        **extra: Any
+        self, method: str, path: str, data: Any = ..., content_type: str | None = ..., secure: bool = ..., **extra: Any
     ) -> _T: ...
 
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
@@ -123,23 +97,23 @@ class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 # fakes to distinguish WSGIRequest and ASGIRequest
 class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     def json(self) -> Any: ...
-    request: Dict[str, Any]
+    request: dict[str, Any]
     client: Client
-    templates: List[Template]
-    context: ContextList | Dict[str, Any]
+    templates: list[Template]
+    context: ContextList | dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
-    redirect_chain: List[Tuple[str, int]]
+    redirect_chain: list[tuple[str, int]]
 
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
     def json(self) -> Any: ...
-    request: Dict[str, Any]
+    request: dict[str, Any]
     client: AsyncClient
-    templates: List[Template]
-    context: ContextList | Dict[str, Any]
+    templates: list[Template]
+    context: ContextList | dict[str, Any]
     content: bytes
     resolver_match: ResolverMatch
-    redirect_chain: List[Tuple[str, int]]
+    redirect_chain: list[tuple[str, int]]
 
 class ClientMixin:
     def store_exc_info(self, **kwargs: Any) -> None: ...
@@ -147,20 +121,20 @@ class ClientMixin:
     @property
     def session(self) -> SessionBase: ...
     def login(self, **credentials: Any) -> bool: ...
-    def force_login(self, user: AbstractBaseUser, backend: Optional[str] = ...) -> None: ...
+    def force_login(self, user: AbstractBaseUser, backend: str | None = ...) -> None: ...
     def logout(self) -> None: ...
 
 class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     handler: ClientHandler
     raise_request_exception: bool
-    exc_info: Optional[Tuple[Type[BaseException], BaseException, TracebackType]]
+    exc_info: tuple[type[BaseException], BaseException, TracebackType] | None
     def __init__(
         self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
     ) -> None: ...
     # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
     def get(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self, path: str, data: _GetDataType = ..., follow: bool = ..., secure: bool = ..., **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def post(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
@@ -170,15 +144,6 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def trace(  # type: ignore
         self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
-    ) -> _MonkeyPatchedWSGIResponse: ...
-    def options(  # type: ignore
-        self,
-        path: str,
-        data: Union[Dict[str, str], str] = ...,
-        content_type: str = ...,
-        follow: bool = ...,
-        secure: bool = ...,
-        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def put(  # type: ignore
         self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any

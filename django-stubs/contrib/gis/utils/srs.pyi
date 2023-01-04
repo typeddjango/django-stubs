@@ -1,9 +1,9 @@
-from typing import Any, Optional
+from typing import Any
 
 def add_srs_entry(
     srs: Any,
     auth_name: str = ...,
-    auth_srid: Optional[Any] = ...,
-    ref_sys_name: Optional[Any] = ...,
-    database: Optional[Any] = ...,
+    auth_srid: Any | None = ...,
+    ref_sys_name: Any | None = ...,
+    database: Any | None = ...,
 ) -> None: ...

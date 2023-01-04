@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional, Sequence, Type, Union
+from collections.abc import Sequence
+from typing import Any
 
 from django import forms as forms
 from django.contrib.postgres.validators import ArrayMaxLengthValidator as ArrayMaxLengthValidator
@@ -12,18 +13,18 @@ from django.forms.widgets import Media, _OptAttrs
 from ..utils import prefix_validation_error as prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
-    default_error_messages: _ErrorMessagesT = ...
+    default_error_messages: _ErrorMessagesT
     base_field: forms.Field
     delimiter: str
-    min_length: Optional[int]
-    max_length: Optional[int]
+    min_length: int | None
+    max_length: int | None
     def __init__(
         self,
         base_field: forms.Field,
         *,
         delimiter: str = ...,
-        max_length: Optional[int] = ...,
-        min_length: Optional[int] = ...,
+        max_length: int | None = ...,
+        min_length: int | None = ...,
         **kwargs: Any
     ) -> None: ...
     def clean(self, value: Any) -> Sequence[Any]: ...
@@ -37,20 +38,20 @@ class SplitArrayWidget(forms.Widget):
     template_name: str
     widget: _ClassLevelWidgetT
     size: int
-    def __init__(self, widget: Union[forms.Widget, Type[forms.Widget]], size: int, **kwargs: Any) -> None: ...
+    def __init__(self, widget: forms.Widget | type[forms.Widget], size: int, **kwargs: Any) -> None: ...
     @property
     def is_hidden(self) -> bool: ...
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
     def id_for_label(self, id_: str) -> str: ...
-    def get_context(self, name: str, value: Any, attrs: Optional[_OptAttrs] = ...) -> Dict[str, Any]: ...
+    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None = ...) -> dict[str, Any]: ...
     @property
     def media(self) -> Media: ...  # type: ignore
     @property
     def needs_multipart_form(self) -> bool: ...  # type: ignore
 
 class SplitArrayField(forms.Field):
-    default_error_messages: _ErrorMessagesT = ...
+    default_error_messages: _ErrorMessagesT
     base_field: forms.Field
     size: int
     remove_trailing_nulls: bool

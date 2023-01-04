@@ -1,4 +1,5 @@
-from typing import Any, Awaitable, Callable, Dict, Mapping, Sequence, Tuple
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from typing import Any
 from urllib.parse import ParseResult
 
 from django.core.handlers.asgi import ASGIHandler
@@ -8,7 +9,7 @@ from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponseBase
 
 class StaticFilesHandlerMixin:
-    handles_files: bool = ...
+    handles_files: bool
     application: BaseHandler
     base_url: ParseResult
     def load_middleware(self) -> None: ...
@@ -25,8 +26,8 @@ class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore
     def __init__(self, application: WSGIHandler) -> None: ...
     def __call__(
         self,
-        environ: Dict[str, Any],
-        start_response: Callable[[str, Sequence[Tuple[str, str]]], None],
+        environ: dict[str, Any],
+        start_response: Callable[[str, Sequence[tuple[str, str]]], None],
     ) -> HttpResponseBase: ...
 
 class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore
@@ -35,7 +36,7 @@ class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ign
     def __init__(self, application: ASGIHandler) -> None: ...
     async def __call__(
         self,
-        scope: Dict[str, Any],
+        scope: dict[str, Any],
         receive: Callable[[], Awaitable[Mapping[str, Any]]],
         send: Callable[[Mapping[str, Any]], Awaitable[None]],
     ) -> None: ...

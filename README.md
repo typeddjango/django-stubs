@@ -5,7 +5,7 @@
 [![Build status](https://github.com/typeddjango/django-stubs/workflows/test/badge.svg?branch=master&event=push)](https://github.com/typeddjango/django-stubs/actions?query=workflow%3Atest)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
-[![StackOverflow](https://img.shields.io/stackexchange/stackoverflow/t/django-stubs)](https://stackoverflow.com/questions/tagged/django-stubs)
+[![StackOverflow](https://shields.io/badge/ask-stackoverflow-orange?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/django-stubs)
 
 
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
@@ -53,6 +53,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs | mypy version | django version | python version
 |--------------| ---- | ---- | ---- |
+| 1.13.0       | 0.980+ | 3.2.x or 4.0.x or 4.1.x | ^3.7
 | 1.12.0       | 0.931+ | 3.2.x or 4.0.x | ^3.7
 | 1.11.0       | 0.931+ | 3.2.x | ^3.7
 | 1.10.0       | 0.931+ | 3.2.x | ^3.7
@@ -269,6 +270,32 @@ def func2(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
 func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 ```
+
+### How do I check if something is an instance of QuerySet in runtime?
+
+A limitation of making `QuerySet` generic is that you can not use
+it for `isinstance` checks.
+
+```python
+from django.db.models.query import QuerySet
+
+def foo(obj: object) -> None:
+    if isinstance(obj, QuerySet): # Error: Parameterized generics cannot be used with class or instance checks
+        ...
+```
+
+To get around with this issue without making `QuerySet` non-generic,
+Django-stubs provides `django_stubs_ext.QuerySetAny`, a non-generic
+variant of `QuerySet` suitable for runtime type checking:
+
+```python
+from django_stubs_ext import QuerySetAny
+
+def foo(obj: object) -> None:
+    if isinstance(obj, QuerySetAny):  # OK
+        ...
+```
+
 
 ## Related projects
 

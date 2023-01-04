@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from django.contrib.messages.storage.base import BaseStorage
 from django.http.request import HttpRequest
 
-def messages(request: HttpRequest) -> Dict[str, Union[Dict[str, int], List[Any], BaseStorage]]: ...
+def messages(request: HttpRequest) -> dict[str, dict[str, int] | list[Any] | BaseStorage]: ...

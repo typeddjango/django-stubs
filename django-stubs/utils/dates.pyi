@@ -1,8 +1,6 @@
-from typing import Dict
-
-WEEKDAYS: Dict[int, str]
-WEEKDAYS_ABBR: Dict[int, str]
-MONTHS: Dict[int, str]
-MONTHS_3: Dict[int, str]
-MONTHS_AP: Dict[int, str]
-MONTHS_ALT: Dict[int, str]
+WEEKDAYS: dict[int, str]
+WEEKDAYS_ABBR: dict[int, str]
+MONTHS: dict[int, str]
+MONTHS_3: dict[int, str]
+MONTHS_AP: dict[int, str]
+MONTHS_ALT: dict[int, str]

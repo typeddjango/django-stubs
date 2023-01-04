@@ -12,7 +12,7 @@ dependencies = [
 
 setup(
     name="django-stubs-ext",
-    version="0.6.0",
+    version="0.7.0",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -34,6 +34,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Typing :: Typed",
         "Framework :: Django",
         "Framework :: Django :: 2.2",
@@ -41,6 +42,7 @@ setup(
         "Framework :: Django :: 3.1",
         "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.0",
+        "Framework :: Django :: 4.1",
     ],
     project_urls={
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",

@@ -1,0 +1,45 @@
+- case: queryset_isinstance_check
+  main: |
+    from typing import Any
+    from django.db.models.query import QuerySet
+    from django_stubs_ext import QuerySetAny
+
+    def foo(q: QuerySet[Any]) -> None:
+      pass
+
+    def bar(q: QuerySetAny) -> None:
+      pass
+
+    def baz(obj: object) -> None:
+      if isinstance(obj, QuerySetAny):
+        reveal_type(obj)             # N: Revealed type is "django.db.models.query._QuerySet[Any, Any]"
+        foo(obj)
+        bar(obj)
+
+      if isinstance(obj, QuerySet):  # E: Parameterized generics cannot be used with class or instance checks
+        reveal_type(obj)             # N: Revealed type is "django.db.models.query._QuerySet[Any, Any]"
+        foo(obj)
+        bar(obj)
+- case: queryset_list
+  main: |
+    from typing import List
+    from django.db.models.query import QuerySet
+    from django_stubs_ext import QuerySetAny
+    from myapp.models import User, Book
+
+    def try_append(queryset_instance: QuerySetAny, queryset: QuerySet[User], queryset_book: QuerySet[Book]) -> None:
+      user_querysets: List[QuerySet[User]] = []
+      user_querysets.append(queryset_instance)
+      user_querysets.append(queryset)
+      user_querysets.append(queryset_book)  # E: Argument 1 to "append" of "list" has incompatible type "_QuerySet[Book, Book]"; expected "_QuerySet[User, User]"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class User(models.Model):
+          pass
+        class Book(models.Model):
+          pass

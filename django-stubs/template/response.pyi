@@ -1,72 +1,74 @@
 import functools
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from http.cookies import SimpleCookie
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Union  # noqa: Y037   # https://github.com/python/mypy/issues/12211
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.template.base import Template
-from django.template.context import RequestContext
+from django.template.context import RequestContext, _ContextKeys
 from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
+from typing_extensions import TypeAlias
 
-_TemplateForResponseT = Union[_ListOrTuple[str], Template, str]
+# https://github.com/python/mypy/issues/12211
+_TemplateForResponseT: TypeAlias = Union[_ListOrTuple[str], Template, str]
 
 class ContentNotRenderedError(Exception): ...
 
 class SimpleTemplateResponse(HttpResponse):
-    content: Any = ...
+    content: Any
     closed: bool
     cookies: SimpleCookie[str]
     status_code: int
-    rendering_attrs: Any = ...
-    template_name: _TemplateForResponseT = ...
-    context_data: Optional[Dict[str, Any]] = ...
-    using: Optional[str] = ...
+    rendering_attrs: Any
+    template_name: _TemplateForResponseT
+    context_data: Mapping[_ContextKeys, Any] | None
+    using: str | None
     def __init__(
         self,
         template: _TemplateForResponseT,
-        context: Optional[Dict[str, Any]] = ...,
-        content_type: Optional[str] = ...,
-        status: Optional[int] = ...,
-        charset: Optional[str] = ...,
-        using: Optional[str] = ...,
-        headers: Optional[Dict[str, Any]] = ...,
+        context: Mapping[_ContextKeys, Any] | None = ...,
+        content_type: str | None = ...,
+        status: int | None = ...,
+        charset: str | None = ...,
+        using: str | None = ...,
+        headers: dict[str, Any] | None = ...,
     ) -> None: ...
-    def resolve_template(self, template: Union[Sequence[str], Template, str]) -> Template: ...
-    def resolve_context(self, context: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]: ...
+    def resolve_template(self, template: Sequence[str] | Template | str) -> Template: ...
+    def resolve_context(self, context: Mapping[_ContextKeys, Any] | None) -> Mapping[_ContextKeys, Any] | None: ...
     @property
     def rendered_content(self) -> str: ...
     def add_post_render_callback(self, callback: Callable) -> None: ...
     def render(self) -> SimpleTemplateResponse: ...
     @property
     def is_rendered(self) -> bool: ...
-    def __iter__(self) -> Any: ...
+    def __iter__(self) -> Iterator[Any]: ...
 
 class TemplateResponse(SimpleTemplateResponse):
     client: Client
     closed: bool
     context: RequestContext
-    context_data: Optional[Dict[str, Any]]
+    context_data: Mapping[_ContextKeys, Any] | None
     cookies: SimpleCookie[str]
     csrf_cookie_set: bool
     json: functools.partial
-    redirect_chain: List[Tuple[str, int]]
     _request: HttpRequest
     status_code: int
     template_name: _TemplateForResponseT
-    templates: List[Template]
-    using: Optional[str]
+    templates: list[Template]
+    using: str | None
     wsgi_request: WSGIRequest
-    rendering_attrs: Any = ...
+    rendering_attrs: Any
     def __init__(
         self,
         request: HttpRequest,
         template: _TemplateForResponseT,
-        context: Optional[Dict[str, Any]] = ...,
-        content_type: Optional[str] = ...,
-        status: Optional[int] = ...,
-        charset: Optional[str] = ...,
-        using: Optional[str] = ...,
-        headers: Optional[Dict[str, Any]] = ...,
+        context: Mapping[_ContextKeys, Any] | None = ...,
+        content_type: str | None = ...,
+        status: int | None = ...,
+        charset: str | None = ...,
+        using: str | None = ...,
+        headers: dict[str, Any] | None = ...,
     ) -> None: ...

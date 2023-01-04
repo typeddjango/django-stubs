@@ -1,24 +1,12 @@
 import decimal
 import uuid
+from collections.abc import Callable, Iterable, Sequence
 from datetime import date
 from datetime import datetime as real_datetime
 from datetime import time, timedelta
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generic,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Generic, Protocol, TypeVar, overload
 
+from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -31,26 +19,26 @@ from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise
-from typing_extensions import Protocol
+from typing_extensions import TypeAlias
 
 class Empty: ...
 class NOT_PROVIDED: ...
 
-BLANK_CHOICE_DASH: List[Tuple[str, str]] = ...
+BLANK_CHOICE_DASH: list[tuple[str, str]]
 
-_Choice = Tuple[Any, Any]
-_ChoiceNamedGroup = Tuple[str, Iterable[_Choice]]
-_FieldChoices = Iterable[Union[_Choice, _ChoiceNamedGroup]]
-_ChoicesList = Union[Sequence[_Choice], Sequence[_ChoiceNamedGroup]]
-_LimitChoicesTo = Union[Q, Dict[str, Any]]
+_Choice: TypeAlias = tuple[Any, Any]
+
+_ChoiceNamedGroup: TypeAlias = tuple[str, Iterable[_Choice]]
+_FieldChoices: TypeAlias = Iterable[_Choice | _ChoiceNamedGroup]
+_ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
+_LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
-_AllLimitChoicesTo = Union[_LimitChoicesTo, _ChoicesCallable]
-_ErrorMessagesT = Dict[str, Any]
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
+_ErrorMessagesT: TypeAlias = dict[str, Any]
 
-_T = TypeVar("_T", bound="Field")
 # __set__ value type
 _ST = TypeVar("_ST", contravariant=True)
 # __get__ return type
@@ -124,110 +112,108 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     attname: str
     auto_created: bool
     primary_key: bool
-    remote_field: Optional[ForeignObjectRel]
+    remote_field: ForeignObjectRel | None
     is_relation: bool
-    related_model: Optional[Type[Model]]
-    one_to_many: Optional[bool] = ...
-    one_to_one: Optional[bool] = ...
-    many_to_many: Optional[bool] = ...
-    many_to_one: Optional[bool] = ...
-    max_length: Optional[int]
-    model: Type[Model]
+    related_model: type[Model] | None
+    one_to_many: bool | None
+    one_to_one: bool | None
+    many_to_many: bool | None
+    many_to_one: bool | None
+    max_length: int | None
+    model: type[Model]
     name: str
     verbose_name: _StrOrPromise
-    description: Union[str, _Getter[str]]
+    description: str | _Getter[str]
     blank: bool
     null: bool
     unique: bool
     editable: bool
-    empty_strings_allowed: bool = ...
-    choices: Optional[_ChoicesList] = ...
-    db_column: Optional[str]
+    empty_strings_allowed: bool
+    choices: _ChoicesList | None
+    db_column: str | None
     column: str
     concrete: bool
     default: Any
     error_messages: _ErrorMessagesT
-    empty_values: Sequence[Any] = ...
+    empty_values: Sequence[Any]
     creation_counter: int
     auto_creation_counter: int
     default_validators: Sequence[validators._ValidatorCallable]
-    default_error_messages: Dict[str, str]
+    default_error_messages: dict[str, str]
     hidden: bool
-    system_check_removed_details: Optional[Any]
-    system_check_deprecated_details: Optional[Any]
-    non_db_attrs: Tuple[str, ...]
+    system_check_removed_details: Any | None
+    system_check_deprecated_details: Any | None
+    non_db_attrs: tuple[str, ...]
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
         db_index: bool = ...,
-        rel: Optional[ForeignObjectRel] = ...,
+        rel: ForeignObjectRel | None = ...,
         default: Any = ...,
         editable: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
-    def __set__(self, instance, value: _ST) -> None: ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
+    def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
-    def __get__(self: _T, instance: None, owner) -> _T: ...
+    def __get__(self: Self, instance: None, owner: Any) -> Self: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: _T, instance, owner) -> _T: ...
+    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
     def deconstruct(self) -> Any: ...
     def set_attributes_from_name(self, name: str) -> None: ...
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
-    def db_check(self, connection: BaseDatabaseWrapper) -> Optional[str]: ...
-    def db_type(self, connection: BaseDatabaseWrapper) -> Optional[str]: ...
-    def db_parameters(self, connection: BaseDatabaseWrapper) -> Dict[str, Optional[str]]: ...
+    def db_check(self, connection: BaseDatabaseWrapper) -> str | None: ...
+    def db_type(self, connection: BaseDatabaseWrapper) -> str | None: ...
+    def db_parameters(self, connection: BaseDatabaseWrapper) -> dict[str, str | None]: ...
     def pre_save(self, model_instance: Model, add: bool) -> Any: ...
     def get_prep_value(self, value: Any) -> Any: ...
     def get_db_prep_value(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool = ...) -> Any: ...
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def get_internal_type(self) -> str: ...
     # TODO: plugin support
-    def formfield(
-        self, form_class: Optional[Any] = ..., choices_form_class: Optional[Any] = ..., **kwargs: Any
-    ) -> Any: ...
+    def formfield(self, form_class: Any | None = ..., choices_form_class: Any | None = ..., **kwargs: Any) -> Any: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
-    def contribute_to_class(self, cls: Type[Model], name: str, private_only: bool = ...) -> None: ...
+    def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
     @property
-    def validators(self) -> List[validators._ValidatorCallable]: ...
+    def validators(self) -> list[validators._ValidatorCallable]: ...
     def run_validators(self, value: Any) -> None: ...
-    def validate(self, value: Any, model_instance: Optional[Model]) -> None: ...
-    def clean(self, value: Any, model_instance: Optional[Model]) -> Any: ...
+    def validate(self, value: Any, model_instance: Model | None) -> None: ...
+    def clean(self, value: Any, model_instance: Model | None) -> Any: ...
     def get_choices(
         self,
         include_blank: bool = ...,
         blank_choice: _ChoicesList = ...,
-        limit_choices_to: Optional[_LimitChoicesTo] = ...,
+        limit_choices_to: _LimitChoicesTo | None = ...,
         ordering: Sequence[str] = ...,
     ) -> _ChoicesList: ...
-    def _get_flatchoices(self) -> List[_Choice]: ...
+    def _get_flatchoices(self) -> list[_Choice]: ...
     @property
-    def flatchoices(self) -> List[_Choice]: ...
+    def flatchoices(self) -> list[_Choice]: ...
     def has_default(self) -> bool: ...
     def get_default(self) -> Any: ...
-    def check(self, **kwargs: Any) -> List[CheckMessage]: ...
-    def get_col(self, alias: str, output_field: Optional[Field] = ...) -> Col: ...
+    def check(self, **kwargs: Any) -> list[CheckMessage]: ...
+    def get_col(self, alias: str, output_field: Field | None = ...) -> Col: ...
     @property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
@@ -235,9 +221,9 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_to_string(self, obj: Model) -> str: ...
 
 class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[float, int, str, Combinable]
+    _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: int
-    _pyi_lookup_exact_type: Union[str, int]
+    _pyi_lookup_exact_type: str | int
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
@@ -249,23 +235,23 @@ class SmallIntegerField(IntegerField[_ST, _GT]): ...
 class BigIntegerField(IntegerField[_ST, _GT]): ...
 
 class FloatField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[float, int, str, Combinable]
+    _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
 
 class DecimalField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, float, decimal.Decimal, Combinable]
+    _pyi_private_set_type: str | float | decimal.Decimal | Combinable
     _pyi_private_get_type: decimal.Decimal
-    _pyi_lookup_exact_type: Union[str, decimal.Decimal]
+    _pyi_lookup_exact_type: str | decimal.Decimal
     # attributes
-    max_digits: int = ...
-    decimal_places: int = ...
+    max_digits: int
+    decimal_places: int
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
-        max_digits: Optional[int] = ...,
-        decimal_places: Optional[int] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        max_digits: int | None = ...,
+        decimal_places: int | None = ...,
         *,
         primary_key: bool = ...,
         unique: bool = ...,
@@ -276,25 +262,25 @@ class DecimalField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: Optional[_FieldChoices] = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
 
 class CharField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, int, Combinable]
+    _pyi_private_set_type: str | int | Combinable
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -303,26 +289,26 @@ class CharField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         *,
-        db_collation: Optional[str] = ...,
-    ): ...
+        db_collation: str | None = ...,
+    ) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
 
 class SlugField(CharField[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
@@ -331,62 +317,62 @@ class SlugField(CharField[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         *,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         db_index: bool = ...,
         allow_unicode: bool = ...,
-    ): ...
+    ) -> None: ...
 
 class EmailField(CharField[_ST, _GT]): ...
 
 class URLField(CharField[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         *,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
         db_index: bool = ...,
-        rel: Optional[ForeignObjectRel] = ...,
+        rel: ForeignObjectRel | None = ...,
         default: Any = ...,
         editable: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
 
 class TextField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, Combinable]
+    _pyi_private_set_type: str | Combinable
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -395,44 +381,44 @@ class TextField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
         *,
-        db_collation: Optional[str] = ...,
-    ): ...
+        db_collation: str | None = ...,
+    ) -> None: ...
 
 class BooleanField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[bool, Combinable]
+    _pyi_private_set_type: bool | Combinable
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
 
 class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: Optional[Union[bool, Combinable]]  # type: ignore
-    _pyi_private_get_type: Optional[bool]  # type: ignore
-    _pyi_lookup_exact_type: Optional[bool]  # type: ignore
+    _pyi_private_set_type: bool | Combinable | None  # type: ignore
+    _pyi_private_get_type: bool | None  # type: ignore
+    _pyi_lookup_exact_type: bool | None  # type: ignore
 
 class IPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, Combinable]
+    _pyi_private_set_type: str | Combinable
     _pyi_private_get_type: str
 
 class GenericIPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, int, Callable[..., Any], Combinable]
+    _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
-    default_error_messages: Dict[str, str] = ...
-    unpack_ipv4: bool = ...
-    protocol: str = ...
+    default_error_messages: dict[str, str]
+    unpack_ipv4: bool
+    protocol: str
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[Any] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: Any | None = ...,
         protocol: str = ...,
         unpack_ipv4: bool = ...,
         primary_key: bool = ...,
@@ -444,31 +430,31 @@ class GenericIPAddressField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: Optional[_FieldChoices] = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
+        error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
 
 class DateTimeCheckMixin: ...
 
 class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, date, Combinable]
+    _pyi_private_set_type: str | date | Combinable
     _pyi_private_get_type: date
-    _pyi_lookup_exact_type: Union[str, date]
+    _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
         *,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
@@ -477,23 +463,23 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: Optional[_FieldChoices] = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
 
 class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, time, real_datetime, Combinable]
+    _pyi_private_set_type: str | time | real_datetime | Combinable
     _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
         *,
@@ -506,62 +492,62 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: Optional[_FieldChoices] = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
 
 class DateTimeField(DateField[_ST, _GT]):
-    _pyi_private_set_type: Union[str, real_datetime, date, Combinable]
+    _pyi_private_set_type: str | real_datetime | date | Combinable
     _pyi_private_get_type: real_datetime
-    _pyi_lookup_exact_type: Union[str, real_datetime]
+    _pyi_lookup_exact_type: str | real_datetime
 
 class UUIDField(Field[_ST, _GT]):
-    _pyi_private_set_type: Union[str, uuid.UUID]
+    _pyi_private_set_type: str | uuid.UUID
     _pyi_private_get_type: uuid.UUID
-    _pyi_lookup_exact_type: Union[uuid.UUID, str]
+    _pyi_lookup_exact_type: uuid.UUID | str
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
+        verbose_name: _StrOrPromise | None = ...,
         *,
-        name: Optional[str] = ...,
+        name: str | None = ...,
         primary_key: bool = ...,
-        max_length: Optional[int] = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
         null: bool = ...,
         db_index: bool = ...,
-        rel: Optional[ForeignObjectRel] = ...,
+        rel: ForeignObjectRel | None = ...,
         default: Any = ...,
         editable: bool = ...,
         serialize: bool = ...,
-        unique_for_date: Optional[str] = ...,
-        unique_for_month: Optional[str] = ...,
-        unique_for_year: Optional[str] = ...,
-        choices: Optional[_FieldChoices] = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
-    path: Any = ...
-    match: Optional[str] = ...
-    recursive: bool = ...
-    allow_files: bool = ...
-    allow_folders: bool = ...
+    path: Any
+    match: str | None
+    recursive: bool
+    allow_files: bool
+    allow_folders: bool
     def __init__(
         self,
-        verbose_name: Optional[_StrOrPromise] = ...,
-        name: Optional[str] = ...,
-        path: Union[str, Callable[..., str]] = ...,
-        match: Optional[str] = ...,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        path: str | Callable[..., str] = ...,
+        match: str | None = ...,
         recursive: bool = ...,
         allow_files: bool = ...,
         allow_folders: bool = ...,
@@ -576,29 +562,29 @@ class FilePathField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: Optional[_FieldChoices] = ...,
+        choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
-        db_column: Optional[str] = ...,
-        db_tablespace: Optional[str] = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: Optional[_ErrorMessagesT] = ...,
-    ): ...
+        error_messages: _ErrorMessagesT | None = ...,
+    ) -> None: ...
 
 class BinaryField(Field[_ST, _GT]):
-    _pyi_private_get_type: Union[bytes, memoryview]
+    _pyi_private_get_type: bytes | memoryview
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta
 
 class AutoFieldMixin:
-    db_returning: bool = ...
+    db_returning: bool
 
 class AutoFieldMeta(type): ...
 
 class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):
-    _pyi_private_set_type: Union[Combinable, int, str]
+    _pyi_private_set_type: Combinable | int | str
     _pyi_private_get_type: int
-    _pyi_lookup_exact_type: Union[str, int]
+    _pyi_lookup_exact_type: str | int
 
 class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...
 class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...

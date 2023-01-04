@@ -1,5 +1,6 @@
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from typing import Any, Callable, Generator
+from typing import Any
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.selenium import SeleniumTestCase
