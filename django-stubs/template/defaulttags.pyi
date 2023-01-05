@@ -1,5 +1,5 @@
 from collections import namedtuple
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterator, Sequence
 from datetime import date as real_date
 from typing import Any
 
@@ -8,7 +8,6 @@ from django.template.context import Context
 from django.utils.safestring import SafeString
 
 from .base import Node, NodeList
-from .context import _ContextKeys
 from .library import Library
 from .smartif import IfParser, Literal
 
@@ -155,13 +154,13 @@ class WidthRatioNode(Node):
 
 class WithNode(Node):
     nodelist: NodeList
-    extra_context: Mapping[_ContextKeys, Any]
+    extra_context: dict[str, Any]
     def __init__(
         self,
         var: str | None,
         name: str | None,
         nodelist: NodeList | Sequence[Node],
-        extra_context: Mapping[_ContextKeys, Any] | None = ...,
+        extra_context: dict[str, Any] | None = ...,
     ) -> None: ...
 
 def autoescape(parser: Parser, token: Token) -> AutoEscapeControlNode: ...

@@ -1,4 +1,4 @@
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from django.template.base import Origin
@@ -8,7 +8,6 @@ from django.utils.safestring import SafeString
 from typing_extensions import TypeAlias
 
 from .base import Template
-from .context import _ContextKeys
 
 _Loader: TypeAlias = Any
 
