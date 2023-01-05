@@ -1,11 +1,6 @@
-import os
 from pathlib import Path
 
-from django.core.management.base import BaseCommand as BaseCommand
-from django.core.management.base import CommandError as CommandError
-from django.core.management.base import CommandParser as CommandParser
-from django.core.management.utils import find_command as find_command
-from django.core.management.utils import popen_wrapper as popen_wrapper
+from django.core.management.base import BaseCommand
 from django.utils._os import _PathCompatible
 
 def has_bom(fn: Path) -> bool: ...

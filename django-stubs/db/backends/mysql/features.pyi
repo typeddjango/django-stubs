@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.base.features import BaseDatabaseFeatures as BaseDatabaseFeatures
+from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.mysql.base import DatabaseWrapper
 
 class DatabaseFeatures(BaseDatabaseFeatures):

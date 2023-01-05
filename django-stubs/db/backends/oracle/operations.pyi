@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.base.operations import BaseDatabaseOperations as BaseDatabaseOperations
+from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseOperations(BaseDatabaseOperations):

@@ -5,9 +5,7 @@ from typing import Any, Generic, NamedTuple, TypeVar, overload
 from _typeshed import Self
 from django.db.models import Manager
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable as Combinable  # noqa: F401
-from django.db.models.expressions import F as F
-from django.db.models.query_utils import Q as Q  # noqa: F401
+from django.db.models.expressions import Combinable
 from django.db.models.sql.query import Query, RawQuery
 from typing_extensions import TypeAlias
 

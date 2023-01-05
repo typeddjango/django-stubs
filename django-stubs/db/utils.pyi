@@ -6,7 +6,6 @@ from django.apps import AppConfig
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.utils.connection import BaseConnectionHandler
-from django.utils.connection import ConnectionDoesNotExist as ConnectionDoesNotExist
 
 DEFAULT_DB_ALIAS: str
 DJANGO_VERSION_PICKLE_KEY: str

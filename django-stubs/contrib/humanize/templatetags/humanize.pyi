@@ -1,6 +1,5 @@
 from collections.abc import Callable
-from datetime import date
-from datetime import datetime as datetime
+from datetime import date, datetime
 from typing import Any, SupportsInt
 
 from django import template

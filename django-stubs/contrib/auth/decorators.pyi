@@ -1,7 +1,6 @@
 from collections.abc import Callable, Iterable
 from typing import TypeVar, overload
 
-from django.contrib.auth import REDIRECT_FIELD_NAME as REDIRECT_FIELD_NAME  # noqa: F401
 from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
 from django.http.response import HttpResponseBase
 

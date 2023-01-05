@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from typing import Any
 
-from django.db.backends.base.client import BaseDatabaseClient as BaseDatabaseClient
+from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseClient(BaseDatabaseClient):

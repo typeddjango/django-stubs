@@ -1,7 +1,7 @@
 import builtins
 from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 
-from django import VERSION as VERSION
+from django import VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.sitemaps import Sitemap

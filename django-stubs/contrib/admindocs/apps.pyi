@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.apps import AppConfig as AppConfig
+from django.apps import AppConfig
 
 class AdminDocsConfig(AppConfig):
     name: str

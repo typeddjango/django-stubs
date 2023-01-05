@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.models.sql import compiler as compiler
+from django.db.models.sql import compiler
 from django.db.models.sql.compiler import _AsSqlType
 
 class SQLCompiler(compiler.SQLCompiler):

@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.base.validation import BaseDatabaseValidation as BaseDatabaseValidation
+from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.oracle.base import DatabaseWrapper
 
 class DatabaseValidation(BaseDatabaseValidation):

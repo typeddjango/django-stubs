@@ -4,7 +4,7 @@ from logging import Logger
 from re import Pattern
 from typing import Any
 
-from django.template.context import Context as Context
+from django.template.context import Context as Context  # noqa: F401 # Django: imported for backwards compatibility
 from django.template.engine import Engine
 from django.template.library import Library
 from django.template.loaders.base import Loader

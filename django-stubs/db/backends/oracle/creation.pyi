@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.base.creation import BaseDatabaseCreation as BaseDatabaseCreation
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.oracle.base import DatabaseWrapper
 
 TEST_DATABASE_PREFIX: str

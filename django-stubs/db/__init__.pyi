@@ -1,12 +1,8 @@
 from typing import Any
 
-from django.utils.connection import ConnectionProxy
-
-from . import migrations as migrations
 from .backends.base.base import BaseDatabaseWrapper
 from .utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS  # Not exported in __all__
 from .utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
-from .utils import ConnectionDoesNotExist as ConnectionDoesNotExist
 from .utils import ConnectionHandler, ConnectionRouter
 from .utils import DatabaseError as DatabaseError
 from .utils import DataError as DataError

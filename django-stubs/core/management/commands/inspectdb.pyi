@@ -1,12 +1,8 @@
 from collections.abc import Iterable
 from typing import Any
 
-from django.core.management.base import BaseCommand as BaseCommand
-from django.core.management.base import CommandError as CommandError
-from django.db import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS
-from django.db import connections as connections
+from django.core.management.base import BaseCommand
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models.constants import LOOKUP_SEP as LOOKUP_SEP
 
 class Command(BaseCommand):
     stealth_options: tuple[str]
