@@ -3,8 +3,6 @@ from typing import Any
 from _typeshed import Self
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.contrib.gis.gdal.geometries import OGRGeometry
-from django.contrib.gis.geometry import hex_regex as hex_regex  # noqa: F401
-from django.contrib.gis.geometry import wkt_regex as wkt_regex
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.mutable_list import ListMixin

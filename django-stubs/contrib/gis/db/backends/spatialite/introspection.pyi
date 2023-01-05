@@ -1,7 +1,6 @@
 from typing import Any
 
-from django.db.backends.sqlite3.introspection import DatabaseIntrospection as DatabaseIntrospection
-from django.db.backends.sqlite3.introspection import FlexibleFieldLookupDict as FlexibleFieldLookupDict
+from django.db.backends.sqlite3.introspection import DatabaseIntrospection, FlexibleFieldLookupDict
 
 class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     base_data_types_reverse: Any

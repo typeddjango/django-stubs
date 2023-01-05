@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.contrib.sitemaps import Sitemap as Sitemap
+from django.contrib.sitemaps import Sitemap
 
 class KMLSitemap(Sitemap):
     geo_format: str

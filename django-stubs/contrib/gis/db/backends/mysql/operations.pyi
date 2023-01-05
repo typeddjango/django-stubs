@@ -1,10 +1,10 @@
 from collections.abc import Callable
 from typing import Any
 
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations as BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geos.geometry import GEOSGeometryBase
-from django.db.backends.mysql.operations import DatabaseOperations as DatabaseOperations
+from django.db.backends.mysql.operations import DatabaseOperations
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     name: str
