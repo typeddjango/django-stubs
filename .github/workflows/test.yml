@@ -49,7 +49,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
-        run: sudo apt-get install binutils libproj-dev gdal-bin
+        run: |
+          sudo apt-get update
+          sudo apt-get install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -76,7 +78,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
-        run: sudo apt-get install binutils libproj-dev gdal-bin
+        run: |
+          sudo apt-get update
+          sudo apt-get install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
