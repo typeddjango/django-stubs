@@ -243,7 +243,6 @@ class OrderBy(Expression):
         nulls_last: bool = ...,
     ) -> None: ...
 
-
 class Window(SQLiteNumericMixin, Expression):
     template: str
     contains_aggregate: bool
