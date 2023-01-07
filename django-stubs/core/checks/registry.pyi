@@ -2,7 +2,6 @@ from collections.abc import Callable, Iterable, Sequence
 from typing import Any, Protocol, TypeVar, overload
 
 from django.apps.config import AppConfig
-from django.apps.registry import Apps
 from django.core.checks.messages import CheckMessage
 
 class Tags:
@@ -21,7 +20,11 @@ class Tags:
 
 class _CheckCallable(Protocol):
     def __call__(
-        self, *, app_configs: Apps, databases: Sequence[str] | None, **kwargs: Any
+        self,
+        *,
+        app_configs: Sequence[AppConfig] | None,
+        databases: Sequence[str] | None,
+        **kwargs: Any,
     ) -> Iterable[CheckMessage]: ...
 
 _C = TypeVar("_C", bound=_CheckCallable)
