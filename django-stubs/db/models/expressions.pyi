@@ -167,9 +167,9 @@ class Func(SQLiteNumericMixin, Expression):
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
-        function: str | None = None,
-        template: str | None = None,
-        arg_joiner: str | None = None,
+        function: str | None = ...,
+        template: str | None = ...,
+        arg_joiner: str | None = ...,
         **extra_context: Any,
     ) -> _AsSqlType: ...
 
