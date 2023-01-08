@@ -1,0 +1,29 @@
+- case: test_checks_register
+  main: |
+    from typing import Any, Sequence, Optional, Union
+
+    from django.apps.config import AppConfig
+    from django.core.checks import register, Warning, CheckMessage
+
+
+    @register("foo", deploy=True)
+    def check_foo(app_configs: Union[Sequence[AppConfig], None], databases: Optional[Sequence[str]], **kwargs: Any) -> list[Warning]:
+        if databases and 'databass' in databases:
+            return [Warning("Naughty list")]
+        return []
+
+    reveal_type(check_foo)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (app_configs: Union[typing.Sequence[django.apps.config.AppConfig], None], databases: Union[typing.Sequence[builtins.str], None], **kwargs: Any) -> builtins.list[django.core.checks.messages.Warning]]"
+    reveal_type(check_foo.tags)  # N: Revealed type is "typing.Sequence[builtins.str]"
+
+    @register
+    def check_bar(*, app_configs: Union[Sequence[AppConfig], None], **kwargs: Any) -> Sequence[CheckMessage]: ...
+
+    reveal_type(check_bar)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (*, app_configs: Union[typing.Sequence[django.apps.config.AppConfig], None], **kwargs: Any) -> typing.Sequence[django.core.checks.messages.CheckMessage]]"
+
+    @register
+    def check_baz(**kwargs: Any) -> Sequence[CheckMessage]: ...
+
+    reveal_type(check_baz)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (**kwargs: Any) -> typing.Sequence[django.core.checks.messages.CheckMessage]]"
+
+    @register()  # E: Value of type variable "_C" of function cannot be "Callable[[int], Sequence[CheckMessage]]"
+    def wrong_args(bla: int) -> Sequence[CheckMessage]: ...
