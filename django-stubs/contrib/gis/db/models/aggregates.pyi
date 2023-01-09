@@ -1,7 +1,6 @@
 from typing import Any
 
 from django.db.models import Aggregate
-from django.db.models.sql.compiler import _AsSqlType
 
 class GeoAggregate(Aggregate):
     is_extent: bool
