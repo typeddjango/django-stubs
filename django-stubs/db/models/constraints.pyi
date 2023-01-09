@@ -5,7 +5,7 @@ from typing import Any, TypeVar, overload
 from _typeshed import Self
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
+from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query_utils import Q
 
 class Deferrable(Enum):
@@ -23,8 +23,8 @@ class BaseConstraint:
     def clone(self: Self) -> Self: ...
 
 class CheckConstraint(BaseConstraint):
-    check: Q
-    def __init__(self, *, check: Q, name: str, violation_error_message: str | None = ...) -> None: ...
+    check: Q | BaseExpression
+    def __init__(self, *, check: Q | BaseExpression, name: str, violation_error_message: str | None = ...) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
     expressions: tuple[Combinable, ...]
