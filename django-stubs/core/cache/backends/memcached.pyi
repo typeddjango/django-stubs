@@ -18,3 +18,6 @@ class MemcachedCache(BaseMemcachedCache):
 
 class PyLibMCCache(BaseMemcachedCache):
     def __init__(self, server: str | Sequence[str], params: dict[str, Any]) -> None: ...
+
+class PyMemcacheCache(BaseMemcachedCache):
+    def __init__(self, server: str | Sequence[str], params: dict[str, Any]) -> None: ...
