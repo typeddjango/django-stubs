@@ -8,7 +8,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 # Typo: `extra_conteNt`, remains in 4.0
 class MySQLSHA2Mixin:
-    def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_content: Any) -> _AsSqlType: ...
+    def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class OracleHashMixin:
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
@@ -16,7 +16,7 @@ class OracleHashMixin:
 # Typo: `extra_conteNt`, remains in 4.0
 class PostgreSQLSHAMixin:
     def as_postgresql(
-        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_content: Any
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
 
 class Chr(Transform):
