@@ -2,20 +2,13 @@ from typing import Any
 
 from django.db.models import Func
 from django.db.models import Transform as StandardTransform
-from django.db.models.sql.compiler import _AsSqlType
 
 NUMERIC_TYPES: Any
 
 class GeoFuncMixin:
-    function: Any
     geom_param_pos: Any
-    def __init__(self, *expressions: Any, **extra: Any) -> None: ...
     @property
     def geo_field(self) -> Any: ...
-    def as_sql(
-        self, compiler: Any, connection: Any, function: Any | None = ..., **extra_context: Any
-    ) -> _AsSqlType: ...
-    def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
 
 class GeoFunc(GeoFuncMixin, Func): ...
 
