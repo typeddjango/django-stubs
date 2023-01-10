@@ -1,12 +1,12 @@
 import threading
 from collections.abc import Callable, Iterable
-from django.db.models.base import Model
 from typing import Any, TypeVar
+
+from django.db.models.base import Model
 
 from .config import AppConfig
 
-
-ModelType = type[TypeVar('ModelType', bound=Model)]
+ModelType = type[TypeVar("ModelType", bound=Model)]
 
 class Apps:
     all_models: dict[str, dict[str, type[Model]]]
