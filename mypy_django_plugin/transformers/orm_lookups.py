@@ -12,8 +12,8 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
     # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
 
-    lookup_kwargs = ctx.arg_names[1]
-    provided_lookup_types = ctx.arg_types[1]
+    lookup_kwargs = ctx.arg_names[1] if len(ctx.arg_names) >= 2 else []
+    provided_lookup_types = ctx.arg_types[1] if len(ctx.arg_types) >= 2 else []
 
     assert isinstance(ctx.type, Instance)
 
