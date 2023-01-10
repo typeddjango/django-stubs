@@ -1,10 +1,12 @@
 import threading
 from collections.abc import Callable, Iterable
-from typing import Any
-
 from django.db.models.base import Model
+from typing import Any, TypeVar
 
 from .config import AppConfig
+
+
+ModelType = type[TypeVar('ModelType', bound=Model)]
 
 class Apps:
     all_models: dict[str, dict[str, type[Model]]]
@@ -24,7 +26,7 @@ class Apps:
     def get_app_config(self, app_label: str) -> AppConfig: ...
     # it's not possible to support it in plugin properly now
     def get_models(self, include_auto_created: bool = ..., include_swapped: bool = ...) -> list[type[Model]]: ...
-    def get_model(self, app_label: str, model_name: str | None = ..., require_ready: bool = ...) -> type[Any]: ...
+    def get_model(self, app_label: str, model_name: str | None = ..., require_ready: bool = ...) -> ModelType: ...
     def register_model(self, app_label: str, model: type[Model]) -> None: ...
     def is_installed(self, app_name: str) -> bool: ...
     def get_containing_app_config(self, object_name: str) -> AppConfig | None: ...
