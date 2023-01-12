@@ -120,7 +120,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
-Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.0/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
+Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.1/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
 
 ```python
 Union[User, AnonymousUser]
@@ -290,6 +290,14 @@ def foo(obj: object) -> None:
     if isinstance(obj, QuerySetAny):  # OK
         ...
 ```
+
+### Why am I getting incompatible argument type mentioning `_StrPromise`?
+
+The lazy translation functions of Django (such as `gettext_lazy`) return a `Promise` instead of `str`. These two types [cannot be used interchangeably](https://github.com/typeddjango/django-stubs/pull/1139#issuecomment-1232167698). The return type of these functions was therefore [changed](https://github.com/typeddjango/django-stubs/pull/689) to reflect that.
+
+If you encounter this error in your own code, you can either cast the `Promise` to `str` (causing the translation to be evaluated), or use the `StrPromise` or `StrOrPromise` types from `django-stubs-ext` in type hints. Which solution to choose depends depends on the particular case. See [working with lazy translation objects](https://docs.djangoproject.com/en/4.1/topics/i18n/translation/#working-with-lazy-translation-objects) in the Django documentation for more information.
+
+If this is reported on Django code, please report an issue or open a pull request to fix the type hints.
 
 ## Related projects
 
