@@ -7,9 +7,7 @@
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 [![StackOverflow](https://shields.io/badge/ask-stackoverflow-orange?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/django-stubs)
 
-
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
-
 
 ## Installation
 
@@ -67,7 +65,6 @@ We rely on different `django` and `mypy` versions:
 | 1.2.0        | 0.730 | 2.2.x | ^3.6
 | 1.1.0        | 0.720 | 2.2.x | ^3.6
 | 0.12.x       | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
-
 
 ## FAQ
 
@@ -128,6 +125,7 @@ Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.0/ref/requ
 ```python
 Union[User, AnonymousUser]
 ```
+
 where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
 If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
@@ -142,7 +140,6 @@ class AuthenticatedHttpRequest(HttpRequest):
 ```
 
 And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
-
 
 ### My QuerySet methods are returning Any rather than my Model
 
@@ -208,9 +205,7 @@ class MyManager(model.Manager):
 
 will cause this error message:
 
-```
-error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
-```
+> error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
 
 This is happening because the `Manager` class is generic, but without
 specifying generics the built-in manager methods are expected to return the
@@ -296,15 +291,12 @@ def foo(obj: object) -> None:
         ...
 ```
 
-
 ## Related projects
 
 - [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
 - [`djangorestframework-stubs`](https://github.com/typeddjango/djangorestframework-stubs) - Stubs for Django REST Framework.
 - [`pytest-mypy-plugins`](https://github.com/typeddjango/pytest-mypy-plugins) - `pytest` plugin that we use for testing `mypy` stubs and plugins.
 - [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template) - Create new typed Django projects in seconds.
-
-
 
 ## To get help
 
