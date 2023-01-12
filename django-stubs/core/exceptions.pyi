@@ -31,7 +31,7 @@ NON_FIELD_ERRORS: Literal["__all__"]
 class ValidationError(Exception):
     error_dict: dict[str, list[ValidationError]]
     error_list: list[ValidationError]
-    message: str
+    message: _StrOrPromise
     code: str | None
     params: dict[str, Any] | None
     def __init__(
