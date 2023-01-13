@@ -21,6 +21,7 @@ from typing_extensions import SupportsIndex, TypeAlias
 _TestClass: TypeAlias = type[SimpleTestCase]
 
 _DecoratedTest: TypeAlias = Callable | _TestClass
+_DT = TypeVar("_DT", bound=_DecoratedTest)
 _C = TypeVar("_C", bound=Callable)  # Any callable
 
 TZ_SUPPORT: bool
@@ -57,7 +58,7 @@ class TestContextDecorator:
     ) -> None: ...
     def decorate_class(self, cls: _TestClass) -> _TestClass: ...
     def decorate_callable(self, func: _C) -> _C: ...
-    def __call__(self, decorated: _DecoratedTest) -> Any: ...
+    def __call__(self, decorated: _DT) -> _DT: ...
 
 class override_settings(TestContextDecorator):
     options: dict[str, Any]

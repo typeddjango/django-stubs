@@ -1,0 +1,8 @@
+-   case: override_settings
+    main: |
+        from django.test import override_settings
+        from django.conf import settings
+        @override_settings(FOO='bar')
+        def test() -> None:
+            pass
+        reveal_type(test) # N: Revealed type is "def ()"
