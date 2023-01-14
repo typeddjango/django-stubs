@@ -7,9 +7,7 @@
 [![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 [![StackOverflow](https://shields.io/badge/ask-stackoverflow-orange?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/django-stubs)
 
-
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
-
 
 ## Installation
 
@@ -68,7 +66,6 @@ We rely on different `django` and `mypy` versions:
 | 1.1.0        | 0.720 | 2.2.x | ^3.6
 | 0.12.x       | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
 
-
 ## FAQ
 
 ### Is this an official Django project?
@@ -123,11 +120,12 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
-Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.0/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
+Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/4.1/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
 
 ```python
 Union[User, AnonymousUser]
 ```
+
 where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
 If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
@@ -142,7 +140,6 @@ class AuthenticatedHttpRequest(HttpRequest):
 ```
 
 And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
-
 
 ### My QuerySet methods are returning Any rather than my Model
 
@@ -208,9 +205,7 @@ class MyManager(model.Manager):
 
 will cause this error message:
 
-```
-error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
-```
+> error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
 
 This is happening because the `Manager` class is generic, but without
 specifying generics the built-in manager methods are expected to return the
@@ -296,6 +291,13 @@ def foo(obj: object) -> None:
         ...
 ```
 
+### Why am I getting incompatible argument type mentioning `_StrPromise`?
+
+The lazy translation functions of Django (such as `gettext_lazy`) return a `Promise` instead of `str`. These two types [cannot be used interchangeably](https://github.com/typeddjango/django-stubs/pull/1139#issuecomment-1232167698). The return type of these functions was therefore [changed](https://github.com/typeddjango/django-stubs/pull/689) to reflect that.
+
+If you encounter this error in your own code, you can either cast the `Promise` to `str` (causing the translation to be evaluated), or use the `StrPromise` or `StrOrPromise` types from `django-stubs-ext` in type hints. Which solution to choose depends depends on the particular case. See [working with lazy translation objects](https://docs.djangoproject.com/en/4.1/topics/i18n/translation/#working-with-lazy-translation-objects) in the Django documentation for more information.
+
+If this is reported on Django code, please report an issue or open a pull request to fix the type hints.
 
 ## Related projects
 
@@ -303,8 +305,6 @@ def foo(obj: object) -> None:
 - [`djangorestframework-stubs`](https://github.com/typeddjango/djangorestframework-stubs) - Stubs for Django REST Framework.
 - [`pytest-mypy-plugins`](https://github.com/typeddjango/pytest-mypy-plugins) - `pytest` plugin that we use for testing `mypy` stubs and plugins.
 - [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template) - Create new typed Django projects in seconds.
-
-
 
 ## To get help
 
