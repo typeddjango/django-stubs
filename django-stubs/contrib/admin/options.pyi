@@ -131,7 +131,7 @@ class BaseModelAdmin(Generic[_ModelT]):
 
 _DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
-_ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], None]
+_ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], Optional[HttpResponse]]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_display: _DisplayT
