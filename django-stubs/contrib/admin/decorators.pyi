@@ -31,7 +31,8 @@ def action(
     permissions: Sequence[str] | None = ...,
     description: _StrOrPromise | None = ...,
 ) -> Callable[
-    [Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn]], Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn]
+    [Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn]],
+    Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn],
 ]: ...
 @overload
 def display(
