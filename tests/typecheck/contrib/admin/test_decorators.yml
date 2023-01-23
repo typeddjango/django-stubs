@@ -96,7 +96,7 @@
         def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[MyModel]) -> FileResponse: ...
 
         def method(self) -> None:
-            reveal_type(self.method_action_bare)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query._QuerySet[main.MyModel, main.MyModel])"
-            reveal_type(self.method_action_fancy)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query._QuerySet[main.MyModel, main.MyModel])"
-            reveal_type(self.method_action_http_response)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query._QuerySet[main.MyModel, main.MyModel]) -> django.http.response.HttpResponse"
-            reveal_type(self.method_action_file_response)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query._QuerySet[main.MyModel, main.MyModel]) -> django.http.response.FileResponse"
+            reveal_type(self.method_action_bare)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query._QuerySet[main.MyModel, main.MyModel])"
+            reveal_type(self.method_action_fancy)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query._QuerySet[main.MyModel, main.MyModel])"
+            reveal_type(self.method_action_http_response)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query._QuerySet[main.MyModel, main.MyModel]) -> django.http.response.HttpResponse"
+            reveal_type(self.method_action_file_response)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query._QuerySet[main.MyModel, main.MyModel]) -> django.http.response.FileResponse"
