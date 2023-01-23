@@ -17,21 +17,23 @@ _QuerySet = TypeVar("_QuerySet", bound=QuerySet)
 # This is deliberately different from _DisplayT defined in contrib.admin.options
 _DisplayCallable: TypeAlias = Union[Callable[[_ModelAdmin, _Model], Any], Callable[[_Model], Any]]  # noqa: Y037
 _DisplayCallableT = TypeVar("_DisplayCallableT", bound=_DisplayCallable)
-_ActionCallable: TypeAlias = Callable[[_ModelAdmin, _Request, _QuerySet], HttpResponseBase | None]  # noqa: Y037
-_ActionCallableT = TypeVar("_ActionCallableT", bound=_ActionCallable)
+_ActionReturn = TypeVar("_ActionReturn", bound=HttpResponseBase | None)
 
 @overload
 def action(
-    function: _ActionCallableT,
+    function: Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn],
     permissions: Sequence[str] | None = ...,
     description: _StrOrPromise | None = ...,
-) -> _ActionCallableT: ...
+) -> Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn]: ...
 @overload
 def action(
     *,
     permissions: Sequence[str] | None = ...,
     description: _StrOrPromise | None = ...,
-) -> Callable[[_ActionCallableT], _ActionCallableT]: ...
+) -> Callable[
+    [Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn]],
+    Callable[[_ModelAdmin, _Request, _QuerySet], _ActionReturn],
+]: ...
 @overload
 def display(
     function: _DisplayCallableT,
