@@ -27,7 +27,7 @@ from django.forms.models import (
 )
 from django.forms.widgets import Media
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseRedirect, HttpResponseBase
+from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.template.response import _TemplateForResponseT
 from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
