@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, cast
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
@@ -38,8 +39,10 @@ def _get_current_field_from_assignment(
     if model_cls is None:
         return None
 
-    current_field = model_cls._meta.get_field(field_name)
-    return current_field
+    try:
+        return model_cls._meta.get_field(field_name)
+    except FieldDoesNotExist:
+        return None
 
 
 def reparametrize_related_field_type(related_field_type: Instance, set_type: MypyType, get_type: MypyType) -> Instance:

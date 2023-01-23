@@ -180,3 +180,24 @@
         obj = MyModel()
 
         reveal_type(obj.small) # N: Revealed type is "builtins.int"
+
+- case: test_ignores_renamed_field
+  main: |
+        # Ref: https://github.com/typeddjango/django-stubs/issues/1261
+        # Django modifies the model so it doesn't have 'modelname', but we don't follow
+        # along. But the 'name=' argument to a field isn't a documented feature.
+        from myapp.models import RenamedField
+        instance = RenamedField()
+        reveal_type(instance.modelname) # N: Revealed type is "builtins.int"
+        instance.fieldname # E: "RenamedField" has no attribute "fieldname"
+        instance.modelname = 1
+        instance.fieldname = 1 # E: "RenamedField" has no attribute "fieldname"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class RenamedField(models.Model):
+            modelname = models.IntegerField(name="fieldname", choices=((1, 'One'),))
