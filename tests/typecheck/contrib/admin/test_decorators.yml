@@ -81,7 +81,7 @@
 
     @admin.register(MyModel)
     class MyModelAdmin(admin.ModelAdmin[MyModel]):
-        actions = [freestanding_action_bare, freestanding_action_fancy, "method_action_bare", "method_action_fancy"]
+        actions = [freestanding_action_bare, freestanding_action_fancy, "method_action_bare", "method_action_fancy", freestanding_action_http_response, freestanding_action_file_response]
 
         @admin.action
         def method_action_bare(self, request: HttpRequest, queryset: QuerySet[MyModel]) -> None: ...
