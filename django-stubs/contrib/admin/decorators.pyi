@@ -6,7 +6,7 @@ from django.contrib.admin.sites import AdminSite
 from django.db.models import Combinable, QuerySet
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponseBase
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 

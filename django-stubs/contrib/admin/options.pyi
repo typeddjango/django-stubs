@@ -27,7 +27,7 @@ from django.forms.models import (
 )
 from django.forms.widgets import Media
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponse, HttpResponseRedirect, HttpResponseBase
 from django.template.response import _TemplateForResponseT
 from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
@@ -131,7 +131,7 @@ class BaseModelAdmin(Generic[_ModelT]):
 
 _DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
-_ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], Optional[HttpResponse]]
+_ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], Optional[HttpResponseBase]]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_display: _DisplayT
