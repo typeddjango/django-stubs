@@ -31,7 +31,7 @@ def action(
     *,
     permissions: Sequence[str] | None = ...,
     description: _StrOrPromise | None = ...,
-) -> Callable[[_ActionCallableT], _ActionCallableT,]: ...
+) -> Callable[[_ActionCallableT], _ActionCallableT]: ...
 @overload
 def display(
     function: _DisplayCallableT,
