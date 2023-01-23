@@ -383,8 +383,8 @@ LOGIN_REDIRECT_URL: str
 
 LOGOUT_REDIRECT_URL: str | None
 
-# The number of days a password reset link is valid for
-PASSWORD_RESET_TIMEOUT_DAYS: int
+# The number of seconds a password reset link is valid for
+PASSWORD_RESET_TIMEOUT: int
 
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
