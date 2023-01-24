@@ -344,7 +344,10 @@ class DjangoContext:
                 related_model_fullname = field.model.__module__ + "." + related_model_cls
                 related_model_cls = self.get_model_class_by_fullname(related_model_fullname)
             else:
-                related_model_cls = self.apps_registry.get_model(related_model_cls)
+                try:
+                    related_model_cls = self.apps_registry.get_model(related_model_cls)
+                except LookupError:
+                    return None
 
         return related_model_cls
 
