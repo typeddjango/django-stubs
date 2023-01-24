@@ -26,8 +26,8 @@ class ChangeList:
     opts: Options[Model]
     lookup_opts: Options[Model]
     root_queryset: QuerySet[Model]
-    list_display: _DisplayT
-    list_display_links: _DisplayT
+    list_display: _DisplayT[Model]
+    list_display_links: _DisplayT[Model]
     list_filter: Sequence[_ListFilterT]
     date_hierarchy: Any
     search_fields: Sequence[str]
@@ -52,8 +52,8 @@ class ChangeList:
         self,
         request: HttpRequest,
         model: type[Model],
-        list_display: _DisplayT,
-        list_display_links: _DisplayT,
+        list_display: _DisplayT[Model],
+        list_display_links: _DisplayT[Model],
         list_filter: Sequence[_ListFilterT],
         date_hierarchy: str | None,
         search_fields: Sequence[str],
