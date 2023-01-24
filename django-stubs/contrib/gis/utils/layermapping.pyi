@@ -19,7 +19,7 @@ class _Writer(Protocol):
 
 class LayerMapping:
     MULTI_TYPES: dict[int, OGRGeomType]
-    FIELD_TYPES: dict[Field, OGRField | tuple[OGRField, ...]]
+    FIELD_TYPES: dict[Field[Any, Any], OGRField | tuple[OGRField, ...]]
     ds: DataSource
     layer: Layer
     using: str
@@ -48,7 +48,7 @@ class LayerMapping:
     ) -> None: ...
     def check_fid_range(self, fid_range: Any) -> Any: ...
     geom_field: str
-    fields: dict[str, Field]
+    fields: dict[str, Field[Any, Any]]
     coord_dim: int
     def check_layer(self) -> Any: ...
     def check_srs(self, source_srs: Any) -> Any: ...

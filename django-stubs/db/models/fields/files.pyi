@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, AnyStr, Protocol, TypeVar, overload
 
 from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
@@ -12,7 +12,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
 
-class FieldFile(File):
+class FieldFile(File[AnyStr]):
     instance: Model
     field: FileField
     storage: Storage
@@ -25,7 +25,7 @@ class FieldFile(File):
     def url(self) -> str: ...
     @property
     def size(self) -> int: ...
-    def save(self, name: str, content: File, save: bool = ...) -> None: ...
+    def save(self, name: str, content: File[AnyStr], save: bool = ...) -> None: ...
     def delete(self, save: bool = ...) -> None: ...
     @property
     def closed(self) -> bool: ...
@@ -33,21 +33,21 @@ class FieldFile(File):
 class FileDescriptor(DeferredAttribute):
     field: FileField
     def __set__(self, instance: Model, value: Any | None) -> None: ...
-    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
+    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile[AnyStr] | FileDescriptor: ...
 
 _M = TypeVar("_M", bound=Model, contravariant=True)
 
 class _UploadToCallable(Protocol[_M]):
     def __call__(self, __instance: _M, __filename: str) -> _PathCompatible: ...
 
-class FileField(Field):
+class FileField(Field[Any, Any]):
     storage: Storage
-    upload_to: _PathCompatible | _UploadToCallable
+    upload_to: _PathCompatible | _UploadToCallable[Model]
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
-        upload_to: _PathCompatible | _UploadToCallable = ...,
+        upload_to: _PathCompatible | _UploadToCallable[_M] = ...,
         storage: Storage | Callable[[], Storage] | None = ...,
         *,
         max_length: int | None = ...,
@@ -84,7 +84,7 @@ class ImageFileDescriptor(FileDescriptor):
     field: ImageField
     def __set__(self, instance: Model, value: str | None) -> None: ...
 
-class ImageFieldFile(ImageFile, FieldFile):
+class ImageFieldFile(ImageFile, FieldFile[AnyStr]):
     field: ImageField
     def delete(self, save: bool = ...) -> None: ...
 

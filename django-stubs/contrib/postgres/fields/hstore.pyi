@@ -3,7 +3,7 @@ from typing import Any
 from django.db.models import Field, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 
-class HStoreField(CheckFieldDefaultMixin, Field):
+class HStoreField(CheckFieldDefaultMixin, Field[Any, Any]):
     def get_transform(self, name: str) -> Any: ...
 
 class KeyTransform(Transform):

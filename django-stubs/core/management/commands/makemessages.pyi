@@ -1,9 +1,9 @@
 from re import Pattern
-from typing import Any
+from typing import Any, AnyStr
 
 from django.core.management.base import BaseCommand
 
-plural_forms_re: Pattern
+plural_forms_re: Pattern[Any]
 STATUS_OK: int
 NO_LOCALE_DIR: Any
 

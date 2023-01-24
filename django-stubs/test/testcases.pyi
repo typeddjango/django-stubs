@@ -13,7 +13,7 @@ from django.db import connections as connections  # noqa: F401
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
-from django.forms import BaseFormSet, Form
+from django.forms import BaseForm, BaseFormSet, Form
 from django.forms.fields import EmailField
 from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponseBase
@@ -120,7 +120,7 @@ class SimpleTestCase(unittest.TestCase):
     @overload
     def assertFormsetError(
         self,
-        formset: BaseFormSet,
+        formset: BaseFormSet[BaseForm],
         form_index: int | None,
         field: str | None,
         errors: list[str] | str,
@@ -187,7 +187,7 @@ class TransactionTestCase(SimpleTestCase):
     serialized_rollback: bool
     def assertQuerysetEqual(
         self,
-        qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
+        qs: Iterator[Any] | list[Model] | QuerySet[Model] | RawQuerySet[Model],
         values: Collection[Any],
         transform: Callable[[Model], Any] | type[str] = ...,
         ordered: bool = ...,
@@ -210,14 +210,14 @@ class TestCase(TransactionTestCase):
     ) -> Generator[list[Callable[[], Any]], None, None]: ...
 
 class CheckCondition:
-    conditions: Sequence[tuple[Callable, str]]
-    def __init__(self, *conditions: tuple[Callable, str]) -> None: ...
-    def add_condition(self, condition: Callable, reason: str) -> CheckCondition: ...
+    conditions: Sequence[tuple[Callable[..., Any], str]]
+    def __init__(self, *conditions: tuple[Callable[..., Any], str]) -> None: ...
+    def add_condition(self, condition: Callable[..., Any], reason: str) -> CheckCondition: ...
     def __get__(self, instance: None, cls: type[TransactionTestCase] | None = ...) -> bool: ...
 
-def skipIfDBFeature(*features: Any) -> Callable: ...
-def skipUnlessDBFeature(*features: Any) -> Callable: ...
-def skipUnlessAnyDBFeature(*features: Any) -> Callable: ...
+def skipIfDBFeature(*features: Any) -> Callable[..., Any]: ...
+def skipUnlessDBFeature(*features: Any) -> Callable[..., Any]: ...
+def skipUnlessAnyDBFeature(*features: Any) -> Callable[..., Any]: ...
 
 class QuietWSGIRequestHandler(WSGIRequestHandler): ...
 

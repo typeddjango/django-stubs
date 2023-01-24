@@ -3,7 +3,7 @@ from io import BytesIO
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, NoReturn, TypeVar
+from typing import Any, AnyStr, Generic, NoReturn, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -20,8 +20,8 @@ from typing_extensions import TypeAlias
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
-CONTENT_TYPE_RE: Pattern
-JSON_CONTENT_TYPE_RE: Pattern
+CONTENT_TYPE_RE: TypeAlias = Pattern[AnyStr]
+JSON_CONTENT_TYPE_RE: TypeAlias = Pattern[AnyStr]
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase

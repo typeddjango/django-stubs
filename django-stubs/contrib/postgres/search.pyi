@@ -8,9 +8,9 @@ from typing_extensions import TypeAlias
 
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 
-class SearchVectorExact(Lookup): ...
-class SearchVectorField(Field): ...
-class SearchQueryField(Field): ...
+class SearchVectorExact(Lookup[Any]): ...
+class SearchVectorField(Field[Any, Any]): ...
+class SearchQueryField(Field[Any, Any]): ...
 
 class SearchConfig(Expression):
     config: _Expression | None
@@ -25,7 +25,7 @@ class SearchVector(SearchVectorCombinable, Func):
     config: _Expression | None
     function: str
     arg_joiner: str
-    output_field: Field
+    output_field: Field[Any, Any]
     def __init__(
         self, *expressions: _Expression, config: _Expression | None = ..., weight: Any | None = ...
     ) -> None: ...
@@ -37,7 +37,7 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field | None = ...,
+        output_field: Field[Any, Any] | None = ...,
     ) -> None: ...
 
 class SearchQueryCombinable:
@@ -53,7 +53,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
     def __init__(
         self,
         value: _Expression,
-        output_field: Field | None = ...,
+        output_field: Field[Any, Any] | None = ...,
         *,
         config: _Expression | None = ...,
         invert: bool = ...,
@@ -68,7 +68,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field | None = ...,
+        output_field: Field[Any, Any] | None = ...,
     ) -> None: ...
 
 class SearchRank(Func):
@@ -84,7 +84,7 @@ class SearchRank(Func):
 class SearchHeadline(Func):
     function: str
     template: str
-    output_field: Field
+    output_field: Field[Any, Any]
     def __init__(
         self,
         expression: _Expression,

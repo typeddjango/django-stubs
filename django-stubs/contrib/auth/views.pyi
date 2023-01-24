@@ -2,6 +2,7 @@ from typing import Any
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import AuthenticationForm
+from django.forms import BaseForm
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
@@ -37,7 +38,7 @@ class PasswordContextMixin:
     extra_context: Any
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
-class PasswordResetView(PasswordContextMixin, FormView):
+class PasswordResetView(PasswordContextMixin, FormView[BaseForm]):
     email_template_name: str
     extra_email_context: Any
     from_email: Any
@@ -52,7 +53,7 @@ INTERNAL_RESET_SESSION_TOKEN: str
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     title: Any
 
-class PasswordResetConfirmView(PasswordContextMixin, FormView):
+class PasswordResetConfirmView(PasswordContextMixin, FormView[BaseForm]):
     post_reset_login: bool
     post_reset_login_backend: Any
     reset_url_token: str
@@ -65,7 +66,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
     title: Any
 
-class PasswordChangeView(PasswordContextMixin, FormView):
+class PasswordChangeView(PasswordContextMixin, FormView[BaseForm]):
     title: Any
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):

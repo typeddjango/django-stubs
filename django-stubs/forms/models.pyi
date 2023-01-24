@@ -1,6 +1,7 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
 from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
     Any,
+    AnyStr,
     ClassVar,
     Generic,
     TypeVar,
@@ -34,7 +35,7 @@ _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 _Labels: TypeAlias = dict[str, str]
 _HelpTexts: TypeAlias = dict[str, str]
 _ErrorMessages: TypeAlias = dict[str, dict[str, str]]
-_FormFieldCallback: TypeAlias = Callable[[models.Field], Field]
+_FormFieldCallback: TypeAlias = Callable[[models.Field[Any, Any]], Field]
 
 _M = TypeVar("_M", bound=Model)
 _ParentM = TypeVar("_ParentM", bound=Model)
@@ -79,7 +80,7 @@ class BaseModelForm(Generic[_M], BaseForm):
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         auto_id: bool | str = ...,
         prefix: str | None = ...,
         initial: Mapping[str, Any] | None = ...,
@@ -111,7 +112,7 @@ def modelform_factory(
     field_classes: Mapping[str, type[Field]] | None = ...,
 ) -> type[ModelForm[_M]]: ...
 
-_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm[Model])
 
 class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     model: type[_M]
@@ -121,7 +122,7 @@ class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         auto_id: str = ...,
         prefix: str | None = ...,
         queryset: QuerySet[_M] | None = ...,
@@ -153,7 +154,7 @@ def modelformset_factory(
     model: type[_M],
     form: type[_ModelFormT] = ...,
     formfield_callback: _FormFieldCallback | None = ...,
-    formset: type[BaseModelFormSet] = ...,
+    formset: type[BaseModelFormSet[Model, ModelForm[Model]]] = ...,
     extra: int = ...,
     can_delete: bool = ...,
     can_order: bool = ...,
@@ -177,11 +178,11 @@ class BaseInlineFormSet(Generic[_M, _ParentM, _ModelFormT], BaseModelFormSet[_M,
     instance: _ParentM
     save_as_new: bool
     unique_fields: Collection[str]
-    fk: ForeignKey  # set by inlineformset_set
+    fk: ForeignKey[Any, Any]  # set by inlineformset_set
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         instance: _ParentM | None = ...,
         save_as_new: bool = ...,
         prefix: str | None = ...,
@@ -199,7 +200,7 @@ def inlineformset_factory(
     parent_model: type[_ParentM],
     model: type[_M],
     form: type[_ModelFormT] = ...,
-    formset: type[BaseInlineFormSet] = ...,
+    formset: type[BaseInlineFormSet[_M, _ParentM, _ModelFormT]] = ...,
     fk_name: str | None = ...,
     fields: _Fields | None = ...,
     exclude: _Fields | None = ...,
@@ -247,7 +248,7 @@ class ModelChoiceIteratorValue:
 
 class ModelChoiceIterator:
     field: ModelChoiceField
-    queryset: QuerySet
+    queryset: QuerySet[Model]
     def __init__(self, field: ModelChoiceField) -> None: ...
     def __iter__(self) -> Iterator[tuple[ModelChoiceIteratorValue | str, str]]: ...
     def __len__(self) -> int: ...
@@ -308,12 +309,12 @@ class ModelMultipleChoiceField(ModelChoiceField):
     def prepare_value(self, value: Any) -> Any: ...
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore
 
-def modelform_defines_fields(form_class: type[ModelForm]) -> bool: ...
+def modelform_defines_fields(form_class: type[ModelForm[Model]]) -> bool: ...
 @overload
 def _get_foreign_key(  # type: ignore
     parent_model: type[Model], model: type[Model], fk_name: str | None = ..., can_fail: Literal[True] = ...
-) -> ForeignKey | None: ...
+) -> ForeignKey[Any, Any] | None: ...
 @overload
 def _get_foreign_key(
     parent_model: type[Model], model: type[Model], fk_name: str | None = ..., can_fail: Literal[False] = ...
-) -> ForeignKey: ...
+) -> ForeignKey[Any, Any]: ...

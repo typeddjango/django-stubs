@@ -8,11 +8,11 @@ from django.utils.safestring import SafeString
 
 class InclusionAdminNode(InclusionNode):
     args: list[Any]
-    func: Callable
+    func: Callable[..., Any]
     kwargs: dict[str, Any]
     takes_context: bool
     template_name: str
     def __init__(
-        self, parser: Parser, token: Token, func: Callable, template_name: str, takes_context: bool = ...
+        self, parser: Parser, token: Token, func: Callable[..., Any], template_name: str, takes_context: bool = ...
     ) -> None: ...
     def render(self, context: Context) -> SafeString: ...

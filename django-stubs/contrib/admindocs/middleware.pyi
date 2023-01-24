@@ -10,6 +10,6 @@ class XViewMiddleware(MiddlewareMixin):
         self,
         request: HttpRequest,
         view_func: Callable[..., HttpResponseBase],
-        view_args: tuple,
+        view_args: tuple[Any, ...],
         view_kwargs: dict[Any, Any],
     ) -> HttpResponse | None: ...

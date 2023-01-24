@@ -23,34 +23,34 @@ class ForeignObjectRel(FieldCacheMixin):
     editable: bool
     is_relation: bool
     null: bool
-    field: ForeignObject
+    field: ForeignObject[Any, Any]
     model: type[Model]
     related_name: str | None
     related_query_name: str | None
     limit_choices_to: _AllLimitChoicesTo | None
     parent_link: bool
-    on_delete: Callable
+    on_delete: Callable[..., Any]
     symmetrical: bool
     multiple: bool
     field_name: str | None
     def __init__(
         self,
-        field: ForeignObject,
+        field: ForeignObject[Any, Any],
         to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        on_delete: Callable = ...,
+        on_delete: Callable[..., Any] = ...,
     ) -> None: ...
     @property
     def hidden(self) -> bool: ...
     @property
     def name(self) -> str: ...
     @property
-    def remote_field(self) -> ForeignObject: ...
+    def remote_field(self) -> ForeignObject[Any, Any]: ...
     @property
-    def target_field(self) -> AutoField: ...
+    def target_field(self) -> AutoField[Any, Any]: ...
     @property
     def related_model(self) -> type[Model]: ...
     @property
@@ -61,7 +61,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def one_to_many(self) -> bool: ...
     @property
     def one_to_one(self) -> bool: ...
-    def get_lookup(self, lookup_name: str) -> type[Lookup] | None: ...
+    def get_lookup(self, lookup_name: str) -> type[Lookup[Any]] | None: ...
     def get_internal_type(self) -> str: ...
     @property
     def db_type(self) -> Any: ...
@@ -75,7 +75,7 @@ class ForeignObjectRel(FieldCacheMixin):
         ordering: Sequence[str] = ...,
     ) -> _ChoicesList: ...
     def is_hidden(self) -> bool: ...
-    def get_joining_columns(self) -> tuple: ...
+    def get_joining_columns(self) -> tuple[Any, ...]: ...
     def get_extra_restriction(
         self, where_class: type[WhereNode], alias: str, related_alias: str
     ) -> StartsWith | WhereNode | None: ...
@@ -84,32 +84,32 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
-    field: ForeignKey
+    field: ForeignKey[Any, Any]
     def __init__(
         self,
-        field: ForeignKey,
+        field: ForeignKey[Any, Any],
         to: type[Model] | str,
         field_name: str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        on_delete: Callable = ...,
+        on_delete: Callable[..., Any] = ...,
     ) -> None: ...
-    def get_related_field(self) -> Field: ...
+    def get_related_field(self) -> Field[Any, Any]: ...
 
 class OneToOneRel(ManyToOneRel):
-    field: OneToOneField
+    field: OneToOneField[Any, Any]
     def __init__(
         self,
-        field: OneToOneField,
+        field: OneToOneField[Any, Any],
         to: type[Model] | str,
         field_name: str | None,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        on_delete: Callable = ...,
+        on_delete: Callable[..., Any] = ...,
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
@@ -119,7 +119,7 @@ class ManyToManyRel(ForeignObjectRel):
     db_constraint: bool
     def __init__(
         self,
-        field: ManyToManyField,
+        field: ManyToManyField[Any, Any],
         to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
@@ -129,4 +129,4 @@ class ManyToManyRel(ForeignObjectRel):
         through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
     ) -> None: ...
-    def get_related_field(self) -> Field: ...
+    def get_related_field(self) -> Field[Any, Any]: ...

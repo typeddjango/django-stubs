@@ -4,7 +4,7 @@ from django.db.models import Lookup, Transform
 
 class RasterBandTransform(Transform): ...
 
-class GISLookup(Lookup):
+class GISLookup(Lookup[Any]):
     sql_template: Any
     transform_func: Any
     distance: bool

@@ -22,9 +22,9 @@ class RangeOperators:
     NOT_GT: Literal["&<"]
     ADJACENT_TO: Literal["-|-"]
 
-class RangeField(models.Field):
+class RangeField(models.Field[Any, Any]):
     empty_strings_allowed: bool
-    base_field: models.Field
+    base_field: models.Field[Any, Any]
     range_type: type[Range]
     def get_prep_value(self, value: Any) -> Any | None: ...
     def to_python(self, value: Any) -> Any: ...
@@ -44,32 +44,32 @@ class DateTimeRangeField(RangeField):
 class DateRangeField(RangeField):
     def __get__(self, instance: Any, owner: Any) -> DateRange: ...
 
-class DateTimeRangeContains(PostgresOperatorLookup):
+class DateTimeRangeContains(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class RangeContainedBy(PostgresOperatorLookup):
+class RangeContainedBy(PostgresOperatorLookup[Any]):
     lookup_name: str
     type_mapping: dict[str, str]
     postgres_operator: str
 
-class FullyLessThan(PostgresOperatorLookup):
+class FullyLessThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class FullGreaterThan(PostgresOperatorLookup):
+class FullGreaterThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class NotLessThan(PostgresOperatorLookup):
+class NotLessThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class NotGreaterThan(PostgresOperatorLookup):
+class NotGreaterThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class AdjacentToLookup(PostgresOperatorLookup):
+class AdjacentToLookup(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
@@ -77,35 +77,35 @@ class RangeStartsWith(models.Transform):
     lookup_name: str
     function: str
     @property
-    def output_field(self) -> models.Field: ...
+    def output_field(self) -> models.Field[Any, Any]: ...
 
 class RangeEndsWith(models.Transform):
     lookup_name: str
     function: str
     @property
-    def output_field(self) -> models.Field: ...
+    def output_field(self) -> models.Field[Any, Any]: ...
 
 class IsEmpty(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class LowerInclusive(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class LowerInfinite(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class UpperInclusive(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class UpperInfinite(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]

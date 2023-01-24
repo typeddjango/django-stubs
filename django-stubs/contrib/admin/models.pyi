@@ -21,13 +21,13 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> LogEntry: ...
 
 class LogEntry(models.Model):
-    action_time: models.DateTimeField
-    user: models.ForeignKey
-    content_type: models.ForeignKey
-    object_id: models.TextField
-    object_repr: models.CharField
-    action_flag: models.PositiveSmallIntegerField
-    change_message: models.TextField
+    action_time: models.DateTimeField[Any, Any]
+    user: models.ForeignKey[Any, Any]
+    content_type: models.ForeignKey[Any, Any]
+    object_id: models.TextField[Any, Any]
+    object_repr: models.CharField[Any, Any]
+    action_flag: models.PositiveSmallIntegerField[Any, Any]
+    change_message: models.TextField[Any, Any]
     objects: LogEntryManager
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...

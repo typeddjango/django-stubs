@@ -26,7 +26,7 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     cache: BaseCache
     def __init__(
         self,
-        get_response: Callable = ...,
+        get_response: Callable[..., Any] = ...,
         cache_timeout: float | None = ...,
         page_timeout: float | None = ...,
         **kwargs: Any

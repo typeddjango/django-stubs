@@ -12,7 +12,7 @@ CLEANSED_SUBSTITUTE: str
 CURRENT_DIR: Path
 
 class CallableSettingWrapper:
-    def __init__(self, callable_setting: Callable | type[Any]) -> None: ...
+    def __init__(self, callable_setting: Callable[..., Any] | type[Any]) -> None: ...
 
 def technical_500_response(
     request: HttpRequest,

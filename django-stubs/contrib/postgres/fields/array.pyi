@@ -19,13 +19,13 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
 
     empty_strings_allowed: bool
     default_error_messages: _ErrorMessagesT
-    base_field: Field
+    base_field: Field[Any, Any]
     size: int | None
     default_validators: Sequence[_ValidatorCallable]
     from_db_value: Any
     def __init__(
         self,
-        base_field: Field,
+        base_field: Field[Any, Any],
         size: int | None = ...,
         *,
         verbose_name: _StrOrPromise | None = ...,

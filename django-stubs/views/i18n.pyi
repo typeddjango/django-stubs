@@ -14,7 +14,7 @@ def get_formats() -> dict[str, list[str] | int | str]: ...
 js_catalog_template: str
 
 class JavaScriptCatalog(View):
-    head: Callable
+    head: Callable[..., Any]
     domain: str
     packages: list[str]
     translation: DjangoTranslation

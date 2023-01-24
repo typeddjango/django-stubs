@@ -1,9 +1,10 @@
 from collections import UserList
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import Any
+from typing import Any, AnyStr
 
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.datastructures import MultiValueDict
 from django.utils.safestring import SafeString
@@ -11,19 +12,19 @@ from typing_extensions import TypeAlias
 
 _DataT: TypeAlias = Mapping[str, Any]  # noqa: Y047
 
-_FilesT: TypeAlias = MultiValueDict[str, UploadedFile]  # noqa: Y047
+_FilesT: TypeAlias = MultiValueDict[str, UploadedFile[AnyStr]]  # noqa: Y047
 
 def pretty_name(name: str) -> str: ...
 def flatatt(attrs: dict[str, Any]) -> SafeString: ...
 
-class ErrorDict(dict):
+class ErrorDict(dict[Any, Any]):
     def as_data(self) -> dict[str, list[ValidationError]]: ...
     def get_json_data(self, escape_html: bool = ...) -> dict[str, Any]: ...
     def as_json(self, escape_html: bool = ...) -> str: ...
     def as_ul(self) -> str: ...
     def as_text(self) -> str: ...
 
-class ErrorList(UserList):
+class ErrorList(UserList[Any]):
     data: list[ValidationError | str]
     error_class: str
     def __init__(

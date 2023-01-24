@@ -10,7 +10,7 @@ class_prepared: Signal
 class ModelSignal(Signal):
     def connect(  # type: ignore
         self,
-        receiver: Callable,
+        receiver: Callable[..., Any],
         sender: type[Model] | str | None = ...,
         weak: bool = ...,
         dispatch_uid: str | None = ...,
@@ -18,7 +18,7 @@ class ModelSignal(Signal):
     ) -> None: ...
     def disconnect(  # type: ignore
         self,
-        receiver: Callable | None = ...,
+        receiver: Callable[..., Any] | None = ...,
         sender: type[Model] | str | None = ...,
         dispatch_uid: str | None = ...,
         apps: Apps | None = ...,

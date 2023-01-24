@@ -1,14 +1,14 @@
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
-color_names: Sequence
+color_names: Sequence[Any]
 foreground: Mapping[str, str]
 background: Mapping[str, str]
 RESET: str
 opt_dict: Mapping[str, str]
 
 def colorize(text: str | None = ..., opts: Sequence[str] = ..., **kwargs: Any) -> str: ...
-def make_style(opts: tuple = ..., **kwargs: Any) -> Callable: ...
+def make_style(opts: tuple[Any] = ..., **kwargs: Any) -> Callable[..., Any]: ...
 
 NOCOLOR_PALETTE: str
 DARK_PALETTE: str

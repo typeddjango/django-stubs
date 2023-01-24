@@ -1,5 +1,5 @@
 from collections.abc import Iterator, Mapping, Sequence, Sized
-from typing import Any, Generic, TypeVar
+from typing import Any, AnyStr, Generic, TypeVar
 
 from django.forms.forms import BaseForm, Form
 from django.forms.utils import ErrorList, _DataT, _FilesT
@@ -39,7 +39,7 @@ class BaseFormSet(Generic[_F], Sized):
     prefix: str | None
     auto_id: str
     data: _DataT
-    files: _FilesT
+    files: _FilesT[Any]
     initial: Sequence[Mapping[str, Any]] | None
     form_kwargs: dict[str, Any]
     error_class: type[ErrorList]
@@ -47,7 +47,7 @@ class BaseFormSet(Generic[_F], Sized):
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         auto_id: str = ...,
         prefix: str | None = ...,
         initial: Sequence[Mapping[str, Any]] | None = ...,

@@ -13,21 +13,21 @@ class AppConfigStub(AppConfig): ...
 class ModelState:
     name: str
     app_label: str
-    fields: dict[str, Field]
+    fields: dict[str, Field[Any, Any]]
     options: dict[str, Any]
     bases: Sequence[type[Model] | str]
-    managers: list[tuple[str, Manager]]
+    managers: list[tuple[str, Manager[Model]]]
     def __init__(
         self,
         app_label: str,
         name: str,
-        fields: list[tuple[str, Field]] | dict[str, Field],
+        fields: list[tuple[str, Field[Any, Any]]] | dict[str, Field[Any, Any]],
         options: dict[str, Any] | None = ...,
         bases: Sequence[type[Model] | str] | None = ...,
-        managers: list[tuple[str, Manager]] | None = ...,
+        managers: list[tuple[str, Manager[Model]]] | None = ...,
     ) -> None: ...
     def clone(self) -> ModelState: ...
-    def construct_managers(self) -> Iterator[tuple[str, Manager]]: ...
+    def construct_managers(self) -> Iterator[tuple[str, Manager[Model]]]: ...
     @classmethod
     def from_model(cls, model: type[Model], exclude_rels: bool = ...) -> ModelState: ...
     # Removed in 3.2, but back in 4.0

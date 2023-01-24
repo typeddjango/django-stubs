@@ -14,43 +14,45 @@ class ListFilter:
     template: str
     used_parameters: Any
     def __init__(
-        self, request: HttpRequest, params: dict[str, str], model: type[Model], model_admin: ModelAdmin
+        self, request: HttpRequest, params: dict[str, str], model: type[Model], model_admin: ModelAdmin[Model]
     ) -> None: ...
     def has_output(self) -> bool: ...
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
-    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet | None: ...
+    def queryset(self, request: HttpRequest, queryset: QuerySet[Model]) -> QuerySet[Model] | None: ...
     def expected_parameters(self) -> list[str] | None: ...
 
 class SimpleListFilter(ListFilter):
     parameter_name: str | None
     lookup_choices: Any
     def value(self) -> str | None: ...
-    def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[Any, str]] | None: ...
+    def lookups(self, request: HttpRequest, model_admin: ModelAdmin[Model]) -> Iterable[tuple[Any, str]] | None: ...
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class FieldListFilter(ListFilter):
-    field: Field
+    field: Field[Any, Any]
     field_path: str
     title: str
     def __init__(
         self,
-        field: Field,
+        field: Field[Any, Any],
         request: HttpRequest,
         params: dict[str, str],
         model: type[Model],
-        model_admin: ModelAdmin,
+        model_admin: ModelAdmin[Model],
         field_path: str,
     ) -> None: ...
     @classmethod
-    def register(cls, test: Callable, list_filter_class: type[FieldListFilter], take_priority: bool = ...) -> None: ...
+    def register(
+        cls, test: Callable[..., Any], list_filter_class: type[FieldListFilter], take_priority: bool = ...
+    ) -> None: ...
     @classmethod
     def create(
         cls,
-        field: Field,
+        field: Field[Any, Any],
         request: HttpRequest,
         params: dict[str, str],
         model: type[Model],
-        model_admin: ModelAdmin,
+        model_admin: ModelAdmin[Model],
         field_path: str,
     ) -> FieldListFilter: ...
 
@@ -67,7 +69,7 @@ class RelatedFieldListFilter(FieldListFilter):
     @property
     def include_empty_choice(self) -> bool: ...
     def field_choices(
-        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
+        self, field: RelatedField[Any, Any], request: HttpRequest, model_admin: ModelAdmin[Model]
     ) -> list[tuple[str, str]]: ...
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
@@ -104,7 +106,7 @@ class AllValuesFieldListFilter(FieldListFilter):
     lookup_val: Any
     lookup_val_isnull: Any
     empty_value_display: str
-    lookup_choices: QuerySet
+    lookup_choices: QuerySet[Model]
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):

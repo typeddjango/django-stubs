@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, ClassVar
+from typing import Any, AnyStr, ClassVar
 
 from django.core.exceptions import ValidationError as ValidationError
 from django.forms.boundfield import BoundField
@@ -20,7 +20,7 @@ class BaseForm:
     use_required_attribute: bool
     is_bound: bool
     data: _DataT
-    files: _FilesT
+    files: _FilesT[Any]
     auto_id: bool | str
     initial: Mapping[str, Any]
     error_class: type[ErrorList]
@@ -33,7 +33,7 @@ class BaseForm:
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         auto_id: bool | str = ...,
         prefix: str | None = ...,
         initial: Mapping[str, Any] | None = ...,

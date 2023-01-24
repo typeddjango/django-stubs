@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
-from typing import Generic, Protocol, TypeVar, overload
+from typing import Any, Generic, Protocol, TypeVar, overload
 
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
@@ -12,7 +12,7 @@ class EmptyPage(InvalidPage): ...
 
 _T = TypeVar("_T")
 
-class _SupportsPagination(Protocol[_T], Sized, Iterable):
+class _SupportsPagination(Protocol[_T], Sized, Iterable[_T]):
     @overload
     def __getitem__(self, __index: int) -> _T: ...
     @overload
@@ -49,12 +49,12 @@ QuerySetPaginator: TypeAlias = Paginator
 class Page(Sequence[_T]):
     object_list: _SupportsPagination[_T]
     number: int
-    paginator: Paginator
+    paginator: Paginator[_T]
     def __init__(
         self,
         object_list: _SupportsPagination[_T],
         number: int,
-        paginator: Paginator,
+        paginator: Paginator[_T],
     ) -> None: ...
     @overload
     def __getitem__(self, index: int) -> _T: ...

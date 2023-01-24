@@ -12,19 +12,19 @@ LANGUAGE_SESSION_KEY: str
 class TranslatorCommentWarning(SyntaxWarning): ...
 
 class Trans:
-    activate: Callable
-    check_for_language: functools._lru_cache_wrapper
-    deactivate: Callable
-    deactivate_all: Callable
-    get_language: Callable
-    get_language_bidi: Callable
-    get_language_from_path: Callable
-    get_language_from_request: Callable
-    gettext: Callable
-    gettext_noop: Callable
-    ngettext: Callable
-    npgettext: Callable
-    pgettext: Callable
+    activate: Callable[..., Any]
+    check_for_language: functools._lru_cache_wrapper[Any]
+    deactivate: Callable[..., Any]
+    deactivate_all: Callable[..., Any]
+    get_language: Callable[..., Any]
+    get_language_bidi: Callable[..., Any]
+    get_language_from_path: Callable[..., Any]
+    get_language_from_request: Callable[..., Any]
+    gettext: Callable[..., Any]
+    gettext_noop: Callable[..., Any]
+    ngettext: Callable[..., Any]
+    npgettext: Callable[..., Any]
+    pgettext: Callable[..., Any]
     def __getattr__(self, real_name: Any) -> Any: ...
 
 def gettext_noop(message: str) -> str: ...
