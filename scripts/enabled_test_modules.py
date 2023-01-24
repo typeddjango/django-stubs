@@ -113,6 +113,9 @@ IGNORED_ERRORS: Dict[str, List[Any]] = {
         'error: "HttpResponse" has no attribute "streaming_content"',
         'error: "HttpResponse" has no attribute "context_data"',
         'Duplicate module named "apps"',
+        "Function is missing a return type annotation",
+        "Function is missing a type annotation",
+        "Library stubs not installed for ",
     ],
     "admin_checks": ['Argument 1 to "append" of "list" has incompatible type "str"; expected "CheckMessage"'],
     "admin_default_site": [
@@ -511,6 +514,11 @@ IGNORED_ERRORS: Dict[str, List[Any]] = {
     ],
     "wsgi": [
         '"HttpResponse" has no attribute "block_size"',
+    ],
+    # test_runner_apps/tagged/tests_syntax_error.py
+    "test_runner_apps": [
+        "invalid syntax",
+        "invalid decimal literal",
     ],
 }
 
