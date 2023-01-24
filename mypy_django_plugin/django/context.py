@@ -1,9 +1,8 @@
 import os
 import sys
 from collections import defaultdict
-from collections.abc import Generator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, MutableMapping, Optional, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generator, Iterable, Iterator, Optional, Set, Tuple, Type, Union
 from unittest import mock
 
 from django.core.exceptions import FieldError
@@ -51,14 +50,14 @@ def temp_environ() -> Iterator[None]:
         os.environ.update(environ)
 
 
-class AppConfigs(dict, MutableMapping[str, "AppConfig"]):  # type: ignore[type-arg]
+class AppConfigs(Dict[str, "AppConfig"]):
     """
     A mapping for 'AppConfig' that monkey patches 'ready' method on insert
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.patches: dict[str, mock._patch[mock.MagicMock]] = {}
+        self.patches: Dict[str, mock._patch[mock.MagicMock]] = {}
 
     def __setitem__(self, key: str, value: "AppConfig") -> None:
         self.patches[key] = mock.patch.object(value, "ready", autospec=True)
