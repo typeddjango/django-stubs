@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models.expressions import Func
 
 class CumeDist(Func):
-    output_field: models.FloatField
+    output_field: models.FloatField[Any, Any]
 
 class DenseRank(Func):
     output_field: models.IntegerField[Any, Any]
@@ -26,7 +26,7 @@ class Ntile(Func):
     output_field: models.IntegerField[Any, Any]
 
 class PercentRank(Func):
-    output_field: models.FloatField
+    output_field: models.FloatField[Any, Any]
 
 class Rank(Func):
     output_field: models.IntegerField[Any, Any]

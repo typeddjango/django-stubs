@@ -50,7 +50,7 @@ class ForeignObjectRel(FieldCacheMixin):
     @property
     def remote_field(self) -> ForeignObject: ...
     @property
-    def target_field(self) -> AutoField: ...
+    def target_field(self) -> AutoField[Any, Any]: ...
     @property
     def related_model(self) -> type[Model]: ...
     @property
@@ -99,10 +99,10 @@ class ManyToOneRel(ForeignObjectRel):
     def get_related_field(self) -> Field[Any, Any]: ...
 
 class OneToOneRel(ManyToOneRel):
-    field: OneToOneField
+    field: OneToOneField[Any, Any]
     def __init__(
         self,
-        field: OneToOneField,
+        field: OneToOneField[Any, Any],
         to: type[Model] | str,
         field_name: str | None,
         related_name: str | None = ...,
@@ -119,7 +119,7 @@ class ManyToManyRel(ForeignObjectRel):
     db_constraint: bool
     def __init__(
         self,
-        field: ManyToManyField,
+        field: ManyToManyField[Any, Any],
         to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,

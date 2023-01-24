@@ -27,7 +27,7 @@ class ExtractMinute(Extract): ...
 class ExtractSecond(Extract): ...
 
 class Now(Func):
-    output_field: models.DateTimeField
+    output_field: models.DateTimeField[Any, Any]
 
 class TruncBase(TimezoneMixin, Transform):
     kind: str
@@ -41,10 +41,10 @@ class TruncWeek(TruncBase): ...
 class TruncDay(TruncBase): ...
 
 class TruncDate(TruncBase):
-    output_field: models.DateField
+    output_field: models.DateField[Any, Any]
 
 class TruncTime(TruncBase):
-    output_field: models.TimeField
+    output_field: models.TimeField[Any, Any]
 
 class TruncHour(TruncBase): ...
 class TruncMinute(TruncBase): ...

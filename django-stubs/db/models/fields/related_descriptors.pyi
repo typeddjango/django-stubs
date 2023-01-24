@@ -14,7 +14,7 @@ from django.db.models.query_utils import DeferredAttribute
 _T = TypeVar("_T")
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
-    field: RelatedField
+    field: RelatedField[Any, Any]
 
 class ForwardManyToOneDescriptor:
     field: ForeignKey[Any, Any]
@@ -34,7 +34,7 @@ class ForwardManyToOneDescriptor:
     def __reduce__(self) -> tuple[Callable[..., Any], tuple[type[Model], str]]: ...
 
 class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
-    field: OneToOneField
+    field: OneToOneField[Any, Any]
     def get_object(self, instance: Model) -> Model: ...
 
 class ReverseOneToOneDescriptor:
@@ -63,7 +63,7 @@ class ReverseManyToOneDescriptor:
 def create_reverse_many_to_one_manager(superclass: type, rel: Any) -> type[RelatedManager]: ...
 
 class ManyToManyDescriptor(ReverseManyToOneDescriptor):
-    field: ManyToManyField  # type: ignore[assignment]
+    field: ManyToManyField[Any, Any]  # type: ignore[assignment]
     rel: ManyToManyRel  # type: ignore[assignment]
     reverse: bool
     def __init__(self, rel: ManyToManyRel, reverse: bool = ...) -> None: ...

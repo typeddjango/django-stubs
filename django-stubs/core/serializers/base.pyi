@@ -82,7 +82,7 @@ class DeserializedObject:
 
 def build_instance(Model: type[Model], data: dict[str, Any], db: str) -> Model: ...
 def deserialize_m2m_values(
-    field: ManyToManyField, field_value: Iterable[Any], using: str | None, handle_forward_references: bool
+    field: ManyToManyField[Any, Any], field_value: Iterable[Any], using: str | None, handle_forward_references: bool
 ) -> Sequence[Any] | object: ...
 def deserialize_fk_value(
     field: ForeignKey[Any, Any], field_value: Any, using: str | None, handle_forward_references: bool
