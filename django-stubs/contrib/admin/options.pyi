@@ -109,7 +109,7 @@ class BaseModelAdmin(Generic[_ModelT]):
         self, db: str | None, db_field: RelatedField, request: HttpRequest
     ) -> QuerySet[Model] | None: ...
     def formfield_for_foreignkey(
-        self, db_field: ForeignKey, request: HttpRequest, **kwargs: Any
+        self, db_field: ForeignKey[Any, Any], request: HttpRequest, **kwargs: Any
     ) -> ModelChoiceField: ...
     def formfield_for_manytomany(
         self, db_field: ManyToManyField, request: HttpRequest, **kwargs: Any

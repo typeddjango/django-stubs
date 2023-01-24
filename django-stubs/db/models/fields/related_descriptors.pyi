@@ -17,8 +17,8 @@ class ForeignKeyDeferredAttribute(DeferredAttribute):
     field: RelatedField
 
 class ForwardManyToOneDescriptor:
-    field: ForeignKey
-    def __init__(self, field_with_rel: ForeignKey) -> None: ...
+    field: ForeignKey[Any, Any]
+    def __init__(self, field_with_rel: ForeignKey[Any, Any]) -> None: ...
     @property
     def RelatedObjectDoesNotExist(self) -> type[ObjectDoesNotExist]: ...
     def is_cached(self, instance: Model) -> bool: ...
@@ -53,7 +53,7 @@ class ReverseOneToOneDescriptor:
 
 class ReverseManyToOneDescriptor:
     rel: ManyToOneRel
-    field: ForeignKey
+    field: ForeignKey[Any, Any]
     def __init__(self, rel: ManyToOneRel) -> None: ...
     @property
     def related_manager_cls(self) -> type[RelatedManager]: ...

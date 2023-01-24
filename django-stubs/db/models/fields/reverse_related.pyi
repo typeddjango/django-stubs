@@ -84,10 +84,10 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
-    field: ForeignKey
+    field: ForeignKey[Any, Any]
     def __init__(
         self,
-        field: ForeignKey,
+        field: ForeignKey[Any, Any],
         to: type[Model] | str,
         field_name: str,
         related_name: str | None = ...,
