@@ -23,8 +23,8 @@ IGNORED_PARAMS: tuple[str, ...]
 
 class ChangeList:
     model: type[Model]
-    opts: Options
-    lookup_opts: Options
+    opts: Options[Model]
+    lookup_opts: Options[Model]
     root_queryset: QuerySet[Model]
     list_display: _DisplayT
     list_display_links: _DisplayT

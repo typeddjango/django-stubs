@@ -40,7 +40,7 @@ class Left(Func):
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Length(Transform):
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
     def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Lower(Transform): ...
@@ -54,7 +54,7 @@ class LPad(Func):
 class LTrim(Transform): ...
 
 class Ord(Transform):
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
     def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
@@ -84,7 +84,7 @@ class SHA384(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform): ..
 class SHA512(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform): ...
 
 class StrIndex(Func):
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
     def as_postgresql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...

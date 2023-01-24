@@ -7,7 +7,7 @@ class CumeDist(Func):
     output_field: models.FloatField
 
 class DenseRank(Func):
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
 
 class FirstValue(Func): ...
 
@@ -23,13 +23,13 @@ class NthValue(Func):
 
 class Ntile(Func):
     def __init__(self, num_buckets: int = ..., **extra: Any) -> None: ...
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
 
 class PercentRank(Func):
     output_field: models.FloatField
 
 class Rank(Func):
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
 
 class RowNumber(Func):
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]

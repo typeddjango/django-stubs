@@ -1,6 +1,7 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
 from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
     Any,
+    AnyStr,
     ClassVar,
     Generic,
     TypeVar,
@@ -79,7 +80,7 @@ class BaseModelForm(Generic[_M], BaseForm):
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         auto_id: bool | str = ...,
         prefix: str | None = ...,
         initial: Mapping[str, Any] | None = ...,
@@ -121,7 +122,7 @@ class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         auto_id: str = ...,
         prefix: str | None = ...,
         queryset: QuerySet[_M] | None = ...,
@@ -181,7 +182,7 @@ class BaseInlineFormSet(Generic[_M, _ParentM, _ModelFormT], BaseModelFormSet[_M,
     def __init__(
         self,
         data: _DataT | None = ...,
-        files: _FilesT | None = ...,
+        files: _FilesT[AnyStr] | None = ...,
         instance: _ParentM | None = ...,
         save_as_new: bool = ...,
         prefix: str | None = ...,

@@ -9,7 +9,7 @@ class TimezoneMixin:
 
 class Extract(TimezoneMixin, Transform):
     lookup_name: str
-    output_field: models.IntegerField
+    output_field: models.IntegerField[Any, Any]
     def __init__(
         self, expression: Any, lookup_name: str | None = ..., tzinfo: Any | None = ..., **extra: Any
     ) -> None: ...
