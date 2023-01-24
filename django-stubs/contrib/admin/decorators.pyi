@@ -13,7 +13,7 @@ from typing_extensions import TypeAlias
 _Model = TypeVar("_Model", bound=Model)
 _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin[Model])
 _Request = TypeVar("_Request", bound=HttpRequest)
-_QuerySet = TypeVar("_QuerySet", bound=QuerySet)
+_QuerySet = TypeVar("_QuerySet", bound=QuerySet[Model])
 # This is deliberately different from _DisplayT defined in contrib.admin.options
 _DisplayCallable: TypeAlias = Union[Callable[[_ModelAdmin, _Model], Any], Callable[[_Model], Any]]  # noqa: Y037
 _DisplayCallableT = TypeVar("_DisplayCallableT", bound=_DisplayCallable)

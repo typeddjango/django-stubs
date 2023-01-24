@@ -5,5 +5,5 @@ from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
 
 def delete_selected(
-    modeladmin: ModelAdmin[Model], request: HttpRequest, queryset: QuerySet
+    modeladmin: ModelAdmin[Model], request: HttpRequest, queryset: QuerySet[Model]
 ) -> TemplateResponse | None: ...

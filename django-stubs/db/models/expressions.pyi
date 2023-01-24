@@ -5,7 +5,7 @@ from typing import Any, TypeVar
 
 from _typeshed import Self
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models import Q
+from django.db.models import Model, Q
 from django.db.models.fields import Field
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.query import QuerySet
@@ -225,12 +225,12 @@ class Subquery(BaseExpression, Combinable):
     query: Query
     extra: dict[Any, Any]
     def __init__(
-        self, queryset: Query | QuerySet, output_field: Field[Any, Any] | None = ..., **extra: Any
+        self, queryset: Query | QuerySet[Model], output_field: Field[Any, Any] | None = ..., **extra: Any
     ) -> None: ...
 
 class Exists(Subquery):
     negated: bool
-    def __init__(self, queryset: Query | QuerySet, negated: bool = ..., **kwargs: Any) -> None: ...
+    def __init__(self, queryset: Query | QuerySet[Model], negated: bool = ..., **kwargs: Any) -> None: ...
     def __invert__(self) -> Exists: ...
 
 class OrderBy(Expression):

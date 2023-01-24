@@ -12,7 +12,7 @@
       from django.db.models.query import QuerySet
       from django.utils.translation import gettext_lazy as _
 
-      def an_action(modeladmin: "A", request: HttpRequest, queryset: QuerySet) -> None:
+      def an_action(modeladmin: "A", request: HttpRequest, queryset: QuerySet[Model]) -> None:
           pass
 
       class TestModel(models.Model):
@@ -81,10 +81,10 @@
           # this will fail if `model` has a type other than the generic specified in the class declaration
           model = TestModel
 
-          def a_method_action(self, request: HttpRequest, queryset: QuerySet) -> None:
+          def a_method_action(self, request: HttpRequest, queryset: QuerySet[Model]) -> None:
               pass
 
-          def a_method_action_with_message_user(self, request: HttpRequest, queryset: QuerySet) -> None:
+          def a_method_action_with_message_user(self, request: HttpRequest, queryset: QuerySet[Model]) -> None:
               self.message_user(request, _("Error message"), messages.ERROR)
 
 # This test is here to make sure we're not running into a mypy issue which is

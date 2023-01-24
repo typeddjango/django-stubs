@@ -187,7 +187,7 @@ class TransactionTestCase(SimpleTestCase):
     serialized_rollback: bool
     def assertQuerysetEqual(
         self,
-        qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
+        qs: Iterator[Any] | list[Model] | QuerySet[Model] | RawQuerySet,
         values: Collection[Any],
         transform: Callable[[Model], Any] | type[str] = ...,
         ordered: bool = ...,

@@ -24,7 +24,7 @@ else:
 
     all_sites: MutableSet[AdminSite]
 
-_ActionCallback: TypeAlias = Callable[[ModelAdmin, HttpRequest, QuerySet], TemplateResponse | None]
+_ActionCallback: TypeAlias = Callable[[ModelAdmin, HttpRequest, QuerySet[Model]], TemplateResponse | None]
 
 class AlreadyRegistered(Exception): ...
 class NotRegistered(Exception): ...
