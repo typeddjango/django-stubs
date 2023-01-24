@@ -1,7 +1,7 @@
 from re import Pattern
-from typing import AnyStr, TypeAlias
+from typing import AnyStr
 
-from typing_extensions import Final, Literal
+from typing_extensions import Final, Literal, TypeAlias
 
 GET_ITERATOR_CHUNK_SIZE: Final[int]
 
