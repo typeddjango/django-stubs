@@ -51,7 +51,7 @@ def temp_environ() -> Iterator[None]:
         os.environ.update(environ)
 
 
-class AppConfigs(dict[str, "AppConfig"]):
+class AppConfigs(Dict[str, "AppConfig"]):
     """
     A mapping for 'AppConfig' that monkey patches 'ready' method on insert
     """
