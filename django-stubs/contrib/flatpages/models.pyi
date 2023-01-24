@@ -7,8 +7,8 @@ class FlatPage(models.Model):
     url: models.CharField[Any, Any]
     title: models.CharField[Any, Any]
     content: models.TextField
-    enable_comments: models.BooleanField
+    enable_comments: models.BooleanField[Any, Any]
     template_name: models.CharField[Any, Any]
-    registration_required: models.BooleanField
+    registration_required: models.BooleanField[Any, Any]
     sites: models.ManyToManyField[Site, Site]
     def get_absolute_url(self) -> str: ...

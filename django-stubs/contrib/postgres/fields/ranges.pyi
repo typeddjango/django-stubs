@@ -88,24 +88,24 @@ class RangeEndsWith(models.Transform):
 class IsEmpty(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class LowerInclusive(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class LowerInfinite(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class UpperInclusive(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
 
 class UpperInfinite(models.Transform):
     lookup_name: str
     function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField[Any, Any]
