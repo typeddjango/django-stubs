@@ -111,7 +111,7 @@ def modelform_factory(
     field_classes: Mapping[str, type[Field]] | None = ...,
 ) -> type[ModelForm[_M]]: ...
 
-_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm[Model])
 
 class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     model: type[_M]
@@ -308,7 +308,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
     def prepare_value(self, value: Any) -> Any: ...
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore
 
-def modelform_defines_fields(form_class: type[ModelForm]) -> bool: ...
+def modelform_defines_fields(form_class: type[ModelForm[Model]]) -> bool: ...
 @overload
 def _get_foreign_key(  # type: ignore
     parent_model: type[Model], model: type[Model], fk_name: str | None = ..., can_fail: Literal[True] = ...

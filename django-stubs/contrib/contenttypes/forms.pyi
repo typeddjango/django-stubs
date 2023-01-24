@@ -4,7 +4,7 @@ from django.db.models import Model
 from django.forms.models import BaseModelFormSet, ModelForm
 
 _M = TypeVar("_M", bound=Model)
-_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm[Model])
 
 class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
     instance: Any

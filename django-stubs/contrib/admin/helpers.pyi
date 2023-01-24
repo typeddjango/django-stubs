@@ -29,11 +29,11 @@ class AdminForm:
     prepopulated_fields: list[_PrepopulatedDict]
     model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
-    form: ModelForm
+    form: ModelForm[Model]
     fieldsets: list[tuple[Any, dict[str, list[str]]]]
     def __init__(
         self,
-        form: ModelForm,
+        form: ModelForm[Model],
         fieldsets: list[tuple[Any, dict[str, list[str]]]],
         prepopulated_fields: Mapping[str, Iterable[str]],
         readonly_fields: Sequence[str] | None = ...,
@@ -48,14 +48,14 @@ class AdminForm:
     def media(self) -> Media: ...
 
 class Fieldset:
-    form: ModelForm
+    form: ModelForm[Model]
     classes: str
     description: str | None
     model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
     def __init__(
         self,
-        form: ModelForm,
+        form: ModelForm[Model],
         name: Any | None = ...,
         readonly_fields: Sequence[str] = ...,
         fields: Sequence[str] = ...,
@@ -68,14 +68,14 @@ class Fieldset:
     def __iter__(self) -> Iterator[Fieldline]: ...
 
 class Fieldline:
-    form: ModelForm
+    form: ModelForm[Model]
     fields: Sequence[str]
     has_visible_field: bool
     model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
     def __init__(
         self,
-        form: ModelForm,
+        form: ModelForm[Model],
         field: str | Sequence[str],
         readonly_fields: Sequence[str] | None = ...,
         model_admin: ModelAdmin[Model] | None = ...,
@@ -88,7 +88,7 @@ class AdminField:
     is_first: bool
     is_checkbox: bool
     is_readonly: bool
-    def __init__(self, form: ModelForm, field: str, is_first: bool) -> None: ...
+    def __init__(self, form: ModelForm[Model], field: str, is_first: bool) -> None: ...
     def label_tag(self) -> SafeString: ...
     def errors(self) -> SafeString: ...
 
@@ -100,7 +100,7 @@ class _FieldDictT(TypedDict):
 
 class AdminReadonlyField:
     field: _FieldDictT
-    form: ModelForm
+    form: ModelForm[Model]
     model_admin: ModelAdmin[Model] | None
     is_first: bool
     is_checkbox: bool
@@ -108,7 +108,7 @@ class AdminReadonlyField:
     empty_value_display: Any
     def __init__(
         self,
-        form: ModelForm,
+        form: ModelForm[Model],
         field: Callable[[Model], Any] | str,
         is_first: bool,
         model_admin: ModelAdmin[Model] | None = ...,
@@ -159,7 +159,7 @@ class InlineAdminForm(AdminForm):
     def __init__(
         self,
         formset: Any,
-        form: ModelForm,
+        form: ModelForm[Model],
         fieldsets: Any,
         prepopulated_fields: Any,
         original: bool | None,
@@ -179,4 +179,4 @@ class InlineFieldset(Fieldset):
     def __iter__(self) -> Iterator[Fieldline]: ...
 
 class AdminErrorList(forms.utils.ErrorList):
-    def __init__(self, form: ModelForm, inline_formsets: Any) -> None: ...
+    def __init__(self, form: ModelForm[Model], inline_formsets: Any) -> None: ...
