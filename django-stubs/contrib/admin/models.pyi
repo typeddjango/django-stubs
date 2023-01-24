@@ -25,7 +25,7 @@ class LogEntry(models.Model):
     user: models.ForeignKey[Any, Any]
     content_type: models.ForeignKey[Any, Any]
     object_id: models.TextField
-    object_repr: models.CharField
+    object_repr: models.CharField[Any, Any]
     action_flag: models.PositiveSmallIntegerField
     change_message: models.TextField
     objects: LogEntryManager
