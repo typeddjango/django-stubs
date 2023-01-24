@@ -154,7 +154,7 @@ class SimpleTestCase(unittest.TestCase):
     ) -> Any: ...
     def assertFieldOutput(
         self,
-        fieldclass: type[EmailField[Any, Any]],
+        fieldclass: type[EmailField],
         valid: dict[str, str],
         invalid: dict[str, list[str]],
         field_args: Iterable[Any] | None = ...,
