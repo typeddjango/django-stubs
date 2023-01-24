@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, AnyStr, Protocol, TypeVar, overload
 
 from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
@@ -12,7 +12,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
 
-class FieldFile(File):
+class FieldFile(File[AnyStr]):
     instance: Model
     field: FileField
     storage: Storage
@@ -25,7 +25,7 @@ class FieldFile(File):
     def url(self) -> str: ...
     @property
     def size(self) -> int: ...
-    def save(self, name: str, content: File, save: bool = ...) -> None: ...
+    def save(self, name: str, content: File[AnyStr], save: bool = ...) -> None: ...
     def delete(self, save: bool = ...) -> None: ...
     @property
     def closed(self) -> bool: ...

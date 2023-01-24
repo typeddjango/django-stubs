@@ -1,9 +1,9 @@
-from typing import IO, TypeVar
+from typing import IO, AnyStr, TypeVar
 
 from _typeshed import Self
 from django.core.files.base import File
 
-class UploadedFile(File):
+class UploadedFile(File[AnyStr]):
     content_type: str | None
     charset: str | None
     content_type_extra: dict[str, str] | None
