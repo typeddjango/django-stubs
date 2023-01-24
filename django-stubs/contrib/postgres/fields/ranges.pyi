@@ -44,32 +44,32 @@ class DateTimeRangeField(RangeField):
 class DateRangeField(RangeField):
     def __get__(self, instance: Any, owner: Any) -> DateRange: ...
 
-class DateTimeRangeContains(PostgresOperatorLookup):
+class DateTimeRangeContains(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class RangeContainedBy(PostgresOperatorLookup):
+class RangeContainedBy(PostgresOperatorLookup[Any]):
     lookup_name: str
     type_mapping: dict[str, str]
     postgres_operator: str
 
-class FullyLessThan(PostgresOperatorLookup):
+class FullyLessThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class FullGreaterThan(PostgresOperatorLookup):
+class FullGreaterThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class NotLessThan(PostgresOperatorLookup):
+class NotLessThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class NotGreaterThan(PostgresOperatorLookup):
+class NotGreaterThan(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
-class AdjacentToLookup(PostgresOperatorLookup):
+class AdjacentToLookup(PostgresOperatorLookup[Any]):
     lookup_name: str
     postgres_operator: str
 
