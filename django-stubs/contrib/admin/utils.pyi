@@ -53,13 +53,13 @@ class _ModelFormatDict(TypedDict):
 def model_format_dict(obj: Model | type[Model] | QuerySet[Model] | Options[Model]) -> _ModelFormatDict: ...
 def model_ngettext(obj: Options[Model] | QuerySet[Model], n: int | None = ...) -> str: ...
 def lookup_field(
-    name: Callable[..., Any] | str, obj: Model, model_admin: BaseModelAdmin | None = ...
+    name: Callable[..., Any] | str, obj: Model, model_admin: BaseModelAdmin[Model] | None = ...
 ) -> tuple[Field[Any, Any] | None, str | None, Any]: ...
 @overload
 def label_for_field(  # type: ignore
     name: Callable[..., Any] | str,
     model: type[Model],
-    model_admin: BaseModelAdmin | None = ...,
+    model_admin: BaseModelAdmin[Model] | None = ...,
     return_attr: Literal[True] = ...,
     form: BaseForm | None = ...,
 ) -> tuple[str, Callable[..., Any] | str | None]: ...
@@ -67,7 +67,7 @@ def label_for_field(  # type: ignore
 def label_for_field(
     name: Callable[..., Any] | str,
     model: type[Model],
-    model_admin: BaseModelAdmin | None = ...,
+    model_admin: BaseModelAdmin[Model] | None = ...,
     return_attr: Literal[False] = ...,
     form: BaseForm | None = ...,
 ) -> str: ...
