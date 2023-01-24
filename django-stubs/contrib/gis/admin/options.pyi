@@ -2,14 +2,15 @@ from typing import Any
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.forms import BaseGeometryWidget
+from django.db.models import Model
 
 spherical_mercator_srid: int
 
-class GISModelAdmin(ModelAdmin):
+class GISModelAdmin(ModelAdmin[Model]):
     gis_widget: BaseGeometryWidget
     gis_widget_kwargs: dict[str, Any]
 
-class GeoModelAdmin(ModelAdmin):
+class GeoModelAdmin(ModelAdmin[Model]):
     default_lon: int
     default_lat: int
     default_zoom: int

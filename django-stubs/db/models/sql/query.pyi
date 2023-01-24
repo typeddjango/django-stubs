@@ -32,7 +32,7 @@ class RawQuery:
     def get_columns(self) -> list[str]: ...
     def __iter__(self) -> Iterator[Any]: ...
     @property
-    def params_type(self) -> None | type[dict] | type[tuple]: ...
+    def params_type(self) -> None | type[dict] | type[tuple[Any, ...]]: ...
 
 class Query(BaseExpression):
     related_ids: list[int] | None
@@ -60,17 +60,17 @@ class Query(BaseExpression):
     select_for_update: bool
     select_for_update_nowait: bool
     select_for_update_skip_locked: bool
-    select_for_update_of: tuple
+    select_for_update_of: tuple[Any, ...]
     select_for_no_key_update: bool
     select_related: dict[str, Any] | bool
     max_depth: int
-    values_select: tuple
+    values_select: tuple[Any, ...]
     annotation_select_mask: set[str] | None
     combinator: str | None
     combinator_all: bool
-    combined_queries: tuple
+    combined_queries: tuple[Any, ...]
     extra_select_mask: set[str] | None
-    extra_tables: tuple
+    extra_tables: tuple[Any, ...]
     extra_order_by: Sequence[Any]
     deferred_loading: tuple[set[str] | frozenset[str], bool]
     explain_query: bool
@@ -87,7 +87,7 @@ class Query(BaseExpression):
     def has_select_fields(self) -> bool: ...
     @property
     def base_table(self) -> str: ...
-    def sql_with_params(self) -> tuple[str, tuple]: ...
+    def sql_with_params(self) -> tuple[str, tuple[Any, ...]]: ...
     def __deepcopy__(self, memo: dict[int, Any]) -> Query: ...
     def get_compiler(self, using: str | None = ..., connection: BaseDatabaseWrapper | None = ...) -> SQLCompiler: ...
     def get_meta(self) -> Options: ...

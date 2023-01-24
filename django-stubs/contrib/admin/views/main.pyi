@@ -34,7 +34,7 @@ class ChangeList:
     list_select_related: bool | Sequence[str]
     list_per_page: int
     list_max_show_all: int
-    model_admin: ModelAdmin
+    model_admin: ModelAdmin[Model]
     preserved_filters: str
     sortable_by: Sequence[str] | None
     page_num: int
@@ -61,7 +61,7 @@ class ChangeList:
         list_per_page: int,
         list_max_show_all: int,
         list_editable: Sequence[str],
-        model_admin: ModelAdmin,
+        model_admin: ModelAdmin[Model],
         sortable_by: Sequence[str] | None,
     ) -> None: ...
     def get_filters_params(self, params: dict[str, Any] | None = ...) -> dict[str, Any]: ...

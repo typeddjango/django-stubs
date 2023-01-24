@@ -46,7 +46,7 @@ class AdminSite:
     empty_value_display: str
     final_catch_all_view: bool
     _empty_value_display: str
-    _registry: dict[type[Model], ModelAdmin]
+    _registry: dict[type[Model], ModelAdmin[Model]]
     _global_actions: dict[str, _ActionCallback]
     _actions: dict[str, _ActionCallback]
     def __init__(self, name: str = ...) -> None: ...
@@ -54,7 +54,7 @@ class AdminSite:
     def register(
         self,
         model_or_iterable: type[Model] | Iterable[type[Model]],
-        admin_class: type[ModelAdmin] | None = ...,
+        admin_class: type[ModelAdmin[Model]] | None = ...,
         **options: Any
     ) -> None: ...
     def unregister(self, model_or_iterable: type[Model] | Iterable[type[Model]]) -> None: ...

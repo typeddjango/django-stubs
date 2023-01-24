@@ -27,7 +27,7 @@ class _PrepopulatedDict(TypedDict):
 
 class AdminForm:
     prepopulated_fields: list[_PrepopulatedDict]
-    model_admin: ModelAdmin | None
+    model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
     form: ModelForm
     fieldsets: list[tuple[Any, dict[str, list[str]]]]
@@ -37,7 +37,7 @@ class AdminForm:
         fieldsets: list[tuple[Any, dict[str, list[str]]]],
         prepopulated_fields: Mapping[str, Iterable[str]],
         readonly_fields: Sequence[str] | None = ...,
-        model_admin: ModelAdmin | None = ...,
+        model_admin: ModelAdmin[Model] | None = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[Fieldset]: ...
     @property
@@ -51,7 +51,7 @@ class Fieldset:
     form: ModelForm
     classes: str
     description: str | None
-    model_admin: ModelAdmin | None
+    model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
     def __init__(
         self,
@@ -61,7 +61,7 @@ class Fieldset:
         fields: Sequence[str] = ...,
         classes: Iterable[str] = ...,
         description: str | None = ...,
-        model_admin: ModelAdmin | None = ...,
+        model_admin: ModelAdmin[Model] | None = ...,
     ) -> None: ...
     @property
     def media(self) -> Media: ...
@@ -71,14 +71,14 @@ class Fieldline:
     form: ModelForm
     fields: Sequence[str]
     has_visible_field: bool
-    model_admin: ModelAdmin | None
+    model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
     def __init__(
         self,
         form: ModelForm,
         field: str | Sequence[str],
         readonly_fields: Sequence[str] | None = ...,
-        model_admin: ModelAdmin | None = ...,
+        model_admin: ModelAdmin[Model] | None = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[AdminField[Any, Any] | AdminReadonlyField[Any, Any]]: ...
     def errors(self) -> SafeString: ...
@@ -101,7 +101,7 @@ class _FieldDictT(TypedDict):
 class AdminReadonlyField:
     field: _FieldDictT
     form: ModelForm
-    model_admin: ModelAdmin | None
+    model_admin: ModelAdmin[Model] | None
     is_first: bool
     is_checkbox: bool
     is_readonly: bool
@@ -111,7 +111,7 @@ class AdminReadonlyField:
         form: ModelForm,
         field: Callable[[Model], Any] | str,
         is_first: bool,
-        model_admin: ModelAdmin | None = ...,
+        model_admin: ModelAdmin[Model] | None = ...,
     ) -> None: ...
     def label_tag(self) -> SafeString: ...
     def contents(self) -> SafeString: ...
@@ -120,7 +120,7 @@ class InlineAdminFormSet:
     opts: Any
     formset: Any
     fieldsets: Any
-    model_admin: ModelAdmin | None
+    model_admin: ModelAdmin[Model] | None
     readonly_fields: Sequence[str]
     prepopulated_fields: dict[str, Any]
     classes: str
@@ -135,7 +135,7 @@ class InlineAdminFormSet:
         fieldsets: Any,
         prepopulated_fields: dict[str, Any] | None = ...,
         readonly_fields: Sequence[str] | None = ...,
-        model_admin: ModelAdmin | None = ...,
+        model_admin: ModelAdmin[Model] | None = ...,
         has_add_permission: bool = ...,
         has_change_permission: bool = ...,
         has_delete_permission: bool = ...,
@@ -164,7 +164,7 @@ class InlineAdminForm(AdminForm):
         prepopulated_fields: Any,
         original: bool | None,
         readonly_fields: Sequence[str] | None = ...,
-        model_admin: ModelAdmin | None = ...,
+        model_admin: ModelAdmin[Model] | None = ...,
         view_on_site_url: str | None = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[InlineFieldset]: ...

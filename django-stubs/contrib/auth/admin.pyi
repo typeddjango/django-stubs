@@ -1,15 +1,16 @@
 from typing import Any
 
 from django.contrib import admin
+from django.db.models import Model
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
 csrf_protect_m: Any
 sensitive_post_parameters_m: Any
 
-class GroupAdmin(admin.ModelAdmin): ...
+class GroupAdmin(admin.ModelAdmin[Model]): ...
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(admin.ModelAdmin[Model]):
     change_user_password_template: Any
     add_fieldsets: Any
     add_form: Any

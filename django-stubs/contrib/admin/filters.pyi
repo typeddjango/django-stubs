@@ -14,7 +14,7 @@ class ListFilter:
     template: str
     used_parameters: Any
     def __init__(
-        self, request: HttpRequest, params: dict[str, str], model: type[Model], model_admin: ModelAdmin
+        self, request: HttpRequest, params: dict[str, str], model: type[Model], model_admin: ModelAdmin[Model]
     ) -> None: ...
     def has_output(self) -> bool: ...
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
@@ -25,7 +25,7 @@ class SimpleListFilter(ListFilter):
     parameter_name: str | None
     lookup_choices: Any
     def value(self) -> str | None: ...
-    def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[Any, str]] | None: ...
+    def lookups(self, request: HttpRequest, model_admin: ModelAdmin[Model]) -> Iterable[tuple[Any, str]] | None: ...
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class FieldListFilter(ListFilter):
@@ -38,7 +38,7 @@ class FieldListFilter(ListFilter):
         request: HttpRequest,
         params: dict[str, str],
         model: type[Model],
-        model_admin: ModelAdmin,
+        model_admin: ModelAdmin[Model],
         field_path: str,
     ) -> None: ...
     @classmethod
@@ -52,7 +52,7 @@ class FieldListFilter(ListFilter):
         request: HttpRequest,
         params: dict[str, str],
         model: type[Model],
-        model_admin: ModelAdmin,
+        model_admin: ModelAdmin[Model],
         field_path: str,
     ) -> FieldListFilter: ...
 
@@ -69,7 +69,7 @@ class RelatedFieldListFilter(FieldListFilter):
     @property
     def include_empty_choice(self) -> bool: ...
     def field_choices(
-        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
+        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin[Model]
     ) -> list[tuple[str, str]]: ...
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 

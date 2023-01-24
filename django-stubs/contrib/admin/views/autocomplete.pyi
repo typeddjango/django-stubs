@@ -6,6 +6,6 @@ from django.http.request import HttpRequest
 from django.views.generic.list import BaseListView
 
 class AutocompleteJsonView(BaseListView):
-    model_admin: ModelAdmin
+    model_admin: ModelAdmin[Model]
     term: Any
     def has_perm(self, request: HttpRequest, obj: Model | None = ...) -> bool: ...

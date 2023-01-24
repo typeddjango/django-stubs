@@ -13,7 +13,7 @@ class Apps:
     apps_ready: bool
     ready_event: threading.Event
     loading: bool
-    _pending_operations: dict[tuple[str, str], list]
+    _pending_operations: dict[tuple[str, str], list[Any]]
     models_ready: bool
     ready: bool
     def __init__(self, installed_apps: Iterable[AppConfig | str] | None = ...) -> None: ...

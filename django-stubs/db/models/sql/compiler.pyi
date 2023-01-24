@@ -43,7 +43,7 @@ class SQLCompiler:
         order_by: list[tuple[Expression, tuple[str, _ParamsT, bool]]],
     ) -> list[_AsSqlType]: ...
     def collapse_group_by(
-        self, expressions: list[Expression], having: list[Expression] | tuple
+        self, expressions: list[Expression], having: list[Expression] | tuple[Any, ...]
     ) -> list[Expression]: ...
     def get_select(
         self,

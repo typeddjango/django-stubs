@@ -134,7 +134,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     def has_module_permission(self, request: HttpRequest) -> bool: ...
 
 _DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
-_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
+_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin[_ModelT])
 _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], HttpResponseBase | None]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):

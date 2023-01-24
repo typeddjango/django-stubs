@@ -11,7 +11,7 @@ from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 _Model = TypeVar("_Model", bound=Model)
-_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
+_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin[Model])
 _Request = TypeVar("_Request", bound=HttpRequest)
 _QuerySet = TypeVar("_QuerySet", bound=QuerySet)
 # This is deliberately different from _DisplayT defined in contrib.admin.options

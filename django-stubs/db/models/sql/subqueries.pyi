@@ -9,14 +9,14 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 
 class DeleteQuery(Query):
-    select: tuple
+    select: tuple[Any, ...]
     where_class: type[WhereNode]
     where: WhereNode
     def do_query(self, table: str, where: WhereNode, using: str) -> int: ...
     def delete_batch(self, pk_list: list[int] | list[str], using: str) -> int: ...
 
 class UpdateQuery(Query):
-    select: tuple
+    select: tuple[Any, ...]
     where_class: type[WhereNode]
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     where: WhereNode
@@ -27,7 +27,7 @@ class UpdateQuery(Query):
     def get_related_updates(self) -> list[UpdateQuery]: ...
 
 class InsertQuery(Query):
-    select: tuple
+    select: tuple[Any, ...]
     where: WhereNode
     where_class: type[WhereNode]
     fields: Iterable[Field[Any, Any]]
@@ -37,7 +37,7 @@ class InsertQuery(Query):
     def insert_values(self, fields: Iterable[Field[Any, Any]], objs: list[Model], raw: bool = ...) -> None: ...
 
 class AggregateQuery(Query):
-    select: tuple
-    sub_params: tuple
+    select: tuple[Any, ...]
+    sub_params: tuple[Any, ...]
     where: WhereNode
     where_class: type[WhereNode]
