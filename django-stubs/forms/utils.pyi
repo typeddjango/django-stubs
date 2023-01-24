@@ -24,7 +24,7 @@ class ErrorDict(dict[Any, Any]):
     def as_ul(self) -> str: ...
     def as_text(self) -> str: ...
 
-class ErrorList(UserList):
+class ErrorList(UserList[Any]):
     data: list[ValidationError | str]
     error_class: str
     def __init__(

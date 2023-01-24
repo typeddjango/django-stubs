@@ -13,7 +13,7 @@ from typing_extensions import TypeAlias
 
 _T = TypeVar("_T", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True)
-_QS = TypeVar("_QS", bound=_QuerySet)
+_QS = TypeVar("_QS", bound=_QuerySet[Model, Any])
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
 
 MAX_GET_RESULTS: int
@@ -46,7 +46,7 @@ class FlatValuesListIterable(BaseIterable[_Row]):
 class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     model: type[_T]
     query: Query
-    _iterable_class: type[BaseIterable]
+    _iterable_class: type[BaseIterable[Any]]
     def __init__(
         self,
         model: type[Model] | None = ...,
@@ -126,7 +126,7 @@ class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
         params: Any = ...,
         translations: dict[str, str] | None = ...,
         using: str | None = ...,
-    ) -> RawQuerySet: ...
+    ) -> RawQuerySet[_T]: ...
     # The type of values may be overridden to be more specific in the mypy plugin, depending on the fields param
     def values(self, *fields: str | Combinable, **expressions: Any) -> _QuerySet[_T, dict[str, Any]]: ...
     # The type of values_list may be overridden to be more specific in the mypy plugin, depending on the fields param

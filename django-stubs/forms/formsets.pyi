@@ -39,7 +39,7 @@ class BaseFormSet(Generic[_F], Sized):
     prefix: str | None
     auto_id: str
     data: _DataT
-    files: _FilesT[AnyStr]
+    files: _FilesT[Any]
     initial: Sequence[Mapping[str, Any]] | None
     form_kwargs: dict[str, Any]
     error_class: type[ErrorList]

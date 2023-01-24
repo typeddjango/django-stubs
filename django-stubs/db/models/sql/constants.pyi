@@ -1,5 +1,5 @@
 from re import Pattern
-from typing import AnyStr
+from typing import AnyStr, TypeAlias
 
 from typing_extensions import Final, Literal
 
@@ -10,7 +10,7 @@ SINGLE: Literal["single"]
 CURSOR: Literal["cursor"]
 NO_RESULTS: Literal["no results"]
 
-ORDER_PATTERN: Pattern[AnyStr]
+ORDER_PATTERN: TypeAlias = Pattern[AnyStr]
 ORDER_DIR: dict[str, tuple[str, str]]
 
 INNER: Literal["INNER JOIN"]

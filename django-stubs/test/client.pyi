@@ -20,8 +20,8 @@ from typing_extensions import TypeAlias
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
-CONTENT_TYPE_RE: Pattern[AnyStr]
-JSON_CONTENT_TYPE_RE: Pattern[AnyStr]
+CONTENT_TYPE_RE: TypeAlias = Pattern[AnyStr]
+JSON_CONTENT_TYPE_RE: TypeAlias = Pattern[AnyStr]
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase

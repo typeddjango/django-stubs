@@ -23,7 +23,7 @@ class ForeignObjectRel(FieldCacheMixin):
     editable: bool
     is_relation: bool
     null: bool
-    field: ForeignObject
+    field: ForeignObject[Any, Any]
     model: type[Model]
     related_name: str | None
     related_query_name: str | None
@@ -35,7 +35,7 @@ class ForeignObjectRel(FieldCacheMixin):
     field_name: str | None
     def __init__(
         self,
-        field: ForeignObject,
+        field: ForeignObject[Any, Any],
         to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
@@ -48,7 +48,7 @@ class ForeignObjectRel(FieldCacheMixin):
     @property
     def name(self) -> str: ...
     @property
-    def remote_field(self) -> ForeignObject: ...
+    def remote_field(self) -> ForeignObject[Any, Any]: ...
     @property
     def target_field(self) -> AutoField[Any, Any]: ...
     @property

@@ -33,7 +33,7 @@ class FieldFile(File[AnyStr]):
 class FileDescriptor(DeferredAttribute):
     field: FileField
     def __set__(self, instance: Model, value: Any | None) -> None: ...
-    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
+    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile[AnyStr] | FileDescriptor: ...
 
 _M = TypeVar("_M", bound=Model, contravariant=True)
 
@@ -42,12 +42,12 @@ class _UploadToCallable(Protocol[_M]):
 
 class FileField(Field[Any, Any]):
     storage: Storage
-    upload_to: _PathCompatible | _UploadToCallable
+    upload_to: _PathCompatible | _UploadToCallable[Model]
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
-        upload_to: _PathCompatible | _UploadToCallable = ...,
+        upload_to: _PathCompatible | _UploadToCallable[_M] = ...,
         storage: Storage | Callable[[], Storage] | None = ...,
         *,
         max_length: int | None = ...,
@@ -84,7 +84,7 @@ class ImageFileDescriptor(FileDescriptor):
     field: ImageField
     def __set__(self, instance: Model, value: str | None) -> None: ...
 
-class ImageFieldFile(ImageFile, FieldFile):
+class ImageFieldFile(ImageFile, FieldFile[AnyStr]):
     field: ImageField
     def delete(self, save: bool = ...) -> None: ...
 

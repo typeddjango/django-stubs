@@ -33,7 +33,7 @@ class HttpRequest(BytesIO):
     POST: _ImmutableQueryDict
     COOKIES: dict[str, str]
     META: dict[str, Any]
-    FILES: MultiValueDict[str, uploadedfile.UploadedFile[AnyStr]]
+    FILES: MultiValueDict[str, uploadedfile.UploadedFile[Any]]
     path: str
     path_info: str
     method: str | None

@@ -10,7 +10,7 @@ from django.views.generic.detail import BaseDetailView, SingleObjectMixin, Singl
 from typing_extensions import Literal
 
 _FormT = TypeVar("_FormT", bound=BaseForm)
-_ModelFormT = TypeVar("_ModelFormT", bound=BaseModelForm)
+_ModelFormT = TypeVar("_ModelFormT", bound=BaseModelForm[models.Model])
 _M = TypeVar("_M", bound=models.Model)
 
 class FormMixin(Generic[_FormT], ContextMixin):

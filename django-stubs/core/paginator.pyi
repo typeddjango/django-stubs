@@ -12,7 +12,7 @@ class EmptyPage(InvalidPage): ...
 
 _T = TypeVar("_T")
 
-class _SupportsPagination(Protocol[_T], Sized, Iterable):
+class _SupportsPagination(Protocol[_T], Sized, Iterable[_T]):
     @overload
     def __getitem__(self, __index: int) -> _T: ...
     @overload

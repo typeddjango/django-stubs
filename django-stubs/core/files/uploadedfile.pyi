@@ -11,7 +11,7 @@ class UploadedFile(File[AnyStr]):
     name: str | None
     def __init__(
         self,
-        file: IO | None = ...,
+        file: IO[AnyStr] | None = ...,
         name: str | None = ...,
         content_type: str | None = ...,
         size: int | None = ...,
@@ -34,7 +34,7 @@ class InMemoryUploadedFile(UploadedFile[AnyStr]):
     field_name: str | None
     def __init__(
         self,
-        file: IO,
+        file: IO[AnyStr],
         field_name: str | None,
         name: str | None,
         content_type: str | None,
@@ -43,7 +43,7 @@ class InMemoryUploadedFile(UploadedFile[AnyStr]):
         content_type_extra: dict[str, str] = ...,
     ) -> None: ...
 
-class SimpleUploadedFile(InMemoryUploadedFile):
+class SimpleUploadedFile(InMemoryUploadedFile[AnyStr]):
     def __init__(self, name: str, content: bytes | None, content_type: str = ...) -> None: ...
     @classmethod
     def from_dict(cls: type[Self], file_dict: dict[str, str | bytes]) -> Self: ...

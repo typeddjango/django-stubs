@@ -20,7 +20,7 @@ class BaseForm:
     use_required_attribute: bool
     is_bound: bool
     data: _DataT
-    files: _FilesT[AnyStr]
+    files: _FilesT[Any]
     auto_id: bool | str
     initial: Mapping[str, Any]
     error_class: type[ErrorList]

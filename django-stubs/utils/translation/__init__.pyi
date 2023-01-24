@@ -13,7 +13,7 @@ class TranslatorCommentWarning(SyntaxWarning): ...
 
 class Trans:
     activate: Callable[..., Any]
-    check_for_language: functools._lru_cache_wrapper
+    check_for_language: functools._lru_cache_wrapper[Any]
     deactivate: Callable[..., Any]
     deactivate_all: Callable[..., Any]
     get_language: Callable[..., Any]

@@ -1,7 +1,7 @@
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
-color_names: Sequence
+color_names: Sequence[Any]
 foreground: Mapping[str, str]
 background: Mapping[str, str]
 RESET: str

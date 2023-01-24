@@ -9,6 +9,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import Expression
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
+from django.forms import BaseForm
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
 from typing_extensions import Literal
@@ -47,7 +48,7 @@ class ChangeList:
     queryset: Any
     title: str
     pk_attname: str
-    formset: BaseFormSet | None
+    formset: BaseFormSet[BaseForm] | None
     def __init__(
         self,
         request: HttpRequest,

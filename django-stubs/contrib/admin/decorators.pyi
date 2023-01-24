@@ -16,7 +16,7 @@ _Request = TypeVar("_Request", bound=HttpRequest)
 _QuerySet = TypeVar("_QuerySet", bound=QuerySet[Model])
 # This is deliberately different from _DisplayT defined in contrib.admin.options
 _DisplayCallable: TypeAlias = Union[Callable[[_ModelAdmin, _Model], Any], Callable[[_Model], Any]]  # noqa: Y037
-_DisplayCallableT = TypeVar("_DisplayCallableT", bound=_DisplayCallable)
+_DisplayCallableT = TypeVar("_DisplayCallableT", bound=_DisplayCallable[ModelAdmin[Model], Model])
 _ActionReturn = TypeVar("_ActionReturn", bound=HttpResponseBase | None)
 
 @overload

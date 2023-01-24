@@ -53,7 +53,7 @@ class TemplateResponse(SimpleTemplateResponse):
     context_data: dict[str, Any] | None
     cookies: SimpleCookie[str]
     csrf_cookie_set: bool
-    json: functools.partial
+    json: functools.partial[Any]
     _request: HttpRequest
     status_code: int
     template_name: _TemplateForResponseT

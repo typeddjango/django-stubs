@@ -49,7 +49,7 @@ class FileUploadHandler:
     def upload_interrupted(self) -> None: ...
 
 class TemporaryFileUploadHandler(FileUploadHandler):
-    file: TemporaryUploadedFile
+    file: TemporaryUploadedFile[Any]
     def new_file(
         self,
         field_name: str,

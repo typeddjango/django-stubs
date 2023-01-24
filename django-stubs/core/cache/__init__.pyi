@@ -8,7 +8,7 @@ from .backends.base import InvalidCacheBackendError as InvalidCacheBackendError
 
 DEFAULT_CACHE_ALIAS: str
 
-class CacheHandler(BaseConnectionHandler):
+class CacheHandler(BaseConnectionHandler[Any]):
     settings_name: str
     exception_class: type[Exception]
     def create_connection(self, alias: str) -> BaseCache: ...
