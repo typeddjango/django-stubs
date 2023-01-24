@@ -17,14 +17,14 @@ class ModelOperation(Operation):
     def name_lower(self) -> str: ...
 
 class CreateModel(ModelOperation):
-    fields: list[tuple[str, Field]]
+    fields: list[tuple[str, Field[Any, Any]]]
     options: dict[str, Any]
     bases: Sequence[type[Model] | str] | None
     managers: Sequence[tuple[str, Manager]] | None
     def __init__(
         self,
         name: str,
-        fields: list[tuple[str, Field]],
+        fields: list[tuple[str, Field[Any, Any]]],
         options: dict[str, Any] | None = ...,
         bases: Sequence[type[Model] | str] | None = ...,
         managers: Sequence[tuple[str, Manager]] | None = ...,

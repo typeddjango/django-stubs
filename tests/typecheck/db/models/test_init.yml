@@ -2,7 +2,7 @@
     main: |
         from django.db.models import Field
 
-        field: Field
+        field: Field[Any, Any]
         my_bool: bool
 
         my_bool = field.one_to_many

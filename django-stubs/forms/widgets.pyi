@@ -145,7 +145,7 @@ class CheckboxInput(Input):
     check_test: _CheckCallable
     input_type: str
     template_name: str
-    def __init__(self, attrs: _OptAttrs | None = ..., check_test: _CheckCallable | None = ...) -> None: ...
+    def __init__(self, attrs: _OptAttrs | None = ..., check_test: _CheckCallable[..., Any] | None = ...) -> None: ...
 
 class ChoiceWidget(Widget):
     allow_multiple_selected: bool

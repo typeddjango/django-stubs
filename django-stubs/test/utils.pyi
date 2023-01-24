@@ -20,9 +20,9 @@ from typing_extensions import SupportsIndex, TypeAlias
 
 _TestClass: TypeAlias = type[SimpleTestCase]
 
-_DecoratedTest: TypeAlias = Callable | _TestClass
+_DecoratedTest: TypeAlias = Callable[..., Any] | _TestClass
 _DT = TypeVar("_DT", bound=_DecoratedTest)
-_C = TypeVar("_C", bound=Callable)  # Any callable
+_C = TypeVar("_C", bound=Callable[..., Any])  # Any callable
 
 TZ_SUPPORT: bool
 
@@ -76,11 +76,13 @@ class modify_settings(override_settings):
 
 class override_system_checks(TestContextDecorator):
     registry: CheckRegistry
-    new_checks: list[Callable]
-    deployment_checks: list[Callable] | None
-    def __init__(self, new_checks: list[Callable], deployment_checks: list[Callable] | None = ...) -> None: ...
-    old_checks: set[Callable]
-    old_deployment_checks: set[Callable]
+    new_checks: list[Callable[..., Any]]
+    deployment_checks: list[Callable[..., Any]] | None
+    def __init__(
+        self, new_checks: list[Callable[..., Any]], deployment_checks: list[Callable[..., Any]] | None = ...
+    ) -> None: ...
+    old_checks: set[Callable[..., Any]]
+    old_deployment_checks: set[Callable[..., Any]]
 
 class CaptureQueriesContext:
     connection: BaseDatabaseWrapper
@@ -103,14 +105,14 @@ class CaptureQueriesContext:
 
 class ignore_warnings(TestContextDecorator):
     ignore_kwargs: dict[str, Any]
-    filter_func: Callable
+    filter_func: Callable[..., Any]
     def __init__(self, **kwargs: Any) -> None: ...
     catch_warnings: AbstractContextManager[list | None]
 
 requires_tz_support: Any
 
 @contextmanager
-def isolate_lru_cache(lru_cache_object: Callable) -> Iterator[None]: ...
+def isolate_lru_cache(lru_cache_object: Callable[..., Any]) -> Iterator[None]: ...
 
 class override_script_prefix(TestContextDecorator):
     prefix: str

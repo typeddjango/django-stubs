@@ -316,7 +316,7 @@ class CallableChoiceIterator:
 
 class ChoiceField(Field):
     choices: _PropertyDescriptor[
-        _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
+        _FieldChoices | _ChoicesCallable[..., Any] | CallableChoiceIterator,
         _FieldChoices | CallableChoiceIterator,
     ]
     widget: _ClassLevelWidgetT

@@ -13,7 +13,7 @@ class AppConfigStub(AppConfig): ...
 class ModelState:
     name: str
     app_label: str
-    fields: dict[str, Field]
+    fields: dict[str, Field[Any, Any]]
     options: dict[str, Any]
     bases: Sequence[type[Model] | str]
     managers: list[tuple[str, Manager]]
@@ -21,7 +21,7 @@ class ModelState:
         self,
         app_label: str,
         name: str,
-        fields: list[tuple[str, Field]] | dict[str, Field],
+        fields: list[tuple[str, Field[Any, Any]]] | dict[str, Field[Any, Any]],
         options: dict[str, Any] | None = ...,
         bases: Sequence[type[Model] | str] | None = ...,
         managers: list[tuple[str, Manager]] | None = ...,

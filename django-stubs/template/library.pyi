@@ -12,8 +12,8 @@ class InvalidTemplateLibrary(Exception): ...
 _C = TypeVar("_C", bound=Callable[..., Any])
 
 class Library:
-    filters: dict[str, Callable]
-    tags: dict[str, Callable]
+    filters: dict[str, Callable[..., Any]]
+    tags: dict[str, Callable[..., Any]]
     def __init__(self) -> None: ...
     @overload
     def tag(self, name: _C) -> _C: ...
@@ -35,7 +35,7 @@ class Library:
     def inclusion_tag(
         self,
         filename: Template | str,
-        func: Callable | None = ...,
+        func: Callable[..., Any] | None = ...,
         takes_context: bool | None = ...,
         name: str | None = ...,
     ) -> Callable[[_C], _C]: ...
@@ -47,7 +47,7 @@ class TagHelperNode(Node):
     kwargs: Any
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         takes_context: bool | None,
         args: list[FilterExpression],
         kwargs: dict[str, FilterExpression],
@@ -56,7 +56,7 @@ class TagHelperNode(Node):
 
 class SimpleNode(TagHelperNode):
     args: list[FilterExpression]
-    func: Callable
+    func: Callable[..., Any]
     kwargs: dict[str, FilterExpression]
     origin: Origin
     takes_context: bool | None
@@ -64,7 +64,7 @@ class SimpleNode(TagHelperNode):
     target_var: str | None
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         takes_context: bool | None,
         args: list[FilterExpression],
         kwargs: dict[str, FilterExpression],
@@ -73,7 +73,7 @@ class SimpleNode(TagHelperNode):
 
 class InclusionNode(TagHelperNode):
     args: list[FilterExpression]
-    func: Callable
+    func: Callable[..., Any]
     kwargs: dict[str, FilterExpression]
     origin: Origin
     takes_context: bool | None
@@ -81,7 +81,7 @@ class InclusionNode(TagHelperNode):
     filename: Template | str
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         takes_context: bool | None,
         args: list[FilterExpression],
         kwargs: dict[str, FilterExpression],

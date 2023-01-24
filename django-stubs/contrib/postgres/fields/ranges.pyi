@@ -22,9 +22,9 @@ class RangeOperators:
     NOT_GT: Literal["&<"]
     ADJACENT_TO: Literal["-|-"]
 
-class RangeField(models.Field):
+class RangeField(models.Field[Any, Any]):
     empty_strings_allowed: bool
-    base_field: models.Field
+    base_field: models.Field[Any, Any]
     range_type: type[Range]
     def get_prep_value(self, value: Any) -> Any | None: ...
     def to_python(self, value: Any) -> Any: ...
@@ -77,13 +77,13 @@ class RangeStartsWith(models.Transform):
     lookup_name: str
     function: str
     @property
-    def output_field(self) -> models.Field: ...
+    def output_field(self) -> models.Field[Any, Any]: ...
 
 class RangeEndsWith(models.Transform):
     lookup_name: str
     function: str
     @property
-    def output_field(self) -> models.Field: ...
+    def output_field(self) -> models.Field[Any, Any]: ...
 
 class IsEmpty(models.Transform):
     lookup_name: str

@@ -45,8 +45,8 @@ class Q(tree.Node):
 
 class DeferredAttribute:
     field_name: str
-    field: Field
-    def __init__(self, field: Field) -> None: ...
+    field: Field[Any, Any]
+    def __init__(self, field: Field[Any, Any]) -> None: ...
 
 _R = TypeVar("_R", bound=type)
 
@@ -65,7 +65,7 @@ class RegisterLookupMixin:
     def _unregister_lookup(cls, lookup: type[Lookup], lookup_name: str | None = ...) -> None: ...
 
 def select_related_descend(
-    field: Field,
+    field: Field[Any, Any],
     restricted: bool,
     requested: Mapping[str, Any] | None,
     load_fields: Collection[str] | None,

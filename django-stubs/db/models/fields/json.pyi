@@ -10,7 +10,7 @@ from django.utils.functional import _StrOrPromise
 from . import Field
 from .mixins import CheckFieldDefaultMixin
 
-class JSONField(CheckFieldDefaultMixin, Field):
+class JSONField(CheckFieldDefaultMixin, Field[Any, Any]):
     encoder: type[json.JSONEncoder] | None
     decoder: type[json.JSONDecoder] | None
     def __init__(

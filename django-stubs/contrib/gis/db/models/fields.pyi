@@ -30,7 +30,7 @@ class SRIDCacheEntry(NamedTuple):
 def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 
 class BaseSpatialField(Field[_ST, _GT]):
-    form_class: type[forms.GeometryField]
+    form_class: type[forms.GeometryField[Any, Any]]
     geom_type: str
     geom_class: type[GEOSGeometry] | None
     geography: bool
@@ -114,33 +114,33 @@ class GeometryField(BaseSpatialField):
 
 class PointField(GeometryField):
     geom_class: type[Point]
-    form_class: type[forms.PointField]
+    form_class: type[forms.PointField[Any, Any]]
 
 class LineStringField(GeometryField):
     geom_class: type[LineString]
-    form_class: type[forms.LineStringField]
+    form_class: type[forms.LineStringField[Any, Any]]
 
 class PolygonField(GeometryField):
     geom_class: type[Polygon]
-    form_class: type[forms.PolygonField]
+    form_class: type[forms.PolygonField[Any, Any]]
 
 class MultiPointField(GeometryField):
     geom_class: type[MultiPoint]
-    form_class: type[forms.MultiPointField]
+    form_class: type[forms.MultiPointField[Any, Any]]
 
 class MultiLineStringField(GeometryField):
     geom_class: type[MultiLineString]
-    form_class: type[forms.MultiLineStringField]
+    form_class: type[forms.MultiLineStringField[Any, Any]]
 
 class MultiPolygonField(GeometryField):
     geom_class: type[MultiPolygon]
-    form_class: type[forms.MultiPolygonField]
+    form_class: type[forms.MultiPolygonField[Any, Any]]
 
 class GeometryCollectionField(GeometryField):
     geom_class: type[GeometryCollection]
-    form_class: type[forms.GeometryCollectionField]
+    form_class: type[forms.GeometryCollectionField[Any, Any]]
 
-class ExtentField(Field):
+class ExtentField(Field[Any, Any]):
     def get_internal_type(self) -> Any: ...
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 

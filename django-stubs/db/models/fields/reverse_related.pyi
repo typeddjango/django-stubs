@@ -29,7 +29,7 @@ class ForeignObjectRel(FieldCacheMixin):
     related_query_name: str | None
     limit_choices_to: _AllLimitChoicesTo | None
     parent_link: bool
-    on_delete: Callable
+    on_delete: Callable[..., Any]
     symmetrical: bool
     multiple: bool
     field_name: str | None
@@ -41,7 +41,7 @@ class ForeignObjectRel(FieldCacheMixin):
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        on_delete: Callable = ...,
+        on_delete: Callable[..., Any] = ...,
     ) -> None: ...
     @property
     def hidden(self) -> bool: ...
@@ -94,9 +94,9 @@ class ManyToOneRel(ForeignObjectRel):
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        on_delete: Callable = ...,
+        on_delete: Callable[..., Any] = ...,
     ) -> None: ...
-    def get_related_field(self) -> Field: ...
+    def get_related_field(self) -> Field[Any, Any]: ...
 
 class OneToOneRel(ManyToOneRel):
     field: OneToOneField
@@ -109,7 +109,7 @@ class OneToOneRel(ManyToOneRel):
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         parent_link: bool = ...,
-        on_delete: Callable = ...,
+        on_delete: Callable[..., Any] = ...,
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
@@ -129,4 +129,4 @@ class ManyToManyRel(ForeignObjectRel):
         through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
     ) -> None: ...
-    def get_related_field(self) -> Field: ...
+    def get_related_field(self) -> Field[Any, Any]: ...

@@ -10,7 +10,7 @@ from django.utils.datastructures import MultiValueDict
 from typing_extensions import TypeAlias
 
 class ResolverMatch:
-    func: Callable
+    func: Callable[..., Any]
     args: tuple[Any, ...]
     kwargs: dict[str, Any]
     url_name: str | None
@@ -24,7 +24,7 @@ class ResolverMatch:
     _func_path: str
     def __init__(
         self,
-        func: Callable,
+        func: Callable[..., Any],
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
         url_name: str | None = ...,
@@ -83,13 +83,13 @@ class LocalePrefixPattern:
 
 class URLPattern:
     pattern: _Pattern
-    callback: Callable
+    callback: Callable[..., Any]
     default_args: dict[str, str] | None
     name: str | None
     def __init__(
         self,
         pattern: _Pattern,
-        callback: Callable,
+        callback: Callable[..., Any],
         default_args: dict[str, str] | None = ...,
         name: str | None = ...,
     ) -> None: ...
@@ -126,7 +126,7 @@ class URLResolver:
     @property
     def url_patterns(self) -> list[_AnyURL]: ...
     def resolve(self, path: str) -> ResolverMatch: ...
-    def resolve_error_handler(self, view_type: int) -> Callable: ...
+    def resolve_error_handler(self, view_type: int) -> Callable[..., Any]: ...
     def reverse(self, lookup_view: str, *args: Any, **kwargs: Any) -> str: ...
     def _is_callback(self, name: str) -> bool: ...
     def _populate(self) -> None: ...

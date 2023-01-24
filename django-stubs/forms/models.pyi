@@ -34,7 +34,7 @@ _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 _Labels: TypeAlias = dict[str, str]
 _HelpTexts: TypeAlias = dict[str, str]
 _ErrorMessages: TypeAlias = dict[str, dict[str, str]]
-_FormFieldCallback: TypeAlias = Callable[[models.Field], Field]
+_FormFieldCallback: TypeAlias = Callable[[models.Field[Any, Any]], Field]
 
 _M = TypeVar("_M", bound=Model)
 _ParentM = TypeVar("_ParentM", bound=Model)
@@ -285,7 +285,7 @@ class ModelChoiceField(ChoiceField):
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def label_from_instance(self, obj: Model) -> str: ...
     choices: _PropertyDescriptor[
-        _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
+        _FieldChoices | _ChoicesCallable[..., Any] | CallableChoiceIterator,
         _FieldChoices | CallableChoiceIterator | ModelChoiceIterator,
     ]
     def prepare_value(self, value: Any) -> Any: ...

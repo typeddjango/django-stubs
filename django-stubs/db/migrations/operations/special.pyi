@@ -35,12 +35,12 @@ class _CodeCallable(Protocol):
 
 class RunPython(Operation):
     code: _CodeCallable
-    reverse_code: _CodeCallable | None
+    reverse_code: _CodeCallable[..., Any] | None
     hints: Mapping[str, Any]
     def __init__(
         self,
         code: _CodeCallable,
-        reverse_code: _CodeCallable | None = ...,
+        reverse_code: _CodeCallable[..., Any] | None = ...,
         atomic: bool | None = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,

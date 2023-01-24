@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 def resolve(path: str, urlconf: str | None = ...) -> ResolverMatch: ...
 def reverse(
-    viewname: Callable | str | None,
+    viewname: Callable[..., Any] | str | None,
     urlconf: str | None = ...,
     args: Sequence[Any] | None = ...,
     kwargs: dict[str, Any] | None = ...,

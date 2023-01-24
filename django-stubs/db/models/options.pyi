@@ -42,8 +42,8 @@ class Options(Generic[_M]):
     FORWARD_PROPERTIES: set[str]
     REVERSE_PROPERTIES: set[str]
     default_apps: Any
-    local_fields: list[Field]
-    local_many_to_many: list[ManyToManyField]
+    local_fields: list[Field[Any, Any]]
+    local_many_to_many: list[ManyToManyField[Any, Any]]
     private_fields: list[Any]
     local_managers: list[Manager]
     base_manager_name: str | None
@@ -67,15 +67,15 @@ class Options(Generic[_M]):
     required_db_features: list[str]
     required_db_vendor: Literal["sqlite", "postgresql", "mysql", "oracle"] | None
     meta: type | None
-    pk: Field | None
-    auto_field: AutoField | None
+    pk: Field[Any, Any] | None
+    auto_field: AutoField[Any, Any] | None
     abstract: bool
     managed: bool
     proxy: bool
     proxy_for_model: type[Model] | None
     concrete_model: type[Model] | None
     swappable: str | None
-    parents: dict[type[Model], GenericForeignKey | Field]
+    parents: dict[type[Model], GenericForeignKey | Field[Any, Any]]
     auto_created: bool
     related_fkey_lookups: list[Any]
     apps: Apps
@@ -114,10 +114,10 @@ class Options(Generic[_M]):
     def default_manager(self) -> Manager | None: ...
     @property
     def fields(self) -> ImmutableList[Field[Any, Any]]: ...
-    def get_field(self, field_name: str) -> Field | ForeignObjectRel | GenericForeignKey: ...
+    def get_field(self, field_name: str) -> Field[Any, Any] | ForeignObjectRel | GenericForeignKey: ...
     def get_base_chain(self, model: type[Model]) -> list[type[Model]]: ...
     def get_parent_list(self) -> list[type[Model]]: ...
-    def get_ancestor_link(self, ancestor: type[Model]) -> OneToOneField | None: ...
+    def get_ancestor_link(self, ancestor: type[Model]) -> OneToOneField[Any, Any] | None: ...
     def get_path_to_parent(self, parent: type[Model]) -> list[PathInfo]: ...
     def get_path_from_parent(self, parent: type[Model]) -> list[PathInfo]: ...
     def get_fields(

@@ -75,7 +75,7 @@ class RequestContext(Context):
         self,
         request: HttpRequest,
         dict_: dict[str, Any] | None = ...,
-        processors: list[Callable] | None = ...,
+        processors: list[Callable[..., Any]] | None = ...,
         use_l10n: bool | None = ...,
         use_tz: bool | None = ...,
         autoescape: bool = ...,

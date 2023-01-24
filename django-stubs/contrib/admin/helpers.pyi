@@ -23,7 +23,7 @@ checkbox: Any
 
 class _PrepopulatedDict(TypedDict):
     field: BoundField
-    dependencies: list[BoundField]
+    dependencies: list[BoundField[Any, Any]]
 
 class AdminForm:
     prepopulated_fields: list[_PrepopulatedDict]
@@ -80,7 +80,7 @@ class Fieldline:
         readonly_fields: Sequence[str] | None = ...,
         model_admin: ModelAdmin | None = ...,
     ) -> None: ...
-    def __iter__(self) -> Iterator[AdminField | AdminReadonlyField]: ...
+    def __iter__(self) -> Iterator[AdminField[Any, Any] | AdminReadonlyField[Any, Any]]: ...
     def errors(self) -> SafeString: ...
 
 class AdminField:

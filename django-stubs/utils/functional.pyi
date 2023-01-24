@@ -46,12 +46,12 @@ class _StrPromise(Promise, Sequence[str]):
     def __getattribute__(self, __name: str) -> Any: ...
 
 _StrOrPromise: TypeAlias = str | _StrPromise  # noqa: Y047
-_C = TypeVar("_C", bound=Callable)
+_C = TypeVar("_C", bound=Callable[..., Any])
 
 def lazy(func: _C, *resultclasses: Any) -> _C: ...
 def lazystr(text: Any) -> _StrPromise: ...
-def keep_lazy(*resultclasses: Any) -> Callable: ...
-def keep_lazy_text(func: Callable) -> Callable: ...
+def keep_lazy(*resultclasses: Any) -> Callable[..., Any]: ...
+def keep_lazy_text(func: Callable[..., Any]) -> Callable[..., Any]: ...
 
 empty: object
 
@@ -59,22 +59,22 @@ def new_method_proxy(func: Callable[..., _T]) -> Callable[..., _T]: ...
 
 class LazyObject:
     def __init__(self) -> None: ...
-    __getattr__: Callable
+    __getattr__: Callable[..., Any]
     def __setattr__(self, name: str, value: Any) -> None: ...
     def __delattr__(self, name: str) -> None: ...
-    def __reduce__(self) -> tuple[Callable, tuple[Model]]: ...
+    def __reduce__(self) -> tuple[Callable[..., Any], tuple[Model]]: ...
     def __copy__(self) -> LazyObject: ...
-    __bytes__: Callable
-    __bool__: Callable
-    __dir__: Callable
-    __ne__: Callable
-    __hash__: Callable
-    __getitem__: Callable
-    __setitem__: Callable
-    __delitem__: Callable
-    __iter__: Callable
-    __len__: Callable
-    __contains__: Callable
+    __bytes__: Callable[..., Any]
+    __bool__: Callable[..., Any]
+    __dir__: Callable[..., Any]
+    __ne__: Callable[..., Any]
+    __hash__: Callable[..., Any]
+    __getitem__: Callable[..., Any]
+    __setitem__: Callable[..., Any]
+    __delitem__: Callable[..., Any]
+    __iter__: Callable[..., Any]
+    __len__: Callable[..., Any]
+    __contains__: Callable[..., Any]
 
 def unpickle_lazyobject(wrapped: Model) -> Model: ...
 

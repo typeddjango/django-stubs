@@ -29,12 +29,12 @@ class SimpleListFilter(ListFilter):
     def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class FieldListFilter(ListFilter):
-    field: Field
+    field: Field[Any, Any]
     field_path: str
     title: str
     def __init__(
         self,
-        field: Field,
+        field: Field[Any, Any],
         request: HttpRequest,
         params: dict[str, str],
         model: type[Model],
@@ -42,11 +42,13 @@ class FieldListFilter(ListFilter):
         field_path: str,
     ) -> None: ...
     @classmethod
-    def register(cls, test: Callable, list_filter_class: type[FieldListFilter], take_priority: bool = ...) -> None: ...
+    def register(
+        cls, test: Callable[..., Any], list_filter_class: type[FieldListFilter], take_priority: bool = ...
+    ) -> None: ...
     @classmethod
     def create(
         cls,
-        field: Field,
+        field: Field[Any, Any],
         request: HttpRequest,
         params: dict[str, str],
         model: type[Model],

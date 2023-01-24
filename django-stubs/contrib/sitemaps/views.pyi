@@ -1,11 +1,11 @@
 from collections.abc import Callable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
 
-_C = TypeVar("_C", bound=Callable)
+_C = TypeVar("_C", bound=Callable[..., Any])
 
 def x_robots_tag(func: _C) -> _C: ...
 def index(
