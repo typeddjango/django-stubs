@@ -63,3 +63,20 @@
             content: |
                 def extra_fn() -> None:
                   pass
+
+-   case: test_skips_executing_custom_app_config_ready
+    main:
+    installed_apps:
+      - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/apps.py
+            content: |
+              from typing import NoReturn
+              from django.apps.config import AppConfig
+              class MyAppConfig(AppConfig):
+                  name = "myapp"
+                  default = True
+
+                  def ready(self) -> NoReturn:
+                      raise Exception("Don't execute ready")
