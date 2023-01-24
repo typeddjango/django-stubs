@@ -384,6 +384,10 @@ class DjangoContext:
 
     def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
         query = Query(model_cls)
+        if lookup == "pk" or lookup.startswith("pk__") and query.get_meta().pk is None:
+            # Primary key lookup when no primary key field is found, model is presumably
+            # abstract and we can't say anything about 'pk'.
+            return AnyType(TypeOfAny.implementation_artifact)
         try:
             lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
             if is_expression:

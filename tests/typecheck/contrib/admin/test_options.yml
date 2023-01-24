@@ -107,7 +107,7 @@
       from django.contrib import admin
 
       class A(admin.ModelAdmin):
-          fieldsets = [  # type: ignore
+          fieldsets = [
               (None, {}),  # E: Missing key "fields" for TypedDict "_FieldOpts"
           ]
 -   case: errors_on_invalid_radio_fields
