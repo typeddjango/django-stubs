@@ -25,7 +25,7 @@ class ASGIRequest(HttpRequest):
     @property
     def GET(self) -> _ImmutableQueryDict: ...  # type: ignore
     POST: _ImmutableQueryDict
-    FILES: MultiValueDict
+    FILES: MultiValueDict[Any, Any]
     @property
     def COOKIES(self) -> dict[str, str]: ...  # type: ignore
 
