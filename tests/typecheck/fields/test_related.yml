@@ -928,3 +928,18 @@
 
                 class SalesMan(models.Model):
                     client = models.ManyToManyField(CustomUser)
+
+-   case: test_fails_if_app_label_is_unknown_in_relation_field
+    main: |
+        from installed.models import InstalledModel
+    installed_apps:
+      - installed
+    files:
+        -   path: installed/__init__.py
+        -   path: installed/models.py
+            content: |
+                from django.db import models
+                class InstalledModel(models.Model):
+                    non_installed = models.ForeignKey(  # E: Cannot find model 'not_installed.NonInstalledModel' referenced in field 'non_installed'
+                        "not_installed.NonInstalledModel", on_delete=models.CASCADE
+                    )
