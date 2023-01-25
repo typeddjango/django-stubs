@@ -1,9 +1,9 @@
 from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.mysql.compiler import SQLCompiler
 from django.db.models import Func
 from django.db.models import Transform as StandardTransform
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 NUMERIC_TYPES: Any
 
