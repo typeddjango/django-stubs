@@ -3,20 +3,18 @@ from typing import Any
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import Combinable, Expression, F, Value
+from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
-# Typo: `extra_conteNt`, remains in 4.0
 class MySQLSHA2Mixin:
-    def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_content: Any) -> _AsSqlType: ...
+    def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class OracleHashMixin:
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-# Typo: `extra_conteNt`, remains in 4.0
 class PostgreSQLSHAMixin:
     def as_postgresql(
-        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_content: Any
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
 
 class Chr(Transform):
