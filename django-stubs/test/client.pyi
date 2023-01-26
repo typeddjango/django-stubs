@@ -60,7 +60,9 @@ def encode_multipart(boundary: str, data: dict[str, Any]) -> bytes: ...
 def encode_file(boundary: str, key: str, file: Any) -> list[bytes]: ...
 
 _GetDataType: TypeAlias = (
-    Mapping[str, str | bytes | Iterable[str | bytes]] | Iterable[tuple[str, str | bytes | Iterable[str | bytes]]] | None
+    Mapping[str, str | bytes | int | Iterable[str | bytes | int]]
+    | Iterable[tuple[str, str | bytes | int | Iterable[str | bytes | int]]]
+    | None
 )
 
 class _RequestFactory(Generic[_T]):
