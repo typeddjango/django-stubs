@@ -18,6 +18,7 @@ from django.forms.models import BaseModelForm, BaseModelFormSet
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
+from django.utils.connection import BaseConnectionHandler
 
 __all__ = ["monkeypatch"]
 
@@ -64,6 +65,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(Sitemap),
     MPGeneric(FileProxyMixin),
     MPGeneric(Lookup),
+    MPGeneric(BaseConnectionHandler),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
