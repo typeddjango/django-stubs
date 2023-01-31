@@ -58,7 +58,9 @@ def get_field_type_from_lookup(
     except LookupsAreUnsupported:
         return AnyType(TypeOfAny.explicit)
 
-    if (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
+    if lookup_field is None:
+        return AnyType(TypeOfAny.implementation_artifact)
+    elif (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
         lookup_field, ForeignObjectRel
     ):
         related_model_cls = django_context.get_field_related_model_cls(lookup_field)

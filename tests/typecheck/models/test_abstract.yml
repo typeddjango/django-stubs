@@ -7,3 +7,29 @@
     AbstractUser.objects.get(pkey=1)  # ER: Cannot resolve keyword 'pkey' into field..*
   installed_apps:
     - django.contrib.auth
+
+- case: test_fetch_pk_with_custom_manager_on_abstract_model
+  main: |
+    from myapp.models import MyModel
+  installed_apps:
+    - myapp
+  files:
+    -   path: myapp/__init__.py
+    -   path: myapp/models.py
+        content: |
+            from django.db import models
+
+            class BaseManager(models.Manager):
+                pass
+
+            class BaseModel(models.Model):
+                objects = BaseManager()
+
+                class Meta:
+                    abstract = True
+
+                def lock(self) -> None:
+                    reveal_type(type(self).objects.values_list("pk"))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.BaseModel, Tuple[Any]]"
+
+            class MyModel(BaseModel):
+                field = models.IntegerField()
