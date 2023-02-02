@@ -209,7 +209,6 @@ def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
 
 
 def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
-
     # make new class expression
     classdef = ClassDef(name, Block([]))
     classdef.fullname = module + "." + name
