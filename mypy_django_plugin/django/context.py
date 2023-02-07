@@ -2,11 +2,12 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.expressions import Expression
 from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
@@ -19,6 +20,7 @@ from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance
 from mypy.types import Type as MypyType
 from mypy.types import TypeOfAny, UnionType
+from typing_extensions import Literal
 
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
@@ -375,29 +377,39 @@ class DjangoContext:
         assert isinstance(field, (Field, ForeignObjectRel))
         return field
 
+    def solve_lookup_type(
+        self, model_cls: Type[Model], lookup: str
+    ) -> Optional[Tuple[Sequence[str], Sequence[str], Union[Expression, Literal[False]]]]:
+        query = Query(model_cls)
+        if (lookup == "pk" or lookup.startswith("pk__")) and query.get_meta().pk is None:
+            # Primary key lookup when no primary key field is found, model is presumably
+            # abstract and we can't say anything about 'pk'.
+            return None
+        return query.solve_lookup_type(lookup)
+
     def resolve_lookup_into_field(
         self, model_cls: Type[Model], lookup: str
-    ) -> Union["Field[Any, Any]", ForeignObjectRel]:
-        query = Query(model_cls)
-        lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
-
+    ) -> Union["Field[Any, Any]", ForeignObjectRel, None]:
+        solved_lookup = self.solve_lookup_type(model_cls, lookup)
+        if solved_lookup is None:
+            return None
+        lookup_parts, field_parts, is_expression = solved_lookup
         if lookup_parts:
             raise LookupsAreUnsupported()
         return self._resolve_field_from_parts(field_parts, model_cls)
 
     def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
-        query = Query(model_cls)
-        if lookup == "pk" or lookup.startswith("pk__") and query.get_meta().pk is None:
-            # Primary key lookup when no primary key field is found, model is presumably
-            # abstract and we can't say anything about 'pk'.
-            return AnyType(TypeOfAny.implementation_artifact)
         try:
-            lookup_parts, field_parts, is_expression = query.solve_lookup_type(lookup)
-            if is_expression:
-                return AnyType(TypeOfAny.explicit)
+            solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
             ctx.api.fail(exc.args[0], ctx.context)
             return AnyType(TypeOfAny.from_error)
+
+        if solved_lookup is None:
+            return AnyType(TypeOfAny.implementation_artifact)
+        lookup_parts, field_parts, is_expression = solved_lookup
+        if is_expression:
+            return AnyType(TypeOfAny.explicit)
 
         field = self._resolve_field_from_parts(field_parts, model_cls)
 
