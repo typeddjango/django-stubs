@@ -251,7 +251,7 @@ def create_manager_info_from_from_queryset_call(
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
         # so this isn't a problem.
-        return None
+        return None  # type: ignore[unreachable]
 
     if len(call_expr.args) == 2 and isinstance(call_expr.args[1], StrExpr):
         manager_name = call_expr.args[1].value
