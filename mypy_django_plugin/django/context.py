@@ -2,7 +2,8 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generator, Iterable, Iterator, Optional, Set, Tuple, Type, Union
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import models
@@ -32,6 +33,7 @@ except ImportError:
 
 
 if TYPE_CHECKING:
+    from django.apps.config import AppConfig
     from django.apps.registry import Apps  # noqa: F401
     from django.conf import LazySettings  # noqa: F401
     from django.contrib.contenttypes.fields import GenericForeignKey
@@ -46,6 +48,42 @@ def temp_environ() -> Iterator[None]:
     finally:
         os.environ.clear()
         os.environ.update(environ)
+
+
+class AppConfigs(Dict[str, "AppConfig"]):
+    """
+    A mapping for 'AppConfig' that monkey patches 'ready' method on insert
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.patches: Dict[str, mock._patch[mock.MagicMock]] = {}
+
+    def __setitem__(self, key: str, value: "AppConfig") -> None:
+        self.patches[key] = mock.patch.object(value, "ready", autospec=True)
+        super().__setitem__(key, value)
+        self.patches[key].start()
+
+
+@contextmanager
+def skip_apps_ready(apps: "Apps") -> Generator[None, None, None]:
+    """
+    Context manager that monkey patches the apps registry's container for app configs so
+    that we avoid executing custom 'ready' methods. This both saves time but more
+    importantly avoids executing custom runtime code for arbitrary apps. There should be
+    no need for django-stubs plugin to have triggered 'ready' in order to type check
+    correctly.
+    """
+    if apps.ready:
+        # Don't overwrite a readied apps instance. Calling '.ready' will be a noop.
+        yield None
+    else:
+        apps.app_configs = AppConfigs()
+        try:
+            yield None
+        finally:
+            for patch in apps.app_configs.patches.values():
+                patch.stop()
 
 
 def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
@@ -64,7 +102,8 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         if not settings.configured:
             settings._setup()  # type: ignore
 
-        apps.populate(settings.INSTALLED_APPS)
+        with skip_apps_ready(apps):
+            apps.populate(settings.INSTALLED_APPS)
 
     assert apps.apps_ready, "Apps are not ready"
     assert settings.configured, "Settings are not configured"
