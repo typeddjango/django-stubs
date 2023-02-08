@@ -26,8 +26,9 @@ class ModelBase(type):
     def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
-    class DoesNotExist(ObjectDoesNotExist): ...
-    class MultipleObjectsReturned(BaseMultipleObjectsReturned): ...
+    DoesNotExist: type[ObjectDoesNotExist]
+    MultipleObjectsReturned: type[BaseMultipleObjectsReturned]
+
     class Meta: ...
     _meta: Options[Any]
     pk: Any
