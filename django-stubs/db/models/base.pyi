@@ -1,5 +1,5 @@
 from collections.abc import Collection, Iterable, Sequence
-from typing import Any, TypeVar
+from typing import Any, Final, TypeVar
 
 from _typeshed import Self
 from django.core.checks.messages import CheckMessage
@@ -26,8 +26,8 @@ class ModelBase(type):
     def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
-    DoesNotExist: type[ObjectDoesNotExist]
-    MultipleObjectsReturned: type[BaseMultipleObjectsReturned]
+    DoesNotExist: Final[type[ObjectDoesNotExist]]
+    MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
 
     class Meta: ...
     _meta: Options[Any]
