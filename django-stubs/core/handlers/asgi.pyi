@@ -1,7 +1,7 @@
 from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
 from typing import IO, Any, TypeVar
 
-from django.core.handlers import base as base
+from django.core.handlers import base
 from django.http.request import HttpRequest, _ImmutableQueryDict
 from django.http.response import HttpResponseBase
 from django.urls.resolvers import ResolverMatch, URLResolver

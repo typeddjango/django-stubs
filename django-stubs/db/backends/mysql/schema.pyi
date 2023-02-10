@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor as BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.mysql.base import DatabaseWrapper
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):

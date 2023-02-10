@@ -1,7 +1,7 @@
 from collections.abc import Container, Iterator
 from typing import Any
 
-from django.db.backends.base.base import BaseDatabaseWrapper as BaseDatabaseWrapper
+from django.db.backends.base.base import BaseDatabaseWrapper
 from typing_extensions import Literal
 
 from .client import DatabaseClient

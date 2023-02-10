@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
-from django.core.management.base import BaseCommand as BaseCommand
+from django.core.management.base import BaseCommand
 
 def module_to_dict(module: Any, omittable: Callable[[str], bool] = ...) -> dict[str, str]: ...
 

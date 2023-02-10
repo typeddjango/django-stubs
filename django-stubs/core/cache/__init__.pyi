@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.utils.connection import BaseConnectionHandler, ConnectionProxy
+from django.utils.connection import BaseConnectionHandler
 
 from .backends.base import BaseCache as BaseCache
 from .backends.base import CacheKeyWarning as CacheKeyWarning

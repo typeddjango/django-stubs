@@ -1,5 +1,4 @@
 from collections.abc import Callable, Sequence
-from functools import wraps as wraps  # noqa: F401
 from typing import Any, Generic, Protocol, TypeVar, overload
 
 from _typeshed import Self

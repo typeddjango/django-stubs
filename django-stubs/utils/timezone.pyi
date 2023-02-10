@@ -1,10 +1,5 @@
 from contextlib import ContextDecorator
-from datetime import date
-from datetime import datetime as datetime
-from datetime import time
-from datetime import timedelta as timedelta
-from datetime import timezone
-from datetime import tzinfo as tzinfo
+from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from types import TracebackType
 from typing import Any, overload
 

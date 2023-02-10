@@ -1,7 +1,7 @@
 from typing import IO, Any
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
-from django.core.serializers import base as base
+from django.core.serializers import base
 
 class Serializer(base.Serializer):
     def indent(self, level: int) -> None: ...
