@@ -12,10 +12,12 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                from django_stubs_ext.db.models import BaseModelMeta
+
                 class Publisher(models.Model):
                     pass
                 class PublisherProxy(Publisher):
-                    class Meta:
+                    class Meta(BaseModelMeta):
                         proxy = True
                 class Blog(models.Model):
                     publisher = models.ForeignKey(to=PublisherProxy, on_delete=models.CASCADE)
