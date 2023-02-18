@@ -109,7 +109,7 @@ class SimpleTestCase(unittest.TestCase):
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
-    def assertFormError(
+    def assertFormError(  # old signature, deprecated in Django 4.1
         self,
         response: HttpResponseBase,
         form: str,
@@ -117,6 +117,7 @@ class SimpleTestCase(unittest.TestCase):
         errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
+    # assertFormsetError (lowercase "set") deprecated in Django 4.2
     @overload
     def assertFormsetError(
         self,
@@ -127,7 +128,26 @@ class SimpleTestCase(unittest.TestCase):
         msg_prefix: str = ...,
     ) -> None: ...
     @overload
-    def assertFormsetError(
+    def assertFormsetError(  # old signature, deprecated in Django 4.1
+        self,
+        response: HttpResponseBase,
+        formset: str,
+        form_index: int | None,
+        field: str | None,
+        errors: list[str] | str,
+        msg_prefix: str = ...,
+    ) -> None: ...
+    @overload
+    def assertFormSetError(
+        self,
+        formset: BaseFormSet,
+        form_index: int | None,
+        field: str | None,
+        errors: list[str] | str,
+        msg_prefix: str = ...,
+    ) -> None: ...
+    @overload
+    def assertFormSetError(
         self,
         response: HttpResponseBase,
         formset: str,
@@ -185,7 +205,16 @@ class TransactionTestCase(SimpleTestCase):
     fixtures: Any
     multi_db: bool
     serialized_rollback: bool
+    # assertQuerysetEqual (lowercase "set") deprecated in Django 4.2
     def assertQuerysetEqual(
+        self,
+        qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
+        values: Collection[Any],
+        transform: Callable[[Model], Any] | type[str] = ...,
+        ordered: bool = ...,
+        msg: str | None = ...,
+    ) -> None: ...
+    def assertQuerySetEqual(
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
         values: Collection[Any],
