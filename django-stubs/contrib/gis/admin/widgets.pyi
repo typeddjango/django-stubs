@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Any
 
-from django.forms.widgets import Textarea as Textarea
+from django.forms.widgets import Textarea
 
 geo_context: Any
 logger: Logger

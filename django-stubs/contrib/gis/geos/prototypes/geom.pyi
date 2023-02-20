@@ -1,7 +1,7 @@
 from ctypes import c_char_p
 from typing import Any
 
-from django.contrib.gis.geos.libgeos import GEOSFuncFactory as GEOSFuncFactory
+from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 c_uchar_p: Any
 

@@ -1,7 +1,7 @@
 from typing import Any
 
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
-from django.contrib.gis.db.backends.utils import SpatialOperator as SpatialOperator
+from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.db.backends.sqlite3.operations import DatabaseOperations
 
 class SpatialiteNullCheckOperator(SpatialOperator): ...

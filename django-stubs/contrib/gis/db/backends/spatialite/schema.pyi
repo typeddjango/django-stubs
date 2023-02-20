@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.sqlite3.schema import DatabaseSchemaEditor as DatabaseSchemaEditor
+from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     sql_add_geometry_column: str

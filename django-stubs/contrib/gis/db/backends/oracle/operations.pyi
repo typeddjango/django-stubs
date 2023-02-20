@@ -1,8 +1,8 @@
 from typing import Any
 
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations as BaseSpatialOperations
-from django.contrib.gis.db.backends.utils import SpatialOperator as SpatialOperator
-from django.db.backends.oracle.operations import DatabaseOperations as DatabaseOperations
+from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.db.backends.oracle.operations import DatabaseOperations
 
 DEFAULT_TOLERANCE: str
 
