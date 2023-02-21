@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Any
 
-from django.db.backends.mysql.schema import DatabaseSchemaEditor as DatabaseSchemaEditor
+from django.db.backends.mysql.schema import DatabaseSchemaEditor
 
 logger: Logger
 

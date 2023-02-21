@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.contrib.gis.geos.libgeos import GEOSFuncFactory as GEOSFuncFactory
+from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 def check_cs_op(result: Any, func: Any, cargs: Any) -> Any: ...
 def check_cs_get(result: Any, func: Any, cargs: Any) -> Any: ...

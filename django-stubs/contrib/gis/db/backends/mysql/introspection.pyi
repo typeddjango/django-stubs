@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.mysql.introspection import DatabaseIntrospection as DatabaseIntrospection
+from django.db.backends.mysql.introspection import DatabaseIntrospection
 
 class MySQLIntrospection(DatabaseIntrospection):
     data_types_reverse: Any

@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.backends.oracle.introspection import DatabaseIntrospection as DatabaseIntrospection
+from django.db.backends.oracle.introspection import DatabaseIntrospection
 
 class OracleIntrospection(DatabaseIntrospection):
     @property

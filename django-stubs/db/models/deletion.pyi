@@ -57,7 +57,7 @@ class RestrictedError(IntegrityError):
 
 class Collector:
     using: str
-    data: Any
+    data: dict[type[Model], set[Model] | list[Model]]
     field_updates: Any
     restricted_objects: Any
     fast_deletes: Any
