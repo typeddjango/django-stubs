@@ -1,5 +1,6 @@
 *.egg-info
 .DS_Store
+.env
 .idea/
 .mypy_cache/
 .pytest_cache/
@@ -10,3 +11,4 @@ out/
 pip-wheel-metadata/
 stubgen/
 build/
+dist/

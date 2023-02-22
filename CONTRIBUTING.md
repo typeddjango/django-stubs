@@ -31,6 +31,30 @@ Additionally, the following resources might be useful:
 As a first step you will need to fork this repository and clone your fork locally.
 In order to be able to continously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
+You can now follow instructions in subsequent sections of this document to manually install dependencies, run tests, etc., _or_ you can [install `just`](https://just.systems/man/en/) to run our `Justfile`. For example:
+
+```console
+> just
+Available recipes:
+    ls              # list available recipes
+    help            # print help info & list available recipes
+    full            # refresh setup, run checks & builds
+    clean           # remove development artifacts
+    setup           # setup up project development environment
+    draft-stubs     # generate new draft stub files
+    lint            # run all linters & checkers
+    test            # run all tests
+    build           # build project packages
+    release         # build & release project packages
+
+> just --show full
+# refresh setup, run checks & builds
+full: clean setup lint test build
+
+> just full
+... # proceeds to create virtualenv, install dependencies, run tests, etc.
+```
+
 ### Dependency Setup
 
 After your repository is setup you will then need to create and activate a git ignored virtual env, e.g.:
