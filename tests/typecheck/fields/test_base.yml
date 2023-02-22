@@ -141,10 +141,9 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django_stubs_ext.db.models import BaseModelMeta
 
                 class AuthMixin(models.Model):
-                    class Meta(BaseModelMeta):
+                    class Meta:
                         abstract = True
                     username = models.CharField(max_length=100)
 

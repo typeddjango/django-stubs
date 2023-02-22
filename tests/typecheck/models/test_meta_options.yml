@@ -49,8 +49,22 @@
             content: |
                 from django.db import models
                 from django.contrib.postgres.fields import ArrayField
+                from django_stubs_ext.db.models import BaseModelMeta
                 class AbstractModel(models.Model):
-                    class Meta:
+                    class Meta(BaseModelMeta):
                         abstract = True
                 class MyModel(AbstractModel):
                     field = ArrayField(models.IntegerField(), default=[])
+-   case: base_model_meta_incompatible_types
+    main: |
+        from django.db import models
+        from django.contrib.postgres.fields import ArrayField
+        from django_stubs_ext.db.models import BaseModelMeta
+
+        class MyModel(models.Model):
+            example = models.CharField(max_length=100)
+            class Meta(BaseModelMeta):
+                abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "BaseModelMeta" defined the type as "bool")
+                verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "List[str]", base class "BaseModelMeta" defined the type as "Union[str, _StrPromise]")
+                unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "Dict[int, int]", base class "BaseModelMeta" defined the type as "Union[Sequence[Sequence[str]], Sequence[str]]")
+                unknown_attr = True  # can't check this
