@@ -141,7 +141,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-
                 class AuthMixin(models.Model):
                     class Meta:
                         abstract = True
