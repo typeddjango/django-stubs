@@ -6,6 +6,7 @@ then
   if [[ "$VIRTUAL_ENV" != ""  ]]
   then
     pip install --upgrade setuptools wheel twine
+    rm -rf dist/ build/
     python setup.py sdist bdist_wheel
     twine upload dist/*
     rm -rf dist/ build/
