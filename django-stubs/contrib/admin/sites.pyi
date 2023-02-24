@@ -33,7 +33,7 @@ class AdminSite:
     site_title: _StrOrPromise
     site_header: _StrOrPromise
     index_title: _StrOrPromise
-    site_url: str
+    site_url: str | None
     login_form: type[AuthenticationForm] | None
     index_template: str | None
     app_index_template: str | None
