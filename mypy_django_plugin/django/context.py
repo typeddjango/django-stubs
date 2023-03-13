@@ -207,7 +207,7 @@ class DjangoContext:
             if isinstance(field, Field):
                 field_name = field.attname
                 # Can not determine target_field for recursive relationship when model is abstract
-                if field.related_model == "self" and not model_cls._meta.abstract:
+                if field.related_model == "self" and model_cls._meta.abstract:
                     continue
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
                 # from django-stubs own declaration. This is to align with the setter types declared for
