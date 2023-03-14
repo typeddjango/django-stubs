@@ -43,7 +43,7 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     rel_class: type[ForeignObjectRel]
     swappable: bool
     @property
-    def related_model(self) -> type[Model]: ...  # type: ignore
+    def related_model(self) -> type[Model] | str: ...  # type: ignore
     def get_forward_related_filter(self, obj: Model) -> dict[str, int | UUID]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
     @property
