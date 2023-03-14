@@ -20,6 +20,7 @@
           from django.db import models
           class OwnedModel(models.Model):
               owner = models.ForeignKey("users.User", on_delete=models.CASCADE)
+              myself = models.ForeignKey("self")
 
               class Meta:
                   abstract = True
