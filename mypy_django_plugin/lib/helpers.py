@@ -124,7 +124,7 @@ def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], f
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type]) -> Optional[TypeInfo]:
+def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type] | Literal["self"]) -> Optional[TypeInfo]:
     if klass is None:
         return None
 
