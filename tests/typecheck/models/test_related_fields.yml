@@ -7,6 +7,7 @@
       reveal_type(Model2().test)  # N: Revealed type is "app3.models.Model3_RelatedManager"
       reveal_type(Model1().test2)  # N: Revealed type is "app3.models.Model4_RelatedManager"
       reveal_type(Model2().test2)  # N: Revealed type is "app3.models.Model4_RelatedManager"
+      Model1()
     installed_apps:
       - base
       - users
