@@ -16,7 +16,7 @@ from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Literal, Self, TypeAlias
 
 class Empty: ...
 class NOT_PROVIDED: ...
