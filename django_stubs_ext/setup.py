@@ -12,7 +12,7 @@ dependencies = [
 
 setup(
     name="django-stubs-ext",
-    version="0.7.0",
+    version="0.8.0",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -20,8 +20,8 @@ setup(
     url="https://github.com/typeddjango/django-stubs",
     author="Simula Proxy",
     author_email="3nki.nam.shub@gmail.com",
-    maintainer="Nikita Sobolev",
-    maintainer_email="mail@sobolevn.me",
+    maintainer="Marti Raudsepp",
+    maintainer_email="marti@juffo.org",
     py_modules=[],
     python_requires=">=3.7",
     install_requires=dependencies,
