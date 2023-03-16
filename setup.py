@@ -22,7 +22,7 @@ with open("README.md") as f:
 dependencies = [
     "mypy>=0.980",
     "django",
-    "django-stubs-ext>=0.7.0",
+    "django-stubs-ext>=0.8.0",
     "tomli",
     # Types:
     "typing-extensions",
@@ -36,7 +36,7 @@ extras_require = {
 
 setup(
     name="django-stubs",
-    version="1.15.0",
+    version="1.16.0",
     description="Mypy stubs for Django",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -44,8 +44,8 @@ setup(
     url="https://github.com/typeddjango/django-stubs",
     author="Maksim Kurnikov",
     author_email="maxim.kurnikov@gmail.com",
-    maintainer="Nikita Sobolev",
-    maintainer_email="mail@sobolevn.me",
+    maintainer="Marti Raudsepp",
+    maintainer_email="marti@juffo.org",
     py_modules=[],
     python_requires=">=3.7",
     install_requires=dependencies,
