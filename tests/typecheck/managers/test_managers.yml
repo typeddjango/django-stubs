@@ -619,3 +619,23 @@
 
                 class MySubModel(MyModel):
                     objects = MySubManager()
+
+-   case: nested_manager_class_definition
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)
+    installed_apps:
+        - myapp
+    out: |
+        main:2: note: Revealed type is "myapp.models.MyModel.MyManager[myapp.models.MyModel]"
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any
+                from django.db import models
+                class MyModel(models.Model):
+                    class MyManager(models.Manager):
+                        def get_instance(self) -> int:
+                            pass
+                    objects = MyManager()

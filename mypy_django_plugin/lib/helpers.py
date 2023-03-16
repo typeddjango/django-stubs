@@ -69,10 +69,27 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) 
     else:
         module, cls_name = fullname.rsplit(".", 1)
 
-    module_file = all_modules.get(module)
-    if module_file is None:
-        return None
-    sym = module_file.names.get(cls_name)
+    parent_classes: List[str] = []
+    while True:
+        module_file = all_modules.get(module)
+        if module_file:
+            break
+        if "." not in module:
+            return None
+        module, parent_cls = module.rsplit(".", 1)
+        parent_classes.insert(0, parent_cls)
+
+    scope: Union[MypyFile, TypeInfo] = module_file
+    for parent_cls in parent_classes:
+        sym = scope.names.get(parent_cls)
+        if sym is None:
+            return None
+        if isinstance(sym.node, TypeInfo):
+            scope = sym.node
+        else:
+            return None
+
+    sym = scope.names.get(cls_name)
     if sym is None:
         return None
     return sym

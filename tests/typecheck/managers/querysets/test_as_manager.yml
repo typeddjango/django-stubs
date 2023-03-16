@@ -212,3 +212,19 @@
                 class MyModel(models.Model):
                     from_queryset = FromQuerySet()
                     as_manager = ModelQuerySet.as_manager()
+
+-   case: nested_queryset_class_definition
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    class MyQuerySet(models.QuerySet):
+                        pass
+                    objects = MyQuerySet.as_manager()
