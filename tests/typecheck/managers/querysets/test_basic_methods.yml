@@ -58,3 +58,21 @@
                 from django.db import models
                 class User(models.Model):
                     pass
+
+-   case: select_related_returns_queryset
+    main: |
+        from myapp.models import Book
+        reveal_type(Book.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, myapp.models.Book]"
+        reveal_type(Book.objects.filter(pk=1).select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, myapp.models.Book]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Person(models.Model):
+                    pass
+
+                class Book(models.Model):
+                    author = models.ForeignKey(Person, on_delete=models.CASCADE)
