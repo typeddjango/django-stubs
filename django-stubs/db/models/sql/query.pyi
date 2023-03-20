@@ -50,6 +50,7 @@ class Query(BaseExpression):
     default_ordering: bool
     standard_ordering: bool
     used_aliases: set[str]
+    where: type[WhereNode]
     filter_is_sticky: bool
     subquery: bool
     group_by: None | Sequence[Combinable] | Sequence[str] | Literal[True]
