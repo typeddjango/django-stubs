@@ -5,7 +5,7 @@ from _typeshed import Self
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db.models import CheckConstraint, Field, UniqueConstraint
+from django.db.models import BaseConstraint, Field
 from django.db.models.manager import BaseManager
 from django.db.models.options import Options
 from typing_extensions import Final
@@ -50,7 +50,7 @@ class Model(metaclass=ModelBase):
     def date_error_message(self, lookup_type: str, field_name: str, unique_for: str) -> ValidationError: ...
     def unique_error_message(self, model_class: type[Self], unique_check: Sequence[str]) -> ValidationError: ...
     def validate_constraints(self, exclude: Collection[str] | None = ...) -> None: ...
-    def get_constraints(self) -> list[tuple[type[Model], Sequence[CheckConstraint | UniqueConstraint]]]: ...
+    def get_constraints(self) -> list[tuple[type[Model], Sequence[BaseConstraint]]]: ...
     def save(
         self,
         force_insert: bool = ...,
