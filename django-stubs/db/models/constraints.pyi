@@ -25,7 +25,9 @@ class BaseConstraint:
 
 class CheckConstraint(BaseConstraint):
     check: Q | BaseExpression
-    def __init__(self, *, check: Q | BaseExpression, name: str, violation_error_message: _StrOrPromise | None = ...) -> None: ...
+    def __init__(
+        self, *, check: Q | BaseExpression, name: str, violation_error_message: _StrOrPromise | None = ...
+    ) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
     expressions: tuple[Combinable, ...]
