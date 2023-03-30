@@ -4,6 +4,7 @@ from django.db.models import Deferrable
 from django.db.models.constraints import BaseConstraint
 from django.db.models.expressions import Combinable
 from django.db.models.query_utils import Q
+from django.utils.functional import _StrOrPromise
 
 class ExclusionConstraint(BaseConstraint):
     expressions: Sequence[tuple[str | Combinable, str]]
@@ -19,5 +20,5 @@ class ExclusionConstraint(BaseConstraint):
         deferrable: Deferrable | None = ...,
         include: list[str] | tuple[str] | None = ...,
         opclasses: list[str] | tuple[str] = ...,
-        violation_error_message: str | None = ...
+        violation_error_message: _StrOrPromise | None = ...
     ) -> None: ...
