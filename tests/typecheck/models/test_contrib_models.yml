@@ -26,3 +26,22 @@
 
         from django.contrib.auth.models import Group
         reveal_type(Group().name)  # N: Revealed type is "builtins.str"
+
+-   case: can_override_abstract_user_manager
+    main: |
+        from myapp.models import User
+        reveal_type(User.objects)  # N: Revealed type is "myapp.models.UserManager[myapp.models.User]"
+        reveal_type(User.objects.all())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
+    installed_apps:
+        - django.contrib.auth
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+              class UserManager(BaseUserManager["User"]):
+                  ...
+
+              class User(AbstractBaseUser):
+                  objects = UserManager()
