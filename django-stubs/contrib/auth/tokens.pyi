@@ -5,7 +5,8 @@ from django.contrib.auth.base_user import AbstractBaseUser
 
 class PasswordResetTokenGenerator:
     key_salt: str
-    secret: Any
+    secret: str | bytes
+    secret_fallbacks: list[str | bytes]
     algorithm: str
     def make_token(self, user: AbstractBaseUser) -> str: ...
     def check_token(self, user: AbstractBaseUser | None, token: str | None) -> bool: ...
