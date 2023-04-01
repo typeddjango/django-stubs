@@ -31,15 +31,15 @@ class CheckConstraint(BaseConstraint):
     ) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
-    expressions: tuple[Combinable, ...]
-    fields: tuple[str, ...]
+    expressions: Sequence[BaseExpression | Combinable]
+    fields: Sequence[str]
     condition: Q | None
     deferrable: Deferrable | None
 
     @overload
     def __init__(
         self,
-        *expressions: str | Combinable,
+        *expressions: str | BaseExpression | Combinable,
         fields: None = ...,
         name: str,
         condition: Q | None = ...,
