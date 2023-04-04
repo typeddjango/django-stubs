@@ -1,10 +1,14 @@
 import configparser
+import sys
 import textwrap
 from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Dict, NoReturn, Optional
 
-import tomli
+if sys.version_info[:2] >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 INI_USAGE = """
 (config)
@@ -64,8 +68,8 @@ class DjangoPluginConfig:
         toml_exit: Callable[[str], NoReturn] = partial(exit_with_error, is_toml=True)
         try:
             with filepath.open(mode="rb") as f:
-                data = tomli.load(f)
-        except (tomli.TOMLDecodeError, OSError):
+                data = tomllib.load(f)
+        except (tomllib.TOMLDecodeError, OSError):
             toml_exit(COULD_NOT_LOAD_FILE)
 
         try:
