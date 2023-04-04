@@ -23,7 +23,7 @@ dependencies = [
     "mypy>=0.980",
     "django",
     "django-stubs-ext>=0.8.0",
-    "tomli",
+    "tomli; python_version < '3.11'",
     # Types:
     "typing-extensions",
     "types-pytz",
