@@ -40,7 +40,6 @@ class Field:
     localize: bool
     error_messages: _ErrorMessagesT
     validators: list[_ValidatorCallable]
-    max_length: int | None
     def __init__(
         self,
         *,
@@ -97,12 +96,14 @@ class CharField(Field):
 class IntegerField(Field):
     max_value: int | None
     min_value: int | None
+    step_size: int | None
     re_decimal: Any
     def __init__(
         self,
         *,
         max_value: int | None = ...,
         min_value: int | None = ...,
+        step_size: int | None = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -124,6 +125,7 @@ class FloatField(IntegerField):
         *,
         max_value: int | float | None = ...,
         min_value: int | float | None = ...,
+        step_size: int | float | None = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -150,6 +152,7 @@ class DecimalField(IntegerField):
         min_value: Decimal | int | float | None = ...,
         max_digits: int | None = ...,
         decimal_places: int | None = ...,
+        step_size: Decimal | int | float | None = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,

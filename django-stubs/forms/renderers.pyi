@@ -9,6 +9,8 @@ from django.template.base import Template
 def get_default_renderer() -> BaseRenderer: ...
 
 class BaseRenderer:
+    form_template_name: str
+    formset_template_name: str
     def get_template(self, template_name: str) -> Any: ...
     def render(self, template_name: str, context: dict[str, Any], request: HttpRequest | None = ...) -> str: ...
 
@@ -23,6 +25,10 @@ class DjangoTemplates(EngineMixin, BaseRenderer):
 class Jinja2(EngineMixin, BaseRenderer):
     @property
     def backend(self) -> type[Jinja2R]: ...
+
+class Jinja2DivFormRenderer(Jinja2):
+    form_template_name: str
+    formset_template_name: str
 
 class TemplatesSetting(BaseRenderer):
     def get_template(self, template_name: str) -> Template | None: ...

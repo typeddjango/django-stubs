@@ -2,9 +2,8 @@ from collections.abc import Iterator, Mapping, Sequence, Sized
 from typing import Any, Generic, TypeVar
 
 from django.forms.forms import BaseForm, Form
-from django.forms.utils import ErrorList, _DataT, _FilesT
+from django.forms.utils import ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, Widget
-from django.utils.safestring import SafeString
 
 TOTAL_FORM_COUNT: str
 INITIAL_FORM_COUNT: str
@@ -23,7 +22,7 @@ class ManagementForm(Form):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def clean(self) -> dict[str, int | None]: ...
 
-class BaseFormSet(Generic[_F], Sized):
+class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
     form: type[_F]
     extra: int
     can_order: bool
@@ -43,7 +42,13 @@ class BaseFormSet(Generic[_F], Sized):
     initial: Sequence[Mapping[str, Any]] | None
     form_kwargs: dict[str, Any]
     error_class: type[ErrorList]
+    deletion_widget: type[Widget]
     ordering_widget: type[Widget]
+    default_error_messages: dict[str, str]
+    template_name_div: str
+    template_name_p: str
+    template_name_table: str
+    template_name_ul: str
     def __init__(
         self,
         data: _DataT | None = ...,
@@ -81,6 +86,8 @@ class BaseFormSet(Generic[_F], Sized):
     @classmethod
     def get_default_prefix(cls) -> str: ...
     @classmethod
+    def get_deletion_widget(cls) -> type[Widget]: ...
+    @classmethod
     def get_ordering_widget(cls) -> type[Widget]: ...
     def non_form_errors(self) -> ErrorList: ...
     @property
@@ -95,9 +102,8 @@ class BaseFormSet(Generic[_F], Sized):
     def is_multipart(self) -> bool: ...
     @property
     def media(self) -> Media: ...
-    def as_table(self) -> SafeString: ...
-    def as_p(self) -> SafeString: ...
-    def as_ul(self) -> SafeString: ...
+    @property
+    def template_name(self) -> str: ...
 
 def formset_factory(
     form: type[_F],
