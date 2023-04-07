@@ -88,7 +88,6 @@
         req.GET.setdefault('foo', 'bar')  # E: This QueryDict is immutable.
         x = 1  # E: Statement is unreachable
 
-# Will work after merging https://github.com/python/mypy/pull/12572
 -   case: request_get_post_unreachable
     main: |
         from django.http.request import HttpRequest
@@ -106,4 +105,3 @@
         reveal_type(req.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
         req.GET['foo'] = 'bar'  # E: This QueryDict is immutable.
         x = 1  # E: Statement is unreachable
-    expect_fail: true

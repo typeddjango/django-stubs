@@ -144,7 +144,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     # class access
-    @overload  # type: ignore
+    @overload
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor: ...
     # Model instance access
     @overload
@@ -193,7 +193,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     # class access
-    @overload  # type: ignore
+    @overload
     def __get__(self, instance: None, owner: Any) -> ForwardOneToOneDescriptor: ...
     # Model instance access
     @overload
@@ -253,7 +253,7 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         error_messages: _ErrorMessagesT | None = ...,
     ) -> None: ...
     # class access
-    @overload  # type: ignore
+    @overload
     def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor: ...
     # Model instance access
     @overload
