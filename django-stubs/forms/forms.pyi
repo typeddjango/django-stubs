@@ -5,14 +5,14 @@ from django.core.exceptions import ValidationError
 from django.forms.boundfield import BoundField
 from django.forms.fields import Field
 from django.forms.renderers import BaseRenderer
-from django.forms.utils import ErrorDict, ErrorList, _DataT, _FilesT
+from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
-class BaseForm:
+class BaseForm(RenderableFormMixin):
     class Meta:
         fields: Sequence[str]
     default_renderer: BaseRenderer | type[BaseRenderer] | None
@@ -30,6 +30,11 @@ class BaseForm:
     fields: dict[str, Field]
     renderer: BaseRenderer
     cleaned_data: dict[str, Any]
+    template_name_div: str
+    template_name_p: str
+    template_name_table: str
+    template_name_ul: str
+    template_name_label: str
     def __init__(
         self,
         data: _DataT | None = ...,
@@ -52,9 +57,8 @@ class BaseForm:
     def is_valid(self) -> bool: ...
     def add_prefix(self, field_name: str) -> str: ...
     def add_initial_prefix(self, field_name: str) -> str: ...
-    def as_table(self) -> SafeString: ...
-    def as_ul(self) -> SafeString: ...
-    def as_p(self) -> SafeString: ...
+    @property
+    def template_name(self) -> str: ...
     def non_field_errors(self) -> ErrorList: ...
     def add_error(self, field: str | None, error: ValidationError | _StrOrPromise) -> None: ...
     def has_error(self, field: str | None, code: str | None = ...) -> bool: ...
