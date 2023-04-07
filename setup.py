@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 extras_require = {
-    "compatible-mypy": ["mypy>=1.1.1,<1.2"],
+    "compatible-mypy": ["mypy>=1.2.0,<1.3"],
 }
 
 setup(
