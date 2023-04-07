@@ -12,8 +12,8 @@ if TYPE_CHECKING:
         """
         Typed base class for Django Model `class Meta:` inner class.
 
-        Most attributes are the same as `django.db.models.options.Options`. Options has some additional attributes and some
-        values are normalized by Django.
+        Most attributes are the same as `django.db.models.options.Options`. Options has some additional attributes and
+        some values are normalized by Django.
 
         Usage::
 
