@@ -4,7 +4,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, FieldDoesNotExist
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
@@ -385,7 +385,25 @@ class DjangoContext:
             # Primary key lookup when no primary key field is found, model is presumably
             # abstract and we can't say anything about 'pk'.
             return None
-        return query.solve_lookup_type(lookup)
+        try:
+            return query.solve_lookup_type(lookup)
+        # This occurs when the following conditions are met:
+        # - model_cls._meta.abstract = True
+        # - part of the lookup is a foreign key defined on model_cls where the 'to' argument is a string
+        # On abstract models the 'to' parameter is only coalesced into the actual class whenever a subclass of it is
+        # instantiated, therefore it is never swapped out for abstract base classes.
+        except AttributeError:
+            pass
+        query_parts = lookup.split("__")
+        try:
+            field = query.get_meta().get_field(query_parts[0])
+        except FieldDoesNotExist:
+            return None
+        if len(query_parts) == 1:
+            return [], [query_parts[0]], False
+        sub_query = Query(field.related_model).solve_lookup_type("__")
+        entire_query_parts = [query_parts[0], *sub_query[1]]
+        return sub_query[0], entire_query_parts, sub_query[2]
 
     def resolve_lookup_into_field(
         self, model_cls: Type[Model], lookup: str
