@@ -107,6 +107,19 @@ class RemoveIndex(IndexOperation):
     name: str
     def __init__(self, model_name: str, name: str) -> None: ...
 
+class RenameIndex(IndexOperation):
+    model_name: str
+    new_name: str
+    old_name: str | None
+    old_fields: Sequence[str] | None
+    def __init__(
+        self,
+        model_name: str,
+        new_name: str,
+        old_name: str | None = ...,
+        old_fields: Sequence[str] | None = ...,
+    ) -> None: ...
+
 class AddConstraint(IndexOperation):
     def __init__(self, model_name: str, constraint: BaseConstraint) -> None: ...
 
