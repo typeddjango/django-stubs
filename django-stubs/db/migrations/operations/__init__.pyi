@@ -14,6 +14,7 @@ from .models import CreateModel as CreateModel
 from .models import DeleteModel as DeleteModel
 from .models import RemoveConstraint as RemoveConstraint
 from .models import RemoveIndex as RemoveIndex
+from .models import RenameIndex as RenameIndex
 from .models import RenameModel as RenameModel
 from .special import RunPython as RunPython
 from .special import RunSQL as RunSQL
