@@ -943,3 +943,29 @@
                     non_installed = models.ForeignKey(  # E: Cannot find model 'not_installed.NonInstalledModel' referenced in field 'non_installed'
                         "not_installed.NonInstalledModel", on_delete=models.CASCADE
                     )
+-   case: test_foreign_key_to_as_string
+    main: |
+        from myapp.models import Book, Publisher
+        publisher = Publisher.objects.create(name="Example Publisher")
+        book = Book.objects.create(name="Book", publisher=publisher)
+        Book.objects.filter(publisher=publisher)
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from django.db import models
+                from django.db.models.query import QuerySet
+
+                class Publisher(models.Model):
+                    name = models.CharField()
+
+                class PrintedGood(models.Model):
+                    publisher = models.ForeignKey(to="myapp.Publisher", on_delete=models.CASCADE)
+
+                    class Meta:
+                        abstract = True
+
+                class Book(PrintedGood):
+                    name = models.CharField()
