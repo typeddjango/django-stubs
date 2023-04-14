@@ -4,7 +4,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
 
-from django.core.exceptions import FieldError, FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
