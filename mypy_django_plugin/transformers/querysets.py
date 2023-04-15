@@ -139,7 +139,10 @@ def get_values_list_row_type(
     elif named:
         row_type = helpers.make_oneoff_named_tuple(typechecker_api, "Row", column_types)
     else:
-        row_type = helpers.make_tuple(typechecker_api, list(column_types.values()))
+        # Since there may have been repeated field lookups, we cannot just use column_types.values here.
+        # This is not the case in named above, because Django will error if duplicate fields are requested.
+        resolved_column_types = [column_types[field_lookup] for field_lookup in field_lookups]
+        row_type = helpers.make_tuple(typechecker_api, resolved_column_types)
 
     return row_type
 

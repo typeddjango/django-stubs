@@ -26,6 +26,27 @@
                     name = models.CharField(max_length=100)
                     age = models.IntegerField()
 
+-   case: values_list_field_repetition
+    main: |
+        from myapp.models import MyUser
+
+        # Values tuples can have the same field repeated
+        values_tuple = MyUser.objects.values_list('name', 'age', 'name').get()
+        reveal_type(values_tuple)  # N: Revealed type is "Tuple[builtins.str, builtins.int, builtins.str]"
+        reveal_type(values_tuple[0])  # N: Revealed type is "builtins.str"
+        reveal_type(values_tuple[1])  # N: Revealed type is "builtins.int"
+        reveal_type(values_tuple[2])  # N: Revealed type is "builtins.str"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    name = models.CharField(max_length=100)
+                    age = models.IntegerField()
+
 -   case: values_list_supports_queryset_methods
     main: |
         from myapp.models import MyUser
