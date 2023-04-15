@@ -177,6 +177,8 @@ SECRET_KEY_FALLBACKS: list[str | bytes]
 # Default file storage mechanism that holds media.
 DEFAULT_FILE_STORAGE: str
 
+STORAGES: dict[str, dict[str, Any]]
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
 MEDIA_ROOT: str
