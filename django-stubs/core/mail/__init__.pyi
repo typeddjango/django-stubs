@@ -16,7 +16,7 @@ from .utils import CachedDnsName as CachedDnsName
 def get_connection(backend: str | None = ..., fail_silently: bool = ..., **kwds: Any) -> Any: ...
 def send_mail(
     subject: _StrOrPromise,
-    message: str,
+    message: _StrOrPromise,
     from_email: str | None,
     recipient_list: Sequence[str],
     fail_silently: bool = ...,
@@ -33,15 +33,15 @@ def send_mass_mail(
     connection: Any | None = ...,
 ) -> int: ...
 def mail_admins(
-    subject: str,
-    message: str,
+    subject: _StrOrPromise,
+    message: _StrOrPromise,
     fail_silently: bool = ...,
     connection: Any | None = ...,
     html_message: str | None = ...,
 ) -> None: ...
 def mail_managers(
-    subject: str,
-    message: str,
+    subject: _StrOrPromise,
+    message: _StrOrPromise,
     fail_silently: bool = ...,
     connection: Any | None = ...,
     html_message: str | None = ...,

@@ -5,6 +5,7 @@ from typing import Any
 
 from django.core.management.color import Style
 from django.http import HttpRequest, HttpResponse
+from django.utils.functional import _StrOrPromise
 
 request_logger: Logger
 DEFAULT_LOGGING: Any
@@ -20,7 +21,7 @@ class AdminEmailHandler(logging.Handler):
         email_backend: str | None = ...,
         reporter_class: str | None = ...,
     ) -> None: ...
-    def send_mail(self, subject: str, message: str, *args: Any, **kwargs: Any) -> None: ...
+    def send_mail(self, subject: _StrOrPromise, message: _StrOrPromise, *args: Any, **kwargs: Any) -> None: ...
     def connection(self) -> Any: ...
     def format_subject(self, subject: str) -> str: ...
 
