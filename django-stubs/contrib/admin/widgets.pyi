@@ -38,7 +38,7 @@ class AdminFileWidget(forms.ClearableFileInput): ...
 def url_params_from_lookup_dict(lookups: Any) -> dict[str, str]: ...
 
 class ForeignKeyRawIdWidget(forms.TextInput):
-    rel: ManyToOneRel
+    rel: ManyToOneRel | ManyToManyRel
     admin_site: AdminSite
     db: str | None
     def __init__(
