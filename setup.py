@@ -22,7 +22,7 @@ with open("README.md") as f:
 dependencies = [
     "mypy>=0.980",
     "django",
-    "django-stubs-ext>=0.8.0",
+    "django-stubs-ext>=4.2.0",
     "tomli; python_version < '3.11'",
     # Types:
     "typing-extensions",
@@ -36,7 +36,7 @@ extras_require = {
 
 setup(
     name="django-stubs",
-    version="1.16.0",
+    version="4.2.0",
     description="Mypy stubs for Django",
     long_description=readme,
     long_description_content_type="text/markdown",
