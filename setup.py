@@ -47,7 +47,7 @@ setup(
     maintainer="Marti Raudsepp",
     maintainer_email="marti@juffo.org",
     py_modules=[],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=dependencies,
     extras_require=extras_require,
     packages=["django-stubs", *find_packages(exclude=["scripts"])],
@@ -58,7 +58,6 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
