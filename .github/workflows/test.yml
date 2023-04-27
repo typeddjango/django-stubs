@@ -69,10 +69,12 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
-        django-version: ['3.2', '4.0']
+        django-version: ['3.2', '4.2']
         include:
           - python-version: '3.8'
             django-version: '2.2'
+          - python-version: '3.11'
+            django-version: '4.0'
           - python-version: '3.11'
             django-version: '4.1'
     steps:

@@ -8,23 +8,12 @@ if TYPE_CHECKING:
 
     from django_stubs_ext import StrOrPromise
 
-    class BaseModelMeta:
+    class TypedModelMeta:
         """
-        Typed base class for Django Model `class Meta:` inner class.
+        Typed base class for Django Model `class Meta:` inner class. At runtime this is just an alias to `object`.
 
         Most attributes are the same as `django.db.models.options.Options`. Options has some additional attributes and
         some values are normalized by Django.
-
-        Usage::
-
-            from django.db import models
-            from django_stubs_ext.db.models import BaseModelMeta
-
-            class MyModel(models.Model):
-                example = models.CharField(max_length=100)
-
-                class Meta(BaseModelMeta):
-                    ordering = ["example"]
         """
 
         abstract: ClassVar[bool]  # default: False
@@ -53,4 +42,4 @@ if TYPE_CHECKING:
         verbose_name_plural: ClassVar[StrOrPromise]
 
 else:
-    BaseModelMeta = object
+    TypedModelMeta = object

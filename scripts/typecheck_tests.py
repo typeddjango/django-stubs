@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import itertools
 import shutil
 import subprocess
@@ -12,12 +13,13 @@ from scripts.git_helpers import checkout_django_branch
 from scripts.paths import DJANGO_SOURCE_DIRECTORY, PROJECT_DIRECTORY
 
 DJANGO_COMMIT_REFS = {
-    "2.2": "44e7cca62382f2535ed0f5d2842b433f0bd23a57",
-    "3.2": "0153a63a674937e4a56d9d5e4ca2d629b011fbde",
-    "4.0": "67d0c4644acfd7707be4a31e8976f865509b09ac",
-    "4.1": "7dfd29b84e5a27d61ae62cb5ed9122d5a99ee1be",
+    "2.2": "2a62cdcfec85938f40abb2e9e6a9ff497e02afe8",
+    "3.2": "007e46d815063d598e0d3db78bfb371100e5c61c",
+    "4.0": "ef62a3a68c9d558486145a42c0d71ea9a76add9e",
+    "4.1": "491dccec1aa10e829539e4e4fcd8cca606a57ebc",
+    "4.2": "879e5d587b84e6fc961829611999431778eb9f6a",
 }
-DEFAULT_DJANGO_VERSION = "3.2"
+DEFAULT_DJANGO_VERSION = "4.2"
 
 _DictToSearch = DefaultDict[str, DefaultDict[Union[str, Pattern[str]], int]]
 
