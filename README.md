@@ -69,6 +69,28 @@ We rely on different `django` and `mypy` versions:
 | 1.1.0        | 0.720 | 2.2.x | ^3.6
 | 0.12.x       | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
 
+## Features
+
+### Type checking of Model Meta attributes
+
+By inheriting from the `TypedModelMeta` class, you can ensure you're using correct types for
+attributes:
+
+```python
+from django.db import models
+from django_stubs_ext.db.models import TypedModelMeta
+
+class MyModel(models.Model):
+    example = models.CharField(max_length=100)
+
+    class Meta(TypedModelMeta):
+        ordering = ["example"]
+        constraints = [
+            models.UniqueConstraint(fields=["example"], name="unique_example"),
+        ]
+```
+
+
 ## FAQ
 
 ### Is this an official Django project?
