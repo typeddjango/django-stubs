@@ -52,7 +52,7 @@ We rely on different `django` and `mypy` versions:
 | django-stubs | mypy version | django version                   | python version
 |--------------|--------------|----------------------------------| ---- |
 | 4.2.0        | 1.2.x        | 3.2.x or 4.0.x or 4.1.x or 4.2.x | ^3.7
-| 1.16.0       | 1.1.x        | 3.2.x or 4.0.x or 4.1.x or 4.2.x | ^3.7
+| 1.16.0       | 1.1.x        | 3.2.x or 4.0.x or 4.1.x          | ^3.7
 | 1.15.0       | 1.0.x        | 3.2.x or 4.0.x or 4.1.x          | ^3.7
 | 1.14.0       | 0.990+       | 3.2.x or 4.0.x or 4.1.x          | ^3.7
 
