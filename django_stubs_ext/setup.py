@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from distutils.core import setup
 
 from setuptools import find_packages
@@ -19,6 +20,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     license="MIT",
+    license_files=["LICENSE.txt"],
     url="https://github.com/typeddjango/django-stubs",
     author="Simula Proxy",
     author_email="3nki.nam.shub@gmail.com",

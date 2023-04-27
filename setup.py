@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 from typing import List
 
@@ -41,6 +42,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     license="MIT",
+    license_files=["LICENSE.txt"],
     url="https://github.com/typeddjango/django-stubs",
     author="Maksim Kurnikov",
     author_email="maxim.kurnikov@gmail.com",
