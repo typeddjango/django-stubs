@@ -1,7 +1,7 @@
 black==23.3.0
 requests==2.29.0
 gitpython==3.1.31
-pre-commit==2.21.0
+pre-commit==3.2.2
 pytest==7.3.1
 pytest-mypy-plugins==1.10.1
 psycopg2-binary
