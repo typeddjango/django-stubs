@@ -10,7 +10,7 @@ dependencies = [
     "typing-extensions",
 ]
 
-# NB! Keep version in sync with django-stubs.
+# NB! For clarity, keep version major.minor.patch in sync with django-stubs.
 # It's fine to skip django-stubs-ext releases, but when doing a release, update this to newest django-stubs version.
 setup(
     name="django-stubs-ext",
