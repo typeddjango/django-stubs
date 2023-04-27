@@ -49,25 +49,12 @@ This fully working [typed boilerplate](https://github.com/wemake-services/wemake
 
 We rely on different `django` and `mypy` versions:
 
-| django-stubs | mypy version | django version | python version
-|--------------| ---- | ---- | ---- |
-| 1.16.0       | 1.1.x | 3.2.x or 4.0.x or 4.1.x | ^3.7
-| 1.15.0       | 1.0.x | 3.2.x or 4.0.x or 4.1.x | ^3.7
-| 1.14.0       | 0.990+ | 3.2.x or 4.0.x or 4.1.x | ^3.7
-| 1.13.0       | 0.980+ | 3.2.x or 4.0.x or 4.1.x | ^3.7
-| 1.12.0       | 0.931+ | 3.2.x or 4.0.x | ^3.7
-| 1.11.0       | 0.931+ | 3.2.x | ^3.7
-| 1.10.0       | 0.931+ | 3.2.x | ^3.7
-| 1.9.0        | 0.910 | 3.2.x | ^3.6
-| 1.8.0        | 0.812 | 3.1.x | ^3.6
-| 1.7.0        | 0.790 | 2.2.x \|\| 3.x | ^3.6
-| 1.6.0        | 0.780 | 2.2.x \|\| 3.x | ^3.6
-| 1.5.0        | 0.770 | 2.2.x \|\| 3.x | ^3.6
-| 1.4.0        | 0.760 | 2.2.x \|\| 3.x | ^3.6
-| 1.3.0        | 0.750 | 2.2.x \|\| 3.x | ^3.6
-| 1.2.0        | 0.730 | 2.2.x | ^3.6
-| 1.1.0        | 0.720 | 2.2.x | ^3.6
-| 0.12.x       | old semantic analyzer (<0.711), dmypy support | 2.1.x | ^3.6
+| django-stubs | mypy version | django version                   | python version
+|--------------|--------------|----------------------------------| ---- |
+| 4.2.0        | 1.2.x        | 3.2.x or 4.0.x or 4.1.x or 4.2.x | ^3.7
+| 1.16.0       | 1.1.x        | 3.2.x or 4.0.x or 4.1.x or 4.2.x | ^3.7
+| 1.15.0       | 1.0.x        | 3.2.x or 4.0.x or 4.1.x          | ^3.7
+| 1.14.0       | 0.990+       | 3.2.x or 4.0.x or 4.1.x          | ^3.7
 
 ## Features
 
