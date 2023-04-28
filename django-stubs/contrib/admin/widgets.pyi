@@ -38,12 +38,12 @@ class AdminFileWidget(forms.ClearableFileInput): ...
 def url_params_from_lookup_dict(lookups: Any) -> dict[str, str]: ...
 
 class ForeignKeyRawIdWidget(forms.TextInput):
-    rel: ManyToOneRel | ManyToManyRel
+    rel: ManyToOneRel
     admin_site: AdminSite
     db: str | None
     def __init__(
         self,
-        rel: ManyToOneRel | ManyToManyRel,
+        rel: ManyToOneRel,
         admin_site: AdminSite,
         attrs: _OptAttrs | None = ...,
         using: str | None = ...,
@@ -54,7 +54,14 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def label_and_url_for_value(self, value: Any) -> tuple[str, str]: ...
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
-    rel: ManyToManyRel
+    rel: ManyToManyRel  # type: ignore
+    def __init__(
+        self,
+        rel: ManyToManyRel,
+        admin_site: AdminSite,
+        attrs: _OptAttrs | None = ...,
+        using: str | None = ...,
+    ) -> None: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     def url_parameters(self) -> dict[str, str]: ...
     def label_and_url_for_value(self, value: Any) -> tuple[str, str]: ...
