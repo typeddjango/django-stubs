@@ -87,3 +87,39 @@
               b = models.ForeignKey(Model2, related_name="test2", on_delete=models.CASCADE)
 
               objects = Model4Manager()
+
+-   case: test_related_name_foreign_object_multi_column
+    main: |
+      from app1.models import Model1, Model2
+
+      reveal_type(Model2.model_1) # N: Revealed type is "django.db.models.fields.related.ForeignObject[app1.models.Model1, app1.models.Model1]"
+      reveal_type(Model2().model_1) # N: Revealed type is "app1.models.Model1"
+      reveal_type(Model1.model_2s) # N: Revealed type is "django.db.models.manager.RelatedManager[app1.models.Model2]"
+      reveal_type(Model1().model_2s) # N: Revealed type is "django.db.models.manager.RelatedManager[app1.models.Model2]"
+
+    installed_apps:
+      - app1
+    files:
+      - path: app1/__init__.py
+      - path: app1/models.py
+        content: |
+          from django.db import models
+          from django.db.models.fields.related import ForeignObject
+
+          class Model1(models.Model):
+              type = models.TextField()
+              ref = models.TextField()
+
+          class Model2(models.Model):
+              name = models.TextField()
+
+              model_1_type = models.TextField()
+              model_2_ref = models.TextField()
+
+              model_1 = ForeignObject(
+                  Model1,
+                  to_fields=["type", "ref"],
+                  from_fields=["model_1_type", "model_2_ref"],
+                  on_delete=models.CASCADE,
+                  related_name="model_2s",
+              )

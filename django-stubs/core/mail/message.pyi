@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 # remove Optional once python 3.7 is dropped (Tuple[str | None, ...] works with mypy on py3.10)
 from typing import Any, Optional, Tuple, overload  # noqa: Y022, Y037
 
+from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 utf8_charset: Any
@@ -82,15 +83,15 @@ class EmailMessage:
     bcc: list[Any]
     reply_to: list[Any]
     from_email: str
-    subject: str
-    body: str
+    subject: _StrOrPromise
+    body: _StrOrPromise
     attachments: list[Any]
     extra_headers: dict[Any, Any]
     connection: Any
     def __init__(
         self,
-        subject: str = ...,
-        body: str | None = ...,
+        subject: _StrOrPromise = ...,
+        body: _StrOrPromise | None = ...,
         from_email: str | None = ...,
         to: Sequence[str] | None = ...,
         bcc: Sequence[str] | None = ...,
@@ -118,8 +119,8 @@ class EmailMultiAlternatives(EmailMessage):
     alternatives: list[tuple[_AttachmentContent, str]]
     def __init__(
         self,
-        subject: str = ...,
-        body: str | None = ...,
+        subject: _StrOrPromise = ...,
+        body: _StrOrPromise | None = ...,
         from_email: str | None = ...,
         to: Sequence[str] | None = ...,
         bcc: Sequence[str] | None = ...,

@@ -10,7 +10,7 @@ def add_domain(domain: str, url: str, secure: bool = ...) -> str: ...
 
 class FeedDoesNotExist(ObjectDoesNotExist): ...
 
-_Item = TypeVar("_Item", bound=Model)
+_Item = TypeVar("_Item")
 _Object = TypeVar("_Object")
 
 class Feed(Generic[_Item, _Object]):

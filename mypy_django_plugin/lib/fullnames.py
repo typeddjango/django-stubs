@@ -6,6 +6,7 @@ CHAR_FIELD_FULLNAME = "django.db.models.fields.CharField"
 ARRAY_FIELD_FULLNAME = "django.contrib.postgres.fields.array.ArrayField"
 AUTO_FIELD_FULLNAME = "django.db.models.fields.AutoField"
 GENERIC_FOREIGN_KEY_FULLNAME = "django.contrib.contenttypes.fields.GenericForeignKey"
+FOREIGN_OBJECT_FULLNAME = "django.db.models.fields.related.ForeignObject"
 FOREIGN_KEY_FULLNAME = "django.db.models.fields.related.ForeignKey"
 ONETOONE_FIELD_FULLNAME = "django.db.models.fields.related.OneToOneField"
 MANYTOMANY_FIELD_FULLNAME = "django.db.models.fields.related.ManyToManyField"
@@ -30,7 +31,14 @@ MANAGER_CLASSES = {
     BASE_MANAGER_CLASS_FULLNAME,
 }
 
-RELATED_FIELDS_CLASSES = {FOREIGN_KEY_FULLNAME, ONETOONE_FIELD_FULLNAME, MANYTOMANY_FIELD_FULLNAME}
+RELATED_FIELDS_CLASSES = frozenset(
+    (
+        FOREIGN_OBJECT_FULLNAME,
+        FOREIGN_KEY_FULLNAME,
+        ONETOONE_FIELD_FULLNAME,
+        MANYTOMANY_FIELD_FULLNAME,
+    )
+)
 
 MIGRATION_CLASS_FULLNAME = "django.db.migrations.migration.Migration"
 OPTIONS_CLASS_FULLNAME = "django.db.models.options.Options"

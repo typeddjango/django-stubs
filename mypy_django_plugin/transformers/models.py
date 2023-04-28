@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Type, Union, cast
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.related import ForeignKey
-from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
+from django.db.models.fields.reverse_related import ForeignObjectRel, OneToOneRel
 from mypy.checker import TypeChecker
 from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, NameExpr, TypeInfo, Var
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
@@ -464,7 +464,7 @@ class AddRelatedManagers(ModelClassInitializer):
                 self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
                 continue
 
-            if isinstance(relation, (ManyToOneRel, ManyToManyRel)):
+            if isinstance(relation, ForeignObjectRel):
                 related_manager_info = None
                 try:
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
