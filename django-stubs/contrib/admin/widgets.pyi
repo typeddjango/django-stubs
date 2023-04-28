@@ -57,7 +57,6 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     rel: ManyToManyRel  # type: ignore
     def __init__(
         self,
-        rel: ManyToManyRel,
         admin_site: AdminSite,
         attrs: _OptAttrs | None = ...,
         using: str | None = ...,
