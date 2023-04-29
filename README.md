@@ -49,12 +49,13 @@ This fully working [typed boilerplate](https://github.com/wemake-services/wemake
 
 We rely on different `django` and `mypy` versions:
 
-| django-stubs | Mypy version | Django version | Django partial support | Python version |
-|--------------|--------------|----------------|------------------------|----------------|
-| 4.2.0        | 1.2.x        | 4.2            | 4.1, 4.0, 3.2          | 3.7 - 3.11     |
-| 1.16.0       | 1.1.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
-| 1.15.0       | 1.0.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
-| 1.14.0       | 0.990+       | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
+| django-stubs   | Mypy version | Django version | Django partial support | Python version |
+|----------------|--------------|----------------|------------------------|----------------|
+| (next release) | 1.2.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.11     |
+| 4.2.0          | 1.2.x        | 4.2            | 4.1, 4.0, 3.2          | 3.7 - 3.11     |
+| 1.16.0         | 1.1.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
+| 1.15.0         | 1.0.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
+| 1.14.0         | 0.990+       | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
 
 ## Features
 
