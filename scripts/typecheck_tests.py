@@ -15,7 +15,6 @@ from scripts.paths import DJANGO_SOURCE_DIRECTORY, PROJECT_DIRECTORY
 DJANGO_COMMIT_REFS = {
     "2.2": "2a62cdcfec85938f40abb2e9e6a9ff497e02afe8",
     "3.2": "007e46d815063d598e0d3db78bfb371100e5c61c",
-    "4.0": "ef62a3a68c9d558486145a42c0d71ea9a76add9e",
     "4.1": "491dccec1aa10e829539e4e4fcd8cca606a57ebc",
     "4.2": "879e5d587b84e6fc961829611999431778eb9f6a",
 }
