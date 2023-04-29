@@ -1,6 +1,4 @@
-from typing import Any
-
-from typing_extensions import Protocol
+from typing import Any, Protocol
 
 
 # Used internally by mypy_django_plugin.

@@ -1,13 +1,12 @@
 import builtins
 from contextlib import suppress
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Protocol
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.monkeypatch import MonkeyPatch
 from django.db.models import Model
 from django.forms.models import ModelForm
-from typing_extensions import Protocol
 
 import django_stubs_ext
 from django_stubs_ext import patch

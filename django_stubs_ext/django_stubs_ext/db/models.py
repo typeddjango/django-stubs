@@ -1,10 +1,9 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import ClassVar, List, Sequence, Tuple, Union
+    from typing import ClassVar, List, Literal, Sequence, Tuple, Union
 
     from django.db.models import BaseConstraint, Index
-    from typing_extensions import Literal
 
     from django_stubs_ext import StrOrPromise
 
