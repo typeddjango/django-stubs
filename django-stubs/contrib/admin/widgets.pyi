@@ -42,7 +42,11 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     admin_site: AdminSite
     db: str | None
     def __init__(
-        self, rel: ManyToOneRel, admin_site: AdminSite, attrs: _OptAttrs | None = ..., using: str | None = ...
+        self,
+        rel: ManyToOneRel,
+        admin_site: AdminSite,
+        attrs: _OptAttrs | None = ...,
+        using: str | None = ...,
     ) -> None: ...
     def base_url_parameters(self) -> dict[str, str]: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
@@ -51,6 +55,13 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     rel: ManyToManyRel  # type: ignore
+    def __init__(
+        self,
+        rel: ManyToManyRel,
+        admin_site: AdminSite,
+        attrs: _OptAttrs | None = ...,
+        using: str | None = ...,
+    ) -> None: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     def url_parameters(self) -> dict[str, str]: ...
     def label_and_url_for_value(self, value: Any) -> tuple[str, str]: ...
