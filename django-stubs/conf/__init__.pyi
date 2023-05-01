@@ -1,8 +1,8 @@
 from typing import Any
-from typing_extensions import Literal
 
 from _typeshed import Self
 from django.utils.functional import LazyObject
+from typing_extensions import Literal
 
 # explicit dependency on standard settings to make it loaded
 from . import global_settings
