@@ -8,7 +8,7 @@ from typing_extensions import Literal
 from . import global_settings
 
 ENVIRONMENT_VARIABLE: Literal["DJANGO_SETTINGS_MODULE"]
-DEFAULT_STORAGE_ALIASL Literal["default"]
+DEFAULT_STORAGE_ALIAS: Literal["default"]
 STATICFILES_STORAGE_ALIAS: Literal["staticfiles"]
 
 # required for plugin to be able to distinguish this specific instance of LazySettings from others
