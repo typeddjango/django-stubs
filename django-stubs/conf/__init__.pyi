@@ -1,4 +1,5 @@
 from typing import Any
+from typing_extensions import Literal
 
 from _typeshed import Self
 from django.utils.functional import LazyObject
@@ -6,9 +7,9 @@ from django.utils.functional import LazyObject
 # explicit dependency on standard settings to make it loaded
 from . import global_settings
 
-ENVIRONMENT_VARIABLE: str
-PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG: str
-DEFAULT_HASHING_ALGORITHM_DEPRECATED_MSG: str
+ENVIRONMENT_VARIABLE: Literal["DJANGO_SETTINGS_MODULE"]
+DEFAULT_STORAGE_ALIASL Literal["default"]
+STATICFILES_STORAGE_ALIAS: Literal["staticfiles"]
 
 # required for plugin to be able to distinguish this specific instance of LazySettings from others
 class _DjangoConfLazyObject(LazyObject):
