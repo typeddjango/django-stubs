@@ -3,7 +3,7 @@ requests==2.29.0
 gitpython==3.1.31
 pre-commit==3.3.1
 pytest==7.3.1
-pytest-mypy-plugins==1.11.0
+pytest-mypy-plugins==1.11.1
 psycopg2-binary
 Django==4.2.1
 -e ./django_stubs_ext
