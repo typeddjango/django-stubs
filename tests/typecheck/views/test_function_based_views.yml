@@ -1,5 +1,5 @@
-- case: http_response
-  main: |
+-   case: http_response
+    main: |
       from django.http.request import HttpRequest
       from django.http.response import HttpResponse
       from django.utils.translation import gettext_lazy as _
@@ -16,8 +16,8 @@
       def object_response(request: HttpRequest) -> HttpResponse:
           return HttpResponse(_('It works!'))
 
-- case: http_response_content
-  main: |
+-   case: http_response_content
+    main: |
       from django.http.request import HttpRequest
       from django.http.response import HttpResponse
       from django.utils.translation import gettext_lazy as _
@@ -45,8 +45,8 @@
           reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
           return response
 
-- case: streaming_http_response
-  main: |
+-   case: streaming_http_response
+    main: |
       from django.http.request import HttpRequest
       from django.http.response import StreamingHttpResponse
       from django.utils.translation import gettext_lazy as _
@@ -66,8 +66,8 @@
       def mixed_response(request: HttpRequest) -> StreamingHttpResponse:
           return StreamingHttpResponse([_('Yes'), '/', _('No')])
 
-- case: streaming_http_response_streaming_content
-  main: |
+-   case: streaming_http_response_streaming_content
+    main: |
       from django.http.request import HttpRequest
       from django.http.response import StreamingHttpResponse
       from django.utils.translation import gettext_lazy as _
@@ -101,8 +101,8 @@
           reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes]"
           return response
 
-- case: streaming_http_response_async
-  main: |
+-   case: streaming_http_response_async
+    main: |
       import typing
       from django.http.request import HttpRequest
       from django.http.response import StreamingHttpResponse
@@ -130,8 +130,8 @@
               yield _('No')
           return StreamingHttpResponse(mixed_iterator())
 
-- case: streaming_http_response_async_streaming_content
-  main: |
+-   case: streaming_http_response_async_streaming_content
+    main: |
       import typing
       from django.http.request import HttpRequest
       from django.http.response import StreamingHttpResponse
