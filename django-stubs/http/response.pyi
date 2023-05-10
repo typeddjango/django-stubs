@@ -1,8 +1,8 @@
 import datetime
-from collections.abc import Iterable, Iterator
+from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator
 from io import BytesIO
 from json import JSONEncoder
-from typing import Any, TypeVar, overload, type_check_only
+from typing import Any, Generic, TypeVar, overload, type_check_only
 
 from django.http.cookie import SimpleCookie
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
@@ -104,10 +104,13 @@ class HttpResponse(HttpResponseBase, Iterable[bytes]):
     def __iter__(self) -> Iterator[bytes]: ...
     def getvalue(self) -> bytes: ...
 
-class StreamingHttpResponse(HttpResponseBase, Iterable[bytes]):
-    streaming_content = _PropertyDescriptor[Iterable[object], Iterator[bytes]]()
-    def __init__(self, streaming_content: Iterable[object] = ..., *args: Any, **kwargs: Any) -> None: ...
+_I = TypeVar("_I", Iterable[object], AsyncIterable[object])
+
+class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[bytes], Generic[_I]):
+    streaming_content = _PropertyDescriptor[_I, Iterator[bytes] | AsyncIterator[bytes]]()
+    def __init__(self, streaming_content: _I = ..., *args: Any, **kwargs: Any) -> None: ...
     def __iter__(self) -> Iterator[bytes]: ...
+    def __aiter__(self) -> AsyncIterator[bytes]: ...
     def getvalue(self) -> bytes: ...
 
 class FileResponse(StreamingHttpResponse):
