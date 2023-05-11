@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToManyField, OneToOneField, RelatedField
+from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField, RelatedField
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from django.db.models.manager import RelatedManager
 from django.db.models.query import QuerySet
