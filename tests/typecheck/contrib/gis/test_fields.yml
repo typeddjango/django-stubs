@@ -1,0 +1,35 @@
+-   case: fields_getter_and_setter
+    main: |
+        from django.contrib.gis.geos import Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection
+        from myapp.models import MyModel
+        model = MyModel()
+        reveal_type(model.point)  # N: Revealed type is "django.contrib.gis.geos.point.Point"
+        model.point = Point()
+        reveal_type(model.line_string)  # N: Revealed type is "django.contrib.gis.geos.linestring.LineString"
+        model.line_string = LineString()
+        reveal_type(model.polygon)  # N: Revealed type is "django.contrib.gis.geos.polygon.Polygon"
+        model.polygon = Polygon()
+        reveal_type(model.multi_point)  # N: Revealed type is "django.contrib.gis.geos.collections.MultiPoint"
+        model.multi_point = MultiPoint()
+        reveal_type(model.multi_line_string)  # N: Revealed type is "django.contrib.gis.geos.collections.MultiLineString"
+        model.multi_line_string = MultiLineString()
+        reveal_type(model.multi_polygon)  # N: Revealed type is "django.contrib.gis.geos.collections.MultiPolygon"
+        model.multi_polygon = MultiPolygon()
+        reveal_type(model.geometry_collection)  # N: Revealed type is "django.contrib.gis.geos.collections.GeometryCollection"
+        model.geometry_collection = GeometryCollection()
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db.models import Model
+                from django.contrib.gis.db.models.fields import PointField, LineStringField, PolygonField, MultiPointField, MultiLineStringField, MultiPolygonField, GeometryCollectionField
+                class MyModel(Model):
+                    point = PointField()
+                    line_string = LineStringField()
+                    polygon = PolygonField()
+                    multi_point = MultiPointField()
+                    multi_line_string = MultiLineStringField()
+                    multi_polygon = MultiPolygonField()
+                    geometry_collection = GeometryCollectionField()
