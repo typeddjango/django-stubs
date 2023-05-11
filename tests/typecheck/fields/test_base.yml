@@ -201,3 +201,50 @@
         from django.db import models
         class RenamedField(models.Model):
             modelname = models.IntegerField(name="fieldname", choices=((1, 'One'),))
+
+- case: test_accepts_db_comment
+  main: |
+    # Ref: https://github.com/typeddjango/django-stubs/issues/1490
+    # Django introduced field attribute 'db_comment' in version 4.2
+    # Here we are only testing one field because the call-arg issue should appear
+    # immediately.
+    from myapp.models import FieldsWithDBComments
+    instance = FieldsWithDBComments()
+    reveal_type(instance.int_f)  # N: Revealed type is "Union[builtins.int, None]"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class RelatedModel(models.Model):
+            pass
+        class MTMRelatedModel(models.Model):
+            pass
+        class FieldsWithDBComments(models.Model):
+            big_int_f = models.BigIntegerField(null=True, blank=True, db_comment="For big numbers")
+            bin_f = models.BinaryField(null=True, blank=True, db_comment="For your bytes")
+            bool_f = models.BooleanField(default=False, db_comment="True or False?")
+            char_f = models.CharField(max_length=10, null=True, blank=True, db_comment="A char field")
+            date_f = models.DateField(null=True, blank=True, db_comment="An important date")
+            datetime_f = models.DateTimeField(null=True, blank=True, db_comment="An important timestamp.")
+            dec_f = models.DecimalField(null=True, blank=True, max_digits=3, decimal_places=2, db_comment="A decimal field.")
+            dur_f = models.DurationField(null=True, blank=True, db_comment="How long something took.")
+            email_f = models.EmailField(null=True, blank=True, db_comment="Contact email")
+            file_f = models.FileField(upload_to="myapp/media", null=True, blank=True, db_comment="An uploaded file")
+            file_path_f = models.FilePathField(null=True, blank=True, db_comment="A file path")
+            float_f = models.FloatField(null=True, blank=True, db_comment="An important float")
+            image_f = models.ImageField(null=True, blank=True, upload_to="myapp/media", db_comment="An image")
+            int_f = models.IntegerField(null=True, blank=True, db_comment="Put a number here")
+            json_f = models.JSONField(null=True, blank=True, db_comment="Important JSON data")
+            pbint_f = models.PositiveBigIntegerField(null=True, blank=True, db_comment="Positive numbers but bigger")
+            psint_f = models.PositiveSmallIntegerField(null=True, blank=True, db_comment="Positive small number")
+            slug_f = models.SlugField(null=True, blank=True, db_comment="A slug for the record.")
+            small_int_f = models.SmallIntegerField(null=True, blank=True, db_comment="A small number")
+            text_f = models.TextField(blank=True, null=True, db_comment="A place for text")
+            time_f = models.TimeField(blank=True, null=True, db_comment="It is that time")
+            url_f = models.URLField(blank=True, null=True, db_comment="An important URL")
+            uuid_f = models.UUIDField(null=True, blank=True, db_comment="Some UUID")
+            fkey_f = models.ForeignKey(to=RelatedModel, null=True, blank=True, on_delete=models.CASCADE, db_comment="Key to RelatedModel")
+            m2m_f = models.ManyToManyField(to=MTMRelatedModel, blank=True, db_comment="Many to Many connection")
