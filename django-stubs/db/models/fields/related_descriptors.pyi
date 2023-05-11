@@ -5,20 +5,21 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
-from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField, RelatedField
+from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToManyField, OneToOneField, RelatedField
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
 from django.db.models.manager import RelatedManager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 
 _T = TypeVar("_T")
+_F = TypeVar("_F", bound=Field)
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
     field: RelatedField
 
-class ForwardManyToOneDescriptor:
-    field: ForeignKey
-    def __init__(self, field_with_rel: ForeignKey) -> None: ...
+class ForwardManyToOneDescriptor(Generic[_F]):
+    field: _F
+    def __init__(self, field_with_rel: _F) -> None: ...
     @property
     def RelatedObjectDoesNotExist(self) -> type[ObjectDoesNotExist]: ...
     def is_cached(self, instance: Model) -> bool: ...
@@ -33,8 +34,7 @@ class ForwardManyToOneDescriptor:
     def __set__(self, instance: Model, value: Model | None) -> None: ...
     def __reduce__(self) -> tuple[Callable, tuple[type[Model], str]]: ...
 
-class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
-    field: OneToOneField
+class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor[_F]):
     def get_object(self, instance: Model) -> Model: ...
 
 class ReverseOneToOneDescriptor:
@@ -62,8 +62,8 @@ class ReverseManyToOneDescriptor:
 
 def create_reverse_many_to_one_manager(superclass: type, rel: Any) -> type[RelatedManager]: ...
 
-class ManyToManyDescriptor(ReverseManyToOneDescriptor):
-    field: ManyToManyField  # type: ignore[assignment]
+class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_F]):
+    field: _F  # type: ignore[assignment]
     rel: ManyToManyRel  # type: ignore[assignment]
     reverse: bool
     def __init__(self, rel: ManyToManyRel, reverse: bool = ...) -> None: ...

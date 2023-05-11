@@ -21,7 +21,7 @@ with open("README.md") as f:
     readme = f.read()
 
 dependencies = [
-    "mypy>=0.980",
+    "mypy>=1.0.0",
     "django",
     "django-stubs-ext>=4.2.0",
     "tomli; python_version < '3.11'",

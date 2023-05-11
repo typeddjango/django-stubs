@@ -6,7 +6,6 @@ from datetime import datetime as real_datetime
 from datetime import time, timedelta
 from typing import Any, Generic, Protocol, TypeVar, overload
 
-from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -19,7 +18,7 @@ from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 class Empty: ...
 class NOT_PROVIDED: ...
@@ -33,17 +32,19 @@ _FieldChoices: TypeAlias = Iterable[_Choice | _ChoiceNamedGroup]
 _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 
+_F = TypeVar("_F", bound=Field, covariant=True)
+
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
-class _FieldDescriptor(Protocol):
+class _FieldDescriptor(Protocol[_F]):
     """
     Accessing fields of a model class (not instance) returns an object conforming to this protocol.
     Depending on field type this could be DeferredAttribute, ForwardManyToOneDescriptor, FileDescriptor, etc.
     """
 
     @property
-    def field(self) -> Field: ...
+    def field(self) -> _F: ...
 
 _AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
 _ErrorMessagesT: TypeAlias = dict[str, Any]
@@ -181,7 +182,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
-    def __get__(self: Self, instance: None, owner: Any) -> _FieldDescriptor: ...
+    def __get__(self: Self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
     # Model instance access
     @overload
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
