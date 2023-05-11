@@ -36,6 +36,15 @@ _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
+class _FieldDescriptor(Protocol):
+    """
+    Accessing fields of a model class (not instance) returns an object conforming to this protocol.
+    Depending on field type this could be DeferredAttribute, ForwardManyToOneDescriptor, FileDescriptor, etc.
+    """
+
+    @property
+    def field(self) -> Field: ...
+
 _AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
 _ErrorMessagesT: TypeAlias = dict[str, Any]
 
@@ -172,7 +181,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
-    def __get__(self: Self, instance: None, owner: Any) -> Self: ...
+    def __get__(self: Self, instance: None, owner: Any) -> _FieldDescriptor: ...
     # Model instance access
     @overload
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
