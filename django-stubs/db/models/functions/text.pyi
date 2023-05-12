@@ -3,6 +3,7 @@ from typing import Any
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
+from django.db.models.expressions import Expression
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 class MySQLSHA2Mixin:
