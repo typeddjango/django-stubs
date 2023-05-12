@@ -127,7 +127,7 @@ class DjangoContext:
         self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel]
     ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
-            related_model_cls = field.related_model
+            related_model_cls = self.get_field_related_model_cls(field)
             primary_key_field = self.get_primary_key_field(related_model_cls)
             primary_key_type = self.get_field_get_type(api, primary_key_field, method="init")
 
@@ -363,13 +363,13 @@ class DjangoContext:
 
             field = currently_observed_model._meta.get_field(field_part)
             if isinstance(field, RelatedField):
-                currently_observed_model = field.related_model
+                currently_observed_model = self.get_field_related_model_cls(field)
                 model_name = currently_observed_model._meta.model_name
                 if model_name is not None and field_part == (model_name + "_id"):
                     field = self.get_primary_key_field(currently_observed_model)
 
             if isinstance(field, ForeignObjectRel):
-                currently_observed_model = field.related_model
+                currently_observed_model = self.get_field_related_model_cls(field)
 
         # Guaranteed by `query.solve_lookup_type` before.
         assert isinstance(field, (Field, ForeignObjectRel))
