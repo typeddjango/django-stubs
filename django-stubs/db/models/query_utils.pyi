@@ -44,7 +44,6 @@ class Q(tree.Node):
     def deconstruct(self) -> tuple[str, tuple, dict[str, str]]: ...
 
 class DeferredAttribute:
-    field_name: str
     field: Field
     def __init__(self, field: Field) -> None: ...
 

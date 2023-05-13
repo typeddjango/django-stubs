@@ -223,6 +223,7 @@
         from myapp2.models import Profile
         reveal_type(Profile().user)  # N: Revealed type is "myapp.models.user.User"
         reveal_type(Profile().user.profile)  # N: Revealed type is "myapp2.models.Profile"
+        reveal_type(Profile.user.field)  # N: Revealed type is "django.db.models.fields.related.OneToOneField[Union[myapp.models.user.User, django.db.models.expressions.Combinable], myapp.models.user.User]"
     installed_apps:
         - myapp
         - myapp2
@@ -279,6 +280,9 @@
         from myapp.models import App, Member
         reveal_type(Member().apps)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.App]"
         reveal_type(App().members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
+        reveal_type(Member.apps.field)  # N: Revealed type is "django.db.models.fields.related.ManyToManyField[typing.Sequence[myapp.models.App], django.db.models.manager.RelatedManager[myapp.models.App]]"
+        # XXX the following is not correct:
+        reveal_type(App.members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
     installed_apps:
         - myapp
     files:
@@ -576,9 +580,11 @@
 -   case: test_related_fields_returned_as_descriptors_from_model_class
     main: |
         from myapp.models import Author, Blog, Publisher, Profile
-        reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor"
-        reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor"
-        reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor"
+        reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.db.models.fields.related.ManyToManyField[typing.Sequence[myapp.models.Blog], django.db.models.manager.RelatedManager[myapp.models.Blog]]]"
+        reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.Publisher, django.db.models.expressions.Combinable], myapp.models.Publisher]]"
+        reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor[django.db.models.fields.related.OneToOneField[Union[myapp.models.Profile, django.db.models.expressions.Combinable], myapp.models.Profile]]"
+        reveal_type(Author.file)  # N: Revealed type is "django.db.models.fields.files.FileDescriptor"
+
     installed_apps:
         - myapp
     files:

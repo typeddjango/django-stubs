@@ -111,7 +111,7 @@
 -   case: if_field_called_on_class_return_field_itself
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser.name)  # N: Revealed type is "django.db.models.fields.CharField[Union[builtins.str, builtins.int, django.db.models.expressions.Combinable], builtins.str]"
+        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[Union[builtins.str, builtins.int, django.db.models.expressions.Combinable], builtins.str]"
     installed_apps:
         - myapp
     files:
@@ -127,7 +127,8 @@
         from django.db import models
         class MyClass:
             myfield: models.IntegerField[int, int]
-        reveal_type(MyClass.myfield)  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.int, builtins.int]"
+        reveal_type(MyClass.myfield)  # N: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.IntegerField[builtins.int, builtins.int]]"
+        reveal_type(MyClass.myfield.field)  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.int, builtins.int]"
         reveal_type(MyClass().myfield)  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.int, builtins.int]"
 
 -   case: fields_inside_mixins_used_in_model_subclasses_resolved_as_primitives
