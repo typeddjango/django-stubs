@@ -1,3 +1,13 @@
+-   case: classonlymethod
+    main: |
+      from django.utils.decorators import classonlymethod
+
+      class Bananaman:
+          @classonlymethod
+          def count_bananas(cls) -> int:
+              return 12
+
+      reveal_type(Bananaman.count_bananas)  # N: Revealed type is "def () -> builtins.int"
 -   case: method_decorator_class
     main: |
       from django.views.generic.base import View
