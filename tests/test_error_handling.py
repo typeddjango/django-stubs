@@ -10,7 +10,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 TEMPLATE = """
 (config)
 ...
-[mypy.plugins.django_stubs]
+[mypy.plugins.django-stubs]
     django_settings_module: str (required)
 ...
 (django-stubs) mypy: error: {}

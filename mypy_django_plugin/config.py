@@ -13,7 +13,7 @@ else:
 INI_USAGE = """
 (config)
 ...
-[mypy.plugins.django_stubs]
+[mypy.plugins.django-stubs]
     django_settings_module: str (required)
 ...
 """
