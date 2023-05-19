@@ -938,6 +938,7 @@
 -   case: test_fails_if_app_label_is_unknown_in_relation_field
     main: |
         from installed.models import InstalledModel
+        InstalledModel.objects.filter(non_installed__isnull=True)
     installed_apps:
       - installed
     files:

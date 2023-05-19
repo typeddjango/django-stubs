@@ -128,6 +128,8 @@ class DjangoContext:
     ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
             related_model_cls = self.get_field_related_model_cls(field)
+            if related_model_cls is None:
+                return AnyType(TypeOfAny.from_error)
             primary_key_field = self.get_primary_key_field(related_model_cls)
             primary_key_type = self.get_field_get_type(api, primary_key_field, method="init")
 
@@ -353,7 +355,7 @@ class DjangoContext:
 
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: Type[Model]
-    ) -> Union["Field[Any, Any]", ForeignObjectRel]:
+    ) -> Union["Field[Any, Any]", ForeignObjectRel, None]:
         currently_observed_model = model_cls
         field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
@@ -363,13 +365,19 @@ class DjangoContext:
 
             field = currently_observed_model._meta.get_field(field_part)
             if isinstance(field, RelatedField):
-                currently_observed_model = self.get_field_related_model_cls(field)
+                related_model = self.get_field_related_model_cls(field)
+                if related_model is None:
+                    return None
+                currently_observed_model = related_model
                 model_name = currently_observed_model._meta.model_name
                 if model_name is not None and field_part == (model_name + "_id"):
                     field = self.get_primary_key_field(currently_observed_model)
 
             if isinstance(field, ForeignObjectRel):
-                currently_observed_model = self.get_field_related_model_cls(field)
+                related_model = self.get_field_related_model_cls(field)
+                if related_model is None:
+                    return None
+                currently_observed_model = related_model
 
         # Guaranteed by `query.solve_lookup_type` before.
         assert isinstance(field, (Field, ForeignObjectRel))
@@ -397,9 +405,18 @@ class DjangoContext:
             field = query.get_meta().get_field(query_parts[0])
         except FieldDoesNotExist:
             return None
+
         if len(query_parts) == 1:
             return [], [query_parts[0]], False
-        sub_query = Query(field.related_model).solve_lookup_type("__")
+
+        related_model = None
+        if isinstance(field, (RelatedField, ForeignObjectRel)):
+            related_model = self.get_field_related_model_cls(field)
+
+        if related_model is None:
+            return None
+
+        sub_query = Query(related_model).solve_lookup_type("__".join(query_parts[1:]))
         entire_query_parts = [query_parts[0], *sub_query[1]]
         return sub_query[0], entire_query_parts, sub_query[2]
 
@@ -428,6 +445,8 @@ class DjangoContext:
             return AnyType(TypeOfAny.explicit)
 
         field = self._resolve_field_from_parts(field_parts, model_cls)
+        if field is None:
+            return AnyType(TypeOfAny.from_error)
 
         lookup_cls = None
         if lookup_parts:
