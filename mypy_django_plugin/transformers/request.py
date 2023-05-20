@@ -1,7 +1,6 @@
 from mypy.plugin import AttributeContext, MethodContext
-from mypy.types import Instance
+from mypy.types import Instance, UninhabitedType, UnionType
 from mypy.types import Type as MypyType
-from mypy.types import UninhabitedType, UnionType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers

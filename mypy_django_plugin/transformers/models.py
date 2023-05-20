@@ -9,9 +9,8 @@ from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, N
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance
+from mypy.types import AnyType, Instance, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, get_proper_type
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext

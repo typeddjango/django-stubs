@@ -1,7 +1,6 @@
 from mypy.plugin import MethodContext
-from mypy.types import AnyType, Instance
+from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers

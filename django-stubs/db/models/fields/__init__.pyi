@@ -1,9 +1,8 @@
 import decimal
 import uuid
 from collections.abc import Callable, Iterable, Sequence
-from datetime import date
+from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from datetime import time, timedelta
 from typing import Any, Generic, Protocol, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error

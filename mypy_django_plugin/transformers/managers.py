@@ -18,9 +18,8 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, Instance, ProperType
+from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.lib import fullnames, helpers

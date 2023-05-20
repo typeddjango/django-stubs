@@ -1,9 +1,8 @@
 from typing import Optional
 
 from mypy.plugin import ClassDefContext, MethodContext
-from mypy.types import CallableType, Instance, NoneTyp
+from mypy.types import CallableType, Instance, NoneTyp, TypeType
 from mypy.types import Type as MypyType
-from mypy.types import TypeType
 
 from mypy_django_plugin.lib import helpers
 

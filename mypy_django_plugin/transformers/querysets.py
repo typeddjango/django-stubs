@@ -7,9 +7,8 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression, NameExpr
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, TupleType
+from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.types import TypedDictType, TypeOfAny, get_proper_type
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
