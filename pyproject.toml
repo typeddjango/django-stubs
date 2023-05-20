@@ -15,5 +15,8 @@ select = [
     "I",    # isort
 ]
 
+[tool.ruff.isort]
+split-on-trailing-comma = false
+
 [build-system]
 requires = ["setuptools<64", "wheel"]
