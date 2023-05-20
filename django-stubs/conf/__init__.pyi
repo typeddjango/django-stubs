@@ -5,7 +5,7 @@ from django.utils.functional import LazyObject
 from typing_extensions import Literal
 
 # explicit dependency on standard settings to make it loaded
-from . import global_settings
+from . import global_settings  # noqa: F401
 
 ENVIRONMENT_VARIABLE: Literal["DJANGO_SETTINGS_MODULE"]
 DEFAULT_STORAGE_ALIAS: Literal["default"]
