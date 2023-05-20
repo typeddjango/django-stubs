@@ -14,6 +14,7 @@ target-version = "py38"
 select = [
     "I",    # isort
     "F401", # Unused imports
+    "UP",   # pyupgrade
 ]
 
 [tool.ruff.isort]

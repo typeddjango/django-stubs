@@ -12,11 +12,6 @@ repos:
       - id: debug-statements
       - id: check-merge-conflict
       - id: end-of-file-fixer
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.4.0
-    hooks:
-      - id: pyupgrade
-        args: ["--py38-plus"]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.0.270
     hooks:
