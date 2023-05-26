@@ -105,6 +105,7 @@ class HttpResponse(HttpResponseBase, Iterable[bytes]):
     def getvalue(self) -> bytes: ...
 
 class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[bytes]):
+    is_async: bool
     streaming_content = _PropertyDescriptor[
         Iterable[object] | AsyncIterable[object], Iterator[bytes] | AsyncIterator[bytes]
     ]()
@@ -114,7 +115,6 @@ class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[byt
     def __iter__(self) -> Iterator[bytes]: ...
     def __aiter__(self) -> AsyncIterator[bytes]: ...
     def getvalue(self) -> bytes: ...
-    is_async: bool
 
 class FileResponse(StreamingHttpResponse):
     file_to_stream: BytesIO | None
