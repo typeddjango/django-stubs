@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import Iterable, Iterator
+from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator
 from io import BytesIO
 from json import JSONEncoder
 from typing import Any, TypeVar, overload, type_check_only
@@ -104,10 +104,16 @@ class HttpResponse(HttpResponseBase, Iterable[bytes]):
     def __iter__(self) -> Iterator[bytes]: ...
     def getvalue(self) -> bytes: ...
 
-class StreamingHttpResponse(HttpResponseBase, Iterable[bytes]):
-    streaming_content = _PropertyDescriptor[Iterable[object], Iterator[bytes]]()
-    def __init__(self, streaming_content: Iterable[object] = ..., *args: Any, **kwargs: Any) -> None: ...
+class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[bytes]):
+    is_async: bool
+    streaming_content = _PropertyDescriptor[
+        Iterable[object] | AsyncIterable[object], Iterator[bytes] | AsyncIterator[bytes]
+    ]()
+    def __init__(
+        self, streaming_content: Iterable[object] | AsyncIterable[object] = ..., *args: Any, **kwargs: Any
+    ) -> None: ...
     def __iter__(self) -> Iterator[bytes]: ...
+    def __aiter__(self) -> AsyncIterator[bytes]: ...
     def getvalue(self) -> bytes: ...
 
 class FileResponse(StreamingHttpResponse):
