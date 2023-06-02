@@ -20,6 +20,7 @@ from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
+from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
@@ -123,7 +124,14 @@ class DjangoContext:
             if isinstance(field, ForeignKey):
                 yield field
 
+    def get_model_related_fields(self, model_cls: Type[Model]) -> Iterator["RelatedField[Any, Any]"]:
+        """Get model forward relations"""
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, RelatedField):
+                yield field
+
     def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
+        """Get model reverse relations"""
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignObjectRel):
                 yield field
@@ -334,9 +342,7 @@ class DjangoContext:
         else:
             return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
-    def get_field_related_model_cls(
-        self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]
-    ) -> Optional[Type[Model]]:
+    def get_field_related_model_cls(self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]) -> Type[Model]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:
@@ -350,11 +356,13 @@ class DjangoContext:
                 # same file model
                 related_model_fullname = field.model.__module__ + "." + related_model_cls
                 related_model_cls = self.get_model_class_by_fullname(related_model_fullname)
+                if related_model_cls is None:
+                    raise UnregisteredModelError
             else:
                 try:
                     related_model_cls = self.apps_registry.get_model(related_model_cls)
-                except LookupError:
-                    return None
+                except LookupError as e:
+                    raise UnregisteredModelError from e
 
         return related_model_cls
 
@@ -441,6 +449,8 @@ class DjangoContext:
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
             ctx.api.fail(exc.args[0], ctx.context)
+            return AnyType(TypeOfAny.from_error)
+        except UnregisteredModelError:
             return AnyType(TypeOfAny.from_error)
 
         if solved_lookup is None:

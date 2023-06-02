@@ -14,6 +14,7 @@ from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
+from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, ANY_ATTR_ALLOWED_CLASS_FULLNAME, MODEL_CLASS_FULLNAME
 from mypy_django_plugin.transformers import fields
@@ -234,8 +235,9 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
 class AddRelatedModelsId(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         for field in self.django_context.get_model_foreign_keys(model_cls):
-            related_model_cls = self.django_context.get_field_related_model_cls(field)
-            if related_model_cls is None:
+            try:
+                related_model_cls = self.django_context.get_field_related_model_cls(field)
+            except UnregisteredModelError:
                 error_context: Context = self.ctx.cls
                 field_sym = self.ctx.cls.info.get(field.name)
                 if field_sym is not None and field_sym.node is not None:

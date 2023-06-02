@@ -1,8 +1,8 @@
+import itertools
 import sys
 from functools import partial
 from typing import Callable, Dict, List, Optional, Tuple, Type
 
-from django.db.models.fields.related import RelatedField
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
@@ -20,6 +20,7 @@ from mypy.types import Type as MypyType
 import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
@@ -147,23 +148,22 @@ class NewSemanalDjangoPlugin(Plugin):
         if not defined_model_classes:
             return []
         deps = set()
+
         for model_class in defined_model_classes:
-            # forward relations
-            for field in self.django_context.get_model_fields(model_class):
-                if isinstance(field, RelatedField):
+            for field in itertools.chain(
+                # forward relations
+                self.django_context.get_model_related_fields(model_class),
+                # reverse relations - `related_objects` is private API (according to docstring)
+                model_class._meta.related_objects,  # type: ignore[attr-defined]
+            ):
+                try:
                     related_model_cls = self.django_context.get_field_related_model_cls(field)
-                    if related_model_cls is None:
-                        continue
-                    related_model_module = related_model_cls.__module__
-                    if related_model_module != file.fullname:
-                        deps.add(self._new_dependency(related_model_module))
-            # reverse relations
-            # `related_objects` is private API (according to docstring)
-            for relation in model_class._meta.related_objects:  # type: ignore[attr-defined]
-                related_model_cls = self.django_context.get_field_related_model_cls(relation)
+                except UnregisteredModelError:
+                    continue
                 related_model_module = related_model_cls.__module__
                 if related_model_module != file.fullname:
                     deps.add(self._new_dependency(related_model_module))
+
         return list(deps) + [
             # for QuerySet.annotate
             self._new_dependency("django_stubs_ext"),
