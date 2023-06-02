@@ -118,6 +118,11 @@ class DjangoContext:
             if isinstance(field, Field):
                 yield field
 
+    def get_model_foreign_keys(self, model_cls: Type[Model]) -> Iterator["ForeignKey[Any, Any]"]:
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, ForeignKey):
+                yield field
+
     def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignObjectRel):
