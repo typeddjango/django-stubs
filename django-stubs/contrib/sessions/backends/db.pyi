@@ -1,4 +1,5 @@
 from typing import Any
+
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sessions.base_session import AbstractBaseSession
 
