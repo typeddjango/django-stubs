@@ -448,8 +448,6 @@ class AddRelatedManagers(ModelClassInitializer):
                 continue
 
             related_model_cls = self.django_context.get_field_related_model_cls(relation)
-            if related_model_cls is None:
-                continue
 
             try:
                 related_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(related_model_cls)
