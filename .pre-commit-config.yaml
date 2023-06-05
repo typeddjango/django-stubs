@@ -18,7 +18,7 @@ repos:
       - id: pyupgrade
         args: ["--py38-plus"]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.269
+    rev: v0.0.270
     hooks:
       - id: ruff
         args: ["--fix", "--fixable=I001", "--exit-non-zero-on-fix"]
