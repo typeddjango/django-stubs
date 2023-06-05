@@ -76,6 +76,9 @@ class MyModel(models.Model):
         ]
 ```
 
+### Other typed base classes
+
+* `django_stubs_ext.db.router.TypedDatabaseRouter` can be used as base when implementing custom database routers.
 
 ## FAQ
 
