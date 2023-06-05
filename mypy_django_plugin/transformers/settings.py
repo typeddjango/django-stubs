@@ -1,8 +1,7 @@
 from mypy.nodes import MemberExpr
 from mypy.plugin import AttributeContext, FunctionContext
-from mypy.types import AnyType, Instance
+from mypy.types import AnyType, Instance, TypeOfAny, TypeType
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny, TypeType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers

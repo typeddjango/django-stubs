@@ -2,9 +2,8 @@ from mypy.checkmember import analyze_member_access
 from mypy.errorcodes import ATTR_DEFINED
 from mypy.nodes import CallExpr, MemberExpr
 from mypy.plugin import AttributeContext
-from mypy.types import AnyType, Instance
+from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
-from mypy.types import TypeOfAny
 
 from mypy_django_plugin.lib import helpers
 

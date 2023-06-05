@@ -2,12 +2,21 @@
 line-length = 120
 include = '\.pyi?$'
 
-[tool.isort]
-profile = 'black'
-line_length = 120
-multi_line_output = 3
-include_trailing_comma = true
-float_to_top = true
+[tool.ruff]
+# Adds to default excludes: https://ruff.rs/docs/settings/#exclude
+extend-exclude = [
+    "django-source",
+    "stubgen",
+    "out",
+]
+line-length = 120
+target-version = "py38"
+select = [
+    "I",    # isort
+]
+
+[tool.ruff.isort]
+split-on-trailing-comma = false
 
 [build-system]
 requires = ["setuptools<64", "wheel"]

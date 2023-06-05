@@ -1,8 +1,7 @@
 import types
 from collections.abc import Iterator
-from datetime import date
+from datetime import date, time
 from datetime import datetime as builtin_datetime
-from datetime import time
 from decimal import Decimal
 from typing import Any, TypeVar, overload
 
