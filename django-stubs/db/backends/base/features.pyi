@@ -9,7 +9,6 @@ class BaseDatabaseFeatures:
     minimum_database_version: tuple[int, ...] | None
     gis_enabled: bool
     allows_group_by_lob: bool
-    allows_group_by_pk: bool
     allows_group_by_selected_pks: bool
     empty_fetchmany_value: Sequence[Any]
     update_can_self_select: bool
