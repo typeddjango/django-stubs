@@ -120,7 +120,7 @@ class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
     geom_param_pos: Any
 
-class IsEmpty(GeoFuncMixin, Transform):
+class IsEmpty(GeoFuncMixin, StandardTransform):
     lookup_name: str
     output_field: Any
 
