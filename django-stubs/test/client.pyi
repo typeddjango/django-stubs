@@ -72,18 +72,79 @@ class _RequestFactory(Generic[_T]):
     errors: BytesIO
     def __init__(self, *, json_encoder: type[JSONEncoder] = ..., **defaults: Any) -> None: ...
     def request(self, **request: Any) -> _T: ...
-    def get(self, path: str, data: _GetDataType = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def post(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def head(self, path: str, data: Any = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def trace(self, path: str, secure: bool = ..., **extra: Any) -> _T: ...
-    def options(
-        self, path: str, data: dict[str, str] | str = ..., content_type: str = ..., secure: bool = ..., **extra: Any
+    def get(
+        self,
+        path: str,
+        data: _GetDataType = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _T: ...
-    def put(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def patch(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
-    def delete(self, path: str, data: Any = ..., content_type: str = ..., secure: bool = ..., **extra: Any) -> _T: ...
+    def post(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
+    ) -> _T: ...
+    def head(
+        self, path: str, data: Any = ..., secure: bool = ..., *, headers: dict[str, Any] | None = ..., **extra: Any
+    ) -> _T: ...
+    def trace(self, path: str, secure: bool = ..., *, headers: dict[str, Any] | None = ..., **extra: Any) -> _T: ...
+    def options(
+        self,
+        path: str,
+        data: dict[str, str] | str = ...,
+        content_type: str = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
+    ) -> _T: ...
+    def put(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
+    ) -> _T: ...
+    def patch(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
+    ) -> _T: ...
+    def delete(
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
+    ) -> _T: ...
     def generic(
-        self, method: str, path: str, data: Any = ..., content_type: str | None = ..., secure: bool = ..., **extra: Any
+        self,
+        method: str,
+        path: str,
+        data: Any = ...,
+        content_type: str | None = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _T: ...
 
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
@@ -91,7 +152,15 @@ class RequestFactory(_RequestFactory[WSGIRequest]): ...
 class _AsyncRequestFactory(_RequestFactory[_T]):
     def request(self, **request: Any) -> _T: ...
     def generic(
-        self, method: str, path: str, data: Any = ..., content_type: str | None = ..., secure: bool = ..., **extra: Any
+        self,
+        method: str,
+        path: str,
+        data: Any = ...,
+        content_type: str | None = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _T: ...
 
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
@@ -130,31 +199,90 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     handler: ClientHandler
     raise_request_exception: bool
     exc_info: tuple[type[BaseException], BaseException, TracebackType] | None
+    extra: Any
+    headers: dict[str, Any]
     def __init__(
-        self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
+        self,
+        enforce_csrf_checks: bool = ...,
+        raise_request_exception: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **defaults: Any
     ) -> None: ...
-    # Silence type warnings, since this class overrides arguments and return types in an unsafe manner.
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
     def get(  # type: ignore
-        self, path: str, data: _GetDataType = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: _GetDataType = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def post(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def head(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def trace(  # type: ignore
-        self, path: str, data: Any = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def put(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def patch(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def delete(  # type: ignore
-        self, path: str, data: Any = ..., content_type: str = ..., follow: bool = ..., secure: bool = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
 
 class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGIResponse]]):
@@ -162,7 +290,13 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     raise_request_exception: bool
     exc_info: Any
     extra: Any
+    headers: dict[str, Any]
     def __init__(
-        self, enforce_csrf_checks: bool = ..., raise_request_exception: bool = ..., **defaults: Any
+        self,
+        enforce_csrf_checks: bool = ...,
+        raise_request_exception: bool = ...,
+        *,
+        headers: dict[str, Any] | None = ...,
+        **defaults: Any
     ) -> None: ...
     async def request(self, **request: Any) -> _MonkeyPatchedASGIResponse: ...
