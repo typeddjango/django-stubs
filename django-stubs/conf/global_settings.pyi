@@ -40,6 +40,7 @@ TIME_ZONE: str
 
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ: bool
+USE_DEPRECATED_PYTZ: bool
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -210,6 +211,10 @@ DATA_UPLOAD_MAX_MEMORY_SIZE: int  # i.e. 2.5 MB
 # SuspiciousOperation (TooManyFieldsSent) is raised.
 DATA_UPLOAD_MAX_NUMBER_FIELDS: int
 
+# Maximum number of files encoded in a multipart upload that will be read
+# before a SuspiciousOperation (TooManyFilesSent) is raised.
+DATA_UPLOAD_MAX_NUMBER_FILES: int
+
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
 # (i.e. "/tmp" on *nix systems).
@@ -300,6 +305,9 @@ THOUSAND_SEPARATOR: str
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE: str
 DEFAULT_INDEX_TABLESPACE: str
+
+# Default primary key field type.
+DEFAULT_AUTO_FIELD: str
 
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS: str
@@ -425,6 +433,10 @@ CSRF_HEADER_NAME: str
 CSRF_TRUSTED_ORIGINS: list[str]
 CSRF_USE_SESSIONS: bool
 
+# Whether to mask CSRF cookie value. It's a transitional setting helpful in
+# migrating multiple instance of the same project to Django 4.1+.
+CSRF_COOKIE_MASKED: bool
+
 ############
 # MESSAGES #
 ############
@@ -444,6 +456,10 @@ LOGGING_CONFIG: str
 
 # Custom logging configuration.
 LOGGING: dict[str, Any]
+
+# Default exception reporter class used in case none has been
+# specifically assigned to the HttpRequest instance.
+DEFAULT_EXCEPTION_REPORTER: str
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
@@ -501,11 +517,12 @@ SILENCED_SYSTEM_CHECKS: list[str]
 #######################
 # SECURITY MIDDLEWARE #
 #######################
-SECURE_BROWSER_XSS_FILTER: bool
 SECURE_CONTENT_TYPE_NOSNIFF: bool
+SECURE_CROSS_ORIGIN_OPENER_POLICY: str
 SECURE_HSTS_INCLUDE_SUBDOMAINS: bool
 SECURE_HSTS_PRELOAD: bool
 SECURE_HSTS_SECONDS: int
 SECURE_REDIRECT_EXEMPT: list[str]
+SECURE_REFERRER_POLICY: str
 SECURE_SSL_HOST: str | None
 SECURE_SSL_REDIRECT: bool
