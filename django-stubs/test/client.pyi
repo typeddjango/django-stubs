@@ -199,7 +199,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     handler: ClientHandler
     raise_request_exception: bool
     exc_info: tuple[type[BaseException], BaseException, TracebackType] | None
-    extra: Any
+    extra: dict[str, Any] | None
     headers: dict[str, Any]
     def __init__(
         self,
@@ -289,7 +289,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     handler: AsyncClientHandler
     raise_request_exception: bool
     exc_info: Any
-    extra: Any
+    extra: dict[str, Any] | None
     headers: dict[str, Any]
     def __init__(
         self,
