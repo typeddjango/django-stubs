@@ -6,9 +6,11 @@ from django.core.checks.messages import CheckMessage
 
 class Tags:
     admin: str
+    async_support: str
     caches: str
     compatibility: str
     database: str
+    files: str
     models: str
     security: str
     signals: str
