@@ -20,6 +20,7 @@ class StaticFilesStorage(FileSystemStorage):
 class HashedFilesMixin:
     default_template: str
     max_post_process_passes: int
+    support_js_module_import_aggregation: bool
     patterns: Any
     hashed_files: Any
     keep_intermediate_files: bool
@@ -38,6 +39,9 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_name: str
     manifest_strict: bool
     keep_intermediate_files: bool
+    manifest_storage: Storage | None
+    hashed_files: dict[str, str]
+    manifest_hash: str
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def read_manifest(self) -> str: ...
     def load_manifest(self) -> dict[str, Any]: ...
