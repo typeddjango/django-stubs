@@ -1,8 +1,6 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
 from typing import Generic, Protocol, TypeVar, overload
 
-from django.db.models.base import Model
-from django.db.models.query import QuerySet
 from typing_extensions import TypeAlias
 
 class UnorderedObjectListWarning(RuntimeWarning): ...

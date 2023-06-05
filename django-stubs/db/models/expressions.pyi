@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from decimal import Decimal
-from typing import Any, TypeVar
+from typing import Any
 
 from _typeshed import Self
 from django.db.backends.base.base import BaseDatabaseWrapper

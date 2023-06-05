@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.http.request import HttpRequest
 
 def gettext(message: str) -> str: ...

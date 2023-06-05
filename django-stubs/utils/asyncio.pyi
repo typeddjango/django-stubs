@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, TypeVar, overload
+from typing import TypeVar, overload
 
 _C = TypeVar("_C", bound=Callable)
 

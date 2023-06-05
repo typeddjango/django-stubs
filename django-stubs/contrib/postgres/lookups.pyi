@@ -1,5 +1,5 @@
-from django.db.models import Lookup, Transform
-from django.db.models.lookups import Exact, PostgresOperatorLookup
+from django.db.models import Transform
+from django.db.models.lookups import PostgresOperatorLookup
 
 from .search import SearchVectorExact
 

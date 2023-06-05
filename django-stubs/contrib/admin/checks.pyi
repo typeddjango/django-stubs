@@ -3,7 +3,7 @@ from typing import Any
 
 from django.apps.config import AppConfig
 from django.contrib.admin.options import BaseModelAdmin
-from django.core.checks.messages import CheckMessage, Error
+from django.core.checks.messages import CheckMessage
 
 def check_admin_app(app_configs: Sequence[AppConfig] | None, **kwargs: Any) -> list[CheckMessage]: ...
 def check_dependencies(**kwargs: Any) -> list[CheckMessage]: ...

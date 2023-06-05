@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.admin.sites import AdminSite
 from django.core.files.base import File
 from django.db.models.fields import _FieldChoices
-from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, ManyToOneRel
+from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel
 from django.forms.models import ModelChoiceIterator
 from django.forms.widgets import _OptAttrs
 from django.utils.functional import _StrOrPromise

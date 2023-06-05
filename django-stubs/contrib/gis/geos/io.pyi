@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.prototypes.io import WKBWriter as WKBWriter  # noqa: F401
 from django.contrib.gis.geos.prototypes.io import WKTWriter as WKTWriter
