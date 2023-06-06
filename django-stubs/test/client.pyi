@@ -148,21 +148,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
 
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
-
-class _AsyncRequestFactory(_RequestFactory[_T]):
-    def request(self, **request: Any) -> _T: ...
-    def generic(
-        self,
-        method: str,
-        path: str,
-        data: Any = ...,
-        content_type: str | None = ...,
-        secure: bool = ...,
-        *,
-        headers: dict[str, Any] | None = ...,
-        **extra: Any
-    ) -> _T: ...
-
+class _AsyncRequestFactory(_RequestFactory[_T]): ...
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 
 # fakes to distinguish WSGIRequest and ASGIRequest
