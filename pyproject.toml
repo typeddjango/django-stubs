@@ -15,10 +15,6 @@ select = [
     "I",    # isort
     "F401", # Unused imports
 ]
-fixable = [
-    "I001",
-    "F401",
-]
 
 [tool.ruff.isort]
 split-on-trailing-comma = false
