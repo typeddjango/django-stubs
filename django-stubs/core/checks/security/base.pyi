@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from django.apps.config import AppConfig
-from django.core.checks.messages import CheckMessage, Error, Warning
+from django.core.checks.messages import Error, Warning
 
 CROSS_ORIGIN_OPENER_POLICY_VALUES: set[str]
 REFERRER_POLICY_VALUES: set[str]

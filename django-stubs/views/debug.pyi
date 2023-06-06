@@ -1,5 +1,4 @@
 from collections.abc import Callable, ItemsView, Iterator
-from importlib.abc import SourceLoader
 from pathlib import Path
 from types import TracebackType
 from typing import Any

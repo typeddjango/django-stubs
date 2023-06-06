@@ -13,7 +13,6 @@ from django.db.models import Model
 from django.db.models.expressions import Col, Combinable
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
-from django.forms import Field as FormField
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise

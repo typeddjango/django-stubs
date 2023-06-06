@@ -10,7 +10,7 @@ from django.core.validators import _ValidatorCallable
 from django.db.models.fields import _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ErrorMessagesT, _FieldChoices
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
-from django.forms.widgets import ChoiceWidget, Widget
+from django.forms.widgets import Widget
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias

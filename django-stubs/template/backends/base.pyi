@@ -2,7 +2,6 @@ from collections.abc import Iterator, Mapping
 from typing import Any, Protocol
 
 from django.http.request import HttpRequest
-from django.template import TemplateDoesNotExist
 from django.template.base import Context
 from django.utils.safestring import SafeString
 

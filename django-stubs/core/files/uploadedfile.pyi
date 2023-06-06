@@ -1,4 +1,4 @@
-from typing import IO, TypeVar
+from typing import IO
 
 from _typeshed import Self
 from django.core.files.base import File

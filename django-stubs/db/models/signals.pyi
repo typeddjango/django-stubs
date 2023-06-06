@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Any
 
 from django.apps.registry import Apps
 from django.db.models.base import Model

@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import TypeVar
 
-from django.contrib.sitemaps import GenericSitemap, Sitemap
+from django.contrib.sitemaps import Sitemap
 from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
 

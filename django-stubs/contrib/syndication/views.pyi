@@ -1,7 +1,6 @@
 from typing import Any, Generic, TypeVar
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Model
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.utils.feedgenerator import Enclosure, SyndicationFeed

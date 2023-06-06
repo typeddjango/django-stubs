@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from enum import Enum
-from typing import Any, TypeVar, overload
+from typing import Any, overload
 
 from _typeshed import Self
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
