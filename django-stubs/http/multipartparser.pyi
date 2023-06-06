@@ -1,9 +1,8 @@
 from collections.abc import Iterator, Mapping
-from typing import IO, Any
+from typing import IO, Any, Literal
 
 from django.http.request import QueryDict
 from django.utils.datastructures import ImmutableList, MultiValueDict
-from typing_extensions import Literal
 
 class MultiPartParserError(Exception): ...
 class InputStreamExhausted(Exception): ...

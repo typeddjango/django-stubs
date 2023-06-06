@@ -3,6 +3,7 @@ from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/1221
     Any,
     ClassVar,
     Generic,
+    Literal,
     TypeVar,
     Union,
     overload,
@@ -23,7 +24,7 @@ from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import Widget
 from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 

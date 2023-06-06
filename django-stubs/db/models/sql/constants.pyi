@@ -1,6 +1,5 @@
 from re import Pattern
-
-from typing_extensions import Final, Literal
+from typing import Final, Literal
 
 GET_ITERATOR_CHUNK_SIZE: Final[int]
 

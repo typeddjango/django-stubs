@@ -1,12 +1,11 @@
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from collections.abc import Callable, Iterable, Sequence
 from io import TextIOBase
-from typing import Any, TextIO
+from typing import Any, Literal, TextIO
 
 from django.apps.config import AppConfig
 from django.core.management.color import Style
 from django.utils.datastructures import _ListOrTuple
-from typing_extensions import Literal
 
 class CommandError(Exception):
     def __init__(self, *args: Any, returncode: int = ..., **kwargs: Any) -> None: ...

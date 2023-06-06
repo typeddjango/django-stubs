@@ -1,9 +1,8 @@
 from collections.abc import Iterable, Iterator, Sequence
-from typing import Any, overload
+from typing import Any, Literal, overload
 
 from django.core.checks.messages import CheckMessage
 from django.core.files.storage import FileSystemStorage, Storage
-from typing_extensions import Literal
 
 searched_locations: Any
 

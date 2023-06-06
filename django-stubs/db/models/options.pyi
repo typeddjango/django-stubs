@@ -1,5 +1,12 @@
 from collections.abc import Iterable, Sequence
-from typing import Any, Generic, TypeVar, Union, overload  # noqa: Y037   # https://github.com/python/mypy/issues/12211
+from typing import (  # noqa: Y037   # https://github.com/python/mypy/issues/12211
+    Any,
+    Generic,
+    Literal,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -14,7 +21,7 @@ from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, _ListOrTuple
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import TypeAlias
 
 PROXY_PARENTS: object
 EMPTY_RELATION_TREE: Any

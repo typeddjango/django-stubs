@@ -3,9 +3,9 @@ from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import TypeAlias
 
 _Admins: TypeAlias = list[tuple[str, str]]
 

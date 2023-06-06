@@ -1,11 +1,11 @@
 from contextlib import ContextDecorator
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from types import TracebackType
-from typing import Any, overload
+from typing import Any, Literal, overload
 
 import pytz
 from pytz import BaseTzInfo
-from typing_extensions import Literal, TypeAlias, TypeGuard
+from typing_extensions import TypeAlias, TypeGuard
 
 _PytzTzInfoT: TypeAlias = pytz.tzinfo.BaseTzInfo | pytz._FixedOffset
 

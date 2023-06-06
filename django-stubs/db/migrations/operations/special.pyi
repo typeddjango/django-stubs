@@ -1,10 +1,9 @@
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional, Protocol  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+from typing import Any, Literal, Protocol
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
 from django.utils.datastructures import _ListOrTuple
-from typing_extensions import Literal
 
 from .base import Operation
 
@@ -17,14 +16,14 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""]
-    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]]
-    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]]
+    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
+    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
     state_operations: Sequence[Operation]
     hints: Mapping[str, Any]
     def __init__(
         self,
-        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]],
-        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | Optional[_ListOrTuple[str]]]] = ...,
+        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]],
+        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]] = ...,
         state_operations: Sequence[Operation] = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,

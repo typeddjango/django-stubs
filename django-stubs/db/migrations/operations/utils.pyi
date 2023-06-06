@@ -1,9 +1,9 @@
 from collections import namedtuple
 from collections.abc import Iterator
+from typing import Literal
 
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models import Field, Model
-from typing_extensions import Literal
 
 def resolve_relation(
     model: str | type[Model], app_label: str | None = ..., model_name: str | None = ...

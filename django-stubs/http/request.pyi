@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Mapping
 from io import BytesIO
 from re import Pattern
-from typing import Any, BinaryIO, NoReturn, TypeVar, overload
+from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload
 
 from _typeshed import Self
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -11,7 +11,7 @@ from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import TypeAlias
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]

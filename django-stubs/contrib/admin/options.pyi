@@ -1,5 +1,12 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Optional, TypeVar, Union  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+    Any,
+    Generic,
+    Literal,
+    Optional,
+    TypeVar,
+    Union,
+)
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -33,7 +40,7 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import Literal, TypeAlias, TypedDict
+from typing_extensions import TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
@@ -81,7 +88,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     raw_id_fields: Sequence[str]
     fields: _FieldGroups | None
     exclude: Sequence[str] | None
-    fieldsets: Optional[_FieldsetSpec]
+    fieldsets: Optional[_FieldsetSpec]  # noqa: UP007
     form: type[forms.ModelForm[_ModelT]]
     filter_vertical: Sequence[str]
     filter_horizontal: Sequence[str]

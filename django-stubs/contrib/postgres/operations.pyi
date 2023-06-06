@@ -1,7 +1,8 @@
+from typing import Literal
+
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations import AddConstraint, AddIndex, RemoveIndex
 from django.db.migrations.operations.base import Operation
-from typing_extensions import Literal
 
 class CreateExtension(Operation):
     reversible: bool

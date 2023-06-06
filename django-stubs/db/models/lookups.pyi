@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Mapping
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Literal, TypeVar
 
 from _typeshed import Self
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -7,7 +7,6 @@ from django.db.models.expressions import Expression, Func
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
 from django.utils.datastructures import OrderedSet
-from typing_extensions import Literal
 
 _T = TypeVar("_T")
 
