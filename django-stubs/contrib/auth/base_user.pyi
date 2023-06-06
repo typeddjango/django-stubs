@@ -1,10 +1,9 @@
-from typing import Any, TypeVar, overload
+from typing import Any, Literal, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import BooleanField
-from typing_extensions import Literal
 
 _T = TypeVar("_T", bound=Model)
 

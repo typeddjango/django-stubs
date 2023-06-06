@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, overload
+from typing import Any, Literal, overload
 from uuid import UUID
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -10,7 +10,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression
 from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import TypeAlias
 
 _ParamT: TypeAlias = str | int
 

@@ -1,9 +1,9 @@
 from collections.abc import Callable, Sequence
-from typing import Any, Generic, Protocol, TypeVar, overload
+from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, overload
 
 from _typeshed import Self
 from django.db.models.base import Model
-from typing_extensions import SupportsIndex, TypeAlias
+from typing_extensions import TypeAlias
 
 _T = TypeVar("_T")
 

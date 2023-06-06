@@ -1,9 +1,8 @@
-from typing import Any
+from typing import Any, Literal
 
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
-from typing_extensions import Literal
 
 class RangeBoundary(models.Expression):
     lower: str

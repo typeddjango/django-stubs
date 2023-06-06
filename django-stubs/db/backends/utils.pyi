@@ -4,11 +4,11 @@ from contextlib import contextmanager
 from decimal import Decimal
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, overload
+from typing import Any, Literal, Protocol, overload
 from uuid import UUID
 
 from _typeshed import Self
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import TypeAlias
 
 logger: Logger
 

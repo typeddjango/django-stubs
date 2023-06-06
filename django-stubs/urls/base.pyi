@@ -1,8 +1,7 @@
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, Literal
 
 from django.urls.resolvers import ResolverMatch
-from typing_extensions import Literal
 
 def resolve(path: str, urlconf: str | None = ...) -> ResolverMatch: ...
 def reverse(

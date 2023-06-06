@@ -1,7 +1,6 @@
-from typing import Any, overload
+from typing import Any, Literal, overload
 
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
-from typing_extensions import Literal
 
 class GDALBand(GDALRasterBase):
     source: Any

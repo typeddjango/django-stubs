@@ -3,14 +3,13 @@ from argparse import ArgumentParser
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from io import StringIO
-from typing import Any
+from typing import Any, Literal
 from unittest import TestCase, TestLoader, TestSuite, TextTestResult, TextTestRunner
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test.testcases import SimpleTestCase
 from django.test.utils import TimeKeeperProtocol
 from django.utils.datastructures import OrderedSet
-from typing_extensions import Literal
 
 class DebugSQLTextTestResult(TextTestResult):
     buffer: bool

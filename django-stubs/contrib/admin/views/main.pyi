@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any
+from typing import Any, Literal
 
 from django.contrib.admin.filters import ListFilter
 from django.contrib.admin.options import ModelAdmin, _DisplayT, _ListFilterT
@@ -9,7 +9,6 @@ from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
-from typing_extensions import Literal
 
 ALL_VAR: str
 ORDER_VAR: str

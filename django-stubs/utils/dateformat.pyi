@@ -2,10 +2,9 @@ from datetime import date
 from datetime import datetime as builtin_datetime
 from datetime import time as builtin_time
 from re import Pattern
-from typing import Any
+from typing import Any, Literal
 
 from django.utils.timezone import _TzInfoT
-from typing_extensions import Literal
 
 re_formatchars: Pattern[str]
 re_escaped: Pattern[str]

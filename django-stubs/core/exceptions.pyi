@@ -1,8 +1,7 @@
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal
 
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Literal
 
 class FieldDoesNotExist(Exception): ...
 class AppRegistryNotReady(Exception): ...
