@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
         All methods are optional.
 
-        Django documentation: https://docs.djangoproject.com/en/dev/topics/db/multi-db/#automatic-database-routing
+        Django documentation: https://docs.djangoproject.com/en/stable/topics/db/multi-db/#automatic-database-routing
         """
 
         def db_for_read(self, model: Type[Model], **hints: Any) -> Optional[str]:
