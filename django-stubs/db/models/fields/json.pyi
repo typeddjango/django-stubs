@@ -57,7 +57,7 @@ class KeyTextTransform(KeyTransform):
     postgres_operator: str
     postgres_nested_operator: str
     @classmethod
-    def from_lookup(cls, lookup: str) -> Self: ...
+    def from_lookup(cls: type[Self], lookup: str) -> Self: ...
 
 KT: Callable[[str], KeyTextTransform]
 
