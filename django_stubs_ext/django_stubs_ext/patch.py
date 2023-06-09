@@ -2,8 +2,10 @@ import builtins
 from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION
+from django.conf import settings
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
@@ -19,9 +21,7 @@ from django.utils.connection import BaseConnectionHandler
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
-from django.contrib.auth.forms import UserCreationForm
 
-from django.conf import settings
 settings.configure()
 
 __all__ = ["monkeypatch"]
