@@ -3,6 +3,9 @@ from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION
 from django.conf import settings
+
+settings.configure()
+
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.auth.forms import UserCreationForm
@@ -21,8 +24,6 @@ from django.utils.connection import BaseConnectionHandler
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
-
-settings.configure()
 
 __all__ = ["monkeypatch"]
 
