@@ -16,11 +16,10 @@ from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelForm, BaseModelFormSet
 from django.utils.connection import BaseConnectionHandler
+from django.utils.module_loading import import_string
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
-
-from django.utils.module_loading import import_string
 
 UserCreationForm = import_string("django.contrib.auth.forms.UserCreationForm")
 
