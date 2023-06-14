@@ -149,6 +149,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_max_show_all: int
     list_editable: Sequence[str]
     search_fields: Sequence[str]
+    search_help_text: _StrOrPromise | None
     date_hierarchy: str | None
     save_as: bool
     save_as_continue: bool
