@@ -9,7 +9,7 @@ from .operations import SpatiaLiteOperations
 from .schema import SpatialiteSchemaEditor
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
-    SchemaEditorClass: SpatialiteSchemaEditor
+    SchemaEditorClass: type[SpatialiteSchemaEditor]
     client_class: type[SpatiaLiteClient]
     features_class: type[DatabaseFeatures]
     introspection_class: type[SpatiaLiteIntrospection]
