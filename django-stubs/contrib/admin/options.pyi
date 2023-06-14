@@ -279,6 +279,9 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def history_view(
         self, request: HttpRequest, object_id: str, extra_context: dict[str, Any] | None = ...
     ) -> HttpResponse: ...
+    def get_formset_kwargs(
+        self, request: HttpRequest, obj: _ModelT, inline: InlineModelAdmin[Model, _ModelT], prefix: str
+    ) -> dict[str, Any]: ...
 
 _ChildModelT = TypeVar("_ChildModelT", bound=Model)
 _ParentModelT = TypeVar("_ParentModelT", bound=Model)
