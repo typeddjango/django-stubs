@@ -96,6 +96,14 @@ class Envelope(GeomOutputGeoFunc):
 class ForcePolygonCW(GeomOutputGeoFunc):
     arity: int
 
+class FromWKB(GeoFunc):
+    output_field: Any
+    arity: int
+
+class FromWKT(GeoFunc):
+    output_field: Any
+    arity: int
+
 class GeoHash(GeoFunc):
     output_field: Any
     def __init__(self, expression: Any, precision: Any | None = ..., **extra: Any) -> None: ...
@@ -111,6 +119,10 @@ class GeometryDistance(GeoFunc):
 class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
     geom_param_pos: Any
+
+class IsEmpty(GeoFuncMixin, StandardTransform):
+    lookup_name: str
+    output_field: Any
 
 class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):
     lookup_name: str
