@@ -59,7 +59,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
         invert: bool = ...,
         search_type: str = ...,
     ) -> None: ...
-    def __invert__(self: Self) -> Self: ...
+    def __invert__(self: Self) -> Self: ...  # type: ignore[override]
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: ignore
     def __init__(
