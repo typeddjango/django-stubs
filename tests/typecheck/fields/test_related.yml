@@ -938,6 +938,7 @@
 -   case: test_fails_if_app_label_is_unknown_in_relation_field
     main: |
         from installed.models import InstalledModel
+        InstalledModel.objects.filter(non_installed__isnull=True)
     installed_apps:
       - installed
     files:
@@ -969,6 +970,37 @@
 
                 class PrintedGood(models.Model):
                     publisher = models.ForeignKey(to="myapp.Publisher", on_delete=models.CASCADE)
+
+                    class Meta:
+                        abstract = True
+
+                class Book(PrintedGood):
+                    name = models.CharField()
+-   case: test_foreign_key_to_as_string_filter_on_abstract
+    main: |
+        from myapp.models import Book, Publisher
+
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from django.db import models
+                from django.db.models.query import QuerySet
+
+                class Publisher(models.Model):
+                    name = models.CharField()
+
+                class MyModel(models.Model):
+                    pass
+
+                class PrintedGood(MyModel):
+                    publisher = models.ForeignKey(to="myapp.Publisher", on_delete=models.CASCADE)
+
+                    @property
+                    def siblings(self) -> QuerySet['PrintedGood']:
+                        return self.__class__.objects.filter(publisher=self.publisher)
 
                     class Meta:
                         abstract = True

@@ -10,6 +10,7 @@ from mypy.types import AnyType, Instance, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 
 if TYPE_CHECKING:
@@ -59,8 +60,9 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
 
     assert isinstance(current_field, RelatedField)
 
-    related_model_cls = django_context.get_field_related_model_cls(current_field)
-    if related_model_cls is None:
+    try:
+        related_model_cls = django_context.get_field_related_model_cls(current_field)
+    except UnregisteredModelError:
         return AnyType(TypeOfAny.from_error)
 
     default_related_field_type = set_descriptor_types_for_field(ctx)

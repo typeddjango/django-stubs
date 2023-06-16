@@ -20,6 +20,7 @@ from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
+from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
@@ -118,7 +119,19 @@ class DjangoContext:
             if isinstance(field, Field):
                 yield field
 
+    def get_model_foreign_keys(self, model_cls: Type[Model]) -> Iterator["ForeignKey[Any, Any]"]:
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, ForeignKey):
+                yield field
+
+    def get_model_related_fields(self, model_cls: Type[Model]) -> Iterator["RelatedField[Any, Any]"]:
+        """Get model forward relations"""
+        for field in model_cls._meta.get_fields():
+            if isinstance(field, RelatedField):
+                yield field
+
     def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
+        """Get model reverse relations"""
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignObjectRel):
                 yield field
@@ -127,7 +140,7 @@ class DjangoContext:
         self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel]
     ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
-            related_model_cls = field.related_model
+            related_model_cls = self.get_field_related_model_cls(field)
             primary_key_field = self.get_primary_key_field(related_model_cls)
             primary_key_type = self.get_field_get_type(api, primary_key_field, method="init")
 
@@ -210,9 +223,6 @@ class DjangoContext:
                         continue
 
                     related_model = self.get_field_related_model_cls(field)
-                    if related_model is None:
-                        expected_types[field_name] = AnyType(TypeOfAny.from_error)
-                        continue
 
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
@@ -312,8 +322,6 @@ class DjangoContext:
         is_nullable = self.get_field_nullability(field, method)
         if isinstance(field, RelatedField):
             related_model_cls = self.get_field_related_model_cls(field)
-            if related_model_cls is None:
-                return AnyType(TypeOfAny.from_error)
 
             if method in ("values", "values_list"):
                 primary_key_field = self.get_primary_key_field(related_model_cls)
@@ -327,9 +335,7 @@ class DjangoContext:
         else:
             return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
-    def get_field_related_model_cls(
-        self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]
-    ) -> Optional[Type[Model]]:
+    def get_field_related_model_cls(self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]) -> Type[Model]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:
@@ -341,13 +347,15 @@ class DjangoContext:
                 related_model_cls = field.model
             elif "." not in related_model_cls:
                 # same file model
-                related_model_fullname = field.model.__module__ + "." + related_model_cls
+                related_model_fullname = f"{field.model.__module__}.{related_model_cls}"
                 related_model_cls = self.get_model_class_by_fullname(related_model_fullname)
+                if related_model_cls is None:
+                    raise UnregisteredModelError
             else:
                 try:
                     related_model_cls = self.apps_registry.get_model(related_model_cls)
-                except LookupError:
-                    return None
+                except LookupError as e:
+                    raise UnregisteredModelError from e
 
         return related_model_cls
 
@@ -363,13 +371,13 @@ class DjangoContext:
 
             field = currently_observed_model._meta.get_field(field_part)
             if isinstance(field, RelatedField):
-                currently_observed_model = field.related_model
+                currently_observed_model = self.get_field_related_model_cls(field)
                 model_name = currently_observed_model._meta.model_name
                 if model_name is not None and field_part == (model_name + "_id"):
                     field = self.get_primary_key_field(currently_observed_model)
 
             if isinstance(field, ForeignObjectRel):
-                currently_observed_model = field.related_model
+                currently_observed_model = self.get_field_related_model_cls(field)
 
         # Guaranteed by `query.solve_lookup_type` before.
         assert isinstance(field, (Field, ForeignObjectRel))
@@ -397,9 +405,15 @@ class DjangoContext:
             field = query.get_meta().get_field(query_parts[0])
         except FieldDoesNotExist:
             return None
+
         if len(query_parts) == 1:
             return [], [query_parts[0]], False
-        sub_query = Query(field.related_model).solve_lookup_type("__")
+
+        if not isinstance(field, (RelatedField, ForeignObjectRel)):
+            return None
+
+        related_model = self.get_field_related_model_cls(field)
+        sub_query = Query(related_model).solve_lookup_type("__".join(query_parts[1:]))
         entire_query_parts = [query_parts[0], *sub_query[1]]
         return sub_query[0], entire_query_parts, sub_query[2]
 
