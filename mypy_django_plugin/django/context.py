@@ -434,8 +434,6 @@ class DjangoContext:
         except FieldError as exc:
             ctx.api.fail(exc.args[0], ctx.context)
             return AnyType(TypeOfAny.from_error)
-        except UnregisteredModelError:
-            return AnyType(TypeOfAny.from_error)
 
         if solved_lookup is None:
             return AnyType(TypeOfAny.implementation_artifact)
