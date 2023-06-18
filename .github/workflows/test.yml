@@ -64,7 +64,7 @@ jobs:
       - name: Run tests
         run: PYTHONPATH='.' pytest
 
-  typecheck:
+  matrix-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -90,5 +90,8 @@ jobs:
           pip install -U pip setuptools wheel
           pip install -r ./requirements.txt
 
-      - name: Run tests
+      - name: Run django-stubs-ext tests
+        run: PYTHONPATH='.' pytest django_stubs_ext
+
+      - name: Run typecheck
         run: python ./scripts/typecheck_tests.py --django_version="${{ matrix.django-version }}"
