@@ -208,7 +208,7 @@ class ExpressionWrapper(Expression, Generic[_E]):
     def __init__(self, expression: _E, output_field: Field) -> None: ...
     expression: _E
 
-class NegatedExpression(ExpressionWrapper, Generic[_E]):
+class NegatedExpression(ExpressionWrapper[_E]):
     def __init__(self, expression: _E) -> None: ...
     def __invert__(self) -> _E: ...  # type: ignore[override]
 
