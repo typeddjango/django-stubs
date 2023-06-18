@@ -88,6 +88,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
+          sed -i -E "s/^Django==.+$/Django==${{ matrix.django-version }}.*/" ./requirements.txt
           pip install -r ./requirements.txt
 
       - name: Run django-stubs-ext tests
