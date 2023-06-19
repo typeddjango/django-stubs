@@ -64,15 +64,13 @@ jobs:
       - name: Run tests
         run: PYTHONPATH='.' pytest
 
-  typecheck:
+  matrix-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
         django-version: ['3.2', '4.2']
         include:
-          - python-version: '3.8'
-            django-version: '2.2'
           - python-version: '3.11'
             django-version: '4.1'
     steps:
@@ -89,6 +87,11 @@ jobs:
         run: |
           pip install -U pip setuptools wheel
           pip install -r ./requirements.txt
+          pip install "Django==${{ matrix.django-version }}"
+          pip check
 
-      - name: Run tests
+      - name: Run django-stubs-ext tests
+        run: PYTHONPATH='.' pytest django_stubs_ext
+
+      - name: Run typecheck
         run: python ./scripts/typecheck_tests.py --django_version="${{ matrix.django-version }}"

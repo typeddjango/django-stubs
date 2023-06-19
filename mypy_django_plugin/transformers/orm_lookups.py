@@ -3,6 +3,7 @@ from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
 
@@ -36,7 +37,10 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         if is_annotated_model_fullname(model_cls_fullname):
             lookup_type = AnyType(TypeOfAny.implementation_artifact)
         else:
-            lookup_type = django_context.resolve_lookup_expected_type(ctx, model_cls, lookup_kwarg)
+            try:
+                lookup_type = django_context.resolve_lookup_expected_type(ctx, model_cls, lookup_kwarg)
+            except UnregisteredModelError:
+                lookup_type = AnyType(TypeOfAny.from_error)
         # Managers as provided_type is not supported yet
         if isinstance(provided_type, Instance) and helpers.has_any_of_bases(
             provided_type.type, (fullnames.MANAGER_CLASS_FULLNAME, fullnames.QUERYSET_CLASS_FULLNAME)

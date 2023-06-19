@@ -70,7 +70,9 @@ class _RequestFactory(Generic[_T]):
     defaults: dict[str, str]
     cookies: SimpleCookie
     errors: BytesIO
-    def __init__(self, *, json_encoder: type[JSONEncoder] = ..., **defaults: Any) -> None: ...
+    def __init__(
+        self, *, json_encoder: type[JSONEncoder] = ..., headers: Mapping[str, Any] | None = ..., **defaults: Any
+    ) -> None: ...
     def request(self, **request: Any) -> _T: ...
     def get(
         self,
@@ -78,7 +80,7 @@ class _RequestFactory(Generic[_T]):
         data: _GetDataType = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
     def post(
@@ -88,13 +90,13 @@ class _RequestFactory(Generic[_T]):
         content_type: str = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
     def head(
-        self, path: str, data: Any = ..., secure: bool = ..., *, headers: dict[str, Any] | None = ..., **extra: Any
+        self, path: str, data: Any = ..., secure: bool = ..., *, headers: Mapping[str, Any] | None = ..., **extra: Any
     ) -> _T: ...
-    def trace(self, path: str, secure: bool = ..., *, headers: dict[str, Any] | None = ..., **extra: Any) -> _T: ...
+    def trace(self, path: str, secure: bool = ..., *, headers: Mapping[str, Any] | None = ..., **extra: Any) -> _T: ...
     def options(
         self,
         path: str,
@@ -102,7 +104,7 @@ class _RequestFactory(Generic[_T]):
         content_type: str = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
     def put(
@@ -112,7 +114,7 @@ class _RequestFactory(Generic[_T]):
         content_type: str = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
     def patch(
@@ -122,7 +124,7 @@ class _RequestFactory(Generic[_T]):
         content_type: str = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
     def delete(
@@ -132,7 +134,7 @@ class _RequestFactory(Generic[_T]):
         content_type: str = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
     def generic(
@@ -143,7 +145,7 @@ class _RequestFactory(Generic[_T]):
         content_type: str | None = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _T: ...
 
@@ -192,7 +194,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         enforce_csrf_checks: bool = ...,
         raise_request_exception: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **defaults: Any
     ) -> None: ...
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
@@ -203,7 +205,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def post(  # type: ignore
@@ -214,7 +216,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def head(  # type: ignore
@@ -224,7 +226,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def trace(  # type: ignore
@@ -234,7 +236,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def put(  # type: ignore
@@ -245,7 +247,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def patch(  # type: ignore
@@ -256,7 +258,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
     def delete(  # type: ignore
@@ -267,7 +269,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         follow: bool = ...,
         secure: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **extra: Any
     ) -> _MonkeyPatchedWSGIResponse: ...
 
@@ -282,7 +284,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         enforce_csrf_checks: bool = ...,
         raise_request_exception: bool = ...,
         *,
-        headers: dict[str, Any] | None = ...,
+        headers: Mapping[str, Any] | None = ...,
         **defaults: Any
     ) -> None: ...
     async def request(self, **request: Any) -> _MonkeyPatchedASGIResponse: ...

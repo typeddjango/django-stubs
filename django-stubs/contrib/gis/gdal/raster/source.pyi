@@ -1,4 +1,6 @@
 from collections.abc import Sequence
+from ctypes import c_void_p
+from pathlib import Path
 from typing import Any
 
 from django.contrib.gis.gdal.driver import Driver
@@ -20,7 +22,7 @@ class TransformPoint(list[Sequence[float]]):
 
 class GDALRaster(GDALRasterBase):
     destructor: Any
-    def __init__(self, ds_input: Any, write: bool = ...) -> None: ...
+    def __init__(self, ds_input: str | Path | bytes | dict | c_void_p, write: bool = ...) -> None: ...
     def __del__(self) -> None: ...
     @property
     def vsi_buffer(self) -> bytes | None: ...
@@ -57,6 +59,7 @@ class GDALRaster(GDALRasterBase):
     @property
     def bands(self) -> BandList: ...
     def warp(self, ds_input: Any, resampling: str = ..., max_error: float = ...) -> GDALRaster: ...
+    def clone(self, name: str | None = ...) -> GDALRaster: ...
     def transform(
         self,
         srs: SpatialReference | int | str,

@@ -1,13 +1,12 @@
 from collections.abc import Callable, ItemsView, Iterator
 from pathlib import Path
 from types import TracebackType
-from typing import Any
+from typing import Any, Pattern
 
 from django.http.request import HttpRequest, QueryDict
 from django.http.response import Http404, HttpResponse
 from django.utils.safestring import SafeString
 
-CLEANSED_SUBSTITUTE: str
 CURRENT_DIR: Path
 
 class CallableSettingWrapper:
@@ -24,6 +23,8 @@ def get_default_exception_reporter_filter() -> SafeExceptionReporterFilter: ...
 def get_exception_reporter_filter(request: HttpRequest | None) -> SafeExceptionReporterFilter: ...
 
 class SafeExceptionReporterFilter:
+    cleansed_substitute: str
+    hidden_settings: Pattern[str]
     def cleanse_setting(self, key: int | str, value: Any) -> Any: ...
     def get_safe_settings(self) -> dict[str, Any]: ...
     def is_active(self, request: HttpRequest | None) -> bool: ...
