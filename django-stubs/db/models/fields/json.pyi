@@ -1,6 +1,8 @@
 import json
+from collections.abc import Callable
 from typing import Any
 
+from _typeshed import Self
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
 from django.db.models.lookups import PostgresOperatorLookup, Transform
@@ -27,6 +29,7 @@ class ContainedBy(PostgresOperatorLookup): ...
 
 class HasKeyLookup(PostgresOperatorLookup):
     logical_operator: str | None
+    def compile_json_path_final_key(self, key_transform: Any) -> str: ...
 
 class HasKey(HasKeyLookup):
     postgres_operator: str
@@ -39,7 +42,9 @@ class HasAnyKeys(HasKeys):
     postgres_operator: str
     logical_operator: str
 
+class HasKeyOrArrayIndex(HasKey): ...
 class JSONExact(lookups.Exact): ...
+class JSONIContains(CaseInsensitiveMixin, lookups.IContains): ...
 
 class KeyTransform(Transform):
     key_name: str
@@ -51,6 +56,10 @@ class KeyTransform(Transform):
 class KeyTextTransform(KeyTransform):
     postgres_operator: str
     postgres_nested_operator: str
+    @classmethod
+    def from_lookup(cls: type[Self], lookup: str) -> Self: ...
+
+KT: Callable[[str], KeyTextTransform]
 
 class KeyTransformTextLookupMixin:
     def __init__(self, key_transform: Any, *args: Any, **kwargs: Any) -> None: ...

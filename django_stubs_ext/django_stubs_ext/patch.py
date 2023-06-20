@@ -8,6 +8,7 @@ from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
 from django.core.paginator import Paginator
+from django.db.models.expressions import ExpressionWrapper
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.lookups import Lookup
@@ -66,6 +67,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(FileProxyMixin),
     MPGeneric(Lookup),
     MPGeneric(BaseConnectionHandler),
+    MPGeneric(ExpressionWrapper),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
