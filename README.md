@@ -311,6 +311,52 @@ If you encounter this error in your own code, you can either cast the `Promise` 
 
 If this is reported on Django code, please report an issue or open a pull request to fix the type hints.
 
+### How to use a custom library to handle Django settings?
+
+Using something like [`django-split-settings`](https://github.com/wemake-services/django-split-settings) or [`django-configurations`](https://github.com/jazzband/django-configurations) will make it hard for mypy to infer your settings.
+
+This might also be the case when using something like:
+
+```python
+try:
+    from .local_settings import *
+except Exception:
+    pass
+```
+
+So, mypy would not like this code:
+
+```python
+from django.conf import settings
+
+settings.CUSTOM_VALUE  # E: 'Settings' object has no attribute 'CUSTOM_SETTING'
+```
+
+To handle this corner case we have a special setting `strict_settings` (`True` by default),
+you can switch it to `False` to always return `Any` and not raise any errors if runtime settings module has the given value:
+
+```toml
+[tool.django-stubs]
+strict_settings = false
+```
+
+or
+
+```ini
+[mypy.plugins.django-stubs]
+strict_settings = false
+```
+
+And then:
+
+```python
+# Works:
+reveal_type(settings.EXISTS_IN_RUNTIME)  # N: Any
+
+# Errors:
+reveal_type(settings.MISSING)  # E: 'Settings' object has no attribute 'MISSING'
+```
+
 ## Related projects
 
 - [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.

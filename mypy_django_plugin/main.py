@@ -71,7 +71,7 @@ class NewSemanalDjangoPlugin(Plugin):
         sys.path.extend(mypy_path())
         # Add paths from mypy_path config option
         sys.path.extend(options.mypy_path)
-        self.django_context = DjangoContext(self.plugin_config.django_settings_module)
+        self.django_context = DjangoContext(self.plugin_config)
 
     def _get_current_queryset_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
@@ -125,8 +125,8 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # for settings
-        if file.fullname == "django.conf" and self.django_context.django_settings_module:
-            return [self._new_dependency(self.django_context.django_settings_module)]
+        if file.fullname == "django.conf" and self.django_context.plugin_config.django_settings_module:
+            return [self._new_dependency(self.django_context.plugin_config.django_settings_module)]
 
         # for values / values_list
         if file.fullname == "django.db.models":

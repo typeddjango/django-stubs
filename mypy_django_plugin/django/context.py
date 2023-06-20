@@ -20,6 +20,7 @@ from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
+from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
@@ -78,10 +79,10 @@ class LookupsAreUnsupported(Exception):
 
 
 class DjangoContext:
-    def __init__(self, django_settings_module: str) -> None:
-        self.django_settings_module = django_settings_module
+    def __init__(self, plugin_config: DjangoPluginConfig) -> None:
+        self.plugin_config = plugin_config
 
-        apps, settings = initialize_django(self.django_settings_module)
+        apps, settings = initialize_django(self.plugin_config.django_settings_module)
         self.apps_registry = apps
         self.settings = settings
 

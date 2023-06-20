@@ -28,7 +28,7 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     # first look for the setting in the project settings file, then global settings
-    settings_module = typechecker_api.modules.get(django_context.django_settings_module)
+    settings_module = typechecker_api.modules.get(django_context.plugin_config.django_settings_module)
     global_settings_module = typechecker_api.modules.get("django.conf.global_settings")
     for module in [settings_module, global_settings_module]:
         if module is not None:
@@ -41,6 +41,13 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
                     )
                     return ctx.default_attr_type
                 return sym.type
+
+    # Now, we want to check if this setting really exist in runtime.
+    # If it does, we just return `Any`, not to raise any false-positives.
+    # But, we cannot reconstruct the exact runtime type.
+    # See https://github.com/typeddjango/django-stubs/pull/1163
+    if not django_context.plugin_config.strict_settings and hasattr(django_context.settings, setting_name):
+        return AnyType(TypeOfAny.implementation_artifact)
 
     ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)
     return ctx.default_attr_type
