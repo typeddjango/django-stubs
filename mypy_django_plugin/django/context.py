@@ -24,12 +24,7 @@ from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
-try:
-    from django.contrib.postgres.fields import ArrayField
-except ImportError:
-
-    class ArrayField:  # type: ignore
-        pass
+from django.contrib.postgres.fields import ArrayField
 
 
 if TYPE_CHECKING:
