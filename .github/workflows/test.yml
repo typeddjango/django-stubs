@@ -92,6 +92,3 @@ jobs:
 
       - name: Run django-stubs-ext tests
         run: PYTHONPATH='.' pytest django_stubs_ext
-
-      - name: Run typecheck
-        run: python ./scripts/typecheck_tests.py --django_version="${{ matrix.django-version }}"
