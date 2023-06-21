@@ -76,13 +76,6 @@ If you get some unexpected results or want to be sure that tests run is not affe
 rm -r .mypy_cache
 ```
 
-We also test the stubs against Django's own test suite. This is done in CI but you can also do this locally.
-To execute the script run:
-
-```bash
-python ./scripts/typecheck_tests.py --django_version 3.2
-```
-
 
 ### Generating Stubs using Stubgen
 
