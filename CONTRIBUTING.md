@@ -7,7 +7,7 @@ This project is open source and community driven. As such we encourage code cont
 3. Improve plugin code and extend its capabilities
 4. Write tests
 5. Update dependencies
-6. Fix and remove things from our `stubtest/allowlist_generated.txt`
+6. Fix and remove things from our `stubtest/allowlist_todo.txt`
 
 ## Tutorials
 
@@ -88,7 +88,7 @@ We have two special files to allow errors:
 You might also want to disable `incremental` mode while working on `stubtest` changes.
 This mode leads to several known problems (stubs do not show up or have strange errors).
 
-**Important**: right now we only run `stubtest` on Python3.9, any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
+**Important**: right now we only run `stubtest` on Python 3.11 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
 
 
 ## Submission Guidelines

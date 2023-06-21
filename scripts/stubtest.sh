@@ -6,11 +6,10 @@ set -e
 
 export MYPYPATH='.'
 
-# TODO: remove `--ignore-positional-only` and ``--ignore-missing-stubs when ready
+# TODO: remove `--ignore-positional-only` when ready
 stubtest django \
     --mypy-config-file mypy.ini \
     --ignore-positional-only \
-    --ignore-missing-stub \
     --allowlist scripts/stubtest/allowlist.txt \
-    --allowlist scripts/stubtest/allowlist_generated.txt \
+    --allowlist scripts/stubtest/allowlist_todo.txt \
     --generate-allowlist
