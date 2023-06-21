@@ -4,6 +4,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Literal, Optional, Sequence, Set, Tuple, Type, Union
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
 from django.db.models.base import Model
@@ -24,14 +25,6 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
-
-try:
-    from django.contrib.postgres.fields import ArrayField
-except ImportError:
-
-    class ArrayField:  # type: ignore
-        pass
-
 
 if TYPE_CHECKING:
     from django.apps.registry import Apps  # noqa: F401
