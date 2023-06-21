@@ -7,6 +7,7 @@ This project is open source and community driven. As such we encourage code cont
 3. Improve plugin code and extend its capabilities
 4. Write tests
 5. Update dependencies
+6. Fix and remove things from our `stubtest/allowlist_todo.txt`
 
 ## Tutorials
 
@@ -76,23 +77,19 @@ If you get some unexpected results or want to be sure that tests run is not affe
 rm -r .mypy_cache
 ```
 
+### Testing stubs with `stubtest`
 
-### Generating Stubs using Stubgen
+Run `bash ./scripts/stubtest.sh` to test that stubs and sources are in-line.
 
-The stubs are based on auto-generated code created by Mypy's stubgen tool (see: [the stubgen docs](https://mypy.readthedocs.io/en/stable/stubgen.html)).
-To make life easier we have a helper script that auto generates these stubs. To use it you can run:
+We have two special files to allow errors:
+1. `scripts/stubtest/allowlist.txt` where we store things that we really don't care about: hacks, django internal utility modules, things that are handled by our plugin, things that are not representable by type system, etc
+2. `scripts/stubtest/allowlist_generate.txt` where we store all errors there are right now. Basically, this is a TODO list: we need to work through this list and fix things (or move entries to real `allowlist.txt`). In the end, ideally we can remove this file
 
-```bash
-python ./scripts/stubgen-django.py --django_version 3.2
-```
+You might also want to disable `incremental` mode while working on `stubtest` changes.
+This mode leads to several known problems (stubs do not show up or have strange errors).
 
-You can also pass an optional commit hash as a second kwarg to checkout a specific commit, e.g.
+**Important**: right now we only run `stubtest` on Python 3.11 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
 
-```bash
-python ./scripts/stubgen-django.py --django_version 3.2 --commit_sha <commit_sha>
-```
-
-The output for this is a gitignored folder called "stubgen" in the repo's root.
 
 ## Submission Guidelines
 
