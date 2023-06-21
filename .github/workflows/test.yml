@@ -64,7 +64,7 @@ jobs:
       - name: Run tests
         run: PYTHONPATH='.' pytest
 
-  test:
+  stubtest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
