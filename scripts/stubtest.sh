@@ -10,7 +10,7 @@ export MYPYPATH='.'
 stubtest django \
     --mypy-config-file mypy.ini \
     --ignore-positional-only \
-    --ignore-missing-stubs \
+    --ignore-missing-stub \
     --allowlist scripts/stubtest/allowlist.txt \
     --allowlist scripts/stubtest/allowlist_generated.txt \
     --generate-allowlist
