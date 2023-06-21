@@ -333,14 +333,15 @@ settings.CUSTOM_VALUE  # E: 'Settings' object has no attribute 'CUSTOM_SETTING'
 ```
 
 To handle this corner case we have a special setting `strict_settings` (`True` by default),
-you can switch it to `False` to always return `Any` and not raise any errors if runtime settings module has the given value:
+you can switch it to `False` to always return `Any` and not raise any errors if runtime settings module has the given value,
+for example `pyproject.toml`:
 
 ```toml
 [tool.django-stubs]
 strict_settings = false
 ```
 
-or
+or `mypy.ini`:
 
 ```ini
 [mypy.plugins.django-stubs]
