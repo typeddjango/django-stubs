@@ -319,8 +319,8 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 def make_typeddict(
     api: CheckerPluginInterface, fields: "OrderedDict[str, MypyType]", required_keys: Set[str]
 ) -> TypedDictType:
-    object_type = api.named_generic_type("mypy_extensions._TypedDict", [])
-    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
+    fallback_type = api.named_generic_type("typing._TypedDict", [])
+    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback_type)
     return typed_dict_type
 
 
