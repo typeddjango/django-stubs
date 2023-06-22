@@ -7,7 +7,7 @@ This project is open source and community driven. As such we encourage code cont
 3. Improve plugin code and extend its capabilities
 4. Write tests
 5. Update dependencies
-6. Fix and remove things from our `stubtest/allowlist_todo.txt`
+6. Fix and remove things from our `scripts/stubtest/allowlist_todo.txt`
 
 ## Tutorials
 
@@ -83,7 +83,7 @@ Run `bash ./scripts/stubtest.sh` to test that stubs and sources are in-line.
 
 We have two special files to allow errors:
 1. `scripts/stubtest/allowlist.txt` where we store things that we really don't care about: hacks, django internal utility modules, things that are handled by our plugin, things that are not representable by type system, etc
-2. `scripts/stubtest/allowlist_generate.txt` where we store all errors there are right now. Basically, this is a TODO list: we need to work through this list and fix things (or move entries to real `allowlist.txt`). In the end, ideally we can remove this file
+2. `scripts/stubtest/allowlist_todo.txt` where we store all errors there are right now. Basically, this is a TODO list: we need to work through this list and fix things (or move entries to real `allowlist.txt`). In the end, ideally we can remove this file
 
 You might also want to disable `incremental` mode while working on `stubtest` changes.
 This mode leads to several known problems (stubs do not show up or have strange errors).
