@@ -74,7 +74,7 @@ class LookupsAreUnsupported(Exception):
 class DjangoContext:
     def __init__(self, plugin_config: DjangoPluginConfig) -> None:
         if isinstance(plugin_config, str):
-            raise RuntimeError('Old API is used: we now require DjangoPluginConfig instance')
+            raise RuntimeError("Old API is used: we now require DjangoPluginConfig instance")
 
         self.plugin_config = plugin_config
 
