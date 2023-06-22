@@ -42,7 +42,7 @@ def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -
     sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MODEL_CLASS_FULLNAME)
 
     if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata(sym.node).setdefault("model_bases", {})
+        bases = helpers.get_django_metadata_bases(sym.node, "model_bases")
         bases[ctx.cls.fullname] = 1
     else:
         if not ctx.api.final_iteration:
@@ -55,7 +55,7 @@ def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -
 def transform_form_class(ctx: ClassDefContext) -> None:
     sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata(sym.node).setdefault("baseform_bases", {})
+        bases = helpers.get_django_metadata_bases(sym.node, "baseform_bases")
         bases[ctx.cls.fullname] = 1
 
     forms.make_meta_nested_class_inherit_from_any(ctx)
@@ -78,7 +78,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_queryset_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata(model_sym.node).setdefault("queryset_bases", {})
+            bases = helpers.get_django_metadata_bases(model_sym.node, "queryset_bases")
             bases[fullnames.QUERYSET_CLASS_FULLNAME] = 1
             return bases
         else:
@@ -87,7 +87,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_manager_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata(model_sym.node).setdefault("manager_bases", {})
+            bases = helpers.get_django_metadata_bases(model_sym.node, "manager_bases")
             bases[fullnames.MANAGER_CLASS_FULLNAME] = 1
             return bases
         else:
@@ -96,7 +96,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_model_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata(model_sym.node).setdefault("model_bases", {})
+            bases = helpers.get_django_metadata_bases(model_sym.node, "model_bases")
             bases[fullnames.MODEL_CLASS_FULLNAME] = 1
             return bases
         else:
@@ -105,7 +105,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_form_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata(model_sym.node).setdefault("baseform_bases", {})
+            bases = helpers.get_django_metadata_bases(model_sym.node, "baseform_bases")
             bases[fullnames.BASEFORM_CLASS_FULLNAME] = 1
             bases[fullnames.FORM_CLASS_FULLNAME] = 1
             bases[fullnames.MODELFORM_CLASS_FULLNAME] = 1

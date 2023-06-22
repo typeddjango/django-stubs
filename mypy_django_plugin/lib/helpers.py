@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast, Literal
 from typing_extensions import TypedDict
 
 from django.db.models.fields import Field
@@ -55,6 +55,12 @@ class DjangoTypeMetadata(TypedDict, total=False):
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
     return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
+
+
+def get_django_metadata_bases(
+    model_info: TypeInfo, key: Literal["baseform_bases", "manager_bases", "model_bases", "queryset_bases"]
+) -> Dict[str, int]:
+    return get_django_metadata(model_info).setdefault(key, {})
 
 
 class IncompleteDefnException(Exception):
@@ -386,4 +392,5 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_se
 def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:
     sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        get_django_metadata(sym.node)["manager_bases"][fullname] = 1
+        bases = get_django_metadata_bases(sym.node, "manager_bases")
+        bases[fullname] = 1
