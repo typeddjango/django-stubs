@@ -21,7 +21,6 @@ from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME

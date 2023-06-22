@@ -20,7 +20,9 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
     return TypeType(Instance(model_info, []))
 
 
-def get_type_of_settings_attribute(ctx: AttributeContext, django_context: DjangoContext, plugin_config: DjangoPluginConfig) -> MypyType:
+def get_type_of_settings_attribute(
+    ctx: AttributeContext, django_context: DjangoContext, plugin_config: DjangoPluginConfig
+) -> MypyType:
     if not isinstance(ctx.context, MemberExpr):
         return ctx.default_attr_type
 

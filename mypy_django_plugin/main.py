@@ -274,7 +274,11 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # Lookup of a settings variable
         if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-            return partial(settings.get_type_of_settings_attribute, django_context=self.django_context, plugin_config=self.plugin_config)
+            return partial(
+                settings.get_type_of_settings_attribute,
+                django_context=self.django_context,
+                plugin_config=self.plugin_config,
+            )
 
         info = self._get_typeinfo_or_none(class_name)
 
