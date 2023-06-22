@@ -76,7 +76,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_queryset_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return helpers.get_django_metadata(model_sym.node).setdefault(
+            return helpers.get_django_metadata(model_sym.node).setdefault(  # type: ignore[no-any-return]
                 "queryset_bases", {fullnames.QUERYSET_CLASS_FULLNAME: 1}
             )
         else:
@@ -85,7 +85,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_manager_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return helpers.get_django_metadata(model_sym.node).setdefault(
+            return helpers.get_django_metadata(model_sym.node).setdefault(  # type: ignore[no-any-return]
                 "manager_bases", {fullnames.MANAGER_CLASS_FULLNAME: 1}
             )
         else:
@@ -94,7 +94,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_model_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return helpers.get_django_metadata(model_sym.node).setdefault(
+            return helpers.get_django_metadata(model_sym.node).setdefault(  # type: ignore[no-any-return]
                 "model_bases", {fullnames.MODEL_CLASS_FULLNAME: 1}
             )
         else:
@@ -103,7 +103,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def _get_current_form_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            return helpers.get_django_metadata(model_sym.node).setdefault(
+            return helpers.get_django_metadata(model_sym.node).setdefault(  # type: ignore[no-any-return]
                 "baseform_bases",
                 {
                     fullnames.BASEFORM_CLASS_FULLNAME: 1,
@@ -274,11 +274,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # Lookup of a settings variable
         if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-            return partial(
-                settings.get_type_of_settings_attribute,
-                django_context=self.django_context,
-                plugin_config=self.plugin_config,
-            )
+            return partial(settings.get_type_of_settings_attribute, django_context=self.django_context, plugin_config=self.plugin_config)
 
         info = self._get_typeinfo_or_none(class_name)
 
