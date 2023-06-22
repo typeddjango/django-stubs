@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from typing_extensions import TypedDict
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -43,8 +44,17 @@ if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
 
 
-def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:
-    return model_info.metadata.setdefault("django", {})
+class DjangoTypeMetadata(TypedDict, total=False):
+    from_queryset_manager: str
+    reverse_managers: Dict[str, str]
+    baseform_bases: Dict[str, int]
+    manager_bases: Dict[str, int]
+    model_bases: Dict[str, int]
+    queryset_bases: Dict[str, int]
+
+
+def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
+    return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
 
 
 class IncompleteDefnException(Exception):
