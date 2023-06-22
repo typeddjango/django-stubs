@@ -28,7 +28,7 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     # first look for the setting in the project settings file, then global settings
-    settings_module = typechecker_api.modules.get(django_context.plugin_config.django_settings_module)
+    settings_module = typechecker_api.modules.get(django_context.django_settings_module)
     global_settings_module = typechecker_api.modules.get("django.conf.global_settings")
     for module in [settings_module, global_settings_module]:
         if module is not None:

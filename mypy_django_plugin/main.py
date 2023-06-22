@@ -125,8 +125,8 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # for settings
-        if file.fullname == "django.conf" and self.django_context.plugin_config.django_settings_module:
-            return [self._new_dependency(self.django_context.plugin_config.django_settings_module)]
+        if file.fullname == "django.conf" and self.django_context.django_settings_module:
+            return [self._new_dependency(self.django_context.django_settings_module)]
 
         # for values / values_list
         if file.fullname == "django.db.models":

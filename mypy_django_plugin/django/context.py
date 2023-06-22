@@ -79,6 +79,10 @@ class DjangoContext:
         self.apps_registry = apps
         self.settings = settings
 
+    @property  # Compat with older API
+    def django_settings_module(self) -> str:
+        return self.plugin_config.django_settings_module
+
     @cached_property
     def model_modules(self) -> Dict[str, Set[Type[Model]]]:
         """All modules that contain Django models."""
