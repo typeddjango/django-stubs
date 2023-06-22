@@ -1,8 +1,7 @@
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, MutableMapping
 from logging import Logger
 from typing import Any
-from weakref import WeakKeyDictionary
 
 NONE_ID: int
 NO_RECEIVERS: Any
@@ -13,8 +12,7 @@ class Signal:
     receivers: list[Any]
     lock: threading.Lock
     use_caching: bool
-    sender_receivers_cache: WeakKeyDictionary[Any, Any] | dict[Any, Any]
-    _dead_receivers: bool
+    sender_receivers_cache: MutableMapping[Any, Any]
 
     def __init__(self, use_caching: bool = ...) -> None: ...
     def connect(
