@@ -60,7 +60,7 @@ def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
 def get_django_metadata_bases(
     model_info: TypeInfo, key: Literal["baseform_bases", "manager_bases", "model_bases", "queryset_bases"]
 ) -> Dict[str, int]:
-    return get_django_metadata(model_info).setdefault(key, {})
+    return get_django_metadata(model_info).setdefault(key, cast(Dict[str, int], {}))
 
 
 class IncompleteDefnException(Exception):
