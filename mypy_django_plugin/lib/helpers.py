@@ -333,7 +333,7 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
         member_name = attr_expr.name
         if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
             if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)  # type: ignore
+                return getattr(django_context.settings, member_name)
     return None
 
 

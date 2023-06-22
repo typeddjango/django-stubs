@@ -3,6 +3,7 @@ from mypy.plugin import AttributeContext, FunctionContext
 from mypy.types import AnyType, Instance, TypeOfAny, TypeType
 from mypy.types import Type as MypyType
 
+from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
 
@@ -19,7 +20,7 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
     return TypeType(Instance(model_info, []))
 
 
-def get_type_of_settings_attribute(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
+def get_type_of_settings_attribute(ctx: AttributeContext, django_context: DjangoContext, plugin_config: DjangoPluginConfig) -> MypyType:
     if not isinstance(ctx.context, MemberExpr):
         return ctx.default_attr_type
 
@@ -46,7 +47,7 @@ def get_type_of_settings_attribute(ctx: AttributeContext, django_context: Django
     # If it does, we just return `Any`, not to raise any false-positives.
     # But, we cannot reconstruct the exact runtime type.
     # See https://github.com/typeddjango/django-stubs/pull/1163
-    if not django_context.plugin_config.strict_settings and hasattr(django_context.settings, setting_name):
+    if not plugin_config.strict_settings and hasattr(django_context.settings, setting_name):
         return AnyType(TypeOfAny.implementation_artifact)
 
     ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)

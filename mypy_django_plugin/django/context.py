@@ -72,16 +72,12 @@ class LookupsAreUnsupported(Exception):
 
 
 class DjangoContext:
-    def __init__(self, plugin_config: DjangoPluginConfig) -> None:
-        self.plugin_config = plugin_config
+    def __init__(self, django_settings_module: str) -> None:
+        self.django_settings_module = django_settings_module
 
-        apps, settings = initialize_django(self.plugin_config.django_settings_module)
+        apps, settings = initialize_django(self.django_settings_module)
         self.apps_registry = apps
         self.settings = settings
-
-    @property  # Compat with older API
-    def django_settings_module(self) -> str:
-        return self.plugin_config.django_settings_module
 
     @cached_property
     def model_modules(self) -> Dict[str, Set[Type[Model]]]:
