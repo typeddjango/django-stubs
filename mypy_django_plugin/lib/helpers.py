@@ -1,6 +1,5 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast, Literal
-from typing_extensions import TypedDict
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Literal, Optional, Set, Union, cast
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -36,6 +35,7 @@ from mypy.plugin import (
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
+from typing_extensions import TypedDict
 
 from mypy_django_plugin.lib import fullnames
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
