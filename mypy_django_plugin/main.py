@@ -130,7 +130,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for values / values_list
         if file.fullname == "django.db.models":
-            return [self._new_dependency("mypy_extensions"), self._new_dependency("typing")]
+            return [self._new_dependency("typing")]
 
         # for `get_user_model()`
         if self.django_context.settings:
