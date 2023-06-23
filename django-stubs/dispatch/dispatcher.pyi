@@ -1,7 +1,7 @@
 import threading
 from collections.abc import Callable, MutableMapping
 from logging import Logger
-from typing import Any, ParamSpec, TypeVar
+from typing import Any, TypeVar
 
 NONE_ID: int
 NO_RECEIVERS: Any
@@ -26,8 +26,7 @@ class Signal:
     def send_robust(self, sender: Any, **named: Any) -> list[tuple[Callable, Exception | Any]]: ...
     def _live_receivers(self, sender: Any) -> list[Callable]: ...
 
-_P = ParamSpec("_P")
-_R = TypeVar("_R")
+_F = TypeVar("_F", bound=Callable[..., Any])
 
 def receiver(
     signal: list[Signal] | tuple[Signal, ...] | Signal,
@@ -35,4 +34,4 @@ def receiver(
     sender: object | None = ...,
     weak: bool = ...,
     dispatch_uid: str | None = ...
-) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]: ...
+) -> Callable[[_F], _F]: ...
