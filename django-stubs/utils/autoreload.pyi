@@ -1,6 +1,7 @@
 import threading
 import types
 from collections.abc import Callable, Iterable, Iterator
+from logging import Logger
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,7 @@ from typing_extensions import ParamSpec
 
 _P = ParamSpec("_P")
 
+logger: Logger
 autoreload_started: Signal
 file_changed: Signal
 DJANGO_AUTORELOAD_ENV: str

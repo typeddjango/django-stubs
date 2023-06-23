@@ -4,7 +4,6 @@ from typing import Protocol, TypeVar
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import classproperty as classproperty
 from django.views.generic.base import View
 
 _T = TypeVar("_T", bound=View | Callable)  # Any callable

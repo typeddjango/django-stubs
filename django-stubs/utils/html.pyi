@@ -4,14 +4,9 @@ from json import JSONEncoder
 from re import Pattern
 from typing import Any
 
+from _typeshed import Incomplete
+from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import SafeString
-
-TRAILING_PUNCTUATION_CHARS: str
-WRAPPING_PUNCTUATION: list[tuple[str, str]]
-DOTS: list[str]
-word_split_re: Pattern[str]
-simple_url_re: Pattern[str]
-simple_url_2_re: Pattern[str]
 
 def escape(text: Any) -> SafeString: ...
 def escapejs(value: Any) -> SafeString: ...
@@ -35,3 +30,30 @@ def smart_urlquote(url: str) -> str: ...
 def urlize(text: str, trim_url_limit: int | None = ..., nofollow: bool = ..., autoescape: bool = ...) -> str: ...
 def avoid_wrapping(value: str) -> str: ...
 def html_safe(klass: type) -> type: ...
+
+class Urlizer:
+    trailing_punctuation_chars: str
+    wrapping_punctuation: Incomplete
+    word_split_re: Pattern[str] | SimpleLazyObject
+    simple_url_re: Pattern[str] | SimpleLazyObject
+    simple_url_2_re: Pattern[str] | SimpleLazyObject
+    mailto_template: str
+    url_template: str
+    def __call__(
+        self, text: Incomplete, trim_url_limit: Incomplete | None = ..., nofollow: bool = ..., autoescape: bool = ...
+    ) -> Incomplete: ...
+    def handle_word(
+        self,
+        word: Incomplete,
+        *,
+        safe_input: Incomplete,
+        trim_url_limit: Incomplete | None = ...,
+        nofollow: bool = ...,
+        autoescape: bool = ...
+    ) -> Incomplete: ...
+    def trim_url(self, x: str, *, limit: int | None) -> Incomplete: ...
+    def trim_punctuation(self, word: str) -> tuple[str, str, str]: ...
+    @staticmethod
+    def is_email_simple(value: str) -> bool: ...
+
+urlizer: Urlizer
