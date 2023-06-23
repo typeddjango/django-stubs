@@ -23,7 +23,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_description: Any
     get_relations: Any
     get_indexes: Any
-    get_key_columns: Any
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators: Any
