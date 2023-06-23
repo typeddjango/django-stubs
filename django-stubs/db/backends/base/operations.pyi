@@ -3,7 +3,7 @@ from collections.abc import Iterable, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
 from decimal import Decimal
-from typing import Any, NoReturn
+from typing import Any
 
 from django.core.management.color import Style
 from django.db.backends.base.base import BaseDatabaseWrapper
