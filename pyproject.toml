@@ -31,4 +31,59 @@ known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 
 [build-system]
-requires = ["setuptools<64", "wheel"]
+requires = ["setuptools>=68,<69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-stubs"
+version = "4.2.1"
+description = "Mypy stubs for Django"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Typing :: Typed",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+]
+requires-python = ">=3.8"
+maintainers = [{ name = "Marti Raudsepp", email = "marti@juffo.org" }]
+authors = [{ name = "Maksim Kurnikov", email = "maxim.kurnikov@gmail.com" }]
+dependencies = [
+    "mypy>=1.0.0",
+    "django",
+    "django-stubs-ext>=4.2.1",
+    "tomli; python_version < '3.11'",
+    # Types:
+    "typing-extensions",
+    "types-pytz",
+    "types-PyYAML",
+]
+
+[project.optional-dependencies]
+"compatible-mypy" = ["mypy>=1.3.0,<1.5"]
+
+[project.urls]
+Homepage = "https://github.com/typeddjango/django-stubs"
+Repository = "https://github.com/typeddjango/django-stubs"
+"Release notes" = "https://github.com/typeddjango/django-stubs/releases"
+
+[tool.setuptools]
+license-files = ["LICENSE.md"]
+py-modules = []
+
+[tool.setuptools.packages.find]
+include = [
+    "django-stubs*",
+    "mypy_django_plugin",
+]
+exclude = [
+    "scripts*",
+]
