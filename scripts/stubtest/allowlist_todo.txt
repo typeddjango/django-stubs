@@ -2204,9 +2204,6 @@ django.db.utils.ConnectionHandler.ensure_defaults
 django.db.utils.ConnectionHandler.prepare_test_settings
 django.db.utils.ConnectionRouter.routers
 django.db.utils.DatabaseErrorWrapper.__call__
-django.dispatch.Signal.__init__
-django.dispatch.dispatcher.Signal.__init__
-django.dispatch.dispatcher.logger
 django.forms.ALL_FIELDS
 django.forms.BaseForm.Meta
 django.forms.BaseForm.__init__
