@@ -49,5 +49,5 @@ def log_response(
     request: HttpRequest | None = ...,
     logger: Logger = ...,
     level: str | None = ...,
-    exception: BaseException | None = ...
+    exception: BaseException | None = ...,
 ) -> None: ...

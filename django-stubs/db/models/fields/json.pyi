@@ -21,7 +21,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         name: str | None = ...,
         encoder: type[json.JSONEncoder] | None = ...,
         decoder: type[json.JSONDecoder] | None = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
 
 class DataContains(PostgresOperatorLookup): ...

@@ -9,5 +9,5 @@ def create_default_site(
     interactive: bool = ...,
     using: str = ...,
     apps: Apps = ...,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None: ...

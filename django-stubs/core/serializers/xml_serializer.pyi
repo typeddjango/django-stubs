@@ -25,7 +25,7 @@ class Deserializer(base.Deserializer):
         *,
         using: str = ...,
         ignorenonexistent: bool = ...,
-        **options: Any
+        **options: Any,
     ) -> None: ...
     def __next__(self) -> base.DeserializedObject: ...
 
