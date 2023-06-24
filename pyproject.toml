@@ -31,7 +31,7 @@ known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 
 [build-system]
-requires = ["setuptools>=68,<69", "wheel"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
