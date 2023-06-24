@@ -5,6 +5,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import ProjectState
 from django.db.models import Model
+from typing_extensions import Self
 
 class Operation:
     reversible: bool
@@ -13,6 +14,7 @@ class Operation:
     elidable: bool
     serialization_expand_args: list[str]
     _constructor_args: tuple[Sequence[Any], dict[str, Any]]
+    def __new__(cls, *args: Any, **kwargs: Any) -> Self: ...
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
     def state_forwards(self, app_label: str, state: ProjectState) -> None: ...
     def database_forwards(

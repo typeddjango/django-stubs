@@ -266,7 +266,6 @@ django.contrib.gis.db.models.CharField.cast_db_type
 django.contrib.gis.db.models.CharField.description
 django.contrib.gis.db.models.CharField.formfield
 django.contrib.gis.db.models.CheckConstraint.validate
-django.contrib.gis.db.models.Choices.do_not_call_in_templates
 django.contrib.gis.db.models.Col
 django.contrib.gis.db.models.Combinable
 django.contrib.gis.db.models.CombinedExpression
@@ -296,9 +295,7 @@ django.contrib.gis.db.models.ExpressionWrapper.deconstruct
 django.contrib.gis.db.models.Extent.is_extent
 django.contrib.gis.db.models.Extent3D.is_extent
 django.contrib.gis.db.models.F.__new__
-django.contrib.gis.db.models.F.copy
 django.contrib.gis.db.models.F.deconstruct
-django.contrib.gis.db.models.F.replace_expressions
 django.contrib.gis.db.models.Field.__copy__
 django.contrib.gis.db.models.Field.__deepcopy__
 django.contrib.gis.db.models.Field.__ge__
@@ -605,7 +602,6 @@ django.contrib.gis.gdal.geometries.OGRGeometry.geojson
 django.contrib.gis.gdal.geometries.Polygon.exterior_ring
 django.contrib.gis.gdal.layer.Layer.num_feat
 django.contrib.gis.gdal.libgdal.err_handler
-django.contrib.gis.gdal.libgdal.lib_name
 django.contrib.gis.gdal.libgdal.lwingdal
 django.contrib.gis.gdal.raster.const.GDAL_TO_CTYPES
 django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_BASE_PATH
@@ -1179,18 +1175,7 @@ django.db.backends.utils.debug_transaction
 django.db.backends.utils.names_digest
 django.db.backends.utils.split_tzname_delta
 django.db.connection
-django.db.migrations.AlterOrderWithRespectTo.option_name
 django.db.migrations.Migration.suggest_name
-django.db.migrations.RenameField.new_name_lower
-django.db.migrations.RenameField.old_name_lower
-django.db.migrations.RenameIndex.new_name_lower
-django.db.migrations.RenameIndex.old_name_lower
-django.db.migrations.RenameModel.new_name_lower
-django.db.migrations.RenameModel.old_name_lower
-django.db.migrations.RunPython.reversible
-django.db.migrations.RunSQL.__init__
-django.db.migrations.RunSQL.reversible
-django.db.migrations.SeparateDatabaseAndState.__init__
 django.db.migrations.autodetector.MigrationAutodetector.create_altered_constraints
 django.db.migrations.autodetector.MigrationAutodetector.create_renamed_fields
 django.db.migrations.autodetector.MigrationAutodetector.generate_added_constraints
@@ -1272,9 +1257,7 @@ django.db.models.Expression.identity
 django.db.models.ExpressionWrapper.__new__
 django.db.models.ExpressionWrapper.deconstruct
 django.db.models.F.__new__
-django.db.models.F.copy
 django.db.models.F.deconstruct
-django.db.models.F.replace_expressions
 django.db.models.Field.__copy__
 django.db.models.Field.__deepcopy__
 django.db.models.Field.__ge__
@@ -1524,9 +1507,7 @@ django.db.models.expressions.Expression.identity
 django.db.models.expressions.ExpressionWrapper.__new__
 django.db.models.expressions.ExpressionWrapper.deconstruct
 django.db.models.expressions.F.__new__
-django.db.models.expressions.F.copy
 django.db.models.expressions.F.deconstruct
-django.db.models.expressions.F.replace_expressions
 django.db.models.expressions.Func.__new__
 django.db.models.expressions.Func.deconstruct
 django.db.models.expressions.Func.function
@@ -2309,7 +2290,6 @@ django.template.backends.jinja2
 django.template.base.Context
 django.template.base.FilterExpression.is_var
 django.template.base.Node.__iter__
-django.template.base.TRANSLATOR_COMMENT_MARK
 django.template.base.VariableDoesNotExist.__init__
 django.template.base.filter_re
 django.template.base.kwarg_re

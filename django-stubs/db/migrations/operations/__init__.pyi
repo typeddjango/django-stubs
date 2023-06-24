@@ -8,6 +8,7 @@ from .models import AlterIndexTogether as AlterIndexTogether
 from .models import AlterModelManagers as AlterModelManagers
 from .models import AlterModelOptions as AlterModelOptions
 from .models import AlterModelTable as AlterModelTable
+from .models import AlterModelTableComment as AlterModelTableComment
 from .models import AlterOrderWithRespectTo as AlterOrderWithRespectTo
 from .models import AlterUniqueTogether as AlterUniqueTogether
 from .models import CreateModel as CreateModel

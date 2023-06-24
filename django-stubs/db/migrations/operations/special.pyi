@@ -29,6 +29,8 @@ class RunSQL(Operation):
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
     ) -> None: ...
+    @property
+    def reversible(self) -> bool: ...  # type: ignore[override]
 
 class _CodeCallable(Protocol):
     def __call__(self, __state_apps: StateApps, __schema_editor: BaseDatabaseSchemaEditor) -> None: ...
@@ -47,3 +49,5 @@ class RunPython(Operation):
     ) -> None: ...
     @staticmethod
     def noop(apps: StateApps, schema_editor: BaseDatabaseSchemaEditor) -> None: ...
+    @property
+    def reversible(self) -> bool: ...  # type: ignore[override]

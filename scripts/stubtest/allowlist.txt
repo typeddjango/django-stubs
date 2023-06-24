@@ -70,3 +70,6 @@ django.utils.translation.template.context_re
 django.utils.translation.template.constant_re
 django.utils.translation.template.block_re
 django.utils.version.version_component_re
+
+# AlterTogetherOptionsOperation.option_name is set as None, but is required in the init
+django.db.migrations.operations.models.AlterTogetherOptionOperation.option_name
