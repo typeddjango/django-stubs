@@ -790,7 +790,6 @@ django.contrib.sessions.base_session.AbstractBaseSession.session_data
 django.contrib.sessions.base_session.AbstractBaseSession.session_key
 django.contrib.sessions.exceptions.SessionInterrupted
 django.contrib.sessions.management.commands.clearsessions.Command.handle
-django.contrib.sessions.middleware.SessionMiddleware.__init__
 django.contrib.sessions.models
 django.contrib.sessions.serializers.PickleSerializer.__init__
 django.contrib.sitemaps.views.SitemapIndexItem
@@ -2334,8 +2333,6 @@ django.http.HttpRequest.is_ajax
 django.http.HttpRequest.readlines
 django.http.HttpResponseBase.__iter__
 django.http.HttpResponseBase.getvalue
-django.http.QueryDict.__copy__
-django.http.QueryDict.__deepcopy__
 django.http.StreamingHttpResponse.content
 django.http.multipartparser.MultiPartParser.IE_sanitize
 django.http.multipartparser.MultiPartParser.boundary_re
@@ -2349,8 +2346,6 @@ django.http.request.HttpRequest.get_raw_uri
 django.http.request.HttpRequest.headers
 django.http.request.HttpRequest.is_ajax
 django.http.request.HttpRequest.readlines
-django.http.request.QueryDict.__copy__
-django.http.request.QueryDict.__deepcopy__
 django.http.request.UploadHandlerList
 django.http.request.host_validation_re
 django.http.request.parse_accept_header
@@ -2359,9 +2354,7 @@ django.http.response.HttpResponseBase.getvalue
 django.http.response.StreamingHttpResponse.content
 django.middleware.cache.CacheMiddleware.__init__
 django.middleware.cache.CacheMiddleware.cache
-django.middleware.cache.FetchFromCacheMiddleware.__init__
 django.middleware.cache.FetchFromCacheMiddleware.cache
-django.middleware.cache.UpdateCacheMiddleware.__init__
 django.middleware.cache.UpdateCacheMiddleware.cache
 django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
 django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
@@ -2375,7 +2368,6 @@ django.middleware.csrf.REASON_INVALID_CHARACTERS
 django.middleware.csrf.RejectRequest
 django.middleware.csrf.invalid_token_chars_re
 django.middleware.gzip.GZipMiddleware.max_random_bytes
-django.middleware.security.SecurityMiddleware.__init__
 django.shortcuts.SupportsGetAbsoluteUrl
 django.template.Engine.template_context_processors
 django.template.Engine.template_loaders
