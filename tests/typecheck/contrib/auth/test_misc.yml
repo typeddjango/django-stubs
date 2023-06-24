@@ -3,9 +3,16 @@
       from django.contrib.auth import get_user
       from django.contrib.sessions.middleware import SessionMiddleware
       from django.http import HttpRequest
+      from django.http.response import HttpResponse
+      from django.http.request import HttpRequest
+      from django.utils.deprecation import GetResponseCallable
+      from typing import Callable
+
+      def get_response(__request: HttpRequest) -> HttpResponse:
+          return HttpResponse()
 
       request = HttpRequest()
-      SessionMiddleware().process_request(request)
+      SessionMiddleware(get_response).process_request(request)
       get_user(request)
 -   case: test_client_session
     main: |
