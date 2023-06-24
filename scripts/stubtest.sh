@@ -11,5 +11,4 @@ stubtest django \
     --mypy-config-file mypy.ini \
     --ignore-positional-only \
     --allowlist scripts/stubtest/allowlist.txt \
-    --allowlist scripts/stubtest/allowlist_todo.txt \
-    --generate-allowlist
+    --allowlist scripts/stubtest/allowlist_todo.txt
