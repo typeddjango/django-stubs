@@ -2,7 +2,7 @@
     main: |
         from myapp.models import User
         User.objects.create(pk=1, name='Max', age=10)
-        User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "list[Any]", expected "Union[float, int, str, Combinable]")
     installed_apps:
         - myapp
     files:

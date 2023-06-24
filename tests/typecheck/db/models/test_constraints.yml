@@ -31,7 +31,7 @@
         )
     regex: true
     out: |
-        main:4: error: No overload variant of "UniqueConstraint" matches argument types "Lower", "List\[str\]", "str"
+        main:4: error: No overload variant of "UniqueConstraint" matches argument types "Lower", "list\[str\]", "str"
         main:4: note: Possible overload variants:
         main:4: note:     .*
         main:4: note:     .*

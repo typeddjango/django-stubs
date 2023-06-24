@@ -13,10 +13,10 @@
         reveal_type(qs[0]) # N: Revealed type is "myapp.models.Blog"
         reveal_type(qs[:9]) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, myapp.models.Blog]"
         reveal_type(qs.create()) # N: Revealed type is "myapp.models.Blog"
-        reveal_type(qs.get_or_create()) # N: Revealed type is "Tuple[myapp.models.Blog, builtins.bool]"
+        reveal_type(qs.get_or_create()) # N: Revealed type is "tuple[myapp.models.Blog, builtins.bool]"
         reveal_type(qs.exists()) # N: Revealed type is "builtins.bool"
         reveal_type(qs.none()) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, myapp.models.Blog]"
-        reveal_type(qs.update_or_create()) # N: Revealed type is "Tuple[myapp.models.Blog, builtins.bool]"
+        reveal_type(qs.update_or_create()) # N: Revealed type is "tuple[myapp.models.Blog, builtins.bool]"
         reveal_type(qs.explain()) # N: Revealed type is "builtins.str"
         reveal_type(qs.raw(qs.explain())) # N: Revealed type is "django.db.models.query.RawQuerySet[Any]"
         # .dates / .datetimes
@@ -32,7 +32,7 @@
         reveal_type(qs.in_bulk()) # N: Revealed type is "builtins.dict[Any, myapp.models.Blog]"
         reveal_type(qs.bulk_update(list(qs), fields=["created_at"]))  # N: Revealed type is "builtins.int"
         reveal_type(qs.bulk_create([]))  # N: Revealed type is "builtins.list[myapp.models.Blog]"
-        reveal_type(qs.delete()) # N: Revealed type is "Tuple[builtins.int, builtins.dict[builtins.str, builtins.int]]"
+        reveal_type(qs.delete()) # N: Revealed type is "tuple[builtins.int, builtins.dict[builtins.str, builtins.int]]"
     installed_apps:
         - myapp
     files:
