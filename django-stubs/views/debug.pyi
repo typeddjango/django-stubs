@@ -6,9 +6,10 @@ from typing import Any
 
 from django.http.request import HttpRequest, QueryDict
 from django.http.response import Http404, HttpResponse
+from django.template import Engine
 from django.utils.safestring import SafeString
 
-CURRENT_DIR: Path
+DEBUG_ENGINE: Engine
 
 class CallableSettingWrapper:
     def __init__(self, callable_setting: Callable | type[Any]) -> None: ...

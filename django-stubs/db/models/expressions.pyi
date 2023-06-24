@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from typing import Any, Generic, Literal, TypeVar
 
@@ -135,6 +135,7 @@ class F(Combinable):
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> F: ...
+    def replace_expressions(self, replacements: Mapping[F, Any]) -> F: ...
     def asc(
         self,
         *,
@@ -148,7 +149,7 @@ class F(Combinable):
         nulls_first: bool | None = ...,
         nulls_last: bool | None = ...,
     ) -> OrderBy: ...
-    def deconstruct(self) -> Any: ...  # fake
+    def copy(self) -> F: ...
 
 class ResolvedOuterRef(F): ...
 

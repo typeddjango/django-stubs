@@ -10,8 +10,9 @@ from .base import Operation
 class SeparateDatabaseAndState(Operation):
     database_operations: Sequence[Operation]
     state_operations: Sequence[Operation]
+
     def __init__(
-        self, database_operations: Sequence[Operation] = ..., state_operations: Sequence[Operation] = ...
+        self, database_operations: Sequence[Operation] | None = ..., state_operations: Sequence[Operation] | None = ...
     ) -> None: ...
 
 class RunSQL(Operation):
@@ -24,7 +25,7 @@ class RunSQL(Operation):
         self,
         sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]],
         reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]] = ...,
-        state_operations: Sequence[Operation] = ...,
+        state_operations: Sequence[Operation] | None = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
     ) -> None: ...

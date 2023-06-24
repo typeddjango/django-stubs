@@ -12,7 +12,6 @@ from django.http.request import HttpRequest
 
 ALL_VAR: str
 ORDER_VAR: str
-ORDER_TYPE_VAR: str
 PAGE_VAR: str
 SEARCH_VAR: str
 ERROR_FLAG: str

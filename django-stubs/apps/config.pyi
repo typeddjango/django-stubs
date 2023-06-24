@@ -5,6 +5,7 @@ from django.apps.registry import Apps
 from django.db.models.base import Model
 from django.utils.functional import _StrOrPromise
 
+APPS_MODULE_NAME: str
 MODELS_MODULE_NAME: str
 
 class AppConfig:
