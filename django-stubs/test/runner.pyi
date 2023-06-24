@@ -132,7 +132,7 @@ class DiscoverRunner:
         timing: bool = ...,
         shuffle: int | Literal[False] = ...,
         logger: logging.Logger | None = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     @classmethod
     def add_arguments(cls, parser: ArgumentParser) -> None: ...

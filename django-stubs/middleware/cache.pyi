@@ -29,5 +29,5 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
         get_response: Callable = ...,
         cache_timeout: float | None = ...,
         page_timeout: float | None = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...

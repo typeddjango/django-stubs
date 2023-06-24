@@ -153,5 +153,5 @@ class JsonResponse(HttpResponse):
         encoder: type[JSONEncoder] = ...,
         safe: bool = ...,
         json_dumps_params: dict[str, Any] | None = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...

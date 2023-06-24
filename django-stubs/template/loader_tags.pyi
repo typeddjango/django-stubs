@@ -58,7 +58,7 @@ class IncludeNode(Node):
         *args: Any,
         extra_context: Any | None = ...,
         isolated_context: bool = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     def render(self, context: Context) -> SafeString: ...
 

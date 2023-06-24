@@ -58,7 +58,7 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore
         boundary: Any | None = ...,
         _subparts: Any | None = ...,
         encoding: str = ...,
-        **_params: Any
+        **_params: Any,
     ) -> None: ...
     def __setitem__(self, name: str, val: str) -> None: ...
 

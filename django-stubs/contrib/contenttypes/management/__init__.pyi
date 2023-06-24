@@ -29,5 +29,5 @@ def create_contenttypes(
     interactive: bool = ...,
     using: str = ...,
     apps: Apps = ...,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None: ...

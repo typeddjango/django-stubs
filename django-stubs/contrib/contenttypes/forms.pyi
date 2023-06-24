@@ -18,7 +18,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
         save_as_new: bool = ...,
         prefix: Any | None = ...,
         queryset: Any | None = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     def initial_form_count(self) -> int: ...
     @classmethod
