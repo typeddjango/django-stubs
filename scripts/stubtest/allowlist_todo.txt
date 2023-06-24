@@ -2,8 +2,6 @@
 # Unsorted: there are real problems and things we can really ignore.
 
 django.__main__
-django.apps.AppConfig.default_auto_field
-django.apps.config.AppConfig.default_auto_field
 django.apps.registry.Apps.populate
 django.conf.CSRF_COOKIE_MASKED_DEPRECATED_MSG
 django.conf.DEFAULT_FILE_STORAGE_DEPRECATED_MSG
