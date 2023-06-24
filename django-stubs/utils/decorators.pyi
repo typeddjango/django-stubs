@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable, Iterable
-from typing import Protocol, TypeVar
+from typing import Protocol, TypeVar, type_check_only
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
@@ -15,7 +15,7 @@ def method_decorator(decorator: Callable | Iterable[Callable], name: str = ...) 
 def decorator_from_middleware_with_args(middleware_class: type) -> Callable: ...
 def decorator_from_middleware(middleware_class: type) -> Callable: ...
 def make_middleware_decorator(middleware_class: type[MiddlewareMixin]) -> Callable: ...
-
+@type_check_only
 class AsyncGetResponseCallable(Protocol):
     def __call__(self, __request: HttpRequest) -> Awaitable[HttpResponseBase]: ...
 
