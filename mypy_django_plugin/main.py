@@ -332,7 +332,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 return create_new_manager_class_from_as_manager_method
         return None
 
-    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+    def report_config_data(self, ctx: ReportConfigContext) -> Dict[str, Any]:
         # Cache would be cleared if any settings do change.
         return self.plugin_config.to_json()
 
