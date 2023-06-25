@@ -1,7 +1,7 @@
 import itertools
 import sys
 from functools import partial
-from typing import Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
@@ -14,6 +14,7 @@ from mypy.plugin import (
     FunctionContext,
     MethodContext,
     Plugin,
+    ReportConfigContext,
 )
 from mypy.types import Type as MypyType
 
@@ -330,6 +331,10 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return create_new_manager_class_from_as_manager_method
         return None
+
+    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+        # Cache would be cleared if any settins do change.
+        return self.plugin_config.to_json()
 
 
 def plugin(version: str) -> Type[NewSemanalDjangoPlugin]:
