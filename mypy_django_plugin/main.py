@@ -333,7 +333,7 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
-        # Cache would be cleared if any settins do change.
+        # Cache would be cleared if any settings do change.
         return self.plugin_config.to_json()
 
 
