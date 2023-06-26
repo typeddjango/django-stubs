@@ -1,5 +1,3 @@
-import functools
-from collections.abc import Callable
 from contextlib import ContextDecorator
 from types import TracebackType
 from typing import Any
@@ -8,22 +6,6 @@ from django.http.request import HttpRequest
 from django.utils.functional import _StrPromise
 
 class TranslatorCommentWarning(SyntaxWarning): ...
-
-class Trans:
-    activate: Callable
-    check_for_language: functools._lru_cache_wrapper
-    deactivate: Callable
-    deactivate_all: Callable
-    get_language: Callable
-    get_language_bidi: Callable
-    get_language_from_path: Callable
-    get_language_from_request: Callable
-    gettext: Callable
-    gettext_noop: Callable
-    ngettext: Callable
-    npgettext: Callable
-    pgettext: Callable
-    def __getattr__(self, real_name: Any) -> Any: ...
 
 def gettext_noop(message: str) -> str: ...
 def gettext(message: str) -> str: ...

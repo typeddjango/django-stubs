@@ -70,6 +70,3 @@ django.utils.translation.template.context_re
 django.utils.translation.template.constant_re
 django.utils.translation.template.block_re
 django.utils.version.version_component_re
-
-# `Trans` class is deleted in Django
-django.utils.translation.Trans
