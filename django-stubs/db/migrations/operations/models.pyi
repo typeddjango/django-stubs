@@ -14,7 +14,7 @@ from django.utils.functional import cached_property
 class ModelOperation(Operation):
     name: str
     def __init__(self, name: str) -> None: ...
-    @cached_property[str]
+    @cached_property
     def name_lower(self) -> str: ...
     def can_reduce_through(self, operation: Operation, app_label: str) -> bool: ...
 
@@ -38,9 +38,9 @@ class RenameModel(ModelOperation):
     old_name: str
     new_name: str
     def __init__(self, old_name: str, new_name: str) -> None: ...
-    @cached_property[str]
+    @cached_property
     def old_name_lower(self) -> str: ...
-    @cached_property[str]
+    @cached_property
     def new_name_lower(self) -> str: ...
 
 class ModelOptionOperation(ModelOperation): ...
@@ -71,7 +71,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         name: str,
         option_value: _OptionTogetherT | None,
     ) -> None: ...
-    @cached_property[set[tuple[str, ...]] | None]
+    @cached_property
     def option_value(self) -> set[tuple[str, ...]] | None: ...
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
     def state_forwards(self, app_label: str, state: Any) -> None: ...
@@ -112,7 +112,7 @@ class AlterModelManagers(ModelOptionOperation):
 
 class IndexOperation(Operation):
     option_name: str
-    @cached_property[str]
+    @cached_property
     def model_name_lower(self) -> str: ...
 
 class AddIndex(IndexOperation):
@@ -137,9 +137,9 @@ class RenameIndex(IndexOperation):
         old_name: str | None = ...,
         old_fields: Sequence[str] | None = ...,
     ) -> None: ...
-    @cached_property[str]
+    @cached_property
     def old_name_lower(self) -> str: ...
-    @cached_property[str]
+    @cached_property
     def new_name_lower(self) -> str: ...
 
 class AddConstraint(IndexOperation):
