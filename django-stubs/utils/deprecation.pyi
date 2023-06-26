@@ -1,9 +1,8 @@
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any, Protocol, type_check_only
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
-from django.utils.decorators import _AsyncGetResponseCallable
 from typing_extensions import TypeAlias
 
 class RemovedInDjango50Warning(DeprecationWarning): ...
@@ -34,6 +33,10 @@ class DeprecationInstanceCheck(type):
 @type_check_only
 class _GetResponseCallable(Protocol):
     def __call__(self, __request: HttpRequest) -> HttpResponseBase: ...
+
+@type_check_only
+class _AsyncGetResponseCallable(Protocol):
+    def __call__(self, __request: HttpRequest) -> Awaitable[HttpResponseBase]: ...
 
 class MiddlewareMixin:
     sync_capable: bool
