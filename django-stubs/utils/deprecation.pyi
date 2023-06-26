@@ -3,6 +3,7 @@ from typing import Any, Protocol, type_check_only
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
+from django.utils.decorators import _AsyncGetResponseCallable
 from typing_extensions import TypeAlias
 
 class RemovedInDjango50Warning(DeprecationWarning): ...
@@ -38,7 +39,7 @@ class MiddlewareMixin:
     sync_capable: bool
     async_capable: bool
 
-    get_response: GetResponseCallable
-    def __init__(self, get_response: GetResponseCallable) -> None: ...
+    get_response: _GetResponseCallable | _AsyncGetResponseCallable
+    def __init__(self, get_response: _GetResponseCallable | _AsyncGetResponseCallable) -> None: ...
     def __call__(self, request: HttpRequest) -> HttpResponseBase: ...
     async def __acall__(self, request: HttpRequest) -> HttpResponseBase: ...
