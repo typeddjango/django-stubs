@@ -1,6 +1,6 @@
 import enum
 import sys
-from typing import Any, Literal
+from typing import Any
 
 if sys.version_info >= (3, 11):
     enum_property = enum.property
@@ -20,7 +20,7 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
     @enum_property
     def value(self) -> Any: ...
     @property
-    def do_not_call_in_templates(self) -> Literal[True]: ...
+    def do_not_call_in_templates(self) -> bool: ...
 
 # fake
 class _IntegerChoicesMeta(ChoicesMeta):
