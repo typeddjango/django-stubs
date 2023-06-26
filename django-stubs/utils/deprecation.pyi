@@ -30,11 +30,9 @@ class DeprecationInstanceCheck(type):
     deprecation_warning: type[Warning]
     def __instancecheck__(self, instance: Any) -> bool: ...
 
-@type_check_only
 class _GetResponseCallable(Protocol):
     def __call__(self, __request: HttpRequest) -> HttpResponseBase: ...
 
-@type_check_only
 class _AsyncGetResponseCallable(Protocol):
     def __call__(self, __request: HttpRequest) -> Awaitable[HttpResponseBase]: ...
 

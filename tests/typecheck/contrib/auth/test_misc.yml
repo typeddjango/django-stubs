@@ -2,10 +2,7 @@
     main: |
       from django.contrib.auth import get_user
       from django.contrib.sessions.middleware import SessionMiddleware
-      from django.http import HttpRequest
-      from django.http.response import HttpResponse
-      from django.http.request import HttpRequest
-      from typing import Callable
+      from django.http import HttpRequest, HttpResponse
 
       def get_response(__request: HttpRequest) -> HttpResponse:
           return HttpResponse()
