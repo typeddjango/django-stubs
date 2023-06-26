@@ -1,8 +1,8 @@
 from collections.abc import Collection, Iterable, Iterator, Mapping, MutableMapping, MutableSet
 from typing import Any, Generic, NoReturn, Protocol, Tuple, TypeVar, overload  # noqa: Y022
 
-from _typeshed import Incomplete, Self
-from typing_extensions import TypeAlias
+from _typeshed import Incomplete
+from typing_extensions import Self, TypeAlias
 
 _K = TypeVar("_K")
 _V = TypeVar("_V")
@@ -39,7 +39,7 @@ class _IndexableCollection(Protocol[_I], Collection[_I]):
     @overload
     def __getitem__(self, index: int) -> _I: ...
     @overload
-    def __getitem__(self: Self, index: slice) -> Self: ...
+    def __getitem__(self, index: slice) -> Self: ...
 
 class OrderedSet(MutableSet[_K]):
     dict: dict[_K, None]
@@ -75,7 +75,7 @@ class MultiValueDict(dict[_K, _V]):
     def items(self) -> Iterator[tuple[_K, _V | list[object]]]: ...  # type: ignore
     def lists(self) -> Iterable[tuple[_K, list[_V]]]: ...
     def dict(self) -> dict[_K, _V | list[object]]: ...
-    def copy(self: Self) -> Self: ...
+    def copy(self) -> Self: ...
     def __getitem__(self, key: _K) -> _V | list[object]: ...  # type: ignore
     def __setitem__(self, key: _K, value: _V) -> None: ...
     # These overrides are needed to convince mypy that this isn't an abstract class
@@ -89,7 +89,7 @@ class MultiValueDict(dict[_K, _V]):
 
 class ImmutableList(tuple[_V, ...]):
     warning: str
-    def __new__(cls: type[Self], *args: Any, warning: str = ..., **kwargs: Any) -> Self: ...
+    def __new__(cls, *args: Any, warning: str = ..., **kwargs: Any) -> Self: ...
     def complain(self, *args: Any, **kwargs: Any) -> NoReturn: ...
 
 class _ItemCallable(Protocol[_V]):
