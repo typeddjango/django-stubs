@@ -1,5 +1,3 @@
-import functools
-from collections.abc import Callable
 from contextlib import ContextDecorator
 from types import TracebackType
 from typing import Any
@@ -7,25 +5,7 @@ from typing import Any
 from django.http.request import HttpRequest
 from django.utils.functional import _StrPromise
 
-LANGUAGE_SESSION_KEY: str
-
 class TranslatorCommentWarning(SyntaxWarning): ...
-
-class Trans:
-    activate: Callable
-    check_for_language: functools._lru_cache_wrapper
-    deactivate: Callable
-    deactivate_all: Callable
-    get_language: Callable
-    get_language_bidi: Callable
-    get_language_from_path: Callable
-    get_language_from_request: Callable
-    gettext: Callable
-    gettext_noop: Callable
-    ngettext: Callable
-    npgettext: Callable
-    pgettext: Callable
-    def __getattr__(self, real_name: Any) -> Any: ...
 
 def gettext_noop(message: str) -> str: ...
 def gettext(message: str) -> str: ...
@@ -38,17 +18,6 @@ def gettext_lazy(message: str) -> _StrPromise: ...
 def pgettext_lazy(context: str, message: str) -> _StrPromise: ...
 def ngettext_lazy(singular: str, plural: str, number: int | str | None = ...) -> _StrPromise: ...
 def npgettext_lazy(context: str, singular: str, plural: str, number: int | str | None = ...) -> _StrPromise: ...
-
-# NOTE: These translation functions are deprecated and removed in Django 4.0. We should remove them when we drop
-# support for 3.2
-def ugettext_noop(message: str) -> str: ...
-def ugettext(message: str) -> str: ...
-def ungettext(singular: str, plural: str, number: float) -> str: ...
-
-ugettext_lazy = gettext_lazy
-
-ungettext_lazy = ngettext_lazy
-
 def activate(language: str) -> None: ...
 def deactivate() -> None: ...
 

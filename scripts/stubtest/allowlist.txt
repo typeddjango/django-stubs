@@ -13,3 +13,60 @@ django.contrib.admin.migrations.*
 django.contrib.auth.migrations.*
 django.contrib.flatpages.migrations.*
 django.contrib.contenttypes.migrations.*
+
+# BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
+django.utils.archive.BaseArchive.list
+django.utils.archive.BaseArchive.extract
+
+# ImmutableList always raise when calling these,
+# later they can be added with `-> NoReturn` overrides.
+django.utils.datastructures.ImmutableList.__delitem__
+django.utils.datastructures.ImmutableList.__delslice__
+django.utils.datastructures.ImmutableList.__iadd__
+django.utils.datastructures.ImmutableList.__imul__
+django.utils.datastructures.ImmutableList.__setitem__
+django.utils.datastructures.ImmutableList.__setslice__
+django.utils.datastructures.ImmutableList.append
+django.utils.datastructures.ImmutableList.extend
+django.utils.datastructures.ImmutableList.insert
+django.utils.datastructures.ImmutableList.pop
+django.utils.datastructures.ImmutableList.remove
+django.utils.datastructures.ImmutableList.sort
+django.utils.datastructures.ImmutableList.reverse
+
+# Promise is lazy, see notes in .pyi
+django.utils.functional.Promise.__add__
+django.utils.functional.Promise.__deepcopy__
+django.utils.functional.Promise.__radd__
+django.utils.functional.Promise.__mod__
+
+# Lazy regex
+django.utils.dateformat.re_escaped
+django.utils.dateformat.re_formatchars
+django.utils.dateparse.date_re
+django.utils.dateparse.datetime_re
+django.utils.dateparse.iso8601_duration_re
+django.utils.dateparse.postgres_interval_re
+django.utils.dateparse.standard_duration_re
+django.utils.dateparse.time_re
+django.utils.http.ASCTIME_DATE
+django.utils.http.ETAG_MATCH
+django.utils.http.RFC1123_DATE
+django.utils.http.RFC850_DATE
+django.utils.text.re_words
+django.utils.text.re_chars
+django.utils.text.re_tag
+django.utils.text.re_newlines
+django.utils.text.re_camel_case
+django.utils.text.smart_split_re
+django.utils.translation.trans_real.language_code_re
+django.utils.translation.trans_real.language_code_prefix_re
+django.utils.translation.trans_real.accept_language_re
+django.utils.translation.template.plural_re
+django.utils.translation.template.inline_re
+django.utils.translation.template.endblock_re
+django.utils.translation.template.dot_re
+django.utils.translation.template.context_re
+django.utils.translation.template.constant_re
+django.utils.translation.template.block_re
+django.utils.version.version_component_re

@@ -1,8 +1,9 @@
 from datetime import date
-from typing import Any
 
 TIME_STRINGS: dict[str, str]
-TIMESINCE_CHUNKS: Any
+TIME_STRINGS_KEYS: list[str]
+TIME_CHUNKS: list[int]
+MONTHS_DAYS: tuple[int, ...]
 
 def timesince(
     d: date,

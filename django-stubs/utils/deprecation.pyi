@@ -1,14 +1,15 @@
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any, Protocol
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from typing_extensions import TypeAlias
 
-class RemovedInDjango40Warning(DeprecationWarning): ...
-class RemovedInDjango41Warning(PendingDeprecationWarning): ...
+class RemovedInDjango50Warning(DeprecationWarning): ...
+class RemovedInDjango51Warning(PendingDeprecationWarning): ...
 
-RemovedInNextVersionWarning: TypeAlias = RemovedInDjango40Warning
+RemovedInNextVersionWarning: TypeAlias = RemovedInDjango50Warning
+RemovedAfterNextVersionWarning: TypeAlias = RemovedInDjango51Warning
 
 class warn_about_renamed_method:
     class_name: str
@@ -29,10 +30,17 @@ class DeprecationInstanceCheck(type):
     deprecation_warning: type[Warning]
     def __instancecheck__(self, instance: Any) -> bool: ...
 
-class GetResponseCallable(Protocol):
+class _GetResponseCallable(Protocol):
     def __call__(self, __request: HttpRequest) -> HttpResponseBase: ...
 
+class _AsyncGetResponseCallable(Protocol):
+    def __call__(self, __request: HttpRequest) -> Awaitable[HttpResponseBase]: ...
+
 class MiddlewareMixin:
-    get_response: GetResponseCallable
-    def __init__(self, get_response: GetResponseCallable = ...) -> None: ...
+    sync_capable: bool
+    async_capable: bool
+
+    get_response: _GetResponseCallable | _AsyncGetResponseCallable
+    def __init__(self, get_response: _GetResponseCallable | _AsyncGetResponseCallable) -> None: ...
     def __call__(self, request: HttpRequest) -> HttpResponseBase: ...
+    async def __acall__(self, request: HttpRequest) -> HttpResponseBase: ...
