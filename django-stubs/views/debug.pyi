@@ -1,7 +1,8 @@
+import re
 from collections.abc import Callable, ItemsView, Iterator
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Pattern
+from typing import Any
 
 from django.http.request import HttpRequest, QueryDict
 from django.http.response import Http404, HttpResponse
@@ -24,7 +25,7 @@ def get_exception_reporter_filter(request: HttpRequest | None) -> SafeExceptionR
 
 class SafeExceptionReporterFilter:
     cleansed_substitute: str
-    hidden_settings: Pattern[str]
+    hidden_settings: re.Pattern[str]
     def cleanse_setting(self, key: int | str, value: Any) -> Any: ...
     def get_safe_settings(self) -> dict[str, Any]: ...
     def is_active(self, request: HttpRequest | None) -> bool: ...

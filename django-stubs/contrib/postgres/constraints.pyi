@@ -20,5 +20,5 @@ class ExclusionConstraint(BaseConstraint):
         deferrable: Deferrable | None = ...,
         include: list[str] | tuple[str] | None = ...,
         opclasses: list[str] | tuple[str] = ...,
-        violation_error_message: _StrOrPromise | None = ...
+        violation_error_message: _StrOrPromise | None = ...,
     ) -> None: ...

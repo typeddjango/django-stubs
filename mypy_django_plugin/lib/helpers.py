@@ -335,8 +335,8 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 def make_typeddict(
     api: CheckerPluginInterface, fields: "OrderedDict[str, MypyType]", required_keys: Set[str]
 ) -> TypedDictType:
-    object_type = api.named_generic_type("mypy_extensions._TypedDict", [])
-    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=object_type)
+    fallback_type = api.named_generic_type("typing._TypedDict", [])
+    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback_type)
     return typed_dict_type
 
 
@@ -349,7 +349,7 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
         member_name = attr_expr.name
         if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
             if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)  # type: ignore
+                return getattr(django_context.settings, member_name)  # type: ignore[no-any-return]
     return None
 
 

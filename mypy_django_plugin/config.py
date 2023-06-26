@@ -14,7 +14,8 @@ INI_USAGE = """
 (config)
 ...
 [mypy.plugins.django-stubs]
-    django_settings_module: str (required)
+django_settings_module = str (required)
+strict_settings = bool (default: true)
 ...
 """
 TOML_USAGE = """
@@ -22,13 +23,14 @@ TOML_USAGE = """
 ...
 [tool.django-stubs]
 django_settings_module = str (required)
+strict_settings = bool (default: true)
 ...
 """
 INVALID_FILE = "mypy config file is not specified or found"
 COULD_NOT_LOAD_FILE = "could not load configuration file"
-MISSING_SECTION = "no section [{section}] found".format
+MISSING_SECTION = "no section [{section}] found"
 MISSING_DJANGO_SETTINGS = "missing required 'django_settings_module' config"
-INVALID_SETTING = "invalid {key!r}: the setting must be a boolean".format
+INVALID_BOOL_SETTING = "invalid {key!r}: the setting must be a boolean"
 
 
 def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
@@ -48,8 +50,9 @@ def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
 
 
 class DjangoPluginConfig:
-    __slots__ = ("django_settings_module",)
+    __slots__ = ("django_settings_module", "strict_settings")
     django_settings_module: str
+    strict_settings: bool
 
     def __init__(self, config_file: Optional[str]) -> None:
         if not config_file:
@@ -75,7 +78,7 @@ class DjangoPluginConfig:
         try:
             config: Dict[str, Any] = data["tool"]["django-stubs"]
         except KeyError:
-            toml_exit(MISSING_SECTION(section="tool.django-stubs"))
+            toml_exit(MISSING_SECTION.format(section="tool.django-stubs"))
 
         if "django_settings_module" not in config:
             toml_exit(MISSING_DJANGO_SETTINGS)
@@ -83,6 +86,10 @@ class DjangoPluginConfig:
         self.django_settings_module = config["django_settings_module"]
         if not isinstance(self.django_settings_module, str):
             toml_exit("invalid 'django_settings_module': the setting must be a string")
+
+        self.strict_settings = config.get("strict_settings", True)
+        if not isinstance(self.strict_settings, bool):
+            toml_exit(INVALID_BOOL_SETTING.format(key="strict_settings"))
 
     def parse_ini_file(self, filepath: Path) -> None:
         parser = configparser.ConfigParser()
@@ -94,9 +101,21 @@ class DjangoPluginConfig:
 
         section = "mypy.plugins.django-stubs"
         if not parser.has_section(section):
-            exit_with_error(MISSING_SECTION(section=section))
+            exit_with_error(MISSING_SECTION.format(section=section))
 
         if not parser.has_option(section, "django_settings_module"):
             exit_with_error(MISSING_DJANGO_SETTINGS)
 
         self.django_settings_module = parser.get(section, "django_settings_module").strip("'\"")
+
+        try:
+            self.strict_settings = parser.getboolean(section, "strict_settings", fallback=True)
+        except ValueError:
+            exit_with_error(INVALID_BOOL_SETTING.format(key="strict_settings"))
+
+    def to_json(self) -> Dict[str, Any]:
+        """We use this method to reset mypy cache via `report_config_data` hook."""
+        return {
+            "django_settings_module": self.django_settings_module,
+            "strict_settings": self.strict_settings,
+        }

@@ -1,7 +1,7 @@
 import itertools
 import sys
 from functools import partial
-from typing import Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
@@ -14,6 +14,7 @@ from mypy.plugin import (
     FunctionContext,
     MethodContext,
     Plugin,
+    ReportConfigContext,
 )
 from mypy.types import Type as MypyType
 
@@ -129,7 +130,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for values / values_list
         if file.fullname == "django.db.models":
-            return [self._new_dependency("mypy_extensions"), self._new_dependency("typing")]
+            return [self._new_dependency("typing")]
 
         # for `get_user_model()`
         if self.django_context.settings:
@@ -273,7 +274,11 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # Lookup of a settings variable
         if class_name == fullnames.DUMMY_SETTINGS_BASE_CLASS:
-            return partial(settings.get_type_of_settings_attribute, django_context=self.django_context)
+            return partial(
+                settings.get_type_of_settings_attribute,
+                django_context=self.django_context,
+                plugin_config=self.plugin_config,
+            )
 
         info = self._get_typeinfo_or_none(class_name)
 
@@ -325,6 +330,10 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
                 return create_new_manager_class_from_as_manager_method
         return None
+
+    def report_config_data(self, ctx: ReportConfigContext) -> Dict[str, Any]:
+        # Cache would be cleared if any settings do change.
+        return self.plugin_config.to_json()
 
 
 def plugin(version: str) -> Type[NewSemanalDjangoPlugin]:

@@ -58,3 +58,42 @@
       main:4: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'
       main:5: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'
       main:5: note: Revealed type is "Any"
+
+
+-   case: settings_loaded_from_runtime_magic
+    disable_cache: true
+    main: |
+        from django.conf import settings
+
+        # Global:
+        reveal_type(settings.SECRET_KEY)  # N: Revealed type is "builtins.str"
+
+        # Custom:
+        reveal_type(settings.A)  # N: Revealed type is "Any"
+        reveal_type(settings.B)  # E: 'Settings' object has no attribute 'B' # N: Revealed type is "Any"
+    custom_settings: |
+        # Some code that mypy cannot analyze, but values exist in runtime:
+        exec('A = 1')
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = mysettings
+        strict_settings = false
+
+
+-   case: settings_loaded_from_runtime_magic_strict_default
+    disable_cache: true
+    main: |
+        from django.conf import settings
+
+        # Global:
+        reveal_type(settings.SECRET_KEY)  # N: Revealed type is "builtins.str"
+
+        # Custom:
+        reveal_type(settings.A)  # E: 'Settings' object has no attribute 'A' # N: Revealed type is "Any"
+        reveal_type(settings.B)  # E: 'Settings' object has no attribute 'B' # N: Revealed type is "Any"
+    custom_settings: |
+        # Some code that mypy cannot analyze, but values exist in runtime:
+        exec('A = 1')
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = mysettings

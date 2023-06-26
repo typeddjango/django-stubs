@@ -96,14 +96,14 @@ class BaseExpression:
         self,
         *,
         descending: bool = ...,
-        nulls_first: bool = ...,
-        nulls_last: bool = ...,
+        nulls_first: bool | None = ...,
+        nulls_last: bool | None = ...,
     ) -> OrderBy: ...
     def desc(
         self,
         *,
-        nulls_first: bool = ...,
-        nulls_last: bool = ...,
+        nulls_first: bool | None = ...,
+        nulls_last: bool | None = ...,
     ) -> OrderBy: ...
     def reverse_ordering(self) -> BaseExpression: ...
     def flatten(self) -> Iterator[BaseExpression]: ...
@@ -139,14 +139,14 @@ class F(Combinable):
         self,
         *,
         descending: bool = ...,
-        nulls_first: bool = ...,
-        nulls_last: bool = ...,
+        nulls_first: bool | None = ...,
+        nulls_last: bool | None = ...,
     ) -> OrderBy: ...
     def desc(
         self,
         *,
-        nulls_first: bool = ...,
-        nulls_last: bool = ...,
+        nulls_first: bool | None = ...,
+        nulls_last: bool | None = ...,
     ) -> OrderBy: ...
     def deconstruct(self) -> Any: ...  # fake
 
@@ -247,9 +247,11 @@ class OrderBy(Expression):
         self,
         expression: Expression | F | Subquery,
         descending: bool = ...,
-        nulls_first: bool = ...,
-        nulls_last: bool = ...,
+        nulls_first: bool | None = ...,
+        nulls_last: bool | None = ...,
     ) -> None: ...
+    def asc(self) -> None: ...  # type: ignore[override]
+    def desc(self) -> None: ...  # type: ignore[override]
 
 class Window(SQLiteNumericMixin, Expression):
     template: str
@@ -261,7 +263,7 @@ class Window(SQLiteNumericMixin, Expression):
         self,
         expression: BaseExpression,
         partition_by: str | Iterable[BaseExpression | F] | F | BaseExpression | None = ...,
-        order_by: Sequence[BaseExpression | F] | BaseExpression | F | None = ...,
+        order_by: Sequence[BaseExpression | F | str] | BaseExpression | F | str | None = ...,
         frame: WindowFrame | None = ...,
         output_field: Field | None = ...,
     ) -> None: ...

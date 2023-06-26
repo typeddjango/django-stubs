@@ -11,7 +11,8 @@ TEMPLATE = """
 (config)
 ...
 [mypy.plugins.django-stubs]
-    django_settings_module: str (required)
+django_settings_module = str (required)
+strict_settings = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
 """
@@ -21,6 +22,7 @@ TEMPLATE_TOML = """
 ...
 [tool.django-stubs]
 django_settings_module = str (required)
+strict_settings = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
 """
@@ -51,6 +53,11 @@ def write_to_file(file_contents: str, suffix: Optional[str] = None) -> Generator
             ["[mypy.plugins.django-stubs]"],
             "missing required 'django_settings_module' config",
             id="no-settings-given",
+        ),
+        pytest.param(
+            ["[mypy.plugins.django-stubs]", "django_settings_module = some.module", "strict_settings = bad"],
+            "invalid 'strict_settings': the setting must be a boolean",
+            id="missing-settings-module",
         ),
     ],
 )
@@ -113,6 +120,15 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
             "could not load configuration file",
             id="invalid toml",
         ),
+        pytest.param(
+            """
+            [tool.django-stubs]
+            django_settings_module = "some.module"
+            strict_settings = "a"
+            """,
+            "invalid 'strict_settings': the setting must be a boolean",
+            id="invalid strict_settings type",
+        ),
     ],
 )
 def test_toml_misconfiguration_handling(capsys: Any, config_file_contents, message_part) -> None:
@@ -124,29 +140,37 @@ def test_toml_misconfiguration_handling(capsys: Any, config_file_contents, messa
     assert error_message == capsys.readouterr().err
 
 
-def test_correct_toml_configuration() -> None:
+@pytest.mark.parametrize("boolean_value", ["true", "false"])
+def test_correct_toml_configuration(boolean_value: str) -> None:
     config_file_contents = """
     [tool.django-stubs]
     some_other_setting = "setting"
     django_settings_module = "my.module"
-    """
+    strict_settings = {}
+    """.format(
+        boolean_value
+    )
 
     with write_to_file(config_file_contents, suffix=".toml") as filename:
         config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == "my.module"
+    assert config.strict_settings is (boolean_value == "true")
 
 
-def test_correct_configuration() -> None:
+@pytest.mark.parametrize("boolean_value", ["true", "True", "false", "False"])
+def test_correct_configuration(boolean_value) -> None:
     """Django settings module gets extracted given valid configuration."""
     config_file_contents = "\n".join(
         [
             "[mypy.plugins.django-stubs]",
-            "\tsome_other_setting = setting",
-            "\tdjango_settings_module = my.module",
+            "some_other_setting = setting",
+            "django_settings_module = my.module",
+            f"strict_settings = {boolean_value}",
         ]
-    ).expandtabs(4)
+    )
     with write_to_file(config_file_contents) as filename:
         config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == "my.module"
+    assert config.strict_settings is (boolean_value.lower() == "true")
