@@ -80,6 +80,23 @@ class MyModel(models.Model):
 
 * `django_stubs_ext.db.router.TypedDatabaseRouter` can be used as base when implementing custom database routers.
 
+## Settings
+
+django-stubs has a few settings, which you can list in:
+
+* `pyproject.toml`, under the table `[tool.django-stubs]`
+* `mypy.ini` under the table `[mypy.plugins.django-stubs]`
+
+The supported settings are:
+
+- `django_settings_module`, a string.
+
+  Specify the import path of your settings module, the same as Django’s [`DJANGO_SETTINGS_MODULE` environment variable](https://docs.djangoproject.com/en/stable/topics/settings/#designating-the-settings).
+
+- `strict_settings`, a boolean, default `true`.
+
+  Set to `false` if using dynamic settings, as [described below](https://github.com/typeddjango/django-stubs#how-to-use-a-custom-library-to-handle-django-settings).
+
 ## FAQ
 
 ### Is this an official Django project?
