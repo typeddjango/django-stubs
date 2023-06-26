@@ -9,12 +9,14 @@ from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from django.db.models.manager import Manager
 from django.db.models.options import _OptionTogetherT
+from django.utils.functional import cached_property
 
 class ModelOperation(Operation):
     name: str
     def __init__(self, name: str) -> None: ...
-    @property
+    @cached_property
     def name_lower(self) -> str: ...
+    def can_reduce_through(self, operation: Operation, app_label: str) -> bool: ...
 
 class CreateModel(ModelOperation):
     fields: list[tuple[str, Field]]
@@ -36,9 +38,9 @@ class RenameModel(ModelOperation):
     old_name: str
     new_name: str
     def __init__(self, old_name: str, new_name: str) -> None: ...
-    @property
+    @cached_property
     def old_name_lower(self) -> str: ...
-    @property
+    @cached_property
     def new_name_lower(self) -> str: ...
 
 class ModelOptionOperation(ModelOperation): ...
@@ -47,6 +49,21 @@ class AlterModelTable(ModelOptionOperation):
     table: str | None
     def __init__(self, name: str, table: str | None) -> None: ...
 
+class AlterModelTableComment(ModelOptionOperation):
+    table_comment: str
+    def __init__(self, name: str, table_comment: str) -> None: ...
+    def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
+    def state_forwards(self, app_label: str, state: Any) -> None: ...
+    def database_forwards(
+        self, app_label: str, schema_editor: BaseDatabaseSchemaEditor, from_state: Any, to_state: Any
+    ) -> None: ...
+    def database_backwards(
+        self, app_label: str, schema_editor: BaseDatabaseSchemaEditor, from_state: Any, to_state: Any
+    ) -> None: ...
+    def describe(self) -> str: ...
+    @property
+    def migration_name_fragment(self) -> str: ...
+
 class AlterTogetherOptionOperation(ModelOptionOperation):
     option_name: str
     def __init__(
@@ -54,7 +71,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         name: str,
         option_value: _OptionTogetherT | None,
     ) -> None: ...
-    @property
+    @cached_property
     def option_value(self) -> set[tuple[str, ...]] | None: ...
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
     def state_forwards(self, app_label: str, state: Any) -> None: ...
@@ -80,6 +97,7 @@ class AlterIndexTogether(AlterTogetherOptionOperation):
     def __init__(self, name: str, index_together: _OptionTogetherT | None) -> None: ...
 
 class AlterOrderWithRespectTo(ModelOptionOperation):
+    option_name: str
     order_with_respect_to: str
     def __init__(self, name: str, order_with_respect_to: str) -> None: ...
 
@@ -94,7 +112,7 @@ class AlterModelManagers(ModelOptionOperation):
 
 class IndexOperation(Operation):
     option_name: str
-    @property
+    @cached_property
     def model_name_lower(self) -> str: ...
 
 class AddIndex(IndexOperation):
@@ -119,9 +137,9 @@ class RenameIndex(IndexOperation):
         old_name: str | None = ...,
         old_fields: Sequence[str] | None = ...,
     ) -> None: ...
-    @property
+    @cached_property
     def old_name_lower(self) -> str: ...
-    @property
+    @cached_property
     def new_name_lower(self) -> str: ...
 
 class AddConstraint(IndexOperation):
