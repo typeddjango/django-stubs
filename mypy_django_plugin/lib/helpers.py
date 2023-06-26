@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Literal, Optional, Set, Union, cast
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -35,6 +35,7 @@ from mypy.plugin import (
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
+from typing_extensions import TypedDict
 
 from mypy_django_plugin.lib import fullnames
 from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
@@ -43,8 +44,23 @@ if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
 
 
-def get_django_metadata(model_info: TypeInfo) -> Dict[str, Any]:
-    return model_info.metadata.setdefault("django", {})
+class DjangoTypeMetadata(TypedDict, total=False):
+    from_queryset_manager: str
+    reverse_managers: Dict[str, str]
+    baseform_bases: Dict[str, int]
+    manager_bases: Dict[str, int]
+    model_bases: Dict[str, int]
+    queryset_bases: Dict[str, int]
+
+
+def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
+    return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
+
+
+def get_django_metadata_bases(
+    model_info: TypeInfo, key: Literal["baseform_bases", "manager_bases", "model_bases", "queryset_bases"]
+) -> Dict[str, int]:
+    return get_django_metadata(model_info).setdefault(key, cast(Dict[str, int], {}))
 
 
 class IncompleteDefnException(Exception):
@@ -376,4 +392,5 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_se
 def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:
     sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
-        get_django_metadata(sym.node)["manager_bases"][fullname] = 1
+        bases = get_django_metadata_bases(sym.node, "manager_bases")
+        bases[fullname] = 1
