@@ -34,10 +34,6 @@ django.utils.datastructures.ImmutableList.remove
 django.utils.datastructures.ImmutableList.sort
 django.utils.datastructures.ImmutableList.reverse
 
-# Django-stubs protocol (XXX not used internally, check usage/issues)
-django.utils.decorators.AsyncGetResponseCallable
-django.utils.deprecation.GetResponseCallable
-
 # Promise is lazy, see notes in .pyi
 django.utils.functional.Promise.__add__
 django.utils.functional.Promise.__deepcopy__
