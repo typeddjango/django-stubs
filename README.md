@@ -82,7 +82,7 @@ class MyModel(models.Model):
 
 ## Settings
 
-The list of settings we support in `[tool.django-stubs]` for `toml` or `[mypy.plugins.django-stubs]` for `ini`:
+The list of settings we support in `[tool.django-stubs]` for `pyproject.toml` or `[mypy.plugins.django-stubs]` for `mypy.ini`:
 - `django_settings_module` string, which is the same as [`DJANGO_SETTINGS_MODULE` env var](https://docs.djangoproject.com/en/4.2/topics/settings/#designating-the-settings)
 - `strict_settings` which can be `true` or `false` (defaults to `true`), behavior is [specified here](https://github.com/typeddjango/django-stubs#how-to-use-a-custom-library-to-handle-django-settings)
 
