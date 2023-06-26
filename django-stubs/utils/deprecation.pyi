@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable
-from typing import Any, Protocol, type_check_only
+from typing import Any, Protocol
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
