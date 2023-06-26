@@ -602,6 +602,7 @@ django.contrib.gis.gdal.geometries.OGRGeometry.geojson
 django.contrib.gis.gdal.geometries.Polygon.exterior_ring
 django.contrib.gis.gdal.layer.Layer.num_feat
 django.contrib.gis.gdal.libgdal.err_handler
+django.contrib.gis.gdal.libgdal.lib_name
 django.contrib.gis.gdal.libgdal.lwingdal
 django.contrib.gis.gdal.raster.const.GDAL_TO_CTYPES
 django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_BASE_PATH
