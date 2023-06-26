@@ -31,7 +31,7 @@ class DeprecationInstanceCheck(type):
     def __instancecheck__(self, instance: Any) -> bool: ...
 
 @type_check_only
-class GetResponseCallable(Protocol):
+class _GetResponseCallable(Protocol):
     def __call__(self, __request: HttpRequest) -> HttpResponseBase: ...
 
 class MiddlewareMixin:

@@ -19,6 +19,7 @@ django.utils.archive.BaseArchive.list
 django.utils.archive.BaseArchive.extract
 
 # ImmutableList always raise when calling these,
+# later they can be added with `-> NoReturn` overrides.
 django.utils.datastructures.ImmutableList.__delitem__
 django.utils.datastructures.ImmutableList.__delslice__
 django.utils.datastructures.ImmutableList.__iadd__
