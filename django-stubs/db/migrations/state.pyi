@@ -11,7 +11,6 @@ from django.utils.functional import cached_property
 
 class AppConfigStub(AppConfig):
     def __init__(self, label: str) -> None: ...
-    def import_models(self) -> None: ...
 
 class ModelState:
     name: str
