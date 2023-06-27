@@ -15,7 +15,7 @@
 
       f = Foo()
       reveal_type(f.attr)        # N: Revealed type is "builtins.list[builtins.str]"
-      f.attr.name                # E: "List[str]" has no attribute "name"
+      f.attr.name                # E: "list[str]" has no attribute "name"
 
 -   case: str_promise_proxy
     main:  |
@@ -30,7 +30,7 @@
       reveal_type(s.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(s.capitalize())    # N: Revealed type is "builtins.str"
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
-      reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> Tuple[builtins.str]"
+      reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> tuple[builtins.str]"
       s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"
       f: Union[_StrPromise, str]
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"

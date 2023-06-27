@@ -40,7 +40,7 @@
 
       # iterators
       # actually [('foo', 'Foo'), ('bar', [])]
-      reveal_type(list(d.items()))  # N: Revealed type is "builtins.list[Tuple[builtins.str, Union[builtins.str, builtins.list[builtins.object]]]]"
+      reveal_type(list(d.items()))  # N: Revealed type is "builtins.list[tuple[builtins.str, Union[builtins.str, builtins.list[builtins.object]]]]"
       reveal_type(list(d.keys()))  # N: Revealed type is "builtins.list[builtins.str]"
       # actually ['Foo', []]
       reveal_type(list(d.values()))  # N: Revealed type is "builtins.list[Union[builtins.str, builtins.list[builtins.object]]]"

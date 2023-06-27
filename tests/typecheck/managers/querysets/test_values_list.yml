@@ -1,8 +1,8 @@
 -   case: values_list_simple_field_returns_queryset_of_tuples
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser.objects.values_list('name').get())  # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(MyUser.objects.values_list('id', 'name').get())  # N: Revealed type is "Tuple[builtins.int, builtins.str]"
+        reveal_type(MyUser.objects.values_list('name').get())  # N: Revealed type is "tuple[builtins.str]"
+        reveal_type(MyUser.objects.values_list('id', 'name').get())  # N: Revealed type is "tuple[builtins.int, builtins.str]"
 
         values_tuple = MyUser.objects.values_list('name', 'age').get()
         reveal_type(values_tuple[0])  # N: Revealed type is "builtins.str"
@@ -10,11 +10,11 @@
 
         # no fields specified return all fields
         all_values_tuple = MyUser.objects.values_list().get()
-        reveal_type(all_values_tuple)  # N: Revealed type is "Tuple[builtins.int, builtins.str, builtins.int]"
+        reveal_type(all_values_tuple)  # N: Revealed type is "tuple[builtins.int, builtins.str, builtins.int]"
 
         # pk as field
         pk_values = MyUser.objects.values_list('pk').get()
-        reveal_type(pk_values)  # N: # N: Revealed type is "Tuple[builtins.int]"
+        reveal_type(pk_values)  # N: # N: Revealed type is "tuple[builtins.int]"
     installed_apps:
         - myapp
     files:
@@ -32,7 +32,7 @@
 
         # Values tuples can have the same field repeated
         values_tuple = MyUser.objects.values_list('name', 'age', 'name').get()
-        reveal_type(values_tuple)  # N: Revealed type is "Tuple[builtins.str, builtins.int, builtins.str]"
+        reveal_type(values_tuple)  # N: Revealed type is "tuple[builtins.str, builtins.int, builtins.str]"
         reveal_type(values_tuple[0])  # N: Revealed type is "builtins.str"
         reveal_type(values_tuple[1])  # N: Revealed type is "builtins.int"
         reveal_type(values_tuple[2])  # N: Revealed type is "builtins.str"
@@ -52,12 +52,12 @@
         from myapp.models import MyUser
         from django.db.models.functions import Length
         query = MyUser.objects.values_list('name')
-        reveal_type(query.order_by("name").get())  # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.distinct("name").get()) # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.distinct().get()) # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.all().get()) # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.filter(age__gt=16).get()) # N: Revealed type is "Tuple[builtins.str]"
-        reveal_type(query.exclude(age__lte=16).get()) # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(query.order_by("name").get())  # N: Revealed type is "tuple[builtins.str]"
+        reveal_type(query.distinct("name").get()) # N: Revealed type is "tuple[builtins.str]"
+        reveal_type(query.distinct().get()) # N: Revealed type is "tuple[builtins.str]"
+        reveal_type(query.all().get()) # N: Revealed type is "tuple[builtins.str]"
+        reveal_type(query.filter(age__gt=16).get()) # N: Revealed type is "tuple[builtins.str]"
+        reveal_type(query.exclude(age__lte=16).get()) # N: Revealed type is "tuple[builtins.str]"
         reveal_type(query.annotate(name_length=Length("name")).get()) # N: Revealed type is "builtins.tuple[Any, ...]"
     installed_apps:
         - myapp
@@ -80,7 +80,7 @@
         reveal_type(values_tuple[3])  # N: Revealed type is "builtins.str"
 
         reverse_fields_list = Blog.objects.values_list('post__text').get()
-        reveal_type(reverse_fields_list)  # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(reverse_fields_list)  # N: Revealed type is "tuple[builtins.str]"
     installed_apps:
         - myapp
     files:
@@ -126,7 +126,7 @@
     main: |
         from myapp.models import MyUser
         values_named_tuple = MyUser.objects.values_list('name', 'age', named=True).get()
-        reveal_type(values_named_tuple)  # N: Revealed type is "Tuple[builtins.str, builtins.int, fallback=main.Row]"
+        reveal_type(values_named_tuple)  # N: Revealed type is "tuple[builtins.str, builtins.int, fallback=main.Row]"
         reveal_type(values_named_tuple.name)  # N: Revealed type is "builtins.str"
         reveal_type(values_named_tuple.age)  # N: Revealed type is "builtins.int"
 
@@ -139,13 +139,13 @@
 
         # pk as field
         pk_values = MyUser.objects.values_list('pk', named=True).get()
-        reveal_type(pk_values)  # N: Revealed type is "Tuple[builtins.int, fallback=main.Row2]"
+        reveal_type(pk_values)  # N: Revealed type is "tuple[builtins.int, fallback=main.Row2]"
         reveal_type(pk_values.pk)  # N: # N: Revealed type is "builtins.int"
 
         # values_list(named=True) inside function
         def func() -> None:
             from myapp.models import MyUser
-            reveal_type(MyUser.objects.values_list('name', named=True).get())  # N: Revealed type is "Tuple[builtins.str, fallback=main.Row3]"
+            reveal_type(MyUser.objects.values_list('name', named=True).get())  # N: Revealed type is "tuple[builtins.str, fallback=main.Row3]"
     installed_apps:
         - myapp
     files:
@@ -189,7 +189,7 @@
         main:3: note: Revealed type is "Any"
         main:4: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id
         main:4: note: Revealed type is "Any"
-        main:5: note: Revealed type is "Tuple[Any]"
+        main:5: note: Revealed type is "tuple[Any]"
     installed_apps:
         - myapp
     files:
@@ -257,7 +257,7 @@
         from myapp.models import TransactionQuerySet
         reveal_type(TransactionQuerySet())  # N: Revealed type is "myapp.models.TransactionQuerySet"
         reveal_type(TransactionQuerySet().values())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Transaction, TypedDict({'id': builtins.int, 'total': builtins.int})]"
-        reveal_type(TransactionQuerySet().values_list())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Transaction, Tuple[builtins.int, builtins.int]]"
+        reveal_type(TransactionQuerySet().values_list())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Transaction, tuple[builtins.int, builtins.int]]"
     installed_apps:
         - myapp
     files:
@@ -273,8 +273,8 @@
 -   case: values_list_of_many_to_many_field
     main: |
         from myapp.models import Author, Book
-        reveal_type(Book.objects.values_list('authors'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, Tuple[builtins.int]]"
-        reveal_type(Author.objects.values_list('books'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Author, Tuple[builtins.int]]"
+        reveal_type(Book.objects.values_list('authors'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, tuple[builtins.int]]"
+        reveal_type(Author.objects.values_list('books'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Author, tuple[builtins.int]]"
     installed_apps:
         - myapp
     files:
@@ -290,7 +290,7 @@
     main: |
         from myapp.models import Blog
         values = Blog.objects.values_list('text').get()
-        reveal_type(values)  # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(values)  # N: Revealed type is "tuple[builtins.str]"
     installed_apps:
         - myapp
     files:

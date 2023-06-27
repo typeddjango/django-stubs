@@ -269,11 +269,11 @@
         from django.db.models.expressions import F
 
         values_list_double_annotate = Blog.objects.annotate(foo=F('id')).annotate(bar=F('id')).values_list('foo', 'bar').get()
-        reveal_type(values_list_double_annotate)  # N: Revealed type is "Tuple[Any, Any]"
+        reveal_type(values_list_double_annotate)  # N: Revealed type is "tuple[Any, Any]"
 
         values_list_named = Blog.objects.annotate(foo=F('id'), bar=F('isad')).values_list('foo', 'text', named=True).get()
         # We have to assume we don't know any of the tuple member types.
-        reveal_type(values_list_named)  # N: Revealed type is "Tuple[Any, builtins.str, fallback=main.Row]"
+        reveal_type(values_list_named)  # N: Revealed type is "tuple[Any, builtins.str, fallback=main.Row]"
         values_list_named.unknown # E: "Row" has no attribute "unknown"
         reveal_type(values_list_named.foo) # N: Revealed type is "Any"
         reveal_type(values_list_named.text) # N: Revealed type is "builtins.str"

@@ -126,7 +126,7 @@
 
       class A(admin.ModelAdmin):
           formfield_overrides = {
-              "not a field": {  # E: Dict entry 0 has incompatible type "str": "Dict[str, Any]"; expected "Type[Field[Any, Any]]": "Mapping[str, Any]"
+              "not a field": {  # E: Dict entry 0 has incompatible type "str": "dict[str, Any]"; expected "type[Field[Any, Any]]": "Mapping[str, Any]"
                   "widget": Textarea
               }
           }
@@ -150,4 +150,4 @@
           pass
 
       class A(ModelAdmin[TestModel]):
-          model = int  # E: Incompatible types in assignment (expression has type "Type[int]", base class "ModelAdmin" defined the type as "Type[TestModel]")
+          model = int  # E: Incompatible types in assignment (expression has type "type[int]", base class "ModelAdmin" defined the type as "type[TestModel]")

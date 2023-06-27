@@ -9,7 +9,7 @@
       reveal_type(response.client)  # N: Revealed type is "django.test.client.Client"
       reveal_type(response.context)  # N: Revealed type is "Union[django.test.utils.ContextList, builtins.dict[builtins.str, Any]]"
       reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
-      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[tuple[builtins.str, builtins.int]]"
       response.json()
 -   case: async_client_methods
     main: |
@@ -23,7 +23,7 @@
         reveal_type(response.client)  # N: Revealed type is "django.test.client.AsyncClient"
         reveal_type(response.context)  # N: Revealed type is "Union[django.test.utils.ContextList, builtins.dict[builtins.str, Any]]"
         reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
-        reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+        reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[tuple[builtins.str, builtins.int]]"
         response.json()
 -   case: request_factories
     main: |
