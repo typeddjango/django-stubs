@@ -1,6 +1,5 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from typing import Any
-from collections.abc import Iterator
 
 from django.core.exceptions import ImproperlyConfigured
 
