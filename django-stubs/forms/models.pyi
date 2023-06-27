@@ -234,7 +234,6 @@ class InlineForeignKeyField(Field):
     required: bool
     show_hidden_initial: bool
     widget: _ClassLevelWidgetT
-    default_error_messages: dict[str, str]
     parent_instance: Model
     pk_field: bool
     to_field: str | None
@@ -263,12 +262,10 @@ class ModelChoiceIterator:
 
 class ModelChoiceField(ChoiceField):
     disabled: bool
-    error_messages: dict[str, str]
     help_text: _StrOrPromise
     required: bool
     show_hidden_initial: bool
     validators: list[Any]
-    default_error_messages: dict[str, str]
     iterator: type[ModelChoiceIterator]
     empty_label: _StrOrPromise | None
     queryset: QuerySet[models.Model] | None
@@ -308,7 +305,6 @@ class ModelMultipleChoiceField(ModelChoiceField):
     show_hidden_initial: bool
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
-    default_error_messages: dict[str, str]
     def __init__(self, queryset: None | Manager[Model] | QuerySet[Model], **kwargs: Any) -> None: ...
     def to_python(self, value: Any) -> list[Model]: ...  # type: ignore[override]
     def clean(self, value: Any) -> QuerySet[Model]: ...
