@@ -12,6 +12,7 @@ extend-exclude = [
 ]
 line-length = 120
 target-version = "py38"
+# See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
 select = [
     "I",        # isort
     "F401",     # Unused imports
@@ -20,7 +21,7 @@ select = [
 ]
 
 [tool.ruff.flake8-tidy-imports.banned-api]
-"_typeshed.Self".msg = "Use typing_extensions.Self instead."
+"_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."
 
 [tool.ruff.isort]
 split-on-trailing-comma = false
