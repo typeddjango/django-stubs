@@ -5,14 +5,7 @@ from uuid import UUID
 from django.core import validators  # due to weird mypy.stubtest error
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
-from django.db.models.fields import (
-    Field,
-    _AllLimitChoicesTo,
-    _ErrorMessagesDict,
-    _ErrorMessagesMapping,
-    _FieldChoices,
-    _LimitChoicesTo,
-)
+from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _FieldChoices, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
 from django.db.models.fields.related_descriptors import (  # noqa: F401

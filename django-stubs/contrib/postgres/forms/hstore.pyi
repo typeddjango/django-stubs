@@ -1,7 +1,7 @@
 from typing import Any
 
 from django import forms
-from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
+from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 
 class HStoreField(forms.CharField):

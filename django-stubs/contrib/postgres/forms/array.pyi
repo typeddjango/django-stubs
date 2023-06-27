@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from django import forms
-from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
+from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.utils import _DataT, _FilesT
 from django.forms.widgets import Media, _OptAttrs

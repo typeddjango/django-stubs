@@ -1,7 +1,7 @@
 from typing import Any
 
 from django import forms
-from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
+from django.db.models.fields import _ErrorMessagesDict
 from django.forms.widgets import MultiWidget, _OptAttrs
 from psycopg2.extras import Range
 
