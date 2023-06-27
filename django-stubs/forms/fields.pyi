@@ -7,7 +7,14 @@ from uuid import UUID
 
 from django.core.files import File
 from django.core.validators import _ValidatorCallable
-from django.db.models.fields import _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ErrorMessagesDict, _FieldChoices
+from django.db.models.fields import (
+    _Choice,
+    _ChoiceNamedGroup,
+    _ChoicesCallable,
+    _ErrorMessagesDict,
+    _ErrorMessagesMapping,
+    _FieldChoices,
+)
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
