@@ -1,5 +1,6 @@
 from collections.abc import Callable, Iterable
-from typing import Any, Generator
+from typing import Any
+from collections.abc import Iterator
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -66,4 +67,4 @@ class BaseCache:
     def close(self, **kwargs: Any) -> None: ...
     async def aclose(self, **kwargs: Any) -> None: ...
 
-def memcache_key_warnings(key: str) -> Generator[str, None, None]: ...
+def memcache_key_warnings(key: str) -> Iterator[str]: ...
