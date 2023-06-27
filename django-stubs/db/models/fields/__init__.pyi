@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, Generic, Protocol, TypeVar, overload
+from typing import Any, Generic, Protocol, TypeVar, overload, Mapping
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
@@ -45,7 +45,8 @@ class _FieldDescriptor(Protocol[_F]):
     def field(self) -> _F: ...
 
 _AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
-_ErrorMessagesT: TypeAlias = dict[str, Any]
+_ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
+_ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
 # __set__ value type
 _ST = TypeVar("_ST", contravariant=True)
@@ -143,12 +144,12 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     column: str
     concrete: bool
     default: Any
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     empty_values: Sequence[Any]
     creation_counter: int
     auto_creation_counter: int
     default_validators: Sequence[validators._ValidatorCallable]
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     hidden: bool
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
@@ -177,7 +178,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
@@ -278,7 +279,7 @@ class DecimalField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class CharField(Field[_ST, _GT]):
@@ -309,7 +310,7 @@ class CharField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         *,
         db_collation: str | None = ...,
     ) -> None: ...
@@ -338,7 +339,7 @@ class SlugField(CharField[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         *,
         max_length: int | None = ...,
         db_index: bool = ...,
@@ -373,7 +374,7 @@ class URLField(CharField[_ST, _GT]):
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class TextField(Field[_ST, _GT]):
@@ -404,7 +405,7 @@ class TextField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         *,
         db_collation: str | None = ...,
     ) -> None: ...
@@ -427,7 +428,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     unpack_ipv4: bool
     protocol: str
     def __init__(
@@ -451,7 +452,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class DateTimeCheckMixin: ...
@@ -485,7 +486,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
@@ -515,7 +516,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class DateTimeField(DateField[_ST, _GT]):
@@ -552,7 +553,7 @@ class UUIDField(Field[_ST, _GT]):
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
@@ -587,7 +588,7 @@ class FilePathField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class BinaryField(Field[_ST, _GT]):
