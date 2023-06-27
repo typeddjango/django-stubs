@@ -803,7 +803,6 @@ django.contrib.staticfiles.management.commands.collectstatic
 django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
 django.contrib.staticfiles.storage
 django.core.cache.InvalidCacheKey
-django.core.cache.backends.base.memcache_key_warnings
 django.core.cache.backends.db.DatabaseCache.pickle_protocol
 django.core.cache.backends.filebased.FileBasedCache.pickle_protocol
 django.core.cache.backends.locmem.LocMemCache.pickle_protocol
