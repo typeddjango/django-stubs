@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from enum import Enum
 from typing import Any, overload
 
-from _typeshed import Self
+from typing_extensions import Self
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Combinable
@@ -22,7 +22,7 @@ class BaseConstraint:
     def create_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
     def remove_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
     def deconstruct(self) -> Any: ...
-    def clone(self: Self) -> Self: ...
+    def clone(self) -> Self: ...
 
 class CheckConstraint(BaseConstraint):
     check: Q | BaseExpression

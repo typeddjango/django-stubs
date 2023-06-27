@@ -7,7 +7,7 @@ from types import TracebackType
 from typing import Any, Literal, Protocol, overload
 from uuid import UUID
 
-from _typeshed import Self
+from typing_extensions import Self
 from typing_extensions import TypeAlias
 
 logger: Logger
@@ -44,7 +44,7 @@ class CursorWrapper:
     WRAP_ERROR_ATTRS: Any
     def __getattr__(self, attr: str) -> Any: ...
     def __iter__(self) -> Iterator[tuple[Any, ...]]: ...
-    def __enter__(self: Self) -> Self: ...
+    def __enter__(self) -> Self: ...
     def __exit__(
         self,
         exc_type: type[BaseException] | None,

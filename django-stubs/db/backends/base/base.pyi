@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from datetime import tzinfo
 from typing import Any
 
-from _typeshed import Self
+from typing_extensions import Self
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -119,4 +119,4 @@ class BaseDatabaseWrapper:
     def run_and_clear_commit_hooks(self) -> None: ...
     @contextmanager
     def execute_wrapper(self, wrapper: _ExecuteWrapper) -> Generator[None, None, None]: ...
-    def copy(self: Self, alias: str | None = ...) -> Self: ...
+    def copy(self, alias: str | None = ...) -> Self: ...

@@ -7,7 +7,7 @@ from logging import Logger
 from types import TracebackType
 from typing import Any, Protocol, SupportsIndex, TypeVar
 
-from _typeshed import Self
+from typing_extensions import Self
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
 from django.core.checks.registry import CheckRegistry
@@ -93,7 +93,7 @@ class CaptureQueriesContext:
     def __len__(self) -> int: ...
     @property
     def captured_queries(self) -> list[dict[str, str]]: ...
-    def __enter__(self: Self) -> Self: ...
+    def __enter__(self) -> Self: ...
     def __exit__(
         self,
         exc_type: type[BaseException] | None,

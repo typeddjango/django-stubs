@@ -3,7 +3,7 @@ from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload
 
-from _typeshed import Self
+from typing_extensions import Self
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -132,7 +132,7 @@ class QueryDict(MultiValueDict[str, str]):
     ) -> None: ...
     @classmethod
     def fromkeys(  # type: ignore
-        cls: type[Self],
+        cls,
         iterable: Iterable[bytes | str],
         value: str | bytes = ...,
         mutable: bool = ...,
