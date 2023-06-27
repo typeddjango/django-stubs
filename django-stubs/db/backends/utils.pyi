@@ -7,8 +7,7 @@ from types import TracebackType
 from typing import Any, Literal, Protocol, overload
 from uuid import UUID
 
-from typing_extensions import Self
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 logger: Logger
 

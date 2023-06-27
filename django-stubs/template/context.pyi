@@ -3,11 +3,10 @@ from contextlib import contextmanager
 from types import TracebackType
 from typing import Any
 
-from typing_extensions import Self
 from django.http.request import HttpRequest
 from django.template.base import Node, Origin, Template
 from django.template.loader_tags import IncludeNode
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _ContextKeys: TypeAlias = int | str | Node
 

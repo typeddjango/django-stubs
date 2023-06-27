@@ -1,7 +1,7 @@
 from typing import IO
 
-from typing_extensions import Self
 from django.core.files.base import File
+from typing_extensions import Self
 
 class UploadedFile(File):
     content_type: str | None

@@ -1,8 +1,8 @@
 from collections.abc import Iterator
 from typing import Any
 
-from typing_extensions import Self
 from django.contrib.gis.geos.base import GEOSBase
+from typing_extensions import Self
 
 class GEOSCoordSeq(GEOSBase):
     ptr_type: Any

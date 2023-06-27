@@ -2,10 +2,10 @@ import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, MutableMapping, Sequence
 from typing import Any, Generic, NoReturn, TypeVar, overload
 
-from typing_extensions import Self
 from django.db.models import Combinable
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
+from typing_extensions import Self
 
 from django_stubs_ext import ValuesQuerySet
 

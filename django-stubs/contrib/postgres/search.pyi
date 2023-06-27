@@ -1,10 +1,9 @@
 from typing import Any
 
-from typing_extensions import Self
 from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func
 from django.db.models.lookups import Lookup
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 

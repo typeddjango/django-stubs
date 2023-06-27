@@ -1,13 +1,13 @@
 from collections.abc import Collection, Iterable, Sequence
 from typing import Any, Final, TypeVar
 
-from typing_extensions import Self
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import BaseConstraint, Field
 from django.db.models.manager import BaseManager
 from django.db.models.options import Options
+from typing_extensions import Self
 
 _Self = TypeVar("_Self", bound=Model)
 

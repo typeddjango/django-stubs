@@ -2,8 +2,8 @@ from collections.abc import Iterator
 from types import TracebackType
 from typing import IO, AnyStr, type_check_only
 
-from typing_extensions import Self
 from django.core.files.utils import FileProxyMixin
+from typing_extensions import Self
 
 class File(FileProxyMixin[AnyStr], IO[AnyStr]):
     DEFAULT_CHUNK_SIZE: int

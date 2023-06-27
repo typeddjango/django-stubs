@@ -1,7 +1,6 @@
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol, TypeVar, overload
 
-from typing_extensions import Self
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
@@ -11,6 +10,7 @@ from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
+from typing_extensions import Self
 
 class FieldFile(File):
     instance: Model

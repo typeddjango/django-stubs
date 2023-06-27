@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from types import TracebackType
 from typing import Any, overload
 
-from typing_extensions import Self
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
@@ -22,6 +21,7 @@ from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.functional import classproperty
+from typing_extensions import Self
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...

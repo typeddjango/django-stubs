@@ -3,7 +3,6 @@ from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from typing import Any, Generic, Literal, TypeVar
 
-from typing_extensions import Self
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q
 from django.db.models.fields import Field
@@ -11,7 +10,7 @@ from django.db.models.lookups import Lookup, Transform
 from django.db.models.query import QuerySet
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 class SQLiteNumericMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...

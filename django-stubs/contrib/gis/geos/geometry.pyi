@@ -1,6 +1,5 @@
 from typing import Any
 
-from typing_extensions import Self
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.contrib.gis.gdal.geometries import OGRGeometry
 from django.contrib.gis.geos.base import GEOSBase
@@ -8,6 +7,7 @@ from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.prepared import PreparedGeometry
+from typing_extensions import Self
 
 class GEOSGeometryBase(GEOSBase):
     ptr_type: Any
