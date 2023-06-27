@@ -31,8 +31,9 @@ dependencies = [
     "types-PyYAML",
 ]
 
+# Keep compatible-mypy major.minor version pinned to what we use in CI (requirements.txt)
 extras_require = {
-    "compatible-mypy": ["mypy>=1.3.0,<1.5"],
+    "compatible-mypy": ["mypy==1.4.*"],
 }
 
 setup(
