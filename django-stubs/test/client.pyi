@@ -275,7 +275,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     raise_request_exception: bool
     exc_info: ExcInfo | None
     extra: dict[str, Any] | None
-    headers: dict[str, Any]
+    headers: Mapping[str, str] | None
     def __init__(
         self,
         enforce_csrf_checks: bool = ...,
@@ -394,7 +394,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     raise_request_exception: bool
     exc_info: ExcInfo | None
     extra: dict[str, Any] | None
-    headers: dict[str, Any]
+    headers: Mapping[str, str] | None
     def __init__(
         self,
         enforce_csrf_checks: bool = ...,
