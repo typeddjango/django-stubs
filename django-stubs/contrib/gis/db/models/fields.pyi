@@ -25,8 +25,8 @@ _GT = TypeVar("_GT")
 class SRIDCacheEntry(NamedTuple):
     units: Any
     units_name: str
-    geodetic: bool
     spheroid: str
+    geodetic: bool
 
 def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 
