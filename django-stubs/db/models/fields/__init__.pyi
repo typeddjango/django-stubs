@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, Generic, Protocol, TypeVar, overload
+from typing import Any, ClassVar, Generic, Protocol, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
