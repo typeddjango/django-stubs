@@ -1,17 +1,17 @@
 -   case: test_appconfig_can_be_str
     main: |
-      from django.app.config import AppConfig
+      from django.apps.config import AppConfig
       from django.utils.functional import cached_property
 
       class FooConfig(AppConfig):
           name = "foo"
           default_auto_field = "django.db.models.BigAutoField"
 
-      reveal_type(FooConfig().default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(FooConfig.default_auto_field)  # N: Revealed type is "builtins.str"
 
 -   case: test_appconfig_can_be_property
     main: |
-      from django.app.config import AppConfig
+      from django.apps.config import AppConfig
       from django.utils.functional import cached_property
 
       class BarConfig(AppConfig):
@@ -20,11 +20,11 @@
           def default_auto_field(self) -> str:
               return "django.db.models.BigAutoField"
 
-      reveal_type(BarConfig().default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(BarConfig.default_auto_field)  # N: Revealed type is "builtins.str"
 
 -   case: test_appconfig_can_be_cached_property
     main: |
-      from django.app.config import AppConfig
+      from django.apps.config import AppConfig
       from django.utils.functional import cached_property
 
       class BazConfig(AppConfig):
@@ -33,4 +33,4 @@
           def default_auto_field(self) -> str:
               return "django.db.models.BigAutoField"
 
-      reveal_type(BazConfig().default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(BazConfig.default_auto_field)  # N: Revealed type is "builtins.str"
