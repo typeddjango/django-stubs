@@ -3,7 +3,7 @@ from collections.abc import Iterator
 
 from django.apps.registry import Apps
 from django.db.models.base import Model
-from django.utils.functional import _StrOrPromise, cached_property
+from django.utils.functional import _Getter, _StrOrPromise
 
 APPS_MODULE_NAME: str
 MODELS_MODULE_NAME: str
@@ -17,9 +17,8 @@ class AppConfig:
     path: str
     models_module: str | None
     models: dict[str, type[Model]]
+    default_auto_field: str | _Getter[str]
     def __init__(self, app_name: str, app_module: types.ModuleType | None) -> None: ...
-    @cached_property
-    def default_auto_field(self) -> str: ...
     @classmethod
     def create(cls, entry: str) -> AppConfig: ...
     def get_model(self, model_name: str, require_ready: bool = ...) -> type[Model]: ...
