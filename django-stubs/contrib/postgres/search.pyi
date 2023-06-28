@@ -1,10 +1,9 @@
 from typing import Any
 
-from _typeshed import Self
 from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func
 from django.db.models.lookups import Lookup
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 
@@ -43,10 +42,10 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
 class SearchQueryCombinable:
     BITAND: str
     BITOR: str
-    def __or__(self: Self, other: SearchQueryCombinable) -> Self: ...
-    def __ror__(self: Self, other: SearchQueryCombinable) -> Self: ...
-    def __and__(self: Self, other: SearchQueryCombinable) -> Self: ...
-    def __rand__(self: Self, other: SearchQueryCombinable) -> Self: ...
+    def __or__(self, other: SearchQueryCombinable) -> Self: ...
+    def __ror__(self, other: SearchQueryCombinable) -> Self: ...
+    def __and__(self, other: SearchQueryCombinable) -> Self: ...
+    def __rand__(self, other: SearchQueryCombinable) -> Self: ...
 
 class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
     SEARCH_TYPES: dict[str, str]
@@ -59,7 +58,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore
         invert: bool = ...,
         search_type: str = ...,
     ) -> None: ...
-    def __invert__(self: Self) -> Self: ...  # type: ignore[override]
+    def __invert__(self) -> Self: ...  # type: ignore[override]
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: ignore
     def __init__(
