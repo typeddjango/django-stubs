@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, Generic, Protocol, TypeVar, overload
+from typing import Any, ClassVar, Generic, Protocol, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
@@ -239,7 +239,10 @@ class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
 class SmallIntegerField(IntegerField[_ST, _GT]): ...
-class BigIntegerField(IntegerField[_ST, _GT]): ...
+
+class BigIntegerField(IntegerField[_ST, _GT]):
+    MAX_BIGINT: ClassVar[int]
+
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]): ...
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]): ...
