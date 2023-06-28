@@ -40,6 +40,31 @@
                     date = models.DateField()
                     datetime = models.DateTimeField()
 
+-   case: date_datetime_fields_have_get_next_by_get_previous_by_no_explicit_any
+    mypy_config: |
+        [mypy-myapp.models]
+        disallow_any_generics = true
+        disallow_any_explicit = true
+    main: |
+        from myapp.models import MyUser
+        reveal_type(MyUser().get_next_by_date())  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(MyUser().get_next_by_datetime())  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(MyUser().get_previous_by_date())  # N: Revealed type is "myapp.models.MyUser"
+        reveal_type(MyUser().get_previous_by_datetime())  # N: Revealed type is "myapp.models.MyUser"
+
+        # accept arbitrary kwargs
+        MyUser().get_next_by_date(arg1=1, arg2=2)
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    date = models.DateField()
+                    datetime = models.DateTimeField()
+
 -   case: get_next_by_get_previous_by_absent_if_null_true
     main: |
         from myapp.models import MyUser
