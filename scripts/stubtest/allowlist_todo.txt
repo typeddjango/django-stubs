@@ -2406,3 +2406,7 @@ django.urls.path
 django.urls.re_path
 django.urls.resolvers.LocaleRegexDescriptor.__get__
 django.urls.resolvers.ResolverMatch.__iter__
+
+# Jinja related:
+django.template.backends.jinja2.Jinja2.template_context_processors
+django.template.backends.jinja2.Template
