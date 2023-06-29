@@ -20,6 +20,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -45,7 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+        shard: [0, 1, 2, 3]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
@@ -61,14 +64,16 @@ jobs:
           pip install -U pip setuptools wheel
           pip install -r ./requirements.txt
 
+      # Must match `shard` definition in the test matrix:
       - name: Run tests
-        run: PYTHONPATH='.' pytest
+        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }}
 
   stubtest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.11']
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
@@ -90,6 +95,7 @@ jobs:
   matrix-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.8', '3.9', '3.10']
         django-version: ['3.2', '4.2']
