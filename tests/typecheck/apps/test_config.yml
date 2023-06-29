@@ -1,46 +1,29 @@
 -   case: test_appconfig_can_be_str
     main: |
       from django.apps.config import AppConfig
+      from django.utils.functional import cached_property
 
       class FooConfig(AppConfig):
           name = "foo"
           default_auto_field = "django.db.models.BigAutoField"
-
-      reveal_type(FooConfig.default_auto_field)  # N: Revealed type is "builtins.str"
-
--   case: test_appconfig_can_be_property
-    main: |
-      from django.apps.config import AppConfig
 
       class BarConfig(AppConfig):
           name = "foo"
           @property
           def default_auto_field(self) -> str: # type: ignore[override]
               return "django.db.models.BigAutoField"
-      default_auto_field = BarConfig("bar", None).default_auto_field
-      reveal_type(default_auto_field)  # N: Revealed type is "builtins.str"
-
--   case: test_appconfig_can_be_cached_property_with_override
-    main: |
-      from django.apps.config import AppConfig
-      from django.utils.functional import cached_property
 
       class BazConfig(AppConfig):
           name = "foo"
           @cached_property
           def default_auto_field(self) -> str: # type: ignore[override]
               return "django.db.models.BigAutoField"
-      default_auto_field = BazConfig("baz", None).default_auto_field
-      reveal_type(default_auto_field)  # N: Revealed type is "builtins.str"
 
--   case: test_appconfig_can_be_cached_property_with_override_no_decorator
-    main: |
-      from django.apps.config import AppConfig
-      from django.utils.functional import cached_property
-
-      class BazConfig(AppConfig):
+      class FooBarConfig(AppConfig):
           name = "foo"
           default_auto_field = cached_property(lambda self: "django.db.models.BigAutoField")
 
-      default_auto_field = BazConfig("baz", None).default_auto_field
-      reveal_type(default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(FooConfig.default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(BarConfig("bar", None).default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(BazConfig("baz", None).default_auto_field)  # N: Revealed type is "builtins.str"
+      reveal_type(FooBarConfig("baz", None).default_auto_field)  # N: Revealed type is "builtins.str"
