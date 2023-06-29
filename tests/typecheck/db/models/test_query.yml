@@ -36,7 +36,7 @@
         class NonTupleValuesListIterable(ValuesListIterable[int]):
             pass
     out: |
-        main:10: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"
+        main:11: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"
 
 
 -   case: django_db_models_query_module_has_NamedValuesListIterable
