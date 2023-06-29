@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from datetime import tzinfo
 from typing import Any
 
-from _typeshed import Self
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.base.features import BaseDatabaseFeatures
@@ -12,7 +11,7 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 NO_DB_ALIAS: str
 RAN_DB_VERSION_CHECK: set[str]
@@ -119,4 +118,4 @@ class BaseDatabaseWrapper:
     def run_and_clear_commit_hooks(self) -> None: ...
     @contextmanager
     def execute_wrapper(self, wrapper: _ExecuteWrapper) -> Generator[None, None, None]: ...
-    def copy(self: Self, alias: str | None = ...) -> Self: ...
+    def copy(self, alias: str | None = ...) -> Self: ...

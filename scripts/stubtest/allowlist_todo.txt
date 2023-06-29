@@ -255,7 +255,6 @@ django.contrib.gis.db.models.BaseConstraint.get_violation_error_message
 django.contrib.gis.db.models.BaseConstraint.validate
 django.contrib.gis.db.models.BaseManager
 django.contrib.gis.db.models.BigAutoField.rel_db_type
-django.contrib.gis.db.models.BigIntegerField.MAX_BIGINT
 django.contrib.gis.db.models.BigIntegerField.formfield
 django.contrib.gis.db.models.BinaryField.get_placeholder
 django.contrib.gis.db.models.BooleanField.formfield
@@ -1216,7 +1215,6 @@ django.db.models.BaseConstraint.get_violation_error_message
 django.db.models.BaseConstraint.validate
 django.db.models.BaseManager
 django.db.models.BigAutoField.rel_db_type
-django.db.models.BigIntegerField.MAX_BIGINT
 django.db.models.BigIntegerField.formfield
 django.db.models.BinaryField.get_placeholder
 django.db.models.BooleanField.formfield
@@ -1547,7 +1545,6 @@ django.db.models.fields.AutoFieldMixin.formfield
 django.db.models.fields.AutoFieldMixin.get_db_prep_value
 django.db.models.fields.AutoFieldMixin.validate
 django.db.models.fields.BigAutoField.rel_db_type
-django.db.models.fields.BigIntegerField.MAX_BIGINT
 django.db.models.fields.BigIntegerField.formfield
 django.db.models.fields.BinaryField.get_placeholder
 django.db.models.fields.BooleanField.formfield
@@ -2283,7 +2280,6 @@ django.template.VariableDoesNotExist.__init__
 django.template.backends.base.BaseEngine.template_dirs
 django.template.backends.django.get_template_tag_modules
 django.template.backends.dummy.TemplateStrings.template_dirs
-django.template.backends.jinja2
 django.template.base.Context
 django.template.base.FilterExpression.is_var
 django.template.base.Node.__iter__
@@ -2409,3 +2405,6 @@ django.urls.path
 django.urls.re_path
 django.urls.resolvers.LocaleRegexDescriptor.__get__
 django.urls.resolvers.ResolverMatch.__iter__
+
+# Jinja related:
+django.template.backends.jinja2.Jinja2.template_context_processors

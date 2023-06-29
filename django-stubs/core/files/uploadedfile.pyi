@@ -1,7 +1,7 @@
 from typing import IO
 
-from _typeshed import Self
 from django.core.files.base import File
+from typing_extensions import Self
 
 class UploadedFile(File):
     content_type: str | None
@@ -46,4 +46,4 @@ class InMemoryUploadedFile(UploadedFile):
 class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name: str, content: bytes | None, content_type: str = ...) -> None: ...
     @classmethod
-    def from_dict(cls: type[Self], file_dict: dict[str, str | bytes]) -> Self: ...
+    def from_dict(cls, file_dict: dict[str, str | bytes]) -> Self: ...

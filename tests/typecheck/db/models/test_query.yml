@@ -19,25 +19,32 @@
             pass
     out: |
         main:4: error: Type argument "int" of "ModelIterable" must be a subtype of "Model"
+
+
 -   case: django_db_models_query_module_has_ValuesListIterable
     main: |
+        from typing import Tuple
         from django.db.models.query import ValuesListIterable
 
-        class IntValuesListIterable(ValuesListIterable[tuple[int,int]]):
+        class IntValuesListIterable(ValuesListIterable[Tuple[int,int]]):
             pass
-        class StringsValuesListIterable(ValuesListIterable[tuple[str,str,str]]):
+        class StringsValuesListIterable(ValuesListIterable[Tuple[str,str,str]]):
             pass
-        class MultiTypeValuesListIterable(ValuesListIterable[tuple[str,int,float]]):
+        class MultiTypeValuesListIterable(ValuesListIterable[Tuple[str,int,float]]):
             pass
 
         class NonTupleValuesListIterable(ValuesListIterable[int]):
             pass
     out: |
-        main:10: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"
+        main:11: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"
+
+
 -   case: django_db_models_query_module_has_NamedValuesListIterable
     main: |
         from django.db.models.query import NamedValuesListIterable
     out: |
+
+
 -   case: QuerySet_has__iterable_class_defined
     main: |
         from django.db.models.query import QuerySet, ValuesIterable, ModelIterable
