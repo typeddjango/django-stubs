@@ -60,12 +60,11 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_models.cache_clear()  # type: ignore
         apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.clear_cache()
 
         if not settings.configured:
             settings._setup()  # type: ignore
-
         apps.populate(settings.INSTALLED_APPS)
 
     assert apps.apps_ready, "Apps are not ready"
