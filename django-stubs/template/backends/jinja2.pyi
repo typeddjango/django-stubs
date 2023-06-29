@@ -1,7 +1,7 @@
-from _typeshed import Incomplete
 from collections.abc import Callable
 from typing import Any
 
+from _typeshed import Incomplete
 from django.template.exceptions import TemplateSyntaxError
 
 from .base import BaseEngine
