@@ -1,8 +1,8 @@
 from collections.abc import Iterator
 from typing import Any
 
-from _typeshed import Self
 from django.contrib.gis.geos.base import GEOSBase
+from typing_extensions import Self
 
 class GEOSCoordSeq(GEOSBase):
     ptr_type: Any
@@ -25,7 +25,7 @@ class GEOSCoordSeq(GEOSBase):
     def dims(self) -> int: ...
     @property
     def hasz(self) -> bool: ...
-    def clone(self: Self) -> Self: ...
+    def clone(self) -> Self: ...
     @property
     def kml(self) -> str: ...
     @property

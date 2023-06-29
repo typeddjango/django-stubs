@@ -557,8 +557,8 @@ class AddExtraFieldMethods(ModelClassInitializer):
                     name=f"get_next_by_{field.attname}",
                     args=[
                         Argument(
-                            Var("kwargs", AnyType(TypeOfAny.explicit)),
-                            AnyType(TypeOfAny.explicit),
+                            Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
+                            AnyType(TypeOfAny.implementation_artifact),
                             initializer=None,
                             kind=ARG_STAR2,
                         )
@@ -570,8 +570,8 @@ class AddExtraFieldMethods(ModelClassInitializer):
                     name=f"get_previous_by_{field.attname}",
                     args=[
                         Argument(
-                            Var("kwargs", AnyType(TypeOfAny.explicit)),
-                            AnyType(TypeOfAny.explicit),
+                            Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
+                            AnyType(TypeOfAny.implementation_artifact),
                             initializer=None,
                             kind=ARG_STAR2,
                         )

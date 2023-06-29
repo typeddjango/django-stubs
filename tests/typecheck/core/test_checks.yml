@@ -1,13 +1,13 @@
 - case: test_checks_register
   main: |
-    from typing import Any, Sequence, Optional, Union
+    from typing import Any, Sequence, Optional, Union, List
 
     from django.apps.config import AppConfig
     from django.core.checks import register, Warning, CheckMessage
 
 
     @register("foo", deploy=True)
-    def check_foo(app_configs: Union[Sequence[AppConfig], None], databases: Optional[Sequence[str]], **kwargs: Any) -> list[Warning]:
+    def check_foo(app_configs: Union[Sequence[AppConfig], None], databases: Optional[Sequence[str]], **kwargs: Any) -> List[Warning]:
         if databases and 'databass' in databases:
             return [Warning("Naughty list")]
         return []
