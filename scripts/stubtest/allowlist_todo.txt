@@ -939,11 +939,6 @@ django.core.management.commands.makemessages.TranslatableFile.__lt__
 django.core.management.commands.makemessages.TranslatableFile.path
 django.core.management.commands.makemessages.is_valid_locale
 django.core.management.commands.makemessages.plural_forms_re
-django.core.management.commands.makemigrations.Command.get_relative_path
-django.core.management.commands.makemigrations.Command.log
-django.core.management.commands.makemigrations.Command.log_output
-django.core.management.commands.makemigrations.Command.write_migration_files
-django.core.management.commands.makemigrations.Command.write_to_last_migration_files
 django.core.management.commands.runserver.Command.on_bind
 django.core.management.commands.runserver.Command.suppressed_base_arguments
 django.core.management.commands.runserver.naiveip_re
