@@ -17,6 +17,17 @@
 
       path('test/', include())
 
+-   case: test_path_accepts_translated_patterns
+    main: |
+      from typing import List
+      from django.urls import path, _AnyURL
+      from django.utils.translation import gettext_lazy as _
+      from django.contrib import admin
+
+      urlpatterns: List[_AnyURL] = [
+          path(_("admin/"), admin.site.urls, name="admin"),
+      ]
+
 -   case: test_urlconf_include
     main: |
       from typing import List
