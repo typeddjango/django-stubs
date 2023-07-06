@@ -130,7 +130,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for values / values_list
         if file.fullname == "django.db.models":
-            return [self._new_dependency("typing")]
+            return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
         if self.django_context.settings:
@@ -141,7 +141,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 except LookupError:
                     # get_user_model() model app is not installed
                     return []
-                return [self._new_dependency(auth_user_module)]
+                return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
         # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
