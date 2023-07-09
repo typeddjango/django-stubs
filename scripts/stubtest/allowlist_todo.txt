@@ -98,7 +98,6 @@ django.contrib.admin.views.main.ChangeList.__init__
 django.contrib.admin.views.main.ChangeList.search_form_class
 django.contrib.admin.views.main.ChangeListSearchForm
 django.contrib.admin.widgets.AdminBigIntegerFieldWidget.media
-django.contrib.admin.widgets.AdminDateWidget.Media
 django.contrib.admin.widgets.AdminDateWidget.media
 django.contrib.admin.widgets.AdminEmailInputWidget.media
 django.contrib.admin.widgets.AdminFileWidget.media
@@ -107,13 +106,14 @@ django.contrib.admin.widgets.AdminRadioSelect.media
 django.contrib.admin.widgets.AdminSplitDateTime.media
 django.contrib.admin.widgets.AdminTextInputWidget.media
 django.contrib.admin.widgets.AdminTextareaWidget.media
-django.contrib.admin.widgets.AdminTimeWidget.Media
 django.contrib.admin.widgets.AdminTimeWidget.media
 django.contrib.admin.widgets.AdminURLFieldWidget.media
 django.contrib.admin.widgets.AdminUUIDInputWidget.media
 django.contrib.admin.widgets.AutocompleteMixin.media
 django.contrib.admin.widgets.AutocompleteSelect.media
 django.contrib.admin.widgets.AutocompleteSelectMultiple.media
+django.contrib.admin.widgets.BaseAdminDateWidget
+django.contrib.admin.widgets.BaseAdminTimeWidget
 django.contrib.admin.widgets.FilteredSelectMultiple.Media
 django.contrib.admin.widgets.FilteredSelectMultiple.media
 django.contrib.admin.widgets.ForeignKeyRawIdWidget.media
@@ -1157,6 +1157,7 @@ django.core.validators.URLValidator.__new__
 django.core.validators.URLValidator.deconstruct
 django.core.validators.URLValidator.regex
 django.core.validators.URLValidator.unsafe_chars
+django.core.validators.URLValidator.max_length
 django.core.validators.slug_re
 django.core.validators.slug_unicode_re
 django.db.backends.base.base.BaseDatabaseWrapper.SchemaEditorClass
