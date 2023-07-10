@@ -39,6 +39,7 @@ class HttpRequest(BytesIO):
     resolver_match: ResolverMatch | None
     content_type: str | None
     content_params: dict[str, str] | None
+    _body: bytes
     _stream: BinaryIO
     # Attributes added by optional parts of Django
     # django.contrib.admin views:
