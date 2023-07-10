@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from django.http.request import HttpRequest
@@ -9,7 +9,7 @@ class ContextMixin:
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
 class View:
-    http_method_names: list[str]
+    http_method_names: Sequence[str]
     request: HttpRequest
     args: Any
     kwargs: Any
