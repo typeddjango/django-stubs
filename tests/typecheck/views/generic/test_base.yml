@@ -1,5 +1,0 @@
--   case: view_http_method_names
-    main: |
-        from django.views.generic.base import View
-        class MyView(View):
-            http_method_names = ('get',)
