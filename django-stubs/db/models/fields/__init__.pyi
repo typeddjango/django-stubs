@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Protocol, TypeVar, overload
+from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
@@ -16,7 +16,7 @@ from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise
-from typing_extensions import Literal, Self, TypeAlias
+from typing_extensions import Self, TypeAlias
 
 class Empty: ...
 class NOT_PROVIDED: ...

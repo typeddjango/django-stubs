@@ -2,7 +2,7 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional, Sequence, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Literal, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -170,7 +170,7 @@ class DjangoContext:
         else:
             return self.get_primary_key_field(related_model_cls)
 
-    def get_primary_key_field(self, model_cls: Type[Model] | Literal["self"]) -> "Field[Any, Any]":
+    def get_primary_key_field(self, model_cls: Type[Model]) -> "Field[Any, Any]":
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 if field.primary_key:
@@ -365,7 +365,7 @@ class DjangoContext:
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: Type[Model]
     ) -> Union["Field[Any, Any]", ForeignObjectRel]:
-        currently_observed_model: type[Model] | Literal["self"] = model_cls
+        currently_observed_model = model_cls
         field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":

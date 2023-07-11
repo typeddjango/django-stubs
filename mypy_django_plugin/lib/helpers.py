@@ -124,7 +124,7 @@ def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], f
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type] | Literal["self"]) -> Optional[TypeInfo]:
+def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type]) -> Optional[TypeInfo]:
     if klass is None:
         return None
 
@@ -217,7 +217,7 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
 
 def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> MypyType:
     if isinstance(field, (RelatedField, ForeignObjectRel)):
-        lookup_type_class = field.related_model
+        lookup_type_class = field.remote_field.model
         rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
         if rel_model_info is None:
             return AnyType(TypeOfAny.from_error)
