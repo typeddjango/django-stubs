@@ -1,5 +1,5 @@
 # Dev tools:
-black==23.3.0
+black==23.7.0
 pre-commit==3.3.3
 pytest==7.4.0
 pytest-mypy-plugins==2.0.0
