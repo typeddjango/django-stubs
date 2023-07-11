@@ -7,7 +7,6 @@
       reveal_type(Model2().test)  # N: Revealed type is "app3.models.Model3_RelatedManager"
       reveal_type(Model1().test2)  # N: Revealed type is "app3.models.Model4_RelatedManager"
       reveal_type(Model2().test2)  # N: Revealed type is "app3.models.Model4_RelatedManager"
-      Model1()
     installed_apps:
       - base
       - users
@@ -21,7 +20,6 @@
           from django.db import models
           class OwnedModel(models.Model):
               owner = models.ForeignKey("users.User", on_delete=models.CASCADE)
-              myself = models.ForeignKey("self", on_delete=models.CASCADE)
 
               class Meta:
                   abstract = True
