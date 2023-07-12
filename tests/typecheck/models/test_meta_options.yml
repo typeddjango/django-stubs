@@ -68,3 +68,29 @@
                 verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "List[str]", base class "TypedModelMeta" defined the type as "Union[str, _StrPromise]")
                 unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "Dict[int, int]", base class "TypedModelMeta" defined the type as "Union[Sequence[Sequence[str]], Sequence[str]]")
                 unknown_attr = True  # can't check this
+
+
+-   case: instantiate_abstract_model
+    main: |
+        from myapp.models import AbstractModel, MyModel
+
+        # Should not raise:
+        MyModel(field=1)
+        MyModel.objects.create(field=2)
+
+        # Errors:
+        AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attribute "Meta.abstract"
+        AbstractModel.objects.create()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attribute "Meta.abstract"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class AbstractModel(models.Model):
+                    class Meta:
+                        abstract = True
+                    base = models.TextField()
+                class MyModel(AbstractModel):
+                    field = models.IntegerField()
