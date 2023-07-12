@@ -3,7 +3,15 @@
     from django.contrib.auth.models import AbstractUser
     AbstractUser.objects.get(pk=1)
     AbstractUser.objects.get(pk__in=[1])
-    reveal_type(AbstractUser().pk)  # N: Revealed type is "Any"
+
+    au: AbstractUser
+    reveal_type(au.pk)  # N: Revealed type is "Any"
+  installed_apps:
+    - django.contrib.auth
+
+- case: test_filter_on_abstract_user_pk_wrong_name
+  main: |
+    from django.contrib.auth.models import AbstractUser
     AbstractUser.objects.get(pkey=1)  # ER: Cannot resolve keyword 'pkey' into field..*
   installed_apps:
     - django.contrib.auth
