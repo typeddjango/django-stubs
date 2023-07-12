@@ -49,6 +49,12 @@ def typecheck_model_method(
             error_message=f'Incompatible type for "{actual_name}" of "{model_cls.__name__}"',
         )
 
+    if model_cls._meta.abstract:
+        ctx.api.fail(
+            f'Cannot instantiate abstract model "{model_cls.__name__}"',
+            ctx.context,
+        )
+
     return ctx.default_return_type
 
 

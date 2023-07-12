@@ -231,9 +231,11 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
-        elif class_fullname in manager_classes and method_name == "create":
-            return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
-        elif class_fullname in manager_classes and method_name in {"filter", "get", "exclude"}:
+        elif method_name == "create":
+            # We need `BASE_MANAGER_CLASS_FULLNAME` to check abstract models.
+            if class_fullname in manager_classes or class_fullname == fullnames.BASE_MANAGER_CLASS_FULLNAME:
+                return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+        elif method_name in {"filter", "get", "exclude"} and class_fullname in manager_classes:
             return partial(
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
