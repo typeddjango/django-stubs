@@ -79,8 +79,8 @@
         MyModel.objects.create(field=2)
 
         # Errors:
-        AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attribute "Meta.abstract"
-        AbstractModel.objects.create()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attribute "Meta.abstract"
+        AbstractModel()  # E: Cannot instantiate abstract model "AbstractModel"
+        AbstractModel.objects.create()  # E: Cannot instantiate abstract model "AbstractModel"
     installed_apps:
         - myapp
     files:
