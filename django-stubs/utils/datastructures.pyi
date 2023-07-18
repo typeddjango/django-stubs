@@ -1,5 +1,5 @@
 from collections.abc import Collection, Iterable, Iterator, Mapping, MutableMapping, MutableSet
-from typing import Any, Generic, NoReturn, Protocol, Tuple, TypeVar, overload  # noqa: Y022
+from typing import Any, Generic, NoReturn, Protocol, TypeVar, overload  # noqa: Y022
 
 from _typeshed import Incomplete
 from typing_extensions import Self, TypeAlias
@@ -11,7 +11,7 @@ _I = TypeVar("_I", covariant=True)
 
 # Unfortunately, there's often check `if isinstance(var, (list, tuple))` in django
 # codebase. So we need sometimes to declare exactly list or tuple.
-_ListOrTuple: TypeAlias = list[_K] | tuple[_K, ...] | Tuple[()]  # noqa: Y047
+_ListOrTuple: TypeAlias = list[_K] | tuple[_K, ...] | tuple[()]  # noqa: Y047
 
 class _PropertyDescriptor(Generic[_K, _V]):
     """
