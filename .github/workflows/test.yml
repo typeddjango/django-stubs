@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   mypy-self-check:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,6 +44,7 @@ jobs:
         run: mypy --cache-dir=/dev/null --no-incremental django-stubs
 
   test:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -69,6 +71,7 @@ jobs:
         run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }}
 
   stubtest:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -93,6 +96,7 @@ jobs:
         run: bash ./scripts/stubtest.sh
 
   matrix-test:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
