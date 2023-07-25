@@ -363,7 +363,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: Type[Model]
     ) -> Union["Field[Any, Any]", ForeignObjectRel]:
         currently_observed_model = model_cls
-        field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
+        field: Union[Field[Any, Any], ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
