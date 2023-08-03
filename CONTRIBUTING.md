@@ -30,7 +30,7 @@ Additionally, the following resources might be useful:
 ### Repository Setup
 
 As a first step you will need to fork this repository and clone your fork locally.
-In order to be able to continously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
+In order to be able to continuously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
 ### Dependency Setup
 
