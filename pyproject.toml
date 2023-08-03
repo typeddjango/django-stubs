@@ -3,6 +3,9 @@ target-version = ['py38']
 line-length = 120
 include = '\.pyi?$'
 
+[tool.codespell]
+ignore-words-list = "aadd,acount,nam"
+
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 extend-exclude = [
