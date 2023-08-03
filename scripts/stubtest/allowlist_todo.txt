@@ -255,7 +255,6 @@ django.contrib.auth.views.LogoutView.get_next_page
 django.contrib.auth.views.PasswordChangeView.form_class
 django.contrib.auth.views.PasswordResetConfirmView.form_class
 django.contrib.auth.views.PasswordResetView.form_class
-django.contrib.auth.views.RedirectURLMixin
 django.contrib.auth.views.SuccessURLAllowedHostsMixin
 django.contrib.contenttypes.admin.GenericInlineModelAdmin
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_field
