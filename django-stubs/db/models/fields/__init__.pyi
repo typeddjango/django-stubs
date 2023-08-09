@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Protocol, TypeVar, overload
+from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
@@ -122,7 +122,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     primary_key: bool
     remote_field: ForeignObjectRel | None
     is_relation: bool
-    related_model: type[Model] | None
+    related_model: type[Model] | Literal["self"] | None
     one_to_many: bool | None
     one_to_one: bool | None
     many_to_many: bool | None

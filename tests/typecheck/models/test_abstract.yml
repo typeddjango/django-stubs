@@ -41,3 +41,33 @@
 
             class MyModel(BaseModel):
                 field = models.IntegerField()
+
+- case: test_can_instantiate_with_recursive_relation_on_abstract_model
+  main: |
+    from myapp.models import Concrete, Recursive
+    first = Concrete.objects.create(parent=None)
+    Concrete.objects.create(parent=first)
+    Recursive.objects.create(parent=None)
+    Recursive(parent=Recursive(parent=None))
+    Concrete(parent=Concrete(parent=None))
+  out: |
+    main:4: error: Unexpected attribute "parent" for model "Recursive"
+    main:4: error: Cannot instantiate abstract model "Recursive"
+    main:5: error: Unexpected attribute "parent" for model "Recursive"
+    main:5: error: Cannot instantiate abstract model "Recursive"
+  installed_apps:
+    - myapp
+  files:
+    -   path: myapp/__init__.py
+    -   path: myapp/models.py
+        content: |
+            from django.db import models
+
+            class Recursive(models.Model):
+                parent = models.ForeignKey("self", null=True, on_delete=models.CASCADE)
+
+                class Meta:
+                    abstract = True
+
+            class Concrete(Recursive):
+                ...
