@@ -62,7 +62,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 
     To understand this example you need:
     1. Be familiar with descriptors: https://docs.python.org/3/howto/descriptor.html
-    2. Follow our explanation bellow
+    2. Follow our explanation below
 
     Let's start with defining our fake model class and fake integer field.
 

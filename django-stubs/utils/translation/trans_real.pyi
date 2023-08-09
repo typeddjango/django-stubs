@@ -4,7 +4,7 @@ from gettext import NullTranslations
 from re import Pattern
 
 # switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
-from typing import Any, Literal, Protocol, Tuple, TypeVar  # noqa: Y022
+from typing import Any, Literal, Protocol, TypeVar  # noqa: Y022
 
 from django.http.request import HttpRequest
 from typing_extensions import TypeAlias
@@ -22,7 +22,7 @@ class _PluralCallable(Protocol):
 def reset_cache(*, setting: str, **kwargs: Any) -> None: ...
 
 # switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
-_KeyT: TypeAlias = str | Tuple[str, int]
+_KeyT: TypeAlias = str | tuple[str, int]
 
 _Z = TypeVar("_Z")
 

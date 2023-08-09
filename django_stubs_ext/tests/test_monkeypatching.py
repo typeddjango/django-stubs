@@ -103,7 +103,7 @@ def test_patched_version_specific(
     django_version: _VersionSpec,
     make_generic_classes: _MakeGenericClasses,
 ) -> None:
-    """Test version speicific types."""
+    """Test version specific types."""
     make_generic_classes(django_version)
 
     for el in _need_generic:
@@ -116,7 +116,7 @@ def test_mypy_builtins_not_patched_globally(
 ) -> None:
     """Ensures that builtins are not patched with `mypy` specific helpers.
 
-    This should only happend during `django.setup()`
+    This should only happen during `django.setup()`
     (https://github.com/typeddjango/django-stubs/issues/609).
     """
     make_generic_classes(include_builtins=False)

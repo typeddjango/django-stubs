@@ -194,6 +194,7 @@
 
 -   case: managers_inherited_from_abstract_classes_multiple_inheritance
     main: |
+        from myapp.models import Child
     installed_apps:
         - myapp
     files:

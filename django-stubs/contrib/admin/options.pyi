@@ -1,12 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
-    Any,
-    Generic,
-    Literal,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import Any, Generic, Literal, Optional, TypeVar  # noqa: Y037  # https://github.com/python/mypy/issues/12211
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -71,13 +64,13 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
 # https://github.com/python/mypy/issues/12211
-_ListFilterT: TypeAlias = Union[
-    type[ListFilter],
-    Field,
-    str,
-    tuple[Field | str, type[FieldListFilter]],
-    list[Field | str | type[FieldListFilter]],
-]
+_ListFilterT: TypeAlias = (
+    type[ListFilter]
+    | Field
+    | str
+    | tuple[Field | str, type[FieldListFilter]]
+    | list[Field | str | type[FieldListFilter]]
+)
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
 # https://github.com/typeddjango/django-stubs/issues/482

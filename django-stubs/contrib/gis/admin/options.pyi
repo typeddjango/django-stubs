@@ -2,6 +2,7 @@ from typing import Any
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.forms import BaseGeometryWidget
+from django.forms.widgets import Media
 
 spherical_mercator_srid: int
 
@@ -40,7 +41,7 @@ class GeoModelAdmin(ModelAdmin):
     debug: bool
     widget: Any
     @property
-    def media(self) -> Any: ...
+    def media(self) -> Media: ...
     def get_map_widget(self, db_field: Any) -> Any: ...
 
 class OSMGeoAdmin(GeoModelAdmin):
