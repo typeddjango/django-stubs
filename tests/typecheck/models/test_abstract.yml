@@ -48,8 +48,13 @@
     first = Concrete.objects.create(parent=None)
     Concrete.objects.create(parent=first)
     Recursive.objects.create(parent=None)
-    Recursive(parent=Recursive(parent=None))  # E: Unexpected attribute "parent" for model "Recursive"
+    Recursive(parent=Recursive(parent=None))
     Concrete(parent=Concrete(parent=None))
+  out: |
+    main:4: error: Unexpected attribute "parent" for model "Recursive"
+    main:4: error: Cannot instantiate abstract model "Recursive"
+    main:5: error: Unexpected attribute "parent" for model "Recursive"
+    main:5: error: Cannot instantiate abstract model "Recursive"
   installed_apps:
     - myapp
   files:
