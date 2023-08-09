@@ -217,6 +217,7 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
 
 def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> MypyType:
     if isinstance(field, (RelatedField, ForeignObjectRel)):
+        # Not using field.related_model because that may have str value "self"
         lookup_type_class = field.remote_field.model
         rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
         if rel_model_info is None:
