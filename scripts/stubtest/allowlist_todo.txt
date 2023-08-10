@@ -315,17 +315,13 @@ django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.supports_toleran
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.unsupported_geojson_options
 django.contrib.gis.db.backends.oracle.introspection
 django.contrib.gis.db.backends.oracle.models.OracleGeometryColumns.Meta
-django.contrib.gis.db.backends.oracle.models.OracleGeometryColumns.objects
 django.contrib.gis.db.backends.oracle.models.OracleSpatialRefSys.Meta
-django.contrib.gis.db.backends.oracle.models.OracleSpatialRefSys.objects
 django.contrib.gis.db.backends.oracle.operations
 django.contrib.gis.db.backends.postgis.adapter.PostGISAdapter.prepare
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersection_returns_none
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
 django.contrib.gis.db.backends.postgis.models.PostGISGeometryColumns.Meta
-django.contrib.gis.db.backends.postgis.models.PostGISGeometryColumns.objects
 django.contrib.gis.db.backends.postgis.models.PostGISSpatialRefSys.Meta
-django.contrib.gis.db.backends.postgis.models.PostGISSpatialRefSys.objects
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
 django.contrib.gis.db.backends.postgis.operations.PostGISOperator.check_geography
@@ -335,9 +331,7 @@ django.contrib.gis.db.backends.spatialite.features.DatabaseFeatures.can_alter_ge
 django.contrib.gis.db.backends.spatialite.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.spatialite.features.DatabaseFeatures.supports_area_geodetic
 django.contrib.gis.db.backends.spatialite.models.SpatialiteGeometryColumns.Meta
-django.contrib.gis.db.backends.spatialite.models.SpatialiteGeometryColumns.objects
 django.contrib.gis.db.backends.spatialite.models.SpatialiteSpatialRefSys.Meta
-django.contrib.gis.db.backends.spatialite.models.SpatialiteSpatialRefSys.objects
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.convert_extent
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.from_text
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.geom_lib_version
@@ -1276,7 +1270,6 @@ django.db.migrations.questioner.NonInteractiveMigrationQuestioner.log_lack_of_mi
 django.db.migrations.recorder.MigrationRecorder.Migration.get_next_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.id
-django.db.migrations.recorder.MigrationRecorder.Migration.objects
 django.db.migrations.serializer.ChoicesSerializer
 django.db.migrations.utils.FieldReference
 django.db.migrations.utils.field_is_referenced
@@ -1534,7 +1527,6 @@ django.db.models.base.Model.Meta
 django.db.models.base.Model.add_to_class
 django.db.models.base.ModelBase.__new__
 django.db.models.base.ModelBase.add_to_class
-django.db.models.base.ModelBase.objects
 django.db.models.base.ModelStateFieldsCacheDescriptor.__get__
 django.db.models.base.make_foreign_order_accessors
 django.db.models.base.method_get_order

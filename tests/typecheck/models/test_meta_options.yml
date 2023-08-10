@@ -80,7 +80,7 @@
 
         # Errors:
         AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
-        AbstractModel.objects.create()
+        AbstractModel.objects.create()  # E: Access to generic instance variables via class is ambiguous
     installed_apps:
         - myapp
     files:

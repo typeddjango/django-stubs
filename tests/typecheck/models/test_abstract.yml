@@ -51,6 +51,7 @@
     Recursive(parent=Recursive(parent=None))
     Concrete(parent=Concrete(parent=None))
   out: |
+    main:4: error: Access to generic instance variables via class is ambiguous
     main:4: error: Unexpected attribute "parent" for model "Recursive"
     main:5: error: Cannot instantiate abstract class "Recursive" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
     main:5: error: Unexpected attribute "parent" for model "Recursive"
@@ -209,4 +210,4 @@
 
             def create_animal_generic(klass: Type[T], name: str) -> T:
                 reveal_type(klass)  # N: Revealed type is "Type[T`-1]"
-                return klass.objects.create(name=name)
+                return klass.objects.create(name=name)  # E: Incompatible return value type (got "Animal", expected "T")

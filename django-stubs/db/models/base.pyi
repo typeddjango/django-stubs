@@ -20,13 +20,13 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def objects(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
-    @property
     def _default_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
     @property
     def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
+    objects: BaseManager[Self]
+
     # Note: these two metaclass generated attributes don't really exist on the 'Model'
     # class, runtime they are only added on concrete subclasses of 'Model'. The
     # metaclass also sets up correct inheritance from concrete parent models exceptions.
