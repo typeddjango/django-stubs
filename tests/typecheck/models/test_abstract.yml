@@ -51,6 +51,7 @@
     Recursive(parent=Recursive(parent=None))
     Concrete(parent=Concrete(parent=None))
   out: |
+    main:4: error: Access to generic instance variables via class is ambiguous
     main:4: error: Unexpected attribute "parent" for model "Recursive"
     main:4: error: Cannot instantiate abstract model "Recursive"
     main:5: error: Unexpected attribute "parent" for model "Recursive"

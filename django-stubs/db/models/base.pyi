@@ -20,13 +20,13 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def objects(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
-    @property
     def _default_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
     @property
     def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
+    objects: BaseManager[Self]
+
     DoesNotExist: Final[type[ObjectDoesNotExist]]
     MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
 

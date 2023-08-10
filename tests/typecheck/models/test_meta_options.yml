@@ -79,8 +79,12 @@
         MyModel.objects.create(field=2)
 
         # Errors:
-        AbstractModel()  # E: Cannot instantiate abstract model "AbstractModel"
-        AbstractModel.objects.create()  # E: Cannot instantiate abstract model "AbstractModel"
+        AbstractModel()
+        AbstractModel.objects.create()
+    out: |
+        main:8: error: Cannot instantiate abstract model "AbstractModel"
+        main:9: error: Access to generic instance variables via class is ambiguous
+        main:9: error: Cannot instantiate abstract model "AbstractModel"
     installed_apps:
         - myapp
     files:
