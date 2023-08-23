@@ -249,13 +249,10 @@ django.contrib.auth.validators.UnicodeUsernameValidator.__new__
 django.contrib.auth.validators.UnicodeUsernameValidator.deconstruct
 django.contrib.auth.views.INTERNAL_RESET_URL_TOKEN
 django.contrib.auth.views.LoginView.form_class
-django.contrib.auth.views.LoginView.get_default_redirect_url
-django.contrib.auth.views.LogoutView.get_default_redirect_url
 django.contrib.auth.views.LogoutView.get_next_page
 django.contrib.auth.views.PasswordChangeView.form_class
 django.contrib.auth.views.PasswordResetConfirmView.form_class
 django.contrib.auth.views.PasswordResetView.form_class
-django.contrib.auth.views.SuccessURLAllowedHostsMixin
 django.contrib.contenttypes.admin.GenericInlineModelAdmin
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_field
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_fk_field
