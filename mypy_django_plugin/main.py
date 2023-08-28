@@ -32,6 +32,7 @@ from mypy_django_plugin.transformers.managers import (
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
+    MetaclassAdjustments,
     handle_annotated_type,
     process_model_class,
     set_auth_user_model_boolean_fields,
@@ -163,12 +164,13 @@ class NewSemanalDjangoPlugin(Plugin):
 
             if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+
         return None
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
         class_fullname, _, method_name = fullname.rpartition(".")
-        # It is looked up very often, specialcase this method for minor speed up
-        if method_name == "__init_subclass__":
+        # Methods called very often -- short circuit for minor speed up
+        if method_name == "__init_subclass__" or fullname.startswith("builtins."):
             return None
 
         if class_fullname.endswith("QueryDict"):
@@ -221,6 +223,9 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        if fullname == fullnames.MODEL_CLASS_FULLNAME:
+            return MetaclassAdjustments.adjust_model_class
+
         sym = self.lookup_fully_qualified(fullname)
         if (
             sym is not None
