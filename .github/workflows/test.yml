@@ -37,7 +37,7 @@ jobs:
         run: mypy --strict mypy_django_plugin
 
       - name: Run mypy on ext code
-        run: mypy --strict django_stubs_ext
+        run: mypy --strict ext
       - name: Run mypy on scripts and utils
         run: mypy --strict scripts
       - name: Run mypy on stubs
