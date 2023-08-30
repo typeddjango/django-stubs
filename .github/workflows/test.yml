@@ -68,7 +68,7 @@ jobs:
 
       # Must match `shard` definition in the test matrix:
       - name: Run tests
-        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }}
+        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} tests
 
   stubtest:
     timeout-minutes: 10
