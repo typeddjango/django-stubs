@@ -124,4 +124,4 @@ jobs:
           pip check
 
       - name: Run django-stubs-ext tests
-        run: PYTHONPATH='.' pytest django_stubs_ext
+        run: PYTHONPATH='.' pytest ext
