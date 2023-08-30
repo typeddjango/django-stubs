@@ -8,7 +8,7 @@ pytest-shard==0.1.2
 # Django deps:
 psycopg2-binary
 Django==4.2.4
--e ./django_stubs_ext
+-e ./ext
 -e .[compatible-mypy]
 
 # Overrides:
