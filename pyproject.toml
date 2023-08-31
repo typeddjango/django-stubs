@@ -27,6 +27,7 @@ select = [
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."
 
 [tool.ruff.isort]
+known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 
 [build-system]

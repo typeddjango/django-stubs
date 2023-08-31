@@ -37,7 +37,7 @@ jobs:
         run: mypy --strict mypy_django_plugin
 
       - name: Run mypy on ext code
-        run: mypy --strict django_stubs_ext
+        run: mypy --strict ext
       - name: Run mypy on scripts and utils
         run: mypy --strict scripts
       - name: Run mypy on stubs
@@ -68,7 +68,7 @@ jobs:
 
       # Must match `shard` definition in the test matrix:
       - name: Run tests
-        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }}
+        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} tests
 
   stubtest:
     timeout-minutes: 10
@@ -124,4 +124,4 @@ jobs:
           pip check
 
       - name: Run django-stubs-ext tests
-        run: PYTHONPATH='.' pytest django_stubs_ext
+        run: PYTHONPATH='.' pytest ext
