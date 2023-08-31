@@ -39,20 +39,6 @@ from mypy_django_plugin.transformers.models import (
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
 
 
-def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MODEL_CLASS_FULLNAME)
-
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata_bases(sym.node, "model_bases")
-        bases[ctx.cls.fullname] = 1
-    else:
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-            return
-
-    process_model_class(ctx, django_context)
-
-
 def transform_form_class(ctx: ClassDefContext) -> None:
     sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
     if sym is not None and isinstance(sym.node, TypeInfo):
@@ -90,15 +76,6 @@ class NewSemanalDjangoPlugin(Plugin):
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
             bases = helpers.get_django_metadata_bases(model_sym.node, "manager_bases")
             bases[fullnames.MANAGER_CLASS_FULLNAME] = 1
-            return bases
-        else:
-            return {}
-
-    def _get_current_model_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "model_bases")
-            bases[fullnames.MODEL_CLASS_FULLNAME] = 1
             return bases
         else:
             return {}
@@ -256,11 +233,14 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
+        sym = self.lookup_fully_qualified(fullname)
         if (
-            fullname in self.django_context.all_registered_model_class_fullnames
-            or fullname in self._get_current_model_bases()
+            sym is not None
+            and isinstance(sym.node, TypeInfo)
+            and sym.node.metaclass_type is not None
+            and sym.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
         ):
-            return partial(transform_model_class, django_context=self.django_context)
+            return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Manager class definition
         if fullname in self._get_current_manager_bases():
