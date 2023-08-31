@@ -414,7 +414,6 @@ django.contrib.gis.db.models.Field.db_type_suffix
 django.contrib.gis.db.models.Field.description
 django.contrib.gis.db.models.Field.descriptor_class
 django.contrib.gis.db.models.Field.error_messages
-django.contrib.gis.db.models.Field.get_attname_column
 django.contrib.gis.db.models.Field.get_db_converters
 django.contrib.gis.db.models.Field.get_filter_kwargs_for_object
 django.contrib.gis.db.models.Field.get_pk_value_on_save
@@ -438,7 +437,6 @@ django.contrib.gis.db.models.ForeignKey.contribute_to_related_class
 django.contrib.gis.db.models.ForeignKey.convert_empty_strings
 django.contrib.gis.db.models.ForeignKey.descriptor_class
 django.contrib.gis.db.models.ForeignKey.formfield
-django.contrib.gis.db.models.ForeignKey.get_attname_column
 django.contrib.gis.db.models.ForeignKey.get_db_converters
 django.contrib.gis.db.models.ForeignObject.__copy__
 django.contrib.gis.db.models.ForeignObject.__get__
@@ -446,7 +444,6 @@ django.contrib.gis.db.models.ForeignObject.class_lookups
 django.contrib.gis.db.models.ForeignObject.contribute_to_related_class
 django.contrib.gis.db.models.ForeignObject.foreign_related_fields
 django.contrib.gis.db.models.ForeignObject.forward_related_accessor_class
-django.contrib.gis.db.models.ForeignObject.get_attname_column
 django.contrib.gis.db.models.ForeignObject.get_class_lookups
 django.contrib.gis.db.models.ForeignObject.get_extra_descriptor_filter
 django.contrib.gis.db.models.ForeignObject.get_extra_restriction
@@ -1355,7 +1352,6 @@ django.db.models.Field.db_type_suffix
 django.db.models.Field.description
 django.db.models.Field.descriptor_class
 django.db.models.Field.error_messages
-django.db.models.Field.get_attname_column
 django.db.models.Field.get_db_converters
 django.db.models.Field.get_filter_kwargs_for_object
 django.db.models.Field.get_pk_value_on_save
@@ -1379,7 +1375,6 @@ django.db.models.ForeignKey.contribute_to_related_class
 django.db.models.ForeignKey.convert_empty_strings
 django.db.models.ForeignKey.descriptor_class
 django.db.models.ForeignKey.formfield
-django.db.models.ForeignKey.get_attname_column
 django.db.models.ForeignKey.get_db_converters
 django.db.models.ForeignObject.__copy__
 django.db.models.ForeignObject.__get__
@@ -1387,7 +1382,6 @@ django.db.models.ForeignObject.class_lookups
 django.db.models.ForeignObject.contribute_to_related_class
 django.db.models.ForeignObject.foreign_related_fields
 django.db.models.ForeignObject.forward_related_accessor_class
-django.db.models.ForeignObject.get_attname_column
 django.db.models.ForeignObject.get_class_lookups
 django.db.models.ForeignObject.get_extra_descriptor_filter
 django.db.models.ForeignObject.get_extra_restriction
@@ -1666,7 +1660,6 @@ django.db.models.fields.Field.db_type_suffix
 django.db.models.fields.Field.description
 django.db.models.fields.Field.descriptor_class
 django.db.models.fields.Field.error_messages
-django.db.models.fields.Field.get_attname_column
 django.db.models.fields.Field.get_db_converters
 django.db.models.fields.Field.get_filter_kwargs_for_object
 django.db.models.fields.Field.get_pk_value_on_save
@@ -1728,7 +1721,6 @@ django.db.models.fields.related.ForeignKey.contribute_to_related_class
 django.db.models.fields.related.ForeignKey.convert_empty_strings
 django.db.models.fields.related.ForeignKey.descriptor_class
 django.db.models.fields.related.ForeignKey.formfield
-django.db.models.fields.related.ForeignKey.get_attname_column
 django.db.models.fields.related.ForeignKey.get_db_converters
 django.db.models.fields.related.ForeignObject.__copy__
 django.db.models.fields.related.ForeignObject.__get__
@@ -1736,7 +1728,6 @@ django.db.models.fields.related.ForeignObject.class_lookups
 django.db.models.fields.related.ForeignObject.contribute_to_related_class
 django.db.models.fields.related.ForeignObject.foreign_related_fields
 django.db.models.fields.related.ForeignObject.forward_related_accessor_class
-django.db.models.fields.related.ForeignObject.get_attname_column
 django.db.models.fields.related.ForeignObject.get_class_lookups
 django.db.models.fields.related.ForeignObject.get_extra_descriptor_filter
 django.db.models.fields.related.ForeignObject.get_extra_restriction
