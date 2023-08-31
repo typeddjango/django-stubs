@@ -238,7 +238,10 @@ class NewSemanalDjangoPlugin(Plugin):
             sym is not None
             and isinstance(sym.node, TypeInfo)
             and sym.node.metaclass_type is not None
-            and sym.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+            and (
+                sym.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+                or sym.node.metaclass_type.type.has_base(fullnames.MODEL_METACLASS_FULLNAME)
+            )
         ):
             return partial(process_model_class, django_context=self.django_context)
 
