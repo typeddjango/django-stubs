@@ -2,6 +2,11 @@
     main: |
         from typing import Type
         from myapp.models import Abstract1, Abstract2, Concrete1, Concrete2, Concrete3
+        from django.db import models
+
+        models.Model.DoesNotExist  # E: "Type[Model]" has no attribute "DoesNotExist"
+        models.Model.MultipleObjectsReturned  # E: "Type[Model]" has no attribute "MultipleObjectsReturned"
+
         reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.DoesNotExist"
