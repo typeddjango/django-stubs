@@ -657,23 +657,18 @@ class MetaclassAdjustments(ModelClassInitializer):
                     and len(stmt.lvalues) == 1
                     and isinstance(stmt.lvalues[0], NameExpr)
                     and stmt.lvalues[0].name == "abstract"
-                    and (
-                        (
-                            # abstract = True (builtins.bool)
-                            isinstance(stmt.rvalue, NameExpr)
-                            and stmt.rvalue.name == "True"
-                            and isinstance(stmt.rvalue.node, Var)
-                            and isinstance(stmt.rvalue.node.type, Instance)
-                            and stmt.rvalue.node.type.type.fullname == "builtins.bool"
-                        )
-                        or (
-                            # abstract: Literal[True]
-                            isinstance(stmt.type, LiteralType)
-                            and stmt.type.value is True
-                        )
-                    )
                 ):
-                    return True
+                    # abstract = True (builtins.bool)
+                    rhs_is_true = (
+                        isinstance(stmt.rvalue, NameExpr)
+                        and stmt.rvalue.name == "True"
+                        and isinstance(stmt.rvalue.node, Var)
+                        and isinstance(stmt.rvalue.node.type, Instance)
+                        and stmt.rvalue.node.type.type.fullname == "builtins.bool"
+                    )
+                    # abstract: Literal[True]
+                    is_literal_true = isinstance(stmt.type, LiteralType) and stmt.type.value is True
+                    return rhs_is_true or is_literal_true
         return False
 
     def add_exception_classes(self) -> None:
