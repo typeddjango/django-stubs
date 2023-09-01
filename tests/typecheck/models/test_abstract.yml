@@ -74,13 +74,17 @@
 
 - case: test_abstract_model_type_cannot_be_used_as_runtime_arg
   main: |
-      from myapp.models import Abstract, Concrete
+      from myapp.models import Abstract, Concrete, LiteralAbstract
       from typing import Generic, Type, TypeVar, overload, Union
+
+      Abstract()  # E: Cannot instantiate abstract class "Abstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
+      LiteralAbstract()  # E: Cannot instantiate abstract class "LiteralAbstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
 
       def f(klass: Type[Abstract]) -> None:
           return None
 
       f(Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected
+      f(Concrete)
 
       def second_arg(arg: str, klass: Type[Abstract]) -> None:
           return None
@@ -94,9 +98,7 @@
           return None
 
       g(Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected
-
-      A = Abstract
-      A()  # E: Cannot instantiate abstract class "Abstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
+      g(Concrete)
 
       @overload
       def o(klass: Type[T], arg: str) -> None: ...
@@ -107,6 +109,7 @@
 
       o(Abstract, "a")  # E: Only concrete class can be given where "Type[Abstract]" is expected
       o(Abstract, 1)  # E: Only concrete class can be given where "Type[Abstract]" is expected
+      o(Concrete, 1)
 
       class M:
           def method(self, klass: Type[Abstract]) -> None:
@@ -142,6 +145,7 @@
     -   path: myapp/models.py
         content: |
             from django.db import models
+            from typing import Literal
 
             class Abstract(models.Model):
                 field = models.CharField()
@@ -151,6 +155,10 @@
 
             class Concrete(Abstract):
                 ...
+
+            class LiteralAbstract(models.Model):
+                class Meta:
+                    abstract: Literal[True]
 
 
 - case: test_use_abstract_model
