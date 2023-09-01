@@ -27,6 +27,11 @@ class ModelBase(type):
     def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
+    # Note: these two metaclass generated attributes don't really exist on the 'Model'
+    # class, runtime they are only added on concrete subclasses of 'Model'. The
+    # metaclass also sets up correct inheritance from concrete parent models exceptions.
+    # Our mypy plugin aligns with this behaviour and will remove the 2 attributes below
+    # and re-add them to correct concrete subclasses of 'Model'
     DoesNotExist: Final[type[ObjectDoesNotExist]]
     MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
 
