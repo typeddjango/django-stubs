@@ -1,14 +1,26 @@
+from functools import cached_property
 from typing import Any, Dict, List, Optional, Type, Union, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel, OneToOneRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_STAR2, Argument, AssignmentStmt, CallExpr, Context, NameExpr, TypeInfo, Var
+from mypy.nodes import (
+    ARG_STAR2,
+    MDEF,
+    Argument,
+    AssignmentStmt,
+    CallExpr,
+    Context,
+    NameExpr,
+    SymbolTableNode,
+    TypeInfo,
+    Var,
+)
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, TypedDictType, TypeOfAny, get_proper_type
+from mypy.types import AnyType, Instance, LiteralType, TypedDictType, TypeOfAny, TypeType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -168,7 +180,7 @@ class ModelClassInitializer:
         return queryset_info
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
-        raise NotImplementedError("Implement this in subclasses")
+        raise NotImplementedError(f"Implement this in subclass {self.__class__.__name__}")
 
 
 class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
@@ -587,6 +599,128 @@ class AddMetaOptionsAttribute(ModelClassInitializer):
             self.add_new_node_to_model_class("_meta", Instance(options_info, [Instance(self.model_classdef.info, [])]))
 
 
+class MetaclassAdjustments(ModelClassInitializer):
+    @classmethod
+    def adjust_model_class(cls, ctx: ClassDefContext) -> None:
+        """
+        For the sake of type checkers other than mypy, some attributes that are
+        dynamically added by Django's model metaclass has been annotated on
+        `django.db.models.base.Model`. We remove those attributes and will handle them
+        through the plugin.
+        """
+        if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
+            return
+
+        does_not_exist = ctx.cls.info.names.get("DoesNotExist")
+        if does_not_exist is not None and isinstance(does_not_exist.node, Var) and not does_not_exist.plugin_generated:
+            del ctx.cls.info.names["DoesNotExist"]
+
+        multiple_objects_returned = ctx.cls.info.names.get("MultipleObjectsReturned")
+        if (
+            multiple_objects_returned is not None
+            and isinstance(multiple_objects_returned.node, Var)
+            and not multiple_objects_returned.plugin_generated
+        ):
+            del ctx.cls.info.names["MultipleObjectsReturned"]
+
+        return
+
+    def get_exception_bases(self, name: str) -> List[Instance]:
+        bases = []
+        for model_base in self.model_classdef.info.direct_base_classes():
+            exception_base_sym = model_base.names.get(name)
+            if (
+                # Base class is a Model
+                model_base.metaclass_type is not None
+                and model_base.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+                # But base class is not 'models.Model'
+                and model_base.fullname != fullnames.MODEL_CLASS_FULLNAME
+                # Base class also has a generated exception base e.g. 'DoesNotExist'
+                and exception_base_sym is not None
+                and exception_base_sym.plugin_generated
+                and isinstance(exception_base_sym.node, TypeInfo)
+            ):
+                bases.append(Instance(exception_base_sym.node, []))
+
+        return bases
+
+    @cached_property
+    def is_model_abstract(self) -> bool:
+        meta = self.model_classdef.info.names.get("Meta")
+        # Check if 'abstract' is declared in this model's 'class Meta' as
+        # 'abstract = True' won't be inherited from a parent model.
+        if meta is not None and isinstance(meta.node, TypeInfo) and "abstract" in meta.node.names:
+            for stmt in meta.node.defn.defs.body:
+                if (
+                    # abstract =
+                    isinstance(stmt, AssignmentStmt)
+                    and len(stmt.lvalues) == 1
+                    and isinstance(stmt.lvalues[0], NameExpr)
+                    and stmt.lvalues[0].name == "abstract"
+                ):
+                    # abstract = True (builtins.bool)
+                    rhs_is_true = (
+                        isinstance(stmt.rvalue, NameExpr)
+                        and stmt.rvalue.name == "True"
+                        and isinstance(stmt.rvalue.node, Var)
+                        and isinstance(stmt.rvalue.node.type, Instance)
+                        and stmt.rvalue.node.type.type.fullname == "builtins.bool"
+                    )
+                    # abstract: Literal[True]
+                    is_literal_true = isinstance(stmt.type, LiteralType) and stmt.type.value is True
+                    return rhs_is_true or is_literal_true
+        return False
+
+    def add_exception_classes(self) -> None:
+        """
+        Adds exception classes 'DoesNotExist' and 'MultipleObjectsReturned' to a model
+        type, aligned with how the model metaclass does it runtime.
+
+        If the model is abstract, exceptions will be added as abstract attributes.
+        """
+        if "DoesNotExist" not in self.model_classdef.info.names:
+            object_does_not_exist = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OBJECT_DOES_NOT_EXIST)
+            does_not_exist: Union[Var, TypeInfo]
+            if self.is_model_abstract:
+                does_not_exist = self.create_new_var("DoesNotExist", TypeType(Instance(object_does_not_exist, [])))
+                does_not_exist.is_abstract_var = True
+            else:
+                does_not_exist = helpers.create_type_info(
+                    "DoesNotExist",
+                    self.model_classdef.info.fullname,
+                    self.get_exception_bases("DoesNotExist") or [Instance(object_does_not_exist, [])],
+                )
+            self.model_classdef.info.names[does_not_exist.name] = SymbolTableNode(
+                MDEF, does_not_exist, plugin_generated=True
+            )
+
+        if "MultipleObjectsReturned" not in self.model_classdef.info.names:
+            django_multiple_objects_returned = self.lookup_typeinfo_or_incomplete_defn_error(
+                fullnames.MULTIPLE_OBJECTS_RETURNED
+            )
+            multiple_objects_returned: Union[Var, TypeInfo]
+            if self.is_model_abstract:
+                multiple_objects_returned = self.create_new_var(
+                    "MultipleObjectsReturned", TypeType(Instance(django_multiple_objects_returned, []))
+                )
+                multiple_objects_returned.is_abstract_var = True
+            else:
+                multiple_objects_returned = helpers.create_type_info(
+                    "MultipleObjectsReturned",
+                    self.model_classdef.info.fullname,
+                    (
+                        self.get_exception_bases("MultipleObjectsReturned")
+                        or [Instance(django_multiple_objects_returned, [])]
+                    ),
+                )
+            self.model_classdef.info.names[multiple_objects_returned.name] = SymbolTableNode(
+                MDEF, multiple_objects_returned, plugin_generated=True
+            )
+
+    def run(self) -> None:
+        self.add_exception_classes()
+
+
 def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
     initializers = [
         InjectAnyAsBaseForNestedMeta,
@@ -598,6 +732,7 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
         AddRelatedManagers,
         AddExtraFieldMethods,
         AddMetaOptionsAttribute,
+        MetaclassAdjustments,
     ]
     for initializer_cls in initializers:
         try:
