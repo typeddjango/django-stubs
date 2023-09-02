@@ -60,12 +60,11 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_models.cache_clear()  # type: ignore
         apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.clear_cache()
 
         if not settings.configured:
             settings._setup()  # type: ignore
-
         apps.populate(settings.INSTALLED_APPS)
 
     assert apps.apps_ready, "Apps are not ready"
@@ -207,6 +206,9 @@ class DjangoContext:
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 field_name = field.attname
+                # Can not determine target_field for recursive relationship when model is abstract
+                if field.related_model == "self" and model_cls._meta.abstract:
+                    continue
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
                 # from django-stubs own declaration. This is to align with the setter types declared for
                 # assignment.
@@ -364,7 +366,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: Type[Model]
     ) -> Union["Field[Any, Any]", ForeignObjectRel]:
         currently_observed_model = model_cls
-        field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
+        field: Union[Field[Any, Any], ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)

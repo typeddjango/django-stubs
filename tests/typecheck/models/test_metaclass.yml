@@ -1,0 +1,75 @@
+-   case: test_contributions_from_modelbase_metaclass
+    main: |
+        from typing import Type
+        from myapp.models import Abstract1, Abstract2, Concrete1, Concrete2, Concrete3
+        from django.db import models
+
+        models.Model.DoesNotExist  # E: "Type[Model]" has no attribute "DoesNotExist"
+        models.Model.MultipleObjectsReturned  # E: "Type[Model]" has no attribute "MultipleObjectsReturned"
+
+        reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.DoesNotExist"
+        reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.DoesNotExist"
+
+        reveal_type(Abstract1.MultipleObjectsReturned)  # N: Revealed type is "Type[django.core.exceptions.MultipleObjectsReturned]"
+        reveal_type(Abstract2.MultipleObjectsReturned)  # N: Revealed type is "Type[django.core.exceptions.MultipleObjectsReturned]"
+        reveal_type(Concrete1.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.MultipleObjectsReturned"
+        reveal_type(Concrete2.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.MultipleObjectsReturned"
+
+        reveal_type(super(Concrete1, Concrete1()).DoesNotExist())  # N: Revealed type is "django.core.exceptions.ObjectDoesNotExist"
+        reveal_type(super(Concrete2, Concrete2()).DoesNotExist())  # N: Revealed type is "myapp.models.Concrete1.DoesNotExist"
+
+        a: Type[Concrete1.DoesNotExist]
+        a = Concrete1.DoesNotExist
+        a = Concrete2.DoesNotExist
+        a = Concrete3.DoesNotExist
+
+        b: Type[Concrete2.DoesNotExist]
+        b = Concrete1.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.DoesNotExist]", variable has type "Type[myapp.models.Concrete2.DoesNotExist]")
+        b = Concrete2.DoesNotExist
+        b = Concrete3.DoesNotExist
+
+        c: Type[Concrete3.DoesNotExist]
+        c = Concrete1.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.DoesNotExist]", variable has type "Type[myapp.models.Concrete3.DoesNotExist]")
+        c = Concrete2.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete2.DoesNotExist]", variable has type "Type[myapp.models.Concrete3.DoesNotExist]")
+        c = Concrete3.DoesNotExist
+
+        d: Type[Concrete1.MultipleObjectsReturned]
+        d = Concrete1.MultipleObjectsReturned
+        d = Concrete2.MultipleObjectsReturned
+        d = Concrete3.MultipleObjectsReturned
+
+        e: Type[Concrete2.MultipleObjectsReturned]
+        e = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete2.MultipleObjectsReturned]")
+        e = Concrete2.MultipleObjectsReturned
+        e = Concrete3.MultipleObjectsReturned
+
+        f: Type[Concrete3.MultipleObjectsReturned]
+        f = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete3.MultipleObjectsReturned]")
+        f = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete3.MultipleObjectsReturned]")
+        f = Concrete3.MultipleObjectsReturned
+    installed_apps:
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.db import models
+
+              class Abstract1(models.Model):
+                  class Meta:
+                      abstract = True
+
+              class Abstract2(Abstract1):
+                  class Meta:
+                      abstract = True
+
+              class Concrete1(Abstract2):
+                  ...
+
+              class Concrete2(Concrete1):
+                  ...
+
+              class Concrete3(Concrete2):
+                  ...

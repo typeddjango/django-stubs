@@ -1,7 +1,7 @@
 import functools
 from collections.abc import Callable, Iterator, Sequence
 from http.cookies import SimpleCookie
-from typing import Any, Union  # noqa: Y037   # https://github.com/python/mypy/issues/12211
+from typing import Any  # noqa: Y037   # https://github.com/python/mypy/issues/12211
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
@@ -13,7 +13,7 @@ from django.utils.datastructures import _ListOrTuple
 from typing_extensions import TypeAlias
 
 # https://github.com/python/mypy/issues/12211
-_TemplateForResponseT: TypeAlias = Union[_ListOrTuple[str], Template, str]
+_TemplateForResponseT: TypeAlias = _ListOrTuple[str] | Template | str
 
 class ContentNotRenderedError(Exception): ...
 

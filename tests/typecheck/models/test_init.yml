@@ -71,7 +71,7 @@
 -   case: fields_from_abstract_user_propagate_to_init
     main: |
         from myapp.models import MyUser
-        user = MyUser(name='Maxim')
+        user = MyUser(name='Maxim', number=1)
     installed_apps:
         - myapp
     files:
@@ -84,7 +84,7 @@
                         abstract = True
                     name = models.CharField(max_length=100)
                 class MyUser(AbstractUser):
-                    pass
+                    number = models.IntegerField()
 
 -   case: pk_refers_to_primary_key_and_could_be_passed_to_init
     main: |
@@ -248,12 +248,13 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                from typing_extensions import Self
                 class AbstractModel(models.Model):
                     class Meta:
                         abstract = True
                     text = models.CharField(max_length=100)
                     @classmethod
-                    def base_init(cls) -> 'AbstractModel':
+                    def base_init(cls) -> Self:
                         return cls(text='mytext')
                 class MyModel(AbstractModel):
                     pass

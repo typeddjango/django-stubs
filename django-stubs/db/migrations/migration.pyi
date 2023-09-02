@@ -1,7 +1,7 @@
-from _typeshed import Self
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
+from typing_extensions import Self
 
 class Migration:
     operations: list[Operation]
@@ -23,6 +23,6 @@ class Migration:
 
 class SwappableTuple(tuple[str, str]):
     setting: str
-    def __new__(cls: type[Self], value: tuple[str, str], setting: str) -> Self: ...
+    def __new__(cls, value: tuple[str, str], setting: str) -> Self: ...
 
 def swappable_dependency(value: str) -> SwappableTuple: ...

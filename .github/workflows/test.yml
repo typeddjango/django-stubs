@@ -16,10 +16,12 @@ concurrency:
 
 jobs:
   mypy-self-check:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -35,17 +37,20 @@ jobs:
         run: mypy --strict mypy_django_plugin
 
       - name: Run mypy on ext code
-        run: mypy --strict django_stubs_ext
+        run: mypy --strict ext
       - name: Run mypy on scripts and utils
         run: mypy --strict scripts
       - name: Run mypy on stubs
         run: mypy --cache-dir=/dev/null --no-incremental django-stubs
 
   test:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+        shard: [0, 1, 2, 3]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
@@ -61,14 +66,17 @@ jobs:
           pip install -U pip setuptools wheel
           pip install -r ./requirements.txt
 
+      # Must match `shard` definition in the test matrix:
       - name: Run tests
-        run: PYTHONPATH='.' pytest
+        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} tests
 
   stubtest:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.11']
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Setup system dependencies
@@ -88,8 +96,10 @@ jobs:
         run: bash ./scripts/stubtest.sh
 
   matrix-test:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.8', '3.9', '3.10']
         django-version: ['3.2', '4.2']
@@ -114,4 +124,4 @@ jobs:
           pip check
 
       - name: Run django-stubs-ext tests
-        run: PYTHONPATH='.' pytest django_stubs_ext
+        run: PYTHONPATH='.' pytest ext

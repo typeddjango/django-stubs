@@ -3,6 +3,9 @@ target-version = ['py38']
 line-length = 120
 include = '\.pyi?$'
 
+[tool.codespell]
+ignore-words-list = "aadd,acount,nam"
+
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 extend-exclude = [
@@ -12,13 +15,19 @@ extend-exclude = [
 ]
 line-length = 120
 target-version = "py38"
+# See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
 select = [
-    "I",    # isort
-    "F401", # Unused imports
-    "UP",   # pyupgrade
+    "I",        # isort
+    "F401",     # Unused imports
+    "UP",       # pyupgrade
+    "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
 ]
 
+[tool.ruff.flake8-tidy-imports.banned-api]
+"_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."
+
 [tool.ruff.isort]
+known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 
 [build-system]

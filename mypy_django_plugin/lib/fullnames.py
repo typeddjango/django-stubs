@@ -1,5 +1,6 @@
 ABSTRACT_USER_MODEL_FULLNAME = "django.contrib.auth.models.AbstractUser"
 PERMISSION_MIXIN_CLASS_FULLNAME = "django.contrib.auth.models.PermissionsMixin"
+MODEL_METACLASS_FULLNAME = "django.db.models.base.ModelBase"
 MODEL_CLASS_FULLNAME = "django.db.models.base.Model"
 FIELD_FULLNAME = "django.db.models.fields.Field"
 CHAR_FIELD_FULLNAME = "django.db.models.fields.CharField"
@@ -51,3 +52,6 @@ F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
 
 STR_PROMISE_FULLNAME = "django.utils.functional._StrPromise"
+
+OBJECT_DOES_NOT_EXIST = "django.core.exceptions.ObjectDoesNotExist"
+MULTIPLE_OBJECTS_RETURNED = "django.core.exceptions.MultipleObjectsReturned"

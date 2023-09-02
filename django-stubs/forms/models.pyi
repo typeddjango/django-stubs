@@ -5,7 +5,6 @@ from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/1221
     Generic,
     Literal,
     TypeVar,
-    Union,
     overload,
 )
 from uuid import UUID
@@ -29,7 +28,7 @@ from typing_extensions import TypeAlias
 ALL_FIELDS: Literal["__all__"]
 
 # https://github.com/python/mypy/issues/12211
-_Fields: TypeAlias = Union[_ListOrTuple[str], Literal["__all__"]]
+_Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
 _Labels: TypeAlias = dict[str, str]

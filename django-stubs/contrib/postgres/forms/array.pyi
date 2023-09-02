@@ -5,7 +5,7 @@ from django import forms
 from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.utils import _DataT, _FilesT
-from django.forms.widgets import Media, _OptAttrs
+from django.forms.widgets import _OptAttrs
 
 from ..utils import prefix_validation_error as prefix_validation_error
 
@@ -42,8 +42,6 @@ class SplitArrayWidget(forms.Widget):
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
     def id_for_label(self, id_: str) -> str: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None = ...) -> dict[str, Any]: ...
-    @property
-    def media(self) -> Media: ...  # type: ignore
     @property
     def needs_multipart_form(self) -> bool: ...  # type: ignore
 

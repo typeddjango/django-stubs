@@ -2,12 +2,12 @@ import json
 from collections.abc import Callable
 from typing import Any
 
-from _typeshed import Self
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler
 from django.utils.functional import _StrOrPromise
+from typing_extensions import Self
 
 from . import Field
 from .mixins import CheckFieldDefaultMixin
@@ -58,7 +58,7 @@ class KeyTextTransform(KeyTransform):
     postgres_operator: str
     postgres_nested_operator: str
     @classmethod
-    def from_lookup(cls: type[Self], lookup: str) -> Self: ...
+    def from_lookup(cls, lookup: str) -> Self: ...
 
 KT: Callable[[str], KeyTextTransform]
 

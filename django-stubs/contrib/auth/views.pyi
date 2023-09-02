@@ -9,18 +9,23 @@ from django.views.generic.edit import FormView
 
 UserModel: Any
 
-class SuccessURLAllowedHostsMixin:
-    success_url_allowed_hosts: Any
+class RedirectURLMixin:
+    next_page: str | None
+    redirect_field_name: str
+    success_url_allowed_hosts: set[str]
+    def get_success_url(self) -> str: ...
+    def get_redirect_url(self) -> str: ...
     def get_success_url_allowed_hosts(self) -> set[str]: ...
+    def get_default_redirect_url(self) -> str: ...
 
-class LoginView(SuccessURLAllowedHostsMixin, FormView[AuthenticationForm]):
+class LoginView(RedirectURLMixin, FormView[AuthenticationForm]):
     authentication_form: Any
     redirect_field_name: Any
     redirect_authenticated_user: bool
     extra_context: Any
     def get_redirect_url(self) -> str: ...
 
-class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
+class LogoutView(RedirectURLMixin, TemplateView):
     next_page: str | None
     redirect_field_name: str
     extra_context: Any

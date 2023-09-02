@@ -4,7 +4,6 @@ from typing import (  # noqa: Y037   # https://github.com/python/mypy/issues/122
     Generic,
     Literal,
     TypeVar,
-    Union,
     overload,
 )
 
@@ -29,7 +28,7 @@ IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
 # https://github.com/python/mypy/issues/12211
-_OptionTogetherT: TypeAlias = Union[_ListOrTuple[_ListOrTuple[str] | str], set[tuple[str, ...]]]  # noqa: Y047
+_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: Y047
 
 @overload
 def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> tuple[tuple[str, ...], ...]: ...

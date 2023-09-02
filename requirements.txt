@@ -1,10 +1,14 @@
-black==23.3.0
+# Dev tools:
+black==23.7.0
 pre-commit==3.3.3
 pytest==7.4.0
-pytest-mypy-plugins==1.11.1
+pytest-mypy-plugins==3.0.0
+pytest-shard==0.1.2
+
+# Django deps:
 psycopg2-binary
-Django==4.2.2
--e ./django_stubs_ext
+Django==4.2.4
+-e ./ext
 -e .[compatible-mypy]
 
 # Overrides:

@@ -20,6 +20,14 @@
                     gender = models.CharField(max_length=100, choices=GENDER_CHOICES)
 
 -   case: date_datetime_fields_have_get_next_by_get_previous_by
+    disable_cache: true
+    parametrized:
+        - allow_any: "true"
+        - allow_any: "false"
+    mypy_config: |
+        [mypy-myapp.models]
+        disallow_any_generics = {{ allow_any }}
+        disallow_any_explicit = {{ allow_any }}
     main: |
         from myapp.models import MyUser
         reveal_type(MyUser().get_next_by_date())  # N: Revealed type is "myapp.models.MyUser"

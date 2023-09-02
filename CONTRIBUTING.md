@@ -30,7 +30,7 @@ Additionally, the following resources might be useful:
 ### Repository Setup
 
 As a first step you will need to fork this repository and clone your fork locally.
-In order to be able to continously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
+In order to be able to continuously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
 ### Dependency Setup
 
@@ -90,19 +90,28 @@ This mode leads to several known problems (stubs do not show up or have strange 
 
 **Important**: right now we only run `stubtest` on Python 3.11 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
 
-
 ## Submission Guidelines
 
 The workflow for contributions is fairly simple:
 
-1. fork and setup the repository as in the previous step.
-2. create a local branch.
-3. make whatever changes you want to contribute.
-4. ensure your contribution does not introduce linting issues or breaks the tests by linting and testing the code.
-5. make a pull request with an adequate description.
+1. Fork and set up the repository as in the previous step.
+2. Create a local branch.
+3. Make whatever changes you want to contribute.
+4. Ensure your contribution passes linting and tests.
+5. Make a pull request with an adequate description.
 
-## A Note About Generics
+## Generics
 
-As Django uses a lot of the more dynamic features of Python (i.e. metaobjects), statically typing it requires heavy use of generics. Unfortunately, the syntax for generics is also valid python syntax. For instance, the statement `class SomeClass(SuperType[int])` implicitly translates to `class SomeClass(SuperType.__class_getitem__(int))`. If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code typechecks.
+As Django uses a lot of the more dynamic features of Python (i.e. metaobjects), statically typing it requires heavy use of generics.
+Unfortunately, the syntax for generics is also valid Python syntax.
+For instance, the statement `class SomeClass(SuperType[int])` implicitly translates to `class SomeClass(SuperType.__class_getitem__(int))`.
+If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code passes type checking.
 
-When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error. If it does, please add the new generic class to the `_need_generic` list in the [django_stubs_ext monkeypatch function](https://github.com/typeddjango/django-stubs/blob/master/django_stubs_ext/django_stubs_ext/patch.py)
+When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error.
+If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/django_stubs_ext/django_stubs_ext/patch.py).
+
+## Private attributes
+
+We only add hints for private attributes when it has some demonstrated real-world use case.
+That means from a third-party package or some well described snippet for a project.
+This rule helps us avoid tying in too closely to Django’s undocumented internals.
