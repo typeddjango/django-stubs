@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from django import forms
-from django.db.models.fields import _ErrorMessagesT
+from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.utils import _DataT, _FilesT
 from django.forms.widgets import _OptAttrs
@@ -10,7 +10,7 @@ from django.forms.widgets import _OptAttrs
 from ..utils import prefix_validation_error as prefix_validation_error
 
 class SimpleArrayField(forms.CharField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: forms.Field
     delimiter: str
     min_length: int | None
@@ -46,7 +46,7 @@ class SplitArrayWidget(forms.Widget):
     def needs_multipart_form(self) -> bool: ...  # type: ignore
 
 class SplitArrayField(forms.Field):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: forms.Field
     size: int
     remove_trailing_nulls: bool

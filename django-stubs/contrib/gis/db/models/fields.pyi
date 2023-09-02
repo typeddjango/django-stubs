@@ -14,7 +14,7 @@ from django.contrib.gis.geos import (
 )
 from django.core.validators import _ValidatorCallable
 from django.db.models.expressions import Combinable
-from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+from django.db.models.fields import Field, _ErrorMessagesMapping, _FieldChoices
 from django.utils.functional import _StrOrPromise
 
 # __set__ value type
@@ -62,7 +62,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     def deconstruct(self) -> Any: ...
     def db_type(self, connection: Any) -> Any: ...
@@ -107,7 +107,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     def deconstruct(self) -> Any: ...
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]

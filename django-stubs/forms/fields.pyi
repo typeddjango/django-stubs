@@ -7,7 +7,14 @@ from uuid import UUID
 
 from django.core.files import File
 from django.core.validators import _ValidatorCallable
-from django.db.models.fields import _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ErrorMessagesT, _FieldChoices
+from django.db.models.fields import (
+    _Choice,
+    _ChoiceNamedGroup,
+    _ChoicesCallable,
+    _ErrorMessagesDict,
+    _ErrorMessagesMapping,
+    _FieldChoices,
+)
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
@@ -31,14 +38,14 @@ class Field:
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
     default_validators: list[_ValidatorCallable]
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     empty_values: Sequence[Any]
     show_hidden_initial: bool
     help_text: _StrOrPromise
     disabled: bool
     label_suffix: str | None
     localize: bool
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     validators: list[_ValidatorCallable]
     def __init__(
         self,
@@ -48,7 +55,7 @@ class Field:
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -83,7 +90,7 @@ class CharField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -109,7 +116,7 @@ class IntegerField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -131,7 +138,7 @@ class FloatField(IntegerField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -158,7 +165,7 @@ class DecimalField(IntegerField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -180,7 +187,7 @@ class BaseTemporalField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -224,7 +231,7 @@ class RegexField(CharField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -245,7 +252,7 @@ class EmailField(CharField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -265,7 +272,7 @@ class FileField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -294,7 +301,7 @@ class URLField(CharField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -332,7 +339,7 @@ class ChoiceField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -362,7 +369,7 @@ class TypedChoiceField(ChoiceField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -390,7 +397,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -411,7 +418,7 @@ class ComboField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -433,7 +440,7 @@ class MultiValueField(Field):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -466,7 +473,7 @@ class FilePathField(ChoiceField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -487,7 +494,7 @@ class SplitDateTimeField(MultiValueField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -508,7 +515,7 @@ class GenericIPAddressField(CharField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -532,7 +539,7 @@ class SlugField(CharField):
         label: _StrOrPromise | None = ...,
         initial: Any | None = ...,
         help_text: _StrOrPromise = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         show_hidden_initial: bool = ...,
         validators: Sequence[_ValidatorCallable] = ...,
         localize: bool = ...,
@@ -548,7 +555,7 @@ class InvalidJSONInput(str): ...
 class JSONString(str): ...
 
 class JSONField(CharField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     widget: _ClassLevelWidgetT
     encoder: Any
     decoder: Any

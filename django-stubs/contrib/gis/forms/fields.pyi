@@ -5,7 +5,6 @@ from django import forms
 class GeometryField(forms.Field):
     widget: Any
     geom_type: str
-    default_error_messages: Any
     srid: Any
     def __init__(self, *, srid: Any | None = ..., geom_type: Any | None = ..., **kwargs: Any) -> None: ...
     def to_python(self, value: Any) -> Any: ...
