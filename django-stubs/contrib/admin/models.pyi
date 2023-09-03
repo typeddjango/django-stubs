@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
 
 from django.db import models
@@ -28,7 +28,7 @@ class LogEntry(models.Model):
     object_repr: models.CharField
     action_flag: models.PositiveSmallIntegerField
     change_message: models.TextField
-    objects: LogEntryManager
+    objects: ClassVar[LogEntryManager]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...
     def is_deletion(self) -> bool: ...

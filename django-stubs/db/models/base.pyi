@@ -1,11 +1,11 @@
 from collections.abc import Collection, Iterable, Sequence
-from typing import Any, Final, TypeVar
+from typing import Any, ClassVar, Final, TypeVar
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import BaseConstraint, Field
-from django.db.models.manager import BaseManager
+from django.db.models.manager import BaseManager, Manager
 from django.db.models.options import Options
 from typing_extensions import Self
 
@@ -25,8 +25,6 @@ class ModelBase(type):
     def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
-    objects: BaseManager[Self]
-
     # Note: these two metaclass generated attributes don't really exist on the 'Model'
     # class, runtime they are only added on concrete subclasses of 'Model'. The
     # metaclass also sets up correct inheritance from concrete parent models exceptions.
@@ -34,6 +32,9 @@ class Model(metaclass=ModelBase):
     # and re-add them to correct concrete subclasses of 'Model'
     DoesNotExist: Final[type[ObjectDoesNotExist]]
     MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
+    # This 'objects' attribute will be deleted, via the plugin, in favor of managing it
+    # to only exist on subclasses it exists on during runtime.
+    objects: ClassVar[Manager[Self]]
 
     class Meta: ...
     _meta: Options[Any]

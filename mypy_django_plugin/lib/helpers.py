@@ -379,7 +379,9 @@ def check_types_compatible(
     api.check_subtype(actual_type, expected_type, ctx.context, error_message, "got", "expected")
 
 
-def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False) -> None:
+def add_new_sym_for_info(
+    info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False, is_classvar: bool = False
+) -> None:
     # type=: type of the variable itself
     var = Var(name=name, type=sym_type)
     # var.info: type of the object variable is bound to
@@ -387,6 +389,7 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_se
     var._fullname = info.fullname + "." + name
     var.is_initialized_in_class = True
     var.is_inferred = True
+    var.is_classvar = is_classvar
     info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
 
 

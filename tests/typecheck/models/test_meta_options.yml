@@ -77,10 +77,11 @@
         # Should not raise:
         MyModel(field=1)
         MyModel.objects.create(field=2)
+        AbstractModel._default_manager.create()
 
         # Errors:
         AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
-        AbstractModel.objects.create()  # E: Access to generic instance variables via class is ambiguous
+        AbstractModel.objects.create()  # E: "Type[AbstractModel]" has no attribute "objects"
     installed_apps:
         - myapp
     files:

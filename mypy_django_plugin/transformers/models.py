@@ -70,8 +70,13 @@ class ModelClassInitializer:
         var.is_inferred = True
         return var
 
-    def add_new_node_to_model_class(self, name: str, typ: MypyType, no_serialize: bool = False) -> None:
-        helpers.add_new_sym_for_info(self.model_classdef.info, name=name, sym_type=typ, no_serialize=no_serialize)
+    def add_new_node_to_model_class(
+        self, name: str, typ: MypyType, no_serialize: bool = False, is_classvar: bool = False
+    ) -> None:
+        # TODO: Rename to signal that it is a `Var` that is added..
+        helpers.add_new_sym_for_info(
+            self.model_classdef.info, name=name, sym_type=typ, no_serialize=no_serialize, is_classvar=is_classvar
+        )
 
     def add_new_class_for_current_module(self, name: str, bases: List[Instance]) -> TypeInfo:
         current_module = self.api.modules[self.model_classdef.info.module_name]
@@ -311,7 +316,7 @@ class AddManagers(ModelClassInitializer):
         assert manager_info is not None
         # Reparameterize dynamically created manager with model type
         manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-        self.add_new_node_to_model_class(manager_name, manager_type)
+        self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
@@ -336,7 +341,7 @@ class AddManagers(ModelClassInitializer):
                 continue
 
             manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-            self.add_new_node_to_model_class(manager_name, manager_type)
+            self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
             if not self.api.final_iteration:
@@ -351,7 +356,9 @@ class AddManagers(ModelClassInitializer):
                 # setting _some_ type
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 self.add_new_node_to_model_class(
-                    manager_name, Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])])
+                    manager_name,
+                    Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])]),
+                    is_classvar=True,
                 )
 
                 # Find expression for e.g. `objects = SomeManager()`
@@ -622,6 +629,10 @@ class MetaclassAdjustments(ModelClassInitializer):
             and not multiple_objects_returned.plugin_generated
         ):
             del ctx.cls.info.names["MultipleObjectsReturned"]
+
+        objects = ctx.cls.info.names.get("objects")
+        if objects is not None and isinstance(objects.node, Var) and not objects.plugin_generated:
+            del ctx.cls.info.names["objects"]
 
         return
 

@@ -31,9 +31,11 @@
 
 -   case: can_override_abstract_user_manager
     main: |
-        from myapp.models import User
-        reveal_type(User.objects)  # N: Revealed type is "myapp.models.UserManager[myapp.models.User]"
-        reveal_type(User.objects.all())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
+        from myapp.models import MyBaseUser, MyUser
+        reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseUserManager[myapp.models.MyBaseUser]"
+        reveal_type(MyBaseUser.objects.all())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.MyBaseUser, myapp.models.MyBaseUser]"
+        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.MyUserManager"
+        reveal_type(MyUser.objects.all())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.MyUser, myapp.models.MyUser]"
     installed_apps:
         - django.contrib.auth
         - myapp
@@ -42,8 +44,15 @@
         - path: myapp/models.py
           content: |
               from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-              class UserManager(BaseUserManager["User"]):
+              from django.contrib.auth.models import AbstractUser, UserManager
+              from typing import ClassVar
+              class MyBaseUserManager(BaseUserManager["MyBaseUser"]):
                   ...
 
-              class User(AbstractBaseUser):
-                  objects = UserManager()
+              class MyBaseUser(AbstractBaseUser):
+                  objects = MyBaseUserManager()
+
+              class MyUserManager(UserManager["MyUser"]):
+                  ...
+              class MyUser(AbstractUser):
+                  objects: ClassVar[MyUserManager] = MyUserManager()
