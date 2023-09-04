@@ -18,7 +18,7 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, Instance, Overloaded, ProperType, TypeOfAny
+from mypy.types import AnyType, CallableType, Instance, Overloaded, ProperType, TypeOfAny, FunctionLike
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -77,28 +77,19 @@ def get_method_type_from_dynamic_manager(
     if method_type is None:
         return None
 
-    if isinstance(method_type, CallableType):
-        return _process_dynamic_method(
-            method_name,
-            method_type,
-            queryset_info=queryset_info,
-            manager_instance=manager_instance,
-            is_fallback_queryset=is_fallback_queryset,
-        )
-    elif isinstance(method_type, Overloaded):
-        items = []
-        for item in method_type.items:
-            items.append(
-                _process_dynamic_method(
-                    method_name,
-                    item,
-                    queryset_info=queryset_info,
-                    manager_instance=manager_instance,
-                    is_fallback_queryset=is_fallback_queryset,
-                )
+    assert isinstance(method_type, FunctionLike)
+    items = []
+    for item in method_type.items:
+        items.append(
+            _process_dynamic_method(
+                method_name,
+                item,
+                queryset_info=queryset_info,
+                manager_instance=manager_instance,
+                is_fallback_queryset=is_fallback_queryset,
             )
-        return Overloaded(items)
-    assert False, "Unreachable"
+        )
+    return Overloaded(items) if len(items) > 1 else items[0]
 
 
 def _process_dynamic_method(
