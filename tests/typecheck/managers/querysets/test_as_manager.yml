@@ -146,6 +146,122 @@
                 class MyModel(models.Model):
                     objects = ManagerFromModelQuerySet
 
+-   case: handles_type_var_in_subclasses_of_subclasses_of_queryset
+    main: |
+        from myapp.models import MyModel, MyOtherModel
+        reveal_type(MyModel.objects.example_2())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.example_2())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.override())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.override2())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.dummy_override())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.example_mixin(MyModel()))  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyOtherModel.objects.example())  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.example_2())  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.override())  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.override2())  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.dummy_override())  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.example_mixin(MyOtherModel()))  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyOtherModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+              from typing import TypeVar, Generic
+              from django.db import models
+
+              T = TypeVar("T", bound=models.Model)
+              T_2 = TypeVar("T_2", bound=models.Model)
+
+              class SomeMixin:
+                  def example_mixin(self, a: T) -> T: ...
+
+              class OtherMixin(models.QuerySet[T]):
+                  def example_other_mixin(self) -> T: ...
+
+              class _MyModelQuerySet(OtherMixin[T], models.QuerySet[T], Generic[T]):
+                  def example(self) -> T: ...
+                  def override(self) -> T: ...
+                  def override2(self) -> T: ...
+                  def dummy_override(self) -> int: ...
+
+              class _MyModelQuerySet2(SomeMixin, _MyModelQuerySet[T_2]):
+                  def example_2(self) -> T_2: ...
+                  def override(self) -> T_2: ...
+                  def override2(self) -> T_2: ...
+                  def dummy_override(self) -> T_2: ...  # type: ignore[override]
+
+              class MyModelQuerySet(_MyModelQuerySet2["MyModel"]):
+                  def override(self) -> "MyModel": ...
+
+              class MyModel(models.Model):
+                  objects = MyModelQuerySet.as_manager()
+
+              class MyOtherModel(models.Model):
+                  objects = _MyModelQuerySet2.as_manager()  # type: ignore
+
+-   case: handles_type_vars
+    main: |
+        from myapp.models import MyModel, BaseQuerySet
+        reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_type())  # N: Revealed type is "Type[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_tuple_simple())  # N: Revealed type is "Tuple[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_tuple_list())  # N: Revealed type is "builtins.tuple[myapp.models.MyModel, ...]"
+        reveal_type(MyModel.objects.example_tuple_double())  # N: Revealed type is "Tuple[builtins.int, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_class())  # N: Revealed type is "myapp.models.Example[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_type_class())  # N: Revealed type is "Type[myapp.models.Example[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_collection())  # N: Revealed type is "typing.Collection[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_set())  # N: Revealed type is "builtins.set[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list_dict())  # N: Revealed type is "builtins.list[builtins.dict[builtins.str, myapp.models.MyModel]]"
+        class TestQuerySet(BaseQuerySet[str]): ... # E: Type argument "str" of "BaseQuerySet" must be a subtype of "Model"
+        reveal_type(MyModel.objects.example_t(5))  # N: Revealed type is "builtins.int"
+        MyModel.objects.example_arg(5, "5")  # E: Argument 1 to "example_arg" of "BaseQuerySet" has incompatible type "int"; expected "MyModel"
+        reveal_type(MyModel.objects.example_arg(MyModel(), "5"))  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from __future__ import annotations
+                from typing import TypeVar, Generic, Collection
+
+                from django.db import models
+
+                _CTE = TypeVar("_CTE", bound=models.Model)
+                T = TypeVar("T")
+
+                class Example(Generic[_CTE]): ...
+
+                class BaseQuerySet(models.QuerySet[_CTE], Generic[_CTE]):
+
+                    def example(self) -> _CTE: ...
+                    def example_list(self) -> list[_CTE]: ...
+                    def example_type(self) -> type[_CTE]: ...
+                    def example_tuple_simple(self) -> tuple[_CTE]: ...
+                    def example_tuple_list(self) -> tuple[_CTE, ...]: ...
+                    def example_tuple_double(self) -> tuple[int, _CTE]: ...
+                    def example_class(self) -> Example[_CTE]: ...
+                    def example_type_class(self) -> type[Example[_CTE]]: ...
+                    def example_collection(self) -> Collection[_CTE]: ...
+                    def example_set(self) -> set[_CTE]: ...
+                    def example_dict(self) -> dict[str, _CTE]: ...
+                    def example_list_dict(self) -> list[dict[str, _CTE]]: ...
+                    def example_t(self, a: T) -> T: ...
+                    def example_arg(self, a: _CTE, b: str) -> _CTE: ...
+
+
+                class MyModelQuerySet(BaseQuerySet["MyModel"]):
+                    ...
+
+                class MyModel(models.Model):
+                    objects = MyModelQuerySet.as_manager()
+
 -   case: reuses_generated_type_when_called_identically_for_multiple_managers
     main: |
         from myapp.models import MyModel
