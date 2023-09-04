@@ -18,7 +18,7 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, Instance, Overloaded, ProperType, TypeOfAny, FunctionLike
+from mypy.types import AnyType, CallableType, FunctionLike, Instance, Overloaded, ProperType, TypeOfAny
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
