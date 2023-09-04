@@ -75,7 +75,7 @@ def get_method_type_from_dynamic_manager(
     is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
 
     method_type = _get_funcdef_type(queryset_info.get_method(method_name))
-    if method_type is None or not isinstance(method_type, FunctionLike):
+    if not isinstance(method_type, FunctionLike):
         return method_type
 
     items = []
