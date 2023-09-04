@@ -75,7 +75,7 @@ def get_method_type_from_dynamic_manager(
 
     method_type = _get_funcdef_type(queryset_info.get_method(method_name))
     if method_type is None or not isinstance(method_type, FunctionLike):
-        return None
+        return method_type
 
     items = []
     for item in method_type.items:
