@@ -14,6 +14,7 @@ from mypy.nodes import (
     SymbolTableNode,
     TypeInfo,
     Var,
+    Node,
 )
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
