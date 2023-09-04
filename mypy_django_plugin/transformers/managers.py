@@ -8,6 +8,7 @@ from mypy.nodes import (
     FuncBase,
     FuncDef,
     MemberExpr,
+    Node,
     OverloadedFuncDef,
     RefExpr,
     StrExpr,
@@ -18,7 +19,7 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny
+from mypy.types import AnyType, CallableType, FunctionLike, Instance, Overloaded, ProperType, TypeOfAny
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -71,24 +72,36 @@ def get_method_type_from_dynamic_manager(
     queryset_info = helpers.lookup_fully_qualified_typeinfo(api, queryset_fullname)
     assert queryset_info is not None
 
-    def get_funcdef_type(definition: Union[FuncBase, Decorator, None]) -> Optional[ProperType]:
-        # TODO: Handle @overload?
-        if isinstance(definition, FuncBase) and not isinstance(definition, OverloadedFuncDef):
-            return definition.type
-        elif isinstance(definition, Decorator):
-            return definition.func.type
-        return None
+    is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
 
-    method_type = get_funcdef_type(queryset_info.get_method(method_name))
-    if method_type is None:
-        return None
+    method_type = _get_funcdef_type(queryset_info.get_method(method_name))
+    if not isinstance(method_type, FunctionLike):
+        return method_type
 
-    assert isinstance(method_type, CallableType)
+    items = []
+    for item in method_type.items:
+        items.append(
+            _process_dynamic_method(
+                method_name,
+                item,
+                queryset_info=queryset_info,
+                manager_instance=manager_instance,
+                is_fallback_queryset=is_fallback_queryset,
+            )
+        )
+    return Overloaded(items) if len(items) > 1 else items[0]
 
+
+def _process_dynamic_method(
+    method_name: str,
+    method_type: CallableType,
+    *,
+    queryset_info: TypeInfo,
+    manager_instance: Instance,
+    is_fallback_queryset: bool,
+) -> CallableType:
     variables = method_type.variables
     ret_type = method_type.ret_type
-
-    is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
 
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
@@ -113,6 +126,14 @@ def get_method_type_from_dynamic_manager(
         variables=variables,
         ret_type=ret_type,
     )
+
+
+def _get_funcdef_type(definition: Union[Node, None]) -> Optional[ProperType]:
+    if isinstance(definition, FuncBase):
+        return definition.type
+    elif isinstance(definition, Decorator):
+        return definition.func.type
+    return None
 
 
 def get_method_type_from_reverse_manager(
@@ -287,6 +308,7 @@ def create_manager_info_from_from_queryset_call(
         )
 
     # Add the new manager to the current module
+    # TODO: use proper SemanticAnalyzer API for that.
     module = api.modules[api.cur_mod_id]
     if name is not None and name != new_manager_info.name:
         # Unless names are equal, there's 2 symbol names that needs the manager info
@@ -339,7 +361,7 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
         if class_mro_info.fullname == fullnames.QUERYSET_CLASS_FULLNAME:
             break
         for name, sym in class_mro_info.names.items():
-            if not isinstance(sym.node, (FuncDef, Decorator)):
+            if not isinstance(sym.node, (FuncDef, OverloadedFuncDef, Decorator)):
                 continue
             # Insert the queryset method name as a class member. Note that the type of
             # the method is set as Any. Figuring out the type is the job of the
@@ -452,17 +474,19 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
     # Note: Order of `add_symbol_table_node` calls matters. Depending on what level
     # we've found the `.as_manager()` call. Point here being that we want to replace the
     # `.as_manager` return value with our newly created manager.
-    assert semanal_api.add_symbol_table_node(
+    added = semanal_api.add_symbol_table_node(
         ctx.name, SymbolTableNode(semanal_api.current_symbol_kind(), var, plugin_generated=True)
     )
+    assert added
     # Add the new manager to the current module
-    assert semanal_api.add_symbol_table_node(
+    added = semanal_api.add_symbol_table_node(
         # We'll use `new_manager_info.name` instead of `manager_class_name` here
         # to handle possible name collisions, as it's unique.
         new_manager_info.name,
         # Note that the generated manager type is always inserted at module level
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
     )
+    assert added
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
