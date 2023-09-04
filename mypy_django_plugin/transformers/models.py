@@ -440,7 +440,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
             default_manager_info = generated_manager_info
 
         default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
-        self.add_new_node_to_model_class("_default_manager", default_manager)
+        self.add_new_node_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
 class AddRelatedManagers(ModelClassInitializer):
