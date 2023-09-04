@@ -1,7 +1,7 @@
 # Dev tools:
 black==23.7.0
 pre-commit==3.4.0
-pytest==7.4.0
+pytest==7.4.1
 pytest-mypy-plugins==3.0.0
 pytest-shard==0.1.2
 
