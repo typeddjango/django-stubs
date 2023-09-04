@@ -74,10 +74,9 @@ def get_method_type_from_dynamic_manager(
     is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
 
     method_type = _get_funcdef_type(queryset_info.get_method(method_name))
-    if method_type is None:
+    if method_type is None or not isinstance(method_type, FunctionLike):
         return None
 
-    assert isinstance(method_type, FunctionLike)
     items = []
     for item in method_type.items:
         items.append(
@@ -128,7 +127,7 @@ def _process_dynamic_method(
     )
 
 
-def _get_funcdef_type(definition: Union[FuncBase, Decorator, None]) -> Optional[ProperType]:
+def _get_funcdef_type(definition: Union[Node, None]) -> Optional[ProperType]:
     if isinstance(definition, FuncBase):
         return definition.type
     elif isinstance(definition, Decorator):
