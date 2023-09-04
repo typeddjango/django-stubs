@@ -8,13 +8,13 @@ from mypy.nodes import (
     FuncBase,
     FuncDef,
     MemberExpr,
+    Node,
     OverloadedFuncDef,
     RefExpr,
     StrExpr,
     SymbolTableNode,
     TypeInfo,
     Var,
-    Node,
 )
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
