@@ -335,7 +335,7 @@
 
 -   case: from_queryset_model_gets_generated_manager_as_default_manager
     main: |
-        from myapp.models import MyModel, NewManager
+        from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
