@@ -127,7 +127,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return []
         deps = set()
 
-        for model_class in defined_model_classes:
+        for model_class in defined_model_classes.values():
             for field in itertools.chain(
                 # forward relations
                 self.django_context.get_model_related_fields(model_class),
