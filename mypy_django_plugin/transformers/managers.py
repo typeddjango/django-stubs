@@ -452,17 +452,19 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
     # Note: Order of `add_symbol_table_node` calls matters. Depending on what level
     # we've found the `.as_manager()` call. Point here being that we want to replace the
     # `.as_manager` return value with our newly created manager.
-    assert semanal_api.add_symbol_table_node(
+    added = semanal_api.add_symbol_table_node(
         ctx.name, SymbolTableNode(semanal_api.current_symbol_kind(), var, plugin_generated=True)
     )
+    assert added
     # Add the new manager to the current module
-    assert semanal_api.add_symbol_table_node(
+    added = semanal_api.add_symbol_table_node(
         # We'll use `new_manager_info.name` instead of `manager_class_name` here
         # to handle possible name collisions, as it's unique.
         new_manager_info.name,
         # Note that the generated manager type is always inserted at module level
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
     )
+    assert added
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
