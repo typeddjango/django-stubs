@@ -71,7 +71,7 @@ class ModelClassInitializer:
         return var
 
     def add_new_node_to_model_class(
-        self, name: str, typ: MypyType, *,  no_serialize: bool = False, is_classvar: bool = False
+        self, name: str, typ: MypyType, *, no_serialize: bool = False, is_classvar: bool = False
     ) -> None:
         # TODO: Rename to signal that it is a `Var` that is added..
         helpers.add_new_sym_for_info(
