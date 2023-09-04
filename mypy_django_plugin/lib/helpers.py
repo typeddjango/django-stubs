@@ -380,7 +380,7 @@ def check_types_compatible(
 
 
 def add_new_sym_for_info(
-    info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False, is_classvar: bool = False
+    info: TypeInfo, name: str, sym_type: MypyType, *, no_serialize: bool = False, is_classvar: bool = False
 ) -> None:
     # type=: type of the variable itself
     var = Var(name=name, type=sym_type)
