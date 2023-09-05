@@ -438,14 +438,14 @@
 -   case: test_queryset_in_model_class_body
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.custom)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.custom().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
     installed_apps:
         - myapp
     files:
@@ -468,7 +468,7 @@
 -   case: test_queryset_in_model_class_body_subclass
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet"
     installed_apps:
         - myapp
     files:
@@ -675,3 +675,92 @@
                   ...
 
               StrCallable = BaseManager.from_queryset(ModelQuerySet, class_name=str(1))
+
+-   case: only_auto_populates_model_arg_to_manager_with_type_var
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.bm_populated_from_qs_populated)
+        reveal_type(MyModel.bm_generic_from_qs_populated)
+
+        reveal_type(MyModel.bm_populated_from_qs_generic)
+        reveal_type(MyModel.bm_generic_from_qs_generic)
+
+        reveal_type(MyModel.m_populated_from_qs_populated)
+        reveal_type(MyModel.m_generic_from_qs_populated)
+
+        reveal_type(MyModel.m_populated_from_qs_generic)
+        reveal_type(MyModel.m_generic_from_qs_generic)
+
+        reveal_type(MyModel.qs_populated_as_manager)
+        reveal_type(MyModel.qs_generic_as_manager)
+    out: |
+        main:2: note: Revealed type is "myapp.models.BaseManagerPopulatedFromQuerySetPopulated"
+        main:3: note: Revealed type is "myapp.models.BaseManagerGenericFromQuerySetPopulated[myapp.models.MyModel]"
+        main:5: note: Revealed type is "myapp.models.BaseManagerPopulatedFromQuerySetGeneric"
+        main:6: note: Revealed type is "myapp.models.BaseManagerGenericFromQuerySetGeneric[myapp.models.MyModel]"
+        main:8: note: Revealed type is "myapp.models.ManagerPopulatedFromQuerySetPopulated"
+        main:9: note: Revealed type is "myapp.models.ManagerGenericFromQuerySetPopulated[myapp.models.MyModel]"
+        main:11: note: Revealed type is "myapp.models.ManagerPopulatedFromQuerySetGeneric"
+        main:12: note: Revealed type is "myapp.models.ManagerGenericFromQuerySetGeneric[myapp.models.MyModel]"
+        main:14: note: Revealed type is "myapp.models.ManagerFromQuerySetPopulated[myapp.models.MyModel]"
+        # TODO: We want a line like below and not an error.. But mypy doesn't trigger
+        # the dynamic class hook for classes with generic arguments..
+        # Revealed type is "myapp.models.ManagerFromQuerySetGeneric[myapp.models.MyModel]"
+        main:15: note: Revealed type is "myapp.models.UnknownManager[myapp.models.MyModel]"
+        myapp/models:50: error: Could not resolve manager type for "myapp.models.MyModel.qs_generic_as_manager"
+    installed_apps:
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from typing import TypeVar
+              from django.db.models import Manager, Model, QuerySet
+              from django.db.models.manager import BaseManager
+
+              class QuerySetPopulated(QuerySet["MyModel"]):
+                  ...
+
+              T = TypeVar("T", bound=Model)
+              class QuerySetGeneric(QuerySet[T]):
+                  ...
+
+              class BaseManagerPopulated(BaseManager["MyModel"]):
+                  ...
+
+              class BaseManagerGeneric(BaseManager[T]):
+                  ...
+
+              class ManagerPopulated(Manager["MyModel"]):
+                  ...
+
+              class ManagerGeneric(Manager[T]):
+                  ...
+
+              BaseManagerPopulatedFromQuerySetPopulated = BaseManagerPopulated.from_queryset(QuerySetPopulated)
+              BaseManagerGenericFromQuerySetPopulated = BaseManagerGeneric.from_queryset(QuerySetPopulated)
+
+              BaseManagerPopulatedFromQuerySetGeneric = BaseManagerPopulated.from_queryset(QuerySetGeneric)
+              BaseManagerGenericFromQuerySetGeneric = BaseManagerGeneric.from_queryset(QuerySetGeneric)
+
+              ManagerPopulatedFromQuerySetPopulated = ManagerPopulated.from_queryset(QuerySetPopulated)
+              ManagerGenericFromQuerySetPopulated = ManagerGeneric.from_queryset(QuerySetPopulated)
+
+              ManagerPopulatedFromQuerySetGeneric = ManagerPopulated.from_queryset(QuerySetGeneric)
+              ManagerGenericFromQuerySetGeneric = ManagerGeneric.from_queryset(QuerySetGeneric)
+
+              class MyModel(Model):
+                  bm_populated_from_qs_populated = BaseManagerPopulatedFromQuerySetPopulated()
+                  bm_generic_from_qs_populated = BaseManagerGenericFromQuerySetPopulated()
+
+                  bm_populated_from_qs_generic = BaseManagerPopulatedFromQuerySetGeneric()
+                  bm_generic_from_qs_generic = BaseManagerGenericFromQuerySetGeneric()
+
+                  m_populated_from_qs_populated = ManagerPopulatedFromQuerySetPopulated()
+                  m_generic_from_qs_populated = ManagerGenericFromQuerySetPopulated()
+
+                  m_populated_from_qs_generic = ManagerPopulatedFromQuerySetGeneric()
+                  m_generic_from_qs_generic = ManagerGenericFromQuerySetGeneric()
+
+                  qs_populated_as_manager = QuerySetPopulated.as_manager()
+                  qs_generic_as_manager = QuerySetGeneric["MyModel"].as_manager()

@@ -314,8 +314,11 @@ class AddManagers(ModelClassInitializer):
             return
 
         assert manager_info is not None
-        # Reparameterize dynamically created manager with model type
-        manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+        if manager_info.is_generic():
+            # Reparameterize dynamically created manager with model type
+            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+        else:
+            manager_type = Instance(manager_info, [])
         self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
@@ -340,7 +343,10 @@ class AddManagers(ModelClassInitializer):
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            if manager_info.is_generic():
+                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            else:
+                manager_type = Instance(manager_info, [])
             self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
@@ -439,7 +445,10 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                     return None
             default_manager_info = generated_manager_info
 
-        default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+        if default_manager_info.is_generic():
+            default_manager = Instance(default_manager_info, [Instance(self.model_classdef.info, [])])
+        else:
+            default_manager = Instance(default_manager_info, [])
         self.add_new_node_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
