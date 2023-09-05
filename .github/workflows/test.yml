@@ -23,7 +23,7 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -52,7 +52,7 @@ jobs:
         shard: [0, 1, 2, 3]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -78,7 +78,7 @@ jobs:
         python-version: ['3.11']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -107,7 +107,7 @@ jobs:
           - python-version: '3.11'
             django-version: '4.1'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup system dependencies
         run: |
           sudo apt-get update
