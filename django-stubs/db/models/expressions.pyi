@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, ClassVar, Generic, Literal, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q
@@ -150,11 +150,14 @@ class F(Combinable):
     ) -> OrderBy: ...
     def copy(self) -> F: ...
 
-class ResolvedOuterRef(F): ...
+class ResolvedOuterRef(F):
+    contains_aggregate: ClassVar[bool]
+    contains_over_clause: ClassVar[bool]
 
 class OuterRef(F):
+    contains_aggregate: ClassVar[bool]
+    contains_over_clause: ClassVar[bool]
     def __init__(self, name: str | OuterRef) -> None: ...
-    contains_aggregate: bool
     def relabeled_clone(self, relabels: Any) -> Self: ...
 
 class Func(SQLiteNumericMixin, Expression):

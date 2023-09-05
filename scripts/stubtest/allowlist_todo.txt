@@ -1591,8 +1591,6 @@ django.db.models.expressions.OrderBy.deconstruct
 django.db.models.expressions.Ref.get_refs
 django.db.models.expressions.Ref.relabeled_clone
 django.db.models.expressions.ResolvedOuterRef.as_sql
-django.db.models.expressions.ResolvedOuterRef.contains_aggregate
-django.db.models.expressions.ResolvedOuterRef.contains_over_clause
 django.db.models.expressions.ResolvedOuterRef.get_group_by_cols
 django.db.models.expressions.ResolvedOuterRef.relabeled_clone
 django.db.models.expressions.Subquery.as_sql
