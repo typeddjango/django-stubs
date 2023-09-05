@@ -1,4 +1,4 @@
-xfrom typing import Any
+from typing import Any
 
 class CPointerBase:
     ptr_type: Any
