@@ -1525,7 +1525,6 @@ django.db.models.expressions.BaseExpression.contains_aggregate
 django.db.models.expressions.BaseExpression.contains_column_references
 django.db.models.expressions.BaseExpression.contains_over_clause
 django.db.models.expressions.BaseExpression.convert_value
-django.db.models.expressions.BaseExpression.deconstruct
 django.db.models.expressions.BaseExpression.empty_result_set_value
 django.db.models.expressions.BaseExpression.get_refs
 django.db.models.expressions.BaseExpression.output_field
