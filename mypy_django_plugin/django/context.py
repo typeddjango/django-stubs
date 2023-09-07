@@ -270,10 +270,6 @@ class DjangoContext:
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
 
-    def get_attname(self, field: "Field[Any, Any]") -> str:
-        attname = field.attname
-        return attname
-
     def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: Optional[str]) -> bool:
         if method in ("values", "values_list"):
             return field.null

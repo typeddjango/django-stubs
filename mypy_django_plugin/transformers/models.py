@@ -289,15 +289,6 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 
 class AddManagers(ModelClassInitializer):
-    def has_any_parametrized_manager_as_base(self, info: TypeInfo) -> bool:
-        for base in helpers.iter_bases(info):
-            if self.is_any_parametrized_manager(base):
-                return True
-        return False
-
-    def is_any_parametrized_manager(self, typ: Instance) -> bool:
-        return typ.type.fullname in fullnames.MANAGER_CLASSES and isinstance(typ.args[0], AnyType)
-
     def lookup_manager(self, fullname: str, manager: "Manager[Any]") -> Optional[TypeInfo]:
         manager_info = self.lookup_typeinfo(fullname)
         if manager_info is None:
