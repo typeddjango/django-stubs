@@ -98,7 +98,6 @@ django.contrib.admin.widgets.AutocompleteMixin.media
 django.contrib.admin.widgets.BaseAdminDateWidget
 django.contrib.admin.widgets.BaseAdminTimeWidget
 django.contrib.admin.widgets.FilteredSelectMultiple.Media
-django.contrib.admin.widgets.RelatedFieldWidgetWrapper.__deepcopy__
 django.contrib.admin.widgets.get_select2_language
 django.contrib.admindocs.utils.non_capturing_group_matcher
 django.contrib.admindocs.utils.remove_non_capturing_groups
@@ -609,14 +608,12 @@ django.contrib.gis.forms.ModelFormMetaclass
 django.contrib.gis.forms.ModelFormOptions
 django.contrib.gis.forms.ModelMultipleChoiceField.hidden_widget
 django.contrib.gis.forms.MultiValueField.__deepcopy__
-django.contrib.gis.forms.MultiWidget.__deepcopy__
 django.contrib.gis.forms.MultipleChoiceField.hidden_widget
 django.contrib.gis.forms.PasswordInput.__slotnames__
 django.contrib.gis.forms.RadioSelect.id_for_label
 django.contrib.gis.forms.SelectDateWidget.select_widget
 django.contrib.gis.forms.SplitDateTimeField.hidden_widget
 django.contrib.gis.forms.TextInput.__slotnames__
-django.contrib.gis.forms.Widget.__deepcopy__
 django.contrib.gis.forms.Widget.subwidgets
 django.contrib.gis.forms.formset_factory
 django.contrib.gis.forms.inlineformset_factory
@@ -777,8 +774,6 @@ django.contrib.postgres.fields.ranges.RangeField.formfield
 django.contrib.postgres.fields.ranges.RangeField.get_placeholder
 django.contrib.postgres.forms.BaseRangeField.hidden_widget
 django.contrib.postgres.forms.JSONField
-django.contrib.postgres.forms.SplitArrayWidget.__deepcopy__
-django.contrib.postgres.forms.array.SplitArrayWidget.__deepcopy__
 django.contrib.postgres.forms.jsonb
 django.contrib.postgres.forms.ranges.BaseRangeField.hidden_widget
 django.contrib.postgres.indexes.PostgresIndex.max_name_length
@@ -2111,14 +2106,12 @@ django.forms.ModelFormMetaclass
 django.forms.ModelFormOptions
 django.forms.ModelMultipleChoiceField.hidden_widget
 django.forms.MultiValueField.__deepcopy__
-django.forms.MultiWidget.__deepcopy__
 django.forms.MultipleChoiceField.hidden_widget
 django.forms.PasswordInput.__slotnames__
 django.forms.RadioSelect.id_for_label
 django.forms.SelectDateWidget.select_widget
 django.forms.SplitDateTimeField.hidden_widget
 django.forms.TextInput.__slotnames__
-django.forms.Widget.__deepcopy__
 django.forms.Widget.subwidgets
 django.forms.boundfield.BoundField.__html__
 django.forms.boundfield.BoundField.subwidgets
@@ -2165,7 +2158,6 @@ django.forms.renderers.Jinja2.backend
 django.forms.utils.DEFAULT_TEMPLATE_DEPRECATION_MSG
 django.forms.utils.ErrorDict.__init__
 django.forms.utils.ErrorList.__init__
-django.forms.widgets.ChoiceWidget.__deepcopy__
 django.forms.widgets.ChoiceWidget.subwidgets
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.EmailInput.__slotnames__
@@ -2174,12 +2166,10 @@ django.forms.widgets.HiddenInput.__slotnames__
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__
 django.forms.widgets.MediaDefiningClass.__new__
-django.forms.widgets.MultiWidget.__deepcopy__
 django.forms.widgets.PasswordInput.__slotnames__
 django.forms.widgets.RadioSelect.id_for_label
 django.forms.widgets.SelectDateWidget.select_widget
 django.forms.widgets.TextInput.__slotnames__
-django.forms.widgets.Widget.__deepcopy__
 django.forms.widgets.Widget.subwidgets
 django.http.HttpHeaders
 django.http.HttpRequest.__init__

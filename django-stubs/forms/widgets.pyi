@@ -1,6 +1,6 @@
 import datetime
-from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, Protocol
+from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Sequence
+from typing import Any, Literal, Protocol, Self
 
 from django.core.files.base import File
 from django.db.models.fields import _FieldChoices
@@ -56,6 +56,7 @@ class Widget(metaclass=MediaDefiningClass):
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
     def id_for_label(self, id_: str) -> str: ...
     def use_required_attribute(self, initial: Any) -> bool: ...
+    def __deepcopy__(self, memo: MutableMapping[int, Self]) -> Self: ...
 
 class Input(Widget):
     input_type: str
