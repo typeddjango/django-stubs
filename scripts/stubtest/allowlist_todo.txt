@@ -571,7 +571,6 @@ django.contrib.gis.db.models.functions.GeoFuncMixin.resolve_expression
 django.contrib.gis.db.models.functions.Length.as_sql
 django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
 django.contrib.gis.default_app_config
-django.contrib.gis.forms.ALL_FIELDS
 django.contrib.gis.forms.BaseForm.Meta
 django.contrib.gis.forms.BaseForm.__init__
 django.contrib.gis.forms.BaseForm.changed_data
@@ -2069,7 +2068,6 @@ django.db.utils.ConnectionHandler.ensure_defaults
 django.db.utils.ConnectionHandler.prepare_test_settings
 django.db.utils.ConnectionRouter.routers
 django.db.utils.DatabaseErrorWrapper.__call__
-django.forms.ALL_FIELDS
 django.forms.BaseForm.Meta
 django.forms.BaseForm.__init__
 django.forms.BaseForm.changed_data
