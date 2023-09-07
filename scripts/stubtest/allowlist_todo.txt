@@ -1934,7 +1934,6 @@ django.db.models.query.RelatedPopulator
 django.db.models.query.get_related_populators
 django.db.models.query.normalize_prefetch_lookups
 django.db.models.query.prefetch_one_level
-django.db.models.query_utils.DeferredAttribute.__get__
 django.db.models.query_utils.InvalidQuery
 django.db.models.query_utils.Q.XOR
 django.db.models.query_utils.Q.__init__

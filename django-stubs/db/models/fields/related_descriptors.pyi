@@ -13,7 +13,7 @@ from django.db.models.query_utils import DeferredAttribute
 _T = TypeVar("_T")
 _F = TypeVar("_F", bound=Field)
 
-class ForeignKeyDeferredAttribute(DeferredAttribute):
+class ForeignKeyDeferredAttribute(DeferredAttribute[RelatedField]):
     field: RelatedField
 
 class ForwardManyToOneDescriptor(Generic[_F]):
