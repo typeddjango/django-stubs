@@ -1912,7 +1912,6 @@ django.db.models.manager.BaseManager.values
 django.db.models.manager.BaseManager.values_list
 django.db.models.manager.Manager.__slotnames__
 django.db.models.manager.RelatedManager
-django.db.models.query.BaseIterable.__aiter__
 django.db.models.query.EmptyQuerySet.__init__
 django.db.models.query.QuerySet.__contains__
 django.db.models.query.QuerySet.__deepcopy__
@@ -1926,7 +1925,6 @@ django.db.models.query.QuerySet.earliest
 django.db.models.query.QuerySet.in_bulk
 django.db.models.query.QuerySet.iterator
 django.db.models.query.QuerySet.latest
-django.db.models.query.RawQuerySet.__aiter__
 django.db.models.query.RawQuerySet.__init__
 django.db.models.query.RawQuerySet.columns
 django.db.models.query.RawQuerySet.model_fields
