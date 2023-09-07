@@ -603,6 +603,7 @@ class DurationField(Field[_ST, _GT]):
 
 class AutoFieldMixin:
     db_returning: bool
+    def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
 
 class AutoFieldMeta(type): ...
 

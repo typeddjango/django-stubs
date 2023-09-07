@@ -1579,7 +1579,6 @@ django.db.models.fields.AutoField.rel_db_type
 django.db.models.fields.AutoFieldMixin.__init__
 django.db.models.fields.AutoFieldMixin.check
 django.db.models.fields.AutoFieldMixin.contribute_to_class
-django.db.models.fields.AutoFieldMixin.deconstruct
 django.db.models.fields.AutoFieldMixin.formfield
 django.db.models.fields.AutoFieldMixin.get_db_prep_value
 django.db.models.fields.AutoFieldMixin.validate
