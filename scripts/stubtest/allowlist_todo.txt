@@ -2173,9 +2173,6 @@ django.forms.widgets.TextInput.__slotnames__
 django.forms.widgets.Widget.subwidgets
 django.http.HttpHeaders
 django.http.HttpRequest.__init__
-django.http.HttpRequest.accepted_types
-django.http.HttpRequest.headers
-django.http.HttpRequest.is_ajax
 django.http.HttpRequest.readlines
 django.http.HttpResponseBase.__iter__
 django.http.HttpResponseBase.getvalue
@@ -2187,9 +2184,6 @@ django.http.request.HttpHeaders.to_asgi_names
 django.http.request.HttpHeaders.to_wsgi_name
 django.http.request.HttpHeaders.to_wsgi_names
 django.http.request.HttpRequest.__init__
-django.http.request.HttpRequest.accepted_types
-django.http.request.HttpRequest.headers
-django.http.request.HttpRequest.is_ajax
 django.http.request.HttpRequest.readlines
 django.http.request.UploadHandlerList
 django.http.request.host_validation_re
