@@ -593,7 +593,6 @@ django.contrib.gis.forms.ChoiceWidget
 django.contrib.gis.forms.DateTimeBaseInput
 django.contrib.gis.forms.EmailInput.__slotnames__
 django.contrib.gis.forms.Field.__deepcopy__
-django.contrib.gis.forms.Field.deconstruct
 django.contrib.gis.forms.Field.hidden_widget
 django.contrib.gis.forms.FileField.bound_data
 django.contrib.gis.forms.FileInput.allow_multiple_selected
@@ -2097,7 +2096,6 @@ django.forms.ChoiceWidget
 django.forms.DateTimeBaseInput
 django.forms.EmailInput.__slotnames__
 django.forms.Field.__deepcopy__
-django.forms.Field.deconstruct
 django.forms.Field.hidden_widget
 django.forms.FileField.bound_data
 django.forms.FileInput.allow_multiple_selected
@@ -2131,7 +2129,6 @@ django.forms.boundfield.BoundField.subwidgets
 django.forms.boundfield.BoundWidget.__html__
 django.forms.fields.ChoiceField.__deepcopy__
 django.forms.fields.Field.__deepcopy__
-django.forms.fields.Field.deconstruct
 django.forms.fields.Field.hidden_widget
 django.forms.fields.FileField.bound_data
 django.forms.fields.MultiValueField.__deepcopy__
