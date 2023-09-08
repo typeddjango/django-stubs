@@ -2014,9 +2014,6 @@ django.db.models.sql.compiler.SQLCompiler.deferred_to_columns
 django.db.models.sql.compiler.SQLCompiler.get_default_columns
 django.db.models.sql.compiler.SQLCompiler.get_qualify_sql
 django.db.models.sql.compiler.SQLCompiler.get_related_selections
-django.db.models.sql.compiler.SQLCompiler.get_select
-django.db.models.sql.compiler.SQLCompiler.pre_sql_setup
-django.db.models.sql.compiler.SQLCompiler.setup_query
 django.db.models.sql.compiler.SQLDeleteCompiler.contains_self_reference_subquery
 django.db.models.sql.compiler.SQLDeleteCompiler.single_alias
 django.db.models.sql.datastructures.BaseTable.equals
