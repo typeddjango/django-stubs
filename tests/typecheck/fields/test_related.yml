@@ -642,8 +642,8 @@
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
         reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], *, bulk: builtins.bool =)"
         reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], *, bulk: builtins.bool =)"
-        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book]"
-        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article]"
+        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
+        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
         reveal_type(user.book_set.queryset_method())  # N: Revealed type is "builtins.int"
         reveal_type(user.article_set.queryset_method())  # N: Revealed type is "builtins.int"
     installed_apps:
