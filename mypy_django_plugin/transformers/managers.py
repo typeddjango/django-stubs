@@ -3,23 +3,36 @@ from typing import Final, Optional, Union
 from mypy.checker import TypeChecker
 from mypy.nodes import (
     GDEF,
+    AssignmentStmt,
     CallExpr,
     Decorator,
     FuncBase,
     FuncDef,
     MemberExpr,
+    NameExpr,
     Node,
     OverloadedFuncDef,
     RefExpr,
     StrExpr,
     SymbolTableNode,
+    TypeAlias,
     TypeInfo,
     Var,
 )
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, FunctionLike, Instance, Overloaded, ProperType, TypeOfAny, TypeVarType
+from mypy.types import (
+    AnyType,
+    CallableType,
+    FunctionLike,
+    Instance,
+    Overloaded,
+    PlaceholderType,
+    ProperType,
+    TypeOfAny,
+    TypeVarType,
+)
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -58,10 +71,11 @@ def get_method_type_from_dynamic_manager(
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
 
-    manager_type_info = manager_instance.type
+    manager_type_info = manager_instance.type.get_containing_type_info(method_name)
 
     if (
-        "django" not in manager_type_info.metadata
+        manager_type_info is None
+        or "django" not in manager_type_info.metadata
         or "from_queryset_manager" not in manager_type_info.metadata["django"]
     ):
         # Manager isn't dynamically added
@@ -347,24 +361,71 @@ def create_manager_info_from_from_queryset_call(
     """
     Extract manager and queryset TypeInfo from a from_queryset call.
     """
-
     if (
         # Check that this is a from_queryset call on a manager subclass
-        not isinstance(call_expr.callee, MemberExpr)
+        not call_expr.callee.name == "from_queryset"
+        or not isinstance(call_expr.callee, MemberExpr)
         or not isinstance(call_expr.callee.expr, RefExpr)
         or not isinstance(call_expr.callee.expr.node, TypeInfo)
         or not call_expr.callee.expr.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-        or not call_expr.callee.name == "from_queryset"
+    ):
+        return None
+
+    module = api.modules[api.cur_mod_id]
+    base_manager_info = call_expr.callee.expr.node
+    # Mypy parses `NewManager = <Manager>.from_queryset(<QuerySet>)` as a `Var`
+    # assignment, but what is happening runtime is rather that `NewManager` becomes an
+    # alias to another type. But mypy can't see that type. Before anything else happens,
+    # we want to adjust this. But we don't have any type to alias yet and we can't be
+    # sure we _can_ have it yet either. Due to the state of eventual dependencies we
+    # might need to defer, so to begin with we insert a placeholder type.
+    new_manager_is_aliased = name is not None
+    assignment_symbol = module.names.get(name)
+    if (
+        new_manager_is_aliased
+        and assignment_symbol is not None
+        and not assignment_symbol.plugin_generated
+        and not isinstance(assignment_symbol.node, TypeAlias)
+    ):
+        assignment_stmt = next(
+            (
+                stmt
+                for stmt in module.defs
+                if (
+                    isinstance(stmt, AssignmentStmt)
+                    and len(stmt.lvalues) == 1
+                    and isinstance(stmt.lvalues[0], NameExpr)
+                    and stmt.lvalues[0].name == name
+                )
+            ),
+            None,
+        )
+        if assignment_stmt is not None:
+            # Mypy don't allow call expressions to be aliases, but to get any kind of
+            # handle to the invisible type we spoof mypy that this statement is a type
+            # alias..
+            assignment_stmt.is_alias_def = True
+            alias = TypeAlias(
+                target=PlaceholderType(
+                    fullname=assignment_symbol.fullname, args=base_manager_info.defn.type_vars[:], line=call_expr.line
+                ),
+                fullname=assignment_symbol.fullname,
+                line=call_expr.line,
+                column=0,
+            )
+            module.names[name] = SymbolTableNode(GDEF, alias, plugin_generated=True)
+
+    if (
         # Check that the call has one or two arguments and that the first is a
         # QuerySet subclass
-        or not 1 <= len(call_expr.args) <= 2
+        not 1 <= len(call_expr.args) <= 2
         or not isinstance(call_expr.args[0], RefExpr)
         or not isinstance(call_expr.args[0].node, TypeInfo)
         or not call_expr.args[0].node.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
     ):
         return None
 
-    base_manager_info, queryset_info = call_expr.callee.expr.node, call_expr.args[0].node
+    queryset_info = call_expr.args[0].node
     if queryset_info.fullname is None:
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
@@ -408,10 +469,18 @@ def create_manager_info_from_from_queryset_call(
 
     # Add the new manager to the current module
     # TODO: use proper SemanticAnalyzer API for that.
-    module = api.modules[api.cur_mod_id]
-    if name is not None and name != new_manager_info.name:
-        # Unless names are equal, there's 2 symbol names that needs the manager info
-        module.names[name] = SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
+    assignment_symbol = module.names.get(name)
+    if (
+        assignment_symbol is not None
+        and name != new_manager_info.name
+        and assignment_symbol.plugin_generated
+        and isinstance(assignment_symbol.node, TypeAlias)
+        and isinstance(assignment_symbol.node.target, PlaceholderType)
+    ):
+        # Unless names are equal, there's 2 symbol names that needs to be updated
+        manager_instance = fill_typevars(new_manager_info)
+        assert isinstance(manager_instance, Instance)
+        assignment_symbol.node.target = manager_instance
 
     module.names[new_manager_info.name] = SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
     return new_manager_info

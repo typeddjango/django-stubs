@@ -310,7 +310,7 @@
 -   case: handles_type_collision_with_from_queryset
     main: |
         from myapp.models import MyModel, FromQuerySet
-        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
+        reveal_type(FromQuerySet)  # N: Revealed type is "def () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
         reveal_type(MyModel.from_queryset)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.as_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
     installed_apps:
