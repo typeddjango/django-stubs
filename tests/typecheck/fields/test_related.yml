@@ -798,11 +798,11 @@
         from myapp.models.user import User
         reveal_type(Store().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
         reveal_type(Store().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
-        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase]"
+        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
         reveal_type(Store().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
         reveal_type(User().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
         reveal_type(User().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
-        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase]"
+        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
         reveal_type(User().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
     installed_apps:
         - myapp
