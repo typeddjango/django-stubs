@@ -24,4 +24,5 @@ def get_storage_class(import_path: str | None = ...) -> type[Storage]: ...
 class DefaultStorage(LazyObject): ...
 
 storages: StorageHandler
-default_storage: DefaultStorage
+# default_storage is actually an instance of DefaultStorage, but it proxies through to a Storage
+default_storage: Storage
