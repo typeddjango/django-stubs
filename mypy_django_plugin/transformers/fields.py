@@ -6,6 +6,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
+from mypy.semanal_shared import parse_bool
 from mypy.types import AnyType, Instance, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
@@ -134,12 +135,12 @@ def set_descriptor_types_for_field(
     is_nullable = False
     null_expr = helpers.get_call_argument_by_name(ctx, "null")
     if null_expr is not None:
-        is_nullable = helpers.parse_bool(null_expr) or False
+        is_nullable = parse_bool(null_expr) or False
     # Allow setting field value to `None` when a field is primary key and has a default that can produce a value
     default_expr = helpers.get_call_argument_by_name(ctx, "default")
     primary_key_expr = helpers.get_call_argument_by_name(ctx, "primary_key")
     if default_expr is not None and primary_key_expr is not None:
-        is_set_nullable = helpers.parse_bool(primary_key_expr) or False
+        is_set_nullable = parse_bool(primary_key_expr) or False
 
     set_type, get_type = get_field_descriptor_types(
         default_return_type.type,
