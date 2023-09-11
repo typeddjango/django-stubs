@@ -58,10 +58,11 @@ def get_method_type_from_dynamic_manager(
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
 
-    manager_type_info = manager_instance.type
+    manager_type_info = manager_instance.type.get_containing_type_info(method_name)
 
     if (
-        "django" not in manager_type_info.metadata
+        manager_type_info is None
+        or "django" not in manager_type_info.metadata
         or "from_queryset_manager" not in manager_type_info.metadata["django"]
     ):
         # Manager isn't dynamically added
@@ -235,45 +236,9 @@ def _replace_type_var(ret_type: MypyType, to_replace: str, replace_by: MypyType)
     return ret_type
 
 
-def get_method_type_from_reverse_manager(
-    api: TypeChecker, method_name: str, manager_type_info: TypeInfo
-) -> Optional[ProperType]:
-    """
-    Attempts to resolve a reverse manager's method via the '_default_manager' manager on the related model
-    From Django docs:
-      "By default the RelatedManager used for reverse relations is a subclass of the default manager for that model."
-    Ref: https://docs.djangoproject.com/en/dev/topics/db/queries/#using-a-custom-reverse-manager
-    """
-    is_reverse_manager = (
-        "django" in manager_type_info.metadata and "related_manager_to_model" in manager_type_info.metadata["django"]
-    )
-    if not is_reverse_manager:
-        return None
-
-    related_model_fullname = manager_type_info.metadata["django"]["related_manager_to_model"]
-    assert isinstance(related_model_fullname, str)
-    model_info = helpers.lookup_fully_qualified_typeinfo(api, related_model_fullname)
-    if model_info is None:
-        return None
-
-    # We should _always_ have a '_default_manager' on a model
-    assert "_default_manager" in model_info.names
-    assert isinstance(model_info.names["_default_manager"].node, Var)
-    manager_instance = model_info.names["_default_manager"].node.type
-    return (
-        get_method_type_from_dynamic_manager(api, method_name, manager_instance)
-        # TODO: Can we assert on None and Instance?
-        if manager_instance is not None and isinstance(manager_instance, Instance)
-        else None
-    )
-
-
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
     api = helpers.get_typechecker_api(ctx)
-    method_type = get_method_type_from_dynamic_manager(
-        api, method_name, instance
-    ) or get_method_type_from_reverse_manager(api, method_name, instance.type)
-
+    method_type = get_method_type_from_dynamic_manager(api, method_name, instance)
     return method_type if method_type is not None else ctx.default_attr_type
 
 
