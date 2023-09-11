@@ -642,8 +642,10 @@
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
         reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], *, bulk: builtins.bool =)"
         reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], *, bulk: builtins.bool =)"
-        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book]"
-        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article]"
+        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
+        reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
+        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
+        reveal_type(user.article_set.get())  # N: Revealed type is "myapp.models.Article"
         reveal_type(user.book_set.queryset_method())  # N: Revealed type is "builtins.int"
         reveal_type(user.article_set.queryset_method())  # N: Revealed type is "builtins.int"
     installed_apps:
@@ -798,11 +800,13 @@
         from myapp.models.user import User
         reveal_type(Store().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
         reveal_type(Store().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
-        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase]"
+        reveal_type(Store().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
+        reveal_type(Store().purchases.get())  # N: Revealed type is "myapp.models.purchase.Purchase"
         reveal_type(Store().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
         reveal_type(User().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
         reveal_type(User().purchases.queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
-        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet[myapp.models.purchase.Purchase]"
+        reveal_type(User().purchases.filter())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
+        reveal_type(User().purchases.get())  # N: Revealed type is "myapp.models.purchase.Purchase"
         reveal_type(User().purchases.filter().queryset_method())  # N: Revealed type is "myapp.models.querysets.PurchaseQuerySet"
     installed_apps:
         - myapp
