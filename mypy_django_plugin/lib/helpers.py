@@ -171,15 +171,6 @@ def make_optional(typ: MypyType) -> MypyType:
     return UnionType.make_union([typ, NoneTyp()])
 
 
-def parse_bool(expr: Expression) -> Optional[bool]:
-    if isinstance(expr, NameExpr):
-        if expr.fullname == "builtins.True":
-            return True
-        if expr.fullname == "builtins.False":
-            return False
-    return None
-
-
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
     for base_fullname in bases:
         if info.has_base(base_fullname):
