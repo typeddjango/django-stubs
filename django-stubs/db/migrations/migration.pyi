@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.operations.base import Operation
