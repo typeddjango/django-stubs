@@ -1,12 +1,5 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
-from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
-    Any,
-    ClassVar,
-    Generic,
-    Literal,
-    TypeVar,
-    overload,
-)
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload  # https://github.com/python/mypy/issues/12211
 from uuid import UUID
 
 from django.db import models

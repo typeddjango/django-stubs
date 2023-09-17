@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, Optional, TypeVar  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+from typing import Any, Generic, Literal, Optional, TypeVar  # https://github.com/python/mypy/issues/12211
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter

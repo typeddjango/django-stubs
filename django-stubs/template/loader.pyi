@@ -2,7 +2,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from django.http.request import HttpRequest
-from django.template.exceptions import TemplateDoesNotExist as TemplateDoesNotExist  # noqa: F401
+from django.template.exceptions import TemplateDoesNotExist as TemplateDoesNotExist
 from django.utils.safestring import SafeString
 
 from .backends.base import _EngineTemplate
