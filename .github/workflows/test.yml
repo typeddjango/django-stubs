@@ -30,7 +30,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip
           pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
@@ -63,7 +63,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip
           pip install -r ./requirements.txt
 
       # Must match `shard` definition in the test matrix:
@@ -89,7 +89,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip
           pip install -r ./requirements.txt
 
       - name: Run stubtest
@@ -118,7 +118,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip
           pip install -r ./requirements.txt
           pip install "Django==${{ matrix.django-version }}"
           pip check
