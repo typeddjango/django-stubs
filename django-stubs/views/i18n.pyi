@@ -16,7 +16,7 @@ js_catalog_template: str
 class JavaScriptCatalog(View):
     head: Callable
     domain: str
-    packages: list[str]
+    packages: list[str] | None
     translation: DjangoTranslation
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def get_paths(self, packages: list[str]) -> list[str]: ...

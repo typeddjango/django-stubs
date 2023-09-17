@@ -2321,29 +2321,6 @@ django.urls.path
 django.urls.re_path
 django.urls.resolvers.LocaleRegexDescriptor.__get__
 django.urls.resolvers.ResolverMatch.__iter__
-django.views.View.view_is_async
-django.views.debug.ExceptionCycleWarning
-django.views.debug.SafeExceptionReporterFilter.get_safe_cookies
-django.views.debug.SafeExceptionReporterFilter.get_safe_request_meta
-django.views.debug.SafeExceptionReporterFilter.hidden_settings
-django.views.debug.builtin_template_path
-django.views.debug.get_caller
-django.views.debug.get_exception_reporter_class
-django.views.defaults.ERROR_PAGE_TEMPLATE
-django.views.generic.View.view_is_async
-django.views.generic.base.TemplateResponseMixin.template_name
-django.views.generic.base.View.view_is_async
-django.views.generic.base.logger
-django.views.generic.dates.DateMixin.uses_datetime_field
-django.views.generic.dates.DatedItems
-django.views.generic.detail.SingleObjectMixin.model
-django.views.generic.edit.BaseDeleteView.__init__
-django.views.generic.edit.BaseDeleteView.form_class
-django.views.generic.edit.DeleteViewCustomDeleteWarning
-django.views.generic.list.MultipleObjectMixin.get_context_data
-django.views.generic.list.MultipleObjectMixin.paginate_by
-django.views.i18n.JavaScriptCatalog.packages
-django.views.static.was_modified_since
 
 # Jinja related:
 django.template.backends.jinja2.Jinja2.template_context_processors

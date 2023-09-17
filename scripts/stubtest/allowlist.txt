@@ -73,7 +73,12 @@ django.utils.translation.template.context_re
 django.utils.translation.template.constant_re
 django.utils.translation.template.block_re
 django.utils.version.version_component_re
+django.views.debug.SafeExceptionReporterFilter.hidden_settings
 
 # AlterTogetherOptionsOperation.option_name is set as None,
 # but is required in the init, so we type it as str
 django.db.migrations.operations.models.AlterTogetherOptionOperation.option_name
+
+# Attributes defaulting to None messing with mypy
+django.views.generic.detail.SingleObjectMixin.model
+django.views.generic.edit.BaseDeleteView.form_class
