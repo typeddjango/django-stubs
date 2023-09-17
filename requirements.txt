@@ -8,10 +8,8 @@ pytest-shard==0.1.2
 # Django deps:
 psycopg2-binary
 django==4.2.5
-# Compat mode required for setuptools>64
-# See mypy issue https://github.com/python/mypy/issues/13392
--e ./ext --config-settings editable_mode=compat
--e .[compatible-mypy] --config-settings editable_mode=compat
+-e ./ext
+-e .[compatible-mypy]
 
 # Overrides:
 mypy==1.5.1

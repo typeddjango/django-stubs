@@ -33,6 +33,11 @@ jobs:
           pip install -U pip
           pip install -r ./requirements.txt
 
+          # Compat mode required for setuptools>64
+          # See mypy issue https://github.com/python/mypy/issues/13392
+          pip install -e . --config-settings editable_mode=compat
+          pip install -e ./ext --config-settings editable_mode=compat
+
       - name: Run mypy on plugin code
         run: mypy --strict mypy_django_plugin
 
@@ -65,6 +70,10 @@ jobs:
         run: |
           pip install -U pip
           pip install -r ./requirements.txt
+          # Compat mode required for setuptools>64
+          # See mypy issue https://github.com/python/mypy/issues/13392
+          pip install -e . --config-settings editable_mode=compat
+          pip install -e ./ext --config-settings editable_mode=compat
 
       # Must match `shard` definition in the test matrix:
       - name: Run tests
@@ -91,6 +100,10 @@ jobs:
         run: |
           pip install -U pip
           pip install -r ./requirements.txt
+          # Compat mode required for setuptools>64
+          # See mypy issue https://github.com/python/mypy/issues/13392
+          pip install -e . --config-settings editable_mode=compat
+          pip install -e ./ext --config-settings editable_mode=compat
 
       - name: Run stubtest
         run: bash ./scripts/stubtest.sh
