@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-stubs-ext"
+
+# NB! For clarity, keep version major.minor.patch in sync with django-stubs.
+# It's fine to skip django-stubs-ext releases, but when doing a release, update this to newest django-stubs version.
+version = "4.2.4"
+description = "Monkey-patching and extensions for django-stubs"
+
+authors = [{ name = "Simula Proxy", email = "3nki.nam.shub@gmail.com" }]
+maintainers = [{ name = "Marti Raudsepp", email = "marti@juffo.org" }]
+readme = "README.md"
+license = { file = "LICENSE.md" }
+requires-python = ">=3.8"
+dependencies = ["django", "typing-extensions"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Typing :: Typed",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+]
+
+[project.urls]
+"Source Code" = "https://github.com/typeddjango/django-stubs"
+"Release notes" = "https://github.com/typeddjango/django-stubs/releases"
+
+# XXX Check the package data
+# XXX Check it contains django_stubs_ext
