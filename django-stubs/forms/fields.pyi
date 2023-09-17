@@ -261,6 +261,7 @@ class EmailField(CharField):
 
 class FileField(Field):
     allow_empty_file: bool
+    max_length: int | None
     def __init__(
         self,
         *,
