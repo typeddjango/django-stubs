@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Sequence
 from typing import Any
 
 from django.utils.xmlutils import SimplerXMLGenerator
@@ -40,7 +41,7 @@ class SyndicationFeed:
         comments: str | None = ...,
         unique_id: str | None = ...,
         unique_id_is_permalink: bool | None = ...,
-        categories: tuple | None = ...,
+        categories: Sequence[str | None] | None = ...,
         item_copyright: str | None = ...,
         ttl: int | None = ...,
         updateddate: datetime.datetime | None = ...,
