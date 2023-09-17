@@ -36,7 +36,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-stubs"
-version = "4.2.1"
+version = "4.2.4"
 description = "Mypy stubs for Django"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { text = "MIT" }
@@ -59,7 +59,7 @@ authors = [{ name = "Maksim Kurnikov", email = "maxim.kurnikov@gmail.com" }]
 dependencies = [
     "mypy>=1.0.0",
     "django",
-    "django-stubs-ext>=4.2.1",
+    "django-stubs-ext>=4.2.2",
     "tomli; python_version < '3.11'",
     # Types:
     "typing-extensions",
@@ -68,7 +68,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-"compatible-mypy" = ["mypy>=1.3.0,<1.5"]
+"compatible-mypy" = ["mypy==1.5.*"]
 
 [project.urls]
 Homepage = "https://github.com/typeddjango/django-stubs"
