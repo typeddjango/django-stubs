@@ -77,9 +77,10 @@ Repository = "https://github.com/typeddjango/django-stubs"
 
 [tool.setuptools]
 license-files = ["LICENSE.md"]
-py-modules = []
+include-package-data = true
 
 [tool.setuptools.packages.find]
+where = ["."]
 include = [
     "django-stubs*",
     "mypy_django_plugin",
@@ -87,3 +88,5 @@ include = [
 exclude = [
     "scripts*",
 ]
+[tool.setuptools.package-data]
+"*" = ["*.pyi", "py.typed"]
