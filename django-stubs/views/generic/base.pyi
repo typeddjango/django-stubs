@@ -1,8 +1,11 @@
+import logging
 from collections.abc import Callable, Sequence
 from typing import Any
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
+
+logger: logging.Logger
 
 class ContextMixin:
     extra_context: dict[str, Any] | None
