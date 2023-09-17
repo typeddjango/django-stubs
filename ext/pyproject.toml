@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "django-stubs-ext"
@@ -13,7 +13,8 @@ description = "Monkey-patching and extensions for django-stubs"
 authors = [{ name = "Simula Proxy", email = "3nki.nam.shub@gmail.com" }]
 maintainers = [{ name = "Marti Raudsepp", email = "marti@juffo.org" }]
 readme = "README.md"
-license = { file = "LICENSE.md" }
+license = {text="MIT"}
+license-files = { paths = ["LICENSE.md"] }
 requires-python = ">=3.8"
 dependencies = ["django", "typing-extensions"]
 classifiers = [
@@ -36,3 +37,10 @@ classifiers = [
 
 # XXX Check the package data
 # XXX Check it contains django_stubs_ext
+
+
+
+[tool.hatch.build]
+include = ["django_stubs_ext", "*.pyi", "py.typed"]
+
+packages = ["django_stubs_ext",]

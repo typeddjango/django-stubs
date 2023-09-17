@@ -31,15 +31,16 @@ known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "django-stubs"
 version = "4.2.4"
 description = "Mypy stubs for Django"
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { text = "MIT" }
+license = {text="MIT"}
+license-files = { paths = ["LICENSE.md"] }
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -75,18 +76,10 @@ Homepage = "https://github.com/typeddjango/django-stubs"
 Repository = "https://github.com/typeddjango/django-stubs"
 "Release notes" = "https://github.com/typeddjango/django-stubs/releases"
 
-[tool.setuptools]
-license-files = ["LICENSE.md"]
-include-package-data = true
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = [
-    "django-stubs*",
-    "mypy_django_plugin",
-]
-exclude = [
-    "scripts*",
-]
-[tool.setuptools.package-data]
-"*" = ["*.pyi", "py.typed"]
+[tool.hatch.build]
+include = ["django-stubs", "mypy_django_plugin", "*.pyi", "py.typed"]
+exclude =[ "ext/"]
+packages = ["django-stubs", "mypy_django_plugin"]
+[tool.hatch.build.targets.wheel]
+packages = ["django-stubs", "mypy_django_plugin"]
