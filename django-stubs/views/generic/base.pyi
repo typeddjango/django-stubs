@@ -4,6 +4,7 @@ from typing import Any
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
+from django.utils.functional import _Getter
 
 logger: logging.Logger
 
@@ -17,6 +18,7 @@ class View:
     args: Any
     kwargs: Any
     def __init__(self, **kwargs: Any) -> None: ...
+    view_is_async: _Getter[bool] | bool
     @classmethod
     def as_view(cls: Any, **initkwargs: Any) -> Callable[..., HttpResponseBase]: ...
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None: ...
