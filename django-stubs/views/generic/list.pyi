@@ -12,7 +12,7 @@ class MultipleObjectMixin(Generic[_M], ContextMixin):
     allow_empty: bool
     queryset: _SupportsPagination[_M] | None
     model: type[_M] | None
-    paginate_by: int
+    paginate_by: int | None
     paginate_orphans: int
     context_object_name: str | None
     paginator_class: type[Paginator]

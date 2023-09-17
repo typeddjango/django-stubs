@@ -27,7 +27,7 @@ class View:
     def options(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
 
 class TemplateResponseMixin:
-    template_name: str
+    template_name: str | None
     template_engine: str | None
     response_class: type[HttpResponse]
     content_type: str | None
