@@ -2,6 +2,7 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Literal, Optional, Sequence, Set, Tuple, Type, Union
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
@@ -13,7 +14,6 @@ from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
-from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
