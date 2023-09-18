@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Sequence
-from typing import Any, Generic, Literal, TypeVar, overload  # https://github.com/python/mypy/issues/12211
+from typing import Any, Generic, Literal, TypeVar, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -21,7 +21,6 @@ EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
-# https://github.com/python/mypy/issues/12211
 _OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: PYI047
 
 @overload

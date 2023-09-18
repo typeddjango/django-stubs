@@ -12,7 +12,6 @@ from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
 from typing_extensions import TypeAlias
 
-# https://github.com/python/mypy/issues/12211
 _TemplateForResponseT: TypeAlias = _ListOrTuple[str] | Template | str
 
 class ContentNotRenderedError(Exception): ...

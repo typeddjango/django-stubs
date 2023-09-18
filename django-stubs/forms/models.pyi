@@ -1,5 +1,5 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
-from typing import Any, ClassVar, Generic, Literal, TypeVar, overload  # https://github.com/python/mypy/issues/12211
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.db import models
@@ -20,7 +20,6 @@ from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-# https://github.com/python/mypy/issues/12211
 _Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
