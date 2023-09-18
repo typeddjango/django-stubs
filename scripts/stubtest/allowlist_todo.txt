@@ -627,7 +627,6 @@ django.contrib.gis.gdal.envelope.OGREnvelope.MinY
 django.contrib.gis.gdal.geometries.LineString.coords
 django.contrib.gis.gdal.geometries.OGRGeometry.geojson
 django.contrib.gis.gdal.geometries.Polygon.exterior_ring
-django.contrib.gis.gdal.layer.Layer.num_feat
 django.contrib.gis.gdal.libgdal.err_handler
 django.contrib.gis.gdal.libgdal.lib_name
 django.contrib.gis.gdal.libgdal.lwingdal
