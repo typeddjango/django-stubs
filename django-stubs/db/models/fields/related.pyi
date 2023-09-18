@@ -238,7 +238,6 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
@@ -252,7 +251,6 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # class access
