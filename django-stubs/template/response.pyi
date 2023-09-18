@@ -1,7 +1,7 @@
 import functools
 from collections.abc import Callable, Iterator, Sequence
 from http.cookies import SimpleCookie
-from typing import Any  # https://github.com/python/mypy/issues/12211
+from typing import Any
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
