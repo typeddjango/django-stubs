@@ -38,7 +38,6 @@ ignore = ["PYI021", "PYI024", "PYI041", "PYI043"]
     "E501",
     "E741",
     "E743",
-    "F401", # Unused import
     "F403", # Use wildcard import
     "F405",
     "F822",
