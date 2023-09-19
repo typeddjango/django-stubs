@@ -7,9 +7,9 @@ from typing_extensions import Self
 
 class Migration:
     operations: Sequence[Operation]
-    dependencies: list[tuple[str, str]]
-    run_before: list[tuple[str, str]]
-    replaces: list[tuple[str, str]]
+    dependencies: Sequence[tuple[str, str]]
+    run_before: Sequence[tuple[str, str]]
+    replaces: Sequence[tuple[str, str]]
     initial: bool | None
     atomic: bool
     name: str
