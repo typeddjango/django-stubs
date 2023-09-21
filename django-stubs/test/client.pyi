@@ -23,7 +23,7 @@ MULTIPART_CONTENT: str
 CONTENT_TYPE_RE: Pattern
 JSON_CONTENT_TYPE_RE: Pattern
 
-UserModel = get_user_model()
+_UserModel = get_user_model()
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
@@ -182,7 +182,7 @@ class ClientMixin:
     @property
     def session(self) -> SessionBase: ...
     def login(self, **credentials: Any) -> bool: ...
-    def force_login(self, user: UserModel, backend: str | None = ...) -> None: ...
+    def force_login(self, user: _UserModel, backend: str | None = ...) -> None: ...
     def logout(self) -> None: ...
 
 class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):

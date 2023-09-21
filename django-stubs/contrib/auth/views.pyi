@@ -7,7 +7,7 @@ from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
-UserModel = get_user_model()
+_UserModel = get_user_model()
 
 class RedirectURLMixin:
     next_page: str | None
@@ -65,7 +65,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     token_generator: Any
     validlink: bool
     user: Any
-    def get_user(self, uidb64: str) -> UserModel | None: ...
+    def get_user(self, uidb64: str) -> _UserModel | None: ...
 
 class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
     title: Any

@@ -12,7 +12,7 @@ from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 from typing_extensions import Self, TypeAlias
 
-UserModel = get_user_model()
+_UserModel = get_user_model()
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
@@ -47,7 +47,7 @@ class HttpRequest(BytesIO):
     # django.contrib.admin views:
     current_app: str
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    user: UserModel | AnonymousUser
+    user: _UserModel | AnonymousUser
     # django.middleware.locale.LocaleMiddleware:
     LANGUAGE_CODE: str
     # django.contrib.sites.middleware.CurrentSiteMiddleware
