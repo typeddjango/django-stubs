@@ -23,7 +23,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
+from mypy_django_plugin.transformers import apps, fields, forms, init_create, meta, querysets, request, settings
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_as_manager_method,
@@ -121,6 +121,10 @@ class NewSemanalDjangoPlugin(Plugin):
                     return []
                 return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
+        if file.fullname == "django.apps":
+            # Preload all registered models.py so that we can resolve lazy references
+            # passed to 'apps.get_model()'. e.g. 'apps.get_model("myapp.MyModel")'
+            return [self._new_dependency(models) for models in self.django_context.model_modules.keys()]
         # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
@@ -219,6 +223,10 @@ class NewSemanalDjangoPlugin(Plugin):
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
             )
+        elif method_name == "get_model":
+            info = self._get_typeinfo_or_none(class_fullname)
+            if info and info.has_base(fullnames.APPS_FULLNAME):
+                return partial(apps.resolve_model_for_get_model, django_context=self.django_context)
 
         return None
 

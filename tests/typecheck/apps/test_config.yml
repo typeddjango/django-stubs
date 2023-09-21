@@ -27,3 +27,51 @@
       reveal_type(BarConfig("bar", None).default_auto_field)  # N: Revealed type is "builtins.str"
       reveal_type(BazConfig("baz", None).default_auto_field)  # N: Revealed type is "builtins.str"
       reveal_type(FooBarConfig("baz", None).default_auto_field)  # N: Revealed type is "builtins.str"
+
+-   case: test_get_model
+    main: |
+        from django.apps import apps
+        reveal_type(apps.get_model("app1.First"))
+        reveal_type(apps.get_model("app1.first"))
+        reveal_type(apps.get_model("app1", "First"))
+        reveal_type(apps.get_model(app_label="app1", model_name="First"))
+        reveal_type(apps.get_model(app_label="app1", model_name="first"))
+        reveal_type(apps.get_model(model_name="First", app_label="app1"))
+
+        reveal_type(apps.get_model("app2.Second"))
+        reveal_type(apps.get_model("app2", "Second"))
+
+        reveal_type(apps.get_model("app1.Nonexisting"))
+        reveal_type(apps.get_model("app2", "Unknown"))
+    out: |
+        main:2: note: Revealed type is "Type[app1.models.First]"
+        main:3: note: Revealed type is "Type[app1.models.First]"
+        main:4: note: Revealed type is "Type[app1.models.First]"
+        main:5: note: Revealed type is "Type[app1.models.First]"
+        main:6: note: Revealed type is "Type[app1.models.First]"
+        main:7: note: Revealed type is "Type[app1.models.First]"
+        main:9: note: Revealed type is "Type[app2.models.Second]"
+        main:10: note: Revealed type is "Type[app2.models.Second]"
+        main:12: note: Revealed type is "Type[django.db.models.base.Model]"
+        main:12: error: Could not match lazy reference with any model
+        main:13: note: Revealed type is "Type[django.db.models.base.Model]"
+        main:13: error: Could not match lazy reference with any model
+    installed_apps:
+        - app1
+        - app2
+    files:
+        -   path: app1/__init__.py
+        -   path: app1/models.py
+            content: |
+                from django.db import models
+
+                class First(models.Model):
+                    field = models.IntegerField()
+
+        -   path: app2/__init__.py
+        -   path: app2/models.py
+            content: |
+                from django.db import models
+
+                class Second(models.Model):
+                    field = models.CharField()

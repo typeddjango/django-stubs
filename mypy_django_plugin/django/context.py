@@ -3,7 +3,21 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Literal, Optional, Sequence, Set, Tuple, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -269,6 +283,14 @@ class DjangoContext:
     @cached_property
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
+
+    @cached_property
+    def model_class_fullnames_by_label_lower(self) -> Mapping[str, str]:
+        return {
+            klass._meta.label_lower: helpers.get_class_fullname(klass)
+            for klass in self.all_registered_model_classes
+            if klass is not models.Model
+        }
 
     def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: Optional[str]) -> bool:
         if method in ("values", "values_list"):
