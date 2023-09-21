@@ -398,11 +398,6 @@ def resolve_lazy_reference(
     if "." not in reference:
         # <object_name> -- needs prefix of <app_label>. We can't implicitly solve
         # what app label this should be, yet.
-        api.fail("Could not resolve lazy reference without an app label", ctx)
-        api.note(
-            ("Try to use a reference explicitly prefixed with app label:" f' "<app_label>.{reference}" instead'),
-            ctx,
-        )
         return None
 
     # Reference conforms to the structure of a lazy reference: '<app_label>.<object_name>'
