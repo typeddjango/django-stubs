@@ -4,7 +4,7 @@ from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
 from mypy.modulefinder import mypy_path
-from mypy.nodes import MypyFile, TypeInfo, ImportFrom
+from mypy.nodes import ImportFrom, MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext,
@@ -113,7 +113,8 @@ class NewSemanalDjangoPlugin(Plugin):
         # for `get_user_model()`
         if self.django_context.settings and any(
             i.id == "django.contrib.auth" and any(name == "get_user_model" for name, _ in i.names)
-            for i in file.imports if isinstance(i, ImportFrom)
+            for i in file.imports
+            if isinstance(i, ImportFrom)
         ):
             auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
             try:
@@ -304,7 +305,6 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
-
         if fullname == fullnames.GET_USER_MODEL_FULLNAME:
             return partial(settings.transform_get_user_model_hook, django_context=self.django_context)
 

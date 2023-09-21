@@ -3,7 +3,6 @@ from pathlib import Path, PosixPath
 from typing import Any, Protocol
 
 from django.contrib.auth import get_user_model
-from typing_extensions import TypeAlias
 
 _UserModel = get_user_model()
 

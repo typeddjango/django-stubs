@@ -1,6 +1,6 @@
 from mypy.plugin import MethodContext
-from mypy.types import UninhabitedType
 from mypy.types import Type as MypyType
+from mypy.types import UninhabitedType
 
 from mypy_django_plugin.django.context import DjangoContext
 

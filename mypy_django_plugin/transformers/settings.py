@@ -1,15 +1,14 @@
-from mypy.nodes import MemberExpr, SymbolTableNode, GDEF, PlaceholderNode
-from mypy.plugin import AttributeContext, FunctionContext, DynamicClassDefContext
+from mypy.nodes import GDEF, MemberExpr, PlaceholderNode, SymbolTableNode
+from mypy.plugin import AttributeContext, DynamicClassDefContext, FunctionContext
 from mypy.types import AnyType, Instance, TypeOfAny, TypeType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers, fullnames
+from mypy_django_plugin.lib import fullnames, helpers
 
 
 def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-
     auth_user_model = django_context.settings.AUTH_USER_MODEL
 
     model_info = None
@@ -24,6 +23,7 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
         return AnyType(TypeOfAny.unannotated)
 
     return TypeType(Instance(model_info, []))
+
 
 def transform_get_user_model_hook(ctx: DynamicClassDefContext, django_context: DjangoContext) -> MypyType:
     auth_user_model = django_context.settings.AUTH_USER_MODEL
