@@ -43,6 +43,9 @@
 
         reveal_type(apps.get_model("app1.Nonexisting"))
         reveal_type(apps.get_model("app2", "Unknown"))
+
+        reveal_type(apps.get_model("sites.Site"))  # Note that sites is not installed
+        reveal_type(apps.get_model("contenttypes.ContentType"))
     out: |
         main:2: note: Revealed type is "Type[app1.models.First]"
         main:3: note: Revealed type is "Type[app1.models.First]"
@@ -56,6 +59,9 @@
         main:12: error: Could not match lazy reference with any model
         main:13: note: Revealed type is "Type[django.db.models.base.Model]"
         main:13: error: Could not match lazy reference with any model
+        main:15: note: Revealed type is "Type[django.db.models.base.Model]"
+        main:15: error: Could not match lazy reference with any model
+        main:16: note: Revealed type is "Type[django.contrib.contenttypes.models.ContentType]"
     installed_apps:
         - app1
         - app2
