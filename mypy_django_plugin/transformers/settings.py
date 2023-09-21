@@ -1,23 +1,49 @@
-from mypy.nodes import MemberExpr
-from mypy.plugin import AttributeContext, FunctionContext
+from mypy.nodes import MemberExpr, SymbolTableNode, GDEF, PlaceholderNode
+from mypy.plugin import AttributeContext, FunctionContext, DynamicClassDefContext
 from mypy.types import AnyType, Instance, TypeOfAny, TypeType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import helpers, fullnames
 
 
 def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+
     auth_user_model = django_context.settings.AUTH_USER_MODEL
-    model_cls = django_context.apps_registry.get_model(auth_user_model)
-    model_cls_fullname = helpers.get_class_fullname(model_cls)
+
+    model_info = None
+    try:
+        model_cls = django_context.apps_registry.get_model(auth_user_model)
+        model_cls_fullname = helpers.get_class_fullname(model_cls)
+    except LookupError:
+        model_cls_fullname = fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME
 
     model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), model_cls_fullname)
     if model_info is None:
         return AnyType(TypeOfAny.unannotated)
 
     return TypeType(Instance(model_info, []))
+
+def transform_get_user_model_hook(ctx: DynamicClassDefContext, django_context: DjangoContext) -> MypyType:
+    auth_user_model = django_context.settings.AUTH_USER_MODEL
+    try:
+        model_cls = django_context.apps_registry.get_model(auth_user_model)
+        model_cls_fullname = helpers.get_class_fullname(model_cls)
+    except LookupError:
+        model_cls_fullname = fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME
+
+    model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_semanal_api(ctx), model_cls_fullname)
+    if model_info is None:
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+            # Temporarily replace the node with a PlaceholderNode. This supresses
+            # 'Variable "..." is not valid as a type' errors from mypy
+            model_info = PlaceholderNode(model_cls_fullname, ctx.call, ctx.call.line)
+        else:
+            return
+
+    ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, model_info))
 
 
 def get_type_of_settings_attribute(

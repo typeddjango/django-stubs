@@ -5,7 +5,7 @@ from re import Pattern
 from types import TracebackType
 from typing import Any, Generic, NoReturn, TypeVar
 
-from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
@@ -22,6 +22,8 @@ BOUNDARY: str
 MULTIPART_CONTENT: str
 CONTENT_TYPE_RE: Pattern
 JSON_CONTENT_TYPE_RE: Pattern
+
+UserModel = get_user_model()
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
@@ -180,7 +182,7 @@ class ClientMixin:
     @property
     def session(self) -> SessionBase: ...
     def login(self, **credentials: Any) -> bool: ...
-    def force_login(self, user: AbstractBaseUser, backend: str | None = ...) -> None: ...
+    def force_login(self, user: UserModel, backend: str | None = ...) -> None: ...
     def logout(self) -> None: ...
 
 class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):

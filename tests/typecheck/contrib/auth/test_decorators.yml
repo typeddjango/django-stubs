@@ -41,6 +41,27 @@
         from django.contrib.auth.decorators import user_passes_test
         @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[Union[AbstractBaseUser, AnonymousUser]], bool]"
         def view_func(request: HttpRequest) -> HttpResponse: ...
+-   case: user_passes_test_has_user_of_type_auth_user_model
+    disable_cache: true
+    main: |
+        from django.http import HttpRequest, HttpResponse
+        from django.contrib.auth.models import AnonymousUser
+        from django.contrib.auth.decorators import user_passes_test
+        from myapp.models import MyUser
+
+        def check_user(user: MyUser | AnonymousUser) -> bool: return True
+        @user_passes_test(check_user)
+        def view_func(request: HttpRequest) -> HttpResponse: ...
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
+        AUTH_USER_MODEL='myapp.MyUser'
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
 -   case: permission_required
     main: |
         from django.contrib.auth.decorators import permission_required

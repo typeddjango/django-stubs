@@ -4,7 +4,7 @@ from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
 from mypy.modulefinder import mypy_path
-from mypy.nodes import MypyFile, TypeInfo
+from mypy.nodes import MypyFile, TypeInfo, ImportFrom
 from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext,
@@ -23,7 +23,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
+from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, settings
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_as_manager_method,
@@ -111,15 +111,17 @@ class NewSemanalDjangoPlugin(Plugin):
             return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
-        if self.django_context.settings:
-            if file.fullname == "django.contrib.auth" or file.fullname in {"django.http", "django.http.request"}:
-                auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
-                try:
-                    auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
-                except LookupError:
-                    # get_user_model() model app is not installed
-                    return []
-                return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
+        if self.django_context.settings and any(
+            i.id == "django.contrib.auth" and any(name == "get_user_model" for name, _ in i.names)
+            for i in file.imports if isinstance(i, ImportFrom)
+        ):
+            auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
+            try:
+                auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
+            except LookupError:
+                # get_user_model() model app is not installed
+                return []
+            return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
         # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
@@ -273,10 +275,6 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
-        # Lookup of the 'request.user' attribute
-        if info and info.has_base(fullnames.HTTPREQUEST_CLASS_FULLNAME) and attr_name == "user":
-            return partial(request.set_auth_user_model_as_type_for_request_user, django_context=self.django_context)
-
         # Lookup of the 'user.is_staff' or 'user.is_active' attribute
         if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
@@ -306,6 +304,10 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
+
+        if fullname == fullnames.GET_USER_MODEL_FULLNAME:
+            return partial(settings.transform_get_user_model_hook, django_context=self.django_context)
+
         # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
         class_name, _, method_name = fullname.rpartition(".")
         if method_name == "from_queryset":
