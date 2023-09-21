@@ -7,10 +7,10 @@ from django.http.response import HttpResponseBase
 
 _VIEW = TypeVar("_VIEW", bound=Callable[..., HttpResponseBase])
 
-UserModel = get_user_model()
+_UserModel = get_user_model()
 
 def user_passes_test(
-    test_func: Callable[[UserModel | AnonymousUser], bool],
+    test_func: Callable[[_UserModel | AnonymousUser], bool],
     login_url: str | None = ...,
     redirect_field_name: str | None = ...,
 ) -> Callable[[_VIEW], _VIEW]: ...

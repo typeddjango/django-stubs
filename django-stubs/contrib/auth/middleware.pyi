@@ -3,9 +3,9 @@ from django.contrib.auth.models import AnonymousUser
 from django.http.request import HttpRequest
 from django.utils.deprecation import MiddlewareMixin
 
-UserModel = get_user_model()
+_UserModel = get_user_model()
 
-def get_user(request: HttpRequest) -> AnonymousUser | UserModel: ...
+def get_user(request: HttpRequest) -> AnonymousUser | _UserModel: ...
 
 class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest) -> None: ...
