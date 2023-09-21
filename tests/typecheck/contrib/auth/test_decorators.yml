@@ -44,12 +44,13 @@
 -   case: user_passes_test_has_user_of_type_auth_user_model
     disable_cache: true
     main: |
+        from typing import Union
         from django.http import HttpRequest, HttpResponse
         from django.contrib.auth.models import AnonymousUser
         from django.contrib.auth.decorators import user_passes_test
         from myapp.models import MyUser
 
-        def check_user(user: MyUser | AnonymousUser) -> bool: return True
+        def check_user(user: Union[MyUser, AnonymousUser]) -> bool: return True
         @user_passes_test(check_user)
         def view_func(request: HttpRequest) -> HttpResponse: ...
     custom_settings: |
