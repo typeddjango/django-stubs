@@ -7,7 +7,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.semanal_shared import parse_bool
-from mypy.types import AnyType, Instance, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -91,18 +91,20 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     related_model_info = helpers.lookup_class_typeinfo(typechecker_api, related_model)
+    related_model_type: ProperType
     if related_model_info is None:
         # maybe no type stub
         related_model_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_type = Instance(related_model_info, [])  # type: ignore
+        related_model_type = Instance(related_model_info, [])
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
+    related_model_to_set_type: ProperType
     if related_model_to_set_info is None:
         # maybe no type stub
         related_model_to_set_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
+        related_model_to_set_type = Instance(related_model_to_set_info, [])
 
     # replace Any with referred_to_type
     return reparametrize_related_field_type(

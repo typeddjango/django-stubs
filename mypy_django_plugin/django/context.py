@@ -29,7 +29,7 @@ try:
     from django.contrib.postgres.fields import ArrayField
 except ImportError:
 
-    class ArrayField:  # type: ignore
+    class ArrayField:  # type: ignore[no-redef]
         pass
 
 
@@ -60,11 +60,11 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.get_swappable_settings_name.cache_clear()  # type: ignore[attr-defined]
         apps.clear_cache()
 
         if not settings.configured:
-            settings._setup()  # type: ignore
+            settings._setup()  # type: ignore[misc]
         apps.populate(settings.INSTALLED_APPS)
 
     assert apps.apps_ready, "Apps are not ready"
@@ -338,7 +338,7 @@ class DjangoContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":  # type: ignore
+            if related_model_cls == "self":  # type: ignore[unreachable]
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:

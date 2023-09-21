@@ -753,7 +753,7 @@ def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: Dj
 def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
     args = ctx.type.args
     type_arg = ctx.api.analyze_type(args[0])
-    api = cast(SemanticAnalyzer, ctx.api.api)  # type: ignore
+    api = helpers.get_semanal_api(ctx)
 
     if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
         return type_arg
@@ -768,7 +768,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext
             if isinstance(annotations_type_arg, TypedDictType):
                 fields_dict = annotations_type_arg
             elif not isinstance(annotations_type_arg, AnyType):
-                ctx.api.fail("Only TypedDicts are supported as type arguments to Annotations", ctx.context)
+                api.fail("Only TypedDicts are supported as type arguments to Annotations", ctx.context)
 
     return get_or_create_annotated_type(api, type_arg, fields_dict=fields_dict)
 
@@ -800,7 +800,7 @@ def get_or_create_annotated_type(
         cast(TypeChecker, api), model_module_name + "." + type_name
     )
     if annotated_typeinfo is None:
-        model_module_file = api.modules.get(model_module_name)  # type: ignore
+        model_module_file = api.modules.get(model_module_name)  # type: ignore[union-attr]
         if model_module_file is None:
             return AnyType(TypeOfAny.from_error)
 
