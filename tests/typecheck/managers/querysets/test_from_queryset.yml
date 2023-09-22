@@ -675,3 +675,36 @@
                   ...
 
               StrCallable = BaseManager.from_queryset(ModelQuerySet, class_name=str(1))
+
+-   case: test_queryset_arg_as_unsupported_expressions
+    main: |
+        from myapp.models import ManagerFromAlias, ManagerFromNonQSGeneric
+        reveal_type(ManagerFromAlias)
+        reveal_type(ManagerFromNonQSGeneric)
+    out: |
+        main:2: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:3: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        myapp/models:11: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[_QuerySet[Model, Model]]"
+        myapp/models:16: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[_QuerySet[Model, Model]]"
+    installed_apps:
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from typing import TypeAlias, Union, Generic, TypeVar
+              from django.db import models
+              from django.db.models.manager import Manager
+
+              class QS1(models.QuerySet[models.Model]):
+                  ...
+              class QS2(models.QuerySet[models.Model]):
+                  ...
+
+              Alias: TypeAlias = Union[QS1, QS2]
+              ManagerFromAlias = Manager[models.Model].from_queryset(Alias)
+
+              T = TypeVar("T")
+              class NonQSGeneric(Generic[T]):
+                  ...
+              ManagerFromNonQSGeneric = Manager[models.Model].from_queryset(NonQSGeneric[int])
