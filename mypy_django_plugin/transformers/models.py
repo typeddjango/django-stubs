@@ -20,7 +20,7 @@ from mypy.nodes import (
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, LiteralType, TypedDictType, TypeOfAny, TypeType, get_proper_type
+from mypy.types import AnyType, Instance, LiteralType, ProperType, TypedDictType, TypeOfAny, TypeType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -775,7 +775,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext
 
 def get_or_create_annotated_type(
     api: Union[SemanticAnalyzer, CheckerPluginInterface], model_type: Instance, fields_dict: Optional[TypedDictType]
-) -> Instance:
+) -> ProperType:
     """
 
     Get or create the type for a model for which you getting/setting any attr is allowed.
@@ -800,7 +800,9 @@ def get_or_create_annotated_type(
         cast(TypeChecker, api), model_module_name + "." + type_name
     )
     if annotated_typeinfo is None:
-        model_module_file = api.modules[model_module_name]  # type: ignore
+        model_module_file = api.modules.get(model_module_name)  # type: ignore
+        if model_module_file is None:
+            return AnyType(TypeOfAny.from_error)
 
         if isinstance(api, SemanticAnalyzer):
             annotated_model_type = api.named_type_or_none(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])
