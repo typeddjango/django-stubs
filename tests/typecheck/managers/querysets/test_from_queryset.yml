@@ -692,7 +692,8 @@
         - path: myapp/__init__.py
         - path: myapp/models.py
           content: |
-              from typing import TypeAlias, Union, Generic, TypeVar
+              from typing import Union, Generic, TypeVar
+              from typing_extensions import TypeAlias
               from django.db import models
               from django.db.models.manager import Manager
 
