@@ -103,7 +103,7 @@ class ModelClassInitializer:
         # Not a generated manager
         return None
 
-    def get_or_create_manager_with_any_fallback(self, related_manager: bool = False) -> TypeInfo:
+    def get_or_create_manager_with_any_fallback(self, related_manager: bool = False) -> Optional[TypeInfo]:
         """
         Create a Manager subclass with fallback to Any for unknown attributes
         and methods. This is used for unresolved managers, where we don't know
@@ -121,11 +121,14 @@ class ModelClassInitializer:
             return manager_info
 
         fallback_queryset = self.get_or_create_queryset_with_any_fallback()
+        if fallback_queryset is None:
+            return None
         base_manager_fullname = (
             fullnames.MANAGER_CLASS_FULLNAME if not related_manager else fullnames.RELATED_MANAGER_CLASS
         )
         base_manager_info = self.lookup_typeinfo(base_manager_fullname)
-        assert base_manager_info, f"Type info for {base_manager_fullname} missing"
+        if base_manager_info is None:
+            return None
 
         base_manager = fill_typevars(base_manager_info)
         assert isinstance(base_manager, Instance)
@@ -153,7 +156,7 @@ class ModelClassInitializer:
 
         return manager_info
 
-    def get_or_create_queryset_with_any_fallback(self) -> TypeInfo:
+    def get_or_create_queryset_with_any_fallback(self) -> Optional[TypeInfo]:
         """
         Create a QuerySet subclass with fallback to Any for unknown attributes
         and methods. This is used for the manager returned by the method above.
@@ -168,7 +171,8 @@ class ModelClassInitializer:
             return queryset_info
 
         base_queryset_info = self.lookup_typeinfo(fullnames.QUERYSET_CLASS_FULLNAME)
-        assert base_queryset_info, f"Type info for {fullnames.QUERYSET_CLASS_FULLNAME} missing"
+        if base_queryset_info is None:
+            return None
 
         base_queryset = fill_typevars(base_queryset_info)
         assert isinstance(base_queryset, Instance)
@@ -346,11 +350,12 @@ class AddManagers(ModelClassInitializer):
                 # ignoring a more specialised manager not being resolved while still
                 # setting _some_ type
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
-                self.add_new_node_to_model_class(
-                    manager_name,
-                    Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])]),
-                    is_classvar=True,
-                )
+                if fallback_manager_info is not None:
+                    self.add_new_node_to_model_class(
+                        manager_name,
+                        Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])]),
+                        is_classvar=True,
+                    )
 
                 # Find expression for e.g. `objects = SomeManager()`
                 manager_expr = self.get_manager_expression(manager_name)
@@ -493,9 +498,10 @@ class AddRelatedManagers(ModelClassInitializer):
                     # See https://github.com/typeddjango/django-stubs/pull/993
                     # for more information on when this error can occur.
                     fallback_manager = self.get_or_create_manager_with_any_fallback(related_manager=True)
-                    self.add_new_node_to_model_class(
-                        attname, Instance(fallback_manager, [Instance(related_model_info, [])])
-                    )
+                    if fallback_manager is not None:
+                        self.add_new_node_to_model_class(
+                            attname, Instance(fallback_manager, [Instance(related_model_info, [])])
+                        )
                     related_model_fullname = related_model_cls.__module__ + "." + related_model_cls.__name__
                     self.ctx.api.fail(
                         (
