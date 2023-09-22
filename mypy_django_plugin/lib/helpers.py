@@ -12,6 +12,7 @@ from mypy.nodes import (
     MDEF,
     Block,
     ClassDef,
+    Context,
     Expression,
     MemberExpr,
     MypyFile,
@@ -385,3 +386,31 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
     if sym is not None and isinstance(sym.node, TypeInfo):
         bases = get_django_metadata_bases(sym.node, "manager_bases")
         bases[fullname] = 1
+
+
+def resolve_lazy_reference(
+    reference: str, *, api: Union[TypeChecker, SemanticAnalyzer], django_context: "DjangoContext", ctx: Context
+) -> Optional[TypeInfo]:
+    """
+    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
+    'TypeInfo' instance.
+    """
+    if "." not in reference:
+        # <object_name> -- needs prefix of <app_label>. We can't implicitly solve
+        # what app label this should be, yet.
+        return None
+
+    # Reference conforms to the structure of a lazy reference: '<app_label>.<object_name>'
+    fullname = django_context.model_class_fullnames_by_label_lower.get(reference.lower())
+    if fullname is not None:
+        model_info = lookup_fully_qualified_typeinfo(api, fullname)
+        if model_info is not None:
+            return model_info
+        elif isinstance(api, SemanticAnalyzer):
+            if not api.final_iteration:
+                # Getting this far, where Django matched the reference but we still can't
+                # find it, we want to defer
+                api.defer()
+    else:
+        api.fail("Could not match lazy reference with any model", ctx)
+    return None
