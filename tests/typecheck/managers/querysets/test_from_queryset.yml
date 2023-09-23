@@ -684,8 +684,8 @@
     out: |
         main:2: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
         main:3: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        myapp/models:11: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[_QuerySet[Model, Model]]"
-        myapp/models:16: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[_QuerySet[Model, Model]]"
+        myapp/models:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[_QuerySet[Model, Model]]"
+        myapp/models:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[_QuerySet[Model, Model]]"
     installed_apps:
         - myapp
     files:
