@@ -24,7 +24,6 @@ from mypy.nodes import (
     Var,
 )
 from mypy.plugin import (
-    AnalyzeTypeContext,
     AttributeContext,
     CheckerPluginInterface,
     ClassDefContext,
@@ -342,7 +341,7 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
     return None
 
 
-def get_semanal_api(ctx: Union[AnalyzeTypeContext, ClassDefContext, DynamicClassDefContext]) -> SemanticAnalyzer:
+def get_semanal_api(ctx: Union[ClassDefContext, DynamicClassDefContext]) -> SemanticAnalyzer:
     if not isinstance(ctx.api, SemanticAnalyzer):
         raise ValueError("Not a SemanticAnalyzer")
     return ctx.api

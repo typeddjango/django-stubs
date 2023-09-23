@@ -20,6 +20,7 @@ from mypy.nodes import (
 from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInterface, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
+from mypy.typeanal import TypeAnalyser
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TypedDictType, TypeOfAny, TypeType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
@@ -753,8 +754,6 @@ def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: Dj
 def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
     args = ctx.type.args
     type_arg = ctx.api.analyze_type(args[0])
-    api = helpers.get_semanal_api(ctx.api)
-
     if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
         return type_arg
 
@@ -768,9 +767,11 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext
             if isinstance(annotations_type_arg, TypedDictType):
                 fields_dict = annotations_type_arg
             elif not isinstance(annotations_type_arg, AnyType):
-                api.fail("Only TypedDicts are supported as type arguments to Annotations", ctx.context)
+                ctx.api.fail("Only TypedDicts are supported as type arguments to Annotations", ctx.context)
 
-    return get_or_create_annotated_type(api, type_arg, fields_dict=fields_dict)
+    assert isinstance(ctx.api, TypeAnalyser)
+    assert isinstance(ctx.api.api, SemanticAnalyzer)
+    return get_or_create_annotated_type(ctx.api.api, type_arg, fields_dict=fields_dict)
 
 
 def get_or_create_annotated_type(
