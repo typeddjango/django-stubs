@@ -753,7 +753,7 @@ def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: Dj
 def handle_annotated_type(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
     args = ctx.type.args
     type_arg = ctx.api.analyze_type(args[0])
-    api = helpers.get_semanal_api(ctx)
+    api = helpers.get_semanal_api(ctx.api)
 
     if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
         return type_arg
