@@ -613,13 +613,6 @@ class AddExtraFieldMethods(ModelClassInitializer):
                 )
 
 
-class AddMetaOptionsAttribute(ModelClassInitializer):
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
-        if "_meta" not in self.model_classdef.info.names:
-            options_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OPTIONS_CLASS_FULLNAME)
-            self.add_new_node_to_model_class("_meta", Instance(options_info, [Instance(self.model_classdef.info, [])]))
-
-
 class ProcessManyToManyFields(ModelClassInitializer):
     """
     Processes 'ManyToManyField()' fields and generates any implicit through tables that
@@ -918,7 +911,6 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
         AddDefaultManagerAttribute,
         AddReverseLookups,
         AddExtraFieldMethods,
-        AddMetaOptionsAttribute,
         ProcessManyToManyFields,
         MetaclassAdjustments,
     ]

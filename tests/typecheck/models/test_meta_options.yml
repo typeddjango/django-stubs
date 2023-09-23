@@ -40,7 +40,7 @@
         from myapp.models import AbstractModel
         class MyModel(AbstractModel):
             pass
-        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "Any"
+        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "Union[django.db.models.fields.Field[Any, Any], django.db.models.fields.reverse_related.ForeignObjectRel, django.contrib.contenttypes.fields.GenericForeignKey]"
     installed_apps:
         - myapp
     files:

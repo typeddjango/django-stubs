@@ -62,3 +62,32 @@
                   ...
               class MyUser(AbstractUser):
                   objects: ClassVar[MyUserManager] = MyUserManager()
+
+-   case: can_combine_permissions_mixin_and_abstract_base_user
+    main: |
+        from django.contrib.auth.base_user import AbstractBaseUser
+        from django.contrib.auth.models import PermissionsMixin
+        from myapp.models import AuthUser
+        reveal_type(AuthUser._meta)
+        reveal_type(AuthUser()._meta)
+        reveal_type(PermissionsMixin._meta)
+        reveal_type(AbstractBaseUser._meta)
+    out: |
+        main:4: note: Revealed type is "django.db.models.options.Options[myapp.models.AuthUser]"
+        main:5: note: Revealed type is "django.db.models.options.Options[myapp.models.AuthUser]"
+        main:6: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.models.PermissionsMixin]"
+        main:7: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.base_user.AbstractBaseUser]"
+    installed_apps:
+        - django.contrib.auth
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.contrib.auth.base_user import AbstractBaseUser
+              from django.contrib.auth.models import PermissionsMixin
+
+              class AuthUser(AbstractBaseUser, PermissionsMixin):
+                  class Meta:
+                      abstract = False
+                      db_table = "auth_user"
