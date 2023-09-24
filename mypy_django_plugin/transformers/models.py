@@ -477,11 +477,11 @@ class AddReverseLookups(ModelClassInitializer):
                     continue
 
             if isinstance(relation, OneToOneRel):
-                related_model_instance = Instance(related_model_info, [])
                 self.add_new_node_to_model_class(
                     attname,
                     Instance(
-                        reverse_one_to_one_descriptor, [Instance(self.model_classdef.info, []), related_model_instance]
+                        reverse_one_to_one_descriptor,
+                        [Instance(self.model_classdef.info, []), Instance(related_model_info, [])],
                     ),
                 )
                 continue
