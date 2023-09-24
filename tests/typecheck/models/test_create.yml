@@ -39,6 +39,8 @@
     main: |
         from myapp.models import Child4
         Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
+    out: |
+        myapp/models:9: error: Definition of "child1" in base class "Parent1" is incompatible with definition in base class "Parent2"
     installed_apps:
         - myapp
     files:
@@ -53,7 +55,7 @@
                     id2 = models.AutoField(primary_key=True)
                     name2 = models.CharField(max_length=50)
 
-                class Child1(Parent1, Parent2):  # type: ignore[misc]
+                class Child1(Parent1, Parent2):
                     value = models.IntegerField()
                 class Child4(Child1):
                     value4 = models.IntegerField()
