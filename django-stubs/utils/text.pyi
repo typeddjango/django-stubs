@@ -35,7 +35,7 @@ def compress_string(s: bytes, *, max_random_bytes: int | None = ...) -> bytes: .
 
 class StreamingBuffer(BytesIO):
     vals: list[bytes]
-    def read(self) -> bytes: ...  # type: ignore
+    def read(self) -> bytes: ...  # type: ignore[override]
 
 def compress_sequence(sequence: Iterable[bytes], *, max_random_bytes: int | None = ...) -> Iterator[bytes]: ...
 
