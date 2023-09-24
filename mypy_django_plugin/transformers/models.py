@@ -440,7 +440,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
         self.add_new_node_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
-class AddRelatedManagers(ModelClassInitializer):
+class AddReverseLookups(ModelClassInitializer):
     def get_reverse_manager_info(self, model_info: TypeInfo, derived_from: str) -> Optional[TypeInfo]:
         manager_fullname = helpers.get_django_metadata(model_info).get("reverse_managers", {}).get(derived_from)
         if not manager_fullname:
@@ -455,6 +455,9 @@ class AddRelatedManagers(ModelClassInitializer):
         helpers.get_django_metadata(model_info).setdefault("reverse_managers", {})[derived_from] = fullname
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+        reverse_one_to_one_descriptor = self.lookup_typeinfo_or_incomplete_defn_error(
+            fullnames.REVERSE_ONE_TO_ONE_DESCRIPTOR
+        )
         # add related managers
         for relation in self.django_context.get_model_relations(model_cls):
             attname = relation.get_accessor_name()
@@ -474,7 +477,13 @@ class AddRelatedManagers(ModelClassInitializer):
                     continue
 
             if isinstance(relation, OneToOneRel):
-                self.add_new_node_to_model_class(attname, Instance(related_model_info, []))
+                self.add_new_node_to_model_class(
+                    attname,
+                    Instance(
+                        reverse_one_to_one_descriptor,
+                        [Instance(self.model_classdef.info, []), Instance(related_model_info, [])],
+                    ),
+                )
                 continue
 
             if isinstance(relation, ForeignObjectRel):
@@ -732,7 +741,7 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
         AddRelatedModelsId,
         AddManagers,
         AddDefaultManagerAttribute,
-        AddRelatedManagers,
+        AddReverseLookups,
         AddExtraFieldMethods,
         AddMetaOptionsAttribute,
         MetaclassAdjustments,

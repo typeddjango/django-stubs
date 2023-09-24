@@ -32,6 +32,7 @@ MANAGER_CLASSES = {
     BASE_MANAGER_CLASS_FULLNAME,
 }
 
+REVERSE_ONE_TO_ONE_DESCRIPTOR = "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor"
 RELATED_FIELDS_CLASSES = frozenset(
     (
         FOREIGN_OBJECT_FULLNAME,

@@ -1011,3 +1011,49 @@
 
                 class Book(PrintedGood):
                     name = models.CharField()
+
+-   case: test_reverse_one_to_one_descriptor
+    main: |
+        from myapp.models import MyModel, Other
+        reveal_type(MyModel.first.RelatedObjectDoesNotExist)
+        reveal_type(Other.mymodel)
+        reveal_type(Other.mymodel.get_queryset())
+        reveal_type(Other.mymodel.RelatedObjectDoesNotExist)
+        reveal_type(Other.has_explicit_name.RelatedObjectDoesNotExist)
+        try:
+            other = Other.objects.get()
+            reveal_type(other.mymodel)
+        except Other.mymodel.RelatedObjectDoesNotExist:
+            ...
+        else:
+            other.mymodel = MyModel()
+            other.mymodel = Other()
+            other.mymodel = None
+            other.has_explicit_name = MyModel()
+            other.has_explicit_name = Other()
+            other.has_explicit_name = None
+    out: |
+        main:2: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor[myapp.models.Other, myapp.models.MyModel]"
+        main:4: note: Revealed type is "django.db.models.query._QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        main:5: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        main:6: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        main:9: note: Revealed type is "myapp.models.MyModel"
+        main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")
+        main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from django.db import models
+
+                class Other(models.Model):
+                    ...
+
+                class MyModel(models.Model):
+                    first = models.OneToOneField(Other, on_delete=models.CASCADE)
+                    second = models.OneToOneField(
+                        Other, on_delete=models.CASCADE, related_name="has_explicit_name"
+                    )
