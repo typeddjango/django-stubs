@@ -1027,6 +1027,7 @@
         else:
             other.mymodel = MyModel()
             other.mymodel = Other()
+            other.mymodel = None
     out: |
         main:2: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor[myapp.models.Other, myapp.models.MyModel]"
