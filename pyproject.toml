@@ -21,6 +21,7 @@ select = [
     "F401",     # Unused imports
     "UP",       # pyupgrade
     "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
+    "PGH003",   # Disallowed blanket `type: ignore` annotations.
 ]
 
 [tool.ruff.flake8-tidy-imports.banned-api]
