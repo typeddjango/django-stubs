@@ -53,7 +53,7 @@
                     id2 = models.AutoField(primary_key=True)
                     name2 = models.CharField(max_length=50)
 
-                class Child1(Parent1, Parent2):
+                class Child1(Parent1, Parent2):  # type: ignore[misc]
                     value = models.IntegerField()
                 class Child4(Child1):
                     value4 = models.IntegerField()
