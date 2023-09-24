@@ -1216,3 +1216,26 @@
                     # Reference without explicit app label
                     parents = models.ManyToManyField("Parent")
                     other_parents = models.ManyToManyField(to="Parent")
+
+-   case: test_relations_with_bad_arguments
+    main: |
+        from myapp.models import MyModel
+        from typing import Type
+        def f(arg: Type[MyModel]) -> MyModel:
+            instance = arg(field=1, unknown=2)
+            reveal_type(instance.field)  # N: Revealed type is "Any"
+            reveal_type(instance.unknown)  # N: Revealed type is "Any"
+            reveal_type(instance.bad)  # N: Revealed type is "Any"
+            return instance
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyModel(models.Model):
+                    field = models.ForeignKey("slef", on_delete=models.CASCADE)  # E: Cannot find model 'slef' referenced in field 'field'
+                    unknown = models.OneToOneField("unknown", on_delete=models.CASCADE)  # E: Cannot find model 'unknown' referenced in field 'unknown'
+                    bad = models.ManyToManyField("bad")

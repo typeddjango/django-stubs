@@ -236,7 +236,12 @@ class DjangoContext:
                         expected_types[field_name] = AnyType(TypeOfAny.unannotated)
                         continue
 
-                    related_model = self.get_field_related_model_cls(field)
+                    try:
+                        related_model = self.get_field_related_model_cls(field)
+                    except UnregisteredModelError:
+                        # Recognise the field but don't say anything about its type..
+                        expected_types[field_name] = AnyType(TypeOfAny.from_error)
+                        continue
 
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
@@ -315,7 +320,12 @@ class DjangoContext:
         """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
-            target_field = field.target_field
+            try:
+                # We gotta be careful for exceptions when we're triggering '__get__'.
+                # Related model could very well be unresolvable
+                target_field = field.target_field
+            except ValueError:
+                return AnyType(TypeOfAny.from_error)
 
         field_info = helpers.lookup_class_typeinfo(api, target_field.__class__)
         if field_info is None:
