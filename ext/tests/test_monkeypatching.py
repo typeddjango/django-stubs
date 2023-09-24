@@ -84,7 +84,7 @@ def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasse
     for cls in extra_classes:
         assert cls[type] is cls  # type: ignore[misc]
 
-    class _TestGeneric(_NotGeneric[Model]):  # type: ignore
+    class _TestGeneric(_NotGeneric[Model]):  # type: ignore[type-arg]
         pass
 
 

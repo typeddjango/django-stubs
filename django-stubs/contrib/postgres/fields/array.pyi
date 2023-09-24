@@ -51,5 +51,5 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @property
-    def description(self) -> str: ...  # type: ignore
+    def description(self) -> str: ...  # type: ignore[override]
     def get_transform(self, name: Any) -> type[Transform] | None: ...

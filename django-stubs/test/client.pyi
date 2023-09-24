@@ -198,7 +198,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         **defaults: Any,
     ) -> None: ...
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
-    def get(  # type: ignore
+    def get(  # type: ignore[override]
         self,
         path: str,
         data: _GetDataType = ...,
@@ -208,7 +208,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def post(  # type: ignore
+    def post(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -219,7 +219,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def head(  # type: ignore
+    def head(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -229,7 +229,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def trace(  # type: ignore
+    def trace(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -239,18 +239,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def put(  # type: ignore
-        self,
-        path: str,
-        data: Any = ...,
-        content_type: str = ...,
-        follow: bool = ...,
-        secure: bool = ...,
-        *,
-        headers: Mapping[str, Any] | None = ...,
-        **extra: Any,
-    ) -> _MonkeyPatchedWSGIResponse: ...
-    def patch(  # type: ignore
+    def put(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -261,7 +250,18 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def delete(  # type: ignore
+    def patch(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    def delete(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,

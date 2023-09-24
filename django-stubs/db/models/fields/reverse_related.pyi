@@ -112,7 +112,7 @@ class OneToOneRel(ManyToOneRel):
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
-    field: ManyToManyField  # type: ignore
+    field: ManyToManyField  # type: ignore[assignment]
     through: type[Model] | None
     through_fields: tuple[str, str] | None
     db_constraint: bool

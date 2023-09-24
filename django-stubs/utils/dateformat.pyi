@@ -33,7 +33,7 @@ class TimeFormat(Formatter):
     def Z(self) -> int | Literal[""]: ...
 
 class DateFormat(TimeFormat):
-    data: builtin_datetime | date | builtin_time  # type: ignore
+    data: builtin_datetime | date | builtin_time  # type: ignore[assignment]
     timezone: _TzInfoT | None
     year_days: Any
     def __init__(self, obj: builtin_datetime | builtin_time | date) -> None: ...
