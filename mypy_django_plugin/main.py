@@ -4,7 +4,7 @@ from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
 from mypy.modulefinder import mypy_path
-from mypy.nodes import ImportFrom, MypyFile, TypeInfo
+from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext,
@@ -111,11 +111,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
-        if self.django_context.settings and any(
-            i.id == "django.contrib.auth" and any(name == "get_user_model" for name, _ in i.names)
-            for i in file.imports
-            if isinstance(i, ImportFrom)
-        ):
+        if file.fullname == "django.contrib.auth" and self.django_context.is_contrib_auth_installed:
             auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
             try:
                 auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__

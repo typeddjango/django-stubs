@@ -1,6 +1,6 @@
 from typing import Union
 
-from mypy.nodes import GDEF, MemberExpr, PlaceholderNode, SymbolTableNode, TypeInfo
+from mypy.nodes import GDEF, MemberExpr, PlaceholderNode, SymbolTableNode, TypeInfo, Var
 from mypy.plugin import AttributeContext, DynamicClassDefContext, FunctionContext
 from mypy.types import AnyType, Instance, TypeOfAny, TypeType
 from mypy.types import Type as MypyType
@@ -21,6 +21,7 @@ def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> 
         model_cls_fullname = fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME
 
     model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), model_cls_fullname)
+
     if model_info is None:
         return AnyType(TypeOfAny.unannotated)
 
@@ -35,18 +36,17 @@ def transform_get_user_model_hook(ctx: DynamicClassDefContext, django_context: D
     except LookupError:
         model_cls_fullname = fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME
 
-    model_info: Union[TypeInfo, PlaceholderNode, None]
-    model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_semanal_api(ctx), model_cls_fullname)
-    if model_info is None:
+    node: Union[TypeInfo, PlaceholderNode, Var, None]
+    node = helpers.lookup_fully_qualified_typeinfo(helpers.get_semanal_api(ctx), model_cls_fullname)
+    if node is None:
         if not ctx.api.final_iteration:
-            ctx.api.defer()
             # Temporarily replace the node with a PlaceholderNode. This suppresses
             # 'Variable "..." is not valid as a type' errors from mypy
-            model_info = PlaceholderNode(model_cls_fullname, ctx.call, ctx.call.line)
+            node = PlaceholderNode(model_cls_fullname, ctx.call, ctx.call.line)
         else:
-            return
+            node = Var(ctx.name, AnyType(TypeOfAny.from_error))
 
-    ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, model_info))
+    ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, node))
 
 
 def get_type_of_settings_attribute(

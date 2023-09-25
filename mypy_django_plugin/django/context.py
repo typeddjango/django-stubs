@@ -473,3 +473,7 @@ class DjangoContext:
 
     def resolve_f_expression_type(self, f_expression_type: Instance) -> MypyType:
         return AnyType(TypeOfAny.explicit)
+
+    @property
+    def is_contrib_auth_installed(self) -> bool:
+        return self.apps_registry.is_installed("django.contrib.auth")
