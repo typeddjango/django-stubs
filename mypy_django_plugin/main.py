@@ -111,13 +111,13 @@ class NewSemanalDjangoPlugin(Plugin):
             return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
-        if file.fullname == "django.contrib.auth" and self.django_context.is_contrib_auth_installed:
+        if file.fullname == "django.contrib.auth" and self.django_context.settings:
             auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
             try:
                 auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
             except LookupError:
-                # get_user_model() model app is not installed
-                return []
+                # get_user_model() model app is not installed, fall back the the default User model
+                auth_user_module = "django.contrib.auth.models"
             return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
         # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
@@ -301,7 +301,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
     def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
-        if fullname == fullnames.GET_USER_MODEL_FULLNAME:
+        if fullname == fullnames.GET_USER_MODEL_FULLNAME and self.django_context.settings:
             return partial(settings.transform_get_user_model_hook, django_context=self.django_context)
 
         # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
