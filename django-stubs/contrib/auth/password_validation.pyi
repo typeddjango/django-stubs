@@ -2,9 +2,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path, PosixPath
 from typing import Any, Protocol
 
-from django.contrib.auth import get_user_model
-
-_UserModel = get_user_model()
+from django.contrib.auth import _UserModel
 
 class PasswordValidator(Protocol):
     def validate(self, __password: str, __user: _UserModel | None = ...) -> None: ...

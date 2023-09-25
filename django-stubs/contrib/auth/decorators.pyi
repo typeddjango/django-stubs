@@ -1,13 +1,11 @@
 from collections.abc import Callable, Iterable
 from typing import TypeVar, overload
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import _UserModel
 from django.contrib.auth.models import AnonymousUser
 from django.http.response import HttpResponseBase
 
 _VIEW = TypeVar("_VIEW", bound=Callable[..., HttpResponseBase])
-
-_UserModel = get_user_model()
 
 def user_passes_test(
     test_func: Callable[[_UserModel | AnonymousUser], bool],

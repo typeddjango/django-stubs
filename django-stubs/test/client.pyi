@@ -5,7 +5,7 @@ from re import Pattern
 from types import TracebackType
 from typing import Any, Generic, NoReturn, TypeVar
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import _UserModel
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
@@ -22,8 +22,6 @@ BOUNDARY: str
 MULTIPART_CONTENT: str
 CONTENT_TYPE_RE: Pattern
 JSON_CONTENT_TYPE_RE: Pattern
-
-_UserModel = get_user_model()
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase

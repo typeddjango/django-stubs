@@ -1,9 +1,7 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import _UserModel
 from django.contrib.auth.models import AnonymousUser
 from django.http.request import HttpRequest
 from django.utils.deprecation import MiddlewareMixin
-
-_UserModel = get_user_model()
 
 def get_user(request: HttpRequest) -> AnonymousUser | _UserModel: ...
 

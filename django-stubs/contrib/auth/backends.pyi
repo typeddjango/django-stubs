@@ -1,18 +1,18 @@
 from typing import Any, TypeVar
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import _UserModel
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.http.request import HttpRequest
 from typing_extensions import TypeAlias
 
-_UserModel = get_user_model()
-_AnyUser: TypeAlias = _UserModel | AnonymousUser
+UserModel: TypeAlias = _UserModel
+_AnyUser: TypeAlias = UserModel | AnonymousUser
 
 class BaseBackend:
-    def authenticate(self, request: HttpRequest | None, **kwargs: Any) -> _UserModel | None: ...
-    def get_user(self, user_id: int) -> _UserModel | None: ...
+    def authenticate(self, request: HttpRequest | None, **kwargs: Any) -> UserModel | None: ...
+    def get_user(self, user_id: int) -> UserModel | None: ...
     def get_user_permissions(self, user_obj: _AnyUser, obj: Model | None = ...) -> set[str]: ...
     def get_group_permissions(self, user_obj: _AnyUser, obj: Model | None = ...) -> set[str]: ...
     def get_all_permissions(self, user_obj: _AnyUser, obj: Model | None = ...) -> set[str]: ...
@@ -21,7 +21,7 @@ class BaseBackend:
 class ModelBackend(BaseBackend):
     def authenticate(
         self, request: HttpRequest | None, username: str | None = ..., password: str | None = ..., **kwargs: Any
-    ) -> _UserModel | None: ...
+    ) -> UserModel | None: ...
     def has_module_perms(self, user_obj: _AnyUser, app_label: str) -> bool: ...
     def user_can_authenticate(self, user: _AnyUser | None) -> bool: ...
     def with_perm(
@@ -30,11 +30,11 @@ class ModelBackend(BaseBackend):
         is_active: bool = ...,
         include_superusers: bool = ...,
         obj: Model | None = ...,
-    ) -> QuerySet[_UserModel]: ...
+    ) -> QuerySet[UserModel]: ...
 
 class AllowAllUsersModelBackend(ModelBackend): ...
 
-_U = TypeVar("_U", bound=_UserModel)
+_U = TypeVar("_U", bound=UserModel)
 
 class RemoteUserBackend(ModelBackend):
     create_unknown_user: bool

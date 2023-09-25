@@ -1,13 +1,11 @@
 from typing import Any
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import _UserModel
 from django.contrib.auth.forms import AuthenticationForm
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-
-_UserModel = get_user_model()
 
 class RedirectURLMixin:
     next_page: str | None

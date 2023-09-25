@@ -1,9 +1,7 @@
 from datetime import date, datetime
 from typing import Any
 
-from django.contrib.auth import get_user_model
-
-_UserModel = get_user_model()
+from django.contrib.auth import _UserModel
 
 class PasswordResetTokenGenerator:
     key_salt: str

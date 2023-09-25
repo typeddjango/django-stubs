@@ -3,7 +3,7 @@ from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import _UserModel
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
@@ -11,8 +11,6 @@ from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 from typing_extensions import Self, TypeAlias
-
-_UserModel = get_user_model()
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
