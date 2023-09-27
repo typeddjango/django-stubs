@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, TypeVar, overload
+from typing import Any, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.core import validators  # due to weird mypy.stubtest error
@@ -11,6 +11,7 @@ from django.db.models.fields.related_descriptors import ForwardManyToOneDescript
 from django.db.models.fields.related_descriptors import (  # noqa: F401
     ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
 )
+from django.db.models.fields.related_descriptors import ManyRelatedManager
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor as ManyToManyDescriptor
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor as ReverseManyToOneDescriptor
 from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor as ReverseOneToOneDescriptor
@@ -18,7 +19,6 @@ from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignO
 from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyRel
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
-from django.db.models.manager import RelatedManager
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self
@@ -27,6 +27,7 @@ RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
 def resolve_relation(scope_model: type[Model], relation: str | type[Model]) -> str | type[Model]: ...
 
+_M = TypeVar("_M", bound=Model)
 # __set__ value type
 _ST = TypeVar("_ST")
 # __get__ return type
@@ -204,10 +205,9 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
 
-class ManyToManyField(RelatedField[_ST, _GT]):
-    _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: RelatedManager[Any]
+_To = TypeVar("_To", bound=Model)
 
+class ManyToManyField(RelatedField[Any, Any], Generic[_To, _M]):
     description: str
     has_null_arg: bool
     swappable: bool
@@ -221,12 +221,12 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     rel_class: type[ManyToManyRel]
     def __init__(
         self,
-        to: type[Model] | str,
+        to: type[_To] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         symmetrical: bool | None = ...,
-        through: str | type[Model] | None = ...,
+        through: type[_M] | str | None = ...,
         through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
         db_table: str | None = ...,
@@ -255,10 +255,10 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     ) -> None: ...
     # class access
     @overload
-    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[Self]: ...
+    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[_M]: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> ManyRelatedManager[_To]: ...
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...

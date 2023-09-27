@@ -13,6 +13,7 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
     from django.contrib.contenttypes.fields import GenericForeignKey
@@ -213,6 +214,10 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     assert isinstance(outer_model_info, TypeInfo)
 
+    if default_return_type.type.has_base(fullnames.MANYTOMANY_FIELD_FULLNAME):
+        return manytomany.fill_model_args_for_many_to_many_field(
+            ctx=ctx, model_info=outer_model_info, default_return_type=default_return_type, django_context=django_context
+        )
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 

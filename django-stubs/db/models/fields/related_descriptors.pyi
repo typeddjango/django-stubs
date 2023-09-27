@@ -1,16 +1,17 @@
-from collections.abc import Callable
-from typing import Any, Generic, TypeVar, overload
+from collections.abc import Callable, Iterable
+from typing import Any, Generic, NoReturn, TypeVar, overload
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
 from django.db.models.fields import Field
-from django.db.models.fields.related import ForeignKey, RelatedField
+from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
-from django.db.models.manager import RelatedManager
+from django.db.models.manager import BaseManager, RelatedManager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
+from typing_extensions import Self
 
-_T = TypeVar("_T")
+_M = TypeVar("_M", bound=Model)
 _F = TypeVar("_F", bound=Field)
 _From = TypeVar("_From", bound=Model)
 _To = TypeVar("_To", bound=Model)
@@ -65,28 +66,63 @@ class ReverseOneToOneDescriptor(Generic[_From, _To]):
     def __reduce__(self) -> tuple[Callable[..., Any], tuple[type[_To], str]]: ...
 
 class ReverseManyToOneDescriptor:
+    """
+    In the example::
+
+        class Child(Model):
+            parent = ForeignKey(Parent, related_name='children')
+
+    ``Parent.children`` is a ``ReverseManyToOneDescriptor`` instance.
+    """
+
     rel: ManyToOneRel
     field: ForeignKey
     def __init__(self, rel: ManyToOneRel) -> None: ...
     @property
-    def related_manager_cls(self) -> type[RelatedManager]: ...
-    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> ReverseManyToOneDescriptor: ...
-    def __set__(self, instance: Model, value: list[Model]) -> Any: ...
+    def related_manager_cls(self) -> type[RelatedManager[Any]]: ...
+    @overload
+    def __get__(self, instance: None, cls: Any = ...) -> Self: ...
+    @overload
+    def __get__(self, instance: Model, cls: Any = ...) -> type[RelatedManager[Any]]: ...
+    def __set__(self, instance: Any, value: Any) -> NoReturn: ...
 
-def create_reverse_many_to_one_manager(superclass: type, rel: Any) -> type[RelatedManager]: ...
+def create_reverse_many_to_one_manager(
+    superclass: type[BaseManager[_M]], rel: ManyToOneRel
+) -> type[RelatedManager[_M]]: ...
 
-class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_F]):
-    field: _F  # type: ignore[assignment]
+class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_M]):
+    """
+    In the example::
+
+        class Pizza(Model):
+            toppings = ManyToManyField(Topping, related_name='pizzas')
+
+    ``Pizza.toppings`` and ``Topping.pizzas`` are ``ManyToManyDescriptor``
+    instances.
+    """
+
+    # 'field' here is 'rel.field'
     rel: ManyToManyRel  # type: ignore[assignment]
+    field: ManyToManyField[Any, _M]  # type: ignore[assignment]
     reverse: bool
     def __init__(self, rel: ManyToManyRel, reverse: bool = ...) -> None: ...
     @property
-    def through(self) -> type[Model]: ...
+    def through(self) -> type[_M]: ...
     @property
-    def related_manager_cls(self) -> type[Any]: ...  # ManyRelatedManager
+    def related_manager_cls(self) -> type[ManyRelatedManager[Any]]: ...  # type: ignore[override]
 
-# fake
-class _ForwardManyToManyManager(Generic[_T]):
-    def all(self) -> QuerySet: ...
+class ManyRelatedManager(BaseManager[_M], Generic[_M]):
+    related_val: tuple[int, ...]
+    def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
+    async def aadd(self, *objs: _M | int, bulk: bool = ...) -> None: ...
+    def remove(self, *objs: _M | int, bulk: bool = ...) -> None: ...
+    async def aremove(self, *objs: _M | int, bulk: bool = ...) -> None: ...
+    def set(self, objs: QuerySet[_M] | Iterable[_M | int], *, bulk: bool = ..., clear: bool = ...) -> None: ...
+    async def aset(self, objs: QuerySet[_M] | Iterable[_M | int], *, bulk: bool = ..., clear: bool = ...) -> None: ...
+    def clear(self) -> None: ...
+    async def aclear(self) -> None: ...
+    def __call__(self, *, manager: str) -> ManyRelatedManager[_M]: ...
 
-def create_forward_many_to_many_manager(superclass: type, rel: Any, reverse: Any) -> _ForwardManyToManyManager: ...
+def create_forward_many_to_many_manager(
+    superclass: type[BaseManager[_M]], rel: ManyToManyRel, reverse: bool
+) -> type[ManyRelatedManager[_M]]: ...
