@@ -1,5 +1,5 @@
 from collections.abc import Collection, Iterable, Sequence
-from typing import Any, ClassVar, Final, TypeVar
+from typing import Any, ClassVar, Final, TypeVar, overload
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
@@ -11,7 +11,11 @@ from typing_extensions import Self
 
 _Self = TypeVar("_Self", bound=Model)
 
-class ModelStateFieldsCacheDescriptor: ...
+class ModelStateFieldsCacheDescriptor:
+    @overload
+    def __get__(self, inst: None, owner: object) -> Self: ...
+    @overload
+    def __get__(self, inst: object, owner: object) -> dict[Any, Any]: ...
 
 class ModelState:
     db: str | None
