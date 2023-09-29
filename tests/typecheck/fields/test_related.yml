@@ -1225,7 +1225,7 @@
             instance = arg(field=1, unknown=2)
             reveal_type(instance.field)  # N: Revealed type is "Any"
             reveal_type(instance.unknown)  # N: Revealed type is "Any"
-            reveal_type(instance.bad)  # N: Revealed type is "Any"
+            reveal_type(instance.bad)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any]"
             return instance
     installed_apps:
         -   myapp
@@ -1238,4 +1238,4 @@
                 class MyModel(models.Model):
                     field = models.ForeignKey("slef", on_delete=models.CASCADE)  # E: Cannot find model 'slef' referenced in field 'field'
                     unknown = models.OneToOneField("unknown", on_delete=models.CASCADE)  # E: Cannot find model 'unknown' referenced in field 'unknown'
-                    bad = models.ManyToManyField("bad")
+                    bad = models.ManyToManyField("bad")  # E: Need type annotation for "bad"
