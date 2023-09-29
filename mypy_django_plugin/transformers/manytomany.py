@@ -1,7 +1,7 @@
 from typing import NamedTuple, Optional, Union
 
 from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, Expression, NameExpr, StrExpr, TypeInfo
+from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, StrExpr, TypeInfo
 from mypy.plugin import FunctionContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import Instance, ProperType, UninhabitedType
@@ -129,16 +129,25 @@ def get_model_from_expression(
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
     """
-    # TODO: Handle settings.AUTH_USER_MODEL?
     if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
         if (
             expr.node.metaclass_type is not None
             and expr.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
         ):
             return Instance(expr.node, [])
-    elif isinstance(expr, StrExpr):
-        model_info = helpers.resolve_lazy_reference(expr.value, api=api, django_context=django_context, ctx=expr)
+
+    lazy_reference = None
+    if isinstance(expr, StrExpr):
+        lazy_reference = expr.value
+    elif (
+        isinstance(expr, MemberExpr)
+        and isinstance(expr.expr, NameExpr)
+        and f"{expr.expr.fullname}.{expr.name}" == fullnames.AUTH_USER_MODEL_FULLNAME
+    ):
+        lazy_reference = django_context.settings.AUTH_USER_MODEL
+
+    if lazy_reference is not None:
+        model_info = helpers.resolve_lazy_reference(lazy_reference, api=api, django_context=django_context, ctx=expr)
         if model_info is not None:
             return Instance(model_info, [])
-
     return None
