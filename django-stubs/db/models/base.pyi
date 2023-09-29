@@ -41,7 +41,7 @@ class Model(metaclass=ModelBase):
     objects: ClassVar[Manager[Self]]
 
     class Meta: ...
-    _meta: Options[Any]
+    _meta: ClassVar[Options[Self]]
     pk: Any
     _state: ModelState
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
