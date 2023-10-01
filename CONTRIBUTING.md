@@ -108,7 +108,7 @@ For instance, the statement `class SomeClass(SuperType[int])` implicitly transla
 If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code passes type checking.
 
 When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error.
-If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/django_stubs_ext/django_stubs_ext/patch.py).
+If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/ext/django_stubs_ext/patch.py).
 
 ## Private attributes
 
