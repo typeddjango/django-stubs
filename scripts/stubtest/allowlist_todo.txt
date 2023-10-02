@@ -86,7 +86,6 @@ django.contrib.admin.utils.NestedObjects.collect
 django.contrib.admin.utils.NestedObjects.nested
 django.contrib.admin.utils.QUOTE_MAP
 django.contrib.admin.utils.UNQUOTE_MAP
-django.contrib.admin.utils.UNQUOTE_RE
 django.contrib.admin.utils.prepare_lookup_value
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.admin_site
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.process_request
@@ -2231,13 +2230,6 @@ django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
 django.test.TransactionTestCase.assertNumQueries
 django.test.TransactionTestCase.assertQuerySetEqual
-django.test.client.CONTENT_TYPE_RE
-django.test.client.Client.options
-django.test.client.FakePayload
-django.test.client.FakePayload.__init__
-django.test.client.FakePayload.read
-django.test.client.FakePayload.readline
-django.test.client.JSON_CONTENT_TYPE_RE
 django.test.html.ASCII_WHITESPACE
 django.test.html.BOOLEAN_ATTRIBUTES
 django.test.html.Parser.error
@@ -2306,7 +2298,6 @@ django.test.testcases.TransactionTestCase.assertQuerySetEqual
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
 django.test.utils.TimeKeeperProtocol
-django.test.utils.override_settings.enable_exception
 django.test.utils.setup_databases
 django.urls.ResolverMatch.__iter__
 django.urls.conf.path
