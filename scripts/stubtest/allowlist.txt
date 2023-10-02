@@ -47,6 +47,9 @@ django.utils.functional.Promise.__radd__
 django.utils.functional.Promise.__mod__
 
 # Lazy regex
+django.contrib.admin.utils.UNQUOTE_RE
+django.test.client.CONTENT_TYPE_RE
+django.test.client.JSON_CONTENT_TYPE_RE
 django.utils.dateformat.re_escaped
 django.utils.dateformat.re_formatchars
 django.utils.dateparse.date_re
