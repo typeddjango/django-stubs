@@ -2230,11 +2230,6 @@ django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
 django.test.TransactionTestCase.assertNumQueries
 django.test.TransactionTestCase.assertQuerySetEqual
-django.test.html.ASCII_WHITESPACE
-django.test.html.BOOLEAN_ATTRIBUTES
-django.test.html.Parser.error
-django.test.html.WHITESPACE
-django.test.html.normalize_attributes
 django.test.runner.DiscoverRunner.build_suite
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by

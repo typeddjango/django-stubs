@@ -50,6 +50,7 @@ django.utils.functional.Promise.__mod__
 django.contrib.admin.utils.UNQUOTE_RE
 django.test.client.CONTENT_TYPE_RE
 django.test.client.JSON_CONTENT_TYPE_RE
+django.test.html.ASCII_WHITESPACE
 django.utils.dateformat.re_escaped
 django.utils.dateformat.re_formatchars
 django.utils.dateparse.date_re
