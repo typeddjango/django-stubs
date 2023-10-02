@@ -60,6 +60,7 @@ class TestContextDecorator:
     def __call__(self, decorated: _DT) -> _DT: ...
 
 class override_settings(TestContextDecorator):
+    enable_exception: Exception | None
     options: dict[str, Any]
     def __init__(self, **kwargs: Any) -> None: ...
     wrapped: Settings

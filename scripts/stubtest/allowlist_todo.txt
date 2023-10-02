@@ -2226,9 +2226,6 @@ django.templatetags.static.PrefixNode.__init__
 django.templatetags.static.StaticNode.__init__
 django.templatetags.tz.UnknownTimezoneException
 django.templatetags.tz.timezone_constructor
-django.test.AsyncClient
-django.test.AsyncRequestFactory
-django.test.Client.options
 django.test.SimpleTestCase.assertFormError
 django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
@@ -2246,8 +2243,6 @@ django.test.html.BOOLEAN_ATTRIBUTES
 django.test.html.Parser.error
 django.test.html.WHITESPACE
 django.test.html.normalize_attributes
-django.test.override_script_prefix
-django.test.override_settings.enable_exception
 django.test.runner.DiscoverRunner.build_suite
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by
