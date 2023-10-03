@@ -5,7 +5,7 @@ from typing import Any
 
 from typing_extensions import TypeAlias
 
-ASCII_WHITESPACE: Pattern
+ASCII_WHITESPACE: Pattern[str]
 BOOLEAN_ATTRIBUTES: set[str]
 
 def normalize_whitespace(string: str) -> str: ...
