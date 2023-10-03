@@ -640,16 +640,12 @@ django.contrib.gis.gdal.srs.SpatialReference.xml
 django.contrib.gis.geoip2.GeoIP2
 django.contrib.gis.geoip2.GeoIP2Exception
 django.contrib.gis.geoip2.base
-django.contrib.gis.geometry.hex_regex
-django.contrib.gis.geometry.json_regex
-django.contrib.gis.geometry.wkt_regex
 django.contrib.gis.geos.GEOSGeometry.__new__
 django.contrib.gis.geos.Point.tuple
 django.contrib.gis.geos.geometry.GEOSGeometry.__new__
 django.contrib.gis.geos.geometry.GEOSGeometryBase.geojson
 django.contrib.gis.geos.geometry.GEOSGeometryBase.make_valid
 django.contrib.gis.geos.geometry.GEOSGeometryBase.normalize
-django.contrib.gis.geos.hex_regex
 django.contrib.gis.geos.libgeos.error_h
 django.contrib.gis.geos.libgeos.notice_h
 django.contrib.gis.geos.mutable_list.ListMixin.__ge__
@@ -657,7 +653,6 @@ django.contrib.gis.geos.mutable_list.ListMixin.__gt__
 django.contrib.gis.geos.mutable_list.ListMixin.__le__
 django.contrib.gis.geos.point.Point.tuple
 django.contrib.gis.geos.prototypes.geom.geos_makevalid
-django.contrib.gis.geos.wkt_regex
 django.contrib.gis.measure.MeasureBase.__ge__
 django.contrib.gis.measure.MeasureBase.__gt__
 django.contrib.gis.measure.MeasureBase.__le__
@@ -969,7 +964,6 @@ django.core.management.commands.makemessages.TranslatableFile.__le__
 django.core.management.commands.makemessages.TranslatableFile.__lt__
 django.core.management.commands.makemessages.TranslatableFile.path
 django.core.management.commands.makemessages.is_valid_locale
-django.core.management.commands.makemessages.plural_forms_re
 django.core.management.commands.runserver.Command.on_bind
 django.core.management.commands.runserver.Command.suppressed_base_arguments
 django.core.management.commands.runserver.naiveip_re
@@ -1004,9 +998,6 @@ django.core.signing.loads
 django.core.validators.BaseValidator.__new__
 django.core.validators.DecimalValidator.__new__
 django.core.validators.EmailValidator.__new__
-django.core.validators.EmailValidator.domain_regex
-django.core.validators.EmailValidator.literal_regex
-django.core.validators.EmailValidator.user_regex
 django.core.validators.FileExtensionValidator.__new__
 django.core.validators.MaxLengthValidator.__new__
 django.core.validators.MaxValueValidator.__new__
@@ -1019,8 +1010,6 @@ django.core.validators.URLValidator.__new__
 django.core.validators.URLValidator.regex
 django.core.validators.URLValidator.unsafe_chars
 django.core.validators.URLValidator.max_length
-django.core.validators.slug_re
-django.core.validators.slug_unicode_re
 django.db.backends.base.base.BaseDatabaseWrapper.SchemaEditorClass
 django.db.backends.base.base.BaseDatabaseWrapper.client_class
 django.db.backends.base.base.BaseDatabaseWrapper.close_if_health_check_failed
@@ -2161,7 +2150,6 @@ django.http.request.HttpRequest.headers
 django.http.request.HttpRequest.is_ajax
 django.http.request.HttpRequest.readlines
 django.http.request.UploadHandlerList
-django.http.request.host_validation_re
 django.http.request.parse_accept_header
 django.http.response.HttpResponseBase.__iter__
 django.http.response.HttpResponseBase.getvalue
@@ -2198,8 +2186,6 @@ django.template.base.Context
 django.template.base.FilterExpression.is_var
 django.template.base.Node.__iter__
 django.template.base.VariableDoesNotExist.__init__
-django.template.base.filter_re
-django.template.base.kwarg_re
 django.template.defaultfilters.json_script
 django.template.defaulttags.IfEqualNode
 django.template.defaulttags.do_ifequal
