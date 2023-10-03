@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
-from io import BytesIO
+from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
@@ -20,19 +20,20 @@ from typing_extensions import TypeAlias
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
-CONTENT_TYPE_RE: Pattern
-JSON_CONTENT_TYPE_RE: Pattern
+CONTENT_TYPE_RE: Pattern[str]
+JSON_CONTENT_TYPE_RE: Pattern[str]
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
     redirect_chain: list[tuple[str, int]]
     def __init__(self, message: str, last_response: HttpResponseBase) -> None: ...
 
-class FakePayload:
+class FakePayload(IOBase):
     read_started: bool
-    def __init__(self, content: bytes | str | None = ...) -> None: ...
+    def __init__(self, initial_bytes: bytes | str | None = ...) -> None: ...
     def __len__(self) -> int: ...
-    def read(self, num_bytes: int = ...) -> bytes: ...
+    def read(self, size: int = ...) -> bytes: ...
+    def readline(self, size: int | None = ..., /) -> bytes: ...
     def write(self, content: bytes | str) -> None: ...
 
 _T = TypeVar("_T")
@@ -229,10 +230,11 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def trace(  # type: ignore[override]
+    def options(  # type: ignore[override]
         self,
         path: str,
-        data: Any = ...,
+        data: dict[str, str] | str = ...,
+        content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
         *,
@@ -266,6 +268,16 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         path: str,
         data: Any = ...,
         content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    def trace(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
         follow: bool = ...,
         secure: bool = ...,
         *,

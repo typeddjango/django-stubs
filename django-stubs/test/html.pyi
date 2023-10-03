@@ -1,12 +1,15 @@
 from collections.abc import Sequence
 from html.parser import HTMLParser
+from re import Pattern
 from typing import Any
 
 from typing_extensions import TypeAlias
 
-WHITESPACE: Any
+ASCII_WHITESPACE: Pattern[str]
+BOOLEAN_ATTRIBUTES: set[str]
 
 def normalize_whitespace(string: str) -> str: ...
+def normalize_attributes(attributes: list[tuple[str, str | None]]) -> list[tuple[str, str | None]]: ...
 
 _ElementAttribute: TypeAlias = tuple[str, str | None]
 
@@ -32,6 +35,7 @@ class Parser(HTMLParser):
     open_tags: Any
     element_positions: Any
     def __init__(self) -> None: ...
+    def error(self, msg: str) -> HTMLParseError: ...
     def format_position(self, position: Any = ..., element: Any = ...) -> str: ...
     @property
     def current(self) -> Element: ...
