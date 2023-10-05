@@ -2027,10 +2027,6 @@ django.http.HttpResponseBase.getvalue
 django.http.StreamingHttpResponse.content
 django.http.multipartparser.MultiPartParser.IE_sanitize
 django.http.multipartparser.MultiPartParser.boundary_re
-django.http.request.HttpHeaders.to_asgi_name
-django.http.request.HttpHeaders.to_asgi_names
-django.http.request.HttpHeaders.to_wsgi_name
-django.http.request.HttpHeaders.to_wsgi_names
 django.http.request.HttpRequest.__init__
 django.http.request.HttpRequest.accepted_types
 django.http.request.HttpRequest.get_raw_uri
