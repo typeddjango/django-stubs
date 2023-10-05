@@ -88,7 +88,7 @@ We have two special files to allow errors:
 You might also want to disable `incremental` mode while working on `stubtest` changes.
 This mode leads to several known problems (stubs do not show up or have strange errors).
 
-**Important**: right now we only run `stubtest` on Python 3.11 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
+**Important**: right now we only run `stubtest` on Python 3.12 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
 
 ## Submission Guidelines
 
