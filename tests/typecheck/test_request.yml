@@ -25,6 +25,7 @@
             reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User"
         if request.user.is_authenticated:
             reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User"
+            reveal_type(request.user.groups.all().get())  # N: Revealed type is "django.contrib.auth.models.Group"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 -   case: request_object_user_without_auth_and_contenttypes_apps

@@ -15,6 +15,6 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     @property
     def empty_intersection_returns_none(self) -> bool: ...
     @property
-    def supports_geometry_field_unique_index(self) -> bool: ...  # type: ignore
+    def supports_geometry_field_unique_index(self) -> bool: ...  # type: ignore[override]
     @property
-    def django_test_skips(self) -> dict[str, Any]: ...  # type: ignore
+    def django_test_skips(self) -> dict[str, Any]: ...  # type: ignore[override]

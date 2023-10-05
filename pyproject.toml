@@ -29,6 +29,7 @@ select = [
     "PYI",      # flake8-pyi
     "RUF100",   # Equivalent to flake8-noqa NQA103
     "PGH004",   # Equivalent to flake8-noqa NQA104
+    "PGH003",   # Disallowed blanket `type: ignore` annotations.
 ]
 ignore = ["PYI021", "PYI024", "PYI041", "PYI043"]
 

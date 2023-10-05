@@ -17,6 +17,9 @@ django.contrib.contenttypes.migrations.*
 # default_storage is actually an instance of DefaultStorage, but it proxies through to a Storage
 django.core.files.storage.default_storage
 
+# 'ManyRelatedManager' does exist and is declared locally, inside a function body
+django.db.models.fields.related_descriptors.ManyRelatedManager
+
 # BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
 django.utils.archive.BaseArchive.list
 django.utils.archive.BaseArchive.extract
@@ -44,6 +47,24 @@ django.utils.functional.Promise.__radd__
 django.utils.functional.Promise.__mod__
 
 # Lazy regex
+django.contrib.admin.utils.UNQUOTE_RE
+django.contrib.gis.geometry.hex_regex
+django.contrib.gis.geometry.json_regex
+django.contrib.gis.geometry.wkt_regex
+django.contrib.gis.geos.hex_regex
+django.contrib.gis.geos.wkt_regex
+django.core.validators.EmailValidator.domain_regex
+django.core.validators.EmailValidator.literal_regex
+django.core.validators.EmailValidator.user_regex
+django.core.validators.slug_re
+django.core.validators.slug_unicode_re
+django.core.management.commands.makemessages.plural_forms_re
+django.http.request.host_validation_re
+django.template.base.filter_re
+django.template.base.kwarg_re
+django.test.client.CONTENT_TYPE_RE
+django.test.client.JSON_CONTENT_TYPE_RE
+django.test.html.ASCII_WHITESPACE
 django.utils.dateformat.re_escaped
 django.utils.dateformat.re_formatchars
 django.utils.dateparse.date_re

@@ -7,7 +7,7 @@ pytest-shard==0.1.2
 
 # Django deps:
 psycopg2-binary
-Django==4.2.5
+Django==4.2.6
 -e ./ext
 -e .[compatible-mypy]
 

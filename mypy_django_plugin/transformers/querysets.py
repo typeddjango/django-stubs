@@ -147,9 +147,11 @@ def get_values_list_row_type(
 
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
-    assert isinstance(ctx.type, Instance)
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_return_type
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        return ctx.default_return_type
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -205,9 +207,11 @@ def gather_kwargs(ctx: MethodContext) -> Optional[Dict[str, MypyType]]:
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
-    assert isinstance(ctx.type, Instance)
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_return_type
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        return ctx.default_return_type
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -270,9 +274,11 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: Dj
 
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on QuerySet, return QuerySet of something
-    assert isinstance(ctx.type, Instance)
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_return_type
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        return ctx.default_return_type
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
