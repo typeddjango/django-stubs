@@ -13,6 +13,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql.compiler import SQLCompiler
 from django.db.models.sql.datastructures import BaseTable, Join
 from django.db.models.sql.where import WhereNode
+from django.utils.functional import cached_property
 
 JoinInfo = namedtuple("JoinInfo", ("final_field", "targets", "opts", "joins", "path", "transform_function"))
 
@@ -85,7 +86,7 @@ class Query(BaseExpression):
     def output_field(self) -> Field: ...
     @property
     def has_select_fields(self) -> bool: ...
-    @property
+    @cached_property
     def base_table(self) -> str: ...
     def sql_with_params(self) -> tuple[str, tuple]: ...
     def __deepcopy__(self, memo: dict[int, Any]) -> Query: ...

@@ -10,6 +10,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression
 from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
+from django.utils.functional import cached_property
 from typing_extensions import TypeAlias
 
 _ParamT: TypeAlias = str | int
@@ -129,9 +130,9 @@ class SQLInsertCompiler(SQLCompiler):
 
 class SQLDeleteCompiler(SQLCompiler):
     query: DeleteQuery
-    @property
+    @cached_property
     def single_alias(self) -> bool: ...
-    @property
+    @cached_property
     def contains_self_reference_subquery(self) -> bool: ...
     def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
