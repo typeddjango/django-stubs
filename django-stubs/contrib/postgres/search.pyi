@@ -1,5 +1,6 @@
 from typing import Any
 
+from db.models import TextField
 from django.db.models import Expression, Field
 from django.db.models.expressions import Combinable, CombinedExpression, Func
 from django.db.models.lookups import Lookup
@@ -24,7 +25,7 @@ class SearchVector(SearchVectorCombinable, Func):
     config: _Expression | None
     function: str
     arg_joiner: str
-    output_field: Field
+    output_field: SearchVectorField  # type: ignore[assignment]
     def __init__(
         self, *expressions: _Expression, config: _Expression | None = ..., weight: Any | None = ...
     ) -> None: ...
@@ -83,7 +84,7 @@ class SearchRank(Func):
 class SearchHeadline(Func):
     function: str
     template: str
-    output_field: Field
+    output_field: TextField
     def __init__(
         self,
         expression: _Expression,

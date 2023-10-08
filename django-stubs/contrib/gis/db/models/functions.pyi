@@ -4,6 +4,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func
 from django.db.models import Transform as StandardTransform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from utils.functional import cached_property
 
 NUMERIC_TYPES: Any
 
@@ -77,7 +78,7 @@ class Difference(OracleToleranceMixin, GeomOutputGeoFunc):
     geom_param_pos: Any
 
 class DistanceResultMixin:
-    @property
+    @cached_property
     def output_field(self) -> Any: ...
     def source_is_geography(self) -> Any: ...
 

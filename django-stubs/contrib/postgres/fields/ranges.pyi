@@ -73,38 +73,24 @@ class AdjacentToLookup(PostgresOperatorLookup):
     postgres_operator: str
 
 class RangeStartsWith(models.Transform):
-    lookup_name: str
-    function: str
     @property
-    def output_field(self) -> models.Field: ...
+    def output_field(self) -> models.Field: ...  # type: ignore[override]
 
 class RangeEndsWith(models.Transform):
-    lookup_name: str
-    function: str
     @property
-    def output_field(self) -> models.Field: ...
+    def output_field(self) -> models.Field: ...  # type: ignore[override]
 
 class IsEmpty(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField  # type: ignore[assignment]
 
 class LowerInclusive(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField  # type: ignore[assignment]
 
 class LowerInfinite(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField  # type: ignore[assignment]
 
 class UpperInclusive(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField  # type: ignore[assignment]
 
 class UpperInfinite(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: models.BooleanField  # type: ignore[assignment]
