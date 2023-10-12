@@ -337,6 +337,7 @@
         from myapp.models import User
         reveal_type(User().friends)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.User]"
         reveal_type(User.friends.through.objects.get())  # N: Revealed type is "myapp.models.User_friends"
+        reveal_type(User.friends.through._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User_friends]"
         reveal_type(User.friends.through().from_user)  # N: Revealed type is "myapp.models.User"
         reveal_type(User.friends.through().from_user_id)  # N: Revealed type is "builtins.int"
         reveal_type(User.friends.through().to_user)  # N: Revealed type is "myapp.models.User"
@@ -1088,6 +1089,7 @@
 
         reveal_type(MyModel.auto_through.through)
         reveal_type(MyModel.auto_through.through.mymodel)
+        reveal_type(MyModel.auto_through.through._default_manager)
 
         reveal_type(MyModel.other_again.through)
     out: |
@@ -1106,7 +1108,8 @@
         main:17: note: Revealed type is "builtins.int"
         main:19: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
         main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.MyModel, django.db.models.expressions.Combinable], myapp.models.MyModel]]"
-        main:22: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
+        main:21: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:23: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
     installed_apps:
         -   myapp
     files:
