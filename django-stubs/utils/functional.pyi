@@ -7,9 +7,9 @@ from typing_extensions import Self, TypeAlias
 _T = TypeVar("_T")
 
 class cached_property(Generic[_T]):
-    func: Callable[..., _T]
+    func: Callable[[Any], _T]
     name: str | None
-    def __init__(self, func: Callable[..., _T], name: str | None = ...) -> None: ...
+    def __init__(self, func: Callable[[Any], _T], name: str | None = ...) -> None: ...
     @overload
     def __get__(self, instance: None, cls: type[Any] | None = ...) -> Self: ...
     @overload
