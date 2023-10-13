@@ -194,7 +194,7 @@ class Star(Expression): ...
 class Col(Expression):
     target: Field
     alias: str
-    contains_column_references: Literal[True]  # type: ignore[assignment]
+    contains_column_references: Literal[True]
     possibly_multivalued: Literal[False]
     def __init__(self, alias: str, target: Field, output_field: Field | None = ...) -> None: ...
 
