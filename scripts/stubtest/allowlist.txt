@@ -110,3 +110,6 @@ django.views.generic.edit.BaseDeleteView.form_class
 # We still keep them in stubs to be a bit more backward compatible.
 # RemovedInDjango40:
 django.middleware.csrf.REASON_BAD_TOKEN
+
+# RemovedInDjango41
+django.core.cache.backends.memcached.MemcachedCache
