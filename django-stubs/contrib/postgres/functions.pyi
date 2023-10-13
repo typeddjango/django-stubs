@@ -1,4 +1,9 @@
-from django.db.models import Func
+from typing import ClassVar
 
-class RandomUUID(Func): ...
-class TransactionNow(Func): ...
+from django.db.models import DateTimeField, Func, UUIDField
+
+class RandomUUID(Func):
+    output_field: ClassVar[UUIDField]  # type: ignore[assignment]
+
+class TransactionNow(Func):
+    output_field: ClassVar[DateTimeField]  # type: ignore[assignment]

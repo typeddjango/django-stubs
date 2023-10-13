@@ -1,7 +1,6 @@
-from typing import Any
+from typing import Any, ClassVar
 
-from db.models import TextField
-from django.db.models import Expression, Field
+from django.db.models import Expression, Field, FloatField, TextField
 from django.db.models.expressions import Combinable, CombinedExpression, Func
 from django.db.models.lookups import Lookup
 from typing_extensions import Self, TypeAlias
@@ -25,7 +24,7 @@ class SearchVector(SearchVectorCombinable, Func):
     config: _Expression | None
     function: str
     arg_joiner: str
-    output_field: SearchVectorField  # type: ignore[assignment]
+    output_field: ClassVar[SearchVectorField]  # type: ignore[assignment]
     def __init__(
         self, *expressions: _Expression, config: _Expression | None = ..., weight: Any | None = ...
     ) -> None: ...
@@ -49,6 +48,7 @@ class SearchQueryCombinable:
     def __rand__(self, other: SearchQueryCombinable) -> Self: ...
 
 class SearchQuery(SearchQueryCombinable, Func):  # type: ignore[misc]
+    output_field: ClassVar[SearchQueryField]  # type: ignore[assignment]
     SEARCH_TYPES: dict[str, str]
     def __init__(
         self,
@@ -72,6 +72,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
     ) -> None: ...
 
 class SearchRank(Func):
+    output_field: ClassVar[FloatField]  # type: ignore[assignment]
     def __init__(
         self,
         vector: SearchVector | _Expression,
@@ -84,7 +85,7 @@ class SearchRank(Func):
 class SearchHeadline(Func):
     function: str
     template: str
-    output_field: TextField
+    output_field: ClassVar[TextField]  # type: ignore[assignment]
     def __init__(
         self,
         expression: _Expression,
@@ -102,9 +103,11 @@ class SearchHeadline(Func):
     ) -> None: ...
 
 class TrigramBase(Func):
+    output_field: ClassVar[FloatField]  # type: ignore[assignment]
     def __init__(self, expression: _Expression, string: str, **extra: Any) -> None: ...
 
 class TrigramWordBase(Func):
+    output_field: ClassVar[FloatField]  # type: ignore[assignment]
     def __init__(self, string: str, expression: _Expression, **extra: Any) -> None: ...
 
 class TrigramSimilarity(TrigramBase): ...

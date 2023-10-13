@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
@@ -43,34 +43,16 @@ class DateTimeRangeField(RangeField):
 class DateRangeField(RangeField):
     def __get__(self, instance: Any, owner: Any) -> DateRange: ...
 
-class DateTimeRangeContains(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
+class DateTimeRangeContains(PostgresOperatorLookup): ...
 
 class RangeContainedBy(PostgresOperatorLookup):
-    lookup_name: str
     type_mapping: dict[str, str]
-    postgres_operator: str
 
-class FullyLessThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class FullGreaterThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class NotLessThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class NotGreaterThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class AdjacentToLookup(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
+class FullyLessThan(PostgresOperatorLookup): ...
+class FullGreaterThan(PostgresOperatorLookup): ...
+class NotLessThan(PostgresOperatorLookup): ...
+class NotGreaterThan(PostgresOperatorLookup): ...
+class AdjacentToLookup(PostgresOperatorLookup): ...
 
 class RangeStartsWith(models.Transform):
     @property
@@ -81,16 +63,16 @@ class RangeEndsWith(models.Transform):
     def output_field(self) -> models.Field: ...  # type: ignore[override]
 
 class IsEmpty(models.Transform):
-    output_field: models.BooleanField  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
 
 class LowerInclusive(models.Transform):
-    output_field: models.BooleanField  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
 
 class LowerInfinite(models.Transform):
-    output_field: models.BooleanField  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
 
 class UpperInclusive(models.Transform):
-    output_field: models.BooleanField  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
 
 class UpperInfinite(models.Transform):
-    output_field: models.BooleanField  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
