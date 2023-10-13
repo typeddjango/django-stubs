@@ -819,8 +819,6 @@ django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
 django.contrib.staticfiles.storage
 django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
-django.core.checks.templates.W001
-django.core.checks.templates.W003
 django.core.files.File.__next__
 django.core.files.File.size
 django.core.files.base.ContentFile.size
