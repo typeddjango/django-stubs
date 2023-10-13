@@ -491,7 +491,6 @@ django.contrib.gis.db.models.aggregates.Extent.is_extent
 django.contrib.gis.db.models.aggregates.Extent3D.is_extent
 django.contrib.gis.db.models.aggregates.GeoAggregate.as_sql
 django.contrib.gis.db.models.aggregates.GeoAggregate.function
-django.contrib.gis.db.models.aggregates.GeoAggregate.output_field
 django.contrib.gis.db.models.fields.BaseSpatialField.class_lookups
 django.contrib.gis.db.models.fields.GeometryField.contribute_to_class
 django.contrib.gis.db.models.fields.RasterField.contribute_to_class
@@ -1169,7 +1168,6 @@ django.db.models.constraints.UniqueConstraint.contains_expressions
 django.db.models.constraints.UniqueConstraint.validate
 django.db.models.expressions.BaseExpression.empty_result_set_value
 django.db.models.expressions.BaseExpression.get_refs
-django.db.models.expressions.BaseExpression.output_field
 django.db.models.expressions.BaseExpression.prefix_references
 django.db.models.expressions.BaseExpression.replace_expressions
 django.db.models.expressions.BaseExpression.select_format

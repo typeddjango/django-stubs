@@ -8,6 +8,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
 from typing_extensions import Self
+from utils.functional import cached_property
 
 _T = TypeVar("_T")
 
