@@ -795,7 +795,6 @@ django.contrib.sessions.base_session.AbstractBaseSession.get_previous_by_expire_
 django.contrib.sessions.base_session.AbstractBaseSession.session_data
 django.contrib.sessions.base_session.AbstractBaseSession.session_key
 django.contrib.sessions.base_session.BaseSessionManager.__slotnames__
-django.contrib.sessions.exceptions.SessionInterrupted
 django.contrib.sessions.management.commands.clearsessions.Command.handle
 django.contrib.sessions.models.Session.expire_date
 django.contrib.sessions.models.Session.get_next_by_expire_date
@@ -823,8 +822,6 @@ django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
 django.core.checks.templates.W001
 django.core.checks.templates.W003
-django.core.exceptions.FullResultSet
-django.core.exceptions.TooManyFilesSent
 django.core.files.File.__next__
 django.core.files.File.size
 django.core.files.base.ContentFile.size
