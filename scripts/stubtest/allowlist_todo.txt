@@ -415,7 +415,6 @@ django.contrib.gis.db.models.JSONField.from_db_value
 django.contrib.gis.db.models.JSONField.get_transform
 django.contrib.gis.db.models.Lookup.get_prep_lhs
 django.contrib.gis.db.models.Lookup.lookup_name
-django.contrib.gis.db.models.Lookup.output_field
 django.contrib.gis.db.models.Lookup.relabeled_clone
 django.contrib.gis.db.models.Lookup.resolve_expression
 django.contrib.gis.db.models.Lookup.select_format
@@ -1068,7 +1067,6 @@ django.db.models.JSONField.from_db_value
 django.db.models.JSONField.get_transform
 django.db.models.Lookup.get_prep_lhs
 django.db.models.Lookup.lookup_name
-django.db.models.Lookup.output_field
 django.db.models.Lookup.relabeled_clone
 django.db.models.Lookup.resolve_expression
 django.db.models.Lookup.select_format
@@ -1438,7 +1436,6 @@ django.db.models.lookups.FieldGetDbPrepValueIterableMixin.process_rhs
 django.db.models.lookups.IExact.process_rhs
 django.db.models.lookups.Lookup.get_prep_lhs
 django.db.models.lookups.Lookup.lookup_name
-django.db.models.lookups.Lookup.output_field
 django.db.models.lookups.Lookup.relabeled_clone
 django.db.models.lookups.Lookup.resolve_expression
 django.db.models.lookups.Lookup.select_format
@@ -1622,7 +1619,6 @@ django.db.models.sql.where.WhereNode.get_lookup
 django.db.models.sql.where.WhereNode.get_refs
 django.db.models.sql.where.WhereNode.get_source_expressions
 django.db.models.sql.where.WhereNode.leaves
-django.db.models.sql.where.WhereNode.output_field
 django.db.models.sql.where.WhereNode.replace_expressions
 django.db.models.sql.where.WhereNode.select_format
 django.db.models.sql.where.WhereNode.set_source_expressions

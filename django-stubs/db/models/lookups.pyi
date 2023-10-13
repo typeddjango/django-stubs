@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Mapping
 from typing import Any, Generic, Literal, TypeVar
 
+from db.models import BooleanField
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression, Func
 from django.db.models.query_utils import RegisterLookupMixin
@@ -37,6 +38,8 @@ class Lookup(Generic[_T]):
     def get_group_by_cols(self) -> list[Expression]: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
+    @cached_property
+    def output_field(self) -> BooleanField: ...
     @cached_property
     def contains_aggregate(self) -> bool: ...
     @cached_property

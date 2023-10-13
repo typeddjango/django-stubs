@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+from db.models import BooleanField
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
@@ -24,6 +25,8 @@ class WhereNode(tree.Node):
     def clone(self) -> WhereNode: ...
     def relabeled_clone(self, change_map: dict[str | None, str]) -> WhereNode: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> WhereNode: ...
+    @cached_property
+    def output_field(self) -> BooleanField: ...
     @cached_property
     def contains_aggregate(self) -> bool: ...
     @cached_property
