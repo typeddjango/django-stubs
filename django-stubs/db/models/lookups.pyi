@@ -6,6 +6,7 @@ from django.db.models.expressions import Expression, Func
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
 from django.utils.datastructures import OrderedSet
+from django.utils.functional import cached_property
 from typing_extensions import Self
 
 _T = TypeVar("_T")
@@ -35,9 +36,9 @@ class Lookup(Generic[_T]):
     def get_group_by_cols(self) -> list[Expression]: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
-    @property
+    @cached_property
     def contains_aggregate(self) -> bool: ...
-    @property
+    @cached_property
     def contains_over_clause(self) -> bool: ...
     @property
     def is_summary(self) -> bool: ...

@@ -7,9 +7,10 @@ from django.db.models import Func, Index, Model
 from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query_utils import Q
 from django.utils.datastructures import _ListOrTuple
+from django.utils.functional import cached_property
 
 class PostgresIndex(Index):
-    @property
+    @cached_property
     def max_name_length(self) -> int: ...  # type: ignore[override]
     def create_sql(
         self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any

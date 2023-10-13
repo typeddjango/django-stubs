@@ -18,7 +18,7 @@ from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyR
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import _StrOrPromise, cached_property
 from typing_extensions import Self
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
@@ -71,7 +71,7 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
     ) -> None: ...
-    @property
+    @cached_property
     def related_model(self) -> type[Model] | Literal["self"]: ...  # type: ignore[override]
     def get_forward_related_filter(self, obj: Model) -> dict[str, int | UUID]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
@@ -132,13 +132,13 @@ class ForeignObject(RelatedField[_ST, _GT]):
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
-    @property
+    @cached_property
     def related_fields(self) -> list[tuple[Field, Field]]: ...
-    @property
+    @cached_property
     def reverse_related_fields(self) -> list[tuple[Field, Field]]: ...
-    @property
+    @cached_property
     def local_related_fields(self) -> tuple[Field, ...]: ...
-    @property
+    @cached_property
     def foreign_related_fields(self) -> tuple[Field, ...]: ...
 
 class ForeignKey(ForeignObject[_ST, _GT]):

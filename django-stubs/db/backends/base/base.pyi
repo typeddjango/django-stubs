@@ -12,6 +12,7 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
+from django.utils.functional import cached_property
 from typing_extensions import Self, TypeAlias
 
 NO_DB_ALIAS: str
@@ -65,9 +66,9 @@ class BaseDatabaseWrapper:
     operators: MutableMapping[str, str]
     def __init__(self, settings_dict: dict[str, Any], alias: str = ...) -> None: ...
     def ensure_timezone(self) -> bool: ...
-    @property
+    @cached_property
     def timezone(self) -> tzinfo | None: ...
-    @property
+    @cached_property
     def timezone_name(self) -> str: ...
     @property
     def queries_logged(self) -> bool: ...

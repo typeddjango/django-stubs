@@ -1,5 +1,7 @@
 from typing import Any
 
+from django.utils.functional import cached_property
+
 class BaseSpatialOperations:
     postgis: bool
     spatialite: bool
@@ -7,7 +9,7 @@ class BaseSpatialOperations:
     oracle: bool
     spatial_version: Any
     select: str
-    @property
+    @cached_property
     def select_extent(self) -> str: ...
     geography: bool
     geometry: bool

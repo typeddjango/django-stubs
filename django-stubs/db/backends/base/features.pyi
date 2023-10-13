@@ -4,6 +4,7 @@ from typing import Any
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.utils import DatabaseError, DataError
+from django.utils.functional import cached_property
 
 class BaseDatabaseFeatures:
     minimum_database_version: tuple[int, ...] | None
@@ -137,8 +138,8 @@ class BaseDatabaseFeatures:
     django_test_skips: dict[str, set[str]]
     connection: BaseDatabaseWrapper
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
-    @property
+    @cached_property
     def supports_explaining_query_execution(self) -> bool: ...
-    @property
+    @cached_property
     def supports_transactions(self) -> bool: ...
     def allows_group_by_selected_pks_on_model(self, model: type[Model]) -> bool: ...
