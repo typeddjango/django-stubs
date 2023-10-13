@@ -817,7 +817,6 @@ django.contrib.staticfiles.finders.FileSystemFinder.__init__
 django.contrib.staticfiles.management.commands.collectstatic
 django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
 django.contrib.staticfiles.storage
-django.core.cache.InvalidCacheKey
 django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
 django.core.checks.templates.W001
