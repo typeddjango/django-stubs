@@ -6,7 +6,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import BinaryField, BooleanField, FloatField, Func, IntegerField, TextField
 from django.db.models import Transform as StandardTransform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
-from utils.functional import cached_property
+from django.utils.functional import cached_property
 
 NUMERIC_TYPES: Any
 
@@ -84,7 +84,7 @@ class DistanceResultMixin:
     def output_field(self) -> DistanceField: ...
     def source_is_geography(self) -> Any: ...
 
-class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
+class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
     geom_param_pos: Any
     spheroid: Any
     def __init__(self, expr1: Any, expr2: Any, spheroid: Any | None = ..., **extra: Any) -> None: ...
@@ -132,7 +132,7 @@ class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):
     output_field: ClassVar[BooleanField]  # type: ignore[assignment]
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
+class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
     spheroid: Any
     def __init__(self, expr1: Any, spheroid: bool = ..., **extra: Any) -> None: ...
     def as_postgresql(
@@ -159,7 +159,7 @@ class NumPoints(GeoFunc):
     output_field: ClassVar[IntegerField]  # type: ignore[assignment]
     arity: int
 
-class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
+class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
     arity: int
     def as_postgresql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
