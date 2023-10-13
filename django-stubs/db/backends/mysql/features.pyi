@@ -49,7 +49,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def can_introspect_foreign_keys(self) -> bool: ...  # type: ignore[override]
     @cached_property
-    def introspected_field_types(self) -> dict[str, str]: ...  # type: ignore [override]
+    def introspected_field_types(self) -> dict[str, str]: ...  # type: ignore[override]
     @cached_property
     def can_return_columns_from_insert(self) -> bool: ...  # type: ignore[override]
     @cached_property
