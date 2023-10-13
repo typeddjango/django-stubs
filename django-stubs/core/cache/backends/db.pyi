@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.core.cache.backends.base import BaseCache
 from django.utils.functional import _StrOrPromise
@@ -20,4 +20,5 @@ class BaseDatabaseCache(BaseCache):
     cache_model_class: Any
     def __init__(self, table: str, params: dict[str, Any]) -> None: ...
 
-class DatabaseCache(BaseDatabaseCache): ...
+class DatabaseCache(BaseDatabaseCache):
+    pickle_protocol: ClassVar[int]
