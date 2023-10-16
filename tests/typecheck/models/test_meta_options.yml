@@ -20,7 +20,7 @@
         reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is "django.db.models.fields.IntegerField[Any, Any]"
         reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is "django.db.models.fields.related.ForeignKey[Any, Any]"
 
-        MyUser._meta.get_field('unknown')  # E: MyUser has no field named 'unknown'
+        MyUser._meta.get_field('unknown')  # E: MyUser has no field named 'unknown'  [misc]
     installed_apps:
         - myapp
     files:
@@ -64,9 +64,9 @@
         class MyModel(models.Model):
             example = models.CharField(max_length=100)
             class Meta(TypedModelMeta):
-                abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")
-                verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "List[str]", base class "TypedModelMeta" defined the type as "Union[str, _StrPromise]")
-                unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "Dict[int, int]", base class "TypedModelMeta" defined the type as "Union[Sequence[Sequence[str]], Sequence[str]]")
+                abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
+                verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "List[str]", base class "TypedModelMeta" defined the type as "Union[str, _StrPromise]")  [assignment]
+                unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "Dict[int, int]", base class "TypedModelMeta" defined the type as "Union[Sequence[Sequence[str]], Sequence[str]]")  [assignment]
                 unknown_attr = True  # can't check this
 
 
@@ -80,8 +80,8 @@
         AbstractModel._default_manager.create()
 
         # Errors:
-        AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"
-        AbstractModel.objects.create()  # E: "Type[AbstractModel]" has no attribute "objects"
+        AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
+        AbstractModel.objects.create()  # E: "Type[AbstractModel]" has no attribute "objects"  [attr-defined]
     installed_apps:
         - myapp
     files:
