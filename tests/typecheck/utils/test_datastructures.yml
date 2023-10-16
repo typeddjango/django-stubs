@@ -4,7 +4,7 @@
       from typing import Dict, List, Tuple, Union
 
       # check constructors
-      var1 = MultiValueDict()  # E: Need type annotation for "var1"
+      var1 = MultiValueDict()  # E: Need type annotation for "var1"  [var-annotated]
       d2: Dict[str, List[Union[str, int]]] = {'foo': ['Foo'], 'bar': [2, 3]}
       var2 = MultiValueDict(d2)
       d3: Tuple[Tuple[str, List[Union[str, int]]], ...] = (('foo', ['Foo']), ('bar', [2, 3]))
@@ -33,10 +33,10 @@
 
       # setters
       reveal_type(d.setlistdefault('baz'))  # N: Revealed type is "builtins.list[builtins.str]"
-      d.setlistdefault('baz', [1])  # E: List item 0 has incompatible type "int"; expected "str"
+      d.setlistdefault('baz', [1])  # E: List item 0 has incompatible type "int"; expected "str"  [list-item]
       reveal_type(d.setlistdefault('baz', []))  # N: Revealed type is "builtins.list[builtins.str]"
       d.appendlist('baz', 'Baz')
-      d.appendlist('baz', 1)  # E: Argument 2 to "appendlist" of "MultiValueDict" has incompatible type "int"; expected "str"
+      d.appendlist('baz', 1)  # E: Argument 2 to "appendlist" of "MultiValueDict" has incompatible type "int"; expected "str"  [arg-type]
 
       # iterators
       # actually [('foo', 'Foo'), ('bar', [])]

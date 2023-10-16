@@ -2,7 +2,7 @@
     main: |
         from myapp.models import MyUser
         user = MyUser(name='user', gender='M')
-        user.get_name_display()  # E: "MyUser" has no attribute "get_name_display"; maybe "get_gender_display"?
+        user.get_name_display()  # E: "MyUser" has no attribute "get_name_display"; maybe "get_gender_display"?  [attr-defined]
         reveal_type(user.get_gender_display())  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
@@ -51,8 +51,8 @@
 -   case: get_next_by_get_previous_by_absent_if_null_true
     main: |
         from myapp.models import MyUser
-        MyUser().get_next_by_date()  # E: "MyUser" has no attribute "get_next_by_date"
-        MyUser().get_previous_by_date()  # E: "MyUser" has no attribute "get_previous_by_date"
+        MyUser().get_next_by_date()  # E: "MyUser" has no attribute "get_next_by_date"  [attr-defined]
+        MyUser().get_previous_by_date()  # E: "MyUser" has no attribute "get_previous_by_date"  [attr-defined]
     installed_apps:
         - myapp
     files:

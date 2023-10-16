@@ -30,7 +30,7 @@
 -   case: fail_if_there_is_no_setting
     main: |
         from django.conf import settings
-        settings.NOT_EXISTING  # E: 'Settings' object has no attribute 'NOT_EXISTING'
+        settings.NOT_EXISTING  # E: 'Settings' object has no attribute 'NOT_EXISTING'  [misc]
 
 -   case: override_default_setting_with_different_type_in_the_different_module
     custom_settings: |
@@ -55,8 +55,8 @@
           reveal_type(settings.NON_EXISTANT_SETTING)
     out: |
       main:3: note: Revealed type is "builtins.str"
-      main:4: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'
-      main:5: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'
+      main:4: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'  [misc]
+      main:5: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'  [misc]
       main:5: note: Revealed type is "Any"
 
 
@@ -70,7 +70,7 @@
 
         # Custom:
         reveal_type(settings.A)  # N: Revealed type is "Any"
-        reveal_type(settings.B)  # E: 'Settings' object has no attribute 'B' # N: Revealed type is "Any"
+        reveal_type(settings.B)  # E: 'Settings' object has no attribute 'B'  [misc] # N: Revealed type is "Any"
     custom_settings: |
         # Some code that mypy cannot analyze, but values exist in runtime:
         exec('A = 1')
@@ -89,8 +89,8 @@
         reveal_type(settings.SECRET_KEY)  # N: Revealed type is "builtins.str"
 
         # Custom:
-        reveal_type(settings.A)  # E: 'Settings' object has no attribute 'A' # N: Revealed type is "Any"
-        reveal_type(settings.B)  # E: 'Settings' object has no attribute 'B' # N: Revealed type is "Any"
+        reveal_type(settings.A)  # E: 'Settings' object has no attribute 'A'  [misc] # N: Revealed type is "Any"
+        reveal_type(settings.B)  # E: 'Settings' object has no attribute 'B'  [misc] # N: Revealed type is "Any"
     custom_settings: |
         # Some code that mypy cannot analyze, but values exist in runtime:
         exec('A = 1')

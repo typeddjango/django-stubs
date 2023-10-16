@@ -86,8 +86,8 @@
         req = mk_request()
         reveal_type(req)  # N: Revealed type is "django.http.request.HttpRequest"
         reveal_type(req.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
-        req.GET.setdefault('foo', 'bar')  # E: This QueryDict is immutable.
-        x = 1  # E: Statement is unreachable
+        req.GET.setdefault('foo', 'bar')  # E: This QueryDict is immutable.  [misc]
+        x = 1  # E: Statement is unreachable  [unreachable]
 
 -   case: request_get_post_unreachable
     main: |
@@ -104,5 +104,5 @@
         req = mk_request()
         reveal_type(req)  # N: Revealed type is "django.http.request.HttpRequest"
         reveal_type(req.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
-        req.GET['foo'] = 'bar'  # E: This QueryDict is immutable.
-        x = 1  # E: Statement is unreachable
+        req.GET['foo'] = 'bar'  # E: This QueryDict is immutable.  [misc]
+        x = 1  # E: Statement is unreachable  [unreachable]

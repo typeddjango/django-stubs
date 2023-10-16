@@ -218,9 +218,9 @@
         reveal_type(MyModel.objects.example_set())  # N: Revealed type is "builtins.set[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_list_dict())  # N: Revealed type is "builtins.list[builtins.dict[builtins.str, myapp.models.MyModel]]"
-        class TestQuerySet(BaseQuerySet[str]): ... # E: Type argument "str" of "BaseQuerySet" must be a subtype of "Model"
+        class TestQuerySet(BaseQuerySet[str]): ... # E: Type argument "str" of "BaseQuerySet" must be a subtype of "Model"  [type-var]
         reveal_type(MyModel.objects.example_t(5))  # N: Revealed type is "builtins.int"
-        MyModel.objects.example_arg(5, "5")  # E: Argument 1 to "example_arg" of "BaseQuerySet" has incompatible type "int"; expected "MyModel"
+        MyModel.objects.example_arg(5, "5")  # E: Argument 1 to "example_arg" of "BaseQuerySet" has incompatible type "int"; expected "MyModel"  [arg-type]
         reveal_type(MyModel.objects.example_arg(MyModel(), "5"))  # N: Revealed type is "myapp.models.MyModel"
     installed_apps:
         - myapp
