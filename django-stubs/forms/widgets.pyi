@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import Iterable, Iterator, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Sequence
 from typing import Any, Literal, Protocol
 
 from django.core.files.base import File
@@ -8,7 +8,7 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import _DataT, _FilesT
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _OptAttrs: TypeAlias = dict[str, Any]
 
@@ -39,6 +39,7 @@ class Widget(metaclass=MediaDefiningClass):
     supports_microseconds: bool
     attrs: _OptAttrs
     template_name: str
+    use_fieldset: bool
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
     @property
     def is_hidden(self) -> bool: ...
@@ -55,6 +56,7 @@ class Widget(metaclass=MediaDefiningClass):
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
     def id_for_label(self, id_: str) -> str: ...
     def use_required_attribute(self, initial: Any) -> bool: ...
+    def __deepcopy__(self, memo: MutableMapping[int, Self]) -> Self: ...
 
 class Input(Widget):
     input_type: str

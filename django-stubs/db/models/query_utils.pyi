@@ -1,6 +1,6 @@
 from collections import namedtuple
 from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar, overload
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
@@ -12,6 +12,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 from django.utils import tree
+from typing_extensions import Self
 
 PathInfo = namedtuple(
     "PathInfo", ["from_opts", "to_opts", "target_fields", "join_field", "m2m", "direct", "filtered_relation"]
@@ -42,9 +43,15 @@ class Q(tree.Node):
     ) -> WhereNode: ...
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
-class DeferredAttribute:
-    field: Field
-    def __init__(self, field: Field) -> None: ...
+_FT = TypeVar("_FT", bound=Field)
+
+class DeferredAttribute(Generic[_FT]):
+    field: _FT
+    def __init__(self, field: _FT) -> None: ...
+    @overload
+    def __get__(self, instance: None, cls: Any | None = None) -> Self: ...
+    @overload
+    def __get__(self, instance: Model, cls: Any | None = None) -> Self | _FT: ...
 
 _R = TypeVar("_R", bound=type)
 

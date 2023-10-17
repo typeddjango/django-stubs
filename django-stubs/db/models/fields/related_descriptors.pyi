@@ -16,7 +16,7 @@ _F = TypeVar("_F", bound=Field)
 _From = TypeVar("_From", bound=Model)
 _To = TypeVar("_To", bound=Model)
 
-class ForeignKeyDeferredAttribute(DeferredAttribute):
+class ForeignKeyDeferredAttribute(DeferredAttribute[RelatedField]):
     field: RelatedField
 
 class ForwardManyToOneDescriptor(Generic[_F]):

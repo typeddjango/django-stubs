@@ -1,5 +1,6 @@
 from .cookie import SimpleCookie as SimpleCookie
 from .cookie import parse_cookie as parse_cookie
+from .request import HttpHeaders as HttpHeaders
 from .request import HttpRequest as HttpRequest
 from .request import QueryDict as QueryDict
 from .request import RawPostDataException as RawPostDataException

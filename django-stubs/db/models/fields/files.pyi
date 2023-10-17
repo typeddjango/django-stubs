@@ -30,10 +30,9 @@ class FieldFile(File):
     @property
     def closed(self) -> bool: ...
 
-class FileDescriptor(DeferredAttribute):
+class FileDescriptor(DeferredAttribute[FileField]):
     field: FileField
     def __set__(self, instance: Model, value: Any | None) -> None: ...
-    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
 
 _M = TypeVar("_M", bound=Model, contravariant=True)
 
