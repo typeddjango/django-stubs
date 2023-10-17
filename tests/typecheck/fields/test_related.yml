@@ -47,8 +47,8 @@
         reveal_type(book.publisher_id)  # N: Revealed type is "uuid.UUID"
         book.publisher_id = '821850bb-c105-426f-b340-3974419d00ca'
         book.publisher_id = UUID('821850bb-c105-426f-b340-3974419d00ca')
-        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "List[int]", variable has type "Union[str, UUID]")
-        book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "Union[str, UUID]")
+        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "List[int]", variable has type "Union[str, UUID]")  [assignment]
+        book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "Union[str, UUID]")  [assignment]
     installed_apps:
         - myapp
     files:
@@ -154,7 +154,7 @@
     main: |
         from myapp.models import View
         reveal_type(View().app.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
-        View().app.unknown  # E: "App" has no attribute "unknown"
+        View().app.unknown  # E: "App" has no attribute "unknown"  [attr-defined]
     installed_apps:
         - myapp
         - myapp2
@@ -337,6 +337,7 @@
         from myapp.models import User
         reveal_type(User().friends)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.User]"
         reveal_type(User.friends.through.objects.get())  # N: Revealed type is "myapp.models.User_friends"
+        reveal_type(User.friends.through._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User_friends]"
         reveal_type(User.friends.through().from_user)  # N: Revealed type is "myapp.models.User"
         reveal_type(User.friends.through().from_user_id)  # N: Revealed type is "builtins.int"
         reveal_type(User.friends.through().to_user)  # N: Revealed type is "myapp.models.User"
@@ -392,15 +393,15 @@
         reveal_type(Book().publisher_id)  # N: Revealed type is "builtins.str"
         Book(publisher_id=1)
         Book(publisher_id='hello')
-        Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable]")
+        Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable]")  [misc]
         Book.objects.create(publisher_id=1)
         Book.objects.create(publisher_id='hello')
 
         reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int"
         Book2(publisher_id=1)
-        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
         Book2.objects.create(publisher_id=1)
-        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")
+        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
     installed_apps:
         - myapp
     files:
@@ -462,7 +463,7 @@
             content: |
                 from django.db import models
                 class Book(models.Model):
-                    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)  # E: Cannot find model 'Publisher' referenced in field 'publisher'
+                    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE)  # E: Cannot find model 'Publisher' referenced in field 'publisher'  [misc]
 
 
 -   case: test_foreign_key_field_without_backwards_relation
@@ -475,7 +476,7 @@
         reveal_type(publisher.books)
         reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
     out: |
-        main:6: error: "Publisher" has no attribute "books"; maybe "books2"?
+        main:6: error: "Publisher" has no attribute "books"; maybe "books2"?  [attr-defined]
         main:6: note: Revealed type is "Any"
     installed_apps:
         - myapp
@@ -734,7 +735,7 @@
                 class TransactionLog(models.Model):
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
-        myapp/models:11: error: Could not resolve manager type for "myapp.models.Transaction.objects"
+        myapp/models:11: error: Could not resolve manager type for "myapp.models.Transaction.objects"  [django-manager-missing]
         myapp/models:13: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
         myapp/models:15: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Transaction]"
         myapp/models:16: note: Revealed type is "Any"
@@ -866,7 +867,7 @@
     main: |
         from myapp.models import User
         reveal_type(User().purchases)  # N: Revealed type is "builtins.int"
-        User().purchases.filter()  # E: "int" has no attribute "filter"
+        User().purchases.filter()  # E: "int" has no attribute "filter"  [attr-defined]
     installed_apps:
         - myapp
     files:
@@ -960,7 +961,7 @@
             content: |
                 from django.db import models
                 class InstalledModel(models.Model):
-                    non_installed = models.ForeignKey(  # E: Cannot find model 'not_installed.NonInstalledModel' referenced in field 'non_installed'
+                    non_installed = models.ForeignKey(  # E: Cannot find model 'not_installed.NonInstalledModel' referenced in field 'non_installed'  [misc]
                         "not_installed.NonInstalledModel", on_delete=models.CASCADE
                     )
 -   case: test_foreign_key_to_as_string
@@ -1048,8 +1049,8 @@
         main:5: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         main:6: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         main:9: note: Revealed type is "myapp.models.MyModel"
-        main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")
-        main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")
+        main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")  [assignment]
+        main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")  [assignment]
     installed_apps:
         -   myapp
     files:
@@ -1088,6 +1089,7 @@
 
         reveal_type(MyModel.auto_through.through)
         reveal_type(MyModel.auto_through.through.mymodel)
+        reveal_type(MyModel.auto_through.through._default_manager)
 
         reveal_type(MyModel.other_again.through)
     out: |
@@ -1106,7 +1108,8 @@
         main:17: note: Revealed type is "builtins.int"
         main:19: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
         main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.MyModel, django.db.models.expressions.Combinable], myapp.models.MyModel]]"
-        main:22: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
+        main:21: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:23: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
     installed_apps:
         -   myapp
     files:
@@ -1192,8 +1195,8 @@
     out: |
         main:2: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[Any]"
         main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any]"
-        myapp/models/child:5: error: Need type annotation for "parents"
-        myapp/models/child:6: error: Need type annotation for "other_parents"
+        myapp/models/child:5: error: Need type annotation for "parents"  [var-annotated]
+        myapp/models/child:6: error: Need type annotation for "other_parents"  [var-annotated]
     installed_apps:
         -   myapp
     files:
@@ -1236,6 +1239,6 @@
                 from django.db import models
 
                 class MyModel(models.Model):
-                    field = models.ForeignKey("slef", on_delete=models.CASCADE)  # E: Cannot find model 'slef' referenced in field 'field'
-                    unknown = models.OneToOneField("unknown", on_delete=models.CASCADE)  # E: Cannot find model 'unknown' referenced in field 'unknown'
-                    bad = models.ManyToManyField("bad")  # E: Need type annotation for "bad"
+                    field = models.ForeignKey("slef", on_delete=models.CASCADE)  # E: Cannot find model 'slef' referenced in field 'field'  [misc]
+                    unknown = models.OneToOneField("unknown", on_delete=models.CASCADE)  # E: Cannot find model 'unknown' referenced in field 'unknown'  [misc]
+                    bad = models.ManyToManyField("bad")  # E: Need type annotation for "bad"  [var-annotated]

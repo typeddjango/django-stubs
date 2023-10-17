@@ -17,7 +17,7 @@
         @admin.display
         def display_property(self) -> str: ...
 
-        @admin.display  # E: Decorators on top of @property are not supported
+        @admin.display  # E: Decorators on top of @property are not supported  [misc]
         @property
         def incorrect_property(self) -> str: ...
 
@@ -79,10 +79,10 @@
     @admin.action
     def freestanding_action_file_response(modeladmin: "MyModelAdmin", request: HttpRequest, queryset: QuerySet[MyModel]) -> FileResponse: ...
 
-    @admin.action # E: Value of type variable "_ModelAdmin" of "action" cannot be "int"
+    @admin.action # E: Value of type variable "_ModelAdmin" of "action" cannot be "int"  [type-var]
     def freestanding_action_invalid_bare(modeladmin: int, request: HttpRequest, queryset: QuerySet[MyModel]) -> None: ...
 
-    @admin.action(description="Some text here", permissions=["test"]) # E: Value of type variable "_ModelAdmin" of function cannot be "int"
+    @admin.action(description="Some text here", permissions=["test"]) # E: Value of type variable "_ModelAdmin" of function cannot be "int"  [type-var]
     def freestanding_action_invalid_fancy(modeladmin: int, request: HttpRequest, queryset: QuerySet[MyModel]) -> None: ...
 
     @admin.register(MyModel)
@@ -101,10 +101,10 @@
         @admin.action(description="Some text here", permissions=["test"])
         def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[MyModel]) -> FileResponse: ...
 
-        @admin.action  # E: Value of type variable "_QuerySet" of "action" cannot be "int"
+        @admin.action  # E: Value of type variable "_QuerySet" of "action" cannot be "int"  [type-var]
         def method_action_invalid_bare(self, request: HttpRequest, queryset: int) -> None: ...
 
-        @admin.action(description="Some text here", permissions=["test"])  # E: Value of type variable "_QuerySet" of function cannot be "int"
+        @admin.action(description="Some text here", permissions=["test"])  # E: Value of type variable "_QuerySet" of function cannot be "int"  [type-var]
         def method_action_invalid_fancy(self, request: HttpRequest, queryset: int) -> None: ...
 
         def method(self) -> None:

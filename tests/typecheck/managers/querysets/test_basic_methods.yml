@@ -48,7 +48,7 @@
     main: |
         from myapp.models import User
         reveal_type(User.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
-        User.objects.not_existing_method()  # E: "Manager[User]" has no attribute "not_existing_method"
+        User.objects.not_existing_method()  # E: "Manager[User]" has no attribute "not_existing_method"  [attr-defined]
     installed_apps:
         - myapp
     files:

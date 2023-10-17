@@ -2158,17 +2158,6 @@ django.middleware.cache.CacheMiddleware.__init__
 django.middleware.cache.CacheMiddleware.cache
 django.middleware.cache.FetchFromCacheMiddleware.cache
 django.middleware.cache.UpdateCacheMiddleware.cache
-django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
-django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
-django.middleware.csrf.CsrfViewMiddleware.csrf_trusted_origins_hosts
-django.middleware.csrf.InvalidTokenFormat
-django.middleware.csrf.REASON_BAD_ORIGIN
-django.middleware.csrf.REASON_BAD_TOKEN
-django.middleware.csrf.REASON_CSRF_TOKEN_MISSING
-django.middleware.csrf.REASON_INCORRECT_LENGTH
-django.middleware.csrf.REASON_INVALID_CHARACTERS
-django.middleware.csrf.RejectRequest
-django.middleware.csrf.invalid_token_chars_re
 django.middleware.gzip.GZipMiddleware.max_random_bytes
 django.shortcuts.SupportsGetAbsoluteUrl
 django.template.Engine.template_context_processors
