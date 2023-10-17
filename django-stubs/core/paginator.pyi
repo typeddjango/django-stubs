@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
-from typing import Generic, Protocol, TypeVar, overload
+from typing import ClassVar, Generic, Protocol, TypeVar, overload
 
-from typing_extensions import TypeAlias
+from django.utils.functional import _StrPromise
 
 class UnorderedObjectListWarning(RuntimeWarning): ...
 class InvalidPage(Exception): ...
@@ -17,6 +17,7 @@ class _SupportsPagination(Protocol[_T], Sized, Iterable):
     def __getitem__(self, __index: slice) -> _SupportsPagination[_T]: ...
 
 class Paginator(Generic[_T]):
+    ELLIPSIS: ClassVar[_StrPromise]
     object_list: _SupportsPagination[_T]
     per_page: int
     orphans: int
@@ -41,8 +42,6 @@ class Paginator(Generic[_T]):
     def get_elided_page_range(
         self, number: int | float | str = ..., *, on_each_side: int = ..., on_ends: int = ...
     ) -> Iterator[str | int]: ...
-
-QuerySetPaginator: TypeAlias = Paginator
 
 class Page(Sequence[_T]):
     object_list: _SupportsPagination[_T]
