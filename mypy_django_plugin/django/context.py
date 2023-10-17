@@ -48,8 +48,8 @@ except ImportError:
 
 
 if TYPE_CHECKING:
-    from django.apps.registry import Apps  # noqa: F401
-    from django.conf import LazySettings  # noqa: F401
+    from django.apps.registry import Apps
+    from django.conf import LazySettings
     from django.contrib.contenttypes.fields import GenericForeignKey
 
 

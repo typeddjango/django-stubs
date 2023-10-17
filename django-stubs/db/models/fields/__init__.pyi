@@ -45,7 +45,7 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
