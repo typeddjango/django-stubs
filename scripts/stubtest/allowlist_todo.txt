@@ -968,12 +968,6 @@ django.core.paginator.Paginator.ELLIPSIS
 django.core.paginator.Paginator.count
 django.core.paginator.Paginator.num_pages
 django.core.paginator.QuerySetPaginator
-django.core.serializers.DeserializationError
-django.core.serializers.Deserializer
-django.core.serializers.M2MDeserializationError
-django.core.serializers.SerializationError
-django.core.serializers.Serializer
-django.core.serializers.base.PickleSerializer
 django.core.servers.basehttp.ServerHandler.__init__
 django.core.servers.basehttp.ThreadedWSGIServer.__init__
 django.core.signing.BASE62_ALPHABET
