@@ -795,7 +795,6 @@ django.contrib.sessions.base_session.AbstractBaseSession.get_previous_by_expire_
 django.contrib.sessions.base_session.AbstractBaseSession.session_data
 django.contrib.sessions.base_session.AbstractBaseSession.session_key
 django.contrib.sessions.base_session.BaseSessionManager.__slotnames__
-django.contrib.sessions.exceptions.SessionInterrupted
 django.contrib.sessions.management.commands.clearsessions.Command.handle
 django.contrib.sessions.models.Session.expire_date
 django.contrib.sessions.models.Session.get_next_by_expire_date
@@ -818,19 +817,8 @@ django.contrib.staticfiles.finders.FileSystemFinder.__init__
 django.contrib.staticfiles.management.commands.collectstatic
 django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
 django.contrib.staticfiles.storage
-django.core.cache.InvalidCacheKey
-django.core.cache.backends.db.DatabaseCache.pickle_protocol
-django.core.cache.backends.filebased.FileBasedCache.pickle_protocol
-django.core.cache.backends.locmem.LocMemCache.pickle_protocol
-django.core.cache.backends.memcached.BaseMemcachedCache.client_servers
-django.core.cache.backends.memcached.MemcachedCache
-django.core.cache.backends.memcached.PyLibMCCache.client_servers
 django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
-django.core.checks.templates.W001
-django.core.checks.templates.W003
-django.core.exceptions.FullResultSet
-django.core.exceptions.TooManyFilesSent
 django.core.files.File.__next__
 django.core.files.File.size
 django.core.files.base.ContentFile.size

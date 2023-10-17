@@ -111,6 +111,9 @@ django.views.generic.edit.BaseDeleteView.form_class
 # RemovedInDjango40:
 django.middleware.csrf.REASON_BAD_TOKEN
 
+# RemovedInDjango41
+django.core.cache.backends.memcached.MemcachedCache
+
 # We re-export `functools.cached_property` which has different semantics
 django.utils.functional.cached_property.__class_getitem__
 django.utils.functional.cached_property.__init__
