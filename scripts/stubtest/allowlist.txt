@@ -58,6 +58,7 @@ django.core.validators.EmailValidator.literal_regex
 django.core.validators.EmailValidator.user_regex
 django.core.validators.slug_re
 django.core.validators.slug_unicode_re
+django.core.validators.URLValidator.regex
 django.core.management.commands.makemessages.plural_forms_re
 django.http.request.host_validation_re
 django.middleware.csrf.invalid_token_chars_re

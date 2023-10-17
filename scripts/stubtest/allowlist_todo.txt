@@ -995,9 +995,6 @@ django.core.validators.ProhibitNullCharactersValidator.__new__
 django.core.validators.RegexValidator.__new__
 django.core.validators.StepValueValidator.__new__
 django.core.validators.URLValidator.__new__
-django.core.validators.URLValidator.regex
-django.core.validators.URLValidator.unsafe_chars
-django.core.validators.URLValidator.max_length
 django.db.backends.base.base.BaseDatabaseWrapper.SchemaEditorClass
 django.db.backends.base.base.BaseDatabaseWrapper.client_class
 django.db.backends.base.base.BaseDatabaseWrapper.close_if_health_check_failed
