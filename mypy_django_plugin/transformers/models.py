@@ -498,7 +498,7 @@ class AddReverseLookups(ModelClassInitializer):
                 try:
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
                         fullnames.RELATED_MANAGER_CLASS
-                    )  # noqa: E501
+                    )
                     default_manager = related_model_info.names.get("_default_manager")
                     if not default_manager:
                         raise helpers.IncompleteDefnException()
@@ -776,7 +776,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
             look_for["through"] = call.args[5]
 
         # Sort out if any of the expected arguments was provided as keyword arguments
-        for arg_expr, arg_kind, arg_name in zip(call.args, call.arg_kinds, call.arg_names):
+        for arg_expr, _arg_kind, arg_name in zip(call.args, call.arg_kinds, call.arg_names):
             if arg_name in look_for and look_for[arg_name] is None:
                 look_for[arg_name] = arg_expr
 

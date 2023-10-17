@@ -8,14 +8,12 @@ from django.db.models.expressions import Combinable
 from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _FieldChoices, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
-from django.db.models.fields.related_descriptors import (  # noqa: F401
-    ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
-)
+from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor as ForwardOneToOneDescriptor
 from django.db.models.fields.related_descriptors import ManyRelatedManager
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor as ManyToManyDescriptor
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor as ReverseManyToOneDescriptor
 from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor as ReverseOneToOneDescriptor
-from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignObjectRel  # noqa: F401
+from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignObjectRel
 from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyRel
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel

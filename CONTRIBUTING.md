@@ -55,7 +55,7 @@ pre-commit install
 
 ### Testing and Linting
 
-We use `mypy`, `pytest`, `flake8`, and `black` for quality control. All tools except pytest are executed using pre-commit when you make a commit.
+We use `mypy`, `pytest`, `ruff`, and `black` for quality control. `ruff` and `black` are executed using pre-commit when you make a commit.
 To ensure there are not formatting or typing issues in the entire repository you can run:
 
 ```bash

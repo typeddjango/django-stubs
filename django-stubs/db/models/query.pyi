@@ -215,7 +215,7 @@ class RawQuerySet(Iterable[_T], Sized):
     def resolve_model_init_order(self) -> tuple[list[str], list[int], list[tuple[str, int]]]: ...
     def using(self, alias: str | None) -> RawQuerySet[_T]: ...
 
-_QuerySetAny: TypeAlias = _QuerySet  # noqa: Y047
+_QuerySetAny: TypeAlias = _QuerySet  # noqa: PYI047
 
 QuerySet: TypeAlias = _QuerySet[_T, _T]
 

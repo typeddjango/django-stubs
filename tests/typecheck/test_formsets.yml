@@ -4,7 +4,7 @@
     from django import forms
     from myapp.models import Article, Category
     ArticleFS: Type[forms.BaseInlineFormSet[Article, Category, Any]] = forms.inlineformset_factory(Category, Article)
-    ArticleFS(instance=Article())  # E: Argument "instance" to "BaseInlineFormSet" has incompatible type "Article"; expected "Optional[Category]"
+    ArticleFS(instance=Article())  # E: Argument "instance" to "BaseInlineFormSet" has incompatible type "Article"; expected "Optional[Category]"  [arg-type]
     fs = ArticleFS(instance=Category())
     reveal_type(fs.instance)  # N: Revealed type is "myapp.models.Category"
   installed_apps:

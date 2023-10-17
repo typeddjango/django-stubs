@@ -9,6 +9,7 @@ ignore-words-list = "aadd,acount,nam"
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 extend-exclude = [
+    ".*/",
     "django-source",
     "stubgen",
     "out",
@@ -17,12 +18,35 @@ line-length = 120
 target-version = "py38"
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
 select = [
+    "B",        # bugbear
+    "E",        # pycodestyle
+    "F",        # pyflakes
+    "INP",      # flake8-tidy-imports
+    "W",        # pycodestyle
     "I",        # isort
-    "F401",     # Unused imports
     "UP",       # pyupgrade
     "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
+    "PYI",      # flake8-pyi
+    "RUF100",   # Equivalent to flake8-noqa NQA103
+    "PGH004",   # Equivalent to flake8-noqa NQA104
     "PGH003",   # Disallowed blanket `type: ignore` annotations.
 ]
+ignore = ["PYI021", "PYI024", "PYI041", "PYI043"]
+
+[tool.ruff.per-file-ignores]
+"*.pyi" = [
+    "B",
+    "E501",
+    "E741",
+    "E743",
+    "F403", # Use wildcard import
+    "F405",
+    "F822",
+    "F821",
+]
+"tests/*.py" = ["INP001"]
+"ext/tests/*.py" = ["INP001"]
+"setup.py" = ["INP001"]
 
 [tool.ruff.flake8-tidy-imports.banned-api]
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."

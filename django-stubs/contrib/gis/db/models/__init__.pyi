@@ -1,4 +1,3 @@
-# noqa: F401
 from django.contrib.gis.db.models.aggregates import *
 from django.contrib.gis.db.models.fields import GeometryCollectionField as GeometryCollectionField
 from django.contrib.gis.db.models.fields import GeometryField as GeometryField

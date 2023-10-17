@@ -1,11 +1,5 @@
 from collections.abc import Iterable, Sequence
-from typing import (  # noqa: Y037   # https://github.com/python/mypy/issues/12211
-    Any,
-    Generic,
-    Literal,
-    TypeVar,
-    overload,
-)
+from typing import Any, Generic, Literal, TypeVar, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -27,8 +21,7 @@ EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
-# https://github.com/python/mypy/issues/12211
-_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: Y047
+_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: PYI047
 
 @overload
 def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> tuple[tuple[str, ...], ...]: ...

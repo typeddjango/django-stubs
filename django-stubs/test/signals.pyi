@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.core.signals import setting_changed as setting_changed  # noqa: F401
+from django.core.signals import setting_changed as setting_changed
 
 template_rendered: Any
 COMPLEX_OVERRIDE_SETTINGS: Any
