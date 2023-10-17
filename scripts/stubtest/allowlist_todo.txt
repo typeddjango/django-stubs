@@ -960,7 +960,6 @@ django.core.management.commands.sqlflush.Command.handle
 django.core.management.commands.squashmigrations.Command.handle
 django.core.management.commands.startapp.Command.handle
 django.core.management.commands.startproject.Command.handle
-django.core.management.templates.TemplateCommand.apply_umask
 django.core.management.utils.find_formatters
 django.core.management.utils.run_formatters
 django.core.management.utils.sentinel
