@@ -2,7 +2,22 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Literal, Optional, Sequence, Set, Tuple, Type, Union
+from functools import cached_property
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -13,7 +28,6 @@ from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
-from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
@@ -29,7 +43,7 @@ try:
     from django.contrib.postgres.fields import ArrayField
 except ImportError:
 
-    class ArrayField:  # type: ignore
+    class ArrayField:  # type: ignore[no-redef]
         pass
 
 
@@ -60,11 +74,11 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.get_swappable_settings_name.cache_clear()  # type: ignore[attr-defined]
         apps.clear_cache()
 
         if not settings.configured:
-            settings._setup()  # type: ignore
+            settings._setup()  # type: ignore[misc]
         apps.populate(settings.INSTALLED_APPS)
 
     assert apps.apps_ready, "Apps are not ready"
@@ -222,7 +236,12 @@ class DjangoContext:
                         expected_types[field_name] = AnyType(TypeOfAny.unannotated)
                         continue
 
-                    related_model = self.get_field_related_model_cls(field)
+                    try:
+                        related_model = self.get_field_related_model_cls(field)
+                    except UnregisteredModelError:
+                        # Recognise the field but don't say anything about its type..
+                        expected_types[field_name] = AnyType(TypeOfAny.from_error)
+                        continue
 
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
@@ -270,6 +289,14 @@ class DjangoContext:
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
 
+    @cached_property
+    def model_class_fullnames_by_label(self) -> Mapping[str, str]:
+        return {
+            klass._meta.label: helpers.get_class_fullname(klass)
+            for klass in self.all_registered_model_classes
+            if klass is not models.Model
+        }
+
     def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: Optional[str]) -> bool:
         if method in ("values", "values_list"):
             return field.null
@@ -293,7 +320,12 @@ class DjangoContext:
         """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
-            target_field = field.target_field
+            try:
+                # We gotta be careful for exceptions when we're triggering '__get__'.
+                # Related model could very well be unresolvable
+                target_field = field.target_field
+            except ValueError:
+                return AnyType(TypeOfAny.from_error)
 
         field_info = helpers.lookup_class_typeinfo(api, target_field.__class__)
         if field_info is None:
@@ -338,7 +370,7 @@ class DjangoContext:
             related_model_cls = field.field.model
 
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":  # type: ignore
+            if related_model_cls == "self":  # type: ignore[unreachable]
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:

@@ -5,8 +5,9 @@ from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression, NameExpr
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression
 from mypy.plugin import FunctionContext, MethodContext
+from mypy.semanal_shared import parse_bool
 from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
@@ -146,9 +147,11 @@ def get_values_list_row_type(
 
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
-    assert isinstance(ctx.type, Instance)
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_return_type
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        return ctx.default_return_type
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -159,14 +162,14 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         return default_return_type
 
     flat_expr = helpers.get_call_argument_by_name(ctx, "flat")
-    if flat_expr is not None and isinstance(flat_expr, NameExpr):
-        flat = helpers.parse_bool(flat_expr)
+    if flat_expr is not None:
+        flat = parse_bool(flat_expr)
     else:
         flat = False
 
     named_expr = helpers.get_call_argument_by_name(ctx, "named")
-    if named_expr is not None and isinstance(named_expr, NameExpr):
-        named = helpers.parse_bool(named_expr)
+    if named_expr is not None:
+        named = parse_bool(named_expr)
     else:
         named = False
 
@@ -204,9 +207,11 @@ def gather_kwargs(ctx: MethodContext) -> Optional[Dict[str, MypyType]]:
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on the Instance, returns QuerySet of something
-    assert isinstance(ctx.type, Instance)
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_return_type
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        return ctx.default_return_type
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:
@@ -269,9 +274,11 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: Dj
 
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     # called on QuerySet, return QuerySet of something
-    assert isinstance(ctx.type, Instance)
+    if not isinstance(ctx.type, Instance):
+        return ctx.default_return_type
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        return ctx.default_return_type
 
     model_type = _extract_model_type_from_queryset(ctx.type)
     if model_type is None:

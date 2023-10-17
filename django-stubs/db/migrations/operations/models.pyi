@@ -28,7 +28,7 @@ class CreateModel(ModelOperation):
         name: str,
         fields: list[tuple[str, Field]],
         options: dict[str, Any] | None = ...,
-        bases: Sequence[type[Model] | str] | None = ...,
+        bases: Sequence[type[Any] | str] | None = ...,
         managers: Sequence[tuple[str, Manager]] | None = ...,
     ) -> None: ...
 

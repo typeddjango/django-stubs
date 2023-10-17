@@ -44,7 +44,7 @@ source .venv/bin/activate
 Then install the dev requirements:
 
 ```bash
-pip install -r ./requirements.txt
+SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 ```
 
 Finally, install the pre-commit hooks:
@@ -88,7 +88,7 @@ We have two special files to allow errors:
 You might also want to disable `incremental` mode while working on `stubtest` changes.
 This mode leads to several known problems (stubs do not show up or have strange errors).
 
-**Important**: right now we only run `stubtest` on Python 3.11 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
+**Important**: right now we only run `stubtest` on Python 3.12 (because it is the latest released version at the moment), any other versions might generate different outputs. Any work to create per-version allowlists is welcome.
 
 ## Submission Guidelines
 
@@ -108,7 +108,7 @@ For instance, the statement `class SomeClass(SuperType[int])` implicitly transla
 If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code passes type checking.
 
 When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error.
-If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/django_stubs_ext/django_stubs_ext/patch.py).
+If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/ext/django_stubs_ext/patch.py).
 
 ## Private attributes
 

@@ -10,6 +10,7 @@ ERROR_404_TEMPLATE_NAME: str
 ERROR_403_TEMPLATE_NAME: str
 ERROR_400_TEMPLATE_NAME: str
 ERROR_500_TEMPLATE_NAME: str
+ERROR_PAGE_TEMPLATE: str
 
 def page_not_found(
     request: HttpRequest, exception: Exception | None, template_name: str = ...

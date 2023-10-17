@@ -402,8 +402,8 @@
     installed_apps:
         - myapp
     out: |
-        myapp/models:5: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"
-        myapp/models:6: error: Incompatible return value type (got "_T", expected "MyModel")
+        myapp/models:5: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"  [override]
+        myapp/models:6: error: Incompatible return value type (got "_T", expected "MyModel")  [return-value]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -537,13 +537,13 @@
                     reveal_type(user.booking_set.all().custom)
                     reveal_type(user.booking_set.all().first())
     out: |
-        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).
-        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).
-        myapp/models:20: error: Could not resolve manager type for "myapp.models.Booking.objects"
-        myapp/models:23: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.objects"
-        myapp/models:24: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.second_objects"
-        myapp/models:27: error: Could not resolve manager type for "myapp.models.AbstractUnresolvable.objects"
-        myapp/models:32: error: Could not resolve manager type for "myapp.models.InvisibleUnresolvable.objects"
+        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).  [django-manager-missing]
+        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).  [django-manager-missing]
+        myapp/models:20: error: Could not resolve manager type for "myapp.models.Booking.objects"  [django-manager-missing]
+        myapp/models:23: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.objects"  [django-manager-missing]
+        myapp/models:24: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.second_objects"  [django-manager-missing]
+        myapp/models:27: error: Could not resolve manager type for "myapp.models.AbstractUnresolvable.objects"  [django-manager-missing]
+        myapp/models:32: error: Could not resolve manager type for "myapp.models.InvisibleUnresolvable.objects"  [django-manager-missing]
         myapp/models:36: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
         myapp/models:37: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
         myapp/models:39: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Booking]"
@@ -610,7 +610,7 @@
     out: |
         main:2: note: Revealed type is "myapp.models.MySubManager"
         main:3: note: Revealed type is "Any"
-        myapp/models:9: error: Missing type parameters for generic type "MyManager"
+        myapp/models:9: error: Missing type parameters for generic type "MyManager"  [type-arg]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
