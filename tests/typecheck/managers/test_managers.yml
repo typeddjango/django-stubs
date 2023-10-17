@@ -126,7 +126,7 @@
 -   case: test_leave_as_is_if_objects_is_set_and_fill_typevars_with_outer_class
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.UserManager[myapp.models.MyUser]"
+        reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.UserManager"
         reveal_type(MyUser.objects.get())  # N: Revealed type is "myapp.models.MyUser"
         reveal_type(MyUser.objects.get_or_404())  # N: Revealed type is "myapp.models.MyUser"
     installed_apps:
@@ -169,9 +169,9 @@
     main: |
         from myapp.models import AbstractPerson, Book
         reveal_type(AbstractPerson.abstract_persons)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.AbstractPerson]"
-        reveal_type(Book.published_objects)  # N: Revealed type is "myapp.models.PublishedBookManager[myapp.models.Book]"
+        reveal_type(Book.published_objects)  # N: Revealed type is "myapp.models.PublishedBookManager"
         Book.published_objects.create(title='hello')
-        reveal_type(Book.annotated_objects)  # N: Revealed type is "myapp.models.AnnotatedBookManager[myapp.models.Book]"
+        reveal_type(Book.annotated_objects)  # N: Revealed type is "myapp.models.AnnotatedBookManager"
         Book.annotated_objects.create(title='hello')
     installed_apps:
         - myapp
@@ -196,20 +196,33 @@
     main: |
         from myapp.models import AbstractBase1, AbstractBase2, Child
         reveal_type(Child.manager1)
+        reveal_type(Child.manager1.get())
         reveal_type(Child.restricted)
+        reveal_type(Child.restricted.get())
+        reveal_type(Child.manager3)
+        reveal_type(Child.manager3.get())
         reveal_type(AbstractBase1.manager1)
+        reveal_type(AbstractBase1.manager1.get())
         reveal_type(AbstractBase2.restricted)
+        reveal_type(AbstractBase2.restricted.get())
     out: |
-        main:2: note: Revealed type is "myapp.models.CustomManager1[myapp.models.Child]"
-        main:3: note: Revealed type is "myapp.models.CustomManager2[myapp.models.Child]"
-        main:4: note: Revealed type is "myapp.models.CustomManager1[myapp.models.AbstractBase1]"
-        main:5: note: Revealed type is "myapp.models.CustomManager2[myapp.models.AbstractBase2]"
+        main:2: note: Revealed type is "myapp.models.CustomManager1"
+        main:3: note: Revealed type is "myapp.models.AbstractBase1"
+        main:4: note: Revealed type is "myapp.models.CustomManager2"
+        main:5: note: Revealed type is "myapp.models.AbstractBase2"
+        main:6: note: Revealed type is "myapp.models.GenericManager[myapp.models.Child]"
+        main:7: note: Revealed type is "myapp.models.Child"
+        main:8: note: Revealed type is "myapp.models.CustomManager1"
+        main:9: note: Revealed type is "myapp.models.AbstractBase1"
+        main:10: note: Revealed type is "myapp.models.CustomManager2"
+        main:11: note: Revealed type is "myapp.models.AbstractBase2"
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import TypeVar
                 from django.db import models
                 class CustomManager1(models.Manager['AbstractBase1']):
                     pass
@@ -225,8 +238,15 @@
                         abstract = True
                     value = models.CharField(max_length=50)
                     restricted = CustomManager2()
+                T = TypeVar("T", bound="AbstractBase3")
+                class GenericManager(models.Manager[T]):
+                    ...
+                class AbstractBase3(models.Model):
+                    class Meta:
+                        abstract = True
+                    manager3 = GenericManager()
 
-                class Child(AbstractBase1, AbstractBase2):
+                class Child(AbstractBase1, AbstractBase2, AbstractBase3):
                     pass
 
 -   case: model_has_a_manager_of_the_same_type
@@ -639,7 +659,7 @@
     installed_apps:
         - myapp
     out: |
-        main:2: note: Revealed type is "myapp.models.MyModel.MyManager[myapp.models.MyModel]"
+        main:2: note: Revealed type is "myapp.models.MyModel.MyManager"
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
