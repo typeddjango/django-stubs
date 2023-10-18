@@ -37,7 +37,7 @@
             @transaction.atomic(using="db", savepoint=True)
             def atomic_method3(self, myparam: str) -> int:
                 pass
-        ClassWithAtomicMethod().atomic_method1("abc") # E: Argument 1 to "atomic_method1" of "ClassWithAtomicMethod" has incompatible type "str"; expected "int"
+        ClassWithAtomicMethod().atomic_method1("abc") # E: Argument 1 to "atomic_method1" of "ClassWithAtomicMethod" has incompatible type "str"; expected "int"  [arg-type]
         # Ensure that the method's type is preserved
         reveal_type(ClassWithAtomicMethod().atomic_method1) # N: Revealed type is "def (abc: builtins.int) -> builtins.str"
         # Ensure that the method's type is preserved

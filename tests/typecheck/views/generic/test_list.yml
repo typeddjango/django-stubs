@@ -47,6 +47,6 @@
                 class Other(models.Model):
                     ...
     out: |
-      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "MultipleObjectMixin" defined the type as "Optional[Type[Other]]")
-      main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "MultipleObjectMixin" defined the type as "Optional[_SupportsPagination[Other]]")
-      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_SupportsPagination[Other]" in supertype "MultipleObjectMixin"
+      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "MultipleObjectMixin" defined the type as "Optional[Type[Other]]")  [assignment]
+      main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "MultipleObjectMixin" defined the type as "Optional[_SupportsPagination[Other]]")  [assignment]
+      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_SupportsPagination[Other]" in supertype "MultipleObjectMixin"  [override]

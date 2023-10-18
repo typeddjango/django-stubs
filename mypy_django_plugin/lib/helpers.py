@@ -10,8 +10,10 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
     MDEF,
+    AssignmentStmt,
     Block,
     ClassDef,
+    Context,
     Expression,
     MemberExpr,
     MypyFile,
@@ -33,7 +35,8 @@ from mypy.plugin import (
     SemanticAnalyzerPluginInterface,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
+from mypy.semanal_shared import parse_bool
+from mypy.types import AnyType, Instance, LiteralType, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 from typing_extensions import TypedDict
 
@@ -45,12 +48,14 @@ if TYPE_CHECKING:
 
 
 class DjangoTypeMetadata(TypedDict, total=False):
+    is_abstract_model: bool
     from_queryset_manager: str
     reverse_managers: Dict[str, str]
     baseform_bases: Dict[str, int]
     manager_bases: Dict[str, int]
     model_bases: Dict[str, int]
     queryset_bases: Dict[str, int]
+    m2m_throughs: Dict[str, str]
 
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
@@ -385,3 +390,61 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
     if sym is not None and isinstance(sym.node, TypeInfo):
         bases = get_django_metadata_bases(sym.node, "manager_bases")
         bases[fullname] = 1
+
+
+def is_abstract_model(model: TypeInfo) -> bool:
+    if model.metaclass_type is None or model.metaclass_type.type.fullname != fullnames.MODEL_METACLASS_FULLNAME:
+        return False
+
+    metadata = get_django_metadata(model)
+    if metadata.get("is_abstract_model") is not None:
+        return metadata["is_abstract_model"]
+
+    meta = model.names.get("Meta")
+    # Check if 'abstract' is declared in this model's 'class Meta' as
+    # 'abstract = True' won't be inherited from a parent model.
+    if meta is not None and isinstance(meta.node, TypeInfo) and "abstract" in meta.node.names:
+        for stmt in meta.node.defn.defs.body:
+            if (
+                # abstract =
+                isinstance(stmt, AssignmentStmt)
+                and len(stmt.lvalues) == 1
+                and isinstance(stmt.lvalues[0], NameExpr)
+                and stmt.lvalues[0].name == "abstract"
+            ):
+                # abstract = True (builtins.bool)
+                rhs_is_true = parse_bool(stmt.rvalue) is True
+                # abstract: Literal[True]
+                is_literal_true = isinstance(stmt.type, LiteralType) and stmt.type.value is True
+                metadata["is_abstract_model"] = rhs_is_true or is_literal_true
+                return metadata["is_abstract_model"]
+
+    metadata["is_abstract_model"] = False
+    return False
+
+
+def resolve_lazy_reference(
+    reference: str, *, api: Union[TypeChecker, SemanticAnalyzer], django_context: "DjangoContext", ctx: Context
+) -> Optional[TypeInfo]:
+    """
+    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
+    'TypeInfo' instance.
+    """
+    if "." not in reference:
+        # <object_name> -- needs prefix of <app_label>. We can't implicitly solve
+        # what app label this should be, yet.
+        return None
+
+    # Reference conforms to the structure of a lazy reference: '<app_label>.<object_name>'
+    fullname = django_context.model_class_fullnames_by_label.get(reference)
+    if fullname is not None:
+        model_info = lookup_fully_qualified_typeinfo(api, fullname)
+        if model_info is not None:
+            return model_info
+        elif isinstance(api, SemanticAnalyzer) and not api.final_iteration:
+            # Getting this far, where Django matched the reference but we still can't
+            # find it, we want to defer
+            api.defer()
+    else:
+        api.fail("Could not match lazy reference with any model", ctx)
+    return None
