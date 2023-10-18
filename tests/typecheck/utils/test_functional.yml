@@ -27,6 +27,11 @@
       class Quux(Foo):
           attr: ClassVar[List[str]] = []
 
+      # ClassVar may not be overridden by cached_property
+      class Baz(Quux):
+          @cached_property
+          def attr(self) -> List[str]: ...  # E: Cannot override writeable attribute with read-only property  [override]
+
 -   case: str_promise_proxy
     main:  |
       from typing import Union
