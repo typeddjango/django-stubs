@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.db import models
 from django.db.models.base import Model
@@ -15,7 +15,7 @@ class ContentType(models.Model):
     id: int
     app_label: models.CharField
     model: models.CharField
-    objects: ContentTypeManager
+    objects: ClassVar[ContentTypeManager]
     @property
     def name(self) -> str: ...
     def model_class(self) -> type[Model] | None: ...

@@ -32,25 +32,12 @@ from mypy_django_plugin.transformers.managers import (
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
+    MetaclassAdjustments,
     handle_annotated_type,
     process_model_class,
     set_auth_user_model_boolean_fields,
 )
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
-
-
-def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MODEL_CLASS_FULLNAME)
-
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata_bases(sym.node, "model_bases")
-        bases[ctx.cls.fullname] = 1
-    else:
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-            return
-
-    process_model_class(ctx, django_context)
 
 
 def transform_form_class(ctx: ClassDefContext) -> None:
@@ -90,15 +77,6 @@ class NewSemanalDjangoPlugin(Plugin):
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
             bases = helpers.get_django_metadata_bases(model_sym.node, "manager_bases")
             bases[fullnames.MANAGER_CLASS_FULLNAME] = 1
-            return bases
-        else:
-            return {}
-
-    def _get_current_model_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "model_bases")
-            bases[fullnames.MODEL_CLASS_FULLNAME] = 1
             return bases
         else:
             return {}
@@ -149,7 +127,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return []
         deps = set()
 
-        for model_class in defined_model_classes:
+        for model_class in defined_model_classes.values():
             for field in itertools.chain(
                 # forward relations
                 self.django_context.get_model_related_fields(model_class),
@@ -186,12 +164,13 @@ class NewSemanalDjangoPlugin(Plugin):
 
             if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+
         return None
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
         class_fullname, _, method_name = fullname.rpartition(".")
-        # It is looked up very often, specialcase this method for minor speed up
-        if method_name == "__init_subclass__":
+        # Methods called very often -- short circuit for minor speed up
+        if method_name == "__init_subclass__" or fullname.startswith("builtins."):
             return None
 
         if class_fullname.endswith("QueryDict"):
@@ -244,6 +223,9 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        if fullname == fullnames.MODEL_CLASS_FULLNAME:
+            return MetaclassAdjustments.adjust_model_class
+
         sym = self.lookup_fully_qualified(fullname)
         if (
             sym is not None
@@ -256,11 +238,14 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
+        sym = self.lookup_fully_qualified(fullname)
         if (
-            fullname in self.django_context.all_registered_model_class_fullnames
-            or fullname in self._get_current_model_bases()
+            sym is not None
+            and isinstance(sym.node, TypeInfo)
+            and sym.node.metaclass_type is not None
+            and sym.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
         ):
-            return partial(transform_model_class, django_context=self.django_context)
+            return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Manager class definition
         if fullname in self._get_current_manager_bases():

@@ -4,7 +4,7 @@ from gettext import NullTranslations
 from re import Pattern
 
 # switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
-from typing import Any, Literal, Protocol, TypeVar  # noqa: Y022
+from typing import Any, Literal, Protocol, TypeVar
 
 from django.http.request import HttpRequest
 from typing_extensions import TypeAlias

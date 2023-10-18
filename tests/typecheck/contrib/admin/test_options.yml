@@ -108,17 +108,17 @@
 
       class A(admin.ModelAdmin):
           fieldsets = [
-              (None, {}),  # E: Missing key "fields" for TypedDict "_FieldOpts"
+              (None, {}),  # E: Missing key "fields" for TypedDict "_FieldOpts"  [typeddict-item]
           ]
 -   case: errors_on_invalid_radio_fields
     main: |
       from django.contrib import admin
 
       class A(admin.ModelAdmin):
-          radio_fields = {"some_field": 0}  # E: Dict entry 0 has incompatible type "str": "Literal[0]"; expected "str": "Literal[1, 2]"
+          radio_fields = {"some_field": 0}  # E: Dict entry 0 has incompatible type "str": "Literal[0]"; expected "str": "Literal[1, 2]"  [dict-item]
 
       class B(admin.ModelAdmin):
-          radio_fields = {1: admin.VERTICAL}  # E: Dict entry 0 has incompatible type "int": "Literal[2]"; expected "str": "Literal[1, 2]"
+          radio_fields = {1: admin.VERTICAL}  # E: Dict entry 0 has incompatible type "int": "Literal[2]"; expected "str": "Literal[1, 2]"  [dict-item]
 -   case: errors_for_invalid_formfield_overrides
     main: |
       from django.contrib import admin
@@ -126,7 +126,7 @@
 
       class A(admin.ModelAdmin):
           formfield_overrides = {
-              "not a field": {  # E: Dict entry 0 has incompatible type "str": "Dict[str, Any]"; expected "Type[Field[Any, Any]]": "Mapping[str, Any]"
+              "not a field": {  # E: Dict entry 0 has incompatible type "str": "Dict[str, Any]"; expected "Type[Field[Any, Any]]": "Mapping[str, Any]"  [dict-item]
                   "widget": Textarea
               }
           }
@@ -140,7 +140,7 @@
           pass
 
       class A(admin.ModelAdmin):
-          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[Any, HttpRequest, _QuerySet[Any, Any]], Optional[HttpResponseBase]], str]"
+          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[Any, HttpRequest, _QuerySet[Any, Any]], Optional[HttpResponseBase]], str]"  [list-item]
 -   case: errors_for_invalid_model_admin_generic
     main: |
       from django.contrib.admin import ModelAdmin
@@ -150,4 +150,4 @@
           pass
 
       class A(ModelAdmin[TestModel]):
-          model = int  # E: Incompatible types in assignment (expression has type "Type[int]", base class "ModelAdmin" defined the type as "Type[TestModel]")
+          model = int  # E: Incompatible types in assignment (expression has type "Type[int]", base class "ModelAdmin" defined the type as "Type[TestModel]")  [assignment]

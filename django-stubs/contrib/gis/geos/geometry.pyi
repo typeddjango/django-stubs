@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
@@ -143,3 +144,4 @@ class LinearGeometryMixin:
 
 class GEOSGeometry(GEOSGeometryBase, ListMixin):
     def __init__(self, geo_input: Any, srid: int | None = ...) -> None: ...
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...

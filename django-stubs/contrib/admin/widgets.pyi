@@ -54,7 +54,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def label_and_url_for_value(self, value: Any) -> tuple[str, str]: ...
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
-    rel: ManyToManyRel  # type: ignore
+    rel: ManyToManyRel  # type: ignore[assignment]
     def __init__(
         self,
         rel: ManyToManyRel,

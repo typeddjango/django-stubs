@@ -6,16 +6,18 @@
       class Foo:
           @cached_property
           def attr(self) -> List[str]: ...
+          @cached_property  # E: Argument 1 to "cached_property" has incompatible type "Callable[[Foo, str], List[str]]"; expected "Callable[[Any], List[str]]"  [arg-type]
+          def attr2(self, arg2: str) -> List[str]: ...
 
           reveal_type(attr)      # N: Revealed type is "django.utils.functional.cached_property[builtins.list[builtins.str]]"
           reveal_type(attr.name) # N: Revealed type is "Union[builtins.str, None]"
 
       reveal_type(Foo.attr)      # N: Revealed type is "django.utils.functional.cached_property[builtins.list[builtins.str]]"
-      reveal_type(Foo.attr.func) # N: Revealed type is "def (*Any, **Any) -> builtins.list[builtins.str]"
+      reveal_type(Foo.attr.func) # N: Revealed type is "def (Any) -> builtins.list[builtins.str]"
 
       f = Foo()
       reveal_type(f.attr)        # N: Revealed type is "builtins.list[builtins.str]"
-      f.attr.name                # E: "List[str]" has no attribute "name"
+      f.attr.name                # E: "List[str]" has no attribute "name"  [attr-defined]
 
 -   case: str_promise_proxy
     main:  |
@@ -31,7 +33,7 @@
       reveal_type(s.capitalize())    # N: Revealed type is "builtins.str"
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
       reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> Tuple[builtins.str]"
-      s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"
+      s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"  [attr-defined]
       f: Union[_StrPromise, str]
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
@@ -47,7 +49,7 @@
       def bar(content: Promise) -> None:
         ...
 
-      foo(s)                         # E: Argument 1 to "foo" has incompatible type "_StrPromise"; expected "str"
+      foo(s)                         # E: Argument 1 to "foo" has incompatible type "_StrPromise"; expected "str"  [arg-type]
       bar(s)
 
 -   case: classproperty_usage

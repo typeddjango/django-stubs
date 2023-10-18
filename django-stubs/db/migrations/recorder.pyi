@@ -1,14 +1,17 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
+from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
+from typing_extensions import Self
 
 class MigrationRecorder:
     class Migration(Model):
         app: Any
         name: Any
         applied: Any
+        objects: ClassVar[Manager[Self]]
     connection: BaseDatabaseWrapper
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
     @property

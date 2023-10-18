@@ -1,7 +1,7 @@
 from typing import Any
 
 from django import forms
-from django.db.models.fields import _ErrorMessagesT
+from django.db.models.fields import _ErrorMessagesDict
 from django.forms.widgets import MultiWidget, _OptAttrs
 from psycopg2.extras import Range
 
@@ -13,7 +13,7 @@ class HiddenRangeWidget(RangeWidget):
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
 
 class BaseRangeField(forms.MultiValueField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: type[forms.Field]
     range_type: type[Range]
     hidden_widget: type[forms.Widget]
@@ -22,21 +22,21 @@ class BaseRangeField(forms.MultiValueField):
     def compress(self, values: tuple[Any | None, Any | None]) -> Range | None: ...
 
 class IntegerRangeField(BaseRangeField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: type[forms.Field]
     range_type: type[Range]
 
 class DecimalRangeField(BaseRangeField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: type[forms.Field]
     range_type: type[Range]
 
 class DateTimeRangeField(BaseRangeField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: type[forms.Field]
     range_type: type[Range]
 
 class DateRangeField(BaseRangeField):
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: type[forms.Field]
     range_type: type[Range]

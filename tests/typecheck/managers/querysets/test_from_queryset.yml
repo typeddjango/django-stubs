@@ -70,6 +70,41 @@
                 NewManager = BaseManager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
                     objects = NewManager()
+-   case: handles_subclasses_of_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/querysets.py
+            content: |
+                from typing import TypeVar, TYPE_CHECKING
+
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                _CTE = TypeVar("_CTE", bound=models.Model)
+
+                class _MyModelQuerySet(models.QuerySet[_CTE]):
+
+                    def example(self) -> _CTE: ...
+
+                class MyModelQuerySet(_MyModelQuerySet["MyModel"]):
+                    ...
+
+        - path: myapp/models.py
+          content: |
+            from django.db import models
+            from django.db.models.manager import BaseManager
+            from .querysets import MyModelQuerySet
+
+            NewManager = BaseManager.from_queryset(MyModelQuerySet)
+            class MyModel(models.Model):
+                objects = NewManager()
 
 -   case: from_queryset_generated_manager_imported_from_other_module
     main: |
@@ -339,17 +374,33 @@
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+
+        # Overloads
+        reveal_type(MyModel.objects.overloaded_method(1))  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel.objects.overloaded_method('a'))  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import Union, overload
                 from django.db import models
 
                 class ModelQuerySet(models.QuerySet):
                     def queryset_method(self) -> str:
                         return 'hello'
+
+                    @overload
+                    def overloaded_method(self, arg: int) -> int: ...
+
+                    @overload
+                    def overloaded_method(self, arg: str) -> str: ...
+
+                    def overloaded_method(
+                        self, arg: Union[int, str],
+                    ) -> Union[int, str]:
+                        return arg
 
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
@@ -624,3 +675,28 @@
                   ...
 
               StrCallable = BaseManager.from_queryset(ModelQuerySet, class_name=str(1))
+
+-   case: test_queryset_arg_as_unsupported_expressions
+    main: |
+        from typing import Union, Generic, TypeVar
+        from typing_extensions import TypeAlias
+        from django.db import models
+        from django.db.models.manager import Manager
+
+        class QS1(models.QuerySet[models.Model]):
+            ...
+        class QS2(models.QuerySet[models.Model]):
+            ...
+
+        Alias: TypeAlias = Union[QS1, QS2]
+        reveal_type(Manager[models.Model].from_queryset(Alias))
+
+        T = TypeVar("T")
+        class NonQSGeneric(Generic[T]):
+            ...
+        reveal_type(Manager[models.Model].from_queryset(NonQSGeneric[int]))
+    out: |
+        main:12: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[_QuerySet[Model, Model]]"  [arg-type]
+        main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[_QuerySet[Model, Model]]"  [arg-type]

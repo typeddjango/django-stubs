@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, ClassVar, Generic, Literal, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q
@@ -107,9 +107,9 @@ class BaseExpression:
     def reverse_ordering(self) -> BaseExpression: ...
     def flatten(self) -> Iterator[BaseExpression]: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
-    def deconstruct(self) -> Any: ...  # fake
 
-class Expression(BaseExpression, Combinable): ...
+class Expression(BaseExpression, Combinable):
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class CombinedExpression(SQLiteNumericMixin, Expression):
     connector: str
@@ -149,12 +149,16 @@ class F(Combinable):
         nulls_last: bool | None = ...,
     ) -> OrderBy: ...
     def copy(self) -> F: ...
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
-class ResolvedOuterRef(F): ...
+class ResolvedOuterRef(F):
+    contains_aggregate: ClassVar[bool]
+    contains_over_clause: ClassVar[bool]
 
 class OuterRef(F):
+    contains_aggregate: ClassVar[bool]
+    contains_over_clause: ClassVar[bool]
     def __init__(self, name: str | OuterRef) -> None: ...
-    contains_aggregate: bool
     def relabeled_clone(self, relabels: Any) -> Self: ...
 
 class Func(SQLiteNumericMixin, Expression):
@@ -175,10 +179,12 @@ class Func(SQLiteNumericMixin, Expression):
         arg_joiner: str | None = ...,
         **extra_context: Any,
     ) -> _AsSqlType: ...
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class Value(Expression):
     value: Any
     def __init__(self, value: Any, output_field: Field | None = ...) -> None: ...
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class RawSQL(Expression):
     params: list[Any]
@@ -207,6 +213,7 @@ _E = TypeVar("_E", bound=Q | Combinable)
 class ExpressionWrapper(Expression, Generic[_E]):
     def __init__(self, expression: _E, output_field: Field) -> None: ...
     expression: _E
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class NegatedExpression(ExpressionWrapper[_E]):
     def __init__(self, expression: _E) -> None: ...
@@ -217,6 +224,7 @@ class When(Expression):
     condition: Any
     result: Any
     def __init__(self, condition: Any = ..., then: Any = ..., **lookups: Any) -> None: ...
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class Case(Expression):
     template: str
@@ -227,6 +235,7 @@ class Case(Expression):
     def __init__(
         self, *cases: Any, default: Any | None = ..., output_field: Field | None = ..., **extra: Any
     ) -> None: ...
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class Subquery(BaseExpression, Combinable):
     template: str
@@ -252,6 +261,7 @@ class OrderBy(Expression):
     ) -> None: ...
     def asc(self) -> None: ...  # type: ignore[override]
     def desc(self) -> None: ...  # type: ignore[override]
+    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class Window(SQLiteNumericMixin, Expression):
     template: str

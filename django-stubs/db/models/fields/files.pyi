@@ -6,7 +6,7 @@ from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
-from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+from django.db.models.fields import Field, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
@@ -68,7 +68,7 @@ class FileField(Field):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # class access
     @overload
