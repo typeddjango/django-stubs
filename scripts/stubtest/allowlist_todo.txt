@@ -2093,8 +2093,6 @@ django.forms.renderers.DjangoDivFormRenderer
 django.forms.renderers.EngineMixin.engine
 django.forms.renderers.Jinja2.backend
 django.forms.utils.DEFAULT_TEMPLATE_DEPRECATION_MSG
-django.forms.utils.ErrorDict.__init__
-django.forms.utils.ErrorList.__init__
 django.forms.widgets.ChoiceWidget.__deepcopy__
 django.forms.widgets.ChoiceWidget.subwidgets
 django.forms.widgets.ChoiceWidget.template_name

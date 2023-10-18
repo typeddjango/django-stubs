@@ -205,8 +205,8 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     # TODO: plugin support
     def formfield(
         self,
-        form_class: type[forms.Field] | None = ...,
-        choices_form_class: Any | None = ...,
+        form_class: type[Field] | None = ...,
+        choices_form_class: type[forms.ChoiceField] | None = ...,
         **kwargs: Any,
     ) -> Field: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
