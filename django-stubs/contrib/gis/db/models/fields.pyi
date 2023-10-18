@@ -109,7 +109,12 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     def formfield(  # type: ignore[override]
-        self, *, form_class: type[forms.GeometryField] | None = ..., geom_type: str = ..., srid: Any = ..., **kwargs: Any
+        self,
+        *,
+        form_class: type[forms.GeometryField] | None = ...,
+        geom_type: str = ...,
+        srid: Any = ...,
+        **kwargs: Any,
     ) -> forms.GeometryField: ...
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 
