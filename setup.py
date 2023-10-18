@@ -33,7 +33,7 @@ dependencies = [
 
 # Keep compatible-mypy major.minor version pinned to what we use in CI (requirements.txt)
 extras_require = {
-    "compatible-mypy": ["mypy==1.5.*"],
+    "compatible-mypy": ["mypy~=1.6.0"],
 }
 
 setup(
@@ -65,6 +65,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Typing :: Typed",
         "Framework :: Django",
         "Framework :: Django :: 3.2",

@@ -49,10 +49,10 @@
     x = MyModel.objects.get(primary='a')
     reveal_type(x.primary)  # N: Revealed type is "builtins.str"
     reveal_type(x.pk)  # N: Revealed type is "builtins.str"
-    x.id  # E: "MyModel" has no attribute "id"
+    x.id  # E: "MyModel" has no attribute "id"  [attr-defined]
 
     MyModel.objects.get(pk='a')
-    MyModel.objects.get(id='a')  # E: Cannot resolve keyword 'id' into field. Choices are: primary
+    MyModel.objects.get(id='a')  # E: Cannot resolve keyword 'id' into field. Choices are: primary  [misc]
   installed_apps:
     - myapp
   files:
@@ -65,5 +65,5 @@
             def __str__(self) -> str:
                 reveal_type(self.primary)  # N: Revealed type is "builtins.str"
                 reveal_type(self.pk)  # N: Revealed type is "builtins.str"
-                self.id  # E: "MyModel" has no attribute "id"
+                self.id  # E: "MyModel" has no attribute "id"  [attr-defined]
                 return self.primary

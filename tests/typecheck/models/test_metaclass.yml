@@ -4,8 +4,8 @@
         from myapp.models import Abstract1, Abstract2, Concrete1, Concrete2, Concrete3
         from django.db import models
 
-        models.Model.DoesNotExist  # E: "Type[Model]" has no attribute "DoesNotExist"
-        models.Model.MultipleObjectsReturned  # E: "Type[Model]" has no attribute "MultipleObjectsReturned"
+        models.Model.DoesNotExist  # E: "Type[Model]" has no attribute "DoesNotExist"  [attr-defined]
+        models.Model.MultipleObjectsReturned  # E: "Type[Model]" has no attribute "MultipleObjectsReturned"  [attr-defined]
 
         reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
@@ -26,13 +26,13 @@
         a = Concrete3.DoesNotExist
 
         b: Type[Concrete2.DoesNotExist]
-        b = Concrete1.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.DoesNotExist]", variable has type "Type[myapp.models.Concrete2.DoesNotExist]")
+        b = Concrete1.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.DoesNotExist]", variable has type "Type[myapp.models.Concrete2.DoesNotExist]")  [assignment]
         b = Concrete2.DoesNotExist
         b = Concrete3.DoesNotExist
 
         c: Type[Concrete3.DoesNotExist]
-        c = Concrete1.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.DoesNotExist]", variable has type "Type[myapp.models.Concrete3.DoesNotExist]")
-        c = Concrete2.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete2.DoesNotExist]", variable has type "Type[myapp.models.Concrete3.DoesNotExist]")
+        c = Concrete1.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.DoesNotExist]", variable has type "Type[myapp.models.Concrete3.DoesNotExist]")  [assignment]
+        c = Concrete2.DoesNotExist  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete2.DoesNotExist]", variable has type "Type[myapp.models.Concrete3.DoesNotExist]")  [assignment]
         c = Concrete3.DoesNotExist
 
         d: Type[Concrete1.MultipleObjectsReturned]
@@ -41,13 +41,13 @@
         d = Concrete3.MultipleObjectsReturned
 
         e: Type[Concrete2.MultipleObjectsReturned]
-        e = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete2.MultipleObjectsReturned]")
+        e = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete2.MultipleObjectsReturned]")  [assignment]
         e = Concrete2.MultipleObjectsReturned
         e = Concrete3.MultipleObjectsReturned
 
         f: Type[Concrete3.MultipleObjectsReturned]
-        f = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete3.MultipleObjectsReturned]")
-        f = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete3.MultipleObjectsReturned]")
+        f = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
+        f = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "Type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "Type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
         f = Concrete3.MultipleObjectsReturned
     installed_apps:
         - myapp

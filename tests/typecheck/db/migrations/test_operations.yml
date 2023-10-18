@@ -16,5 +16,5 @@
 
      RunSQL(sql=["SOME SQLS", ("SOME SQLS %s, %s", ["PARAM", "ANOTHER PARAM"])], reverse_sql=["SOME SQLS", ("SOME SQLS %s, %s", ["PARAM", "ANOTHER PARAM"])])
 
-     RunSQL(sql=("SOME SQL", {}))                                                 # E: Argument "sql" to "RunSQL" has incompatible type "Tuple[str, Dict[<nothing>, <nothing>]]"; expected "Union[str, Union[List[Union[str, Tuple[str, Union[Dict[str, Any], Union[List[str], Tuple[str, ...], Tuple[]], None]]]], Tuple[Union[str, Tuple[str, Union[Dict[str, Any], Union[List[str], Tuple[str, ...], Tuple[]], None]]], ...], Tuple[]]]"
-     RunSQL(sql=["SOME SQLS", ("SOME SQLS %s, %s", [object(), "ANOTHER PARAM"])]) # E: List item 0 has incompatible type "object"; expected "str"
+     RunSQL(sql=("SOME SQL", {}))                                                 # E: Argument "sql" to "RunSQL" has incompatible type "Tuple[str, Dict[<nothing>, <nothing>]]"; expected "Union[str, Union[List[Union[str, Tuple[str, Union[Dict[str, Any], Union[List[str], Tuple[str, ...], Tuple[()]], None]]]], Tuple[Union[str, Tuple[str, Union[Dict[str, Any], Union[List[str], Tuple[str, ...], Tuple[()]], None]]], ...], Tuple[()]]]"  [arg-type]
+     RunSQL(sql=["SOME SQLS", ("SOME SQLS %s, %s", [object(), "ANOTHER PARAM"])]) # E: List item 0 has incompatible type "object"; expected "str"  [list-item]

@@ -63,7 +63,7 @@
     main: |
         from myapp.models import User
         reveal_type(User().my_pk)  # N: Revealed type is "builtins.int"
-        User().id  # E: "User" has no attribute "id"
+        User().id  # E: "User" has no attribute "id"  [attr-defined]
     installed_apps:
         - myapp
     files:
@@ -94,9 +94,9 @@
 -   case: blank_and_not_null_charfield_does_not_allow_none
     main: |
         from myapp.models import MyModel
-        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "Union[str, int, Combinable]")
+        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "Union[str, int, Combinable]")  [misc]
         MyModel(notnulltext="")
-        MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")
+        MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")  [assignment]
         reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
@@ -158,7 +158,7 @@
             published = cast(models.Field[Year, Year], models.IntegerField())
         book = Book()
         reveal_type(book.published)  # N: Revealed type is "main.Year"
-        book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year")
+        book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year")  [assignment]
         book.published = Year(2006)
         reveal_type(book.published)  # N: Revealed type is "main.Year"
         def accepts_int(arg: int) -> None: ...
@@ -190,9 +190,9 @@
         from myapp.models import RenamedField
         instance = RenamedField()
         reveal_type(instance.modelname) # N: Revealed type is "builtins.int"
-        instance.fieldname # E: "RenamedField" has no attribute "fieldname"
+        instance.fieldname # E: "RenamedField" has no attribute "fieldname"  [attr-defined]
         instance.modelname = 1
-        instance.fieldname = 1 # E: "RenamedField" has no attribute "fieldname"
+        instance.fieldname = 1 # E: "RenamedField" has no attribute "fieldname"  [attr-defined]
   installed_apps:
     - myapp
   files:

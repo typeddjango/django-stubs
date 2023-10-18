@@ -10,7 +10,7 @@ from django.utils.datastructures import _ListOrTuple
 
 class PostgresIndex(Index):
     @property
-    def max_name_length(self) -> int: ...  # type: ignore
+    def max_name_length(self) -> int: ...  # type: ignore[override]
     def create_sql(
         self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
     ) -> Statement: ...

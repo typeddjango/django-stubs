@@ -83,7 +83,7 @@
             def some(self) -> None:
                 reveal_type(self.get_form())  # N: Revealed type is "main.ArticleModelForm"
                 reveal_type(self.get_form(SubArticleModelForm))  # N: Revealed type is "main.SubArticleModelForm"
-                reveal_type(self.get_form(AnotherArticleModelForm))  # N: Revealed type is "main.AnotherArticleModelForm"  # E: Argument 1 to "get_form" of "FormMixin" has incompatible type "Type[AnotherArticleModelForm]"; expected "Optional[Type[ArticleModelForm]]"
+                reveal_type(self.get_form(AnotherArticleModelForm))  # N: Revealed type is "main.AnotherArticleModelForm"  # E: Argument 1 to "get_form" of "FormMixin" has incompatible type "Type[AnotherArticleModelForm]"; expected "Optional[Type[ArticleModelForm]]"  [arg-type]
     installed_apps:
         - myapp
     files:

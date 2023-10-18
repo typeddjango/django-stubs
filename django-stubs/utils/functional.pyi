@@ -7,9 +7,9 @@ from typing_extensions import Self, TypeAlias
 _T = TypeVar("_T")
 
 class cached_property(Generic[_T]):
-    func: Callable[..., _T]
+    func: Callable[[Any], _T]
     name: str | None
-    def __init__(self, func: Callable[..., _T], name: str | None = ...) -> None: ...
+    def __init__(self, func: Callable[[Any], _T], name: str | None = ...) -> None: ...
     @overload
     def __get__(self, instance: None, cls: type[Any] | None = ...) -> Self: ...
     @overload
@@ -44,7 +44,7 @@ class _StrPromise(Promise, Sequence[str]):
     # Mypy requires this for the attribute hook to take effect
     def __getattribute__(self, __name: str) -> Any: ...
 
-_StrOrPromise: TypeAlias = str | _StrPromise  # noqa: Y047
+_StrOrPromise: TypeAlias = str | _StrPromise  # noqa: PYI047
 _C = TypeVar("_C", bound=Callable)
 
 def lazy(func: _C, *resultclasses: Any) -> _C: ...

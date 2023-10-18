@@ -2,6 +2,7 @@ import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, MutableMapping, Reversible, Sequence, Sized
 from typing import Any, Generic, NamedTuple, TypeVar, overload
 
+from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
@@ -121,7 +122,7 @@ class _QuerySet(Generic[_T, _Row], Collection[_Row], Reversible[_Row], Sized):
     async def acontains(self, obj: Model) -> bool: ...
     def raw(
         self,
-        raw_query: str,
+        raw_query: _ExecuteQuery,
         params: Any = ...,
         translations: dict[str, str] | None = ...,
         using: str | None = ...,
@@ -214,7 +215,7 @@ class RawQuerySet(Iterable[_T], Sized):
     def resolve_model_init_order(self) -> tuple[list[str], list[int], list[tuple[str, int]]]: ...
     def using(self, alias: str | None) -> RawQuerySet[_T]: ...
 
-_QuerySetAny: TypeAlias = _QuerySet  # noqa: Y047
+_QuerySetAny: TypeAlias = _QuerySet  # noqa: PYI047
 
 QuerySet: TypeAlias = _QuerySet[_T, _T]
 

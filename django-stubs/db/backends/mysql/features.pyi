@@ -42,46 +42,46 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_table_check_constraints: bool
     can_return_rows_from_bulk_insert: bool
     @property
-    def allows_auto_pk_0(self) -> bool: ...  # type: ignore
+    def allows_auto_pk_0(self) -> bool: ...  # type: ignore[override]
     @property
-    def update_can_self_select(self) -> bool: ...  # type: ignore
+    def update_can_self_select(self) -> bool: ...  # type: ignore[override]
     @property
-    def can_introspect_foreign_keys(self) -> bool: ...  # type: ignore
+    def can_introspect_foreign_keys(self) -> bool: ...  # type: ignore[override]
     @property
     def introspected_field_types(self) -> dict[str, str]: ...  # type: ignore [override]
     @property
-    def can_return_columns_from_insert(self) -> bool: ...  # type: ignore
+    def can_return_columns_from_insert(self) -> bool: ...  # type: ignore[override]
     @property
-    def has_zoneinfo_database(self) -> bool: ...  # type: ignore
+    def has_zoneinfo_database(self) -> bool: ...  # type: ignore[override]
     @property
     def is_sql_auto_is_null_enabled(self) -> bool: ...
     @property
-    def supports_over_clause(self) -> bool: ...  # type: ignore
+    def supports_over_clause(self) -> bool: ...  # type: ignore[override]
     @property
-    def supports_column_check_constraints(self) -> bool: ...  # type: ignore
+    def supports_column_check_constraints(self) -> bool: ...  # type: ignore[override]
     @property
-    def can_introspect_check_constraints(self) -> bool: ...  # type: ignore
+    def can_introspect_check_constraints(self) -> bool: ...  # type: ignore[override]
     @property
-    def has_select_for_update_skip_locked(self) -> bool: ...  # type: ignore
+    def has_select_for_update_skip_locked(self) -> bool: ...  # type: ignore[override]
     @property
-    def has_select_for_update_nowait(self) -> bool: ...  # type: ignore
+    def has_select_for_update_nowait(self) -> bool: ...  # type: ignore[override]
     @property
-    def has_select_for_update_of(self) -> bool: ...  # type: ignore
+    def has_select_for_update_of(self) -> bool: ...  # type: ignore[override]
     @property
     def supports_explain_analyze(self) -> bool: ...
     @property
-    def supported_explain_formats(self) -> set[str]: ...  # type: ignore
+    def supported_explain_formats(self) -> set[str]: ...  # type: ignore[override]
     @property
     def supports_transactions(self) -> bool: ...
     @property
-    def ignores_table_name_case(self) -> bool: ...  # type: ignore
+    def ignores_table_name_case(self) -> bool: ...  # type: ignore[override]
     @property
-    def supports_default_in_lead_lag(self) -> bool: ...  # type: ignore
+    def supports_default_in_lead_lag(self) -> bool: ...  # type: ignore[override]
     @property
-    def supports_json_field(self) -> bool: ...  # type: ignore
+    def supports_json_field(self) -> bool: ...  # type: ignore[override]
     @property
-    def can_introspect_json_field(self) -> bool: ...  # type: ignore
+    def can_introspect_json_field(self) -> bool: ...  # type: ignore[override]
     @property
-    def supports_index_column_ordering(self) -> bool: ...  # type: ignore
+    def supports_index_column_ordering(self) -> bool: ...  # type: ignore[override]
     @property
-    def supports_expression_indexes(self) -> bool: ...  # type: ignore
+    def supports_expression_indexes(self) -> bool: ...  # type: ignore[override]

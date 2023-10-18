@@ -6,7 +6,7 @@
       reveal_type(is_naive(datetime(2020, 1, 1)))
       reveal_type(is_naive(time()))
     out: |
-      main:3: error: No overload variant of "is_naive" matches argument type "date"
+      main:3: error: No overload variant of "is_naive" matches argument type "date"  [call-overload]
       main:3: note: Possible overload variants:
       main:3: note:     def is_naive(value: time) -> Literal[True]
       main:3: note:     def is_naive(value: datetime) -> bool
@@ -21,7 +21,7 @@
       reveal_type(is_aware(datetime(2020, 1, 1)))
       reveal_type(is_aware(time()))
     out: |
-      main:3: error: No overload variant of "is_aware" matches argument type "date"
+      main:3: error: No overload variant of "is_aware" matches argument type "date"  [call-overload]
       main:3: note: Possible overload variants:
       main:3: note:     def is_aware(value: time) -> Literal[False]
       main:3: note:     def is_aware(value: datetime) -> bool
