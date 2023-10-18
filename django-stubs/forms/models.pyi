@@ -1,12 +1,5 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
-from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
-    Any,
-    ClassVar,
-    Generic,
-    Literal,
-    TypeVar,
-    overload,
-)
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.db import models
@@ -27,7 +20,6 @@ from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-# https://github.com/python/mypy/issues/12211
 _Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
@@ -308,11 +300,11 @@ class ModelMultipleChoiceField(ModelChoiceField):
     def to_python(self, value: Any) -> list[Model]: ...  # type: ignore[override]
     def clean(self, value: Any) -> QuerySet[Model]: ...
     def prepare_value(self, value: Any) -> Any: ...
-    def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore
+    def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore[override]
 
 def modelform_defines_fields(form_class: type[ModelForm]) -> bool: ...
 @overload
-def _get_foreign_key(  # type: ignore
+def _get_foreign_key(  # type: ignore[misc]
     parent_model: type[Model], model: type[Model], fk_name: str | None = ..., can_fail: Literal[True] = ...
 ) -> ForeignKey | None: ...
 @overload

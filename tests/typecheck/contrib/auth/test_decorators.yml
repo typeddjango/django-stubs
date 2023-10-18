@@ -26,7 +26,7 @@
     main: |
         from typing import Any
         from django.contrib.auth.decorators import login_required
-        @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"
+        @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
         def view_func2(request: Any) -> str: ...
 -   case: user_passes_test
     main: |
@@ -39,7 +39,7 @@
     main: |
         from django.http import HttpRequest, HttpResponse
         from django.contrib.auth.decorators import user_passes_test
-        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[Union[AbstractBaseUser, AnonymousUser]], bool]"
+        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[Union[AbstractBaseUser, AnonymousUser]], bool]"  [arg-type]
         def view_func(request: HttpRequest) -> HttpResponse: ...
 -   case: permission_required
     main: |

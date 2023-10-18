@@ -71,7 +71,6 @@ class Field:
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
     def get_bound_field(self, form: BaseForm, field_name: str) -> BoundField: ...
-    def deconstruct(self) -> Any: ...
 
 class CharField(Field):
     max_length: int | None
@@ -145,7 +144,7 @@ class FloatField(IntegerField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Any | None) -> float | None: ...  # type: ignore
+    def to_python(self, value: Any | None) -> float | None: ...  # type: ignore[override]
     def validate(self, value: float) -> None: ...
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
@@ -172,7 +171,7 @@ class DecimalField(IntegerField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
-    def to_python(self, value: Any | None) -> Decimal | None: ...  # type: ignore
+    def to_python(self, value: Any | None) -> Decimal | None: ...  # type: ignore[override]
     def validate(self, value: Decimal) -> None: ...
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
@@ -262,6 +261,7 @@ class EmailField(CharField):
 
 class FileField(Field):
     allow_empty_file: bool
+    max_length: int | None
     def __init__(
         self,
         *,
@@ -316,7 +316,7 @@ class BooleanField(Field):
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class NullBooleanField(BooleanField):
-    def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore
+    def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore[override]
     def validate(self, value: Any) -> None: ...
 
 class CallableChoiceIterator:
@@ -549,7 +549,7 @@ class SlugField(CharField):
 
 class UUIDField(CharField):
     def prepare_value(self, value: Any | None) -> Any | None: ...
-    def to_python(self, value: Any) -> UUID | None: ...  # type: ignore
+    def to_python(self, value: Any) -> UUID | None: ...  # type: ignore[override]
 
 class InvalidJSONInput(str): ...
 class JSONString(str): ...

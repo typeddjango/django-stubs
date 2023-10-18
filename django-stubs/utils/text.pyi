@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable, Iterator
 from io import BytesIO
 from re import Pattern
-from typing import TypeVar, overload
+from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject, _StrOrPromise
@@ -19,6 +19,7 @@ re_camel_case: Pattern[str]
 def wrap(text: _StrOrPromiseT, width: int) -> _StrOrPromiseT: ...
 
 class Truncator(SimpleLazyObject):
+    MAX_LENGTH_HTML: ClassVar[int]
     def __init__(self, text: Model | str) -> None: ...
     def add_truncation_text(self, text: str, truncate: str | None = ...) -> str: ...
     def chars(self, num: int, truncate: str | None = ..., html: bool = ...) -> str: ...
@@ -35,7 +36,7 @@ def compress_string(s: bytes, *, max_random_bytes: int | None = ...) -> bytes: .
 
 class StreamingBuffer(BytesIO):
     vals: list[bytes]
-    def read(self) -> bytes: ...  # type: ignore
+    def read(self) -> bytes: ...  # type: ignore[override]
 
 def compress_sequence(sequence: Iterable[bytes], *, max_random_bytes: int | None = ...) -> Iterator[bytes]: ...
 

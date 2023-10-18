@@ -7,7 +7,7 @@ from django.dispatch import Signal
 class_prepared: Signal
 
 class ModelSignal(Signal):
-    def connect(  # type: ignore
+    def connect(  # type: ignore[override]
         self,
         receiver: Callable,
         sender: type[Model] | str | None = ...,
@@ -15,7 +15,7 @@ class ModelSignal(Signal):
         dispatch_uid: str | None = ...,
         apps: Apps | None = ...,
     ) -> None: ...
-    def disconnect(  # type: ignore
+    def disconnect(  # type: ignore[override]
         self,
         receiver: Callable | None = ...,
         sender: type[Model] | str | None = ...,

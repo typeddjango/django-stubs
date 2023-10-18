@@ -5,6 +5,7 @@ from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
 from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload
 
+from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -44,7 +45,7 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
@@ -190,7 +191,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
-    def deconstruct(self) -> Any: ...
+    def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
     def set_attributes_from_name(self, name: str) -> None: ...
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
     def db_check(self, connection: BaseDatabaseWrapper) -> str | None: ...
@@ -202,7 +203,12 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def get_internal_type(self) -> str: ...
     # TODO: plugin support
-    def formfield(self, form_class: Any | None = ..., choices_form_class: Any | None = ..., **kwargs: Any) -> Any: ...
+    def formfield(
+        self,
+        form_class: type[forms.Field] | None = ...,
+        choices_form_class: Any | None = ...,
+        **kwargs: Any,
+    ) -> Field: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
     def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
@@ -420,9 +426,9 @@ class BooleanField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: bool
 
 class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: bool | Combinable | None  # type: ignore
-    _pyi_private_get_type: bool | None  # type: ignore
-    _pyi_lookup_exact_type: bool | None  # type: ignore
+    _pyi_private_set_type: bool | Combinable | None  # type: ignore[assignment]
+    _pyi_private_get_type: bool | None  # type: ignore[assignment]
+    _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | Combinable
@@ -603,6 +609,7 @@ class DurationField(Field[_ST, _GT]):
 
 class AutoFieldMixin:
     db_returning: bool
+    def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
 
 class AutoFieldMeta(type): ...
 

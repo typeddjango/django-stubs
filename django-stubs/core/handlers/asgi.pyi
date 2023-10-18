@@ -23,11 +23,11 @@ class ASGIRequest(HttpRequest):
     META: dict[str, Any]
     def __init__(self, scope: Mapping[str, Any], body_file: IO[bytes]) -> None: ...
     @property
-    def GET(self) -> _ImmutableQueryDict: ...  # type: ignore
+    def GET(self) -> _ImmutableQueryDict: ...  # type: ignore[override]
     POST: _ImmutableQueryDict
     FILES: MultiValueDict
     @property
-    def COOKIES(self) -> dict[str, str]: ...  # type: ignore
+    def COOKIES(self) -> dict[str, str]: ...  # type: ignore[override]
 
 _T = TypeVar("_T")
 

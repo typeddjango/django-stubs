@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
         run: mypy --strict mypy_django_plugin
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         shard: [0, 1, 2, 3]
       fail-fast: false
     steps:
@@ -64,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       # Must match `shard` definition in the test matrix:
       - name: Run tests
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run stubtest
         run: bash ./scripts/stubtest.sh
@@ -101,10 +101,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
         django-version: ['3.2', '4.2']
         include:
-          - python-version: '3.11'
+          - python-version: '3.12'
             django-version: '4.1'
     steps:
       - uses: actions/checkout@v4
@@ -119,7 +119,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
           pip install "Django==${{ matrix.django-version }}"
           pip check
 

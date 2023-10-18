@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, Optional, TypeVar  # noqa: Y037  # https://github.com/python/mypy/issues/12211
+from typing import Any, Generic, Literal, TypeVar
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -63,7 +63,6 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # https://github.com/python/mypy/issues/8921
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
-# https://github.com/python/mypy/issues/12211
 _ListFilterT: TypeAlias = (
     type[ListFilter]
     | Field
@@ -81,7 +80,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     raw_id_fields: Sequence[str]
     fields: _FieldGroups | None
     exclude: Sequence[str] | None
-    fieldsets: Optional[_FieldsetSpec]  # noqa: UP007
+    fieldsets: _FieldsetSpec | None
     form: type[forms.ModelForm[_ModelT]]
     filter_vertical: Sequence[str]
     filter_horizontal: Sequence[str]
@@ -307,10 +306,10 @@ class InlineModelAdmin(Generic[_ChildModelT, _ParentModelT], BaseModelAdmin[_Chi
         self, request: HttpRequest, obj: _ParentModelT | None = ..., **kwargs: Any
     ) -> type[BaseInlineFormSet[_ChildModelT, _ParentModelT, forms.ModelForm[_ChildModelT]]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ChildModelT]: ...
-    def has_add_permission(self, request: HttpRequest, obj: _ParentModelT | None) -> bool: ...  # type: ignore
-    def has_change_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore
-    def has_delete_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore
-    def has_view_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore
+    def has_add_permission(self, request: HttpRequest, obj: _ParentModelT | None) -> bool: ...  # type: ignore[override]
+    def has_change_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
+    def has_delete_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
+    def has_view_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
 
 class StackedInline(InlineModelAdmin[_ChildModelT, _ParentModelT]):
     template: str
