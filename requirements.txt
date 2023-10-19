@@ -12,4 +12,4 @@ Django==4.2.6
 -e .[compatible-mypy]
 
 # Overrides:
-mypy==1.6.0
+mypy==1.6.1
