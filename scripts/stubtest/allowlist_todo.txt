@@ -900,8 +900,6 @@ django.core.management.base.BaseCommand.suppressed_base_arguments
 django.core.management.commands.compilemessages.Command.handle
 django.core.management.commands.dbshell.Command.handle
 django.core.management.commands.diffsettings.Command.handle
-django.core.management.commands.dumpdata.has_bz2
-django.core.management.commands.dumpdata.has_lzma
 django.core.management.commands.flush.Command.handle
 django.core.management.commands.flush.Command.stealth_options
 django.core.management.commands.inspectdb.Command.get_meta
@@ -913,8 +911,6 @@ django.core.management.commands.loaddata.Command.get_fixture_name_and_dirs
 django.core.management.commands.loaddata.Command.get_targets
 django.core.management.commands.loaddata.Command.reset_sequences
 django.core.management.commands.loaddata.Command.save_obj
-django.core.management.commands.loaddata.has_bz2
-django.core.management.commands.loaddata.has_lzma
 django.core.management.commands.makemessages.BuildFile.is_templatized
 django.core.management.commands.makemessages.BuildFile.path
 django.core.management.commands.makemessages.BuildFile.work_path

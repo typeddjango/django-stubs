@@ -5,6 +5,9 @@ from django.apps.config import AppConfig
 from django.core.management.base import BaseCommand
 from django.db.models.base import Model
 
+has_bz2: bool
+has_lzma: bool
+
 READ_STDIN: str
 
 class Command(BaseCommand):
