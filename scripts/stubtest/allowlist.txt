@@ -106,6 +106,25 @@ django.db.migrations.operations.models.AlterTogetherOptionOperation.option_name
 django.views.generic.detail.SingleObjectMixin.model
 django.views.generic.edit.BaseDeleteView.form_class
 
+# Dynamically added via django.core.management.color.make_style
+django.core.management.color.Style.ERROR
+django.core.management.color.Style.ERROR_OUTPUT
+django.core.management.color.Style.HTTP_BAD_REQUEST
+django.core.management.color.Style.HTTP_INFO
+django.core.management.color.Style.HTTP_NOT_FOUND
+django.core.management.color.Style.HTTP_NOT_MODIFIED
+django.core.management.color.Style.HTTP_REDIRECT
+django.core.management.color.Style.HTTP_SERVER_ERROR
+django.core.management.color.Style.HTTP_SUCCESS
+django.core.management.color.Style.MIGRATE_HEADING
+django.core.management.color.Style.MIGRATE_LABEL
+django.core.management.color.Style.NOTICE
+django.core.management.color.Style.SQL_COLTYPE
+django.core.management.color.Style.SQL_FIELD
+django.core.management.color.Style.SQL_KEYWORD
+django.core.management.color.Style.SQL_TABLE
+django.core.management.color.Style.SUCCESS
+django.core.management.color.Style.WARNING
 # `error: <...> is not present at runtime`
 # This happens often for variables removed in later django version.
 # We still keep them in stubs to be a bit more backward compatible.
