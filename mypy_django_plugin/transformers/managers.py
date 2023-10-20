@@ -132,6 +132,9 @@ def _process_dynamic_method(
             _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0])
             for arg_type in args_types
         ]
+    if base_that_has_method.self_type:
+        # Manages -> Self returns
+        ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, manager_instance)
 
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
