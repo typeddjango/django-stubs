@@ -125,13 +125,17 @@ def _process_dynamic_method(
         variables = []
     args_types = method_type.arg_types[1:]
     if _has_compatible_type_vars(base_that_has_method):
-        ret_type = _replace_type_var(
-            ret_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0]
-        )
-        args_types = [
-            _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0])
-            for arg_type in args_types
-        ]
+        typed_var = manager_instance.args or queryset_info.bases[0].args
+        if (
+            typed_var
+            and isinstance(typed_var[0], Instance)
+            and typed_var[0].type.has_base(fullnames.MODEL_CLASS_FULLNAME)
+        ):
+            ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, typed_var[0])
+            args_types = [
+                _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0])
+                for arg_type in args_types
+            ]
     if base_that_has_method.self_type:
         # Manages -> Self returns
         ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, manager_instance)
