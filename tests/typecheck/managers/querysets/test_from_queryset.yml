@@ -1,3 +1,26 @@
+-   case: from_queryset_self_return_management
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from typing_extensions import Self
+                from typing import List
+
+                class ModelQuerySet(models.QuerySet):
+                    def example_simple(self) -> Self: ...
+                    def example_list(self) -> List[Self]: ...
+                NewManager = BaseManager.from_queryset(ModelQuerySet)
+                class MyModel(models.Model):
+                    objects = NewManager()
+
 -   case: from_queryset_with_base_manager
     main: |
         from myapp.models import MyModel

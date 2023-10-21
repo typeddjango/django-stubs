@@ -1,3 +1,31 @@
+-   case: self_return_management
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing import List, Dict
+                from typing_extensions import Self
+
+                class BaseQuerySet(models.QuerySet):
+                    def example_dict(self) -> Dict[str, Self]: ...
+
+                class MyQuerySet(BaseQuerySet):
+                    def example_simple(self) -> Self: ...
+                    def example_list(self) -> List[Self]: ...
+                    def just_int(self) -> int: ...
+
+                class MyModel(models.Model):
+                    objects = MyQuerySet.as_manager()
 -   case: declares_manager_type_like_django
     main: |
         from myapp.models import MyModel
