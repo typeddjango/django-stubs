@@ -775,11 +775,7 @@ django.core.mail.make_msgid
 django.core.mail.message.SafeMIMEMultipart.__init__
 django.core.mail.message.SafeMIMEText.__init__
 django.core.mail.outbox
-django.core.management.BaseCommand.add_base_argument
-django.core.management.BaseCommand.suppressed_base_arguments
 django.core.management.base.ALL_CHECKS
-django.core.management.base.BaseCommand.add_base_argument
-django.core.management.base.BaseCommand.suppressed_base_arguments
 django.core.management.commands.flush.Command.stealth_options
 django.core.management.commands.inspectdb.Command.get_meta
 django.core.management.commands.loaddata.Command.compression_formats
@@ -804,7 +800,6 @@ django.core.management.commands.makemessages.TranslatableFile.__lt__
 django.core.management.commands.makemessages.TranslatableFile.path
 django.core.management.commands.makemessages.is_valid_locale
 django.core.management.commands.runserver.Command.on_bind
-django.core.management.commands.runserver.Command.suppressed_base_arguments
 django.core.management.commands.runserver.naiveip_re
 django.core.management.utils.find_formatters
 django.core.management.utils.run_formatters
