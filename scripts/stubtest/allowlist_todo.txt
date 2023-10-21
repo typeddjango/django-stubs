@@ -799,8 +799,6 @@ django.core.management.commands.makemessages.TranslatableFile.__le__
 django.core.management.commands.makemessages.TranslatableFile.__lt__
 django.core.management.commands.makemessages.TranslatableFile.path
 django.core.management.commands.makemessages.is_valid_locale
-django.core.management.commands.runserver.Command.on_bind
-django.core.management.commands.runserver.naiveip_re
 django.core.management.utils.find_formatters
 django.core.management.utils.run_formatters
 django.core.management.utils.sentinel
