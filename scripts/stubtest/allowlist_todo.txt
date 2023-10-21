@@ -778,12 +778,6 @@ django.core.mail.outbox
 django.core.management.base.ALL_CHECKS
 django.core.management.commands.flush.Command.stealth_options
 django.core.management.commands.inspectdb.Command.get_meta
-django.core.management.commands.loaddata.Command.compression_formats
-django.core.management.commands.loaddata.Command.find_fixture_files_in_dir
-django.core.management.commands.loaddata.Command.get_fixture_name_and_dirs
-django.core.management.commands.loaddata.Command.get_targets
-django.core.management.commands.loaddata.Command.reset_sequences
-django.core.management.commands.loaddata.Command.save_obj
 django.core.management.commands.makemessages.Command.build_potfiles
 django.core.management.commands.makemessages.Command.copy_plural_forms
 django.core.management.commands.makemessages.Command.find_files
