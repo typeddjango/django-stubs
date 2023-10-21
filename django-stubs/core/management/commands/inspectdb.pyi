@@ -17,5 +17,11 @@ class Command(BaseCommand):
         self, connection: BaseDatabaseWrapper, table_name: str, row: Any
     ) -> tuple[str, dict[str, Any], list[str]]: ...
     def get_meta(
-        self, table_name: str, constraints: Any, column_to_field_name: Any, is_view: Any, is_partition: Any
+        self,
+        table_name: str,
+        constraints: Any,
+        column_to_field_name: Any,
+        is_view: bool,
+        is_partition: bool,
+        comment: str | None,
     ) -> list[str]: ...
