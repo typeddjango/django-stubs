@@ -776,7 +776,6 @@ django.core.mail.message.SafeMIMEMultipart.__init__
 django.core.mail.message.SafeMIMEText.__init__
 django.core.mail.outbox
 django.core.management.base.ALL_CHECKS
-django.core.management.commands.flush.Command.stealth_options
 django.core.management.commands.inspectdb.Command.get_meta
 django.core.management.commands.makemessages.Command.build_potfiles
 django.core.management.commands.makemessages.Command.copy_plural_forms
