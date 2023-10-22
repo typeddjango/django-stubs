@@ -175,6 +175,7 @@ def make_optional(typ: MypyType) -> MypyType:
     return UnionType.make_union([typ, NoneTyp()])
 
 
+# Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
 def parse_bool(expr: Expression) -> Optional[bool]:
     if isinstance(expr, NameExpr):
         if expr.fullname == "builtins.True":
