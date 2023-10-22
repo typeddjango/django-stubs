@@ -98,9 +98,19 @@ django.utils.translation.template.block_re
 django.utils.version.version_component_re
 django.views.debug.SafeExceptionReporterFilter.hidden_settings
 
-# AlterTogetherOptionsOperation.option_name is set as None,
+# AlterTogetherOptionOperation.option_name is set as None,
 # but is required in the init, so we type it as str
 django.db.migrations.operations.models.AlterTogetherOptionOperation.option_name
+
+# These are set to None in the base class but *must* be overridden
+# because they are required in the init, so we type them without the None option.
+django.db.backends.base.base.BaseDatabaseWrapper.SchemaEditorClass
+django.db.backends.base.base.BaseDatabaseWrapper.client_class
+django.db.backends.base.base.BaseDatabaseWrapper.creation_class
+django.db.backends.base.base.BaseDatabaseWrapper.features_class
+django.db.backends.base.base.BaseDatabaseWrapper.introspection_class
+django.db.backends.base.base.BaseDatabaseWrapper.ops
+django.db.backends.base.base.BaseDatabaseWrapper.ops_class
 
 # Attributes defaulting to None messing with mypy
 django.views.generic.detail.SingleObjectMixin.model
