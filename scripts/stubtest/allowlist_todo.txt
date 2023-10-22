@@ -963,9 +963,6 @@ django.core.validators.ProhibitNullCharactersValidator.__new__
 django.core.validators.RegexValidator.__new__
 django.core.validators.StepValueValidator.__new__
 django.core.validators.URLValidator.__new__
-django.db.backends.base.creation.BaseDatabaseCreation.log
-django.db.backends.base.creation.BaseDatabaseCreation.mark_expected_failures_and_skips
-django.db.backends.base.creation.BaseDatabaseCreation.setup_worker_connection
 django.db.backends.base.features.BaseDatabaseFeatures.allows_group_by_select_index
 django.db.backends.base.features.BaseDatabaseFeatures.create_test_table_with_composite_primary_key
 django.db.backends.base.features.BaseDatabaseFeatures.ignores_unnecessary_order_by_in_subqueries
@@ -1093,7 +1090,6 @@ django.db.backends.sqlite3.base.SQLiteCursorWrapper.executemany
 django.db.backends.sqlite3.base.adapt_date
 django.db.backends.sqlite3.base.adapt_datetime
 django.db.backends.sqlite3.base.check_sqlite_version
-django.db.backends.sqlite3.creation.DatabaseCreation.setup_worker_connection
 django.db.backends.sqlite3.features.DatabaseFeatures.can_alter_table_drop_column
 django.db.backends.sqlite3.features.DatabaseFeatures.can_alter_table_rename_column
 django.db.backends.sqlite3.features.DatabaseFeatures.can_introspect_json_field
