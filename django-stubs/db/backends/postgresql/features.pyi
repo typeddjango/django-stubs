@@ -20,7 +20,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_no_key_update: bool
     can_release_savepoints: bool
     supports_tablespaces: bool
-    supports_transactions: bool
+    supports_transactions: bool  # type: ignore[assignment]
     can_introspect_materialized_views: bool
     can_distinct_on_fields: bool
     can_rollback_ddl: bool
