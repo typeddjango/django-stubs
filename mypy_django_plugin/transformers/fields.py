@@ -6,13 +6,13 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.semanal_shared import parse_bool
 from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
