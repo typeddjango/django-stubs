@@ -2,7 +2,6 @@ from typing import Any
 
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.mysql.base import DatabaseWrapper
-from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     connection: DatabaseWrapper
@@ -72,7 +71,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_explain_analyze(self) -> bool: ...
     @property
     def supported_explain_formats(self) -> set[str]: ...  # type: ignore[override]
-    @cached_property
+    @property
     def supports_transactions(self) -> bool: ...
     @property
     def ignores_table_name_case(self) -> bool: ...  # type: ignore[override]

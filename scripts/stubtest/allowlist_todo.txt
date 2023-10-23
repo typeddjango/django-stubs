@@ -963,6 +963,10 @@ django.core.validators.ProhibitNullCharactersValidator.__new__
 django.core.validators.RegexValidator.__new__
 django.core.validators.StepValueValidator.__new__
 django.core.validators.URLValidator.__new__
+django.db.backends.base.base.BaseDatabaseWrapper.timezone
+django.db.backends.base.base.BaseDatabaseWrapper.timezone_name
+django.db.backends.base.features.BaseDatabaseFeatures.supports_explaining_query_execution
+django.db.backends.base.features.BaseDatabaseFeatures.supports_transactions
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base
 django.db.backends.mysql.features.DatabaseFeatures.allows_auto_pk_0
@@ -993,6 +997,7 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_over_clause
 django.db.backends.mysql.features.DatabaseFeatures.supports_select_difference
 django.db.backends.mysql.features.DatabaseFeatures.supports_select_intersection
 django.db.backends.mysql.features.DatabaseFeatures.supports_table_check_constraints
+django.db.backends.mysql.features.DatabaseFeatures.supports_transactions
 django.db.backends.mysql.features.DatabaseFeatures.test_collations
 django.db.backends.mysql.features.DatabaseFeatures.update_can_self_select
 django.db.backends.mysql.features.DatabaseFeatures.uses_savepoints
