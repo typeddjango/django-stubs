@@ -93,6 +93,43 @@
                 NewManager = BaseManager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
                     objects = NewManager()
+
+-   case: from_queryset_custom_manager_subclass
+    main: |
+        from myapp.models import NewManager
+        reveal_type(NewManager().example())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/querysets.py
+            content: |
+                from typing import TypeVar, TYPE_CHECKING
+
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                _CTE = TypeVar("_CTE", bound=models.Model)
+
+                class _MyModelQuerySet(models.QuerySet[_CTE]):
+
+                    def example(self) -> _CTE: ...
+
+                class MyModelQuerySet(_MyModelQuerySet["MyModel"]): ...
+
+        - path: myapp/models.py
+          content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from .querysets import MyModelQuerySet
+
+                class TypedManager(BaseManager["MyModel"]): ...
+
+                NewManager = TypedManager.from_queryset(MyModelQuerySet)
+                class MyModel(models.Model):
+                    objects = NewManager()
 -   case: handles_subclasses_of_queryset
     main: |
         from myapp.models import MyModel
