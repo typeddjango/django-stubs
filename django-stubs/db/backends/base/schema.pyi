@@ -7,6 +7,7 @@ from typing import Any
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.ddl_references import Statement
 from django.db.models.base import Model
+from django.db.models.constraints import BaseConstraint
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from typing_extensions import Self
@@ -25,9 +26,14 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
     sql_alter_column_not_null: str
     sql_alter_column_default: str
     sql_alter_column_no_default: str
+    sql_alter_column_no_default_null: str
     sql_delete_column: str
     sql_rename_column: str
     sql_update_with_default: str
+    sql_unique_constraint: str
+    sql_check_constraint: str
+    sql_delete_constraint: str
+    sql_constraint: str
     sql_create_check: str
     sql_delete_check: str
     sql_create_unique: str
@@ -39,10 +45,14 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
     sql_delete_fk: str
 
     sql_create_index: str
+    sql_create_unique_index: str
+    sql_rename_index: str
     sql_delete_index: str
     sql_create_pk: str
     sql_delete_pk: str
     sql_delete_procedure: str
+    sql_alter_table_comment: str
+    sql_alter_column_comment: str
     connection: BaseDatabaseWrapper
     collect_sql: bool
     collected_sql: Any
@@ -64,6 +74,7 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
         self, model: type[Model], field: Field, include_default: bool = ...
     ) -> tuple[None, None] | tuple[str, list[Any]]: ...
     def skip_default(self, field: Any) -> bool: ...
+    def skip_default_on_alter(self, field: Any) -> bool: ...
     def prepare_default(self, value: Any) -> Any: ...
     def effective_default(self, field: Field) -> int | str: ...
     def quote_value(self, value: Any) -> str: ...
@@ -71,6 +82,9 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
     def delete_model(self, model: type[Model]) -> None: ...
     def add_index(self, model: type[Model], index: Index) -> None: ...
     def remove_index(self, model: type[Model], index: Index) -> None: ...
+    def rename_index(self, model: type[Model], old_index: Index, new_index: Index) -> None: ...
+    def add_constraint(self, model: type[Model], constraint: BaseConstraint) -> None: ...
+    def remove_constraint(self, model: type[Model], constraint: BaseConstraint) -> None: ...
     def alter_unique_together(
         self,
         model: type[Model],
@@ -84,6 +98,9 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
         new_index_together: Sequence[Sequence[str]],
     ) -> None: ...
     def alter_db_table(self, model: type[Model], old_db_table: str, new_db_table: str) -> None: ...
+    def alter_db_table_comment(
+        self, model: type[Model], old_db_table_comment: str | None, new_db_table_comment: str
+    ) -> None: ...
     def alter_db_tablespace(self, model: Any, old_db_tablespace: Any, new_db_tablespace: Any) -> None: ...
     def add_field(self, model: Any, field: Any) -> None: ...
     def remove_field(self, model: Any, field: Any) -> None: ...

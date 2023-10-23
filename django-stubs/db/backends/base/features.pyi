@@ -3,13 +3,14 @@ from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, DataError
 
 class BaseDatabaseFeatures:
     minimum_database_version: tuple[int, ...] | None
     gis_enabled: bool
     allows_group_by_lob: bool
     allows_group_by_selected_pks: bool
+    allows_group_by_select_index: bool
     empty_fetchmany_value: Sequence[Any]
     update_can_self_select: bool
     interprets_empty_strings_as_nulls: bool
@@ -36,6 +37,7 @@ class BaseDatabaseFeatures:
     truncates_names: bool
     has_real_datatype: bool
     supports_subqueries_in_group_by: bool
+    ignores_unnecessary_order_by_in_subqueries: bool
     has_native_uuid_field: bool
     has_native_duration_field: bool
     supports_temporal_subtraction: bool
@@ -60,6 +62,7 @@ class BaseDatabaseFeatures:
     can_distinct_on_fields: bool
     atomic_transactions: bool
     can_rollback_ddl: bool
+    schema_editor_uses_clientside_param_binding: bool
     supports_atomic_references_rename: bool
     supports_combined_alters: bool
     supports_foreign_keys: bool
@@ -86,6 +89,7 @@ class BaseDatabaseFeatures:
     supports_select_difference: bool
     supports_slicing_ordering_in_compound: bool
     supports_parentheses_in_compound: bool
+    requires_compound_order_by_subquery: bool
     supports_aggregate_filter_clause: bool
     supports_index_on_text_field: bool
     supports_over_clause: bool
@@ -95,6 +99,7 @@ class BaseDatabaseFeatures:
     time_cast_precision: int
     create_test_procedure_without_params_sql: str | None
     create_test_procedure_with_int_param_sql: str | None
+    create_test_table_with_composite_primary_key: str | None
     supports_callproc_kwargs: bool
     supported_explain_formats: set[str]
     supports_default_in_lead_lag: bool
@@ -109,6 +114,7 @@ class BaseDatabaseFeatures:
     collate_as_index_expression: bool
     allows_multiple_constraints_on_same_fields: bool
     supports_boolean_expr_in_select_clause: bool
+    supports_comparing_boolean_expr: bool
     supports_json_field: bool
     can_introspect_json_field: bool
     supports_primitives_in_json_field: bool
@@ -120,6 +126,11 @@ class BaseDatabaseFeatures:
     supports_collation_on_charfield: bool
     supports_collation_on_textfield: bool
     supports_non_deterministic_collations: bool
+    supports_comments: bool
+    supports_comments_inline: bool
+    supports_logical_xor: bool
+    prohibits_null_characters_in_text_exception: tuple[ValueError | DataError] | None
+    supports_unlimited_charfield: bool
     test_collations: dict[str, str | None]
     test_now_utc_template: str | None
     django_test_expected_failures: set[str]

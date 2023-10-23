@@ -1,6 +1,7 @@
 from collections.abc import Callable, Generator, Iterator, MutableMapping
 from contextlib import contextmanager
 from datetime import tzinfo
+from logging import Logger
 from typing import Any
 
 from django.db.backends.base.client import BaseDatabaseClient
@@ -16,9 +17,13 @@ from typing_extensions import Self, TypeAlias
 NO_DB_ALIAS: str
 RAN_DB_VERSION_CHECK: set[str]
 
+logger: Logger
+
 _ExecuteWrapper: TypeAlias = Callable[
     [Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any
 ]
+
+def timezone_constructor(tzname: str) -> tzinfo: ...
 
 class BaseDatabaseWrapper:
     data_types: dict[str, str]
@@ -97,6 +102,7 @@ class BaseDatabaseWrapper:
     def enable_constraint_checking(self) -> None: ...
     def check_constraints(self, table_names: Any | None = ...) -> None: ...
     def is_usable(self) -> bool: ...
+    def close_if_health_check_failed(self) -> None: ...
     def close_if_unusable_or_obsolete(self) -> None: ...
     @property
     def allow_thread_sharing(self) -> bool: ...
