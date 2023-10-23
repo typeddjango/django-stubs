@@ -35,7 +35,6 @@ from mypy.plugin import (
     SemanticAnalyzerPluginInterface,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.semanal_shared import parse_bool
 from mypy.types import AnyType, Instance, LiteralType, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 from typing_extensions import TypedDict
@@ -174,6 +173,16 @@ def get_call_argument_type_by_name(ctx: Union[FunctionContext, MethodContext], n
 
 def make_optional(typ: MypyType) -> MypyType:
     return UnionType.make_union([typ, NoneTyp()])
+
+
+# Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
+def parse_bool(expr: Expression) -> Optional[bool]:
+    if isinstance(expr, NameExpr):
+        if expr.fullname == "builtins.True":
+            return True
+        if expr.fullname == "builtins.False":
+            return False
+    return None
 
 
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
