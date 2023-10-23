@@ -5,9 +5,9 @@ if [[ -z $(git status -s) ]]
 then
   if [[ "$VIRTUAL_ENV" != ""  ]]
   then
-    pip install --upgrade setuptools wheel twine
+    pip install --upgrade setuptools wheel twine build
     rm -rf dist/ build/
-    python setup.py sdist bdist_wheel
+    python -m build
     twine upload dist/*
     rm -rf dist/ build/
   else
