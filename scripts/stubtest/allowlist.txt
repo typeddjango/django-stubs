@@ -143,3 +143,46 @@ django.middleware.csrf.REASON_BAD_TOKEN
 
 # RemovedInDjango41
 django.core.cache.backends.memcached.MemcachedCache
+
+# We re-export `functools.cached_property` which has different semantics
+django.utils.functional.cached_property.__class_getitem__
+django.utils.functional.cached_property.__init__
+django.utils.functional.cached_property.__set__
+django.utils.functional.cached_property.name
+
+# Ignore @cached_property error "cannot reconcile @property on stub with runtime object"
+django.db.migrations.RenameField.new_name_lower
+django.db.migrations.RenameField.old_name_lower
+django.db.migrations.RenameIndex.new_name_lower
+django.db.migrations.RenameIndex.old_name_lower
+django.db.migrations.RenameModel.new_name_lower
+django.db.migrations.RenameModel.old_name_lower
+django.db.migrations.operations.RenameField.new_name_lower
+django.db.migrations.operations.RenameField.old_name_lower
+django.db.migrations.operations.RenameIndex.new_name_lower
+django.db.migrations.operations.RenameIndex.old_name_lower
+django.db.migrations.operations.RenameModel.new_name_lower
+django.db.migrations.operations.RenameModel.old_name_lower
+django.db.migrations.operations.fields.FieldOperation.model_name_lower
+django.db.migrations.operations.fields.FieldOperation.name_lower
+django.db.migrations.operations.fields.RenameField.new_name_lower
+django.db.migrations.operations.fields.RenameField.old_name_lower
+django.db.migrations.operations.models.AlterTogetherOptionOperation.option_value
+django.db.migrations.operations.models.IndexOperation.model_name_lower
+django.db.migrations.operations.models.ModelOperation.name_lower
+django.db.migrations.operations.models.RenameIndex.new_name_lower
+django.db.migrations.operations.models.RenameIndex.old_name_lower
+django.db.migrations.operations.models.RenameModel.new_name_lower
+django.db.migrations.operations.models.RenameModel.old_name_lower
+django.db.migrations.state.ModelState.name_lower
+django.db.migrations.state.ProjectState.apps
+django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
+django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
+django.middleware.csrf.CsrfViewMiddleware.csrf_trusted_origins_hosts
+django.urls.URLPattern.lookup_str
+django.urls.URLResolver.url_patterns
+django.urls.URLResolver.urlconf_module
+django.urls.resolvers.URLPattern.lookup_str
+django.urls.resolvers.URLResolver.url_patterns
+django.urls.resolvers.URLResolver.urlconf_module
+django.utils.connection.BaseConnectionHandler.settings

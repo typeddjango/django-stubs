@@ -1,20 +1,13 @@
 from collections.abc import Callable, Sequence
+
+# Mypy has special handling for functools.cached_property, reuse typeshed's definition instead of defining our own
+from functools import cached_property as cached_property
 from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, overload
 
 from django.db.models.base import Model
 from typing_extensions import Self, TypeAlias
 
 _T = TypeVar("_T")
-
-class cached_property(Generic[_T]):
-    func: Callable[[Any], _T]
-    name: str | None
-    def __init__(self, func: Callable[[Any], _T], name: str | None = ...) -> None: ...
-    @overload
-    def __get__(self, instance: None, cls: type[Any] | None = ...) -> Self: ...
-    @overload
-    def __get__(self, instance: object, cls: type[Any] | None = ...) -> _T: ...
-    def __set_name__(self, owner: type[Any], name: str) -> None: ...
 
 # Promise is only subclassed by a proxy class defined in the lazy function
 # so it makes sense for it to have all the methods available in that proxy class
