@@ -390,3 +390,6 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+django.contrib.gis.db.models.aggregates.GeoAggregate.output_field
+django.contrib.gis.db.models.functions.DistanceResultMixin.output_field
+django.db.models.expressions.BaseExpression.output_field

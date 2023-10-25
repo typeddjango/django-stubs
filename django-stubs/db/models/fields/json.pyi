@@ -58,7 +58,7 @@ class KeyTransform(Transform):
 class KeyTextTransform(KeyTransform):
     postgres_operator: str
     postgres_nested_operator: str
-    output_field: ClassVar[TextField]  # type: ignore[assignment]
+    output_field: ClassVar[TextField]
     @classmethod
     def from_lookup(cls, lookup: str) -> Self: ...
 

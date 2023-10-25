@@ -56,23 +56,23 @@ class AdjacentToLookup(PostgresOperatorLookup): ...
 
 class RangeStartsWith(models.Transform):
     @property
-    def output_field(self) -> models.Field: ...  # type: ignore[override]
+    def output_field(self) -> models.Field: ...
 
 class RangeEndsWith(models.Transform):
     @property
-    def output_field(self) -> models.Field: ...  # type: ignore[override]
+    def output_field(self) -> models.Field: ...
 
 class IsEmpty(models.Transform):
-    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]
 
 class LowerInclusive(models.Transform):
-    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]
 
 class LowerInfinite(models.Transform):
-    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]
 
 class UpperInclusive(models.Transform):
-    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]
 
 class UpperInfinite(models.Transform):
-    output_field: ClassVar[models.BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[models.BooleanField]

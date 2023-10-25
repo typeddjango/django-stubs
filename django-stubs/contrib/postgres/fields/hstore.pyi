@@ -8,7 +8,7 @@ class HStoreField(CheckFieldDefaultMixin, Field):
     def get_transform(self, name: str) -> Any: ...
 
 class KeyTransform(Transform):
-    output_field: ClassVar[TextField]  # type: ignore[assignment]
+    output_field: ClassVar[TextField]
 
     def __init__(self, key_name: str, *args: Any, **kwargs: Any) -> None: ...
 
@@ -17,7 +17,7 @@ class KeyTransformFactory:
     def __call__(self, *args: Any, **kwargs: Any) -> KeyTransform: ...
 
 class KeysTransform(Transform):
-    output_field: ClassVar[ArrayField]  # type: ignore[assignment]
+    output_field: ClassVar[ArrayField]
 
 class ValuesTransform(Transform):
-    output_field: ClassVar[ArrayField]  # type: ignore[assignment]
+    output_field: ClassVar[ArrayField]

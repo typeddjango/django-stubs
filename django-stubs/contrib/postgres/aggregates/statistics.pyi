@@ -3,7 +3,7 @@ from typing import ClassVar
 from django.db.models import Aggregate, FloatField, IntegerField
 
 class StatAggregate(Aggregate):
-    output_field: ClassVar[FloatField]  # type: ignore[assignment]
+    output_field: ClassVar[FloatField]
 
 class Corr(StatAggregate): ...
 class CovarPop(StatAggregate): ...

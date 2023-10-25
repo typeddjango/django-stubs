@@ -9,7 +9,7 @@ class TimezoneMixin:
 
 class Extract(TimezoneMixin, Transform):
     lookup_name: str
-    output_field: ClassVar[models.IntegerField]  # type: ignore[assignment]
+    output_field: ClassVar[models.IntegerField]
     def __init__(
         self, expression: Any, lookup_name: str | None = ..., tzinfo: Any | None = ..., **extra: Any
     ) -> None: ...
@@ -27,7 +27,7 @@ class ExtractMinute(Extract): ...
 class ExtractSecond(Extract): ...
 
 class Now(Func):
-    output_field: ClassVar[models.DateTimeField]  # type: ignore[assignment]
+    output_field: ClassVar[models.DateTimeField]
 
 class TruncBase(TimezoneMixin, Transform):
     kind: str
@@ -41,10 +41,10 @@ class TruncWeek(TruncBase): ...
 class TruncDay(TruncBase): ...
 
 class TruncDate(TruncBase):
-    output_field: ClassVar[models.DateField]  # type: ignore[assignment]
+    output_field: ClassVar[models.DateField]
 
 class TruncTime(TruncBase):
-    output_field: ClassVar[models.TimeField]  # type: ignore[assignment]
+    output_field: ClassVar[models.TimeField]
 
 class TruncHour(TruncBase): ...
 class TruncMinute(TruncBase): ...

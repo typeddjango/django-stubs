@@ -7,19 +7,19 @@ from .mixins import OrderableAggMixin
 
 class ArrayAgg(OrderableAggMixin, Aggregate):
     @property
-    def output_field(self) -> ArrayField: ...  # type: ignore[override]
+    def output_field(self) -> ArrayField: ...
 
 class BitAnd(Aggregate): ...
 class BitOr(Aggregate): ...
 
 class BoolAnd(Aggregate):
-    output_field: ClassVar[BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[BooleanField]
 
 class BoolOr(Aggregate):
-    output_field: ClassVar[BooleanField]  # type: ignore[assignment]
+    output_field: ClassVar[BooleanField]
 
 class JSONBAgg(OrderableAggMixin, Aggregate):
-    output_field: ClassVar[JSONField]  # type: ignore[assignment]
+    output_field: ClassVar[JSONField]
 
 class StringAgg(OrderableAggMixin, Aggregate):
-    output_field: ClassVar[TextField]  # type: ignore[assignment]
+    output_field: ClassVar[TextField]
