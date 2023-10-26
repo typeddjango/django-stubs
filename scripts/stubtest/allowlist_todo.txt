@@ -90,7 +90,6 @@ django.contrib.admin.utils.prepare_lookup_value
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.admin_site
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.process_request
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.serialize_result
-django.contrib.admin.views.main.ChangeList.__init__
 django.contrib.admin.views.main.ChangeList.search_form_class
 django.contrib.admin.views.main.ChangeListSearchForm
 django.contrib.admin.widgets.AutocompleteMixin.media
