@@ -17,14 +17,14 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""]
-    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
-    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
+    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[Any] | None]]
+    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[Any] | None]]
     state_operations: Sequence[Operation]
     hints: Mapping[str, Any]
     def __init__(
         self,
-        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]],
-        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]] = ...,
+        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[Any] | None]],
+        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[Any] | None]] = ...,
         state_operations: Sequence[Operation] | None = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
