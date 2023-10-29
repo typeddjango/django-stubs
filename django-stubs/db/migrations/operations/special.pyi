@@ -4,8 +4,11 @@ from typing import Any, Literal, Protocol
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
 from django.utils.datastructures import _ListOrTuple
+from typing_extensions import TypeAlias
 
 from .base import Operation
+
+_SqlOperations: TypeAlias = str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[Any] | None]]
 
 class SeparateDatabaseAndState(Operation):
     database_operations: Sequence[Operation]
@@ -17,14 +20,14 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""]
-    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
-    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
+    sql: _SqlOperations
+    reverse_sql: _SqlOperations | None
     state_operations: Sequence[Operation]
     hints: Mapping[str, Any]
     def __init__(
         self,
-        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]],
-        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]] = ...,
+        sql: _SqlOperations,
+        reverse_sql: _SqlOperations | None = ...,
         state_operations: Sequence[Operation] | None = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
