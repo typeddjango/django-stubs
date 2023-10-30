@@ -26,9 +26,7 @@ django.db.models.fields.related_descriptors.RelatedManager
 # _locally/dynamically_ runtime -- Created via
 # 'django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager'
 django.contrib.admin.models.LogEntry_RelatedManager
-django.contrib.auth.models.Group_RelatedManager
 django.contrib.auth.models.Permission_RelatedManager
-django.contrib.auth.models.User_RelatedManager
 
 # BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
 django.utils.archive.BaseArchive.list

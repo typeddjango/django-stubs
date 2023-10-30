@@ -167,7 +167,6 @@ django.contrib.auth.models.GroupManager.__slotnames__
 django.contrib.auth.models.Permission.codename
 django.contrib.auth.models.Permission.content_type
 django.contrib.auth.models.Permission.content_type_id
-django.contrib.auth.models.Permission.group_set
 django.contrib.auth.models.Permission.id
 django.contrib.auth.models.Permission.name
 django.contrib.auth.models.Permission.user_set
