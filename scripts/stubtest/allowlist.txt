@@ -20,6 +20,14 @@ django.core.files.storage.default_storage
 # 'ManyRelatedManager' does exist and is declared locally, inside a function body
 django.db.models.fields.related_descriptors.ManyRelatedManager
 
+# '<Model>_RelatedManager' entries are plugin generated and these subclasses only exist
+# _locally/dynamically_ runtime -- Created via
+# 'django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager'
+django.contrib.admin.models.LogEntry_RelatedManager
+django.contrib.auth.models.Group_RelatedManager
+django.contrib.auth.models.Permission_RelatedManager
+django.contrib.auth.models.User_RelatedManager
+
 # BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
 django.utils.archive.BaseArchive.list
 django.utils.archive.BaseArchive.extract
