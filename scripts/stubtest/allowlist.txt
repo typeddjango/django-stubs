@@ -163,6 +163,7 @@ django.contrib.gis.forms.BaseForm.changed_data
 django.contrib.gis.forms.BaseFormSet.forms
 django.contrib.gis.forms.BaseFormSet.management_form
 django.contrib.gis.forms.BoundField.subwidgets
+django.contrib.postgres.expressions.ArraySubquery.output_field
 django.core.files.File.size
 django.core.files.base.File.size
 django.core.files.storage.FileSystemStorage.base_location
