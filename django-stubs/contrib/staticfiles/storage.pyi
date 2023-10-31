@@ -10,8 +10,6 @@ from typing_extensions import TypeAlias
 _PostProcessT: TypeAlias = Iterator[tuple[str, str, bool] | tuple[str, None, RuntimeError]]
 
 class StaticFilesStorage(FileSystemStorage):
-    base_location: str
-    location: _PathCompatible
     def __init__(
         self, location: _PathCompatible | None = ..., base_url: str | None = ..., *args: Any, **kwargs: Any
     ) -> None: ...

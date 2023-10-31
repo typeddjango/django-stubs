@@ -3,6 +3,7 @@ from typing import Any
 
 from _typeshed import Incomplete
 from django.template.exceptions import TemplateSyntaxError
+from django.utils.functional import cached_property
 
 from .base import BaseEngine
 
@@ -10,7 +11,7 @@ class Jinja2(BaseEngine):
     env: Any
     context_processors: list[str]
     def __init__(self, params: dict[str, Any]) -> None: ...
-    @property
+    @cached_property
     def template_context_processors(self) -> list[Callable]: ...
 
 class Origin:

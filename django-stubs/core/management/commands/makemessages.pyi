@@ -2,6 +2,7 @@ from re import Pattern
 from typing import Any
 
 from django.core.management.base import BaseCommand
+from django.utils.functional import cached_property
 
 plural_forms_re: Pattern[str]
 STATUS_OK: int
@@ -21,11 +22,11 @@ class BuildFile:
     """
 
     def __init__(self, command: BaseCommand, domain: str, translatable: TranslatableFile) -> None: ...
-    @property
+    @cached_property
     def is_templatized(self) -> bool: ...
-    @property
+    @cached_property
     def path(self) -> str: ...
-    @property
+    @cached_property
     def work_path(self) -> str: ...
     def preprocess(self) -> None: ...
     def postprocess_messages(self, msgs: str) -> str: ...

@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from django.apps.config import AppConfig
 from django.core.management.base import BaseCommand
 from django.db.models.base import Model
+from django.utils.functional import cached_property
 
 has_bz2: bool
 has_lzma: bool
@@ -22,7 +23,7 @@ class Command(BaseCommand):
     def loaddata(self, fixture_labels: Sequence[str]) -> None: ...
     def load_label(self, fixture_label: str) -> None: ...
     def find_fixtures(self, fixture_label: str) -> list[tuple[str, str | None, str | None]]: ...
-    @property
+    @cached_property
     def fixture_dirs(self) -> list[str]: ...
     def parse_name(self, fixture_name: str) -> tuple[str, str | None, str | None]: ...
 
