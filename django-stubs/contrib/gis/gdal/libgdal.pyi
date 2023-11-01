@@ -9,6 +9,7 @@ from _ctypes import _CData
 logger: Logger
 lib_path: str
 lib_names: list[str] | None
+lib_name: str
 lgdal: CDLL
 if sys.platform == "win32":
     from ctypes import WinDLL
