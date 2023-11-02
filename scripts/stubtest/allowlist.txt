@@ -19,6 +19,8 @@ django.core.files.storage.default_storage
 
 # 'ManyRelatedManager' does exist and is declared locally, inside a function body
 django.db.models.fields.related_descriptors.ManyRelatedManager
+# 'RelatedManager' does exist and is declared locally, inside a function body
+django.db.models.fields.related_descriptors.RelatedManager
 
 # '<Model>_RelatedManager' entries are plugin generated and these subclasses only exist
 # _locally/dynamically_ runtime -- Created via

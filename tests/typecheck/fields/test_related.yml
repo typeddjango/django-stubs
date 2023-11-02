@@ -4,7 +4,7 @@
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
         publisher = Publisher()
-        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
         - myapp
     files:
@@ -70,8 +70,8 @@
         reveal_type(book.publisher2)  # N: Revealed type is "myapp.models.Publisher"
 
         publisher = Publisher()
-        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
-        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
         - myapp
     files:
@@ -137,9 +137,9 @@
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
-                        reveal_type(self.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
-                        reveal_type(self.members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
-                        reveal_type(self.sheets)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Sheet]"
+                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
+                        reveal_type(self.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Member]"
+                        reveal_type(self.sheets)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Sheet]"
                         reveal_type(self.profile)  # N: Revealed type is "myapp.models.Profile"
                 class View(models.Model):
                     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
@@ -153,7 +153,7 @@
 -   case: test_circular_dependency_in_imports_with_string_based
     main: |
         from myapp.models import View
-        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
+        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
         View().app.unknown  # E: "App" has no attribute "unknown"  [attr-defined]
     installed_apps:
         - myapp
@@ -172,13 +172,13 @@
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
-                        reveal_type(self.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
+                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
 
 -   case: models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model
     main: |
         from myapp.models import App
-        reveal_type(App().views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
-        reveal_type(App().views2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View2]"
+        reveal_type(App().views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
+        reveal_type(App().views2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View2]"
     installed_apps:
         - myapp
     files:
@@ -196,7 +196,7 @@
 -   case: models_imported_inside_init_file_foreign_key
     main: |
         from myapp2.models import View
-        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp2.models.View]"
+        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp2.models.View]"
     installed_apps:
         - myapp
         - myapp2
@@ -280,11 +280,11 @@
         from myapp.models import App, Member
         reveal_type(Member().apps)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.App]"
         reveal_type(Member().apps.get())  # N: Revealed type is "myapp.models.App"
-        reveal_type(App().members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
+        reveal_type(App().members)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Member]"
         reveal_type(App().members.get())  # N: Revealed type is "myapp.models.Member"
         reveal_type(Member.apps.field)  # N: Revealed type is "django.db.models.fields.related.ManyToManyField[Any, myapp.models.Member_apps]"
         # XXX the following is not correct:
-        reveal_type(App.members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
+        reveal_type(App.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Member]"
     installed_apps:
         - myapp
     files:
@@ -372,7 +372,7 @@
 -   case: if_no_related_name_is_passed_create_default_related_managers
     main: |
         from myapp.models import Publisher
-        reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
         - myapp
     files:
@@ -474,7 +474,7 @@
 
         publisher = Publisher()
         reveal_type(publisher.books)
-        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     out: |
         main:6: error: "Publisher" has no attribute "books"; maybe "books2"?  [attr-defined]
         main:6: note: Revealed type is "Any"
@@ -564,8 +564,8 @@
 -   case: related_manager_name_defined_by_pattern
     main: |
         from myapp.models import Publisher
-        reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
-        reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Article]"
+        reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
     installed_apps:
         - myapp
     files:
@@ -620,8 +620,8 @@
         reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
 
         user = MyUser()
-        reveal_type(user.book_set) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
-        reveal_type(user.article_set) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Article]"
+        reveal_type(user.book_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(user.article_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
     installed_apps:
         - myapp
     files:
@@ -736,7 +736,7 @@
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
         myapp/models:11: error: Could not resolve manager type for "myapp.models.Transaction.objects"  [django-manager-missing]
-        myapp/models:13: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
+        myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
         myapp/models:15: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Transaction]"
         myapp/models:16: note: Revealed type is "Any"
 
