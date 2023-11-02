@@ -7,7 +7,7 @@ from typing import Any
 from _ctypes import _CData
 
 logger: Logger
-lib_path: str
+lib_path: str | None
 lib_names: list[str] | None
 lib_name: str
 lgdal: CDLL
