@@ -86,6 +86,7 @@ class ReverseManyToOneDescriptor:
     def __get__(self, instance: Model, cls: Any = ...) -> type[RelatedManager[Any]]: ...
     def __set__(self, instance: Any, value: Any) -> NoReturn: ...
 
+# Fake class, Django defines 'RelatedManager' inside a function body
 class RelatedManager(BaseManager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
@@ -123,6 +124,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_M]):
     @property
     def related_manager_cls(self) -> type[ManyRelatedManager[Any]]: ...  # type: ignore[override]
 
+# Fake class, Django defines 'ManyRelatedManager' inside a function body
 class ManyRelatedManager(BaseManager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
