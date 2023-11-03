@@ -1705,7 +1705,6 @@ django.db.models.manager.BaseManager.using
 django.db.models.manager.BaseManager.values
 django.db.models.manager.BaseManager.values_list
 django.db.models.manager.Manager.__slotnames__
-django.db.models.manager.RelatedManager
 django.db.models.options.Options.base_manager
 django.db.models.options.Options.concrete_fields
 django.db.models.options.Options.db_returning_fields
