@@ -359,7 +359,6 @@ django.contrib.gis.db.models.Field.__deepcopy__
 django.contrib.gis.db.models.Field.__ge__
 django.contrib.gis.db.models.Field.__get__
 django.contrib.gis.db.models.Field.__gt__
-django.contrib.gis.db.models.Field.__init__
 django.contrib.gis.db.models.Field.__le__
 django.contrib.gis.db.models.Field.__lt__
 django.contrib.gis.db.models.Field.__set__
@@ -1102,7 +1101,6 @@ django.db.models.Field.__deepcopy__
 django.db.models.Field.__ge__
 django.db.models.Field.__get__
 django.db.models.Field.__gt__
-django.db.models.Field.__init__
 django.db.models.Field.__le__
 django.db.models.Field.__lt__
 django.db.models.Field.__set__
@@ -1393,7 +1391,6 @@ django.db.models.fields.Field.__deepcopy__
 django.db.models.fields.Field.__ge__
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__gt__
-django.db.models.fields.Field.__init__
 django.db.models.fields.Field.__le__
 django.db.models.fields.Field.__lt__
 django.db.models.fields.Field.__set__
