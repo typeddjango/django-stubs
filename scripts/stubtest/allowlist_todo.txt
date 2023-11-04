@@ -1527,7 +1527,6 @@ django.db.models.fields.related.OneToOneField.formfield
 django.db.models.fields.related.OneToOneField.forward_related_accessor_class
 django.db.models.fields.related.OneToOneField.related_accessor_class
 django.db.models.fields.related.OneToOneRel.__init__
-django.db.models.fields.related.RelatedField.__init__
 django.db.models.fields.related.RelatedField.formfield
 django.db.models.fields.related.RelatedField.related_model
 django.db.models.fields.related.ReverseManyToOneDescriptor.related_manager_cls
