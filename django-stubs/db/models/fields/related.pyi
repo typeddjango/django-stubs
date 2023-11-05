@@ -41,6 +41,36 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     remote_field: ForeignObjectRel
     rel_class: type[ForeignObjectRel]
     swappable: bool
+    def __init__(
+        self,
+        related_name: str | None = ...,
+        related_query_name: str | None = ...,
+        limit_choices_to: _AllLimitChoicesTo | None = ...,
+        *,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
     @property
     def related_model(self) -> type[Model] | Literal["self"]: ...  # type: ignore[override]
     def get_forward_related_filter(self, obj: Model) -> dict[str, int | UUID]: ...
@@ -73,7 +103,6 @@ class ForeignObject(RelatedField[_ST, _GT]):
         parent_link: bool = ...,
         swappable: bool = ...,
         *,
-        db_constraint: bool = ...,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,
@@ -88,10 +117,10 @@ class ForeignObject(RelatedField[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     # class access
     @overload
@@ -147,10 +176,10 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
 
 class OneToOneField(ForeignKey[_ST, _GT]):
@@ -188,10 +217,10 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     # class access
     @overload
@@ -247,9 +276,9 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _M]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     # class access
     @overload
