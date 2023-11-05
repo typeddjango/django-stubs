@@ -1,13 +1,11 @@
-from collections.abc import Sequence
-from typing import Any
-
 from django.utils._os import _PathCompatible
+from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
 
 from .base import Storage
 from .mixins import StorageSettingsMixin
 
-class FileSystemStorage(Storage, StorageSettingsMixin):
+class FileSystemStorage(_Deconstructible, Storage, StorageSettingsMixin):
     OS_OPEN_FLAGS: int
 
     def __init__(
@@ -27,4 +25,3 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
     def file_permissions_mode(self) -> int | None: ...
     @cached_property
     def directory_permissions_mode(self) -> int | None: ...
-    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...  # fake
