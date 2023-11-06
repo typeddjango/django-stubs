@@ -159,7 +159,6 @@ django.contrib.gis.admin.options.GeoModelAdminMixin
 django.contrib.gis.admin.site
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.supports_geography
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geojson_options
-django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.mariadb
 django.contrib.gis.db.backends.mysql.base
 django.contrib.gis.db.backends.mysql.introspection
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
