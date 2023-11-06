@@ -10,7 +10,6 @@ from django.forms.boundfield import BoundField
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, Widget
-from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from typing_extensions import TypedDict
 
@@ -147,8 +146,7 @@ class InlineAdminFormSet:
     def inline_formset_data(self) -> str: ...
     @property
     def forms(self) -> list[BaseForm]: ...
-    @cached_property
-    def non_form_errors(self) -> Callable[[], ErrorList]: ...
+    def non_form_errors(self) -> ErrorList: ...
     @property
     def media(self) -> Media: ...
 

@@ -162,7 +162,6 @@ django.utils.functional.cached_property.__set__
 django.utils.functional.cached_property.name
 
 # Ignore @cached_property error "cannot reconcile @property on stub with runtime object"
-django.contrib.admin.helpers.InlineAdminFormSet.non_form_errors
 django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor.related_manager_cls
 django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_extent
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
