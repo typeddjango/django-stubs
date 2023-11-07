@@ -1953,8 +1953,6 @@ django.templatetags.tz.timezone_constructor
 django.test.SimpleTestCase.assertFormError
 django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
-django.test.TransactionTestCase.assertNumQueries
-django.test.TransactionTestCase.assertQuerySetEqual
 django.test.runner.DiscoverRunner.build_suite
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by
@@ -1997,8 +1995,6 @@ django.test.testcases.SerializeMixin.tearDownClass
 django.test.testcases.SimpleTestCase.assertFormError
 django.test.testcases.SimpleTestCase.assertFormSetError
 django.test.testcases.SimpleTestCase.assertTemplateNotUsed
-django.test.testcases.TransactionTestCase.assertNumQueries
-django.test.testcases.TransactionTestCase.assertQuerySetEqual
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
 django.test.utils.TimeKeeperProtocol
