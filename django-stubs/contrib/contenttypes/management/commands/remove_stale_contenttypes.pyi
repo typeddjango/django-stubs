@@ -1,10 +1,8 @@
-from _typeshed import Unused
 from typing import Literal
 
-from django.db.models.deletion import Collector
-
+from _typeshed import Unused
 from django.core.management import BaseCommand
-
+from django.db.models.deletion import Collector
 
 class Command(BaseCommand): ...
 

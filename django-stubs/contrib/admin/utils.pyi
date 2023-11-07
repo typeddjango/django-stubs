@@ -1,15 +1,16 @@
 import datetime
-from _typeshed import Unused
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, overload, TypeVar
+from typing import Any, Literal, TypeVar, overload
 from uuid import UUID
 
+from _typeshed import Unused
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.db.models.base import Model
 from django.db.models.deletion import Collector
+from django.db.models.fields import Field, reverse_related
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
@@ -18,9 +19,7 @@ from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
 from typing_extensions import TypedDict
 
-from django.db.models.fields import Field, reverse_related
-
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 
