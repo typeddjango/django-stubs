@@ -214,7 +214,6 @@ django.contrib.contenttypes.admin.GenericTabularInline
 django.contrib.contenttypes.fields.GenericRelation.contribute_to_class
 django.contrib.contenttypes.fields.GenericRelation.get_extra_restriction
 django.contrib.contenttypes.forms.generic_inlineformset_factory
-django.contrib.contenttypes.management.commands.remove_stale_contenttypes.Command.handle
 django.contrib.contenttypes.management.inject_rename_contenttypes_operations
 django.contrib.contenttypes.models.ContentType.app_label
 django.contrib.contenttypes.models.ContentType.app_labeled_name
@@ -711,7 +710,6 @@ django.contrib.sessions.base_session.AbstractBaseSession.get_previous_by_expire_
 django.contrib.sessions.base_session.AbstractBaseSession.session_data
 django.contrib.sessions.base_session.AbstractBaseSession.session_key
 django.contrib.sessions.base_session.BaseSessionManager.__slotnames__
-django.contrib.sessions.management.commands.clearsessions.Command.handle
 django.contrib.sessions.models.Session.expire_date
 django.contrib.sessions.models.Session.get_next_by_expire_date
 django.contrib.sessions.models.Session.get_previous_by_expire_date
@@ -782,13 +780,8 @@ django.core.management.BaseCommand.suppressed_base_arguments
 django.core.management.base.ALL_CHECKS
 django.core.management.base.BaseCommand.add_base_argument
 django.core.management.base.BaseCommand.suppressed_base_arguments
-django.core.management.commands.compilemessages.Command.handle
-django.core.management.commands.dbshell.Command.handle
-django.core.management.commands.diffsettings.Command.handle
-django.core.management.commands.flush.Command.handle
 django.core.management.commands.flush.Command.stealth_options
 django.core.management.commands.inspectdb.Command.get_meta
-django.core.management.commands.inspectdb.Command.handle
 django.core.management.commands.loaddata.Command.compression_formats
 django.core.management.commands.loaddata.Command.find_fixture_files_in_dir
 django.core.management.commands.loaddata.Command.get_fixture_name_and_dirs
@@ -813,11 +806,6 @@ django.core.management.commands.makemessages.is_valid_locale
 django.core.management.commands.runserver.Command.on_bind
 django.core.management.commands.runserver.Command.suppressed_base_arguments
 django.core.management.commands.runserver.naiveip_re
-django.core.management.commands.shell.Command.handle
-django.core.management.commands.sqlflush.Command.handle
-django.core.management.commands.squashmigrations.Command.handle
-django.core.management.commands.startapp.Command.handle
-django.core.management.commands.startproject.Command.handle
 django.core.management.utils.find_formatters
 django.core.management.utils.run_formatters
 django.core.management.utils.sentinel

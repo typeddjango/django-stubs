@@ -7,6 +7,8 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 class Command(BaseCommand):
     stealth_options: tuple[str]
     db_module: str
+
+    def handle(self, **options: Any) -> None: ...
     def handle_inspection(self, options: dict[str, Any]) -> Iterable[str]: ...
     def normalize_col_name(
         self, col_name: str, used_column_names: list[str], is_relation: bool
