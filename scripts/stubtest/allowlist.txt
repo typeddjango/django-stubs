@@ -234,10 +234,13 @@ django.core.files.storage.memory.InMemoryStorage.file_permissions_mode
 django.core.files.storage.memory.InMemoryStorage.location
 django.core.handlers.asgi.ASGIRequest.COOKIES
 django.core.handlers.asgi.ASGIRequest.GET
+django.core.management.commands.loaddata.Command.compression_formats
 django.core.management.commands.loaddata.Command.fixture_dirs
 django.core.management.commands.makemessages.BuildFile.is_templatized
 django.core.management.commands.makemessages.BuildFile.path
 django.core.management.commands.makemessages.BuildFile.work_path
+django.core.management.commands.makemessages.Command.gettext_version
+django.core.management.commands.makemessages.Command.settings_available
 django.core.paginator.Paginator.count
 django.core.paginator.Paginator.num_pages
 django.db.backends.base.base.BaseDatabaseWrapper.timezone
