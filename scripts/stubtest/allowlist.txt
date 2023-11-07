@@ -305,6 +305,7 @@ django.db.models.Lookup.contains_aggregate
 django.db.models.Lookup.contains_over_clause
 django.db.models.expressions.BaseExpression.contains_aggregate
 django.db.models.expressions.BaseExpression.contains_column_references
+django.db.models.expressions.BaseExpression.contains_subquery
 django.db.models.expressions.BaseExpression.contains_over_clause
 django.db.models.expressions.BaseExpression.convert_value
 django.db.models.fields.DecimalField.validators
