@@ -80,8 +80,6 @@ django.contrib.admin.templatetags.admin_list.DOT
 django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
 django.contrib.admin.tests.CSPMiddleware.process_response
-django.contrib.admin.utils.NestedObjects.collect
-django.contrib.admin.utils.NestedObjects.nested
 django.contrib.admin.utils.QUOTE_MAP
 django.contrib.admin.utils.UNQUOTE_MAP
 django.contrib.admin.utils.prepare_lookup_value
@@ -1183,7 +1181,6 @@ django.db.models.constraints.CheckConstraint.validate
 django.db.models.constraints.UniqueConstraint.__init__
 django.db.models.constraints.UniqueConstraint.contains_expressions
 django.db.models.constraints.UniqueConstraint.validate
-django.db.models.deletion.Collector.__init__
 django.db.models.expressions.BaseExpression.empty_result_set_value
 django.db.models.expressions.BaseExpression.get_refs
 django.db.models.expressions.BaseExpression.output_field
