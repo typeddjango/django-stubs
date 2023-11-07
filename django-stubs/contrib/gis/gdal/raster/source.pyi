@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
 from django.contrib.gis.gdal.srs import SpatialReference
+from django.utils.functional import cached_property
 
 class TransformPoint(list[Sequence[float]]):
     indices: dict[str, tuple[int, int]]
@@ -26,11 +27,11 @@ class GDALRaster(GDALRasterBase):
     def __del__(self) -> None: ...
     @property
     def vsi_buffer(self) -> bytes | None: ...
-    @property
+    @cached_property
     def is_vsi_based(self) -> bool: ...
     @property
     def name(self) -> str: ...
-    @property
+    @cached_property
     def driver(self) -> Driver: ...
     @property
     def width(self) -> int: ...

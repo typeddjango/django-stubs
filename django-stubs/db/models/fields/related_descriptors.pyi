@@ -9,6 +9,7 @@ from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel,
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
+from django.utils.functional import cached_property
 from typing_extensions import Self
 
 _M = TypeVar("_M", bound=Model)
@@ -22,7 +23,7 @@ class ForeignKeyDeferredAttribute(DeferredAttribute):
 class ForwardManyToOneDescriptor(Generic[_F]):
     field: _F
     def __init__(self, field_with_rel: _F) -> None: ...
-    @property
+    @cached_property
     def RelatedObjectDoesNotExist(self) -> type[ObjectDoesNotExist]: ...
     def is_cached(self, instance: Model) -> bool: ...
     def get_queryset(self, **hints: Any) -> QuerySet: ...
@@ -51,7 +52,7 @@ class ReverseOneToOneDescriptor(Generic[_From, _To]):
 
     related: OneToOneRel
     def __init__(self, related: OneToOneRel) -> None: ...
-    @property
+    @cached_property
     def RelatedObjectDoesNotExist(self) -> type[ObjectDoesNotExist]: ...
     def is_cached(self, instance: _From) -> bool: ...
     def get_queryset(self, **hints: Any) -> QuerySet[_To]: ...
@@ -78,7 +79,7 @@ class ReverseManyToOneDescriptor:
     rel: ManyToOneRel
     field: ForeignKey
     def __init__(self, rel: ManyToOneRel) -> None: ...
-    @property
+    @cached_property
     def related_manager_cls(self) -> type[RelatedManager[Any]]: ...
     @overload
     def __get__(self, instance: None, cls: Any = ...) -> Self: ...
@@ -121,7 +122,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_M]):
     def __init__(self, rel: ManyToManyRel, reverse: bool = ...) -> None: ...
     @property
     def through(self) -> type[_M]: ...
-    @property
+    @cached_property
     def related_manager_cls(self) -> type[ManyRelatedManager[Any]]: ...  # type: ignore[override]
 
 # Fake class, Django defines 'ManyRelatedManager' inside a function body
