@@ -1,7 +1,7 @@
 import zipfile
 from collections.abc import Sequence
 from io import BufferedReader
-from typing import Callable, Literal, TypeAlias
+from typing import Callable, Literal
 
 from django.apps.config import AppConfig
 from django.core.management.base import BaseCommand
@@ -9,6 +9,7 @@ from django.core.serializers.base import DeserializedObject
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.utils.functional import cached_property
+from typing_extensions import TypeAlias
 
 has_bz2: bool
 has_lzma: bool
