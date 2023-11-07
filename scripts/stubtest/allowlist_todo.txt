@@ -436,7 +436,6 @@ django.contrib.gis.db.models.ImageField.attr_class
 django.contrib.gis.db.models.ImageField.contribute_to_class
 django.contrib.gis.db.models.ImageField.descriptor_class
 django.contrib.gis.db.models.ImageField.formfield
-django.contrib.gis.db.models.IntegerChoices.__new__
 django.contrib.gis.db.models.IntegerField.class_lookups
 django.contrib.gis.db.models.IntegerField.formfield
 django.contrib.gis.db.models.IntegerField.validators
@@ -512,7 +511,6 @@ django.contrib.gis.db.models.Subquery.empty_result_set_value
 django.contrib.gis.db.models.Subquery.external_aliases
 django.contrib.gis.db.models.Subquery.get_external_cols
 django.contrib.gis.db.models.Subquery.subquery
-django.contrib.gis.db.models.TextChoices.__new__
 django.contrib.gis.db.models.TextField.formfield
 django.contrib.gis.db.models.TimeField.class_lookups
 django.contrib.gis.db.models.TimeField.formfield
@@ -1149,7 +1147,6 @@ django.db.models.ImageField.attr_class
 django.db.models.ImageField.contribute_to_class
 django.db.models.ImageField.descriptor_class
 django.db.models.ImageField.formfield
-django.db.models.IntegerChoices.__new__
 django.db.models.IntegerField.class_lookups
 django.db.models.IntegerField.formfield
 django.db.models.IntegerField.validators
@@ -1224,7 +1221,6 @@ django.db.models.Subquery.empty_result_set_value
 django.db.models.Subquery.external_aliases
 django.db.models.Subquery.get_external_cols
 django.db.models.Subquery.subquery
-django.db.models.TextChoices.__new__
 django.db.models.TextField.formfield
 django.db.models.TimeField.class_lookups
 django.db.models.TimeField.formfield
@@ -1268,14 +1264,6 @@ django.db.models.constraints.UniqueConstraint.__init__
 django.db.models.constraints.UniqueConstraint.contains_expressions
 django.db.models.constraints.UniqueConstraint.validate
 django.db.models.deletion.Collector.__init__
-django.db.models.enums.ChoicesMeta.__new__
-django.db.models.enums.ChoicesMeta.choices
-django.db.models.enums.ChoicesMeta.labels
-django.db.models.enums.ChoicesMeta.names
-django.db.models.enums.ChoicesMeta.values
-django.db.models.enums.IntegerChoices.__new__
-django.db.models.enums.TextChoices.__new__
-django.db.models.enums.enum_property
 django.db.models.expressions.BaseExpression.contains_aggregate
 django.db.models.expressions.BaseExpression.contains_column_references
 django.db.models.expressions.BaseExpression.contains_over_clause
