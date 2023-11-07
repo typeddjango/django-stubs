@@ -218,12 +218,12 @@ class TransactionTestCase(SimpleTestCase):
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
         values: Collection[Any],
-        transform: Callable[[Model], Any] | type[str] = ...,
+        transform: Callable[[Model], Any] | type[str] | None = ...,
         ordered: bool = ...,
         msg: str | None = ...,
     ) -> None: ...
     @overload
-    def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore[misc]
+    def assertNumQueries(self, num: int, func: None = ..., *, using: str = ...) -> _AssertNumQueriesContext: ...
     @overload
     def assertNumQueries(
         self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any
