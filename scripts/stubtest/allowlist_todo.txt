@@ -1386,7 +1386,6 @@ django.db.models.functions.ExtractYear.class_lookups
 django.db.models.functions.JSONObject.as_oracle
 django.db.models.functions.JSONObject.as_postgresql
 django.db.models.functions.JSONObject.as_sql
-django.db.models.functions.MD5
 django.db.models.functions.Now.as_mysql
 django.db.models.functions.Now.as_postgresql
 django.db.models.functions.NullIf.as_oracle
@@ -1433,7 +1432,6 @@ django.db.models.functions.mixins.FixDurationInputMixin.as_mysql
 django.db.models.functions.mixins.FixDurationInputMixin.as_oracle
 django.db.models.functions.text.Concat.function
 django.db.models.functions.text.ConcatPair.as_postgresql
-django.db.models.functions.text.MD5
 django.db.models.indexes.IndexExpression.wrapper_classes
 django.db.models.lookups.FieldGetDbPrepValueIterableMixin.batch_process_rhs
 django.db.models.lookups.FieldGetDbPrepValueIterableMixin.process_rhs
