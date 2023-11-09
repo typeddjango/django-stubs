@@ -76,19 +76,19 @@ _ListFilterT: TypeAlias = (
 _ModelT = TypeVar("_ModelT", bound=Model)
 
 class BaseModelAdmin(Generic[_ModelT]):
-    autocomplete_fields: Sequence[str]
-    raw_id_fields: Sequence[str]
+    autocomplete_fields: _ListOrTuple[str]
+    raw_id_fields: _ListOrTuple[str]
     fields: _FieldGroups | None
-    exclude: Sequence[str] | None
+    exclude: _ListOrTuple[str] | None
     fieldsets: _FieldsetSpec | None
     form: type[forms.ModelForm[_ModelT]]
-    filter_vertical: Sequence[str]
-    filter_horizontal: Sequence[str]
+    filter_vertical: _ListOrTuple[str]
+    filter_horizontal: _ListOrTuple[str]
     radio_fields: Mapping[str, _Direction]
     prepopulated_fields: dict[str, Sequence[str]]
     formfield_overrides: Mapping[type[Field], Mapping[str, Any]]
-    readonly_fields: Sequence[str]
-    ordering: Sequence[str] | None
+    readonly_fields: _ListOrTuple[str] | None
+    ordering: _ListOrTuple[str] | None
     sortable_by: _ListOrTuple[str] | None
     view_on_site: bool | Callable[[_ModelT], str]
     show_full_result_count: bool
@@ -136,11 +136,11 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_display: _DisplayT
     list_display_links: _DisplayT | None
     list_filter: _ListOrTuple[_ListFilterT]
-    list_select_related: bool | Sequence[str]
+    list_select_related: bool | _ListOrTuple[str]
     list_per_page: int
     list_max_show_all: int
-    list_editable: Sequence[str]
-    search_fields: Sequence[str]
+    list_editable: _ListOrTuple[str]
+    search_fields: _ListOrTuple[str]
     search_help_text: _StrOrPromise | None
     date_hierarchy: str | None
     save_as: bool
@@ -148,7 +148,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     save_on_top: bool
     paginator: type
     preserve_filters: bool
-    inlines: Sequence[type[InlineModelAdmin]]
+    inlines: _ListOrTuple[type[InlineModelAdmin]]
     add_form_template: _TemplateForResponseT | None
     change_form_template: _TemplateForResponseT | None
     change_list_template: _TemplateForResponseT | None
