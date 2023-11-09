@@ -299,7 +299,6 @@ django.contrib.gis.db.models.BLANK_CHOICE_DASH
 django.contrib.gis.db.models.BaseConstraint.contains_expressions
 django.contrib.gis.db.models.BaseConstraint.get_violation_error_message
 django.contrib.gis.db.models.BaseConstraint.validate
-django.contrib.gis.db.models.BaseManager
 django.contrib.gis.db.models.BigAutoField.rel_db_type
 django.contrib.gis.db.models.BigIntegerField.formfield
 django.contrib.gis.db.models.BinaryField.get_placeholder
@@ -309,9 +308,6 @@ django.contrib.gis.db.models.CharField.cast_db_type
 django.contrib.gis.db.models.CharField.description
 django.contrib.gis.db.models.CharField.formfield
 django.contrib.gis.db.models.CheckConstraint.validate
-django.contrib.gis.db.models.Col
-django.contrib.gis.db.models.Combinable
-django.contrib.gis.db.models.CombinedExpression
 django.contrib.gis.db.models.Count.__init__
 django.contrib.gis.db.models.Count.empty_result_set_value
 django.contrib.gis.db.models.DEFERRED
@@ -356,8 +352,6 @@ django.contrib.gis.db.models.Field.rel_db_type
 django.contrib.gis.db.models.Field.select_format
 django.contrib.gis.db.models.Field.unique
 django.contrib.gis.db.models.FieldDoesNotExist
-django.contrib.gis.db.models.FieldFile
-django.contrib.gis.db.models.FileDescriptor
 django.contrib.gis.db.models.FileField.__get__
 django.contrib.gis.db.models.FileField.attr_class
 django.contrib.gis.db.models.FileField.contribute_to_class
@@ -461,9 +455,6 @@ django.contrib.gis.db.models.QuerySet.__reversed__
 django.contrib.gis.db.models.QuerySet.__xor__
 django.contrib.gis.db.models.QuerySet.datetimes
 django.contrib.gis.db.models.RasterField.contribute_to_class
-django.contrib.gis.db.models.RawQuerySet
-django.contrib.gis.db.models.RawSQL
-django.contrib.gis.db.models.Ref
 django.contrib.gis.db.models.SlugField.formfield
 django.contrib.gis.db.models.SmallAutoField.rel_db_type
 django.contrib.gis.db.models.StdDev.__init__
@@ -957,7 +948,6 @@ django.db.models.BLANK_CHOICE_DASH
 django.db.models.BaseConstraint.contains_expressions
 django.db.models.BaseConstraint.get_violation_error_message
 django.db.models.BaseConstraint.validate
-django.db.models.BaseManager
 django.db.models.BigAutoField.rel_db_type
 django.db.models.BigIntegerField.formfield
 django.db.models.BinaryField.get_placeholder
@@ -967,9 +957,6 @@ django.db.models.CharField.cast_db_type
 django.db.models.CharField.description
 django.db.models.CharField.formfield
 django.db.models.CheckConstraint.validate
-django.db.models.Col
-django.db.models.Combinable
-django.db.models.CombinedExpression
 django.db.models.Count.__init__
 django.db.models.Count.empty_result_set_value
 django.db.models.DEFERRED
@@ -1012,8 +999,6 @@ django.db.models.Field.rel_db_type
 django.db.models.Field.select_format
 django.db.models.Field.unique
 django.db.models.FieldDoesNotExist
-django.db.models.FieldFile
-django.db.models.FileDescriptor
 django.db.models.FileField.__get__
 django.db.models.FileField.attr_class
 django.db.models.FileField.contribute_to_class
@@ -1114,9 +1099,6 @@ django.db.models.QuerySet.__deepcopy__
 django.db.models.QuerySet.__reversed__
 django.db.models.QuerySet.__xor__
 django.db.models.QuerySet.datetimes
-django.db.models.RawQuerySet
-django.db.models.RawSQL
-django.db.models.Ref
 django.db.models.SlugField.formfield
 django.db.models.SmallAutoField.rel_db_type
 django.db.models.StdDev.__init__
