@@ -292,7 +292,7 @@
         main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
         main:10: error: Incompatible types in assignment (expression has type "str", variable has type "Union[int, float]")  [assignment]
         main:12: error: Incompatible types in assignment (expression has type "List[str]", variable has type "Sequence[Union[int, float]]")  [assignment]
-        main:13: error: Incompatible types in assignment (expression has type "List[<nothing>]", variable has type "Union[float, int, str, Combinable]")  [assignment]
+        main:13: error: Incompatible types in assignment (expression has type "List[Never]", variable has type "Union[float, int, str, Combinable]")  [assignment]
         main:15: error: Incompatible type for "redefined_set_type" of "MyModel" (got "str", expected "int")  [misc]
         main:15: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "Union[int, float]")  [misc]
         main:15: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[Union[int, float]]")  [misc]
