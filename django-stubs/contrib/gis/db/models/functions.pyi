@@ -1,7 +1,7 @@
 from typing import Any, ClassVar
 
 from django.contrib.gis.db.models.fields import GeometryField
-from django.contrib.gis.db.models.sql.conversion import DistanceField
+from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import BinaryField, BooleanField, FloatField, Func, IntegerField, TextField
 from django.db.models import Transform as StandardTransform
@@ -18,8 +18,8 @@ class GeoFuncMixin:
 class GeoFunc(GeoFuncMixin, Func): ...
 
 class GeomOutputGeoFunc(GeoFunc):
-    @property
-    def output_field(self) -> Any: ...
+    @cached_property
+    def output_field(self) -> GeometryField: ...
 
 class SQLiteDecimalToFloatMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
@@ -30,8 +30,8 @@ class OracleToleranceMixin:
 
 class Area(OracleToleranceMixin, GeoFunc):
     arity: int
-    @property
-    def output_field(self) -> Any: ...
+    @cached_property
+    def output_field(self) -> AreaField: ...
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Azimuth(GeoFunc):

@@ -172,6 +172,7 @@ django.contrib.gis.db.backends.mysql.operations.MySQLOperations.mariadb
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.mysql
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.select
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.unsupported_functions
+django.contrib.gis.db.backends.postgis.operations.ST_Polygon.output_field
 django.contrib.gis.db.backends.spatialite.features.DatabaseFeatures.supports_area_geodetic
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.unsupported_functions
 django.contrib.gis.db.models.DecimalField.validators
@@ -191,6 +192,10 @@ django.contrib.gis.db.models.ForeignObjectRel.related_model
 django.contrib.gis.db.models.IntegerField.validators
 django.contrib.gis.db.models.Lookup.contains_aggregate
 django.contrib.gis.db.models.Lookup.contains_over_clause
+django.contrib.gis.db.models.aggregates.GeoAggregate.output_field
+django.contrib.gis.db.models.functions.Area.output_field
+django.contrib.gis.db.models.functions.DistanceResultMixin.output_field
+django.contrib.gis.db.models.functions.GeomOutputGeoFunc.output_field
 django.contrib.gis.forms.BaseForm.changed_data
 django.contrib.gis.forms.BaseFormSet.forms
 django.contrib.gis.forms.BaseFormSet.management_form
@@ -305,9 +310,10 @@ django.db.models.Lookup.contains_aggregate
 django.db.models.Lookup.contains_over_clause
 django.db.models.expressions.BaseExpression.contains_aggregate
 django.db.models.expressions.BaseExpression.contains_column_references
-django.db.models.expressions.BaseExpression.contains_subquery
 django.db.models.expressions.BaseExpression.contains_over_clause
+django.db.models.expressions.BaseExpression.contains_subquery
 django.db.models.expressions.BaseExpression.convert_value
+django.db.models.expressions.BaseExpression.output_field
 django.db.models.fields.DecimalField.validators
 django.db.models.fields.Field.cached_col
 django.db.models.fields.Field.validators
@@ -390,6 +396,3 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
-django.contrib.gis.db.models.aggregates.GeoAggregate.output_field
-django.contrib.gis.db.models.functions.DistanceResultMixin.output_field
-django.db.models.expressions.BaseExpression.output_field
