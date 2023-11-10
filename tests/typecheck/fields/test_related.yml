@@ -650,8 +650,8 @@
         user = MyUser()
         reveal_type(user.book_set) # N: Revealed type is "myapp.models.Book_RelatedManager"
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
-        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], *, bulk: builtins.bool =)"
-        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], *, bulk: builtins.bool =)"
+        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], bulk: builtins.bool =)"
+        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], bulk: builtins.bool =)"
         reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
         reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
         reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"

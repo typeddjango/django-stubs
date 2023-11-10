@@ -257,7 +257,7 @@
 -   case: from_queryset_returns_intersection_of_manager_and_queryset
     main: |
         from myapp.models import MyModel, NewManager
-        reveal_type(NewManager())  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[<nothing>]"
+        reveal_type(NewManager())  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
@@ -283,12 +283,12 @@
 -   case: from_queryset_with_class_name_provided
     main: |
         from myapp.models import MyModel, NewManager, OtherModel, OtherManager
-        reveal_type(NewManager())  # N: Revealed type is "myapp.models.NewManager[<nothing>]"
+        reveal_type(NewManager())  # N: Revealed type is "myapp.models.NewManager[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
         reveal_type(MyModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
-        reveal_type(OtherManager())  # N: Revealed type is "myapp.models.X[<nothing>]"
+        reveal_type(OtherManager())  # N: Revealed type is "myapp.models.X[Never]"
         reveal_type(OtherModel.objects)  # N: Revealed type is "myapp.models.X[myapp.models.OtherModel]"
         reveal_type(OtherModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
         reveal_type(OtherModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
@@ -657,7 +657,7 @@
 -   case: handles_name_collision_with_generated_type
     main: |
         from myapp.models import MyModel, BaseManagerFromModelQuerySet
-        reveal_type(BaseManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[<nothing>]"
+        reveal_type(BaseManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -679,7 +679,7 @@
     main: |
         from myapp.models import MyModel, Generated, BaseManagerFromModelQuerySet
         reveal_type(BaseManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
-        reveal_type(Generated())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[<nothing>]"
+        reveal_type(Generated())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[myapp.models.MyModel]"
     installed_apps:
         - myapp
