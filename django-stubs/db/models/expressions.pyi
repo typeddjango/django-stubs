@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Any, ClassVar, Generic, Literal, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models import Q
+from django.db.models import Q, fields
 from django.db.models.fields import Field
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.query import QuerySet
@@ -85,7 +85,7 @@ class BaseExpression:
     def conditional(self) -> bool: ...
     @property
     def field(self) -> Field: ...
-    @property
+    @cached_property
     def output_field(self) -> Field: ...
     @cached_property
     def convert_value(self) -> Callable: ...
@@ -124,6 +124,7 @@ class DurationExpression(CombinedExpression):
     def compile(self, side: Combinable, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class TemporalSubtraction(CombinedExpression):
+    output_field: ClassVar[fields.DurationField]
     def __init__(self, lhs: Combinable, rhs: Combinable) -> None: ...
 
 class F(_Deconstructible, Combinable):
@@ -241,6 +242,7 @@ class Subquery(BaseExpression, Combinable):
     def __init__(self, queryset: Query | QuerySet, output_field: Field | None = ..., **extra: Any) -> None: ...
 
 class Exists(Subquery):
+    output_field: ClassVar[fields.BooleanField]
     def __init__(self, queryset: Query | QuerySet, **kwargs: Any) -> None: ...
 
 class OrderBy(Expression):

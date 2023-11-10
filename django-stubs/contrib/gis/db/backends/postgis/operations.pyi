@@ -2,8 +2,10 @@ from typing import Any, Literal
 
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.contrib.gis.db.models.fields import GeometryField
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func
+from django.utils.functional import cached_property
 
 BILATERAL: Literal["bilateral"]
 
@@ -16,8 +18,8 @@ class PostGISOperator(SpatialOperator):
 class ST_Polygon(Func):
     function: str
     def __init__(self, expr: Any) -> None: ...
-    @property
-    def output_field(self) -> Any: ...
+    @cached_property
+    def output_field(self) -> GeometryField: ...
 
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name: str
