@@ -12,4 +12,4 @@ Django==4.2.7
 -e .[compatible-mypy]
 
 # Overrides:
-git+https://github.com/python/mypy@release-1.7
+mypy==1.7.0
