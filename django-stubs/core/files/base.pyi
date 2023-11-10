@@ -9,7 +9,7 @@ from typing_extensions import Self
 class File(FileProxyMixin[AnyStr], IO[AnyStr]):
     DEFAULT_CHUNK_SIZE: int
     file: IO[AnyStr] | None
-    name: str | None  # type: ignore[assignment]
+    name: str | None
     mode: str
     def __init__(self, file: IO[AnyStr] | None, name: str | None = ...) -> None: ...
     def __bool__(self) -> bool: ...
