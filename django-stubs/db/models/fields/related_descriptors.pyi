@@ -6,7 +6,7 @@ from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
-from django.db.models.manager import BaseManager
+from django.db.models.manager import BaseManager, Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
@@ -88,7 +88,7 @@ class ReverseManyToOneDescriptor:
     def __set__(self, instance: Any, value: Any) -> NoReturn: ...
 
 # Fake class, Django defines 'RelatedManager' inside a function body
-class RelatedManager(BaseManager[_M], Generic[_M]):
+class RelatedManager(Manager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
     async def aadd(self, *objs: _M | int, bulk: bool = ...) -> None: ...
