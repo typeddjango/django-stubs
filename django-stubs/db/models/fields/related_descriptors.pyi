@@ -126,7 +126,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_M]):
     def related_manager_cls(self) -> type[ManyRelatedManager[Any]]: ...  # type: ignore[override]
 
 # Fake class, Django defines 'ManyRelatedManager' inside a function body
-class ManyRelatedManager(BaseManager[_M], Generic[_M]):
+class ManyRelatedManager(Manager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
     async def aadd(self, *objs: _M | int, bulk: bool = ...) -> None: ...
