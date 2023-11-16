@@ -946,7 +946,7 @@
         from myapp.models import SalesMan
         sales_man = SalesMan()
         reveal_type(sales_man.client) # N: Revealed type is "myapp.models.CustomUser_ManyRelatedManager"
-        reveal_type(sales_man.client(manager="staffs")) # N: Revealed type is "myapp.models.CustomUser_ManyRelatedManager"
+        reveal_type(sales_man.client(manager="staffs")) # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.CustomUser]"
     installed_apps:
         - myapp
     files:
