@@ -187,6 +187,7 @@ class NewSemanalDjangoPlugin(Plugin):
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return forms.extract_proper_type_for_get_form
+
         elif method_name == "__get__" and class_fullname in {
             fullnames.MANYTOMANY_FIELD_FULLNAME,
             fullnames.MANY_TO_MANY_DESCRIPTOR,

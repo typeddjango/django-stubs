@@ -153,33 +153,38 @@ def get_model_from_expression(
     return None
 
 
+def get_related_manager_and_model(ctx: MethodContext) -> Optional[tuple[Instance, Instance]]:
+    if (
+        isinstance(ctx.default_return_type, Instance)
+        and ctx.default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER
+    ):
+        # This is a call to '__get__' overload with a model instance of 'ManyToManyDescriptor'.
+        # Returning a 'ManyRelatedManager'. Which we want to, just like Django, build from the
+        # default manager of the related model.
+        many_related_manager = ctx.default_return_type
+        # Require first type argument of 'ManyRelatedManager' to be a model
+        if (
+            many_related_manager.args
+            and isinstance(many_related_manager.args[0], Instance)
+            and helpers.is_model_instance(many_related_manager.args[0])
+        ):
+            return many_related_manager, many_related_manager.args[0]
+
+    return None
+
+
 def refine_many_to_many_related_manager(ctx: MethodContext) -> MypyType:
     """
     Updates the 'ManyRelatedManager' returned by e.g. 'ManyToManyDescriptor' to be a subclass
     of 'ManyRelatedManager' and the related model's default manager.
     """
-    if (
-        not isinstance(ctx.default_return_type, Instance)
-        # Only change a return type being 'ManyRelatedManager'
-        or ctx.default_return_type.type.fullname != fullnames.MANY_RELATED_MANAGER
-    ):
+    related_objects = get_related_manager_and_model(ctx)
+    if related_objects is None:
         return ctx.default_return_type
 
-    # This is a call to '__get__' overload with a model instance of 'ManyToManyDescriptor'.
-    # Returning a 'ManyRelatedManager'. Which we want to, just like Django, build from the
-    # default manager of the related model.
-    many_related_manager = ctx.default_return_type
-    # Require first type argument of 'ManyRelatedManager' to be a model
-    if (
-        not many_related_manager.args
-        or not isinstance(many_related_manager.args[0], Instance)
-        or many_related_manager.args[0].type.metaclass_type is None
-        or many_related_manager.args[0].type.metaclass_type.type.fullname != fullnames.MODEL_METACLASS_FULLNAME
-    ):
-        return ctx.default_return_type
-
+    many_related_manager, related_model_instance = related_objects
     checker = helpers.get_typechecker_api(ctx)
-    related_model_instance = many_related_manager.args[0].copy_modified()
+    related_model_instance = related_model_instance.copy_modified()
     related_manager_info = helpers.get_reverse_manager_info(
         checker, related_model_instance.type, derived_from="_default_manager"
     )

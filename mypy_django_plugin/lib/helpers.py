@@ -471,3 +471,10 @@ def resolve_lazy_reference(
     else:
         api.fail("Could not match lazy reference with any model", ctx)
     return None
+
+
+def is_model_instance(instance: Instance) -> bool:
+    return (
+        instance.type.metaclass_type is not None
+        and instance.type.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+    )

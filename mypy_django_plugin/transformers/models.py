@@ -484,8 +484,9 @@ class AddReverseLookups(ModelClassInitializer):
                     ),
                 )
                 continue
+
             elif isinstance(relation, ManyToManyRel):
-                # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime..
+                # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime.
                 to_fullname = helpers.get_class_fullname(relation.remote_field.model)
                 to_model_info = self.lookup_typeinfo_or_incomplete_defn_error(to_fullname)
                 assert relation.through is not None
@@ -497,6 +498,7 @@ class AddReverseLookups(ModelClassInitializer):
                         self.many_to_many_descriptor, [Instance(to_model_info, []), Instance(through_model_info, [])]
                     ),
                 )
+
             else:
                 related_manager_info = None
                 try:
