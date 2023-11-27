@@ -7,8 +7,9 @@ from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject, _StrOrPromise
 
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
+_StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
 
-def capfirst(x: _StrOrPromiseT | None) -> _StrOrPromiseT | None: ...
+def capfirst(x: _StrOrPromiseOrNoneT) -> _StrOrPromiseOrNoneT: ...
 
 re_words: Pattern[str]
 re_chars: Pattern[str]
