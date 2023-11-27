@@ -3,7 +3,7 @@ from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload
 
-from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth import _UserModel
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
@@ -54,7 +54,7 @@ class HttpRequest(BytesIO):
     # django.contrib.admin views:
     current_app: str
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    user: AbstractBaseUser | AnonymousUser
+    user: _UserModel | AnonymousUser
     # django.middleware.locale.LocaleMiddleware:
     LANGUAGE_CODE: str
     # django.contrib.sites.middleware.CurrentSiteMiddleware

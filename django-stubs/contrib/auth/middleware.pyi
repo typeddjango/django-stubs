@@ -1,9 +1,9 @@
-from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth import _UserModel
 from django.contrib.auth.models import AnonymousUser
 from django.http.request import HttpRequest
 from django.utils.deprecation import MiddlewareMixin
 
-def get_user(request: HttpRequest) -> AnonymousUser | AbstractBaseUser: ...
+def get_user(request: HttpRequest) -> AnonymousUser | _UserModel: ...
 
 class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest) -> None: ...

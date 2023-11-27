@@ -1,4 +1,6 @@
+GET_USER_MODEL_FULLNAME = "django.contrib.auth.get_user_model"
 ABSTRACT_USER_MODEL_FULLNAME = "django.contrib.auth.models.AbstractUser"
+ABSTRACT_BASE_USER_MODEL_FULLNAME = "django.contrib.auth.base_user.AbstractBaseUser"
 PERMISSION_MIXIN_CLASS_FULLNAME = "django.contrib.auth.models.PermissionsMixin"
 MODEL_METACLASS_FULLNAME = "django.db.models.base.ModelBase"
 MODEL_CLASS_FULLNAME = "django.db.models.base.Model"
