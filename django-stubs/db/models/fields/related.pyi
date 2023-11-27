@@ -25,7 +25,6 @@ RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
 def resolve_relation(scope_model: type[Model], relation: str | type[Model]) -> str | type[Model]: ...
 
-_M = TypeVar("_M", bound=Model)
 # __set__ value type
 _ST = TypeVar("_ST")
 # __get__ return type
@@ -232,9 +231,10 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
 
+_Through = TypeVar("_Through", bound=Model)
 _To = TypeVar("_To", bound=Model)
 
-class ManyToManyField(RelatedField[Any, Any], Generic[_To, _M]):
+class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     description: str
     has_null_arg: bool
     swappable: bool
@@ -253,7 +253,7 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _M]):
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         symmetrical: bool | None = ...,
-        through: type[_M] | str | None = ...,
+        through: type[_Through] | str | None = ...,
         through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
         db_table: str | None = ...,
@@ -282,7 +282,7 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _M]):
     ) -> None: ...
     # class access
     @overload
-    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[_To, _M]: ...
+    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[_To, _Through]: ...
     # Model instance access
     @overload
     def __get__(self, instance: Model, owner: Any) -> ManyRelatedManager[_To]: ...
