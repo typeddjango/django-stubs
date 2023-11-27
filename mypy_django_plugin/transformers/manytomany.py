@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Tuple, Union
 
 from mypy.checker import TypeChecker
 from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, StrExpr, TypeInfo
@@ -153,7 +153,7 @@ def get_model_from_expression(
     return None
 
 
-def get_related_manager_and_model(ctx: MethodContext) -> Optional[tuple[Instance, Instance]]:
+def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance, Instance]]:
     if (
         isinstance(ctx.default_return_type, Instance)
         and ctx.default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER
