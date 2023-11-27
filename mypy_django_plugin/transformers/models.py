@@ -850,8 +850,7 @@ class MetaclassAdjustments(ModelClassInitializer):
             exception_base_sym = model_base.names.get(name)
             if (
                 # Base class is a Model
-                model_base.metaclass_type is not None
-                and model_base.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+                helpers.is_model_type(model_base)
                 # But base class is not 'models.Model'
                 and model_base.fullname != fullnames.MODEL_CLASS_FULLNAME
                 # Base class also has a generated exception base e.g. 'DoesNotExist'

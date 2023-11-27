@@ -245,12 +245,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
         sym = self.lookup_fully_qualified(fullname)
-        if (
-            sym is not None
-            and isinstance(sym.node, TypeInfo)
-            and sym.node.metaclass_type is not None
-            and sym.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
-        ):
+        if sym is not None and isinstance(sym.node, TypeInfo) and helpers.is_model_type(sym.node):
             return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Manager class definition

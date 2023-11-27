@@ -416,7 +416,7 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
 
 
 def is_abstract_model(model: TypeInfo) -> bool:
-    if model.metaclass_type is None or model.metaclass_type.type.fullname != fullnames.MODEL_METACLASS_FULLNAME:
+    if not is_model_type(model):
         return False
 
     metadata = get_django_metadata(model)
@@ -473,8 +473,5 @@ def resolve_lazy_reference(
     return None
 
 
-def is_model_instance(instance: Instance) -> bool:
-    return (
-        instance.type.metaclass_type is not None
-        and instance.type.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
-    )
+def is_model_type(info: TypeInfo) -> bool:
+    return info.metaclass_type is not None and info.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
