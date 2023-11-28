@@ -130,10 +130,7 @@ def get_model_from_expression(
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
     """
     if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
-        if (
-            expr.node.metaclass_type is not None
-            and expr.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
-        ):
+        if helpers.is_model_type(expr.node):
             return Instance(expr.node, [])
 
     lazy_reference = None
@@ -166,7 +163,7 @@ def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance
         if (
             many_related_manager.args
             and isinstance(many_related_manager.args[0], Instance)
-            and helpers.is_model_instance(many_related_manager.args[0])
+            and helpers.is_model_type(many_related_manager.args[0].type)
         ):
             return many_related_manager, many_related_manager.args[0]
 
