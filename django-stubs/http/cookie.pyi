@@ -1,5 +1,3 @@
-from typing import Any
-
-SimpleCookie: Any
+from http.cookies import SimpleCookie as SimpleCookie
 
 def parse_cookie(cookie: str) -> dict[str, str]: ...

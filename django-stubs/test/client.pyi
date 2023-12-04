@@ -1,4 +1,5 @@
 from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
+from http.cookies import SimpleCookie
 from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
@@ -10,7 +11,6 @@ from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
-from django.http.cookie import SimpleCookie
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from django.template.base import Template
