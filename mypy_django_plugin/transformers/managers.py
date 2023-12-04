@@ -109,29 +109,38 @@ def _process_dynamic_method(
     variables = method_type.variables
     ret_type = method_type.ret_type
 
+    if not is_fallback_queryset:
+        queryset_instance = Instance(queryset_info, manager_instance.args)
+    else:
+        # The fallback queryset inherits _QuerySet, which has two generics
+        # instead of the one exposed on QuerySet. That means that we need
+        # to add the model twice. In real code it's not possible to inherit
+        # from _QuerySet, as it doesn't exist at runtime, so this fix is
+        # only needed for plugin-generated querysets.
+        queryset_instance = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
+
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
-        if not is_fallback_queryset:
-            ret_type = Instance(queryset_info, manager_instance.args)
-        else:
-            # The fallback queryset inherits _QuerySet, which has two generics
-            # instead of the one exposed on QuerySet. That means that we need
-            # to add the model twice. In real code it's not possible to inherit
-            # from _QuerySet, as it doesn't exist at runtime, so this fix is
-            # only needed for pluign-generated querysets.
-            ret_type = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
+        ret_type = queryset_instance
         variables = []
     args_types = method_type.arg_types[1:]
     if _has_compatible_type_vars(base_that_has_method):
-        ret_type = _replace_type_var(
-            ret_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0]
-        )
-        args_types = [
-            _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0])
-            for arg_type in args_types
-        ]
+        typed_var = manager_instance.args or queryset_info.bases[0].args
+        if (
+            typed_var
+            and isinstance(typed_var[0], Instance)
+            and typed_var[0].type.has_base(fullnames.MODEL_CLASS_FULLNAME)
+        ):
+            ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, typed_var[0])
+            args_types = [
+                _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0])
+                for arg_type in args_types
+            ]
+    if base_that_has_method.self_type:
+        # Manages -> Self returns
+        ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, queryset_instance)
 
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(

@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import Any
 
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
@@ -8,6 +7,7 @@ from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.prepared import PreparedGeometry
+from django.utils.deconstruct import _Deconstructible
 from typing_extensions import Self
 
 class GEOSGeometryBase(GEOSBase):
@@ -142,6 +142,5 @@ class LinearGeometryMixin:
     @property
     def closed(self) -> bool: ...
 
-class GEOSGeometry(GEOSGeometryBase, ListMixin):
+class GEOSGeometry(_Deconstructible, GEOSGeometryBase, ListMixin):
     def __init__(self, geo_input: Any, srid: int | None = ...) -> None: ...
-    def deconstruct(obj) -> tuple[str, Sequence[Any], dict[str, Any]]: ...

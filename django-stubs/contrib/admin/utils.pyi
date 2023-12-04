@@ -1,8 +1,10 @@
 import datetime
+from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, overload
+from typing import Any, Literal, TypeVar, overload
 from uuid import UUID
 
+from _typeshed import Unused
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.forms import AdminPasswordChangeForm
@@ -17,6 +19,8 @@ from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
 from typing_extensions import TypedDict
 
+_T = TypeVar("_T")
+
 class FieldIsAForeignKeyColumnName(Exception): ...
 
 def lookup_spawns_duplicates(opts: Options, lookup_path: str) -> bool: ...
@@ -27,24 +31,33 @@ def flatten(fields: Any) -> list[Callable | str]: ...
 def flatten_fieldsets(fieldsets: Any) -> list[Callable | str]: ...
 def get_deleted_objects(
     objs: Sequence[Model | None] | QuerySet[Model], request: HttpRequest, admin_site: AdminSite
-) -> tuple[list[Model], dict[str, int], set[str], list[str]]: ...
+) -> tuple[list[str], dict[str, int], set[str], list[str]]: ...
 
 class NestedObjects(Collector):
-    data: dict[type[Model], set[Model] | list[Model]]
-    dependencies: dict[Any, Any]
-    fast_deletes: list[Any]
-    field_updates: dict[Any, Any]
-    using: str
-    edges: Any
-    protected: Any
-    model_objs: Any
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
+    edges: dict[Model, list[Model]]
+    protected: set[Model]
+    model_objs: defaultdict[str, set[Model]]
     def add_edge(self, source: Model | None, target: Model) -> None: ...
+    def collect(  # type: ignore[override]
+        self,
+        objs: _IndexableCollection[Model | None],
+        source: type[Model] | None = ...,
+        source_attr: str | None = ...,
+        *,
+        nullable: bool = ...,
+        collect_related: bool = ...,
+        reverse_dependency: bool = ...,
+        keep_parents: bool = ...,
+        fail_on_restricted: bool = ...,
+    ) -> None: ...
     def related_objects(
         self, related_model: type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]
     ) -> QuerySet[Model]: ...
-    def nested(self, format_callback: Callable = ...) -> list[Any]: ...
-    def can_fast_delete(self, *args: Any, **kwargs: Any) -> bool: ...
+    @overload
+    def nested(self, format_callback: None = None) -> list[Model]: ...
+    @overload
+    def nested(self, format_callback: Callable[[Model], _T]) -> list[_T]: ...
+    def can_fast_delete(self, *args: Unused, **kwargs: Unused) -> Literal[False]: ...
 
 class _ModelFormatDict(TypedDict):
     verbose_name: str
@@ -56,7 +69,7 @@ def lookup_field(
     name: Callable | str, obj: Model, model_admin: BaseModelAdmin | None = ...
 ) -> tuple[Field | None, str | None, Any]: ...
 @overload
-def label_for_field(  # type: ignore[misc]
+def label_for_field(  # type: ignore[overload-overlap]
     name: Callable | str,
     model: type[Model],
     model_admin: BaseModelAdmin | None = ...,

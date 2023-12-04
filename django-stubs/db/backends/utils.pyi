@@ -69,15 +69,15 @@ class CursorDebugWrapper(CursorWrapper):
     ) -> Generator[None, None, None]: ...
 
 @overload
-def typecast_date(s: None | Literal[""]) -> None: ...  # type: ignore[misc]
+def typecast_date(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
 @overload
 def typecast_date(s: str) -> datetime.date: ...
 @overload
-def typecast_time(s: None | Literal[""]) -> None: ...  # type: ignore[misc]
+def typecast_time(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
 @overload
 def typecast_time(s: str) -> datetime.time: ...
 @overload
-def typecast_timestamp(s: None | Literal[""]) -> None: ...  # type: ignore[misc]
+def typecast_timestamp(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
 @overload
 def typecast_timestamp(s: str) -> datetime.datetime: ...
 def split_identifier(identifier: str) -> tuple[str, str]: ...

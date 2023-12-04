@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
@@ -43,68 +43,36 @@ class DateTimeRangeField(RangeField):
 class DateRangeField(RangeField):
     def __get__(self, instance: Any, owner: Any) -> DateRange: ...
 
-class DateTimeRangeContains(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
+class DateTimeRangeContains(PostgresOperatorLookup): ...
 
 class RangeContainedBy(PostgresOperatorLookup):
-    lookup_name: str
     type_mapping: dict[str, str]
-    postgres_operator: str
 
-class FullyLessThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class FullGreaterThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class NotLessThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class NotGreaterThan(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
-
-class AdjacentToLookup(PostgresOperatorLookup):
-    lookup_name: str
-    postgres_operator: str
+class FullyLessThan(PostgresOperatorLookup): ...
+class FullGreaterThan(PostgresOperatorLookup): ...
+class NotLessThan(PostgresOperatorLookup): ...
+class NotGreaterThan(PostgresOperatorLookup): ...
+class AdjacentToLookup(PostgresOperatorLookup): ...
 
 class RangeStartsWith(models.Transform):
-    lookup_name: str
-    function: str
     @property
     def output_field(self) -> models.Field: ...
 
 class RangeEndsWith(models.Transform):
-    lookup_name: str
-    function: str
     @property
     def output_field(self) -> models.Field: ...
 
 class IsEmpty(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: ClassVar[models.BooleanField]
 
 class LowerInclusive(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: ClassVar[models.BooleanField]
 
 class LowerInfinite(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: ClassVar[models.BooleanField]
 
 class UpperInclusive(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: ClassVar[models.BooleanField]
 
 class UpperInfinite(models.Transform):
-    lookup_name: str
-    function: str
-    output_field: models.BooleanField
+    output_field: ClassVar[models.BooleanField]

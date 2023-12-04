@@ -2,6 +2,7 @@ from typing import Any
 
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.postgresql.base import DatabaseWrapper
+from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     connection: DatabaseWrapper
@@ -49,7 +50,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_11(self) -> bool: ...
     @property
     def is_postgresql_12(self) -> bool: ...
-    @property
+    @cached_property
     def is_postgresql_13(self) -> bool: ...
     has_brin_autosummarize: bool
     has_websearch_to_tsquery: bool

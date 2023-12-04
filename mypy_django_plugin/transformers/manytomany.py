@@ -1,8 +1,8 @@
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Tuple, Union
 
 from mypy.checker import TypeChecker
 from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, StrExpr, TypeInfo
-from mypy.plugin import FunctionContext
+from mypy.plugin import FunctionContext, MethodContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import Instance, ProperType, UninhabitedType
 from mypy.types import Type as MypyType
@@ -130,10 +130,7 @@ def get_model_from_expression(
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
     """
     if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
-        if (
-            expr.node.metaclass_type is not None
-            and expr.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
-        ):
+        if helpers.is_model_type(expr.node):
             return Instance(expr.node, [])
 
     lazy_reference = None
@@ -151,3 +148,57 @@ def get_model_from_expression(
         if model_info is not None:
             return Instance(model_info, [])
     return None
+
+
+def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance, Instance]]:
+    if (
+        isinstance(ctx.default_return_type, Instance)
+        and ctx.default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER
+    ):
+        # This is a call to '__get__' overload with a model instance of 'ManyToManyDescriptor'.
+        # Returning a 'ManyRelatedManager'. Which we want to, just like Django, build from the
+        # default manager of the related model.
+        many_related_manager = ctx.default_return_type
+        # Require first type argument of 'ManyRelatedManager' to be a model
+        if (
+            many_related_manager.args
+            and isinstance(many_related_manager.args[0], Instance)
+            and helpers.is_model_type(many_related_manager.args[0].type)
+        ):
+            return many_related_manager, many_related_manager.args[0]
+
+    return None
+
+
+def refine_many_to_many_related_manager(ctx: MethodContext) -> MypyType:
+    """
+    Updates the 'ManyRelatedManager' returned by e.g. 'ManyToManyDescriptor' to be a subclass
+    of 'ManyRelatedManager' and the related model's default manager.
+    """
+    related_objects = get_related_manager_and_model(ctx)
+    if related_objects is None:
+        return ctx.default_return_type
+
+    many_related_manager, related_model_instance = related_objects
+    checker = helpers.get_typechecker_api(ctx)
+    related_model_instance = related_model_instance.copy_modified()
+    related_manager_info = helpers.get_reverse_manager_info(
+        checker, related_model_instance.type, derived_from="_default_manager"
+    )
+    if related_manager_info is None:
+        default_manager_node = related_model_instance.type.names.get("_default_manager")
+        if default_manager_node is None or not isinstance(default_manager_node.type, Instance):
+            return ctx.default_return_type
+
+        related_manager_info = helpers.add_new_class_for_module(
+            module=checker.modules[related_model_instance.type.module_name],
+            name=f"{related_model_instance.type.name}_ManyRelatedManager",
+            bases=[many_related_manager, default_manager_node.type],
+        )
+        related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_instance.type.fullname}
+        helpers.set_reverse_manager_info(
+            related_model_instance.type,
+            derived_from="_default_manager",
+            fullname=related_manager_info.fullname,
+        )
+    return Instance(related_manager_info, [])

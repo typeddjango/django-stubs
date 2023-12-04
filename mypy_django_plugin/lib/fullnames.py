@@ -17,7 +17,7 @@ AUTH_USER_MODEL_FULLNAME = "django.conf.settings.AUTH_USER_MODEL"
 QUERYSET_CLASS_FULLNAME = "django.db.models.query._QuerySet"
 BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
-RELATED_MANAGER_CLASS = "django.db.models.manager.RelatedManager"
+RELATED_MANAGER_CLASS = "django.db.models.fields.related_descriptors.RelatedManager"
 
 WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.WithAnnotations"
 ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.Annotations"
@@ -34,6 +34,8 @@ MANAGER_CLASSES = {
 }
 
 REVERSE_ONE_TO_ONE_DESCRIPTOR = "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor"
+MANY_TO_MANY_DESCRIPTOR = "django.db.models.fields.related_descriptors.ManyToManyDescriptor"
+MANY_RELATED_MANAGER = "django.db.models.fields.related_descriptors.ManyRelatedManager"
 RELATED_FIELDS_CLASSES = frozenset(
     (
         FOREIGN_OBJECT_FULLNAME,

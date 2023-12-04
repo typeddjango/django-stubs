@@ -4,6 +4,7 @@ from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 from django import VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
@@ -64,6 +65,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(BaseModelFormSet),
     MPGeneric(Feed),
     MPGeneric(Sitemap),
+    MPGeneric(SuccessMessageMixin),
     MPGeneric(FileProxyMixin),
     MPGeneric(Lookup),
     MPGeneric(BaseConnectionHandler),

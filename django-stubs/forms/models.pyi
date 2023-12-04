@@ -1,12 +1,5 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
-from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
-    Any,
-    ClassVar,
-    Generic,
-    Literal,
-    TypeVar,
-    overload,
-)
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.db import models
@@ -27,7 +20,6 @@ from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-# https://github.com/python/mypy/issues/12211
 _Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
@@ -89,7 +81,7 @@ class BaseModelForm(Generic[_M], BaseForm):
         empty_permitted: bool = ...,
         instance: _M | None = ...,
         use_required_attribute: bool | None = ...,
-        renderer: BaseRenderer = ...,
+        renderer: BaseRenderer | None = ...,
     ) -> None: ...
     def validate_unique(self) -> None: ...
     def save(self, commit: bool = ...) -> _M: ...
@@ -312,7 +304,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
 def modelform_defines_fields(form_class: type[ModelForm]) -> bool: ...
 @overload
-def _get_foreign_key(  # type: ignore[misc]
+def _get_foreign_key(  # type: ignore[overload-overlap]
     parent_model: type[Model], model: type[Model], fk_name: str | None = ..., can_fail: Literal[True] = ...
 ) -> ForeignKey | None: ...
 @overload

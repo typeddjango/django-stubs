@@ -7,14 +7,13 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.semanal_shared import parse_bool
 from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
-from mypy_django_plugin.lib.helpers import is_annotated_model_fullname
+from mypy_django_plugin.lib.helpers import is_annotated_model_fullname, parse_bool
 from mypy_django_plugin.transformers.models import get_or_create_annotated_type
 
 

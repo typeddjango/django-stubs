@@ -5,6 +5,7 @@ from django.template.backends.base import BaseEngine
 from django.template.backends.django import DjangoTemplates as DjangoTemplatesR
 from django.template.backends.jinja2 import Jinja2 as Jinja2R
 from django.template.base import Template
+from django.utils.functional import cached_property
 
 def get_default_renderer() -> BaseRenderer: ...
 
@@ -16,14 +17,14 @@ class BaseRenderer:
 
 class EngineMixin:
     def get_template(self, template_name: str) -> Any: ...
-    @property
+    @cached_property
     def engine(self) -> BaseEngine: ...
 
 class DjangoTemplates(EngineMixin, BaseRenderer):
     backend: type[DjangoTemplatesR]
 
 class Jinja2(EngineMixin, BaseRenderer):
-    @property
+    @cached_property
     def backend(self) -> type[Jinja2R]: ...
 
 class Jinja2DivFormRenderer(Jinja2):

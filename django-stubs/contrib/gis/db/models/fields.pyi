@@ -108,7 +108,14 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
-    def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
+    def formfield(  # type: ignore[override]
+        self,
+        *,
+        form_class: type[forms.GeometryField] | None = ...,
+        geom_type: str = ...,
+        srid: Any = ...,
+        **kwargs: Any,
+    ) -> forms.GeometryField: ...
     def select_format(self, compiler: Any, sql: Any, params: Any) -> Any: ...
 
 class PointField(GeometryField[_ST, _GT]):

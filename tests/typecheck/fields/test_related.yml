@@ -4,7 +4,7 @@
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
         publisher = Publisher()
-        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
         - myapp
     files:
@@ -70,8 +70,8 @@
         reveal_type(book.publisher2)  # N: Revealed type is "myapp.models.Publisher"
 
         publisher = Publisher()
-        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
-        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
         - myapp
     files:
@@ -137,9 +137,9 @@
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
-                        reveal_type(self.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
-                        reveal_type(self.members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
-                        reveal_type(self.sheets)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Sheet]"
+                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
+                        reveal_type(self.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Member]"
+                        reveal_type(self.sheets)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Sheet]"
                         reveal_type(self.profile)  # N: Revealed type is "myapp.models.Profile"
                 class View(models.Model):
                     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
@@ -153,7 +153,7 @@
 -   case: test_circular_dependency_in_imports_with_string_based
     main: |
         from myapp.models import View
-        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
+        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
         View().app.unknown  # E: "App" has no attribute "unknown"  [attr-defined]
     installed_apps:
         - myapp
@@ -172,13 +172,13 @@
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
-                        reveal_type(self.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
+                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
 
 -   case: models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model
     main: |
         from myapp.models import App
-        reveal_type(App().views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View]"
-        reveal_type(App().views2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.View2]"
+        reveal_type(App().views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
+        reveal_type(App().views2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View2]"
     installed_apps:
         - myapp
     files:
@@ -196,7 +196,7 @@
 -   case: models_imported_inside_init_file_foreign_key
     main: |
         from myapp2.models import View
-        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp2.models.View]"
+        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp2.models.View]"
     installed_apps:
         - myapp
         - myapp2
@@ -278,13 +278,16 @@
 -   case: many_to_many_field_converts_to_queryset_of_model_type
     main: |
         from myapp.models import App, Member
-        reveal_type(Member().apps)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.App]"
+        reveal_type(Member().apps)  # N: Revealed type is "myapp.models.App_ManyRelatedManager"
         reveal_type(Member().apps.get())  # N: Revealed type is "myapp.models.App"
-        reveal_type(App().members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
+        reveal_type(Member().apps.app_method())  # N: Revealed type is "builtins.str"
+        Member().apps.add(App())
+        reveal_type(App().members)  # N: Revealed type is "myapp.models.Member_ManyRelatedManager"
         reveal_type(App().members.get())  # N: Revealed type is "myapp.models.Member"
-        reveal_type(Member.apps.field)  # N: Revealed type is "django.db.models.fields.related.ManyToManyField[Any, myapp.models.Member_apps]"
-        # XXX the following is not correct:
-        reveal_type(App.members)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Member]"
+        reveal_type(App().members.member_method())  # N: Revealed type is "builtins.int"
+        App().members.add(Member())
+        reveal_type(Member.apps.field)  # N: Revealed type is "django.db.models.fields.related.ManyToManyField[myapp.models.App, myapp.models.Member_apps]"
+        reveal_type(App.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Member, myapp.models.Member_apps]"
     installed_apps:
         - myapp
     files:
@@ -292,15 +295,23 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
+                class AppQuerySet(models.QuerySet["App"]):
+                    def app_method(self) -> str:
+                        return "abc"
                 class App(models.Model):
-                    pass
+                    objects = AppQuerySet.as_manager()
+
+                class MemberQuerySet(models.QuerySet["Member"]):
+                    def member_method(self) -> int:
+                        return 1
                 class Member(models.Model):
                     apps = models.ManyToManyField(to=App, related_name='members')
+                    objects = MemberQuerySet.as_manager()
 
 -   case: many_to_many_works_with_string_if_imported
     main: |
         from myapp.models import Member
-        reveal_type(Member().apps)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp2.models.App]"
+        reveal_type(Member().apps)  # N: Revealed type is "myapp2.models.App_ManyRelatedManager"
     installed_apps:
         - myapp
         - myapp2
@@ -335,7 +346,8 @@
 -   case: many_to_many_with_self
     main: |
         from myapp.models import User
-        reveal_type(User().friends)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.User]"
+        reveal_type(User().friends)  # N: Revealed type is "myapp.models.User_ManyRelatedManager"
+        reveal_type(User().friends.get())  # N: Revealed type is "myapp.models.User"
         reveal_type(User.friends.through.objects.get())  # N: Revealed type is "myapp.models.User_friends"
         reveal_type(User.friends.through._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User_friends]"
         reveal_type(User.friends.through().from_user)  # N: Revealed type is "myapp.models.User"
@@ -372,7 +384,7 @@
 -   case: if_no_related_name_is_passed_create_default_related_managers
     main: |
         from myapp.models import Publisher
-        reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
         - myapp
     files:
@@ -474,7 +486,7 @@
 
         publisher = Publisher()
         reveal_type(publisher.books)
-        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     out: |
         main:6: error: "Publisher" has no attribute "books"; maybe "books2"?  [attr-defined]
         main:6: note: Revealed type is "Any"
@@ -564,8 +576,8 @@
 -   case: related_manager_name_defined_by_pattern
     main: |
         from myapp.models import Publisher
-        reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
-        reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Article]"
+        reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
     installed_apps:
         - myapp
     files:
@@ -588,9 +600,9 @@
 -   case: test_related_fields_returned_as_descriptors_from_model_class
     main: |
         from myapp.models import Author, Blog, Publisher, Profile
-        reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Author_blogs]"
+        reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Blog, myapp.models.Author_blogs]"
         reveal_type(Author.blogs.through)  # N: Revealed type is "Type[myapp.models.Author_blogs]"
-        reveal_type(Author().blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.Blog]"
+        reveal_type(Author().blogs)  # N: Revealed type is "myapp.models.Blog_ManyRelatedManager"
         reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.Publisher, django.db.models.expressions.Combinable], myapp.models.Publisher]]"
         reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor[django.db.models.fields.related.OneToOneField[Union[myapp.models.Profile, django.db.models.expressions.Combinable], myapp.models.Profile]]"
         reveal_type(Author.file)  # N: Revealed type is "django.db.models.fields.files.FileDescriptor"
@@ -620,8 +632,8 @@
         reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
 
         user = MyUser()
-        reveal_type(user.book_set) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Book]"
-        reveal_type(user.article_set) # N: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.Article]"
+        reveal_type(user.book_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(user.article_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
     installed_apps:
         - myapp
     files:
@@ -650,8 +662,8 @@
         user = MyUser()
         reveal_type(user.book_set) # N: Revealed type is "myapp.models.Book_RelatedManager"
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
-        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], *, bulk: builtins.bool =)"
-        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], *, bulk: builtins.bool =)"
+        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], bulk: builtins.bool =)"
+        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], bulk: builtins.bool =)"
         reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
         reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
         reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
@@ -736,7 +748,7 @@
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
         myapp/models:11: error: Could not resolve manager type for "myapp.models.Transaction.objects"  [django-manager-missing]
-        myapp/models:13: note: Revealed type is "django.db.models.manager.RelatedManager[myapp.models.TransactionLog]"
+        myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
         myapp/models:15: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Transaction]"
         myapp/models:16: note: Revealed type is "Any"
 
@@ -933,7 +945,7 @@
     main: |
         from myapp.models import SalesMan
         sales_man = SalesMan()
-        reveal_type(sales_man.client) # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.CustomUser]"
+        reveal_type(sales_man.client) # N: Revealed type is "myapp.models.CustomUser_ManyRelatedManager"
         reveal_type(sales_man.client(manager="staffs")) # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.CustomUser]"
     installed_apps:
         - myapp
@@ -1092,6 +1104,13 @@
         reveal_type(MyModel.auto_through.through._default_manager)
 
         reveal_type(MyModel.other_again.through)
+        reveal_type(Other.autos)
+        reveal_type(Other.autos.through)
+        reveal_type(Other.autos.through.objects.get())
+
+        reveal_type(Other().autos.custom_qs_method())
+        reveal_type(Other().customs.custom_qs_method())
+        reveal_type(Other().autos.add)
     out: |
         main:2: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:3: note: Revealed type is "myapp.models.Other"
@@ -1110,6 +1129,12 @@
         main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.MyModel, django.db.models.expressions.Combinable], myapp.models.MyModel]]"
         main:21: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:23: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
+        main:24: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.MyModel, myapp.models.MyModel_auto_through]"
+        main:25: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
+        main:26: note: Revealed type is "myapp.models.MyModel_auto_through"
+        main:28: note: Revealed type is "builtins.str"
+        main:29: note: Revealed type is "builtins.str"
+        main:30: note: Revealed type is "def (*objs: Union[myapp.models.MyModel, builtins.int], bulk: builtins.bool =)"
     installed_apps:
         -   myapp
     files:
@@ -1132,11 +1157,18 @@
 
                     objects = CustomThroughManager()
 
+                class MyModelQuerySet(models.QuerySet["MyModel"]):
+                    def custom_qs_method(self) -> str:
+                        return "abc"
+
+                MyModelManager = models.Manager.from_queryset(MyModelQuerySet)
                 class MyModel(models.Model):
                     auto_through = models.ManyToManyField(Other, related_name="autos")
                     # Have multiple M2Ms with implicit through
                     other_again = models.ManyToManyField(Other, related_name="others_again")
                     custom_through = models.ManyToManyField(Other, through=CustomThrough, related_name="customs")
+
+                    objects = MyModelManager()
 
 -   case: test_many_to_many_with_lazy_references
     main: |
@@ -1193,7 +1225,7 @@
         reveal_type(Child.parents)
         reveal_type(Child().parents)
     out: |
-        main:2: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[Any]"
+        main:2: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[Any, Any]"
         main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any]"
         myapp/models/child:5: error: Need type annotation for "parents"  [var-annotated]
         myapp/models/child:6: error: Need type annotation for "other_parents"  [var-annotated]

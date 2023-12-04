@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.db.models.expressions import Func
+from django.db.models.fields import IntegerField
 from django.db.models.functions.mixins import FixDurationInputMixin, NumericOutputFieldMixin
 
 class Aggregate(Func):
@@ -10,7 +11,10 @@ class Aggregate(Func):
     def __init__(self, *expressions: Any, distinct: bool = ..., filter: Any | None = ..., **extra: Any) -> None: ...
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate): ...
-class Count(Aggregate): ...
+
+class Count(Aggregate):
+    output_field: ClassVar[IntegerField]
+
 class Max(Aggregate): ...
 class Min(Aggregate): ...
 class StdDev(NumericOutputFieldMixin, Aggregate): ...
