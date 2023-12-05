@@ -52,9 +52,9 @@ class Model(metaclass=ModelBase):
     def _do_update(
         self,
         base_qs: QuerySet[Self],
-        using: Any,
+        using: str | None,
         pk_val: Any,
-        values: Collection[Any] | None,
+        values: Collection[tuple[Field, type[Model] | None, Any]],
         update_fields: Iterable[str] | None,
         forced_update: bool,
     ) -> bool: ...
