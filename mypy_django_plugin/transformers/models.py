@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Type, Union, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
-from django.db.models.fields.reverse_related import ForeignObjectRel, OneToOneRel
+from django.db.models.fields.reverse_related import ManyToManyRel, OneToOneRel
 from mypy.checker import TypeChecker
 from mypy.nodes import (
     ARG_STAR2,
@@ -448,23 +448,15 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
 
 
 class AddReverseLookups(ModelClassInitializer):
-    def get_reverse_manager_info(self, model_info: TypeInfo, derived_from: str) -> Optional[TypeInfo]:
-        manager_fullname = helpers.get_django_metadata(model_info).get("reverse_managers", {}).get(derived_from)
-        if not manager_fullname:
-            return None
+    @cached_property
+    def reverse_one_to_one_descriptor(self) -> TypeInfo:
+        return self.lookup_typeinfo_or_incomplete_defn_error(fullnames.REVERSE_ONE_TO_ONE_DESCRIPTOR)
 
-        symbol = self.api.lookup_fully_qualified_or_none(manager_fullname)
-        if symbol is None or not isinstance(symbol.node, TypeInfo):
-            return None
-        return symbol.node
-
-    def set_reverse_manager_info(self, model_info: TypeInfo, derived_from: str, fullname: str) -> None:
-        helpers.get_django_metadata(model_info).setdefault("reverse_managers", {})[derived_from] = fullname
+    @cached_property
+    def many_to_many_descriptor(self) -> TypeInfo:
+        return self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MANY_TO_MANY_DESCRIPTOR)
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
-        reverse_one_to_one_descriptor = self.lookup_typeinfo_or_incomplete_defn_error(
-            fullnames.REVERSE_ONE_TO_ONE_DESCRIPTOR
-        )
         # add related managers
         for relation in self.django_context.get_model_relations(model_cls):
             attname = relation.get_accessor_name()
@@ -487,13 +479,27 @@ class AddReverseLookups(ModelClassInitializer):
                 self.add_new_node_to_model_class(
                     attname,
                     Instance(
-                        reverse_one_to_one_descriptor,
+                        self.reverse_one_to_one_descriptor,
                         [Instance(self.model_classdef.info, []), Instance(related_model_info, [])],
                     ),
                 )
                 continue
 
-            if isinstance(relation, ForeignObjectRel):
+            elif isinstance(relation, ManyToManyRel):
+                # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime.
+                to_fullname = helpers.get_class_fullname(relation.remote_field.model)
+                to_model_info = self.lookup_typeinfo_or_incomplete_defn_error(to_fullname)
+                assert relation.through is not None
+                through_fullname = helpers.get_class_fullname(relation.through)
+                through_model_info = self.lookup_typeinfo_or_incomplete_defn_error(through_fullname)
+                self.add_new_node_to_model_class(
+                    attname,
+                    Instance(
+                        self.many_to_many_descriptor, [Instance(to_model_info, []), Instance(through_model_info, [])]
+                    ),
+                )
+
+            else:
                 related_manager_info = None
                 try:
                     related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(
@@ -534,8 +540,8 @@ class AddReverseLookups(ModelClassInitializer):
 
                 # Check if the related model has a related manager subclassed from the default manager
                 # TODO: Support other reverse managers than `_default_manager`
-                default_reverse_manager_info = self.get_reverse_manager_info(
-                    model_info=related_model_info, derived_from="_default_manager"
+                default_reverse_manager_info = helpers.get_reverse_manager_info(
+                    self.api, model_info=related_model_info, derived_from="_default_manager"
                 )
                 if default_reverse_manager_info:
                     self.add_new_node_to_model_class(attname, Instance(default_reverse_manager_info, []))
@@ -564,7 +570,7 @@ class AddReverseLookups(ModelClassInitializer):
                 new_related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_info.fullname}
                 # Stash the new reverse manager type fullname on the related model, so we don't duplicate
                 # or have to create it again for other reverse relations
-                self.set_reverse_manager_info(
+                helpers.set_reverse_manager_info(
                     related_model_info,
                     derived_from="_default_manager",
                     fullname=new_related_manager_info.fullname,
@@ -844,8 +850,7 @@ class MetaclassAdjustments(ModelClassInitializer):
             exception_base_sym = model_base.names.get(name)
             if (
                 # Base class is a Model
-                model_base.metaclass_type is not None
-                and model_base.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+                helpers.is_model_type(model_base)
                 # But base class is not 'models.Model'
                 and model_base.fullname != fullnames.MODEL_CLASS_FULLNAME
                 # Base class also has a generated exception base e.g. 'DoesNotExist'

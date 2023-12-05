@@ -1,10 +1,11 @@
 -   case: self_return_management
     main: |
-        from myapp.models import MyModel
-        reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]]"
+        from myapp.models import MyModel, MyModelWithoutSelf
+        reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
         reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModelWithoutSelf.objects.method())  # N: Revealed type is "myapp.models.QuerySetWithoutSelf"
 
     installed_apps:
         - myapp
@@ -26,6 +27,13 @@
 
                 class MyModel(models.Model):
                     objects = MyQuerySet.as_manager()
+
+                class QuerySetWithoutSelf(models.QuerySet["MyModelWithoutSelf"]):
+                    def method(self) -> "QuerySetWithoutSelf":
+                        return self
+
+                class MyModelWithoutSelf(models.Model):
+                    objects = QuerySetWithoutSelf.as_manager()
 -   case: declares_manager_type_like_django
     main: |
         from myapp.models import MyModel
@@ -192,6 +200,8 @@
         reveal_type(MyOtherModel.objects.dummy_override())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.example_mixin(MyOtherModel()))  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyOtherModel"
+        reveal_type(MyOtherModel.objects.test_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
+        reveal_type(MyOtherModel.objects.test_sub_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
     installed_apps:
         - myapp
     files:
@@ -200,6 +210,7 @@
             content: |
               from typing import TypeVar, Generic
               from django.db import models
+              from typing_extensions import Self
 
               T = TypeVar("T", bound=models.Model)
               T_2 = TypeVar("T_2", bound=models.Model)
@@ -215,12 +226,14 @@
                   def override(self) -> T: ...
                   def override2(self) -> T: ...
                   def dummy_override(self) -> int: ...
+                  def test_sub_self(self) -> Self: ...
 
               class _MyModelQuerySet2(SomeMixin, _MyModelQuerySet[T_2]):
                   def example_2(self) -> T_2: ...
                   def override(self) -> T_2: ...
                   def override2(self) -> T_2: ...
                   def dummy_override(self) -> T_2: ...  # type: ignore[override]
+                  def test_self(self) -> Self: ...
 
               class MyModelQuerySet(_MyModelQuerySet2["MyModel"]):
                   def override(self) -> "MyModel": ...

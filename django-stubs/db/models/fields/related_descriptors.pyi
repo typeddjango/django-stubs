@@ -6,7 +6,7 @@ from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel, OneToOneRel
-from django.db.models.manager import BaseManager
+from django.db.models.manager import BaseManager, Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
@@ -15,6 +15,7 @@ from typing_extensions import Self
 _M = TypeVar("_M", bound=Model)
 _F = TypeVar("_F", bound=Field)
 _From = TypeVar("_From", bound=Model)
+_Through = TypeVar("_Through", bound=Model)
 _To = TypeVar("_To", bound=Model)
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
@@ -84,11 +85,11 @@ class ReverseManyToOneDescriptor:
     @overload
     def __get__(self, instance: None, cls: Any = ...) -> Self: ...
     @overload
-    def __get__(self, instance: Model, cls: Any = ...) -> type[RelatedManager[Any]]: ...
+    def __get__(self, instance: Model, cls: Any = ...) -> RelatedManager[Any]: ...
     def __set__(self, instance: Any, value: Any) -> NoReturn: ...
 
 # Fake class, Django defines 'RelatedManager' inside a function body
-class RelatedManager(BaseManager[_M], Generic[_M]):
+class RelatedManager(Manager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
     async def aadd(self, *objs: _M | int, bulk: bool = ...) -> None: ...
@@ -104,7 +105,7 @@ def create_reverse_many_to_one_manager(
     superclass: type[BaseManager[_M]], rel: ManyToOneRel
 ) -> type[RelatedManager[_M]]: ...
 
-class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_M]):
+class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
     """
     In the example::
 
@@ -117,16 +118,20 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_M]):
 
     # 'field' here is 'rel.field'
     rel: ManyToManyRel  # type: ignore[assignment]
-    field: ManyToManyField[Any, _M]  # type: ignore[assignment]
+    field: ManyToManyField[_To, _Through]  # type: ignore[assignment]
     reverse: bool
     def __init__(self, rel: ManyToManyRel, reverse: bool = ...) -> None: ...
     @property
-    def through(self) -> type[_M]: ...
+    def through(self) -> type[_Through]: ...
     @cached_property
-    def related_manager_cls(self) -> type[ManyRelatedManager[Any]]: ...  # type: ignore[override]
+    def related_manager_cls(self) -> type[ManyRelatedManager[_To]]: ...  # type: ignore[override]
+    @overload  # type: ignore[override]
+    def __get__(self, instance: None, cls: Any = ...) -> Self: ...
+    @overload
+    def __get__(self, instance: Model, cls: Any = ...) -> ManyRelatedManager[_To]: ...
 
 # Fake class, Django defines 'ManyRelatedManager' inside a function body
-class ManyRelatedManager(BaseManager[_M], Generic[_M]):
+class ManyRelatedManager(Manager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
     async def aadd(self, *objs: _M | int, bulk: bool = ...) -> None: ...

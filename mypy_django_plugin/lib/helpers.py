@@ -67,6 +67,20 @@ def get_django_metadata_bases(
     return get_django_metadata(model_info).setdefault(key, cast(Dict[str, int], {}))
 
 
+def get_reverse_manager_info(
+    api: Union[TypeChecker, SemanticAnalyzer], model_info: TypeInfo, derived_from: str
+) -> Optional[TypeInfo]:
+    manager_fullname = get_django_metadata(model_info).get("reverse_managers", {}).get(derived_from)
+    if not manager_fullname:
+        return None
+
+    return lookup_fully_qualified_typeinfo(api, manager_fullname)
+
+
+def set_reverse_manager_info(model_info: TypeInfo, derived_from: str, fullname: str) -> None:
+    get_django_metadata(model_info).setdefault("reverse_managers", {})[derived_from] = fullname
+
+
 class IncompleteDefnException(Exception):
     pass
 
@@ -402,7 +416,7 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
 
 
 def is_abstract_model(model: TypeInfo) -> bool:
-    if model.metaclass_type is None or model.metaclass_type.type.fullname != fullnames.MODEL_METACLASS_FULLNAME:
+    if not is_model_type(model):
         return False
 
     metadata = get_django_metadata(model)
@@ -457,3 +471,7 @@ def resolve_lazy_reference(
     else:
         api.fail("Could not match lazy reference with any model", ctx)
     return None
+
+
+def is_model_type(info: TypeInfo) -> bool:
+    return info.metaclass_type is not None and info.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME

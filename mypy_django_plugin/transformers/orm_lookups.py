@@ -15,9 +15,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     lookup_kwargs = ctx.arg_names[1] if len(ctx.arg_names) >= 2 else []
     provided_lookup_types = ctx.arg_types[1] if len(ctx.arg_types) >= 2 else []
 
-    assert isinstance(ctx.type, Instance)
-
-    if not ctx.type.args or not isinstance(ctx.type.args[0], Instance):
+    if not isinstance(ctx.type, Instance) or not ctx.type.args or not isinstance(ctx.type.args[0], Instance):
         return ctx.default_return_type
 
     model_cls_fullname = ctx.type.args[0].type.fullname

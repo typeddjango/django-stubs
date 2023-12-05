@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import ClassVar, List, Literal, Sequence, Tuple, Union
 
-    from django.db.models import BaseConstraint, Index
+    from django.db.models import BaseConstraint, Index, OrderBy
 
     from django_stubs_ext import StrOrPromise
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
         get_latest_by: ClassVar[Union[str, Sequence[str]]]
         managed: ClassVar[bool]  # default: True
         order_with_respect_to: ClassVar[str]
-        ordering: ClassVar[Sequence[str]]
+        ordering: ClassVar[Sequence[Union[str, OrderBy]]]
         permissions: ClassVar[List[Tuple[str, str]]]
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False
