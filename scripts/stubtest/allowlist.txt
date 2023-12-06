@@ -156,7 +156,6 @@ django.core.cache.backends.memcached.MemcachedCache
 
 # We re-export `functools.cached_property` which has different semantics
 django.utils.functional.cached_property.__class_getitem__
-django.utils.functional.cached_property.__init__
 django.utils.functional.cached_property.__set__
 django.utils.functional.cached_property.name
 
@@ -250,7 +249,6 @@ django.db.backends.mysql.features.DatabaseFeatures.can_introspect_check_constrai
 django.db.backends.mysql.features.DatabaseFeatures.can_introspect_foreign_keys
 django.db.backends.mysql.features.DatabaseFeatures.can_introspect_json_field
 django.db.backends.mysql.features.DatabaseFeatures.can_return_columns_from_insert
-django.db.backends.mysql.features.DatabaseFeatures.has_select_for_update_nowait
 django.db.backends.mysql.features.DatabaseFeatures.has_select_for_update_of
 django.db.backends.mysql.features.DatabaseFeatures.has_select_for_update_skip_locked
 django.db.backends.mysql.features.DatabaseFeatures.has_zoneinfo_database
@@ -263,7 +261,6 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_default_in_lead_lag
 django.db.backends.mysql.features.DatabaseFeatures.supports_explain_analyze
 django.db.backends.mysql.features.DatabaseFeatures.supports_expression_indexes
 django.db.backends.mysql.features.DatabaseFeatures.supports_index_column_ordering
-django.db.backends.mysql.features.DatabaseFeatures.supports_over_clause
 django.db.backends.mysql.features.DatabaseFeatures.supports_transactions
 django.db.backends.mysql.features.DatabaseFeatures.update_can_self_select
 django.db.backends.postgresql.base.DatabaseWrapper.pg_version
