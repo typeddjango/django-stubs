@@ -40,18 +40,10 @@ django.contrib.admin.sites.AdminSite.get_model_admin
 django.contrib.admin.utils.build_q_object_from_lookup_parameters
 django.contrib.admin.utils.get_last_value_from_parameters
 django.contrib.admin.views.main.ChangeList.get_queryset
-django.contrib.auth.aauthenticate
 django.contrib.auth.admin.UserAdmin.lookup_allowed
-django.contrib.auth.aget_user
-django.contrib.auth.alogin
-django.contrib.auth.alogout
-django.contrib.auth.aupdate_session_auth_hash
-django.contrib.auth.base_user.AbstractBaseUser.acheck_password
 django.contrib.auth.hashers.CryptPasswordHasher
-django.contrib.auth.hashers.acheck_password
 django.contrib.auth.hashers.verify_password
 django.contrib.auth.middleware.auser
-django.contrib.auth.models.AbstractBaseUser.acheck_password
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
@@ -242,7 +234,6 @@ django.db.models.lookups.Lookup.allowed_default
 django.db.models.query.Prefetch.get_current_querysets
 django.db.models.query.QuerySet.aupdate_or_create
 django.db.models.query.QuerySet.update_or_create
-django.db.models.query.aprefetch_related_objects
 django.db.models.query_utils.FilteredRelation.relabeled_clone
 django.db.models.query_utils.FilteredRelation.resolve_expression
 django.db.models.query_utils.Q.identity
@@ -278,8 +269,6 @@ django.forms.renderers.BaseRenderer.field_template_name
 django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.forms.utils.RenderableFieldMixin
 django.forms.widgets.ClearableFileInput.checked
-django.shortcuts.aget_list_or_404
-django.shortcuts.aget_object_or_404
 django.template.Template.__iter__
 django.template.autoreload
 django.template.base.Template.__iter__
@@ -300,10 +289,6 @@ django.test.client.AsyncClient.patch
 django.test.client.AsyncClient.post
 django.test.client.AsyncClient.put
 django.test.client.AsyncClient.trace
-django.test.client.ClientMixin.aforce_login
-django.test.client.ClientMixin.alogin
-django.test.client.ClientMixin.alogout
-django.test.client.ClientMixin.asession
 django.test.runner.DiscoverRunner.__init__
 django.test.runner.DiscoverRunner.run_tests
 django.test.runner.RemoteTestResult.addDuration

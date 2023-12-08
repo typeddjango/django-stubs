@@ -395,3 +395,7 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+
+# Module-scoped loop variables that shouldn't be exported
+django.contrib.admindocs.utils.name
+django.contrib.admindocs.utils.urlbase
