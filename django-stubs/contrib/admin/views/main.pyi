@@ -27,6 +27,7 @@ class ChangeList:
     list_filter: Sequence[_ListFilterT]
     date_hierarchy: Any
     search_fields: Sequence[str]
+    search_help_text: str | None
     list_select_related: bool | Sequence[str]
     list_per_page: int
     list_max_show_all: int
@@ -59,6 +60,7 @@ class ChangeList:
         list_editable: Sequence[str],
         model_admin: ModelAdmin,
         sortable_by: Sequence[str] | None,
+        search_help_text: str | None,
     ) -> None: ...
     def get_filters_params(self, params: dict[str, Any] | None = ...) -> dict[str, Any]: ...
     def get_filters(self, request: HttpRequest) -> tuple[list[ListFilter], bool, dict[str, bool | str], bool, bool]: ...

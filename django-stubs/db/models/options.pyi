@@ -1,11 +1,5 @@
 from collections.abc import Iterable, Sequence
-from typing import (  # noqa: Y037   # https://github.com/python/mypy/issues/12211
-    Any,
-    Generic,
-    Literal,
-    TypeVar,
-    overload,
-)
+from typing import Any, Generic, Literal, TypeVar, overload
 
 from django.apps.config import AppConfig
 from django.apps.registry import Apps
@@ -19,7 +13,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.manager import Manager
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, _ListOrTuple
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import _StrOrPromise, cached_property
 from typing_extensions import TypeAlias
 
 PROXY_PARENTS: object
@@ -27,8 +21,7 @@ EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
-# https://github.com/python/mypy/issues/12211
-_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: Y047
+_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: PYI047
 
 @overload
 def normalize_together(option_together: _ListOrTuple[_ListOrTuple[str] | str]) -> tuple[tuple[str, ...], ...]: ...
@@ -108,17 +101,17 @@ class Options(Generic[_M]):
     def verbose_name_raw(self) -> str: ...
     @property
     def swapped(self) -> str | None: ...
-    @property
+    @cached_property
     def fields_map(self) -> dict[str, Field[Any, Any] | ForeignObjectRel]: ...
-    @property
+    @cached_property
     def managers(self) -> ImmutableList[Manager]: ...
-    @property
+    @cached_property
     def managers_map(self) -> dict[str, Manager]: ...
-    @property
+    @cached_property
     def base_manager(self) -> Manager: ...
-    @property
+    @cached_property
     def default_manager(self) -> Manager | None: ...
-    @property
+    @cached_property
     def fields(self) -> ImmutableList[Field[Any, Any]]: ...
     def get_field(self, field_name: str) -> Field | ForeignObjectRel | GenericForeignKey: ...
     def get_base_chain(self, model: type[Model]) -> list[type[Model]]: ...
@@ -129,7 +122,7 @@ class Options(Generic[_M]):
     def get_fields(
         self, include_parents: bool = ..., include_hidden: bool = ...
     ) -> list[Field[Any, Any] | ForeignObjectRel | GenericForeignKey]: ...
-    @property
+    @cached_property
     def total_unique_constraints(self) -> list[UniqueConstraint]: ...
-    @property
+    @cached_property
     def db_returning_fields(self) -> list[Field[Any, Any]]: ...

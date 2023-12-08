@@ -8,7 +8,7 @@ from typing import Any, overload
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
-from django.db import connections  # noqa: F401
+from django.db import connections as connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
@@ -218,12 +218,12 @@ class TransactionTestCase(SimpleTestCase):
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
         values: Collection[Any],
-        transform: Callable[[Model], Any] | type[str] = ...,
+        transform: Callable[[Model], Any] | type[str] | None = ...,
         ordered: bool = ...,
         msg: str | None = ...,
     ) -> None: ...
     @overload
-    def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore
+    def assertNumQueries(self, num: int, func: None = ..., *, using: str = ...) -> _AssertNumQueriesContext: ...
     @overload
     def assertNumQueries(
         self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any

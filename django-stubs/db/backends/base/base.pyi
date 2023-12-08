@@ -1,6 +1,7 @@
 from collections.abc import Callable, Generator, Iterator, MutableMapping
 from contextlib import contextmanager
 from datetime import tzinfo
+from logging import Logger
 from typing import Any
 
 from django.db.backends.base.client import BaseDatabaseClient
@@ -11,14 +12,19 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
+from django.utils.functional import cached_property
 from typing_extensions import Self, TypeAlias
 
 NO_DB_ALIAS: str
 RAN_DB_VERSION_CHECK: set[str]
 
+logger: Logger
+
 _ExecuteWrapper: TypeAlias = Callable[
     [Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any
 ]
+
+def timezone_constructor(tzname: str) -> tzinfo: ...
 
 class BaseDatabaseWrapper:
     data_types: dict[str, str]
@@ -60,9 +66,9 @@ class BaseDatabaseWrapper:
     operators: MutableMapping[str, str]
     def __init__(self, settings_dict: dict[str, Any], alias: str = ...) -> None: ...
     def ensure_timezone(self) -> bool: ...
-    @property
+    @cached_property
     def timezone(self) -> tzinfo | None: ...
-    @property
+    @cached_property
     def timezone_name(self) -> str: ...
     @property
     def queries_logged(self) -> bool: ...
@@ -97,6 +103,7 @@ class BaseDatabaseWrapper:
     def enable_constraint_checking(self) -> None: ...
     def check_constraints(self, table_names: Any | None = ...) -> None: ...
     def is_usable(self) -> bool: ...
+    def close_if_health_check_failed(self) -> None: ...
     def close_if_unusable_or_obsolete(self) -> None: ...
     @property
     def allow_thread_sharing(self) -> bool: ...

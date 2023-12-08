@@ -11,9 +11,9 @@ from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
 from typing_extensions import TypeAlias
 
-_DataT: TypeAlias = Mapping[str, Any]  # noqa: Y047
+_DataT: TypeAlias = Mapping[str, Any]  # noqa: PYI047
 
-_FilesT: TypeAlias = MultiValueDict[str, UploadedFile]  # noqa: Y047
+_FilesT: TypeAlias = MultiValueDict[str, UploadedFile]  # noqa: PYI047
 
 def pretty_name(name: str) -> str: ...
 def flatatt(attrs: dict[str, Any]) -> SafeString: ...
@@ -46,6 +46,7 @@ class ErrorDict(dict[str, ErrorList], RenderableErrorMixin):
     template_name_ul: str
     renderer: BaseRenderer
 
+    def __init__(self, *args: Any, renderer: BaseRenderer | None = None, **kwargs: Any): ...
     def as_data(self) -> dict[str, list[ValidationError]]: ...
     def get_json_data(self, escape_html: bool = ...) -> dict[str, Any]: ...
 
@@ -59,6 +60,7 @@ class ErrorList(UserList[ValidationError | _StrOrPromise], RenderableErrorMixin)
         self,
         initlist: ErrorList | Sequence[str | Exception] | None = ...,
         error_class: str | None = ...,
+        renderer: BaseRenderer | None = ...,
     ) -> None: ...
     def as_data(self) -> list[ValidationError]: ...
     def get_json_data(self, escape_html: bool = ...) -> list[dict[str, str]]: ...

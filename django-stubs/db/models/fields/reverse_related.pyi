@@ -7,6 +7,7 @@ from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToMan
 from django.db.models.lookups import Lookup, StartsWith
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
+from django.utils.functional import cached_property
 
 from .mixins import FieldCacheMixin
 
@@ -42,23 +43,23 @@ class ForeignObjectRel(FieldCacheMixin):
         parent_link: bool = ...,
         on_delete: Callable = ...,
     ) -> None: ...
-    @property
+    @cached_property
     def hidden(self) -> bool: ...
-    @property
+    @cached_property
     def name(self) -> str: ...
     @property
     def remote_field(self) -> ForeignObject: ...
     @property
     def target_field(self) -> AutoField: ...
-    @property
+    @cached_property
     def related_model(self) -> type[Model] | Literal["self"]: ...
-    @property
+    @cached_property
     def many_to_many(self) -> bool: ...
-    @property
+    @cached_property
     def many_to_one(self) -> bool: ...
-    @property
+    @cached_property
     def one_to_many(self) -> bool: ...
-    @property
+    @cached_property
     def one_to_one(self) -> bool: ...
     def get_lookup(self, lookup_name: str) -> type[Lookup] | None: ...
     def get_internal_type(self) -> str: ...
@@ -112,13 +113,13 @@ class OneToOneRel(ManyToOneRel):
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
-    field: ManyToManyField  # type: ignore
+    field: ManyToManyField[Any, Any]  # type: ignore[assignment]
     through: type[Model] | None
     through_fields: tuple[str, str] | None
     db_constraint: bool
     def __init__(
         self,
-        field: ManyToManyField,
+        field: ManyToManyField[Any, Any],
         to: type[Model] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,

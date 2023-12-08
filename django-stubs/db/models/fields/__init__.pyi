@@ -5,6 +5,7 @@ from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
 from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload
 
+from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -15,7 +16,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
-from django.utils.functional import _Getter, _StrOrPromise
+from django.utils.functional import _Getter, _StrOrPromise, cached_property
 from typing_extensions import Self, TypeAlias
 
 class Empty: ...
@@ -44,7 +45,7 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
@@ -174,11 +175,11 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
@@ -202,11 +203,16 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def get_internal_type(self) -> str: ...
     # TODO: plugin support
-    def formfield(self, form_class: Any | None = ..., choices_form_class: Any | None = ..., **kwargs: Any) -> Any: ...
+    def formfield(
+        self,
+        form_class: type[forms.Field] | None = ...,
+        choices_form_class: type[forms.ChoiceField] | None = ...,
+        **kwargs: Any,
+    ) -> forms.Field: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
     def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
-    @property
+    @cached_property
     def validators(self) -> list[validators._ValidatorCallable]: ...
     def run_validators(self, value: Any) -> None: ...
     def validate(self, value: Any, model_instance: Model | None) -> None: ...
@@ -225,7 +231,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_default(self) -> Any: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     def get_col(self, alias: str, output_field: Field | None = ...) -> Col: ...
-    @property
+    @cached_property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
     def get_attname(self) -> str: ...
@@ -420,9 +426,9 @@ class BooleanField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: bool
 
 class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: bool | Combinable | None  # type: ignore
-    _pyi_private_get_type: bool | None  # type: ignore
-    _pyi_lookup_exact_type: bool | None  # type: ignore
+    _pyi_private_set_type: bool | Combinable | None  # type: ignore[assignment]
+    _pyi_private_get_type: bool | None  # type: ignore[assignment]
+    _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | Combinable

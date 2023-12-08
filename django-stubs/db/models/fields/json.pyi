@@ -1,9 +1,10 @@
 import json
 from collections.abc import Callable
-from typing import Any
+from typing import Any, ClassVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
+from django.db.models.fields import TextField
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler
 from django.utils.functional import _StrOrPromise
@@ -57,6 +58,7 @@ class KeyTransform(Transform):
 class KeyTextTransform(KeyTransform):
     postgres_operator: str
     postgres_nested_operator: str
+    output_field: ClassVar[TextField]
     @classmethod
     def from_lookup(cls, lookup: str) -> Self: ...
 

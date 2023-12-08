@@ -6,13 +6,14 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.semanal_shared import parse_bool
-from mypy.types import AnyType, Instance, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.helpers import parse_bool
+from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
     from django.contrib.contenttypes.fields import GenericForeignKey
@@ -91,18 +92,20 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     related_model_info = helpers.lookup_class_typeinfo(typechecker_api, related_model)
+    related_model_type: ProperType
     if related_model_info is None:
         # maybe no type stub
         related_model_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_type = Instance(related_model_info, [])  # type: ignore
+        related_model_type = Instance(related_model_info, [])
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
+    related_model_to_set_type: ProperType
     if related_model_to_set_info is None:
         # maybe no type stub
         related_model_to_set_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
+        related_model_to_set_type = Instance(related_model_to_set_info, [])
 
     # replace Any with referred_to_type
     return reparametrize_related_field_type(
@@ -211,6 +214,10 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     assert isinstance(outer_model_info, TypeInfo)
 
+    if default_return_type.type.has_base(fullnames.MANYTOMANY_FIELD_FULLNAME):
+        return manytomany.fill_model_args_for_many_to_many_field(
+            ctx=ctx, model_info=outer_model_info, default_return_type=default_return_type, django_context=django_context
+        )
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 

@@ -57,9 +57,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def check_constraints(self, table_names: Any | None = ...) -> None: ...
     def is_usable(self) -> bool: ...
     @property
-    def display_name(self) -> str: ...  # type: ignore [override]
+    def display_name(self) -> str: ...  # type: ignore[override]
     @property
-    def data_type_check_constraints(self) -> dict[str, str]: ...  # type: ignore [override]
+    def data_type_check_constraints(self) -> dict[str, str]: ...  # type: ignore[override]
     @property
     def mysql_server_data(self) -> dict[str, Any]: ...
     @property

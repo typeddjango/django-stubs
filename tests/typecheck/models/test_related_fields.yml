@@ -94,8 +94,8 @@
 
       reveal_type(Model2.model_1.field) # N: Revealed type is "django.db.models.fields.related.ForeignObject[app1.models.Model1, app1.models.Model1]"
       reveal_type(Model2().model_1) # N: Revealed type is "app1.models.Model1"
-      reveal_type(Model1.model_2s) # N: Revealed type is "django.db.models.manager.RelatedManager[app1.models.Model2]"
-      reveal_type(Model1().model_2s) # N: Revealed type is "django.db.models.manager.RelatedManager[app1.models.Model2]"
+      reveal_type(Model1.model_2s) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[app1.models.Model2]"
+      reveal_type(Model1().model_2s) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[app1.models.Model2]"
 
     installed_apps:
       - app1

@@ -6,7 +6,7 @@ from django.forms.forms import BaseForm
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from django.forms.widgets import Widget
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import _StrOrPromise, cached_property
 from django.utils.safestring import SafeString
 from typing_extensions import TypeAlias
 
@@ -22,7 +22,7 @@ class BoundField:
     label: _StrOrPromise
     help_text: _StrOrPromise
     def __init__(self, form: BaseForm, field: Field, name: str) -> None: ...
-    @property
+    @cached_property
     def subwidgets(self) -> list[BoundWidget]: ...
     def __bool__(self) -> bool: ...
     def __iter__(self) -> Iterator[BoundWidget]: ...

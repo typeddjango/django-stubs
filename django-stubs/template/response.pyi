@@ -1,7 +1,7 @@
 import functools
 from collections.abc import Callable, Iterator, Sequence
 from http.cookies import SimpleCookie
-from typing import Any  # noqa: Y037   # https://github.com/python/mypy/issues/12211
+from typing import Any
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
@@ -12,7 +12,6 @@ from django.test.client import Client
 from django.utils.datastructures import _ListOrTuple
 from typing_extensions import TypeAlias
 
-# https://github.com/python/mypy/issues/12211
 _TemplateForResponseT: TypeAlias = _ListOrTuple[str] | Template | str
 
 class ContentNotRenderedError(Exception): ...
@@ -20,7 +19,7 @@ class ContentNotRenderedError(Exception): ...
 class SimpleTemplateResponse(HttpResponse):
     content: Any
     closed: bool
-    cookies: SimpleCookie[str]
+    cookies: SimpleCookie
     status_code: int
     rendering_attrs: Any
     template_name: _TemplateForResponseT
@@ -51,7 +50,7 @@ class TemplateResponse(SimpleTemplateResponse):
     closed: bool
     context: RequestContext
     context_data: dict[str, Any] | None
-    cookies: SimpleCookie[str]
+    cookies: SimpleCookie
     csrf_cookie_set: bool
     json: functools.partial
     _request: HttpRequest

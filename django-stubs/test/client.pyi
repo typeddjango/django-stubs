@@ -1,5 +1,6 @@
 from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
-from io import BytesIO
+from http.cookies import SimpleCookie
+from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
@@ -10,7 +11,6 @@ from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
-from django.http.cookie import SimpleCookie
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from django.template.base import Template
@@ -20,19 +20,20 @@ from typing_extensions import TypeAlias
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
-CONTENT_TYPE_RE: Pattern
-JSON_CONTENT_TYPE_RE: Pattern
+CONTENT_TYPE_RE: Pattern[str]
+JSON_CONTENT_TYPE_RE: Pattern[str]
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
     redirect_chain: list[tuple[str, int]]
     def __init__(self, message: str, last_response: HttpResponseBase) -> None: ...
 
-class FakePayload:
+class FakePayload(IOBase):
     read_started: bool
-    def __init__(self, content: bytes | str | None = ...) -> None: ...
+    def __init__(self, initial_bytes: bytes | str | None = ...) -> None: ...
     def __len__(self) -> int: ...
-    def read(self, num_bytes: int = ...) -> bytes: ...
+    def read(self, size: int = ...) -> bytes: ...
+    def readline(self, size: int | None = ..., /) -> bytes: ...
     def write(self, content: bytes | str) -> None: ...
 
 _T = TypeVar("_T")
@@ -202,7 +203,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         **defaults: Any,
     ) -> None: ...
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
-    def get(  # type: ignore
+    def get(  # type: ignore[override]
         self,
         path: str,
         data: _GetDataType = ...,
@@ -212,7 +213,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def post(  # type: ignore
+    def post(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -223,7 +224,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def head(  # type: ignore
+    def head(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -233,17 +234,18 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def trace(  # type: ignore
+    def options(  # type: ignore[override]
         self,
         path: str,
-        data: Any = ...,
+        data: dict[str, str] | str = ...,
+        content_type: str = ...,
         follow: bool = ...,
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def put(  # type: ignore
+    def put(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -254,7 +256,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def patch(  # type: ignore
+    def patch(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
@@ -265,11 +267,21 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         headers: Mapping[str, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
-    def delete(  # type: ignore
+    def delete(  # type: ignore[override]
         self,
         path: str,
         data: Any = ...,
         content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedWSGIResponse: ...
+    def trace(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
         follow: bool = ...,
         secure: bool = ...,
         *,

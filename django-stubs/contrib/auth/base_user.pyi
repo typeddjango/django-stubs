@@ -1,4 +1,4 @@
-from typing import Any, Literal, TypeVar, overload
+from typing import Any, ClassVar, Literal, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model
@@ -14,7 +14,7 @@ class BaseUserManager(models.Manager[_T]):
     def get_by_natural_key(self, username: str | None) -> _T: ...
 
 class AbstractBaseUser(models.Model):
-    REQUIRED_FIELDS: list[str]
+    REQUIRED_FIELDS: ClassVar[list[str]]
 
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)

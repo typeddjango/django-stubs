@@ -10,6 +10,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression
 from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
+from django.utils.functional import cached_property
 from typing_extensions import TypeAlias
 
 _ParamT: TypeAlias = str | int
@@ -96,7 +97,7 @@ class SQLCompiler:
     ) -> Iterator[Sequence[Any]]: ...
     def has_results(self) -> bool: ...
     @overload
-    def execute_sql(  # type: ignore
+    def execute_sql(  # type: ignore[overload-overlap]
         self, result_type: Literal["cursor"] = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> CursorWrapper: ...
     @overload
@@ -104,7 +105,7 @@ class SQLCompiler:
         self, result_type: Literal["no results"] | None = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> None: ...
     @overload
-    def execute_sql(  # type: ignore
+    def execute_sql(  # type: ignore[overload-overlap]
         self, result_type: Literal["single"] = ..., chunked_fetch: bool = ..., chunk_size: int = ...
     ) -> Iterable[Sequence[Any]] | None: ...
     @overload
@@ -122,29 +123,29 @@ class SQLInsertCompiler(SQLCompiler):
     def prepare_value(self, field: Any, value: Any) -> Any: ...
     def pre_save_val(self, field: Any, obj: Any) -> Any: ...
     def assemble_as_sql(self, fields: Any, value_rows: Any) -> tuple[list[list[str]], list[list[Any]]]: ...
-    def as_sql(self) -> list[_AsSqlType]: ...  # type: ignore
-    def execute_sql(  # type: ignore
+    def as_sql(self) -> list[_AsSqlType]: ...  # type: ignore[override]
+    def execute_sql(  # type: ignore[override]
         self, returning_fields: Sequence[str] | None = ...
     ) -> list[tuple[Any]]: ...  # 1-tuple
 
 class SQLDeleteCompiler(SQLCompiler):
     query: DeleteQuery
-    @property
+    @cached_property
     def single_alias(self) -> bool: ...
-    @property
+    @cached_property
     def contains_self_reference_subquery(self) -> bool: ...
-    def as_sql(self) -> _AsSqlType: ...  # type: ignore
+    def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
 class SQLUpdateCompiler(SQLCompiler):
     query: UpdateQuery
-    def as_sql(self) -> _AsSqlType: ...  # type: ignore
-    def execute_sql(self, result_type: Literal["cursor", "no results"]) -> int: ...  # type: ignore
-    def pre_sql_setup(self) -> None: ...  # type: ignore
+    def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
+    def execute_sql(self, result_type: Literal["cursor", "no results"]) -> int: ...  # type: ignore[override]
+    def pre_sql_setup(self) -> None: ...  # type: ignore[override]
 
 class SQLAggregateCompiler(SQLCompiler):
     query: AggregateQuery
     col_count: int
-    def as_sql(self) -> _AsSqlType: ...  # type: ignore
+    def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
 def cursor_iter(
     cursor: CursorWrapper, sentinel: Any, col_count: int | None, itersize: int

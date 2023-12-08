@@ -23,7 +23,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
+from mypy_django_plugin.transformers import fields, forms, init_create, manytomany, meta, querysets, request, settings
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_as_manager_method,
@@ -188,6 +188,12 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return forms.extract_proper_type_for_get_form
 
+        elif method_name == "__get__" and class_fullname in {
+            fullnames.MANYTOMANY_FIELD_FULLNAME,
+            fullnames.MANY_TO_MANY_DESCRIPTOR,
+        }:
+            return manytomany.refine_many_to_many_related_manager
+
         manager_classes = self._get_current_manager_bases()
 
         if method_name == "values":
@@ -239,12 +245,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
         sym = self.lookup_fully_qualified(fullname)
-        if (
-            sym is not None
-            and isinstance(sym.node, TypeInfo)
-            and sym.node.metaclass_type is not None
-            and sym.node.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
-        ):
+        if sym is not None and isinstance(sym.node, TypeInfo) and helpers.is_model_type(sym.node):
             return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Manager class definition

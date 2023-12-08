@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, TypeVar, overload
+from typing import Any, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.core import validators  # due to weird mypy.stubtest error
@@ -8,19 +8,17 @@ from django.db.models.expressions import Combinable
 from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _FieldChoices, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
-from django.db.models.fields.related_descriptors import (  # noqa: F401
-    ForwardOneToOneDescriptor as ForwardOneToOneDescriptor,
-)
+from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor as ForwardOneToOneDescriptor
+from django.db.models.fields.related_descriptors import ManyRelatedManager
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor as ManyToManyDescriptor
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor as ReverseManyToOneDescriptor
 from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor as ReverseOneToOneDescriptor
-from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignObjectRel  # noqa: F401
+from django.db.models.fields.reverse_related import ForeignObjectRel as ForeignObjectRel
 from django.db.models.fields.reverse_related import ManyToManyRel as ManyToManyRel
 from django.db.models.fields.reverse_related import ManyToOneRel as ManyToOneRel
 from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
-from django.db.models.manager import RelatedManager
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import _StrOrPromise, cached_property
 from typing_extensions import Self
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
@@ -42,8 +40,38 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     remote_field: ForeignObjectRel
     rel_class: type[ForeignObjectRel]
     swappable: bool
-    @property
-    def related_model(self) -> type[Model] | Literal["self"]: ...  # type: ignore
+    def __init__(
+        self,
+        related_name: str | None = ...,
+        related_query_name: str | None = ...,
+        limit_choices_to: _AllLimitChoicesTo | None = ...,
+        *,
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: bool = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @cached_property
+    def related_model(self) -> type[Model] | Literal["self"]: ...  # type: ignore[override]
     def get_forward_related_filter(self, obj: Model) -> dict[str, int | UUID]: ...
     def get_reverse_related_filter(self, obj: Model) -> Q: ...
     @property
@@ -74,7 +102,6 @@ class ForeignObject(RelatedField[_ST, _GT]):
         parent_link: bool = ...,
         swappable: bool = ...,
         *,
-        db_constraint: bool = ...,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,
@@ -89,10 +116,10 @@ class ForeignObject(RelatedField[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     # class access
     @overload
@@ -104,13 +131,13 @@ class ForeignObject(RelatedField[_ST, _GT]):
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
-    @property
+    @cached_property
     def related_fields(self) -> list[tuple[Field, Field]]: ...
-    @property
+    @cached_property
     def reverse_related_fields(self) -> list[tuple[Field, Field]]: ...
-    @property
+    @cached_property
     def local_related_fields(self) -> tuple[Field, ...]: ...
-    @property
+    @cached_property
     def foreign_related_fields(self) -> tuple[Field, ...]: ...
 
 class ForeignKey(ForeignObject[_ST, _GT]):
@@ -148,10 +175,10 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
 
 class OneToOneField(ForeignKey[_ST, _GT]):
@@ -189,10 +216,10 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     # class access
     @overload
@@ -204,10 +231,10 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
 
-class ManyToManyField(RelatedField[_ST, _GT]):
-    _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: RelatedManager[Any]
+_Through = TypeVar("_Through", bound=Model)
+_To = TypeVar("_To", bound=Model)
 
+class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     description: str
     has_null_arg: bool
     swappable: bool
@@ -221,12 +248,12 @@ class ManyToManyField(RelatedField[_ST, _GT]):
     rel_class: type[ManyToManyRel]
     def __init__(
         self,
-        to: type[Model] | str,
+        to: type[_To] | str,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
         limit_choices_to: _AllLimitChoicesTo | None = ...,
         symmetrical: bool | None = ...,
-        through: str | type[Model] | None = ...,
+        through: type[_Through] | str | None = ...,
         through_fields: tuple[str, str] | None = ...,
         db_constraint: bool = ...,
         db_table: str | None = ...,
@@ -249,16 +276,16 @@ class ManyToManyField(RelatedField[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     # class access
     @overload
-    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[Self]: ...
+    def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[_To, _Through]: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> ManyRelatedManager[_To]: ...
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...

@@ -18,7 +18,7 @@
         class MyModelModelIterable(ModelIterable[MyModel]):
             pass
     out: |
-        main:4: error: Type argument "int" of "ModelIterable" must be a subtype of "Model"
+        main:4: error: Type argument "int" of "ModelIterable" must be a subtype of "Model"  [type-var]
 
 
 -   case: django_db_models_query_module_has_ValuesListIterable
@@ -36,7 +36,7 @@
         class NonTupleValuesListIterable(ValuesListIterable[int]):
             pass
     out: |
-        main:11: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"
+        main:11: error: Type argument "int" of "ValuesListIterable" must be a subtype of "Tuple[Any, ...]"  [type-var]
 
 
 -   case: django_db_models_query_module_has_NamedValuesListIterable
@@ -53,4 +53,4 @@
         QuerySet._iterable_class = ModelIterable
         QuerySet._iterable_class = int
     out: |
-        main:5: error: Incompatible types in assignment (expression has type "Type[int]", variable has type "Type[BaseIterable[Any]]")
+        main:5: error: Incompatible types in assignment (expression has type "Type[int]", variable has type "Type[BaseIterable[Any]]")  [assignment]

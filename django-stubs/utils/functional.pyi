@@ -1,20 +1,13 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
+
+# Mypy has special handling for functools.cached_property, reuse typeshed's definition instead of defining our own
+from functools import cached_property as cached_property
 from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, overload
 
 from django.db.models.base import Model
 from typing_extensions import Self, TypeAlias
 
 _T = TypeVar("_T")
-
-class cached_property(Generic[_T]):
-    func: Callable[..., _T]
-    name: str | None
-    def __init__(self, func: Callable[..., _T], name: str | None = ...) -> None: ...
-    @overload
-    def __get__(self, instance: None, cls: type[Any] | None = ...) -> Self: ...
-    @overload
-    def __get__(self, instance: object, cls: type[Any] | None = ...) -> _T: ...
-    def __set_name__(self, owner: type[Any], name: str) -> None: ...
 
 # Promise is only subclassed by a proxy class defined in the lazy function
 # so it makes sense for it to have all the methods available in that proxy class
@@ -27,10 +20,9 @@ class Promise:
     def __radd__(self, other: Any) -> Any: ...
     def __deepcopy__(self, memo: Any) -> Self: ...
 
-class _StrPromise(Promise, Sequence[str]):
+class _StrPromise(Promise):
     def __add__(self, __s: str) -> str: ...
-    # Incompatible with Sequence.__contains__
-    def __contains__(self, __o: str) -> bool: ...  # type: ignore[override]
+    def __contains__(self, __o: str) -> bool: ...
     def __ge__(self, __x: str) -> bool: ...
     def __getitem__(self, __i: SupportsIndex | slice) -> str: ...
     def __gt__(self, __x: str) -> bool: ...
@@ -44,7 +36,7 @@ class _StrPromise(Promise, Sequence[str]):
     # Mypy requires this for the attribute hook to take effect
     def __getattribute__(self, __name: str) -> Any: ...
 
-_StrOrPromise: TypeAlias = str | _StrPromise  # noqa: Y047
+_StrOrPromise: TypeAlias = str | _StrPromise  # noqa: PYI047
 _C = TypeVar("_C", bound=Callable)
 
 def lazy(func: _C, *resultclasses: Any) -> _C: ...
