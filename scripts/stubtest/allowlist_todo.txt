@@ -162,14 +162,12 @@ django.contrib.auth.models.AnonymousUser.__int__
 django.contrib.auth.models.Group.id
 django.contrib.auth.models.Group.name
 django.contrib.auth.models.Group.permissions
-django.contrib.auth.models.Group.user_set
 django.contrib.auth.models.GroupManager.__slotnames__
 django.contrib.auth.models.Permission.codename
 django.contrib.auth.models.Permission.content_type
 django.contrib.auth.models.Permission.content_type_id
 django.contrib.auth.models.Permission.id
 django.contrib.auth.models.Permission.name
-django.contrib.auth.models.Permission.user_set
 django.contrib.auth.models.PermissionManager.__slotnames__
 django.contrib.auth.models.PermissionsMixin.Meta.abstract
 django.contrib.auth.models.PermissionsMixin.groups
