@@ -1,7 +1,6 @@
 from collections import deque
-from collections.abc import Iterable
 from functools import cached_property
-from typing import Any, Dict, List, Optional, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
