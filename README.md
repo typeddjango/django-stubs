@@ -177,54 +177,6 @@ class AuthenticatedHttpRequest(HttpRequest):
 
 And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
 
-### My QuerySet methods are returning Any rather than my Model
-
-If you are using `MyQuerySet.as_manager()`:
-
-Example:
-
-```python
-from django.db import models
-
-class MyModelQuerySet(models.QuerySet):
-    pass
-
-
-class MyModel(models.Model):
-    bar = models.IntegerField()
-    objects = MyModelQuerySet.as_manager()
-
-
-def use_my_model() -> int:
-    foo = MyModel.objects.get(id=1) # Should now be `MyModel`
-    return foo.xyz # Gives an error
-```
-
-Or if you're using `Manager.from_queryset`:
-
-Example:
-
-```python
-from django.db import models
-
-
-class MyModelQuerySet(models.QuerySet):
-    pass
-
-
-MyModelManager = models.Manager.from_queryset(MyModelQuerySet)
-
-
-class MyModel(models.Model):
-    bar = models.IntegerField()
-    objects = MyModelManager()
-
-
-def use_my_model() -> int:
-    foo = MyModel.objects.get(id=1) # Should now be `MyModel`
-    return foo.xyz # Gives an error
-```
-
 ### Why am I getting incompatible return type errors on my custom managers?
 
 If you declare your custom managers without generics and override built-in
