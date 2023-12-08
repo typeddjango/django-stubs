@@ -4,7 +4,7 @@ line-length = 120
 include = '\.pyi?$'
 
 [tool.codespell]
-ignore-words-list = "aadd,acount,nam"
+ignore-words-list = "aadd,acount,nam,asend"
 
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
