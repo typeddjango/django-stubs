@@ -474,4 +474,4 @@ def resolve_lazy_reference(
 
 
 def is_model_type(info: TypeInfo) -> bool:
-    return info.metaclass_type is not None and info.metaclass_type.type.fullname == fullnames.MODEL_METACLASS_FULLNAME
+    return info.metaclass_type is not None and info.metaclass_type.type.has_base(fullnames.MODEL_METACLASS_FULLNAME)
