@@ -1,5 +1,6 @@
+from collections import deque
 from functools import cached_property
-from typing import Any, Dict, List, Optional, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
@@ -15,6 +16,7 @@ from mypy.nodes import (
     Expression,
     NameExpr,
     RefExpr,
+    Statement,
     StrExpr,
     SymbolTableNode,
     TypeInfo,
@@ -626,6 +628,28 @@ class ProcessManyToManyFields(ModelClassInitializer):
     where an explicit 'through' argument has been passed.
     """
 
+    def statements(self) -> Iterable[Statement]:
+        """
+        Returns class body statements from the current model and any of its bases that
+        is an abstract model. Statements from any concrete parent class or parents of
+        that concrete class will be skipped.
+        """
+        processed_models = set()
+        # Produce all statements from current class
+        model_bases = deque([self.model_classdef])
+        # Do a breadth first search over the current model and its bases, to find all
+        # abstract parent models that have not been "interrupted" by any concrete model.
+        while model_bases:
+            model = model_bases.popleft()
+            yield from model.defs.body
+            for base in model.info.bases:
+                # Only produce any additional statements from abstract model bases, as they
+                # simulate regular python inheritance. Avoid concrete models, and any of their
+                # parents, as they're handled differently by Django.
+                if helpers.is_abstract_model(base.type) and base.type.fullname not in processed_models:
+                    model_bases.append(base.type.defn)
+                    processed_models.add(base.type.fullname)
+
     def run(self) -> None:
         if self.is_model_abstract:
             # TODO: Create abstract through models?
@@ -642,26 +666,26 @@ class ProcessManyToManyFields(ModelClassInitializer):
         from_pk = self.get_pk_instance(self.model_classdef.info)
         fk_set_type, fk_get_type = get_field_descriptor_types(fk_field, is_set_nullable=False, is_get_nullable=False)
 
-        for defn in self.model_classdef.defs.body:
+        for statement in self.statements():
             # Check if this part of the class body is an assignment from a 'ManyToManyField' call
             # <field> = ManyToManyField(...)
             if (
-                isinstance(defn, AssignmentStmt)
-                and len(defn.lvalues) == 1
-                and isinstance(defn.lvalues[0], NameExpr)
-                and isinstance(defn.rvalue, CallExpr)
-                and len(defn.rvalue.args) > 0  # Need at least the 'to' argument
-                and isinstance(defn.rvalue.callee, RefExpr)
-                and isinstance(defn.rvalue.callee.node, TypeInfo)
-                and defn.rvalue.callee.node.has_base(fullnames.MANYTOMANY_FIELD_FULLNAME)
+                isinstance(statement, AssignmentStmt)
+                and len(statement.lvalues) == 1
+                and isinstance(statement.lvalues[0], NameExpr)
+                and isinstance(statement.rvalue, CallExpr)
+                and len(statement.rvalue.args) > 0  # Need at least the 'to' argument
+                and isinstance(statement.rvalue.callee, RefExpr)
+                and isinstance(statement.rvalue.callee.node, TypeInfo)
+                and statement.rvalue.callee.node.has_base(fullnames.MANYTOMANY_FIELD_FULLNAME)
             ):
-                m2m_field_name = defn.lvalues[0].name
-                m2m_field_symbol = self.model_classdef.info.names.get(m2m_field_name)
+                m2m_field_name = statement.lvalues[0].name
+                m2m_field_symbol = self.model_classdef.info.get(m2m_field_name)
                 # The symbol referred to by the assignment expression is expected to be a variable
                 if m2m_field_symbol is None or not isinstance(m2m_field_symbol.node, Var):
                     continue
                 # Resolve argument information of the 'ManyToManyField(...)' call
-                args = self.resolve_many_to_many_arguments(defn.rvalue, context=defn)
+                args = self.resolve_many_to_many_arguments(statement.rvalue, context=statement)
                 if (
                     # Ignore calls without required 'to' argument, mypy will complain
                     args is None

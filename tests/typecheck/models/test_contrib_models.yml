@@ -159,3 +159,14 @@
 
               class Other(models.Model):
                   user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+-   case: test_permissions_inherited_reverese_relations
+    main: |
+        from django.contrib.auth.models import Permission
+        reveal_type(Permission().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager"
+
+        from django.contrib.auth.models import Group
+        reveal_type(Group().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager"
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
+        AUTH_USER_MODEL='auth.User'

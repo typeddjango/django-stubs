@@ -1274,3 +1274,44 @@
                     field = models.ForeignKey("slef", on_delete=models.CASCADE)  # E: Cannot find model 'slef' referenced in field 'field'  [misc]
                     unknown = models.OneToOneField("unknown", on_delete=models.CASCADE)  # E: Cannot find model 'unknown' referenced in field 'unknown'  [misc]
                     bad = models.ManyToManyField("bad")  # E: Need type annotation for "bad"  [var-annotated]
+
+-   case: test_reverse_of_inherited_many_to_many_fields
+    main: |
+        from myapp.models import Other
+        other = Other()
+        reveal_type(other.abstract_of_concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager"
+        reveal_type(other.concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager"
+        reveal_type(other.abstract_of_abstract_parent)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager"
+        reveal_type(other.abstract_parent)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager"
+        reveal_type(other.mymodel)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager"
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Other(models.Model):
+                    ...
+
+                class AbstractOfConcreteParent(models.Model):
+                    m2m_1 = models.ManyToManyField(Other, related_name="abstract_of_concrete_parent")
+                    class Meta:
+                        abstract = True
+
+                class ConcreteParent(AbstractOfConcreteParent):
+                    m2m_2 = models.ManyToManyField(Other, related_name="concrete_parent")
+
+                class AbstractOfAbstractParent(models.Model):
+                    m2m_3 = models.ManyToManyField(Other, related_name="abstract_of_abstract_parent")
+                    class Meta:
+                        abstract = True
+
+                class AbstractParent(AbstractOfAbstractParent):
+                    m2m_4 = models.ManyToManyField(Other, related_name="abstract_parent")
+                    class Meta:
+                        abstract = True
+
+                class MyModel(ConcreteParent, AbstractParent):
+                    m2m_5 = models.ManyToManyField(Other, related_name="mymodel")
