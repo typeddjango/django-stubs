@@ -14,9 +14,9 @@ from . import Field
 from .mixins import CheckFieldDefaultMixin
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST = TypeVar("_ST", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True)
+_GT = TypeVar("_GT", covariant=True, default=Any)
 
 class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     encoder: type[json.JSONEncoder] | None
