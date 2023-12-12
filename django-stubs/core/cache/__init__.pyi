@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, TypeVar
 
 from django.utils.connection import BaseConnectionHandler
 
@@ -9,7 +9,9 @@ from .backends.base import InvalidCacheKey as InvalidCacheKey
 
 DEFAULT_CACHE_ALIAS: str
 
-class CacheHandler(BaseConnectionHandler):
+_T = TypeVar("_T")
+
+class CacheHandler(BaseConnectionHandler[_T]):
     settings_name: str
     exception_class: type[Exception]
     def create_connection(self, alias: str) -> BaseCache: ...
@@ -18,4 +20,4 @@ class CacheHandler(BaseConnectionHandler):
 def close_caches(**kwargs: Any) -> None: ...
 
 cache: BaseCache
-caches: CacheHandler
+caches: CacheHandler[Any]

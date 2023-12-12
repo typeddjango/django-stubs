@@ -65,10 +65,10 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
 _ListFilterT: TypeAlias = (
     type[ListFilter]
-    | Field
+    | Field[Any, Any]
     | str
-    | tuple[Field | str, type[FieldListFilter]]
-    | list[Field | str | type[FieldListFilter]]
+    | tuple[Field[Any, Any] | str, type[FieldListFilter]]
+    | list[Field[Any, Any] | str | type[FieldListFilter]]
 )
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
