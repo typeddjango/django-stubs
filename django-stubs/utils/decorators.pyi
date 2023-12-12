@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
@@ -7,9 +7,8 @@ from django.views.generic.base import View
 from typing_extensions import TypeAlias
 
 _T = TypeVar("_T", bound=View | Callable)  # Any callable
-_CallableType = TypeVar("_CallableType", bound=Callable)
-_VIEW = TypeVar("_VIEW", bound=Callable[..., HttpResponseBase])
-_DECORATOR: TypeAlias = Callable[..., _VIEW | Callable[..., _VIEW]]
+_CallableType = TypeVar("_CallableType", bound=Callable[..., Any])
+_DECORATOR: TypeAlias = Callable[..., Callable[..., HttpResponseBase] | Callable[..., Callable[..., HttpResponseBase]]]
 
 classonlymethod = classmethod
 
