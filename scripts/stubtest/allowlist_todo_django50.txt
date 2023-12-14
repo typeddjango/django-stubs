@@ -139,7 +139,6 @@ django.db.backends.base.features.BaseDatabaseFeatures.supports_nulls_distinct_un
 django.db.backends.base.features.BaseDatabaseFeatures.supports_stored_generated_columns
 django.db.backends.base.features.BaseDatabaseFeatures.supports_virtual_generated_columns
 django.db.backends.base.operations.BaseDatabaseOperations.prepare_join_on_clause
-django.db.backends.base.schema.BaseDatabaseSchemaEditor.db_default_sql
 django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
 django.db.backends.mysql.features.DatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field

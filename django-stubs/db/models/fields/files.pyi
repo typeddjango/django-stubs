@@ -56,6 +56,7 @@ class FileField(Field):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: Any = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
