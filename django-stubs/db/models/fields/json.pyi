@@ -4,6 +4,7 @@ from typing import Any, ClassVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
+from django.db.models.expressions import Expression
 from django.db.models.fields import TextField
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler
@@ -24,6 +25,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         decoder: type[json.JSONDecoder] | None = ...,
         **kwargs: Any,
     ) -> None: ...
+    def from_db_value(self, value: str | None, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...
 
 class DataContains(PostgresOperatorLookup): ...
 class ContainedBy(PostgresOperatorLookup): ...
