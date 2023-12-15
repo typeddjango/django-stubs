@@ -6,6 +6,7 @@ from re import Pattern
 from types import TracebackType
 from typing import Any, Generic, NoReturn, TypeVar, type_check_only
 
+from asgiref.typing import HTTPScope
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
@@ -155,7 +156,8 @@ class _RequestFactory(Generic[_T]):
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
 
 @type_check_only
-class _AsyncRequestFactory(_RequestFactory[_T]): ...
+class _AsyncRequestFactory(_RequestFactory[_T]):
+    defaults: HTTPScope  # type: ignore[assignment]
 
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 

@@ -22,6 +22,7 @@ with open("README.md") as f:
 
 dependencies = [
     "django",
+    "asgiref",
     "django-stubs-ext>=5.0.0.dev1",
     "tomli; python_version < '3.11'",
     # Types:
