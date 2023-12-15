@@ -60,7 +60,6 @@ django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.CheckConstraint.__init__
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
-django.contrib.gis.db.models.Field.__init__
 django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.generated
 django.contrib.gis.db.models.FilteredRelation.relabeled_clone
@@ -174,7 +173,6 @@ django.db.models.Case.allowed_default
 django.db.models.CheckConstraint.__init__
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.F.allowed_default
-django.db.models.Field.__init__
 django.db.models.Field._get_flatchoices
 django.db.models.Field.generated
 django.db.models.FilteredRelation.relabeled_clone
@@ -206,7 +204,6 @@ django.db.models.expressions.OrderByList.allowed_default
 django.db.models.expressions.RawSQL.allowed_default
 django.db.models.expressions.Value.allowed_default
 django.db.models.expressions.When.allowed_default
-django.db.models.fields.Field.__init__
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.generated
 django.db.models.fields.generated

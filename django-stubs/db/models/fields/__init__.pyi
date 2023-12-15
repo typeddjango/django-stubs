@@ -11,7 +11,7 @@ from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
-from django.db.models.expressions import Col, Combinable
+from django.db.models.expressions import Col, Combinable, Expression
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
@@ -142,7 +142,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     choices: _ChoicesList | None
     db_column: str | None
     db_comment: str | None
-    db_default: Any
+    db_default: type[NOT_PROVIDED] | Expression
     column: str
     concrete: bool
     default: Any
@@ -181,7 +181,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
@@ -282,7 +282,7 @@ class DecimalField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -311,7 +311,7 @@ class CharField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -341,7 +341,7 @@ class SlugField(CharField[_ST, _GT]):
         blank: bool = ...,
         null: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -377,7 +377,7 @@ class URLField(CharField[_ST, _GT]):
         db_index: bool = ...,
         rel: ForeignObjectRel | None = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         serialize: bool = ...,
         unique_for_date: str | None = ...,
@@ -409,7 +409,7 @@ class TextField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -460,7 +460,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -495,7 +495,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -526,7 +526,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -561,7 +561,7 @@ class UUIDField(Field[_ST, _GT]):
         db_index: bool = ...,
         rel: ForeignObjectRel | None = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         serialize: bool = ...,
         unique_for_date: str | None = ...,
@@ -600,7 +600,7 @@ class FilePathField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
