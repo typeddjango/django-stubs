@@ -457,7 +457,6 @@ django.contrib.gis.db.models.TimeField.formfield
 django.contrib.gis.db.models.URLField.formfield
 django.contrib.gis.db.models.UUIDField.class_lookups
 django.contrib.gis.db.models.UUIDField.formfield
-django.contrib.gis.db.models.UniqueConstraint.__init__
 django.contrib.gis.db.models.UniqueConstraint.contains_expressions
 django.contrib.gis.db.models.UniqueConstraint.validate
 django.contrib.gis.db.models.Value.empty_result_set_value
@@ -1038,7 +1037,6 @@ django.db.models.TimeField.formfield
 django.db.models.URLField.formfield
 django.db.models.UUIDField.class_lookups
 django.db.models.UUIDField.formfield
-django.db.models.UniqueConstraint.__init__
 django.db.models.UniqueConstraint.contains_expressions
 django.db.models.UniqueConstraint.validate
 django.db.models.Value.empty_result_set_value
@@ -1071,7 +1069,6 @@ django.db.models.constraints.BaseConstraint.contains_expressions
 django.db.models.constraints.BaseConstraint.get_violation_error_message
 django.db.models.constraints.BaseConstraint.validate
 django.db.models.constraints.CheckConstraint.validate
-django.db.models.constraints.UniqueConstraint.__init__
 django.db.models.constraints.UniqueConstraint.contains_expressions
 django.db.models.constraints.UniqueConstraint.validate
 django.db.models.expressions.BaseExpression.empty_result_set_value
