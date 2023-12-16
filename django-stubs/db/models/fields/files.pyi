@@ -13,9 +13,6 @@ from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self
 
-# __set__ value type
-_ST = TypeVar("_ST")
-
 class FieldFile(File):
     instance: Model
     field: FileField
@@ -60,7 +57,7 @@ class FileField(Field):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
+        db_default: type[NOT_PROVIDED] | Expression | str = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,

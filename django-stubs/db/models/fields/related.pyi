@@ -278,7 +278,6 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
         blank: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
