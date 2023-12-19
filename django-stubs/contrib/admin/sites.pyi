@@ -1,6 +1,6 @@
 import sys
 from collections.abc import Callable, Iterable
-from typing import Any
+from typing import Any, TypeVar
 
 from django.apps.config import AppConfig
 from django.contrib.admin.options import ModelAdmin
@@ -24,6 +24,7 @@ else:
 
     all_sites: MutableSet[AdminSite]
 
+_ViewType = TypeVar("_ViewType", bound=Callable[..., HttpResponse])
 _ActionCallback: TypeAlias = Callable[[ModelAdmin, HttpRequest, QuerySet], TemplateResponse | None]
 
 class AlreadyRegistered(Exception): ...
@@ -65,7 +66,7 @@ class AdminSite:
     @property
     def actions(self) -> Iterable[tuple[str, _ActionCallback]]: ...
     def has_permission(self, request: HttpRequest) -> bool: ...
-    def admin_view(self, view: Callable[..., HttpResponse], cacheable: bool = ...) -> Callable[..., HttpResponse]: ...
+    def admin_view(self, view: _ViewType, cacheable: bool = ...) -> _ViewType: ...
     def get_urls(self) -> list[URLResolver | URLPattern]: ...
     @property
     def urls(self) -> tuple[list[URLResolver | URLPattern], str, str]: ...
