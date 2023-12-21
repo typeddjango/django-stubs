@@ -396,7 +396,6 @@ django.contrib.gis.db.models.IntegerField.class_lookups
 django.contrib.gis.db.models.IntegerField.formfield
 django.contrib.gis.db.models.JSONField.class_lookups
 django.contrib.gis.db.models.JSONField.formfield
-django.contrib.gis.db.models.JSONField.from_db_value
 django.contrib.gis.db.models.JSONField.get_transform
 django.contrib.gis.db.models.Lookup.get_prep_lhs
 django.contrib.gis.db.models.Lookup.lookup_name
@@ -979,7 +978,6 @@ django.db.models.IntegerField.class_lookups
 django.db.models.IntegerField.formfield
 django.db.models.JSONField.class_lookups
 django.db.models.JSONField.formfield
-django.db.models.JSONField.from_db_value
 django.db.models.JSONField.get_transform
 django.db.models.Lookup.get_prep_lhs
 django.db.models.Lookup.lookup_name
@@ -1196,7 +1194,6 @@ django.db.models.fields.json.HasKeyLookup.as_sql
 django.db.models.fields.json.HasKeyLookup.as_sqlite
 django.db.models.fields.json.JSONField.class_lookups
 django.db.models.fields.json.JSONField.formfield
-django.db.models.fields.json.JSONField.from_db_value
 django.db.models.fields.json.JSONField.get_transform
 django.db.models.fields.json.KeyTextTransform.as_mysql
 django.db.models.fields.json.KeyTransform.as_mysql
