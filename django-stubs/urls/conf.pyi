@@ -1,6 +1,6 @@
 from collections.abc import Callable, Sequence
 from types import ModuleType
-from typing import Any, overload
+from typing import Any, Coroutine, overload
 
 from django.urls import URLPattern, URLResolver, _AnyURL
 from django.utils.functional import _StrOrPromise
@@ -10,6 +10,7 @@ from ..conf.urls import IncludedURLConf
 from ..http.response import HttpResponseBase
 
 _URLConf: TypeAlias = str | ModuleType | Sequence[_AnyURL]
+_ResponseType: TypeAlias = HttpResponseBase | Coroutine[Any, Any, HttpResponseBase] | Coroutine[Any, Any, None]
 
 def include(
     arg: _URLConf | tuple[_URLConf, str], namespace: str | None = ...
@@ -18,7 +19,7 @@ def include(
 # path()
 @overload
 def path(
-    route: _StrOrPromise, view: Callable[..., HttpResponseBase], kwargs: dict[str, Any] = ..., name: str = ...
+    route: _StrOrPromise, view: Callable[..., _ResponseType], kwargs: dict[str, Any] = ..., name: str = ...
 ) -> URLPattern: ...
 @overload
 def path(route: _StrOrPromise, view: IncludedURLConf, kwargs: dict[str, Any] = ..., name: str = ...) -> URLResolver: ...
@@ -30,7 +31,7 @@ def path(
 # re_path()
 @overload
 def re_path(
-    route: _StrOrPromise, view: Callable[..., HttpResponseBase], kwargs: dict[str, Any] = ..., name: str = ...
+    route: _StrOrPromise, view: Callable[..., _ResponseType], kwargs: dict[str, Any] = ..., name: str = ...
 ) -> URLPattern: ...
 @overload
 def re_path(
