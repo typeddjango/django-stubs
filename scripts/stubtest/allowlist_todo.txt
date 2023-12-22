@@ -707,8 +707,6 @@ django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
 django.contrib.staticfiles.storage
 django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
-django.core.files.File.__next__
-django.core.files.base.File.__next__
 django.core.files.locks.OVERLAPPED
 django.core.files.locks.PVOID
 django.core.files.locks.ULONG_PTR
@@ -1639,8 +1637,6 @@ django.http.HttpRequest.__init__
 django.http.HttpRequest.get_raw_uri
 django.http.HttpRequest.is_ajax
 django.http.HttpRequest.readlines
-django.http.HttpResponseBase.__iter__
-django.http.HttpResponseBase.getvalue
 django.http.StreamingHttpResponse.content
 django.http.multipartparser.MultiPartParser.IE_sanitize
 django.http.multipartparser.MultiPartParser.boundary_re
@@ -1650,8 +1646,6 @@ django.http.request.HttpRequest.is_ajax
 django.http.request.HttpRequest.readlines
 django.http.request.UploadHandlerList
 django.http.request.parse_accept_header
-django.http.response.HttpResponseBase.__iter__
-django.http.response.HttpResponseBase.getvalue
 django.http.response.StreamingHttpResponse.content
 django.middleware.cache.CacheMiddleware.__init__
 django.middleware.cache.CacheMiddleware.cache
