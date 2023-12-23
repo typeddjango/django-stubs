@@ -5,7 +5,8 @@ from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, SupportsIndex, TypeVar
+from typing import Any, Generator, Protocol, SupportsIndex, TypeVar
+from unittest import TestCase, TestSuite
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
@@ -165,6 +166,7 @@ def setup_databases(
     aliases: Mapping[str, Any] | None = ...,
     **kwargs: Any,
 ) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
+def iter_test_cases(tests: TestSuite) -> Generator[TestCase, None, None]: ...
 def teardown_databases(
     old_config: Iterable[tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
 ) -> None: ...
