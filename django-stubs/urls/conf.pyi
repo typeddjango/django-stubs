@@ -7,10 +7,10 @@ from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 from ..conf.urls import IncludedURLConf
-from ..http.response import HttpResponseBase
+from ..http.response import HttpResponse, HttpResponseBase
 
 _URLConf: TypeAlias = str | ModuleType | Sequence[_AnyURL]
-_ResponseType: TypeAlias = HttpResponseBase | Coroutine[Any, Any, HttpResponseBase] | Coroutine[Any, Any, None]
+_ResponseType: TypeAlias = HttpResponseBase | Coroutine[Any, Any, HttpResponseBase] | Coroutine[Any, Any, HttpResponse]
 
 def include(
     arg: _URLConf | tuple[_URLConf, str], namespace: str | None = ...
