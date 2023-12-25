@@ -5,7 +5,6 @@ from typing import Any, overload
 
 from django.core.checks.messages import CheckMessage
 from django.urls import _AnyURL
-from django.urls.converters import UUIDConverter
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from typing_extensions import TypeAlias
@@ -59,7 +58,7 @@ class CheckURLMixin:
 class RegexPattern(CheckURLMixin):
     regex: LocaleRegexDescriptor
     name: str | None
-    converters: dict[Any, Any]
+    converters: dict[str, Any]
     def __init__(self, regex: str, name: str | None = ..., is_endpoint: bool = ...) -> None: ...
     def match(self, path: str) -> tuple[str, tuple, dict[str, str]] | None: ...
     def check(self) -> list[CheckMessage]: ...
@@ -67,14 +66,14 @@ class RegexPattern(CheckURLMixin):
 class RoutePattern(CheckURLMixin):
     regex: LocaleRegexDescriptor
     name: str | None
-    converters: dict[str, UUIDConverter]
+    converters: dict[str, Any]
     def __init__(self, route: str, name: str | None = ..., is_endpoint: bool = ...) -> None: ...
     def match(self, path: str) -> tuple[str, tuple, dict[str, int | str]] | None: ...
     def check(self) -> list[CheckMessage]: ...
 
 class LocalePrefixPattern:
     prefix_default_language: bool
-    converters: dict[Any, Any]
+    converters: dict[str, Any]
     def __init__(self, prefix_default_language: bool = ...) -> None: ...
     @property
     def regex(self) -> Pattern[str]: ...
