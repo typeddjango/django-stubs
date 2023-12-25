@@ -103,7 +103,7 @@ class URLPattern:
 
 class URLResolver:
     pattern: _Pattern
-    urlconf_name: str | None | Sequence[_AnyURL]
+    urlconf_name: str | None | Sequence[_AnyURL] | ModuleType
     callback: None
     default_kwargs: dict[str, Any]
     namespace: str | None
