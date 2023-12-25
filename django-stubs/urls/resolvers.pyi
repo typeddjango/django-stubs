@@ -113,7 +113,7 @@ class URLResolver:
     def __init__(
         self,
         pattern: _Pattern,
-        urlconf_name: str | None | Sequence[_AnyURL],
+        urlconf_name: str | None | Sequence[_AnyURL] | ModuleType,
         default_kwargs: dict[str, Any] | None = ...,
         app_name: str | None = ...,
         namespace: str | None = ...,
