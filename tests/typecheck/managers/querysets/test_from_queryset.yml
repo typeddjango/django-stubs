@@ -1,3 +1,48 @@
+-   case: from_queryset_self_return_management
+    main: |
+        from myapp.models import MyModel, MyModelWithoutSelf
+        reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.test_custom_manager())  # N: Revealed type is "myapp.models.CustomManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModelWithoutSelf.objects.method())  # N: Revealed type is "myapp.models.QuerySetWithoutSelf"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from typing import List, Dict
+                from typing_extensions import Self
+
+                class CustomManager(BaseManager):
+                    def test_custom_manager(self) -> Self: ...
+
+                class BaseQuerySet(models.QuerySet):
+                    def example_dict(self) -> Dict[str, Self]: ...
+
+                class MyQuerySet(BaseQuerySet):
+                    def example_simple(self) -> Self: ...
+                    def example_list(self) -> List[Self]: ...
+                    def just_int(self) -> int: ...
+
+                NewManager = CustomManager.from_queryset(MyQuerySet)
+
+                class MyModel(models.Model):
+                    objects = NewManager()
+
+                class QuerySetWithoutSelf(models.QuerySet["MyModelWithoutSelf"]):
+                    def method(self) -> "QuerySetWithoutSelf":
+                        return self
+
+                ManagerWithoutSelf = BaseManager.from_queryset(QuerySetWithoutSelf)
+
+                class MyModelWithoutSelf(models.Model):
+                    objects = ManagerWithoutSelf()
+
 -   case: from_queryset_with_base_manager
     main: |
         from myapp.models import MyModel
@@ -70,6 +115,78 @@
                 NewManager = BaseManager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
                     objects = NewManager()
+
+-   case: from_queryset_custom_manager_subclass
+    main: |
+        from myapp.models import NewManager
+        reveal_type(NewManager().example())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/querysets.py
+            content: |
+                from typing import TypeVar, TYPE_CHECKING
+
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                _CTE = TypeVar("_CTE", bound=models.Model)
+
+                class _MyModelQuerySet(models.QuerySet[_CTE]):
+
+                    def example(self) -> _CTE: ...
+
+                class MyModelQuerySet(_MyModelQuerySet["MyModel"]): ...
+
+        - path: myapp/models.py
+          content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from .querysets import MyModelQuerySet
+
+                class TypedManager(BaseManager["MyModel"]): ...
+
+                NewManager = TypedManager.from_queryset(MyModelQuerySet)
+                class MyModel(models.Model):
+                    objects = NewManager()
+-   case: handles_subclasses_of_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/querysets.py
+            content: |
+                from typing import TypeVar, TYPE_CHECKING
+
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                if TYPE_CHECKING:
+                    from .models import MyModel
+
+                _CTE = TypeVar("_CTE", bound=models.Model)
+
+                class _MyModelQuerySet(models.QuerySet[_CTE]):
+
+                    def example(self) -> _CTE: ...
+
+                class MyModelQuerySet(_MyModelQuerySet["MyModel"]):
+                    ...
+
+        - path: myapp/models.py
+          content: |
+            from django.db import models
+            from django.db.models.manager import BaseManager
+            from .querysets import MyModelQuerySet
+
+            NewManager = BaseManager.from_queryset(MyModelQuerySet)
+            class MyModel(models.Model):
+                objects = NewManager()
 
 -   case: from_queryset_generated_manager_imported_from_other_module
     main: |
@@ -162,7 +279,7 @@
 -   case: from_queryset_returns_intersection_of_manager_and_queryset
     main: |
         from myapp.models import MyModel, NewManager
-        reveal_type(NewManager())  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[<nothing>]"
+        reveal_type(NewManager())  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
@@ -188,12 +305,12 @@
 -   case: from_queryset_with_class_name_provided
     main: |
         from myapp.models import MyModel, NewManager, OtherModel, OtherManager
-        reveal_type(NewManager())  # N: Revealed type is "myapp.models.NewManager[<nothing>]"
+        reveal_type(NewManager())  # N: Revealed type is "myapp.models.NewManager[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
         reveal_type(MyModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
-        reveal_type(OtherManager())  # N: Revealed type is "myapp.models.X[<nothing>]"
+        reveal_type(OtherManager())  # N: Revealed type is "myapp.models.X[Never]"
         reveal_type(OtherModel.objects)  # N: Revealed type is "myapp.models.X[myapp.models.OtherModel]"
         reveal_type(OtherModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
         reveal_type(OtherModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
@@ -278,8 +395,8 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: Union[builtins.int, builtins.str]) -> <nothing>"
-        reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "<nothing>"
+        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: Union[builtins.int, builtins.str]) -> Never"
+        reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "Never"
     installed_apps:
         - myapp
     files:
@@ -339,17 +456,33 @@
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+
+        # Overloads
+        reveal_type(MyModel.objects.overloaded_method(1))  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel.objects.overloaded_method('a'))  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import Union, overload
                 from django.db import models
 
                 class ModelQuerySet(models.QuerySet):
                     def queryset_method(self) -> str:
                         return 'hello'
+
+                    @overload
+                    def overloaded_method(self, arg: int) -> int: ...
+
+                    @overload
+                    def overloaded_method(self, arg: str) -> str: ...
+
+                    def overloaded_method(
+                        self, arg: Union[int, str],
+                    ) -> Union[int, str]:
+                        return arg
 
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
@@ -460,7 +593,7 @@
         reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.select_related)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, *, all: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, all: builtins.bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: Union[builtins.str, None]) -> myapp.models.MyQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -484,7 +617,7 @@
 #
 # For details see: https://github.com/typeddjango/django-stubs/issues/1022
 -   case: from_queryset_custom_auth_user_model
-    # Cache needs to be disabled to consistenly reproduce the bug
+    # Cache needs to be disabled to consistently reproduce the bug
     disable_cache: true
     main: |
         from users.models import User
@@ -546,7 +679,7 @@
 -   case: handles_name_collision_with_generated_type
     main: |
         from myapp.models import MyModel, BaseManagerFromModelQuerySet
-        reveal_type(BaseManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[<nothing>]"
+        reveal_type(BaseManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -568,7 +701,7 @@
     main: |
         from myapp.models import MyModel, Generated, BaseManagerFromModelQuerySet
         reveal_type(BaseManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
-        reveal_type(Generated())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[<nothing>]"
+        reveal_type(Generated())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -624,3 +757,28 @@
                   ...
 
               StrCallable = BaseManager.from_queryset(ModelQuerySet, class_name=str(1))
+
+-   case: test_queryset_arg_as_unsupported_expressions
+    main: |
+        from typing import Union, Generic, TypeVar
+        from typing_extensions import TypeAlias
+        from django.db import models
+        from django.db.models.manager import Manager
+
+        class QS1(models.QuerySet[models.Model]):
+            ...
+        class QS2(models.QuerySet[models.Model]):
+            ...
+
+        Alias: TypeAlias = Union[QS1, QS2]
+        reveal_type(Manager[models.Model].from_queryset(Alias))
+
+        T = TypeVar("T")
+        class NonQSGeneric(Generic[T]):
+            ...
+        reveal_type(Manager[models.Model].from_queryset(NonQSGeneric[int]))
+    out: |
+        main:12: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[_QuerySet[Model, Model]]"  [arg-type]
+        main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[_QuerySet[Model, Model]]"  [arg-type]

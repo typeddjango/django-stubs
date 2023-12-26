@@ -1,3 +1,4 @@
+from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import Any
 
@@ -57,12 +58,13 @@ class RestrictedError(IntegrityError):
 
 class Collector:
     using: str
+    origin: Model | QuerySet[Model] | None
     data: dict[type[Model], set[Model] | list[Model]]
-    field_updates: Any
-    restricted_objects: Any
-    fast_deletes: Any
-    dependencies: Any
-    def __init__(self, using: str) -> None: ...
+    field_updates: defaultdict[tuple[Field, Any], list[Model]]
+    restricted_objects: defaultdict[Model, defaultdict[Field, set[Model]]]
+    fast_deletes: list[QuerySet[Model]]
+    dependencies: defaultdict[Model, set[Model]]
+    def __init__(self, using: str, origin: Model | QuerySet[Model] | None = None) -> None: ...
     def add(
         self,
         objs: _IndexableCollection[Model],

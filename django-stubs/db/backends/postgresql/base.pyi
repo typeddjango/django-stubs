@@ -4,6 +4,7 @@ from typing import Any
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
 from django.db.backends.utils import _ExecuteQuery
+from django.utils.functional import cached_property
 
 from .client import DatabaseClient
 from .creation import DatabaseCreation
@@ -34,7 +35,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx: int
-    @property
+    @cached_property
     def pg_version(self) -> int: ...
 
 class CursorDebugWrapper(BaseCursorDebugWrapper):

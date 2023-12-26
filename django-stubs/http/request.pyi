@@ -3,7 +3,6 @@ from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload
 
-from _typeshed import Self
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -11,7 +10,8 @@ from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
-from typing_extensions import TypeAlias
+from django.utils.functional import cached_property
+from typing_extensions import Self, TypeAlias
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
@@ -27,6 +27,14 @@ class HttpHeaders(CaseInsensitiveMapping[str]):
     def __init__(self, environ: Mapping[str, Any]) -> None: ...
     @classmethod
     def parse_header_name(cls, header: str) -> str | None: ...
+    @classmethod
+    def to_wsgi_name(cls, header: str) -> str: ...
+    @classmethod
+    def to_asgi_name(cls, header: str) -> str: ...
+    @classmethod
+    def to_wsgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
+    @classmethod
+    def to_asgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
 
 class HttpRequest(BytesIO):
     GET: _ImmutableQueryDict
@@ -40,6 +48,7 @@ class HttpRequest(BytesIO):
     resolver_match: ResolverMatch | None
     content_type: str | None
     content_params: dict[str, str] | None
+    _body: bytes
     _stream: BinaryIO
     # Attributes added by optional parts of Django
     # django.contrib.admin views:
@@ -82,12 +91,12 @@ class HttpRequest(BytesIO):
     def upload_handlers(self) -> UploadHandlerList: ...
     @upload_handlers.setter
     def upload_handlers(self, upload_handlers: UploadHandlerList) -> None: ...
-    @property
+    @cached_property
     def accepted_types(self) -> list[MediaType]: ...
     def parse_file_upload(
         self, META: Mapping[str, Any], post_data: BinaryIO
     ) -> tuple[QueryDict, MultiValueDict[str, uploadedfile.UploadedFile]]: ...
-    @property
+    @cached_property
     def headers(self) -> HttpHeaders: ...
     @property
     def body(self) -> bytes: ...
@@ -131,8 +140,8 @@ class QueryDict(MultiValueDict[str, str]):
         encoding: str | None = ...,
     ) -> None: ...
     @classmethod
-    def fromkeys(  # type: ignore
-        cls: type[Self],
+    def fromkeys(  # type: ignore[override]
+        cls,
         iterable: Iterable[bytes | str],
         value: str | bytes = ...,
         mutable: bool = ...,

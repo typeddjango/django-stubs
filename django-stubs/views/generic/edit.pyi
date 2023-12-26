@@ -67,7 +67,10 @@ class DeletionMixin(Generic[_M]):
 
 class BaseDeleteView(Generic[_M, _ModelFormT], DeletionMixin[_M], FormMixin[_ModelFormT], BaseDetailView[_M]):
     object: _M
+    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class DeleteView(Generic[_M, _ModelFormT], SingleObjectTemplateResponseMixin, BaseDeleteView[_M, _ModelFormT]):
     object: _M
     template_name_suffix: str
+
+class DeleteViewCustomDeleteWarning(Warning): ...

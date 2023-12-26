@@ -6,7 +6,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.fields import _ErrorMessagesT
+from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
@@ -28,7 +28,7 @@ class UsernameField(forms.CharField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class BaseUserCreationForm(forms.ModelForm[_User]):
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     password1: forms.Field
     password2: forms.Field
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
@@ -45,7 +45,7 @@ class UserChangeForm(forms.ModelForm[_User]):
 class AuthenticationForm(forms.Form):
     username: forms.Field
     password: forms.Field
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     request: HttpRequest | None
     user_cache: Any
     username_field: models.Field
@@ -81,7 +81,7 @@ class PasswordResetForm(forms.Form):
     ) -> None: ...
 
 class SetPasswordForm(forms.Form):
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     new_password1: forms.Field
     new_password2: forms.Field
     user: AbstractBaseUser
@@ -90,12 +90,12 @@ class SetPasswordForm(forms.Form):
     def save(self, commit: bool = ...) -> AbstractBaseUser: ...
 
 class PasswordChangeForm(SetPasswordForm):
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     old_password: forms.Field
     def clean_old_password(self) -> str: ...
 
 class AdminPasswordChangeForm(forms.Form):
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     required_css_class: str
     password1: forms.Field
     password2: forms.Field

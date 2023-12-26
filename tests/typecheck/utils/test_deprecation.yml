@@ -1,0 +1,13 @@
+-   case: basic_middleware_mixin_test
+    main: |
+      from typing import Union
+
+      from django.utils.deprecation import MiddlewareMixin
+      from django.http import HttpRequest, HttpResponseBase
+      from collections.abc import Awaitable
+
+      class MyMiddleware(MiddlewareMixin):
+          def __call__(
+              self, request: HttpRequest
+          ) -> Union[HttpResponseBase, Awaitable[HttpResponseBase]]:
+              return self.get_response(request)

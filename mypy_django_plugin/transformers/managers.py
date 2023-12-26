@@ -8,6 +8,7 @@ from mypy.nodes import (
     FuncBase,
     FuncDef,
     MemberExpr,
+    Node,
     OverloadedFuncDef,
     RefExpr,
     StrExpr,
@@ -18,7 +19,7 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny
+from mypy.types import AnyType, CallableType, FunctionLike, Instance, Overloaded, ProperType, TypeOfAny, TypeVarType
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -57,10 +58,11 @@ def get_method_type_from_dynamic_manager(
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
 
-    manager_type_info = manager_instance.type
+    manager_type_info = manager_instance.type.get_containing_type_info(method_name)
 
     if (
-        "django" not in manager_type_info.metadata
+        manager_type_info is None
+        or "django" not in manager_type_info.metadata
         or "from_queryset_manager" not in manager_type_info.metadata["django"]
     ):
         # Manager isn't dynamically added
@@ -71,43 +73,78 @@ def get_method_type_from_dynamic_manager(
     queryset_info = helpers.lookup_fully_qualified_typeinfo(api, queryset_fullname)
     assert queryset_info is not None
 
-    def get_funcdef_type(definition: Union[FuncBase, Decorator, None]) -> Optional[ProperType]:
-        # TODO: Handle @overload?
-        if isinstance(definition, FuncBase) and not isinstance(definition, OverloadedFuncDef):
-            return definition.type
-        elif isinstance(definition, Decorator):
-            return definition.func.type
+    is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
+
+    base_that_has_method = queryset_info.get_containing_type_info(method_name)
+    if base_that_has_method is None:
         return None
+    method_type = _get_funcdef_type(base_that_has_method.names[method_name].node)
+    if not isinstance(method_type, FunctionLike):
+        return method_type
 
-    method_type = get_funcdef_type(queryset_info.get_method(method_name))
-    if method_type is None:
-        return None
+    items = []
+    for item in method_type.items:
+        items.append(
+            _process_dynamic_method(
+                method_name,
+                item,
+                base_that_has_method=base_that_has_method,
+                queryset_info=queryset_info,
+                manager_instance=manager_instance,
+                is_fallback_queryset=is_fallback_queryset,
+            )
+        )
+    return Overloaded(items) if len(items) > 1 else items[0]
 
-    assert isinstance(method_type, CallableType)
 
+def _process_dynamic_method(
+    method_name: str,
+    method_type: CallableType,
+    *,
+    queryset_info: TypeInfo,
+    base_that_has_method: TypeInfo,
+    manager_instance: Instance,
+    is_fallback_queryset: bool,
+) -> CallableType:
     variables = method_type.variables
     ret_type = method_type.ret_type
 
-    is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
+    if not is_fallback_queryset:
+        queryset_instance = Instance(queryset_info, manager_instance.args)
+    else:
+        # The fallback queryset inherits _QuerySet, which has two generics
+        # instead of the one exposed on QuerySet. That means that we need
+        # to add the model twice. In real code it's not possible to inherit
+        # from _QuerySet, as it doesn't exist at runtime, so this fix is
+        # only needed for plugin-generated querysets.
+        queryset_instance = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
 
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
-        if not is_fallback_queryset:
-            ret_type = Instance(queryset_info, manager_instance.args)
-        else:
-            # The fallback queryset inherits _QuerySet, which has two generics
-            # instead of the one exposed on QuerySet. That means that we need
-            # to add the model twice. In real code it's not possible to inherit
-            # from _QuerySet, as it doesn't exist at runtime, so this fix is
-            # only needed for pluign-generated querysets.
-            ret_type = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
+        ret_type = queryset_instance
         variables = []
+    args_types = method_type.arg_types[1:]
+    if _has_compatible_type_vars(base_that_has_method):
+        typed_var = manager_instance.args or queryset_info.bases[0].args
+        if (
+            typed_var
+            and isinstance(typed_var[0], Instance)
+            and typed_var[0].type.has_base(fullnames.MODEL_CLASS_FULLNAME)
+        ):
+            ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, typed_var[0])
+            args_types = [
+                _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, manager_instance.args[0])
+                for arg_type in args_types
+            ]
+    if base_that_has_method.self_type:
+        # Manages -> Self returns
+        ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, queryset_instance)
 
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
-        arg_types=method_type.arg_types[1:],
+        arg_types=args_types,
         arg_kinds=method_type.arg_kinds[1:],
         arg_names=method_type.arg_names[1:],
         variables=variables,
@@ -115,45 +152,102 @@ def get_method_type_from_dynamic_manager(
     )
 
 
-def get_method_type_from_reverse_manager(
-    api: TypeChecker, method_name: str, manager_type_info: TypeInfo
-) -> Optional[ProperType]:
-    """
-    Attempts to resolve a reverse manager's method via the '_default_manager' manager on the related model
-    From Django docs:
-      "By default the RelatedManager used for reverse relations is a subclass of the default manager for that model."
-    Ref: https://docs.djangoproject.com/en/dev/topics/db/queries/#using-a-custom-reverse-manager
-    """
-    is_reverse_manager = (
-        "django" in manager_type_info.metadata and "related_manager_to_model" in manager_type_info.metadata["django"]
-    )
-    if not is_reverse_manager:
-        return None
+def _get_funcdef_type(definition: Union[Node, None]) -> Optional[ProperType]:
+    if isinstance(definition, FuncBase):
+        return definition.type
+    elif isinstance(definition, Decorator):
+        return definition.func.type
+    return None
 
-    related_model_fullname = manager_type_info.metadata["django"]["related_manager_to_model"]
-    assert isinstance(related_model_fullname, str)
-    model_info = helpers.lookup_fully_qualified_typeinfo(api, related_model_fullname)
-    if model_info is None:
-        return None
 
-    # We should _always_ have a '_default_manager' on a model
-    assert "_default_manager" in model_info.names
-    assert isinstance(model_info.names["_default_manager"].node, Var)
-    manager_instance = model_info.names["_default_manager"].node.type
-    return (
-        get_method_type_from_dynamic_manager(api, method_name, manager_instance)
-        # TODO: Can we assert on None and Instance?
-        if manager_instance is not None and isinstance(manager_instance, Instance)
-        else None
-    )
+def _has_compatible_type_vars(type_info: TypeInfo) -> bool:
+    """
+    Determines whether the provided 'type_info',
+    is a generically parameterized subclass of models.QuerySet[T], with exactly
+    one type variable.
+
+    Criteria for compatibility:
+    1. 'type_info' must be a generic class with exactly one type variable.
+    2. All superclasses of 'type_info', up to and including models.QuerySet,
+       must also be generic classes with exactly one type variable.
+
+    Examples:
+
+    Compatible:
+        class _MyModelQuerySet(models.QuerySet[T]): ...
+        class MyModelQuerySet(_MyModelQuerySet[T_2]):
+            def example(self) -> T_2: ...
+
+    Incompatible:
+        class MyModelQuerySet(models.QuerySet[T], Generic[T, T2]):
+            def example(self, a: T2) -> T_2: ...
+
+    Returns:
+        True if the 'base' meets the criteria, otherwise False.
+    """
+    args = type_info.defn.type_vars
+    if not args or len(args) > 1 or not isinstance(args[0], TypeVarType):
+        # No type var to manage, or too many
+        return False
+    type_var: Optional[MypyType] = None
+    # check that for all the bases it has only one type vars
+    for sub_base in type_info.bases:
+        unic_args = list(set(sub_base.args))
+        if not unic_args or len(unic_args) > 1:
+            # No type var for the sub_base, skipping
+            continue
+        if type_var and unic_args and type_var != unic_args[0]:
+            # There is two different type vars in the bases, we are not compatible
+            return False
+        type_var = unic_args[0]
+    if not type_var:
+        # No type var found in the bases.
+        return False
+
+    if type_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+        # If it is a subclass of _QuerySet, it is compatible.
+        return True
+    # check that at least one base is a subclass of queryset with Generic type vars
+    return any(_has_compatible_type_vars(sub_base.type) for sub_base in type_info.bases)
+
+
+def _replace_type_var(ret_type: MypyType, to_replace: str, replace_by: MypyType) -> MypyType:
+    """
+    Substitutes a specified type variable within a Mypy type expression with an actual type.
+
+    This function is recursive, and it operates on various kinds of Mypy types like Instance,
+    ProperType, etc., to deeply replace the specified type variable.
+
+    Parameters:
+    - ret_type: A Mypy type expression where the substitution should occur.
+    - to_replace: The type variable to be replaced, specified as its full name.
+    - replace_by: The actual Mypy type to substitute in place of 'to_replace'.
+
+    Example:
+    Given:
+        ret_type = "typing.Collection[T]"
+        to_replace = "T"
+        replace_by = "myapp.models.MyModel"
+    Result:
+        "typing.Collection[myapp.models.MyModel]"
+    """
+    if isinstance(ret_type, TypeVarType) and ret_type.fullname == to_replace:
+        return replace_by
+    elif isinstance(ret_type, Instance):
+        # Since it is an instance, recursively find the type var for all its args.
+        ret_type.args = tuple(_replace_type_var(item, to_replace, replace_by) for item in ret_type.args)
+    if isinstance(ret_type, ProperType) and hasattr(ret_type, "item"):
+        # For example TypeType has an item. find the type_var for this item
+        ret_type.item = _replace_type_var(ret_type.item, to_replace, replace_by)
+    if isinstance(ret_type, ProperType) and hasattr(ret_type, "items"):
+        # For example TypeList has items. find recursively type_var for its items
+        ret_type.items = [_replace_type_var(item, to_replace, replace_by) for item in ret_type.items]
+    return ret_type
 
 
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
     api = helpers.get_typechecker_api(ctx)
-    method_type = get_method_type_from_dynamic_manager(
-        api, method_name, instance
-    ) or get_method_type_from_reverse_manager(api, method_name, instance.type)
-
+    method_type = get_method_type_from_dynamic_manager(api, method_name, instance)
     return method_type if method_type is not None else ctx.default_attr_type
 
 
@@ -287,6 +381,7 @@ def create_manager_info_from_from_queryset_call(
         )
 
     # Add the new manager to the current module
+    # TODO: use proper SemanticAnalyzer API for that.
     module = api.modules[api.cur_mod_id]
     if name is not None and name != new_manager_info.name:
         # Unless names are equal, there's 2 symbol names that needs the manager info
@@ -339,7 +434,7 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
         if class_mro_info.fullname == fullnames.QUERYSET_CLASS_FULLNAME:
             break
         for name, sym in class_mro_info.names.items():
-            if not isinstance(sym.node, (FuncDef, Decorator)):
+            if not isinstance(sym.node, (FuncDef, OverloadedFuncDef, Decorator)):
                 continue
             # Insert the queryset method name as a class member. Note that the type of
             # the method is set as Any. Figuring out the type is the job of the
@@ -452,17 +547,19 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
     # Note: Order of `add_symbol_table_node` calls matters. Depending on what level
     # we've found the `.as_manager()` call. Point here being that we want to replace the
     # `.as_manager` return value with our newly created manager.
-    assert semanal_api.add_symbol_table_node(
+    added = semanal_api.add_symbol_table_node(
         ctx.name, SymbolTableNode(semanal_api.current_symbol_kind(), var, plugin_generated=True)
     )
+    assert added
     # Add the new manager to the current module
-    assert semanal_api.add_symbol_table_node(
+    added = semanal_api.add_symbol_table_node(
         # We'll use `new_manager_info.name` instead of `manager_class_name` here
         # to handle possible name collisions, as it's unique.
         new_manager_info.name,
         # Note that the generated manager type is always inserted at module level
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
     )
+    assert added
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:

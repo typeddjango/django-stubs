@@ -6,7 +6,6 @@ from django.http.request import HttpRequest
 from .base import BaseEngine
 
 class TemplateStrings(BaseEngine):
-    template_dirs: tuple[str]
     def __init__(self, params: dict[str, dict[Any, Any] | list[Any] | bool | str]) -> None: ...
 
 class Template(string.Template):

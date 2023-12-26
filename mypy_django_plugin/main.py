@@ -23,7 +23,7 @@ from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.transformers import fields, forms, init_create, meta, querysets, request, settings
+from mypy_django_plugin.transformers import fields, forms, init_create, manytomany, meta, querysets, request, settings
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     create_new_manager_class_from_as_manager_method,
@@ -32,25 +32,12 @@ from mypy_django_plugin.transformers.managers import (
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
+    MetaclassAdjustments,
     handle_annotated_type,
     process_model_class,
     set_auth_user_model_boolean_fields,
 )
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
-
-
-def transform_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.MODEL_CLASS_FULLNAME)
-
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata_bases(sym.node, "model_bases")
-        bases[ctx.cls.fullname] = 1
-    else:
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-            return
-
-    process_model_class(ctx, django_context)
 
 
 def transform_form_class(ctx: ClassDefContext) -> None:
@@ -94,15 +81,6 @@ class NewSemanalDjangoPlugin(Plugin):
         else:
             return {}
 
-    def _get_current_model_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.MODEL_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "model_bases")
-            bases[fullnames.MODEL_CLASS_FULLNAME] = 1
-            return bases
-        else:
-            return {}
-
     def _get_current_form_bases(self) -> Dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
@@ -130,7 +108,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for values / values_list
         if file.fullname == "django.db.models":
-            return [self._new_dependency("typing")]
+            return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
         if self.django_context.settings:
@@ -141,7 +119,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 except LookupError:
                     # get_user_model() model app is not installed
                     return []
-                return [self._new_dependency(auth_user_module)]
+                return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
         # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
@@ -149,7 +127,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return []
         deps = set()
 
-        for model_class in defined_model_classes:
+        for model_class in defined_model_classes.values():
             for field in itertools.chain(
                 # forward relations
                 self.django_context.get_model_related_fields(model_class),
@@ -186,12 +164,13 @@ class NewSemanalDjangoPlugin(Plugin):
 
             if helpers.is_model_subclass_info(info, self.django_context):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+
         return None
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
         class_fullname, _, method_name = fullname.rpartition(".")
-        # It is looked up very often, specialcase this method for minor speed up
-        if method_name == "__init_subclass__":
+        # Methods called very often -- short circuit for minor speed up
+        if method_name == "__init_subclass__" or fullname.startswith("builtins."):
             return None
 
         if class_fullname.endswith("QueryDict"):
@@ -208,6 +187,12 @@ class NewSemanalDjangoPlugin(Plugin):
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
                 return forms.extract_proper_type_for_get_form
+
+        elif method_name == "__get__" and class_fullname in {
+            fullnames.MANYTOMANY_FIELD_FULLNAME,
+            fullnames.MANY_TO_MANY_DESCRIPTOR,
+        }:
+            return manytomany.refine_many_to_many_related_manager
 
         manager_classes = self._get_current_manager_bases()
 
@@ -231,9 +216,11 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
-        elif class_fullname in manager_classes and method_name == "create":
-            return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
-        elif class_fullname in manager_classes and method_name in {"filter", "get", "exclude"}:
+        elif method_name == "create":
+            # We need `BASE_MANAGER_CLASS_FULLNAME` to check abstract models.
+            if class_fullname in manager_classes or class_fullname == fullnames.BASE_MANAGER_CLASS_FULLNAME:
+                return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
+        elif method_name in {"filter", "get", "exclude"} and class_fullname in manager_classes:
             return partial(
                 mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
                 django_context=self.django_context,
@@ -242,6 +229,9 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        if fullname == fullnames.MODEL_CLASS_FULLNAME:
+            return MetaclassAdjustments.adjust_model_class
+
         sym = self.lookup_fully_qualified(fullname)
         if (
             sym is not None
@@ -254,11 +244,9 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
-        if (
-            fullname in self.django_context.all_registered_model_class_fullnames
-            or fullname in self._get_current_model_bases()
-        ):
-            return partial(transform_model_class, django_context=self.django_context)
+        sym = self.lookup_fully_qualified(fullname)
+        if sym is not None and isinstance(sym.node, TypeInfo) and helpers.is_model_type(sym.node):
+            return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Manager class definition
         if fullname in self._get_current_manager_bases():

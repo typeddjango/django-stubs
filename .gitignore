@@ -11,3 +11,4 @@ out/
 pip-wheel-metadata/
 stubgen/
 build/
+dist/

@@ -502,7 +502,7 @@ STATICFILES_FINDERS: list[str]
 ##############
 
 # Migration module overrides for apps, by app label.
-MIGRATION_MODULES: dict[str, str]
+MIGRATION_MODULES: dict[str, str | None]
 
 #################
 # SYSTEM CHECKS #

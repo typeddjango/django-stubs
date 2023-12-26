@@ -1,13 +1,5 @@
 from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
-from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
-    Any,
-    ClassVar,
-    Generic,
-    Literal,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.db import models
@@ -28,8 +20,7 @@ from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-# https://github.com/python/mypy/issues/12211
-_Fields: TypeAlias = Union[_ListOrTuple[str], Literal["__all__"]]
+_Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
 _Labels: TypeAlias = dict[str, str]
@@ -90,7 +81,7 @@ class BaseModelForm(Generic[_M], BaseForm):
         empty_permitted: bool = ...,
         instance: _M | None = ...,
         use_required_attribute: bool | None = ...,
-        renderer: BaseRenderer = ...,
+        renderer: BaseRenderer | None = ...,
     ) -> None: ...
     def validate_unique(self) -> None: ...
     def save(self, commit: bool = ...) -> _M: ...
@@ -234,7 +225,6 @@ class InlineForeignKeyField(Field):
     required: bool
     show_hidden_initial: bool
     widget: _ClassLevelWidgetT
-    default_error_messages: dict[str, str]
     parent_instance: Model
     pk_field: bool
     to_field: str | None
@@ -263,12 +253,10 @@ class ModelChoiceIterator:
 
 class ModelChoiceField(ChoiceField):
     disabled: bool
-    error_messages: dict[str, str]
     help_text: _StrOrPromise
     required: bool
     show_hidden_initial: bool
     validators: list[Any]
-    default_error_messages: dict[str, str]
     iterator: type[ModelChoiceIterator]
     empty_label: _StrOrPromise | None
     queryset: QuerySet[models.Model] | None
@@ -308,16 +296,15 @@ class ModelMultipleChoiceField(ModelChoiceField):
     show_hidden_initial: bool
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
-    default_error_messages: dict[str, str]
     def __init__(self, queryset: None | Manager[Model] | QuerySet[Model], **kwargs: Any) -> None: ...
     def to_python(self, value: Any) -> list[Model]: ...  # type: ignore[override]
     def clean(self, value: Any) -> QuerySet[Model]: ...
     def prepare_value(self, value: Any) -> Any: ...
-    def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore
+    def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore[override]
 
 def modelform_defines_fields(form_class: type[ModelForm]) -> bool: ...
 @overload
-def _get_foreign_key(  # type: ignore
+def _get_foreign_key(  # type: ignore[overload-overlap]
     parent_model: type[Model], model: type[Model], fk_name: str | None = ..., can_fail: Literal[True] = ...
 ) -> ForeignKey | None: ...
 @overload

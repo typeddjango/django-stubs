@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, Literal, TypeVar
+from typing import Any, ClassVar, Literal, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
@@ -10,7 +10,7 @@ from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _AnyUser: TypeAlias = Model | AnonymousUser
 
@@ -21,7 +21,7 @@ class PermissionManager(models.Manager[Permission]):
 
 class Permission(models.Model):
     content_type_id: int
-    objects: PermissionManager
+    objects: ClassVar[PermissionManager]
 
     name = models.CharField(max_length=255)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -32,7 +32,7 @@ class GroupManager(models.Manager[Group]):
     def get_by_natural_key(self, name: str) -> Group: ...
 
 class Group(models.Model):
-    objects: GroupManager
+    objects: ClassVar[GroupManager]
 
     name = models.CharField(max_length=150)
     permissions = models.ManyToManyField(Permission)
@@ -60,6 +60,9 @@ class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
+
+    class Meta:
+        abstract: Literal[True]
     def get_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_all_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
@@ -78,8 +81,13 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField()
     date_joined = models.DateTimeField()
 
+    objects: ClassVar[UserManager[Self]]
+
     EMAIL_FIELD: str
     USERNAME_FIELD: str
+
+    class Meta:
+        abstract: Literal[True]
     def get_full_name(self) -> str: ...
     def get_short_name(self) -> str: ...
     def email_user(

@@ -16,102 +16,120 @@ concurrency:
 
 jobs:
   mypy-self-check:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+      fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
         run: mypy --strict mypy_django_plugin
 
       - name: Run mypy on ext code
-        run: mypy --strict django_stubs_ext
+        run: mypy --strict ext
       - name: Run mypy on scripts and utils
         run: mypy --strict scripts
       - name: Run mypy on stubs
         run: mypy --cache-dir=/dev/null --no-incremental django-stubs
 
   test:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        shard: [0, 1, 2, 3]
+      fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
+      # Must match `shard` definition in the test matrix:
       - name: Run tests
-        run: PYTHONPATH='.' pytest
+        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} tests
 
   stubtest:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
+      fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run stubtest
         run: bash ./scripts/stubtest.sh
 
   matrix-test:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
-        django-version: ['3.2', '4.2']
+        python-version: ['3.10', '3.11']
+        django-version: ['3.2', '4.2', '5.0']
         include:
-          - python-version: '3.11'
+          - python-version: '3.8'
+            django-version: '3.2'
+          - python-version: '3.8'
+            django-version: '4.2'
+          - python-version: '3.9'
+            django-version: '3.2'
+          - python-version: '3.9'
+            django-version: '4.2'
+          - python-version: '3.12'
             django-version: '4.1'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
           pip install "Django==${{ matrix.django-version }}"
           pip check
 
       - name: Run django-stubs-ext tests
-        run: PYTHONPATH='.' pytest django_stubs_ext
+        run: PYTHONPATH='.' pytest ext

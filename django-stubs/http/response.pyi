@@ -1,10 +1,10 @@
 import datetime
 from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator
+from http.cookies import SimpleCookie
 from io import BytesIO
 from json import JSONEncoder
 from typing import Any, Literal, TypeVar, overload, type_check_only
 
-from django.http.cookie import SimpleCookie
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
 
 class BadHeaderError(ValueError): ...

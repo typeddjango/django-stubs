@@ -1,5 +1,6 @@
 ABSTRACT_USER_MODEL_FULLNAME = "django.contrib.auth.models.AbstractUser"
 PERMISSION_MIXIN_CLASS_FULLNAME = "django.contrib.auth.models.PermissionsMixin"
+MODEL_METACLASS_FULLNAME = "django.db.models.base.ModelBase"
 MODEL_CLASS_FULLNAME = "django.db.models.base.Model"
 FIELD_FULLNAME = "django.db.models.fields.Field"
 CHAR_FIELD_FULLNAME = "django.db.models.fields.CharField"
@@ -11,11 +12,12 @@ FOREIGN_KEY_FULLNAME = "django.db.models.fields.related.ForeignKey"
 ONETOONE_FIELD_FULLNAME = "django.db.models.fields.related.OneToOneField"
 MANYTOMANY_FIELD_FULLNAME = "django.db.models.fields.related.ManyToManyField"
 DUMMY_SETTINGS_BASE_CLASS = "django.conf._DjangoConfLazyObject"
+AUTH_USER_MODEL_FULLNAME = "django.conf.settings.AUTH_USER_MODEL"
 
 QUERYSET_CLASS_FULLNAME = "django.db.models.query._QuerySet"
 BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
-RELATED_MANAGER_CLASS = "django.db.models.manager.RelatedManager"
+RELATED_MANAGER_CLASS = "django.db.models.fields.related_descriptors.RelatedManager"
 
 WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.WithAnnotations"
 ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.Annotations"
@@ -31,12 +33,14 @@ MANAGER_CLASSES = {
     BASE_MANAGER_CLASS_FULLNAME,
 }
 
+REVERSE_ONE_TO_ONE_DESCRIPTOR = "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor"
+MANY_TO_MANY_DESCRIPTOR = "django.db.models.fields.related_descriptors.ManyToManyDescriptor"
+MANY_RELATED_MANAGER = "django.db.models.fields.related_descriptors.ManyRelatedManager"
 RELATED_FIELDS_CLASSES = frozenset(
     (
         FOREIGN_OBJECT_FULLNAME,
         FOREIGN_KEY_FULLNAME,
         ONETOONE_FIELD_FULLNAME,
-        MANYTOMANY_FIELD_FULLNAME,
     )
 )
 
@@ -51,3 +55,6 @@ F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
 
 STR_PROMISE_FULLNAME = "django.utils.functional._StrPromise"
+
+OBJECT_DOES_NOT_EXIST = "django.core.exceptions.ObjectDoesNotExist"
+MULTIPLE_OBJECTS_RETURNED = "django.core.exceptions.MultipleObjectsReturned"

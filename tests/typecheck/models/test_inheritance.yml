@@ -26,7 +26,7 @@
         def service(a: A) -> int:
             pass
         b_instance = B()
-        service(b_instance)  # E: Argument 1 to "service" has incompatible type "B"; expected "A"
+        service(b_instance)  # E: Argument 1 to "service" has incompatible type "B"; expected "A"  [arg-type]
         a_instance = A()
         c_instance = C()
         service(a_instance)
@@ -52,8 +52,8 @@
         b_instance = B()
         reveal_type(b_instance.b_attr) # N: Revealed type is "builtins.int"
 
-        b_instance.non_existent_attribute  # E: "B" has no attribute "non_existent_attribute"
-        b_instance.non_existent_attribute = 2  # E: "B" has no attribute "non_existent_attribute"
+        b_instance.non_existent_attribute  # E: "B" has no attribute "non_existent_attribute"  [attr-defined]
+        b_instance.non_existent_attribute = 2  # E: "B" has no attribute "non_existent_attribute"  [attr-defined]
     installed_apps:
         - myapp
     files:

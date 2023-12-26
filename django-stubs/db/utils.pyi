@@ -6,6 +6,7 @@ from django.apps import AppConfig
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.utils.connection import BaseConnectionHandler
+from django.utils.functional import cached_property
 
 DEFAULT_DB_ALIAS: str
 DJANGO_VERSION_PICKLE_KEY: str
@@ -42,7 +43,7 @@ class ConnectionHandler(BaseConnectionHandler[BaseDatabaseWrapper]):
 
 class ConnectionRouter:
     def __init__(self, routers: Iterable[Any] | None = ...) -> None: ...
-    @property
+    @cached_property
     def routers(self) -> list[Any]: ...
     def db_for_read(self, model: type[Model], **hints: Any) -> str: ...
     def db_for_write(self, model: type[Model], **hints: Any) -> str: ...

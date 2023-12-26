@@ -1,10 +1,11 @@
 import decimal
 import uuid
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, Generic, Protocol, TypeVar, overload
+from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload
 
+from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
@@ -15,7 +16,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
 from django.utils.datastructures import DictWrapper
-from django.utils.functional import _Getter, _StrOrPromise
+from django.utils.functional import _Getter, _StrOrPromise, cached_property
 from typing_extensions import Self, TypeAlias
 
 class Empty: ...
@@ -44,8 +45,9 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: Y047
-_ErrorMessagesT: TypeAlias = dict[str, Any]
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
+_ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
+_ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
 # __set__ value type
 _ST = TypeVar("_ST", contravariant=True)
@@ -62,7 +64,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 
     To understand this example you need:
     1. Be familiar with descriptors: https://docs.python.org/3/howto/descriptor.html
-    2. Follow our explanation bellow
+    2. Follow our explanation below
 
     Let's start with defining our fake model class and fake integer field.
 
@@ -122,7 +124,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     primary_key: bool
     remote_field: ForeignObjectRel | None
     is_relation: bool
-    related_model: type[Model] | None
+    related_model: type[Model] | Literal["self"] | None
     one_to_many: bool | None
     one_to_one: bool | None
     many_to_many: bool | None
@@ -143,12 +145,12 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     column: str
     concrete: bool
     default: Any
-    error_messages: _ErrorMessagesT
+    error_messages: _ErrorMessagesDict
     empty_values: Sequence[Any]
     creation_counter: int
     auto_creation_counter: int
     default_validators: Sequence[validators._ValidatorCallable]
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     hidden: bool
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
@@ -173,23 +175,23 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
-        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
-    def __get__(self: Self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
+    def __get__(self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
     # Model instance access
     @overload
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
-    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
-    def deconstruct(self) -> Any: ...
+    def __get__(self, instance: Any, owner: Any) -> Self: ...
+    def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
     def set_attributes_from_name(self, name: str) -> None: ...
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
     def db_check(self, connection: BaseDatabaseWrapper) -> str | None: ...
@@ -201,11 +203,16 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def get_internal_type(self) -> str: ...
     # TODO: plugin support
-    def formfield(self, form_class: Any | None = ..., choices_form_class: Any | None = ..., **kwargs: Any) -> Any: ...
+    def formfield(
+        self,
+        form_class: type[forms.Field] | None = ...,
+        choices_form_class: type[forms.ChoiceField] | None = ...,
+        **kwargs: Any,
+    ) -> forms.Field: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
     def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = ...) -> None: ...
     def to_python(self, value: Any) -> Any: ...
-    @property
+    @cached_property
     def validators(self) -> list[validators._ValidatorCallable]: ...
     def run_validators(self, value: Any) -> None: ...
     def validate(self, value: Any, model_instance: Model | None) -> None: ...
@@ -224,10 +231,11 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_default(self) -> Any: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     def get_col(self, alias: str, output_field: Field | None = ...) -> Col: ...
-    @property
+    @cached_property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
     def get_attname(self) -> str: ...
+    def get_attname_column(self) -> tuple[str, str]: ...
     def value_to_string(self, obj: Model) -> str: ...
 
 class IntegerField(Field[_ST, _GT]):
@@ -239,7 +247,10 @@ class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
 class SmallIntegerField(IntegerField[_ST, _GT]): ...
-class BigIntegerField(IntegerField[_ST, _GT]): ...
+
+class BigIntegerField(IntegerField[_ST, _GT]):
+    MAX_BIGINT: ClassVar[int]
+
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]): ...
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]): ...
@@ -278,7 +289,7 @@ class DecimalField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class CharField(Field[_ST, _GT]):
@@ -309,7 +320,7 @@ class CharField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         *,
         db_collation: str | None = ...,
     ) -> None: ...
@@ -338,7 +349,7 @@ class SlugField(CharField[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         *,
         max_length: int | None = ...,
         db_index: bool = ...,
@@ -373,7 +384,7 @@ class URLField(CharField[_ST, _GT]):
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class TextField(Field[_ST, _GT]):
@@ -404,7 +415,7 @@ class TextField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         *,
         db_collation: str | None = ...,
     ) -> None: ...
@@ -415,9 +426,9 @@ class BooleanField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: bool
 
 class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: bool | Combinable | None  # type: ignore
-    _pyi_private_get_type: bool | None  # type: ignore
-    _pyi_lookup_exact_type: bool | None  # type: ignore
+    _pyi_private_set_type: bool | Combinable | None  # type: ignore[assignment]
+    _pyi_private_get_type: bool | None  # type: ignore[assignment]
+    _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | Combinable
@@ -427,7 +438,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     unpack_ipv4: bool
     protocol: str
     def __init__(
@@ -451,7 +462,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class DateTimeCheckMixin: ...
@@ -485,7 +496,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
@@ -515,7 +526,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class DateTimeField(DateField[_ST, _GT]):
@@ -552,7 +563,7 @@ class UUIDField(Field[_ST, _GT]):
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
@@ -587,7 +598,7 @@ class FilePathField(Field[_ST, _GT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
 class BinaryField(Field[_ST, _GT]):
@@ -598,6 +609,7 @@ class DurationField(Field[_ST, _GT]):
 
 class AutoFieldMixin:
     db_returning: bool
+    def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
 
 class AutoFieldMeta(type): ...
 

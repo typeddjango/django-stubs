@@ -5,11 +5,10 @@ from contextlib import contextmanager
 from types import TracebackType
 from typing import Any, overload
 
-from _typeshed import Self
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
-from django.db import connections  # noqa: F401
+from django.db import connections as connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
@@ -22,6 +21,7 @@ from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.functional import classproperty
+from typing_extensions import Self
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...
@@ -41,7 +41,7 @@ class _AssertTemplateUsedContext:
     def on_template_render(self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any) -> None: ...
     def test(self) -> None: ...
     def message(self) -> str: ...
-    def __enter__(self: Self) -> Self: ...
+    def __enter__(self) -> Self: ...
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
@@ -218,12 +218,12 @@ class TransactionTestCase(SimpleTestCase):
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
         values: Collection[Any],
-        transform: Callable[[Model], Any] | type[str] = ...,
+        transform: Callable[[Model], Any] | type[str] | None = ...,
         ordered: bool = ...,
         msg: str | None = ...,
     ) -> None: ...
     @overload
-    def assertNumQueries(self, num: int, using: str = ...) -> _AssertNumQueriesContext: ...  # type: ignore
+    def assertNumQueries(self, num: int, func: None = ..., *, using: str = ...) -> _AssertNumQueriesContext: ...
     @overload
     def assertNumQueries(
         self, num: int, func: Callable[..., Any], *args: Any, using: str = ..., **kwargs: Any
@@ -296,8 +296,8 @@ class LiveServerTestCase(TransactionTestCase):
 class SerializeMixin:
     lockfile: Any
     @classmethod
-    def setUpClass(cls: type[Self]) -> None: ...
+    def setUpClass(cls) -> None: ...
     @classmethod
-    def tearDownClass(cls: type[Self]) -> None: ...
+    def tearDownClass(cls) -> None: ...
 
 def connections_support_transactions(aliases: Iterable[str] | None = ...) -> bool: ...

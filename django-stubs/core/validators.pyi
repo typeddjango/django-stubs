@@ -4,6 +4,7 @@ from re import Pattern, RegexFlag
 from typing import Any
 
 from django.core.files.base import File
+from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
@@ -11,9 +12,9 @@ EMPTY_VALUES: Any
 
 _Regex: TypeAlias = str | Pattern[str]
 
-_ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: Y047
+_ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: PYI047
 
-class RegexValidator:
+class RegexValidator(_Deconstructible):
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition
     message: _StrOrPromise
     code: str
@@ -38,6 +39,8 @@ class URLValidator(RegexValidator):
     tld_re: str
     host_re: str
     schemes: Sequence[str]
+    unsafe_chars: frozenset[str]
+    max_length: int
     def __init__(self, schemes: Sequence[str] | None = ..., **kwargs: Any) -> None: ...
     def __call__(self, value: str) -> None: ...
 
@@ -45,7 +48,7 @@ integer_validator: RegexValidator
 
 def validate_integer(value: float | str | None) -> None: ...
 
-class EmailValidator:
+class EmailValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
     user_regex: Pattern[str]
@@ -82,7 +85,7 @@ def int_list_validator(
 
 validate_comma_separated_integer_list: RegexValidator
 
-class BaseValidator:
+class BaseValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
     limit_value: Any
@@ -102,7 +105,7 @@ class MinLengthValidator(BaseValidator):
 class MaxLengthValidator(BaseValidator):
     def clean(self, x: Sized) -> int: ...
 
-class DecimalValidator:
+class DecimalValidator(_Deconstructible):
     messages: dict[str, str]
     max_digits: int | None
     decimal_places: int | None
@@ -110,7 +113,7 @@ class DecimalValidator:
     def __call__(self, value: Decimal) -> None: ...
     def __eq__(self, other: object) -> bool: ...
 
-class FileExtensionValidator:
+class FileExtensionValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
     allowed_extensions: Collection[str] | None
@@ -125,7 +128,7 @@ class FileExtensionValidator:
 def get_available_image_extensions() -> Sequence[str]: ...
 def validate_image_file_extension(value: File) -> None: ...
 
-class ProhibitNullCharactersValidator:
+class ProhibitNullCharactersValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
     def __init__(self, message: _StrOrPromise | None = ..., code: str | None = ...) -> None: ...

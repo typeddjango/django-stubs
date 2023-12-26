@@ -1,16 +1,16 @@
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol, TypeVar, overload
 
-from _typeshed import Self
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
-from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+from django.db.models.fields import Field, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
+from typing_extensions import Self
 
 class FieldFile(File):
     instance: Model
@@ -68,7 +68,7 @@ class FileField(Field):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # class access
     @overload
@@ -78,7 +78,7 @@ class FileField(Field):
     def __get__(self, instance: Model, owner: Any) -> Any: ...
     # non-Model instances
     @overload
-    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
+    def __get__(self, instance: Any, owner: Any) -> Self: ...
     def generate_filename(self, instance: Model | None, filename: _PathCompatible) -> str: ...
 
 class ImageFileDescriptor(FileDescriptor):
@@ -106,5 +106,5 @@ class ImageField(FileField):
     def __get__(self, instance: Model, owner: Any) -> Any: ...
     # non-Model instances
     @overload
-    def __get__(self: Self, instance: Any, owner: Any) -> Self: ...
+    def __get__(self, instance: Any, owner: Any) -> Self: ...
     def update_dimension_fields(self, instance: Model, force: bool = ..., *args: Any, **kwargs: Any) -> None: ...
