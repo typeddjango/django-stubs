@@ -9,7 +9,7 @@ from .backends.base import InvalidCacheKey as InvalidCacheKey
 
 DEFAULT_CACHE_ALIAS: str
 
-class CacheHandler(BaseConnectionHandler):
+class CacheHandler(BaseConnectionHandler[BaseCache]):
     settings_name: str
     exception_class: type[Exception]
     def create_connection(self, alias: str) -> BaseCache: ...

@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Mapping
 from io import BytesIO
 from re import Pattern
-from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload
+from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload, type_check_only
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
@@ -103,6 +103,7 @@ class HttpRequest(BytesIO):
     def _load_post_and_files(self) -> None: ...
     def accepts(self, media_type: str) -> bool: ...
 
+@type_check_only
 class _MutableHttpRequest(HttpRequest):
     GET: QueryDict  # type: ignore[assignment]
     POST: QueryDict  # type: ignore[assignment]
@@ -167,6 +168,7 @@ class QueryDict(MultiValueDict[str, str]):
     def copy(self) -> QueryDict: ...
     def urlencode(self, safe: str | None = ...) -> str: ...
 
+@type_check_only
 class _ImmutableQueryDict(QueryDict):
     _mutable: Literal[False]
     # def __init__(

@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
-from typing import ClassVar, Generic, Protocol, TypeVar, overload
+from typing import ClassVar, Generic, Protocol, TypeVar, overload, type_check_only
 
 from django.utils.functional import _StrPromise, cached_property
 
@@ -10,6 +10,7 @@ class EmptyPage(InvalidPage): ...
 
 _T = TypeVar("_T")
 
+@type_check_only
 class _SupportsPagination(Protocol[_T], Sized, Iterable):
     @overload
     def __getitem__(self, __index: int) -> _T: ...
