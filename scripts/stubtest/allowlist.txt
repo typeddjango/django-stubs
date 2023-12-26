@@ -145,15 +145,6 @@ django.core.management.color.Style.SQL_TABLE
 django.core.management.color.Style.SUCCESS
 django.core.management.color.Style.WARNING
 
-# `error: <...> is not present at runtime`
-# This happens often for variables removed in later django version.
-# We still keep them in stubs to be a bit more backward compatible.
-# RemovedInDjango40:
-django.middleware.csrf.REASON_BAD_TOKEN
-
-# RemovedInDjango41
-django.core.cache.backends.memcached.MemcachedCache
-
 # We re-export `functools.cached_property` which has different semantics
 django.utils.functional.cached_property.__class_getitem__
 django.utils.functional.cached_property.__set__
@@ -395,3 +386,21 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+
+
+# `error: <...> is not present at runtime`
+# This happens often for variables removed in later django version.
+# We still keep them in stubs to be a bit more backward compatible.
+
+# RemovedInDjango40:
+django.middleware.csrf.REASON_BAD_TOKEN
+django.test.runner.default_test_processes
+django.test.runner.partition_suite_by_type
+django.test.runner.reorder_suite
+django.test.runner.RemoteTestResult.stop_if_failfast
+
+# RemovedInDjango41
+django.core.cache.backends.memcached.MemcachedCache
+
+# RemovedInDjango50
+django.test.runner.DiscoverRunner.build_suite
