@@ -13,4 +13,4 @@ Django==5.0.0; python_version >= '3.10'
 -e .[compatible-mypy]
 
 # Overrides:
-mypy==1.7.1
+mypy==1.8.0
