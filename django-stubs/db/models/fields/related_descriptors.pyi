@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import Any, Generic, NoReturn, TypeVar, overload
+from typing import Any, Generic, NoReturn, TypeVar, overload, type_check_only
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
@@ -89,6 +89,7 @@ class ReverseManyToOneDescriptor:
     def __set__(self, instance: Any, value: Any) -> NoReturn: ...
 
 # Fake class, Django defines 'RelatedManager' inside a function body
+@type_check_only
 class RelatedManager(Manager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...
@@ -131,6 +132,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
     def __get__(self, instance: Model, cls: Any = ...) -> ManyRelatedManager[_To]: ...
 
 # Fake class, Django defines 'ManyRelatedManager' inside a function body
+@type_check_only
 class ManyRelatedManager(Manager[_M], Generic[_M]):
     related_val: tuple[int, ...]
     def add(self, *objs: _M | int, bulk: bool = ...) -> None: ...

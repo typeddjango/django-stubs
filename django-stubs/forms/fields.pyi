@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -352,6 +352,7 @@ class ChoiceField(Field):
     def validate(self, value: Any) -> None: ...
     def valid_value(self, value: Any) -> bool: ...
 
+@type_check_only
 class _CoerceCallable(Protocol):
     def __call__(self, __value: Any) -> Any: ...
 

@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -52,10 +52,12 @@ csrf_protect_m: Any
 
 _FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
 
+@type_check_only
 class _OptionalFieldOpts(TypedDict, total=False):
     classes: Sequence[str]
     description: _StrOrPromise
 
+@type_check_only
 class _FieldOpts(_OptionalFieldOpts, total=True):
     fields: _FieldGroups
 

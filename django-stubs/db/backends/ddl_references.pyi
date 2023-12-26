@@ -1,6 +1,7 @@
 from collections.abc import Sequence
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 
+@type_check_only
 class _QuoteCallable(Protocol):
     """Get rid of `cannot assign to method`"""
 
@@ -35,6 +36,7 @@ class Columns(TableColumns):
         self, table: str, columns: list[str], quote_name: _QuoteCallable, col_suffixes: Sequence[str] = ...
     ) -> None: ...
 
+@type_check_only
 class _NameCallable(Protocol):
     """Get rid of `cannot assign to method`"""
 

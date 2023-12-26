@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 
 from django.contrib.gis.gdal import DataSource, OGRGeomType
 from django.contrib.gis.gdal.field import Field as OGRField
@@ -14,6 +14,7 @@ class InvalidDecimal(LayerMapError): ...
 class InvalidInteger(LayerMapError): ...
 class MissingForeignKey(LayerMapError): ...
 
+@type_check_only
 class _Writer(Protocol):
     def write(self, __s: str) -> Any: ...
 

@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, Protocol, TypeVar, overload, type_check_only
 
 from django.apps.config import AppConfig
 from django.core.checks.messages import CheckMessage
@@ -20,6 +20,7 @@ class Tags:
     translation: str
     urls: str
 
+@type_check_only
 class _CheckCallable(Protocol):
     def __call__(
         self,
@@ -31,6 +32,7 @@ class _CheckCallable(Protocol):
 
 _C = TypeVar("_C", bound=_CheckCallable)
 
+@type_check_only
 class _ProcessedCheckCallable(Protocol[_C]):
     tags: Sequence[str]
     __call__: _C

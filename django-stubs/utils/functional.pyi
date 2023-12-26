@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 # Mypy has special handling for functools.cached_property, reuse typeshed's definition instead of defining our own
 from functools import cached_property as cached_property
-from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, overload
+from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, overload, type_check_only
 
 from django.db.models.base import Model
 from typing_extensions import Self, TypeAlias
@@ -20,6 +20,7 @@ class Promise:
     def __radd__(self, other: Any) -> Any: ...
     def __deepcopy__(self, memo: Any) -> Self: ...
 
+@type_check_only
 class _StrPromise(Promise):
     def __add__(self, __s: str) -> str: ...
     def __contains__(self, __o: str) -> bool: ...
@@ -94,6 +95,7 @@ class classproperty(Generic[_Get]):
     def __get__(self, instance: Any | None, cls: type[Any] | None = ...) -> _Get: ...
     def getter(self, method: Callable[[Any], _Get]) -> classproperty[_Get]: ...
 
+@type_check_only
 class _Getter(Protocol[_Get]):
     """Type fake to declare some read-only properties (until `property` builtin is generic)
 
