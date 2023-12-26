@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Literal, Protocol, TypeVar, overload
+from typing import Any, Literal, Protocol, TypeVar, overload, type_check_only
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
@@ -14,7 +14,7 @@ def render(
     status: int | None = ...,
     using: str | None = ...,
 ) -> HttpResponse: ...
-
+@type_check_only
 class SupportsGetAbsoluteUrl(Protocol):
     def get_absolute_url(self) -> str: ...
 
