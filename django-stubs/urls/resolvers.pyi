@@ -86,13 +86,13 @@ class LocalePrefixPattern:
 class URLPattern:
     pattern: _Pattern
     callback: Callable
-    default_args: dict[str, str] | None
+    default_args: dict[str, Any]
     name: str | None
     def __init__(
         self,
         pattern: _Pattern,
         callback: Callable,
-        default_args: dict[str, str] | None = ...,
+        default_args: dict[str, Any] | None = ...,
         name: str | None = ...,
     ) -> None: ...
     def check(self) -> list[CheckMessage]: ...
