@@ -30,8 +30,6 @@ django.contrib.gis.admin.ModelAdmin.log_deletions
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.models.CharField.slice_expression
 django.contrib.gis.db.models.CheckConstraint.__init__
-django.contrib.gis.db.models.F.__contains__
-django.contrib.gis.db.models.F.__getitem__
 django.contrib.gis.db.models.Field.slice_expression
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.ForeignObjectRel.cache_name
@@ -257,8 +255,6 @@ django.db.migrations.operations.special.SeparateDatabaseAndState.category
 django.db.migrations.serializer.FUNCTION_TYPES
 django.db.models.CharField.slice_expression
 django.db.models.CheckConstraint.__init__
-django.db.models.F.__contains__
-django.db.models.F.__getitem__
 django.db.models.Field.slice_expression
 django.db.models.ForeignObjectRel.accessor_name
 django.db.models.ForeignObjectRel.cache_name
@@ -279,10 +275,7 @@ django.db.models.base.Model.save
 django.db.models.constraints.CheckConstraint.__init__
 django.db.models.expressions.BaseExpression.constraint_validation_compatible
 django.db.models.expressions.BaseExpression.get_expression_for_validation
-django.db.models.expressions.F.__contains__
-django.db.models.expressions.F.__getitem__
 django.db.models.expressions.OrderBy.constraint_validation_compatible
-django.db.models.expressions.Sliced
 django.db.models.expressions.WindowFrame.__init__
 django.db.models.expressions.WindowFrame.get_exclusion
 django.db.models.expressions.WindowFrameExclusion

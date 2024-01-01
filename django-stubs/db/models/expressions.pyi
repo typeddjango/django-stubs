@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
-from typing import Any, ClassVar, Generic, Literal, TypeVar
+from typing import Any, ClassVar, Generic, Literal, NoReturn, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q, fields
@@ -132,6 +132,8 @@ class F(_Deconstructible, Combinable):
     name: str
     allowed_default: ClassVar[bool]
     def __init__(self, name: str) -> None: ...
+    def __getitem__(self, subscript: int | slice) -> Sliced: ...
+    def __contains__(self, other: Any) -> NoReturn: ...
     def resolve_expression(
         self,
         query: Any | None = None,
@@ -154,7 +156,18 @@ class F(_Deconstructible, Combinable):
         nulls_first: bool | None = ...,
         nulls_last: bool | None = ...,
     ) -> OrderBy: ...
-    def copy(self) -> F: ...
+    def copy(self) -> Self: ...
+
+class Sliced(F):
+    def __init__(self, obj: F, subscript: int | slice) -> None: ...
+    def resolve_expression(
+        self,
+        query: Any | None = None,
+        allow_joins: bool = True,
+        reuse: set[str] | None = None,
+        summarize: bool = False,
+        for_save: bool = False,
+    ) -> Func: ...
 
 class ResolvedOuterRef(F):
     contains_aggregate: ClassVar[bool]
