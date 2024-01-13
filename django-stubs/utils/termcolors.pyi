@@ -1,10 +1,10 @@
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, Literal
 
 color_names: tuple[str]
 foreground: dict[str, str]
 background: dict[str, str]
-RESET: str
+RESET: Literal["0"]
 opt_dict: dict[str, str]
 
 def colorize(text: str | None = ..., opts: Sequence[str] = ..., *, fg: str = ..., bg: str = ...) -> str: ...
