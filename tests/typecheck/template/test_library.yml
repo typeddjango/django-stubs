@@ -122,3 +122,13 @@
             return ', '.join(results)
 
         reveal_type(format_results) # N: Revealed type is "def (results: builtins.list[builtins.str]) -> builtins.str"
+
+-   case: stringfilter
+    main: |
+        from django.template.defaultfilters import stringfilter
+
+        @stringfilter
+        def lower(value: str) -> str:
+            return value.lower()
+
+        reveal_type(lower) # N: Revealed type is "def (value: object) -> builtins.str"

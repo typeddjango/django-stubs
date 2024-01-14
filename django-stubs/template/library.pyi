@@ -1,5 +1,7 @@
 from collections.abc import Callable, Collection, Iterable, Mapping, Sequence, Sized
-from typing import Any, TypeVar, overload
+from typing import Any, Literal, TypeVar, overload
+
+from typing_extensions import Concatenate
 
 from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
@@ -11,23 +13,25 @@ class InvalidTemplateLibrary(Exception): ...
 
 _C = TypeVar("_C", bound=Callable[..., Any])
 _FilterC = TypeVar("_FilterC", bound=Callable[[Any], Any] | Callable[[Any, Any], Any])
+_TakesContextC = TypeVar("_TakesContextC", bound=Callable[Concatenate[Context, ...], Any])
 
 class Library:
     filters: dict[str, Callable[[Any], Any] | Callable[[Any, Any], Any]]
     tags: dict[str, Callable]
     def __init__(self) -> None: ...
     @overload
-    def tag(self, name: _C) -> _C: ...
+    def tag(self, name: _C, /) -> _C: ...
     @overload
-    def tag(self, name: str, compile_function: _C) -> _C: ...
+    def tag(self, *, name: str, compile_function: _C) -> _C: ...
     @overload
-    def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_C], _C]: ...
+    def tag(self, *, name: str | None = ..., compile_function: None = ...) -> Callable[[_C], _C]: ...
     def tag_function(self, func: _C) -> _C: ...
     @overload
     def filter(self, name: _FilterC, /) -> _FilterC: ...
     @overload
     def filter(
         self,
+        *,
         name: str | None = ...,
         filter_func: None = ...,
         is_safe: bool = ...,
@@ -37,6 +41,7 @@ class Library:
     @overload
     def filter(
         self,
+        *,
         name: str,
         filter_func: _FilterC,
         is_safe: bool = ...,
@@ -44,9 +49,15 @@ class Library:
         expects_localtime: bool = ...,
     ) -> _FilterC: ...
     @overload
-    def simple_tag(self, func: _C) -> _C: ...
+    def simple_tag(self, func: _C, /) -> _C: ...
     @overload
-    def simple_tag(self, takes_context: bool | None = ..., name: str | None = ...) -> Callable[[_C], _C]: ...
+    def simple_tag(
+        self, *, takes_context: Literal[True], name: str | None = ...
+    ) -> Callable[[_TakesContextC], _TakesContextC]: ...
+    @overload
+    def simple_tag(
+        self, *, takes_context: Literal[False] | None = ..., name: str | None = ...
+    ) -> Callable[[_C], _C]: ...
     def inclusion_tag(
         self,
         filename: Template | str,
