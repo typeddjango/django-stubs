@@ -20,6 +20,34 @@
 
         reveal_type(lower) # N: Revealed type is "def (value: builtins.str) -> builtins.str"
 
+-   case: register_filter_no_decorator
+    main: |
+        from django import template
+        register = template.Library()
+
+        def lower(value: str) -> str:
+            return value.lower()
+
+        registered = register.filter("tolower", lower)
+
+        reveal_type(registered) # N: Revealed type is "def (value: builtins.str) -> builtins.str"
+
+-   case: register_bad_filters
+    main: |
+        from django import template
+        register = template.Library()
+
+        @register.filter
+        def lower() -> str:
+            return ""
+
+        @register.filter(name="toomanyargs")
+        def toomanyargs(arg1: str, arg2: str, arg3: str) -> str:
+            return ""
+    out: |
+        main:4: error: Value of type variable "_FilterC" of "filter" of "Library" cannot be "Callable[[], str]"  [type-var]
+        main:8: error: Value of type variable "_FilterC" of function cannot be "Callable[[str, str, str], str]"  [type-var]
+
 -   case: register_simple_tag_no_args
     main: |
         import datetime

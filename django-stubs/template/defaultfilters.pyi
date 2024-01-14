@@ -2,13 +2,16 @@ from collections.abc import Callable
 from datetime import date as _date
 from datetime import datetime
 from datetime import time as _time
-from typing import Any
+from typing import Any, TypeVar
 
+from django.template.library import Library
 from django.utils.safestring import SafeString
 
-register: Any
+_C = TypeVar("_C", bound=Callable[..., Any])
 
-def stringfilter(func: Callable) -> Callable: ...
+register: Library
+
+def stringfilter(func: _C) -> _C: ...
 def addslashes(value: str) -> str: ...
 def capfirst(value: str) -> str: ...
 def escapejs_filter(value: str) -> SafeString: ...

@@ -10,9 +10,10 @@ from .base import Node, Template
 class InvalidTemplateLibrary(Exception): ...
 
 _C = TypeVar("_C", bound=Callable[..., Any])
+_FilterC = TypeVar("_FilterC", bound=Callable[[Any], Any] | Callable[[Any, Any], Any])
 
 class Library:
-    filters: dict[str, Callable]
+    filters: dict[str, Callable[[Any], Any] | Callable[[Any, Any], Any]]
     tags: dict[str, Callable]
     def __init__(self) -> None: ...
     @overload
@@ -23,11 +24,25 @@ class Library:
     def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_C], _C]: ...
     def tag_function(self, func: _C) -> _C: ...
     @overload
-    def filter(self, name: _C, filter_func: None = ..., **flags: Any) -> _C: ...
+    def filter(self, name: _FilterC, /) -> _FilterC: ...
     @overload
-    def filter(self, name: str | None, filter_func: _C, **flags: Any) -> _C: ...
+    def filter(
+        self,
+        name: str | None = ...,
+        filter_func: None = ...,
+        is_safe: bool = ...,
+        needs_autoescape: bool = ...,
+        expects_localtime: bool = ...,
+    ) -> Callable[[_FilterC], _FilterC]: ...
     @overload
-    def filter(self, name: str | None = ..., filter_func: None = ..., **flags: Any) -> Callable[[_C], _C]: ...
+    def filter(
+        self,
+        name: str,
+        filter_func: _FilterC,
+        is_safe: bool = ...,
+        needs_autoescape: bool = ...,
+        expects_localtime: bool = ...,
+    ) -> _FilterC: ...
     @overload
     def simple_tag(self, func: _C) -> _C: ...
     @overload
