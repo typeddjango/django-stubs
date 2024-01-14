@@ -1,11 +1,10 @@
 from collections.abc import Callable, Collection, Iterable, Mapping, Sequence, Sized
 from typing import Any, Literal, TypeVar, overload
 
-from typing_extensions import Concatenate
-
 from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeString
+from typing_extensions import Concatenate
 
 from .base import Node, Template
 

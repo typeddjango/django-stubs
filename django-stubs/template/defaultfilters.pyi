@@ -4,10 +4,9 @@ from datetime import datetime
 from datetime import time as _time
 from typing import Any, TypeVar
 
-from typing_extensions import Concatenate, ParamSpec
-
 from django.template.library import Library
 from django.utils.safestring import SafeString
+from typing_extensions import Concatenate, ParamSpec
 
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
