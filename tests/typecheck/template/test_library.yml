@@ -72,7 +72,7 @@
             timezone = context['timezone']
             return "test"
 
-        reveal_type(current_time) # N: Revealed type is "def (context: Context, format_string: builtins.str) -> builtins.str"
+        reveal_type(current_time) # N: Revealed type is "def (context: django.template.context.Context, format_string: builtins.str) -> builtins.str"
 
 -   case: register_simple_tag_named
     main: |
@@ -136,7 +136,7 @@
         def format_results(context: Context, results: List[str]) -> str:
             return ', '.join(results)
 
-        reveal_type(format_results) # N: Revealed type is "def (context: Context, results: builtins.list[builtins.str]) -> builtins.str"
+        reveal_type(format_results) # N: Revealed type is "def (context: django.template.context.Context, results: builtins.list[builtins.str]) -> builtins.str"
 
 -   case: stringfilter
     main: |
