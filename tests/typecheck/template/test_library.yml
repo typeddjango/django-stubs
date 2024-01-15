@@ -63,15 +63,16 @@
 -   case: register_simple_tag_context
     main: |
         from django import template
+        from django.template.context import Context
         from typing import Dict, Any
         register = template.Library()
 
         @register.simple_tag(takes_context=True)
-        def current_time(context: Dict[str, Any], format_string: str) -> str:
+        def current_time(context: Context, format_string: str) -> str:
             timezone = context['timezone']
             return "test"
 
-        reveal_type(current_time) # N: Revealed type is "def (context: builtins.dict[builtins.str, Any], format_string: builtins.str) -> builtins.str"
+        reveal_type(current_time) # N: Revealed type is "def (context: Context, format_string: builtins.str) -> builtins.str"
 
 -   case: register_simple_tag_named
     main: |
@@ -123,6 +124,20 @@
 
         reveal_type(format_results) # N: Revealed type is "def (results: builtins.list[builtins.str]) -> builtins.str"
 
+-   case: register_inclusion_tag_takes_context
+    main: |
+        from django import template
+        from django.template.context import Context
+
+        from typing import List
+        register = template.Library()
+
+        @register.inclusion_tag('results.html', takes_context=True)
+        def format_results(context: Context, results: List[str]) -> str:
+            return ', '.join(results)
+
+        reveal_type(format_results) # N: Revealed type is "def (context: Context, results: builtins.list[builtins.str]) -> builtins.str"
+
 -   case: stringfilter
     main: |
         from django.template.defaultfilters import stringfilter
@@ -131,4 +146,4 @@
         def lower(value: str) -> str:
             return value.lower()
 
-        reveal_type(lower) # N: Revealed type is "def (value: object) -> builtins.str"
+        reveal_type(lower) # N: Revealed type is "def (builtins.object) -> builtins.str"

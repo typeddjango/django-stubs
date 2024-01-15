@@ -11,20 +11,21 @@ from .base import Node, Template
 class InvalidTemplateLibrary(Exception): ...
 
 _C = TypeVar("_C", bound=Callable[..., Any])
+_CompileC = TypeVar("_CompileC", bound=Callable[[Parser, Token], Node])
 _FilterC = TypeVar("_FilterC", bound=Callable[[Any], Any] | Callable[[Any, Any], Any])
 _TakesContextC = TypeVar("_TakesContextC", bound=Callable[Concatenate[Context, ...], Any])
 
 class Library:
     filters: dict[str, Callable[[Any], Any] | Callable[[Any, Any], Any]]
-    tags: dict[str, Callable]
+    tags: dict[str, Callable[[Parser, Token], Node]]
     def __init__(self) -> None: ...
     @overload
-    def tag(self, name: _C, /) -> _C: ...
+    def tag(self, name: _CompileC, /) -> _CompileC: ...
     @overload
-    def tag(self, name: str, compile_function: _C) -> _C: ...
+    def tag(self, name: str, compile_function: _CompileC) -> _CompileC: ...
     @overload
-    def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_C], _C]: ...
-    def tag_function(self, func: _C) -> _C: ...
+    def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_CompileC], _CompileC]: ...
+    def tag_function(self, func: _CompileC) -> _CompileC: ...
     @overload
     def filter(self, name: _FilterC, /) -> _FilterC: ...
     @overload
@@ -57,11 +58,21 @@ class Library:
     def simple_tag(
         self, *, takes_context: Literal[False] | None = ..., name: str | None = ...
     ) -> Callable[[_C], _C]: ...
+    @overload
     def inclusion_tag(
         self,
         filename: Template | str,
-        func: Callable | None = ...,
-        takes_context: bool | None = ...,
+        func: Callable[..., Any] | None = ...,
+        *,
+        takes_context: Literal[True],
+        name: str | None = ...,
+    ) -> Callable[[_TakesContextC], _TakesContextC]: ...
+    @overload
+    def inclusion_tag(
+        self,
+        filename: Template | str,
+        func: Callable[..., Any] | None = ...,
+        takes_context: Literal[False] | None = ...,
         name: str | None = ...,
     ) -> Callable[[_C], _C]: ...
 
