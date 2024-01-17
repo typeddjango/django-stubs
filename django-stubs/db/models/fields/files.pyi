@@ -39,7 +39,7 @@ _M = TypeVar("_M", bound=Model, contravariant=True)
 
 @type_check_only
 class _UploadToCallable(Protocol[_M]):
-    def __call__(self, __instance: _M, __filename: str) -> _PathCompatible: ...
+    def __call__(self, instance: _M, filename: str, /) -> _PathCompatible: ...
 
 class FileField(Field):
     storage: Storage

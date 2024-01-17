@@ -354,7 +354,7 @@ class ChoiceField(Field):
 
 @type_check_only
 class _CoerceCallable(Protocol):
-    def __call__(self, __value: Any) -> Any: ...
+    def __call__(self, value: Any, /) -> Any: ...
 
 class TypedChoiceField(ChoiceField):
     coerce: _CoerceCallable
