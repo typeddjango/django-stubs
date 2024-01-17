@@ -98,7 +98,7 @@ class ImmutableList(tuple[_V, ...]):
 class _ItemCallable(Protocol[_V]):
     """Don't mess with arguments when assigning in class body in stub"""
 
-    def __call__(self, __value: _V) -> _V: ...
+    def __call__(self, value: _V, /) -> _V: ...
 
 class DictWrapper(dict[str, _V]):
     func: _ItemCallable[_V]
