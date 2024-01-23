@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Literal
 
 from .utils.version import get_version as get_version
 
