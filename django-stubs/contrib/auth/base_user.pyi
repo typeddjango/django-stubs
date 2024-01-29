@@ -22,6 +22,7 @@ class AbstractBaseUser(models.Model):
 
     class Meta:
         abstract: Literal[True]
+
     def get_username(self) -> str: ...
     def natural_key(self) -> tuple[str]: ...
     @property

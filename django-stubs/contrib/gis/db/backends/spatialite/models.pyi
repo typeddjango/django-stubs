@@ -17,6 +17,7 @@ class SpatialiteGeometryColumns(models.Model):
         app_label: str
         db_table: str
         managed: bool
+
     @classmethod
     def table_name_col(cls) -> Any: ...
     @classmethod
@@ -35,5 +36,6 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
         app_label: str
         db_table: str
         managed: bool
+
     @property
     def wkt(self) -> Any: ...

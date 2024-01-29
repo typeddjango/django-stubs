@@ -18,6 +18,7 @@ class AbstractBaseSession(models.Model):
 
     class Meta:
         abstract: Literal[True]
+
     @classmethod
     def get_session_store_class(cls) -> type[SessionBase] | None: ...
     def get_decoded(self) -> dict[str, Any]: ...
