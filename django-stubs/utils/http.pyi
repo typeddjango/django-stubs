@@ -10,9 +10,11 @@ RFC3986_GENDELIMS: str
 RFC3986_SUBDELIMS: str
 
 def urlencode(
-    query: Mapping[str, str | bytes | int | Iterable[str | bytes | int]]
-    | Iterable[tuple[str, str | bytes | int | Iterable[str | bytes | int]]]
-    | None,
+    query: (
+        Mapping[str, str | bytes | int | Iterable[str | bytes | int]]
+        | Iterable[tuple[str, str | bytes | int | Iterable[str | bytes | int]]]
+        | None
+    ),
     doseq: bool = ...,
 ) -> str: ...
 def http_date(epoch_seconds: float | None = ...) -> str: ...
