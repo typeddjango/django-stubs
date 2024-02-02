@@ -390,3 +390,8 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+
+# Keyword only in stubs
+django.db.models.(\w*)Field.__init__
+django.db.models.fields.(\w*)Field.__init__
+django.contrib.gis.db.models.(\w*)Field.__init__
