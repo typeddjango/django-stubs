@@ -103,9 +103,28 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 
     Notice, that this is not magic. This is how descriptors work with ``mypy``.
 
-    We also need ``_pyi_private_set_type`` attributes
-    and friends to help inside our plugin.
-    It is required to enhance parts like ``filter`` queries.
+    Each field class defines three "type-only" attributes:
+    - ``_pyi_lookup_exact_type``: Used for ``filter`` queries and friends.
+    - ``_pyi_private_get/set_type``: Used to parametrize the field class
+      on instantiation. Additional logic is also applied if the field is nullable,
+      a primary key or has a default.
+
+    To improve support with other type checkers, subclasses define overloads on the
+    ``__init__`` method to automatically parametrize the field class:
+
+    .. code:: python
+
+        class Example(Model):
+            count = IntField(null=True)
+            my_pk = IntField(primary_key=True, default=def_gen)
+
+        example = Example()
+        reveal_type(example.count)  # Revealed type is "builtins.int | None", even without the plugin
+
+        example.my_pk = None  # No error with the mypy plugin, error in "vanilla" type checking
+
+    Plugin logic is still kept as these overloads only support field nullability, as shown
+    in the example.
     """
 
     _pyi_private_set_type: Any
@@ -160,6 +179,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
+        *,
         null: bool = ...,
         db_index: bool = ...,
         rel: ForeignObjectRel | None = ...,
@@ -240,23 +260,417 @@ class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
+    @overload
+    def __init__(
+        self: IntegerField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: IntegerField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
-class SmallIntegerField(IntegerField[_ST, _GT]): ...
+class SmallIntegerField(IntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: SmallIntegerField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: SmallIntegerField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class BigIntegerField(IntegerField[_ST, _GT]):
     MAX_BIGINT: ClassVar[int]
+    @overload
+    def __init__(
+        self: BigIntegerField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BigIntegerField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]): ...
-class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]): ...
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: PositiveIntegerField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveIntegerField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: PositiveSmallIntegerField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveSmallIntegerField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: PositiveBigIntegerField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveBigIntegerField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class FloatField(Field[_ST, _GT]):
     _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
+    @overload
+    def __init__(
+        self: FloatField[float | int | str | Combinable | None, float | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: FloatField[float | int | str | Combinable, float],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class DecimalField(Field[_ST, _GT]):
     _pyi_private_set_type: str | float | decimal.Decimal | Combinable
@@ -265,8 +679,9 @@ class DecimalField(Field[_ST, _GT]):
     # attributes
     max_digits: int
     decimal_places: int
+    @overload
     def __init__(
-        self,
+        self: DecimalField[str | float | decimal.Decimal | Combinable | None, decimal.Decimal | None],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         max_digits: int | None = ...,
@@ -275,7 +690,32 @@ class DecimalField(Field[_ST, _GT]):
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DecimalField[str | float | decimal.Decimal | Combinable, decimal.Decimal],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        max_digits: int | None = ...,
+        decimal_places: int | None = ...,
+        *,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -296,15 +736,17 @@ class CharField(Field[_ST, _GT]):
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+    @overload
     def __init__(
-        self,
+        self: CharField[str | int | Combinable | None, str | None],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        *,
+        null: Literal[True],
         db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -321,21 +763,20 @@ class CharField(Field[_ST, _GT]):
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
-        *,
         db_collation: str | None = ...,
     ) -> None: ...
-
-class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
-
-class SlugField(CharField[_ST, _GT]):
+    @overload
     def __init__(
-        self,
+        self: CharField[str | int | Combinable, str],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,
+        max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
@@ -351,17 +792,187 @@ class SlugField(CharField[_ST, _GT]):
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_collation: str | None = ...,
+    ) -> None: ...
+
+class CommaSeparatedIntegerField(CharField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: CommaSeparatedIntegerField[str | int | Combinable | None, str | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
         *,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_collation: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: CommaSeparatedIntegerField[str | int | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_collation: str | None = ...,
+    ) -> None: ...
+
+class SlugField(CharField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: SlugField[str | int | Combinable | None, str | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        max_length: int | None = ...,
+        db_index: bool = ...,
+        allow_unicode: bool = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: SlugField[str | int | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         max_length: int | None = ...,
         db_index: bool = ...,
         allow_unicode: bool = ...,
     ) -> None: ...
 
-class EmailField(CharField[_ST, _GT]): ...
+class EmailField(CharField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: EmailField[str | int | Combinable | None, str | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_collation: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: EmailField[str | int | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_collation: str | None = ...,
+    ) -> None: ...
 
 class URLField(CharField[_ST, _GT]):
+    @overload
     def __init__(
-        self,
+        self: URLField[str | int | Combinable | None, str | None],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         *,
@@ -369,7 +980,35 @@ class URLField(CharField[_ST, _GT]):
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: URLField[str | int | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        *,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         rel: ForeignObjectRel | None = ...,
         default: Any = ...,
@@ -394,15 +1033,17 @@ class TextField(Field[_ST, _GT]):
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+    @overload
     def __init__(
-        self,
+        self: TextField[str | Combinable | None, str | None],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        *,
+        null: Literal[True],
         db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -419,7 +1060,34 @@ class TextField(Field[_ST, _GT]):
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
+        db_collation: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: TextField[str | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
         *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
         db_collation: str | None = ...,
     ) -> None: ...
 
@@ -427,8 +1095,64 @@ class BooleanField(Field[_ST, _GT]):
     _pyi_private_set_type: bool | Combinable
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
+    @overload
+    def __init__(
+        self: BooleanField[bool | Combinable | None, bool | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BooleanField[bool | Combinable, bool],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
-class NullBooleanField(BooleanField[_ST, _GT]):
+class NullBooleanField(BooleanField[bool | Combinable | None, bool | None]):
     _pyi_private_set_type: bool | Combinable | None  # type: ignore[assignment]
     _pyi_private_get_type: bool | None  # type: ignore[assignment]
     _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
@@ -436,6 +1160,62 @@ class NullBooleanField(BooleanField[_ST, _GT]):
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | Combinable
     _pyi_private_get_type: str
+    @overload
+    def __init__(
+        self: IPAddressField[str | Combinable | None, str | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: IPAddressField[str | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
@@ -444,8 +1224,9 @@ class GenericIPAddressField(Field[_ST, _GT]):
     default_error_messages: _ErrorMessagesDict
     unpack_ipv4: bool
     protocol: str
+    @overload
     def __init__(
-        self,
+        self: GenericIPAddressField[str | int | Callable[..., Any] | Combinable | None, str | None],
         verbose_name: _StrOrPromise | None = ...,
         name: Any | None = ...,
         protocol: str = ...,
@@ -453,7 +1234,33 @@ class GenericIPAddressField(Field[_ST, _GT]):
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: GenericIPAddressField[str | int | Callable[..., Any] | Combinable, str],
+        verbose_name: _StrOrPromise | None = ...,
+        name: Any | None = ...,
+        protocol: str = ...,
+        unpack_ipv4: bool = ...,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -477,8 +1284,9 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
+    @overload
     def __init__(
-        self,
+        self: DateField[str | date | Combinable | None, date | None],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         auto_now: bool = ...,
@@ -488,7 +1296,33 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DateField[str | date | Combinable, date],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        *,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -509,8 +1343,9 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
+    @overload
     def __init__(
-        self,
+        self: TimeField[str | time | real_datetime | Combinable | None, time | None],
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         auto_now: bool = ...,
@@ -519,7 +1354,32 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: TimeField[str | time | real_datetime | Combinable, time],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        *,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         default: Any = ...,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -539,13 +1399,66 @@ class DateTimeField(DateField[_ST, _GT]):
     _pyi_private_set_type: str | real_datetime | date | Combinable
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
+    @overload
+    def __init__(
+        self: DateTimeField[str | real_datetime | date | Combinable | None, real_datetime | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        *,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[True],
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DateTimeField[str | real_datetime | date | Combinable, real_datetime],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        *,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
 
 class UUIDField(Field[_ST, _GT]):
     _pyi_private_set_type: str | uuid.UUID
     _pyi_private_get_type: uuid.UUID
     _pyi_lookup_exact_type: uuid.UUID | str
+    @overload
     def __init__(
-        self,
+        self: UUIDField[str | uuid.UUID | None, uuid.UUID | None],
         verbose_name: _StrOrPromise | None = ...,
         *,
         name: str | None = ...,
@@ -553,7 +1466,35 @@ class UUIDField(Field[_ST, _GT]):
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
-        null: bool = ...,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: UUIDField[str | uuid.UUID, uuid.UUID],
+        verbose_name: _StrOrPromise | None = ...,
+        *,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: Literal[False] = ...,
         db_index: bool = ...,
         rel: ForeignObjectRel | None = ...,
         default: Any = ...,
@@ -611,9 +1552,121 @@ class FilePathField(Field[_ST, _GT]):
 
 class BinaryField(Field[_ST, _GT]):
     _pyi_private_get_type: bytes | memoryview
+    @overload
+    def __init__(
+        self: BinaryField[Any | None, bytes | memoryview | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BinaryField[Any, bytes | memoryview],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta
+    @overload
+    def __init__(
+        self: DurationField[Any | None, timedelta | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DurationField[Any, timedelta],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
 class AutoFieldMixin:
     db_returning: bool
@@ -625,6 +1678,175 @@ class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta)
     _pyi_private_set_type: Combinable | int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
+    @overload
+    def __init__(
+        self: AutoField[Combinable | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: AutoField[Combinable | int | str, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
 
-class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...
-class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...
+class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: BigAutoField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BigAutoField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+
+class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: SmallAutoField[float | int | str | Combinable | None, int | None],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[True],
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: SmallAutoField[float | int | str | Combinable, int],
+        verbose_name: _StrOrPromise | None = ...,
+        name: str | None = ...,
+        primary_key: bool = ...,
+        max_length: int | None = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        *,
+        null: Literal[False] = ...,
+        db_index: bool = ...,
+        rel: ForeignObjectRel | None = ...,
+        default: Any = ...,
+        editable: bool = ...,
+        serialize: bool = ...,
+        unique_for_date: str | None = ...,
+        unique_for_month: str | None = ...,
+        unique_for_year: str | None = ...,
+        choices: _FieldChoices | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_tablespace: str | None = ...,
+        auto_created: bool = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        db_comment: str | None = ...,
+    ) -> None: ...
