@@ -1,6 +1,6 @@
 import json
 from collections.abc import Callable
-from typing import Any, ClassVar, TypeVar
+from typing import Any, ClassVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
@@ -9,7 +9,7 @@ from django.db.models.fields import TextField
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 from . import Field
 from .mixins import CheckFieldDefaultMixin
