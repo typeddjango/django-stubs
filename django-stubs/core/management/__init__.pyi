@@ -2,6 +2,7 @@ from typing import Any
 
 from .base import BaseCommand as BaseCommand
 from .base import CommandError as CommandError
+from .base import CommandParser as CommandParser
 
 def find_commands(management_dir: str) -> list[str]: ...
 def load_command_class(app_name: str, name: str) -> BaseCommand: ...
