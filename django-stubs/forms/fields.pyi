@@ -307,6 +307,7 @@ class URLField(CharField):
         localize: bool = ...,
         disabled: bool = ...,
         label_suffix: str | None = ...,
+        assume_scheme: str | None = ...,
     ) -> None: ...
     def to_python(self, value: Any | None) -> str | None: ...
 
