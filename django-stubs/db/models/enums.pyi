@@ -2,7 +2,7 @@ import enum
 import sys
 from typing import Any, TypeVar, type_check_only
 
-from typing_extensions import Self
+from typing_extensions import Self, TypeAlias
 
 _Self = TypeVar("_Self")
 
@@ -28,6 +28,8 @@ class ChoicesMeta(enum.EnumMeta):
     def labels(self) -> list[str]: ...
     @property
     def values(self) -> list[Any]: ...
+
+ChoicesType: TypeAlias = ChoicesMeta
 
 class Choices(enum.Enum, metaclass=ChoicesMeta):
     @property
