@@ -184,7 +184,6 @@ django.db.models.ForeignObject.get_joining_fields
 django.db.models.ForeignObject.get_reverse_joining_fields
 django.db.models.ForeignObjectRel.get_joining_fields
 django.db.models.Func.allowed_default
-django.db.models.GeneratedField
 django.db.models.Lookup.allowed_default
 django.db.models.Prefetch.get_current_querysets
 django.db.models.Q.identity
