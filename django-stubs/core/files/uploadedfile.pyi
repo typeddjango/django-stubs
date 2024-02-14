@@ -40,7 +40,7 @@ class InMemoryUploadedFile(UploadedFile):
         content_type: str | None,
         size: int | None,
         charset: str | None,
-        content_type_extra: dict[str, str] = ...,
+        content_type_extra: dict[str, str] | None = ...,
     ) -> None: ...
 
 class SimpleUploadedFile(InMemoryUploadedFile):
