@@ -1,5 +1,6 @@
 from datetime import timedelta
 from typing import Any, Protocol, type_check_only
+
 from typing_extensions import Unpack
 
 BASE62_ALPHABET: str
