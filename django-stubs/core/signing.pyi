@@ -1,8 +1,6 @@
 from datetime import timedelta
 from typing import Any, Protocol, type_check_only
 
-from typing_extensions import Unpack
-
 BASE62_ALPHABET: str
 
 class BadSignature(Exception): ...
@@ -47,7 +45,7 @@ class Signer:
     algorithm: str
     def __init__(
         self,
-        *args: Unpack[tuple[()]],
+        *args: Any,
         key: bytes | str | None = ...,
         sep: str = ...,
         salt: bytes | str | None = ...,
