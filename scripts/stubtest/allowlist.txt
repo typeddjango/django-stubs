@@ -258,6 +258,7 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_expression_indexes
 django.db.backends.mysql.features.DatabaseFeatures.supports_index_column_ordering
 django.db.backends.mysql.features.DatabaseFeatures.supports_transactions
 django.db.backends.mysql.features.DatabaseFeatures.update_can_self_select
+django.db.backends.oracle.features.DatabaseFeatures.supports_boolean_expr_in_select_clause
 django.db.backends.postgresql.base.DatabaseWrapper.pg_version
 django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_13
 django.db.migrations.RenameField.new_name_lower
