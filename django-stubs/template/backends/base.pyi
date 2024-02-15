@@ -1,5 +1,5 @@
 from collections.abc import Iterator, Mapping
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 
 from django.http.request import HttpRequest
 from django.template.base import Context
@@ -19,6 +19,7 @@ class BaseEngine:
     def template_dirs(self) -> tuple[str]: ...
     def iter_template_filenames(self, template_name: str) -> Iterator[str]: ...
 
+@type_check_only
 class _EngineTemplate(Protocol):
     def render(
         self,

@@ -1,6 +1,7 @@
 import smtplib
 import threading
 
+from _typeshed import StrOrBytesPath
 from django.core.mail.backends.base import BaseEmailBackend
 
 class EmailBackend(BaseEmailBackend):
@@ -11,7 +12,7 @@ class EmailBackend(BaseEmailBackend):
     use_tls: bool
     use_ssl: bool
     timeout: int | None
-    ssl_keyfile: str | None
-    ssl_certfile: str | None
+    ssl_keyfile: StrOrBytesPath | None
+    ssl_certfile: StrOrBytesPath | None
     connection: smtplib.SMTP_SSL | smtplib.SMTP | None
     _lock: threading.RLock

@@ -3,7 +3,7 @@ from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, type_check_only
 
 from typing_extensions import TypeAlias
 
@@ -86,6 +86,7 @@ SERVER_EMAIL: str
 DATABASES: dict[str, dict[str, Any]]
 
 # Classes used to implement DB routing behavior.
+@type_check_only
 class Router(Protocol):
     def allow_migrate(self, db: str, app_label: str, **hints: Any) -> bool | None: ...
 

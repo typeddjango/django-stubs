@@ -12,6 +12,7 @@ class MigrationRecorder:
         name: Any
         applied: Any
         objects: ClassVar[Manager[Self]]
+
     connection: BaseDatabaseWrapper
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
     @property
