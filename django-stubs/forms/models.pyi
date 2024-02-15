@@ -251,7 +251,7 @@ class ModelChoiceIterator:
     def __bool__(self) -> bool: ...
     def choice(self, obj: Model) -> tuple[ModelChoiceIteratorValue, str]: ...
 
-class ModelChoiceField(ChoiceField):
+class ModelChoiceField(ChoiceField, Generic[_M]):
     disabled: bool
     help_text: _StrOrPromise
     required: bool
@@ -259,12 +259,12 @@ class ModelChoiceField(ChoiceField):
     validators: list[Any]
     iterator: type[ModelChoiceIterator]
     empty_label: _StrOrPromise | None
-    queryset: QuerySet[models.Model] | None
+    queryset: QuerySet[_M] | None
     limit_choices_to: _AllLimitChoicesTo | None
     to_field_name: str | None
     def __init__(
         self,
-        queryset: None | Manager[models.Model] | QuerySet[models.Model],
+        queryset: Manager[_M] | QuerySet[_M] | None,
         *,
         empty_label: _StrOrPromise | None = ...,
         required: bool = ...,
@@ -278,17 +278,17 @@ class ModelChoiceField(ChoiceField):
         **kwargs: Any,
     ) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
-    def label_from_instance(self, obj: Model) -> str: ...
+    def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
         _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
         _FieldChoices | CallableChoiceIterator | ModelChoiceIterator,
     ]
     def prepare_value(self, value: Any) -> Any: ...
-    def to_python(self, value: Any | None) -> Model | None: ...
-    def validate(self, value: Model | None) -> None: ...
+    def to_python(self, value: Any | None) -> _M | None: ...
+    def validate(self, value: _M | None) -> None: ...
     def has_changed(self, initial: Model | int | str | UUID | None, data: int | str | None) -> bool: ...
 
-class ModelMultipleChoiceField(ModelChoiceField):
+class ModelMultipleChoiceField(ModelChoiceField[_M]):
     disabled: bool
     empty_label: _StrOrPromise | None
     help_text: _StrOrPromise
@@ -296,9 +296,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
     show_hidden_initial: bool
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
-    def __init__(self, queryset: None | Manager[Model] | QuerySet[Model], **kwargs: Any) -> None: ...
-    def to_python(self, value: Any) -> list[Model]: ...  # type: ignore[override]
-    def clean(self, value: Any) -> QuerySet[Model]: ...
+    def __init__(self, queryset: Manager[_M] | QuerySet[_M] | None, **kwargs: Any) -> None: ...
+    def to_python(self, value: Any) -> list[_M]: ...  # type: ignore[override]
+    def clean(self, value: Any) -> QuerySet[_M]: ...
     def prepare_value(self, value: Any) -> Any: ...
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore[override]
 
