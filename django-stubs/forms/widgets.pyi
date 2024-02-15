@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, type_check_only
 
 from django.core.files.base import File
 from django.db.models.fields import _FieldChoices
@@ -137,9 +137,9 @@ class TimeInput(DateTimeBaseInput):
     template_name: str
 
 def boolean_check(v: Any) -> bool: ...
-
+@type_check_only
 class _CheckCallable(Protocol):
-    def __call__(self, __value: Any) -> bool: ...
+    def __call__(self, value: Any, /) -> bool: ...
 
 class CheckboxInput(Input):
     check_test: _CheckCallable

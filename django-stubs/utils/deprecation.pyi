@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
@@ -30,11 +30,13 @@ class DeprecationInstanceCheck(type):
     deprecation_warning: type[Warning]
     def __instancecheck__(self, instance: Any) -> bool: ...
 
+@type_check_only
 class _GetResponseCallable(Protocol):
-    def __call__(self, __request: HttpRequest) -> HttpResponseBase: ...
+    def __call__(self, request: HttpRequest, /) -> HttpResponseBase: ...
 
+@type_check_only
 class _AsyncGetResponseCallable(Protocol):
-    def __call__(self, __request: HttpRequest) -> Awaitable[HttpResponseBase]: ...
+    def __call__(self, request: HttpRequest, /) -> Awaitable[HttpResponseBase]: ...
 
 class MiddlewareMixin:
     sync_capable: bool

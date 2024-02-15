@@ -49,7 +49,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
-| (next release) | 1.7.x        | 5.0            | 4.2, 4.1, 3.2          | 3.8 - 3.12     |
+| (next release) | 1.8.x        | 5.0            | 4.2, 4.1, 3.2          | 3.8 - 3.12     |
 | 4.2.7          | 1.7.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.12     |
 | 4.2.6          | 1.6.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.12     |
 | 4.2.5          | 1.6.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.12     |
@@ -305,7 +305,7 @@ So, mypy would not like this code:
 ```python
 from django.conf import settings
 
-settings.CUSTOM_VALUE  # E: 'Settings' object has no attribute 'CUSTOM_SETTING'
+settings.CUSTOM_VALUE  # E: 'Settings' object has no attribute 'CUSTOM_VALUE'
 ```
 
 To handle this corner case we have a special setting `strict_settings` (`True` by default),
@@ -328,7 +328,7 @@ And then:
 
 ```python
 # Works:
-reveal_type(settings.EXISTS_IN_RUNTIME)  # N: Any
+reveal_type(settings.EXISTS_AT_RUNTIME)  # N: Any
 
 # Errors:
 reveal_type(settings.MISSING)  # E: 'Settings' object has no attribute 'MISSING'

@@ -7,7 +7,6 @@ django.conf.DEFAULT_FILE_STORAGE_DEPRECATED_MSG
 django.conf.LazySettings.DEFAULT_FILE_STORAGE
 django.conf.LazySettings.STATICFILES_STORAGE
 django.conf.STATICFILES_STORAGE_DEPRECATED_MSG
-django.conf.global_settings.Router
 django.conf.global_settings.gettext_noop
 django.conf.urls.IncludedURLConf
 django.conf.urls.url
@@ -187,7 +186,6 @@ django.contrib.auth.models.User.username
 django.contrib.auth.models.UserManager.__slotnames__
 django.contrib.auth.password_validation.CommonPasswordValidator.DEFAULT_PASSWORD_LIST_PATH
 django.contrib.auth.password_validation.CommonPasswordValidator.__init__
-django.contrib.auth.password_validation.PasswordValidator
 django.contrib.auth.password_validation.exceeds_maximum_length_ratio
 django.contrib.auth.tokens.PasswordResetTokenGenerator._make_token_with_timestamp
 django.contrib.auth.tokens.PasswordResetTokenGenerator.algorithm
@@ -396,7 +394,6 @@ django.contrib.gis.db.models.IntegerField.class_lookups
 django.contrib.gis.db.models.IntegerField.formfield
 django.contrib.gis.db.models.JSONField.class_lookups
 django.contrib.gis.db.models.JSONField.formfield
-django.contrib.gis.db.models.JSONField.from_db_value
 django.contrib.gis.db.models.JSONField.get_transform
 django.contrib.gis.db.models.Lookup.get_prep_lhs
 django.contrib.gis.db.models.Lookup.lookup_name
@@ -458,7 +455,6 @@ django.contrib.gis.db.models.TimeField.formfield
 django.contrib.gis.db.models.URLField.formfield
 django.contrib.gis.db.models.UUIDField.class_lookups
 django.contrib.gis.db.models.UUIDField.formfield
-django.contrib.gis.db.models.UniqueConstraint.__init__
 django.contrib.gis.db.models.UniqueConstraint.contains_expressions
 django.contrib.gis.db.models.UniqueConstraint.validate
 django.contrib.gis.db.models.Value.empty_result_set_value
@@ -708,8 +704,6 @@ django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
 django.contrib.staticfiles.storage
 django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
-django.core.files.File.__next__
-django.core.files.base.File.__next__
 django.core.files.locks.OVERLAPPED
 django.core.files.locks.PVOID
 django.core.files.locks.ULONG_PTR
@@ -760,13 +754,6 @@ django.core.management.utils.run_formatters
 django.core.management.utils.sentinel
 django.core.servers.basehttp.ServerHandler.__init__
 django.core.servers.basehttp.ThreadedWSGIServer.__init__
-django.core.signing.BASE62_ALPHABET
-django.core.signing.Serializer
-django.core.signing.Signer.__init__
-django.core.signing.Signer.signature
-django.core.signing.b62_decode
-django.core.signing.b62_encode
-django.core.signing.loads
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base
 django.db.backends.mysql.features.DatabaseFeatures.can_rename_index
@@ -979,7 +966,6 @@ django.db.models.IntegerField.class_lookups
 django.db.models.IntegerField.formfield
 django.db.models.JSONField.class_lookups
 django.db.models.JSONField.formfield
-django.db.models.JSONField.from_db_value
 django.db.models.JSONField.get_transform
 django.db.models.Lookup.get_prep_lhs
 django.db.models.Lookup.lookup_name
@@ -1040,7 +1026,6 @@ django.db.models.TimeField.formfield
 django.db.models.URLField.formfield
 django.db.models.UUIDField.class_lookups
 django.db.models.UUIDField.formfield
-django.db.models.UniqueConstraint.__init__
 django.db.models.UniqueConstraint.contains_expressions
 django.db.models.UniqueConstraint.validate
 django.db.models.Value.empty_result_set_value
@@ -1073,7 +1058,6 @@ django.db.models.constraints.BaseConstraint.contains_expressions
 django.db.models.constraints.BaseConstraint.get_violation_error_message
 django.db.models.constraints.BaseConstraint.validate
 django.db.models.constraints.CheckConstraint.validate
-django.db.models.constraints.UniqueConstraint.__init__
 django.db.models.constraints.UniqueConstraint.contains_expressions
 django.db.models.constraints.UniqueConstraint.validate
 django.db.models.expressions.BaseExpression.empty_result_set_value
@@ -1196,7 +1180,6 @@ django.db.models.fields.json.HasKeyLookup.as_sql
 django.db.models.fields.json.HasKeyLookup.as_sqlite
 django.db.models.fields.json.JSONField.class_lookups
 django.db.models.fields.json.JSONField.formfield
-django.db.models.fields.json.JSONField.from_db_value
 django.db.models.fields.json.JSONField.get_transform
 django.db.models.fields.json.KeyTextTransform.as_mysql
 django.db.models.fields.json.KeyTransform.as_mysql
@@ -1642,8 +1625,6 @@ django.http.HttpRequest.__init__
 django.http.HttpRequest.get_raw_uri
 django.http.HttpRequest.is_ajax
 django.http.HttpRequest.readlines
-django.http.HttpResponseBase.__iter__
-django.http.HttpResponseBase.getvalue
 django.http.StreamingHttpResponse.content
 django.http.multipartparser.MultiPartParser.IE_sanitize
 django.http.multipartparser.MultiPartParser.boundary_re
@@ -1653,15 +1634,12 @@ django.http.request.HttpRequest.is_ajax
 django.http.request.HttpRequest.readlines
 django.http.request.UploadHandlerList
 django.http.request.parse_accept_header
-django.http.response.HttpResponseBase.__iter__
-django.http.response.HttpResponseBase.getvalue
 django.http.response.StreamingHttpResponse.content
 django.middleware.cache.CacheMiddleware.__init__
 django.middleware.cache.CacheMiddleware.cache
 django.middleware.cache.FetchFromCacheMiddleware.cache
 django.middleware.cache.UpdateCacheMiddleware.cache
 django.middleware.gzip.GZipMiddleware.max_random_bytes
-django.shortcuts.SupportsGetAbsoluteUrl
 django.template.EngineHandler.__init__
 django.template.Library.filter_function
 django.template.Library.simple_tag
@@ -1739,7 +1717,6 @@ django.test.testcases.SimpleTestCase.assertFormSetError
 django.test.testcases.SimpleTestCase.assertTemplateNotUsed
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
-django.test.utils.TimeKeeperProtocol
 django.test.utils.setup_databases
 django.urls.ResolverMatch.__iter__
 django.urls.conf.path

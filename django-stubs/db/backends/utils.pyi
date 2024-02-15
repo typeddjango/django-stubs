@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from decimal import Decimal
 from logging import Logger
 from types import TracebackType
-from typing import Any, Literal, Protocol, overload
+from typing import Any, Literal, Protocol, overload, type_check_only
 from uuid import UUID
 
 from typing_extensions import Self, TypeAlias
@@ -12,6 +12,7 @@ from typing_extensions import Self, TypeAlias
 logger: Logger
 
 # Protocol matching psycopg2.sql.Composable, to avoid depending psycopg2
+@type_check_only
 class _Composable(Protocol):
     def as_string(self, context: Any) -> str: ...
     def __add__(self, other: Self) -> _Composable: ...

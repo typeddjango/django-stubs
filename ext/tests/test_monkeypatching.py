@@ -21,8 +21,7 @@ class _MakeGenericClasses(Protocol):
         django_version: Optional[_VersionSpec] = None,
         extra_classes: Optional[Iterable[type]] = None,
         include_builtins: bool = True,
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 @pytest.fixture(scope="function")

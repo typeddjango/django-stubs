@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, Protocol, TypeVar, overload, type_check_only
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
@@ -37,8 +37,9 @@ class FileDescriptor(DeferredAttribute):
 
 _M = TypeVar("_M", bound=Model, contravariant=True)
 
+@type_check_only
 class _UploadToCallable(Protocol[_M]):
-    def __call__(self, __instance: _M, __filename: str) -> _PathCompatible: ...
+    def __call__(self, instance: _M, filename: str, /) -> _PathCompatible: ...
 
 class FileField(Field):
     storage: Storage

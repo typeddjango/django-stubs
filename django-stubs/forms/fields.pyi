@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -307,6 +307,7 @@ class URLField(CharField):
         localize: bool = ...,
         disabled: bool = ...,
         label_suffix: str | None = ...,
+        assume_scheme: str | None = ...,
     ) -> None: ...
     def to_python(self, value: Any | None) -> str | None: ...
 
@@ -352,8 +353,9 @@ class ChoiceField(Field):
     def validate(self, value: Any) -> None: ...
     def valid_value(self, value: Any) -> bool: ...
 
+@type_check_only
 class _CoerceCallable(Protocol):
-    def __call__(self, __value: Any) -> Any: ...
+    def __call__(self, value: Any, /) -> Any: ...
 
 class TypedChoiceField(ChoiceField):
     coerce: _CoerceCallable

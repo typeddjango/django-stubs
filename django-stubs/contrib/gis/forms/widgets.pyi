@@ -26,6 +26,7 @@ class OpenLayersWidget(BaseGeometryWidget):
     class Media:
         css: Any
         js: Any
+
     def serialize(self, value: Any) -> Any: ...
     def deserialize(self, value: Any) -> Any: ...
 
