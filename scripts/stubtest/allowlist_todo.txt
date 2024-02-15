@@ -754,12 +754,6 @@ django.core.management.utils.run_formatters
 django.core.management.utils.sentinel
 django.core.servers.basehttp.ServerHandler.__init__
 django.core.servers.basehttp.ThreadedWSGIServer.__init__
-django.core.signing.BASE62_ALPHABET
-django.core.signing.Signer.__init__
-django.core.signing.Signer.signature
-django.core.signing.b62_decode
-django.core.signing.b62_encode
-django.core.signing.loads
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base
 django.db.backends.mysql.features.DatabaseFeatures.can_rename_index
