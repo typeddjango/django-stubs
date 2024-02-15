@@ -20,7 +20,7 @@ from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-_Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
+_Fields: TypeAlias = Collection[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
 _Labels: TypeAlias = dict[str, str]
