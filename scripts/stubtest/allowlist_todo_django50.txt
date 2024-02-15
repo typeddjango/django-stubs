@@ -127,7 +127,6 @@ django.core.management.commands.optimizemigration
 django.core.paginator.Paginator.__init__
 django.core.paginator.Paginator.default_error_messages
 django.core.serializers.base.PickleSerializer
-django.core.validators.StepValueValidator.__init__
 django.db.backends.base.base.timezone_constructor
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
