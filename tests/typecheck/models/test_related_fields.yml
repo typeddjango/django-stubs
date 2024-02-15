@@ -123,3 +123,22 @@
                   on_delete=models.CASCADE,
                   related_name="model_2s",
               )
+
+- case: test_processes_other_relations_when_one_field_is_broken
+  main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel().others)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Other]"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class MyModel(models.Model):
+            # Plugin doesn't handle lazy reference without app label
+            broken = models.ManyToManyField("MyModel", related_name="mymodels")  # type: ignore[var-annotated]
+
+        class Other(models.Model):
+            field = models.ForeignKey(MyModel, related_name="others", on_delete=models.CASCADE)
