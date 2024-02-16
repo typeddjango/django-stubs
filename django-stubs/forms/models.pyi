@@ -14,13 +14,13 @@ from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import Widget
-from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
+from django.utils.datastructures import _IndexableCollection, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-_Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
+_Fields: TypeAlias = Collection[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
 _Labels: TypeAlias = dict[str, str]
