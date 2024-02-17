@@ -70,7 +70,6 @@ django.contrib.gis.db.models.ForeignObject.get_joining_fields
 django.contrib.gis.db.models.ForeignObject.get_reverse_joining_fields
 django.contrib.gis.db.models.ForeignObjectRel.get_joining_fields
 django.contrib.gis.db.models.Func.allowed_default
-django.contrib.gis.db.models.GeneratedField
 django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
@@ -181,7 +180,6 @@ django.db.models.ForeignObject.get_joining_fields
 django.db.models.ForeignObject.get_reverse_joining_fields
 django.db.models.ForeignObjectRel.get_joining_fields
 django.db.models.Func.allowed_default
-django.db.models.GeneratedField
 django.db.models.Lookup.allowed_default
 django.db.models.Prefetch.get_current_querysets
 django.db.models.Q.identity
@@ -206,7 +204,6 @@ django.db.models.expressions.When.allowed_default
 django.db.models.fields.Field.__init__
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.generated
-django.db.models.fields.generated
 django.db.models.fields.related.ForeignKey.cast_db_type
 django.db.models.fields.related.ForeignObject.get_joining_fields
 django.db.models.fields.related.ForeignObject.get_reverse_joining_fields
