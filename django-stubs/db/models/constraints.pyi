@@ -15,6 +15,7 @@ class Deferrable(Enum):
 
 class BaseConstraint:
     name: str
+    violation_error_code: str | None
     violation_error_message: _StrOrPromise | None
     default_violation_error_message: _StrOrPromise
     def __init__(self, name: str, violation_error_message: _StrOrPromise | None = ...) -> None: ...
@@ -27,7 +28,12 @@ class BaseConstraint:
 class CheckConstraint(BaseConstraint):
     check: Q | BaseExpression
     def __init__(
-        self, *, check: Q | BaseExpression, name: str, violation_error_message: _StrOrPromise | None = ...
+        self,
+        *,
+        check: Q | BaseExpression,
+        name: str,
+        violation_error_code: str | None = ...,
+        violation_error_message: _StrOrPromise | None = ...,
     ) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
@@ -46,6 +52,7 @@ class UniqueConstraint(BaseConstraint):
         deferrable: Deferrable | None = ...,
         include: Sequence[str] | None = ...,
         opclasses: Sequence[Any] = ...,
+        violation_error_code: str | None = ...,
         violation_error_message: _StrOrPromise | None = ...,
     ) -> None: ...
     @overload
