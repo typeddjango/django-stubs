@@ -77,7 +77,6 @@ django.contrib.gis.db.models.QuerySet.aupdate_or_create
 django.contrib.gis.db.models.QuerySet.update_or_create
 django.contrib.gis.db.models.Value.allowed_default
 django.contrib.gis.db.models.When.allowed_default
-django.contrib.gis.db.models.functions.ClosestPoint
 django.contrib.gis.forms.BaseForm._html_output
 django.contrib.gis.forms.BaseModelFormSet.save_existing
 django.contrib.gis.forms.BoundField.get_context
