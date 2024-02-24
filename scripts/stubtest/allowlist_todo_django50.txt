@@ -7,7 +7,6 @@ django.conf.global_settings.CSRF_COOKIE_MASKED
 django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
 django.conf.global_settings.USE_DEPRECATED_PYTZ
 django.conf.global_settings.USE_L10N
-django.contrib.admin.AdminSite.get_log_entries
 django.contrib.admin.AdminSite.get_model_admin
 django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
 django.contrib.admin.BooleanFieldListFilter.get_facet_counts
@@ -32,7 +31,6 @@ django.contrib.admin.filters.SimpleListFilter.get_facet_counts
 django.contrib.admin.helpers.checkbox
 django.contrib.admin.options.BaseModelAdmin.lookup_allowed
 django.contrib.admin.options.IS_FACETS_VAR
-django.contrib.admin.sites.AdminSite.get_log_entries
 django.contrib.admin.sites.AdminSite.get_model_admin
 django.contrib.admin.utils.build_q_object_from_lookup_parameters
 django.contrib.admin.utils.get_last_value_from_parameters
@@ -43,7 +41,6 @@ django.contrib.auth.hashers.verify_password
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
-django.contrib.gis.admin.AdminSite.get_log_entries
 django.contrib.gis.admin.AdminSite.get_model_admin
 django.contrib.gis.admin.OpenLayersWidget
 django.contrib.gis.admin.options.spherical_mercator_srid
