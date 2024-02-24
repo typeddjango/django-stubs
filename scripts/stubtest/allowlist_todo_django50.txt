@@ -238,10 +238,6 @@ django.db.models.sql.query.Query.build_filtered_relation_q
 django.db.models.sql.query.Query.join
 django.db.models.sql.query.Query.resolve_lookup_value
 django.db.models.sql.query.Query.setup_joins
-django.dispatch.Signal.asend
-django.dispatch.Signal.asend_robust
-django.dispatch.dispatcher.Signal.asend
-django.dispatch.dispatcher.Signal.asend_robust
 django.forms.BaseForm._html_output
 django.forms.BaseModelFormSet.save_existing
 django.forms.BoundField.get_context
