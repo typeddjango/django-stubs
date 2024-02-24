@@ -1,3 +1,4 @@
+import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from typing import Any, Generic, Literal, TypeVar, type_check_only
 
@@ -41,6 +42,11 @@ HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
 
 _Direction: TypeAlias = Literal[1, 2]
+
+class ShowFacets(enum.Enum):
+    NEVER: str
+    ALLOW: str
+    ALWAYS: str
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -150,6 +156,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     save_on_top: bool
     paginator: type
     preserve_filters: bool
+    show_facets: ShowFacets
     inlines: _ListOrTuple[type[InlineModelAdmin]]
     add_form_template: _TemplateForResponseT | None
     change_form_template: _TemplateForResponseT | None

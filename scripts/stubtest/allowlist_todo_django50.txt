@@ -15,7 +15,6 @@ django.contrib.admin.ChoicesFieldListFilter.get_facet_counts
 django.contrib.admin.DateFieldListFilter.get_facet_counts
 django.contrib.admin.EmptyFieldListFilter.get_facet_counts
 django.contrib.admin.EmptyFieldListFilter.get_lookup_condition
-django.contrib.admin.ModelAdmin.show_facets
 django.contrib.admin.RelatedFieldListFilter.get_facet_counts
 django.contrib.admin.ShowFacets
 django.contrib.admin.SimpleListFilter.get_facet_counts
@@ -33,8 +32,6 @@ django.contrib.admin.filters.SimpleListFilter.get_facet_counts
 django.contrib.admin.helpers.checkbox
 django.contrib.admin.options.BaseModelAdmin.lookup_allowed
 django.contrib.admin.options.IS_FACETS_VAR
-django.contrib.admin.options.ModelAdmin.show_facets
-django.contrib.admin.options.ShowFacets
 django.contrib.admin.sites.AdminSite.get_log_entries
 django.contrib.admin.sites.AdminSite.get_model_admin
 django.contrib.admin.utils.build_q_object_from_lookup_parameters
@@ -49,7 +46,6 @@ django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
 django.contrib.gis.admin.AdminSite.get_log_entries
 django.contrib.gis.admin.AdminSite.get_model_admin
-django.contrib.gis.admin.ModelAdmin.show_facets
 django.contrib.gis.admin.OpenLayersWidget
 django.contrib.gis.admin.options.spherical_mercator_srid
 django.contrib.gis.admin.widgets
