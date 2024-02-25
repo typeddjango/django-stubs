@@ -66,7 +66,6 @@ django.contrib.gis.db.models.Q.identity
 django.contrib.gis.db.models.Value.allowed_default
 django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.forms.BaseForm._html_output
-django.contrib.gis.forms.BaseModelFormSet.save_existing
 django.contrib.gis.forms.BoundField.get_context
 django.contrib.gis.forms.BoundField.template_name
 django.contrib.gis.forms.ClearableFileInput.checked
@@ -218,7 +217,6 @@ django.db.models.sql.query.Query.join
 django.db.models.sql.query.Query.resolve_lookup_value
 django.db.models.sql.query.Query.setup_joins
 django.forms.BaseForm._html_output
-django.forms.BaseModelFormSet.save_existing
 django.forms.BoundField.get_context
 django.forms.BoundField.template_name
 django.forms.ClearableFileInput.checked
@@ -229,7 +227,6 @@ django.forms.fields.CallableChoiceIterator
 django.forms.fields.Field.__init__
 django.forms.fields_for_model
 django.forms.forms.BaseForm._html_output
-django.forms.models.BaseModelFormSet.save_existing
 django.forms.models.fields_for_model
 django.forms.renderers.BaseRenderer.field_template_name
 django.forms.renderers.Jinja2DivFormRenderer.__init__
