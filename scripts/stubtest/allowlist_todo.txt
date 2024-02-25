@@ -225,7 +225,6 @@ django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
 django.contrib.gis.admin.GISModelAdmin
-django.contrib.gis.admin.GISModelAdmin.gis_widget
 django.contrib.gis.admin.GeoModelAdmin
 django.contrib.gis.admin.ModelAdmin
 django.contrib.gis.admin.ModelAdmin.log_addition
@@ -237,7 +236,6 @@ django.contrib.gis.admin.TabularInline
 django.contrib.gis.admin.action
 django.contrib.gis.admin.display
 django.contrib.gis.admin.options.GISModelAdmin
-django.contrib.gis.admin.options.GISModelAdmin.gis_widget
 django.contrib.gis.admin.options.GeoModelAdmin
 django.contrib.gis.admin.options.OSMGeoAdmin
 django.contrib.gis.admin.site
