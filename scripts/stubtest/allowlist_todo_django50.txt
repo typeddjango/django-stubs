@@ -28,7 +28,6 @@ django.contrib.admin.filters.EmptyFieldListFilter.get_lookup_condition
 django.contrib.admin.filters.FacetsMixin
 django.contrib.admin.filters.RelatedFieldListFilter.get_facet_counts
 django.contrib.admin.filters.SimpleListFilter.get_facet_counts
-django.contrib.admin.helpers.checkbox
 django.contrib.admin.options.BaseModelAdmin.lookup_allowed
 django.contrib.admin.options.IS_FACETS_VAR
 django.contrib.admin.sites.AdminSite.get_model_admin

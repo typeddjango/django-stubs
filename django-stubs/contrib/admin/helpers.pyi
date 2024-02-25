@@ -19,8 +19,6 @@ class ActionForm(forms.Form):
     action: Any
     select_across: Any
 
-checkbox: Any
-
 @type_check_only
 class _PrepopulatedDict(TypedDict):
     field: BoundField
