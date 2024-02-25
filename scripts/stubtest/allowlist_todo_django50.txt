@@ -26,13 +26,11 @@ django.contrib.admin.filters.EmptyFieldListFilter.get_lookup_condition
 django.contrib.admin.filters.FacetsMixin
 django.contrib.admin.filters.RelatedFieldListFilter.get_facet_counts
 django.contrib.admin.filters.SimpleListFilter.get_facet_counts
-django.contrib.admin.options.BaseModelAdmin.lookup_allowed
 django.contrib.admin.options.IS_FACETS_VAR
 django.contrib.admin.sites.AdminSite.get_model_admin
 django.contrib.admin.utils.build_q_object_from_lookup_parameters
 django.contrib.admin.utils.get_last_value_from_parameters
 django.contrib.admin.views.main.ChangeList.get_queryset
-django.contrib.auth.admin.UserAdmin.lookup_allowed
 django.contrib.auth.hashers.CryptPasswordHasher
 django.contrib.auth.hashers.verify_password
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
