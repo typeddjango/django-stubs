@@ -26,7 +26,6 @@ dependencies = [
     "tomli; python_version < '3.11'",
     # Types:
     "typing-extensions",
-    "types-pytz",
     "types-PyYAML",
 ]
 

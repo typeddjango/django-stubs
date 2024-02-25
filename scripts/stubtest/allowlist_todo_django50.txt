@@ -5,7 +5,6 @@
 django.conf.FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG
 django.conf.global_settings.CSRF_COOKIE_MASKED
 django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
-django.conf.global_settings.USE_DEPRECATED_PYTZ
 django.contrib.admin.AdminSite.get_model_admin
 django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
 django.contrib.admin.BooleanFieldListFilter.get_facet_counts
@@ -44,7 +43,6 @@ django.contrib.gis.admin.OpenLayersWidget
 django.contrib.gis.admin.options.spherical_mercator_srid
 django.contrib.gis.admin.widgets
 django.contrib.gis.db.backends.spatialite.schema.SpatialiteSchemaEditor.alter_db_table
-django.contrib.gis.db.models.BaseConstraint.__init__
 django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
@@ -108,7 +106,6 @@ django.core.handlers.asgi.get_script_prefix
 django.core.management.commands.inspectdb.Command.normalize_table_name
 django.core.management.commands.optimizemigration
 django.core.serializers.base.PickleSerializer
-django.db.backends.base.base.timezone_constructor
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
 django.db.backends.base.features.BaseDatabaseFeatures.supports_default_keyword_in_bulk_insert
@@ -148,7 +145,6 @@ django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
 django.db.backends.utils.CursorWrapper.APPS_NOT_READY_WARNING_MSG
 django.db.migrations.serializer.BaseUnorderedSequenceSerializer
-django.db.models.BaseConstraint.__init__
 django.db.models.Case.allowed_default
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.F.allowed_default
@@ -167,7 +163,6 @@ django.db.models.Prefetch.get_current_querysets
 django.db.models.Q.identity
 django.db.models.Value.allowed_default
 django.db.models.When.allowed_default
-django.db.models.constraints.BaseConstraint.__init__
 django.db.models.expressions.BaseExpression.allowed_default
 django.db.models.expressions.Case.allowed_default
 django.db.models.expressions.CombinedExpression.allowed_default
