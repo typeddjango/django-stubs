@@ -394,7 +394,6 @@
         import django.utils.archive
         import django.utils.asyncio
         import django.utils.autoreload
-        import django.utils.baseconv
         import django.utils.cache
         import django.utils.connection
         import django.utils.crypto
@@ -402,7 +401,6 @@
         import django.utils.dateformat
         import django.utils.dateparse
         import django.utils.dates
-        import django.utils.datetime_safe
         import django.utils.deconstruct
         import django.utils.decorators
         import django.utils.deprecation
