@@ -1669,7 +1669,6 @@ django.templatetags.static.StaticNode.__init__
 django.test.SimpleTestCase.assertFormError
 django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
-django.test.runner.DiscoverRunner.build_suite
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by
 django.test.runner.DummyList
