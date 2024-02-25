@@ -2,13 +2,19 @@ from typing import Any
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.forms import BaseGeometryWidget
+from django.db.models import Field
+from django.forms.fields import Field as FormField
 from django.forms.widgets import Media
+from django.http import HttpRequest
 
 spherical_mercator_srid: int
 
-class GISModelAdmin(ModelAdmin):
+class GeoModelAdminMixin:
     gis_widget: BaseGeometryWidget
     gis_widget_kwargs: dict[str, Any]
+    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField: ...
+
+class GISModelAdmin(GeoModelAdminMixin, ModelAdmin): ...
 
 class GeoModelAdmin(ModelAdmin):
     default_lon: int

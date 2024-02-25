@@ -239,7 +239,6 @@ django.contrib.gis.admin.display
 django.contrib.gis.admin.options.GISModelAdmin
 django.contrib.gis.admin.options.GISModelAdmin.gis_widget
 django.contrib.gis.admin.options.GeoModelAdmin
-django.contrib.gis.admin.options.GeoModelAdminMixin
 django.contrib.gis.admin.options.OSMGeoAdmin
 django.contrib.gis.admin.site
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.can_alter_geometry_field
