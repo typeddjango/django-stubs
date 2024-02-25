@@ -5,7 +5,6 @@
 django.conf.FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG
 django.conf.global_settings.CSRF_COOKIE_MASKED
 django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
-django.conf.global_settings.USE_DEPRECATED_PYTZ
 django.conf.global_settings.USE_L10N
 django.contrib.admin.AdminSite.get_model_admin
 django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
@@ -109,7 +108,6 @@ django.core.handlers.asgi.get_script_prefix
 django.core.management.commands.inspectdb.Command.normalize_table_name
 django.core.management.commands.optimizemigration
 django.core.serializers.base.PickleSerializer
-django.db.backends.base.base.timezone_constructor
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
 django.db.backends.base.features.BaseDatabaseFeatures.supports_default_keyword_in_bulk_insert
