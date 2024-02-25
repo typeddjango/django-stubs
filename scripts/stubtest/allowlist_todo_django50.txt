@@ -252,7 +252,6 @@ django.test.client.AsyncClient.post
 django.test.client.AsyncClient.put
 django.test.client.AsyncClient.trace
 django.test.runner.DiscoverRunner.__init__
-django.test.runner.DiscoverRunner.run_tests
 django.test.runner.RemoteTestResult.addDuration
 django.utils.baseconv
 django.utils.choices
