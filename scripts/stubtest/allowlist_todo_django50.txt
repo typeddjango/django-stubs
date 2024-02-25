@@ -5,7 +5,6 @@
 django.conf.FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG
 django.conf.global_settings.CSRF_COOKIE_MASKED
 django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
-django.conf.global_settings.USE_L10N
 django.contrib.admin.AdminSite.get_model_admin
 django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
 django.contrib.admin.BooleanFieldListFilter.get_facet_counts
