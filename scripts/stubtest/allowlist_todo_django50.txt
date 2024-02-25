@@ -46,7 +46,6 @@ django.contrib.gis.admin.OpenLayersWidget
 django.contrib.gis.admin.options.spherical_mercator_srid
 django.contrib.gis.admin.widgets
 django.contrib.gis.db.backends.spatialite.schema.SpatialiteSchemaEditor.alter_db_table
-django.contrib.gis.db.models.BaseConstraint.__init__
 django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
@@ -150,7 +149,6 @@ django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
 django.db.backends.utils.CursorWrapper.APPS_NOT_READY_WARNING_MSG
 django.db.migrations.serializer.BaseUnorderedSequenceSerializer
-django.db.models.BaseConstraint.__init__
 django.db.models.Case.allowed_default
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.F.allowed_default
@@ -169,7 +167,6 @@ django.db.models.Prefetch.get_current_querysets
 django.db.models.Q.identity
 django.db.models.Value.allowed_default
 django.db.models.When.allowed_default
-django.db.models.constraints.BaseConstraint.__init__
 django.db.models.expressions.BaseExpression.allowed_default
 django.db.models.expressions.Case.allowed_default
 django.db.models.expressions.CombinedExpression.allowed_default
