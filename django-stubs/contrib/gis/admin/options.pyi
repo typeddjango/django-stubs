@@ -10,7 +10,7 @@ from django.http import HttpRequest
 spherical_mercator_srid: int
 
 class GeoModelAdminMixin:
-    gis_widget: ClassVar[type[OSMWidget]]
+    gis_widget: type[OSMWidget]
     gis_widget_kwargs: ClassVar[dict[str, Any]]
     def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField: ...
 
