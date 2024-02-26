@@ -395,5 +395,5 @@ django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
 
-# Potential mypy bug with metaclass
+# Potential stubtest bug with metaclass
 django.contrib.gis.admin.options.GeoModelAdminMixin.gis_widget
