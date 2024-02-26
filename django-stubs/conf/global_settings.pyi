@@ -40,7 +40,6 @@ TIME_ZONE: str
 
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ: bool
-USE_DEPRECATED_PYTZ: bool
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -65,10 +64,6 @@ LANGUAGE_COOKIE_PATH: str
 LANGUAGE_COOKIE_HTTPONLY: bool
 LANGUAGE_COOKIE_SAMESITE: Literal["Lax", "Strict", "None", False] | None
 LANGUAGE_COOKIE_SECURE: bool
-
-# If you set this to True, Django will format dates, numbers and calendars
-# according to user current locale.
-USE_L10N: bool
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.

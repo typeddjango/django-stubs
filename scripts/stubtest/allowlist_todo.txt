@@ -225,19 +225,15 @@ django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
 django.contrib.gis.admin.GISModelAdmin
-django.contrib.gis.admin.GeoModelAdmin
 django.contrib.gis.admin.ModelAdmin
 django.contrib.gis.admin.ModelAdmin.log_addition
 django.contrib.gis.admin.ModelAdmin.log_change
 django.contrib.gis.admin.ModelAdmin.log_deletion
-django.contrib.gis.admin.OSMGeoAdmin
 django.contrib.gis.admin.StackedInline
 django.contrib.gis.admin.TabularInline
 django.contrib.gis.admin.action
 django.contrib.gis.admin.display
 django.contrib.gis.admin.options.GISModelAdmin
-django.contrib.gis.admin.options.GeoModelAdmin
-django.contrib.gis.admin.options.OSMGeoAdmin
 django.contrib.gis.admin.site
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.can_alter_geometry_field
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.empty_intersection_returns_none
@@ -1670,7 +1666,6 @@ django.templatetags.static.StaticNode.__init__
 django.test.SimpleTestCase.assertFormError
 django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
-django.test.runner.DiscoverRunner.build_suite
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by
 django.test.runner.DummyList
