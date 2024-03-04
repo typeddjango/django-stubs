@@ -1,6 +1,6 @@
 from collections import namedtuple
 from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, TypeVar
+from typing import Any, ClassVar, Literal, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
@@ -49,7 +49,7 @@ class DeferredAttribute:
 _R = TypeVar("_R", bound=type)
 
 class RegisterLookupMixin:
-    class_lookups: list[dict[Any, Any]]
+    class_lookups: ClassVar[dict[str, Any]]
     lookup_name: str
     @classmethod
     def get_lookups(cls) -> dict[str, Any]: ...
