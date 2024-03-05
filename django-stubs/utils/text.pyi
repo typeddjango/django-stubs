@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable, Iterator
 from io import BytesIO
-from re import Pattern
+from re import Pattern, Match
 from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
@@ -16,7 +16,7 @@ re_prt: Pattern[str]
 
 class WordsRegex:
     @staticmethod
-    def search(text: str, pos: int) -> re.Match | FakeMatch: ...
+    def search(text: str, pos: int) -> Match | FakeMatch: ...
 
 class FakeMatch:
     def __init__(self, text: str, end: int) -> None: ...
