@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable, Iterator
 from io import BytesIO
-from re import Pattern
+from re import Match, Pattern
 from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
@@ -11,7 +11,19 @@ _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | Non
 
 def capfirst(x: _StrOrPromiseOrNoneT) -> _StrOrPromiseOrNoneT: ...
 
-re_words: Pattern[str]
+re_notag: Pattern[str]
+re_prt: Pattern[str]
+
+class WordsRegex:
+    @staticmethod
+    def search(text: str, pos: int) -> Match | FakeMatch: ...
+
+class FakeMatch:
+    def __init__(self, text: str, end: int) -> None: ...
+    def __getitem__(self, group: int) -> str | None: ...
+    def end(self, group: int = 0) -> int: ...
+
+re_words: type[WordsRegex]
 re_chars: Pattern[str]
 re_tag: Pattern[str]
 re_newlines: Pattern[str]
