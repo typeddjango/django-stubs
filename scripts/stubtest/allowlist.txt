@@ -142,15 +142,6 @@ django.core.management.color.Style.SQL_TABLE
 django.core.management.color.Style.SUCCESS
 django.core.management.color.Style.WARNING
 
-# `error: <...> is not present at runtime`
-# This happens often for variables removed in later django version.
-# We still keep them in stubs to be a bit more backward compatible.
-# RemovedInDjango40:
-django.middleware.csrf.REASON_BAD_TOKEN
-
-# RemovedInDjango41
-django.core.cache.backends.memcached.MemcachedCache
-
 # We re-export `functools.cached_property` which has different semantics
 django.utils.functional.cached_property.__class_getitem__
 django.utils.functional.cached_property.__set__
