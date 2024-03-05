@@ -83,7 +83,8 @@ django.utils.http.ASCTIME_DATE
 django.utils.http.ETAG_MATCH
 django.utils.http.RFC1123_DATE
 django.utils.http.RFC850_DATE
-django.utils.text.re_words
+django.utils.text.re_notag
+django.utils.text.re_prt
 django.utils.text.re_chars
 django.utils.text.re_tag
 django.utils.text.re_newlines
