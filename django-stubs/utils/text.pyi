@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable, Iterator
 from io import BytesIO
-from re import Pattern, Match
+from re import Pattern
 from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
