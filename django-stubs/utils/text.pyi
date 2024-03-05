@@ -23,7 +23,7 @@ class FakeMatch:
     def __getitem__(self, group: int) -> str | None: ...
     def end(self, group: int = 0) -> int: ...
 
-re_words: WordsRegex
+re_words: type[WordsRegex]
 re_chars: Pattern[str]
 re_tag: Pattern[str]
 re_newlines: Pattern[str]
