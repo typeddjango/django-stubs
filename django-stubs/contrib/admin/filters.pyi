@@ -4,10 +4,12 @@ from typing import Any, ClassVar
 
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
+from django.db.models.aggregates import Count
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
+from django.db.models.query_utils import Q
 from django.http.request import HttpRequest
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
@@ -32,13 +34,17 @@ class ListFilter:
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet | None: ...
     def expected_parameters(self) -> list[str | None]: ...
 
-class SimpleListFilter(ListFilter):
+class FacetsMixin:
+    def get_facet_counts(self, pk_attname: str, filtered_qs: QuerySet[Model]) -> dict[str, Count]: ...
+    def get_facet_queryset(self, changelist: ChangeList) -> dict[str, int]: ...
+
+class SimpleListFilter(FacetsMixin, ListFilter):
     parameter_name: str | None
     lookup_choices: list[tuple[str, _StrOrPromise]]
     def value(self) -> str | None: ...
     def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[str, _StrOrPromise]] | None: ...
 
-class FieldListFilter(ListFilter):
+class FieldListFilter(FacetsMixin, ListFilter):
     list_separator: ClassVar[str]
     field: Field
     field_path: str
@@ -117,3 +123,4 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter): ...
 class EmptyFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_val: str | None
+    def get_lookup_condition(self) -> Q: ...

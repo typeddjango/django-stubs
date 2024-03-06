@@ -15,6 +15,7 @@ from .filters import SimpleListFilter as SimpleListFilter
 from .options import HORIZONTAL as HORIZONTAL
 from .options import VERTICAL as VERTICAL
 from .options import ModelAdmin as ModelAdmin
+from .options import ShowFacets as ShowFacets
 from .options import StackedInline as StackedInline
 from .options import TabularInline as TabularInline
 from .sites import AdminSite as AdminSite
