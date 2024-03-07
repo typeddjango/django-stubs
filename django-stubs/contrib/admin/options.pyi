@@ -99,7 +99,6 @@ class BaseModelAdmin(Generic[_ModelT]):
     readonly_fields: _ListOrTuple[str]
     ordering: _ListOrTuple[str] | None
     sortable_by: _ListOrTuple[str] | None
-    view_on_site: bool | Callable[[_ModelT], str]
     show_full_result_count: bool
     checks_class: Any
     model: type[_ModelT]
@@ -136,6 +135,8 @@ class BaseModelAdmin(Generic[_ModelT]):
     def has_view_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_view_or_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_module_permission(self, request: HttpRequest) -> bool: ...
+    @property
+    def view_on_site(self) -> Callable[[_ModelT], str] | bool: ...
 
 _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
 _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], HttpResponseBase | None]
