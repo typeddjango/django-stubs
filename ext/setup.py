@@ -23,7 +23,6 @@ setup(
     license_files=["LICENSE.md"],
     url="https://github.com/typeddjango/django-stubs",
     author="Simula Proxy",
-    author_email="3nki.nam.shub@gmail.com",
     maintainer="Marti Raudsepp",
     maintainer_email="marti@juffo.org",
     py_modules=[],
@@ -47,6 +46,7 @@ setup(
         "Framework :: Django :: 5.0",
     ],
     project_urls={
+        "Funding": "https://github.com/sponsors/typeddjango",
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",
     },
 )
