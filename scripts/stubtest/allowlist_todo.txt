@@ -1675,3 +1675,4 @@ django.urls.resolvers.ResolverMatch.__iter__
 django.db.models.expressions.rhs
 django.db.models.expressions.result
 django.db.models.expressions.lhs
+django.db.backends.postgresql.base.Cursor
