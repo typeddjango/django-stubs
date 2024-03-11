@@ -1,7 +1,4 @@
 from collections.abc import Sequence
-from email import charset as Charset
-from email.header import Header
-from email._policybase import Policy
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
