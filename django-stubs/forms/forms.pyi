@@ -13,9 +13,6 @@ from django.utils.safestring import SafeString
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
 class BaseForm(RenderableFormMixin):
-    class Meta:
-        fields: Sequence[str]
-
     default_renderer: BaseRenderer | type[BaseRenderer] | None
     field_order: Iterable[str] | None
     use_required_attribute: bool
