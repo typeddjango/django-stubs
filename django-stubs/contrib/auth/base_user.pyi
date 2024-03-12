@@ -5,7 +5,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import BooleanField
 
-from django_stubs_ext.db.models import ModelWithMeta as _ModelWithMeta
+from django_stubs_ext.db.models import ModelMeta as _ModelMeta
 
 _T = TypeVar("_T", bound=Model)
 
@@ -15,15 +15,14 @@ class BaseUserManager(models.Manager[_T]):
     def make_random_password(self, length: int = ..., allowed_chars: str = ...) -> str: ...
     def get_by_natural_key(self, username: str | None) -> _T: ...
 
-class AbstractBaseUser(_ModelWithMeta, models.Model):
+class AbstractBaseUser(models.Model):
     REQUIRED_FIELDS: ClassVar[list[str]]
 
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_active: bool | BooleanField[bool | Combinable, bool]
 
-    class Meta:
-        abstract: Literal[True]
+    Meta: ClassVar[type[_ModelMeta]]
 
     def get_username(self) -> str: ...
     def natural_key(self) -> tuple[str]: ...

@@ -5,25 +5,21 @@ from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db.models.manager import Manager
 from typing_extensions import Self
 
-from django_stubs_ext.db.models import ModelWithMeta as _ModelWithMeta
+from django_stubs_ext.db.models import ModelMeta as _ModelMeta
 
-class OracleGeometryColumns(_ModelWithMeta, models.Model):
+class OracleGeometryColumns(models.Model):
     table_name: Any
     column_name: Any
     srid: Any
     objects: ClassVar[Manager[Self]]
-
-    class Meta:
-        app_label: str
-        db_table: str
-        managed: bool
+    Meta: ClassVar[type[_ModelMeta]]
 
     @classmethod
     def table_name_col(cls) -> Any: ...
     @classmethod
     def geom_col_name(cls) -> Any: ...
 
-class OracleSpatialRefSys(_ModelWithMeta, models.Model, SpatialRefSysMixin):
+class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     cs_name: Any
     srid: Any
     auth_srid: Any
@@ -31,11 +27,7 @@ class OracleSpatialRefSys(_ModelWithMeta, models.Model, SpatialRefSysMixin):
     wktext: Any
     cs_bounds: Any
     objects: ClassVar[Manager[Self]]
-
-    class Meta:
-        app_label: str
-        db_table: str
-        managed: bool
+    Meta: ClassVar[type[_ModelMeta]]
 
     @property
     def wkt(self) -> Any: ...

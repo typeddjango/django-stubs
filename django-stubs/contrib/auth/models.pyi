@@ -12,7 +12,7 @@ from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeAlias
 
-from django_stubs_ext.db.models import ModelWithMeta as _ModelWithMeta
+from django_stubs_ext.db.models import ModelMeta as _ModelMeta
 
 _AnyUser: TypeAlias = Model | AnonymousUser
 
@@ -58,13 +58,12 @@ class UserManager(BaseUserManager[_T]):
         obj: Model | None = ...,
     ) -> QuerySet[_T]: ...
 
-class PermissionsMixin(_ModelWithMeta, models.Model):
+class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
 
-    class Meta:
-        abstract: Literal[True]
+    Meta: ClassVar[type[_ModelMeta]]
 
     def get_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
@@ -73,7 +72,7 @@ class PermissionsMixin(_ModelWithMeta, models.Model):
     def has_perms(self, perm_list: Iterable[str], obj: _AnyUser | None = ...) -> bool: ...
     def has_module_perms(self, app_label: str) -> bool: ...
 
-class AbstractUser(_ModelWithMeta, AbstractBaseUser, PermissionsMixin):
+class AbstractUser(AbstractBaseUser, PermissionsMixin):
     username_validator: UnicodeUsernameValidator
 
     username = models.CharField(max_length=150)
@@ -89,8 +88,7 @@ class AbstractUser(_ModelWithMeta, AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD: str
     USERNAME_FIELD: str
 
-    class Meta:
-        abstract: Literal[True]
+    Meta: ClassVar[type[_ModelMeta]]
 
     def get_full_name(self) -> str: ...
     def get_short_name(self) -> str: ...
