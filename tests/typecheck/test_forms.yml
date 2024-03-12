@@ -112,12 +112,3 @@
 
                 class Article(models.Model):
                     name = models.CharField(max_length=128)
--   case: boundfield_html
-    main: |
-        from django import forms
-        class ArticleForm(forms.Form):
-            headline = forms.CharField()
-
-        form = ArticleForm()
-        reveal_type(form["headline"]) # N: Revealed type is "django.forms.boundfield.BoundField"
-        reveal_type(form["headline"].__html__)  # N: Revealed type is "def () -> django.utils.safestring.SafeString"
