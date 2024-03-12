@@ -5,7 +5,9 @@ from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db.models.manager import Manager
 from typing_extensions import Self
 
-class OracleGeometryColumns(models.Model):
+from django_stubs_ext.db.models import ModelWithMeta as _ModelWithMeta
+
+class OracleGeometryColumns(_ModelWithMeta, models.Model):
     table_name: Any
     column_name: Any
     srid: Any
@@ -21,7 +23,7 @@ class OracleGeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls) -> Any: ...
 
-class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
+class OracleSpatialRefSys(_ModelWithMeta, models.Model, SpatialRefSysMixin):
     cs_name: Any
     srid: Any
     auth_srid: Any

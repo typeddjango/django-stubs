@@ -4,7 +4,9 @@ from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
 from typing_extensions import Self
 
-class PostGISGeometryColumns(models.Model):
+from django_stubs_ext.db.models import ModelWithMeta as _ModelWithMeta
+
+class PostGISGeometryColumns(_ModelWithMeta, models.Model):
     f_table_catalog: Any
     f_table_schema: Any
     f_table_name: Any
@@ -24,7 +26,7 @@ class PostGISGeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls) -> Any: ...
 
-class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
+class PostGISSpatialRefSys(_ModelWithMeta, models.Model, SpatialRefSysMixin):
     srid: Any
     auth_name: Any
     auth_srid: Any

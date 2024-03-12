@@ -12,6 +12,8 @@ from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeAlias
 
+from django_stubs_ext.db.models import ModelWithMeta as _ModelWithMeta
+
 _AnyUser: TypeAlias = Model | AnonymousUser
 
 def update_last_login(sender: type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
@@ -56,7 +58,7 @@ class UserManager(BaseUserManager[_T]):
         obj: Model | None = ...,
     ) -> QuerySet[_T]: ...
 
-class PermissionsMixin(models.Model):
+class PermissionsMixin(_ModelWithMeta, models.Model):
     is_superuser = models.BooleanField()
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
@@ -71,7 +73,7 @@ class PermissionsMixin(models.Model):
     def has_perms(self, perm_list: Iterable[str], obj: _AnyUser | None = ...) -> bool: ...
     def has_module_perms(self, app_label: str) -> bool: ...
 
-class AbstractUser(AbstractBaseUser, PermissionsMixin):
+class AbstractUser(_ModelWithMeta, AbstractBaseUser, PermissionsMixin):
     username_validator: UnicodeUsernameValidator
 
     username = models.CharField(max_length=150)
