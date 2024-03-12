@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Protocol, Sequence, Tuple, Type, TypeVar, Union
+from typing import TYPE_CHECKING, ClassVar, Literal, Protocol, Sequence, Tuple, Union
 
 from django.db.models import BaseConstraint, Index, OrderBy
 from typing_extensions import TypeAlias
@@ -168,13 +168,3 @@ ModelMeta: TypeAlias = Union[
     _MetaVerboseName,
     _MetaVerboseNamePlural,
 ]
-
-
-_Meta = TypeVar("_Meta", bound=ModelMeta)
-
-
-class _ModelWithMeta(Protocol[_Meta]):
-    Meta: Type[_Meta]
-
-
-ModelWithMeta: TypeAlias = _ModelWithMeta[Any]
