@@ -254,12 +254,3 @@ django.utils.text.add_truncation_text
 django.utils.timezone.make_aware
 django.utils.timezone.utc
 django.utils.topological_sort
-django.views.csrf.CSRF_FAILURE_TEMPLATE
-django.views.csrf.builtin_template_path
-django.views.decorators.debug.coroutine_functions_to_sensitive_variables
-django.views.generic.edit.BaseDeleteView.__init__
-django.views.generic.edit.DeleteViewCustomDeleteWarning
-django.views.i18n.builtin_template_path
-django.views.i18n.js_catalog_template
-django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE
-django.views.static.builtin_template_path
