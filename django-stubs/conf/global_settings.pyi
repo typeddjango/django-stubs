@@ -119,6 +119,11 @@ TEMPLATES: list[dict[str, Any]]
 # Default form rendering class.
 FORM_RENDERER: str
 
+# RemovedInDjango60Warning: It's a transitional setting helpful in early
+# adoption of "https" as the new default value of forms.URLField.assume_scheme.
+# Set to True to assume "https" during the Django 5.x release cycle.
+FORMS_URLFIELD_ASSUME_HTTPS: bool
+
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL: str
@@ -428,10 +433,6 @@ CSRF_COOKIE_SAMESITE: Literal["Lax", "Strict", "None", False]
 CSRF_HEADER_NAME: str
 CSRF_TRUSTED_ORIGINS: list[str]
 CSRF_USE_SESSIONS: bool
-
-# Whether to mask CSRF cookie value. It's a transitional setting helpful in
-# migrating multiple instance of the same project to Django 4.1+.
-CSRF_COOKIE_MASKED: bool
 
 ############
 # MESSAGES #
