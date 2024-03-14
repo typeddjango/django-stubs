@@ -26,12 +26,11 @@ class SimpleListFilter(ListFilter):
     lookup_choices: Any
     def value(self) -> str | None: ...
     def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[Any, str]] | None: ...
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class FieldListFilter(ListFilter):
     field: Field
     field_path: str
-    title: str
+    title: _StrOrPromise
     def __init__(
         self,
         field: Field,
@@ -55,37 +54,30 @@ class FieldListFilter(ListFilter):
     ) -> FieldListFilter: ...
 
 class RelatedFieldListFilter(FieldListFilter):
-    used_parameters: dict[Any, Any]
     lookup_kwarg: str
     lookup_kwarg_isnull: str
     lookup_val: Any
     lookup_val_isnull: Any
     lookup_choices: Any
     lookup_title: str
-    title: str
     empty_value_display: Any
     @property
     def include_empty_choice(self) -> bool: ...
     def field_choices(
         self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
     ) -> list[tuple[str, str]]: ...
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class BooleanFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_kwarg2: str
     lookup_val: Any
     lookup_val2: Any
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class ChoicesFieldListFilter(FieldListFilter):
-    title: str
-    used_parameters: dict[Any, Any]
     lookup_kwarg: str
     lookup_kwarg_isnull: str
     lookup_val: Any
     lookup_val_isnull: Any
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class DateFieldListFilter(FieldListFilter):
     field_generic: Any
@@ -94,28 +86,17 @@ class DateFieldListFilter(FieldListFilter):
     lookup_kwarg_until: Any
     links: Any
     lookup_kwarg_isnull: Any
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
 class AllValuesFieldListFilter(FieldListFilter):
-    title: str
-    used_parameters: dict[Any, Any]
     lookup_kwarg: str
     lookup_kwarg_isnull: str
     lookup_val: Any
     lookup_val_isnull: Any
     empty_value_display: str
     lookup_choices: QuerySet
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
 
-class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
-    lookup_kwarg: str
-    lookup_kwarg_isnull: str
-    lookup_val: Any
-    lookup_val_isnull: Any
-    title: str
-    used_parameters: dict[Any, Any]
+class RelatedOnlyFieldListFilter(RelatedFieldListFilter): ...
 
 class EmptyFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_val: Any
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
