@@ -10,13 +10,11 @@ django.conf.STATICFILES_STORAGE_DEPRECATED_MSG
 django.conf.global_settings.gettext_noop
 django.conf.urls.IncludedURLConf
 django.conf.urls.url
-django.contrib.admin.FieldListFilter.list_separator
 django.contrib.admin.FieldListFilter.title
 django.contrib.admin.ModelAdmin
 django.contrib.admin.ModelAdmin.log_addition
 django.contrib.admin.ModelAdmin.log_change
 django.contrib.admin.ModelAdmin.log_deletion
-django.contrib.admin.RelatedFieldListFilter.field_admin_ordering
 django.contrib.admin.StackedInline
 django.contrib.admin.TabularInline
 django.contrib.admin.action
@@ -24,9 +22,7 @@ django.contrib.admin.apps.AdminConfig.default
 django.contrib.admin.decorators.action
 django.contrib.admin.decorators.display
 django.contrib.admin.display
-django.contrib.admin.filters.FieldListFilter.list_separator
 django.contrib.admin.filters.FieldListFilter.title
-django.contrib.admin.filters.RelatedFieldListFilter.field_admin_ordering
 django.contrib.admin.forms.AdminAuthenticationForm
 django.contrib.admin.forms.AdminPasswordChangeForm
 django.contrib.admin.helpers.ActionForm

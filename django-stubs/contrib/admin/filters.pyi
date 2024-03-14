@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator
-from typing import Any
+from typing import Any, ClassVar
 
 from django.contrib.admin.options import ModelAdmin
 from django.db.models.base import Model
@@ -7,6 +7,7 @@ from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
+from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 
 class ListFilter:
@@ -28,6 +29,7 @@ class SimpleListFilter(ListFilter):
     def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[Any, str]] | None: ...
 
 class FieldListFilter(ListFilter):
+    list_separator: ClassVar[str]
     field: Field
     field_path: str
     title: _StrOrPromise
@@ -63,6 +65,9 @@ class RelatedFieldListFilter(FieldListFilter):
     empty_value_display: Any
     @property
     def include_empty_choice(self) -> bool: ...
+    def field_admin_ordering(
+        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
+    ) -> _ListOrTuple[str]: ...
     def field_choices(
         self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
     ) -> list[tuple[str, str]]: ...
