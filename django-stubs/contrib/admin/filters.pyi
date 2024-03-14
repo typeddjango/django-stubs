@@ -1,7 +1,9 @@
 from collections.abc import Callable, Iterable, Iterator
+from datetime import date, datetime
 from typing import Any, ClassVar
 
 from django.contrib.admin.options import ModelAdmin
+from django.contrib.admin.views.main import ChangeList
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -9,24 +11,32 @@ from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
+from django.utils.safestring import SafeString
+from typing_extensions import TypedDict
+
+class _ListFilterChoices(TypedDict):
+    selected: bool
+    query_string: str
+    display: _StrOrPromise
 
 class ListFilter:
     title: _StrOrPromise | None
     template: str
-    used_parameters: Any
+    request: HttpRequest
+    used_parameters: dict[str, bool | datetime | str]
     def __init__(
         self, request: HttpRequest, params: dict[str, str], model: type[Model], model_admin: ModelAdmin
     ) -> None: ...
     def has_output(self) -> bool: ...
-    def choices(self, changelist: Any) -> Iterator[dict[str, Any]]: ...
+    def choices(self, changelist: ChangeList) -> Iterator[_ListFilterChoices]: ...
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet | None: ...
     def expected_parameters(self) -> list[str | None]: ...
 
 class SimpleListFilter(ListFilter):
     parameter_name: str | None
-    lookup_choices: Any
+    lookup_choices: list[tuple[str, _StrOrPromise]]
     def value(self) -> str | None: ...
-    def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[Any, str]] | None: ...
+    def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[str, _StrOrPromise]] | None: ...
 
 class FieldListFilter(ListFilter):
     list_separator: ClassVar[str]
@@ -43,7 +53,9 @@ class FieldListFilter(ListFilter):
         field_path: str,
     ) -> None: ...
     @classmethod
-    def register(cls, test: Callable, list_filter_class: type[FieldListFilter], take_priority: bool = ...) -> None: ...
+    def register(
+        cls, test: Callable[[Field], Any], list_filter_class: type[FieldListFilter], take_priority: bool = ...
+    ) -> None: ...
     @classmethod
     def create(
         cls,
@@ -58,11 +70,11 @@ class FieldListFilter(ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_kwarg_isnull: str
-    lookup_val: Any
-    lookup_val_isnull: Any
-    lookup_choices: Any
-    lookup_title: str
-    empty_value_display: Any
+    lookup_val: str | None
+    lookup_val_isnull: str | None
+    lookup_choices: list[tuple[str, _StrOrPromise]]
+    lookup_title: _StrOrPromise
+    empty_value_display: SafeString
     @property
     def include_empty_choice(self) -> bool: ...
     def field_admin_ordering(
@@ -70,38 +82,38 @@ class RelatedFieldListFilter(FieldListFilter):
     ) -> _ListOrTuple[str]: ...
     def field_choices(
         self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin
-    ) -> list[tuple[str, str]]: ...
+    ) -> list[tuple[str, _StrOrPromise]]: ...
 
 class BooleanFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_kwarg2: str
-    lookup_val: Any
-    lookup_val2: Any
+    lookup_val: str | None
+    lookup_val2: str | None
 
 class ChoicesFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_kwarg_isnull: str
-    lookup_val: Any
-    lookup_val_isnull: Any
+    lookup_val: str | None
+    lookup_val_isnull: str | None
 
 class DateFieldListFilter(FieldListFilter):
-    field_generic: Any
-    date_params: Any
-    lookup_kwarg_since: Any
-    lookup_kwarg_until: Any
-    links: Any
-    lookup_kwarg_isnull: Any
+    field_generic: str
+    date_params: dict[str, str]
+    lookup_kwarg_since: str
+    lookup_kwarg_until: str
+    links: tuple[tuple[_StrOrPromise, dict[str, bool | date | datetime]], ...]
+    lookup_kwarg_isnull: str
 
 class AllValuesFieldListFilter(FieldListFilter):
     lookup_kwarg: str
     lookup_kwarg_isnull: str
-    lookup_val: Any
-    lookup_val_isnull: Any
-    empty_value_display: str
+    lookup_val: str | None
+    lookup_val_isnull: str | None
+    empty_value_display: SafeString
     lookup_choices: QuerySet
 
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter): ...
 
 class EmptyFieldListFilter(FieldListFilter):
     lookup_kwarg: str
-    lookup_val: Any
+    lookup_val: str | None
