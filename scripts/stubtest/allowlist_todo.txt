@@ -420,7 +420,6 @@ django.contrib.gis.db.models.PositiveIntegerField.integer_field_class
 django.contrib.gis.db.models.PositiveSmallIntegerField.formfield
 django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
 django.contrib.gis.db.models.Q.XOR
-django.contrib.gis.db.models.Q.__init__
 django.contrib.gis.db.models.Q.check
 django.contrib.gis.db.models.Q.flatten
 django.contrib.gis.db.models.Q.resolve_expression
@@ -970,7 +969,6 @@ django.db.models.PositiveIntegerField.integer_field_class
 django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
 django.db.models.Q.XOR
-django.db.models.Q.__init__
 django.db.models.Q.check
 django.db.models.Q.flatten
 django.db.models.Q.resolve_expression
@@ -1364,7 +1362,6 @@ django.db.models.query.prefetch_one_level
 django.db.models.query_utils.DeferredAttribute.__get__
 django.db.models.query_utils.InvalidQuery
 django.db.models.query_utils.Q.XOR
-django.db.models.query_utils.Q.__init__
 django.db.models.query_utils.Q.check
 django.db.models.query_utils.Q.flatten
 django.db.models.query_utils.Q.resolve_expression
@@ -1673,3 +1670,9 @@ django.urls.path
 django.urls.re_path
 django.urls.resolvers.LocaleRegexDescriptor.__get__
 django.urls.resolvers.ResolverMatch.__iter__
+
+# mypy 1.9.0 new issues:
+django.db.models.expressions.rhs
+django.db.models.expressions.result
+django.db.models.expressions.lhs
+django.db.backends.postgresql.base.Cursor

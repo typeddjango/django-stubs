@@ -2,9 +2,6 @@
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore.
 
-django.conf.FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG
-django.conf.global_settings.CSRF_COOKIE_MASKED
-django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
 django.contrib.admin.AdminSite.get_model_admin
 django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
 django.contrib.admin.BooleanFieldListFilter.get_facet_counts
@@ -31,8 +28,6 @@ django.contrib.admin.sites.AdminSite.get_model_admin
 django.contrib.admin.utils.build_q_object_from_lookup_parameters
 django.contrib.admin.utils.get_last_value_from_parameters
 django.contrib.admin.views.main.ChangeList.get_queryset
-django.contrib.auth.hashers.CryptPasswordHasher
-django.contrib.auth.hashers.verify_password
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
@@ -227,39 +222,4 @@ django.template.Template.__iter__
 django.template.autoreload
 django.template.base.Template.__iter__
 django.template.defaultfilters.escapeseq
-django.test.AsyncClient.delete
-django.test.AsyncClient.get
-django.test.AsyncClient.head
-django.test.AsyncClient.options
-django.test.AsyncClient.patch
-django.test.AsyncClient.post
-django.test.AsyncClient.put
-django.test.AsyncClient.trace
-django.test.client.AsyncClient.delete
-django.test.client.AsyncClient.get
-django.test.client.AsyncClient.head
-django.test.client.AsyncClient.options
-django.test.client.AsyncClient.patch
-django.test.client.AsyncClient.post
-django.test.client.AsyncClient.put
-django.test.client.AsyncClient.trace
-django.test.runner.DiscoverRunner.__init__
-django.test.runner.RemoteTestResult.addDuration
 django.utils.choices
-django.utils.deprecation.RemovedInDjango50Warning
-django.utils.deprecation.RemovedInDjango60Warning
-django.utils.html.VOID_ELEMENTS
-django.utils.text.Truncator.add_truncation_text
-django.utils.text.add_truncation_text
-django.utils.timezone.make_aware
-django.utils.timezone.utc
-django.utils.topological_sort
-django.views.csrf.CSRF_FAILURE_TEMPLATE
-django.views.csrf.builtin_template_path
-django.views.decorators.debug.coroutine_functions_to_sensitive_variables
-django.views.generic.edit.BaseDeleteView.__init__
-django.views.generic.edit.DeleteViewCustomDeleteWarning
-django.views.i18n.builtin_template_path
-django.views.i18n.js_catalog_template
-django.views.static.DEFAULT_DIRECTORY_INDEX_TEMPLATE
-django.views.static.builtin_template_path
