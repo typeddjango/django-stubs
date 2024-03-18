@@ -6,6 +6,9 @@ set -e
 
 export MYPYPATH='.'
 
+# Cleaning existing cache:
+rm -rf .mypy_cache
+
 # TODO: remove `--ignore-positional-only` when ready
 stubtest django \
     --mypy-config-file mypy.ini \
