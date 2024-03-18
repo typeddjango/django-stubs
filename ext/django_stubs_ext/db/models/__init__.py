@@ -7,6 +7,8 @@ from django_stubs_ext import StrOrPromise
 
 if TYPE_CHECKING:
 
+    from typing import List
+
     class TypedModelMeta:
         """
         Typed base class for Django Model `class Meta:` inner class. At runtime this is just an alias to `object`.
@@ -14,8 +16,6 @@ if TYPE_CHECKING:
         Most attributes are the same as `django.db.models.options.Options`. Options has some additional attributes and
         some values are normalized by Django.
         """
-
-        from typing import List
 
         abstract: ClassVar[bool]  # default: False
         app_label: ClassVar[str]
