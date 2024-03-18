@@ -1,5 +1,5 @@
 # Dev tools:
-black==24.2.0
+black==24.3.0
 pre-commit==3.5.0; python_version < '3.9'
 pre-commit==3.6.2; python_version >= '3.9'
 pytest==8.1.1
