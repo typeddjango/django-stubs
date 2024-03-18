@@ -100,7 +100,6 @@ django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.backends.RemoteUserBackend.authenticate
 django.contrib.auth.backends.RemoteUserBackend.configure_user
-django.contrib.auth.base_user.AbstractBaseUser.Meta.abstract
 django.contrib.auth.base_user.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
@@ -108,13 +107,11 @@ django.contrib.auth.decorators.login_required
 django.contrib.auth.default_app_config
 django.contrib.auth.forms.AdminPasswordChangeForm
 django.contrib.auth.forms.AuthenticationForm
-django.contrib.auth.forms.BaseUserCreationForm.Meta.field_classes
 django.contrib.auth.forms.BaseUserCreationForm.Meta.model
 django.contrib.auth.forms.BaseUserCreationForm.declared_fields
 django.contrib.auth.forms.PasswordChangeForm
 django.contrib.auth.forms.PasswordResetForm
 django.contrib.auth.forms.SetPasswordForm
-django.contrib.auth.forms.UserChangeForm.Meta.field_classes
 django.contrib.auth.forms.UserChangeForm.Meta.model
 django.contrib.auth.forms.UserChangeForm.declared_fields
 django.contrib.auth.forms.UserCreationForm.declared_fields
@@ -129,13 +126,9 @@ django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
 django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
 django.contrib.auth.management.commands.createsuperuser.PASSWORD_FIELD
-django.contrib.auth.models.AbstractBaseUser.Meta.abstract
 django.contrib.auth.models.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
-django.contrib.auth.models.AbstractUser.Meta.abstract
-django.contrib.auth.models.AbstractUser.Meta.verbose_name
-django.contrib.auth.models.AbstractUser.Meta.verbose_name_plural
 django.contrib.auth.models.AbstractUser.date_joined
 django.contrib.auth.models.AbstractUser.email
 django.contrib.auth.models.AbstractUser.email_user
@@ -163,7 +156,6 @@ django.contrib.auth.models.Permission.content_type_id
 django.contrib.auth.models.Permission.id
 django.contrib.auth.models.Permission.name
 django.contrib.auth.models.PermissionManager.__slotnames__
-django.contrib.auth.models.PermissionsMixin.Meta.abstract
 django.contrib.auth.models.PermissionsMixin.groups
 django.contrib.auth.models.PermissionsMixin.is_superuser
 django.contrib.auth.models.PermissionsMixin.user_permissions
@@ -253,14 +245,10 @@ django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skip
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.supports_tolerance_parameter
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.unsupported_geojson_options
 django.contrib.gis.db.backends.oracle.introspection
-django.contrib.gis.db.backends.oracle.models.OracleGeometryColumns.Meta
-django.contrib.gis.db.backends.oracle.models.OracleSpatialRefSys.Meta
 django.contrib.gis.db.backends.oracle.operations
 django.contrib.gis.db.backends.postgis.adapter.PostGISAdapter.prepare
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersection_returns_none
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
-django.contrib.gis.db.backends.postgis.models.PostGISGeometryColumns.Meta
-django.contrib.gis.db.backends.postgis.models.PostGISSpatialRefSys.Meta
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
 django.contrib.gis.db.backends.postgis.operations.PostGISOperator.check_geography
@@ -464,7 +452,6 @@ django.contrib.gis.db.models.functions.Length.as_sql
 django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
 django.contrib.gis.default_app_config
 django.contrib.gis.forms.ALL_FIELDS
-django.contrib.gis.forms.BaseForm.Meta
 django.contrib.gis.forms.BaseForm.__init__
 django.contrib.gis.forms.BaseFormSet.__init__
 django.contrib.gis.forms.BaseFormSet.deletion_widget
@@ -1469,7 +1456,6 @@ django.db.utils.ConnectionHandler.ensure_defaults
 django.db.utils.ConnectionHandler.prepare_test_settings
 django.db.utils.DatabaseErrorWrapper.__call__
 django.forms.ALL_FIELDS
-django.forms.BaseForm.Meta
 django.forms.BaseForm.__init__
 django.forms.BaseFormSet.__init__
 django.forms.BaseFormSet.deletion_widget
@@ -1520,7 +1506,6 @@ django.forms.fields.FileField.bound_data
 django.forms.fields.MultiValueField.__deepcopy__
 django.forms.fields.MultipleChoiceField.hidden_widget
 django.forms.fields.SplitDateTimeField.hidden_widget
-django.forms.forms.BaseForm.Meta
 django.forms.forms.BaseForm.__init__
 django.forms.forms.DeclarativeFieldsMetaclass.__new__
 django.forms.forms.Form
