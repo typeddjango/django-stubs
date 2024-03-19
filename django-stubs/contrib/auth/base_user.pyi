@@ -5,8 +5,6 @@ from django.db.models.base import Model
 from django.db.models.expressions import Combinable
 from django.db.models.fields import BooleanField
 
-from django_stubs_ext.db.models import ModelMeta as _ModelMeta
-
 _T = TypeVar("_T", bound=Model)
 
 class BaseUserManager(models.Manager[_T]):

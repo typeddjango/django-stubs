@@ -12,8 +12,6 @@ from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeAlias
 
-from django_stubs_ext.db.models import ModelMeta as _ModelMeta
-
 _AnyUser: TypeAlias = Model | AnonymousUser
 
 def update_last_login(sender: type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
