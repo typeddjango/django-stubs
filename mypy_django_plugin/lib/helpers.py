@@ -416,6 +416,9 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
 
 
 def is_abstract_model(model: TypeInfo) -> bool:
+    if model.fullname in fullnames.DJANGO_ABSTRACT_MODELS:
+        return True
+
     if not is_model_type(model):
         return False
 

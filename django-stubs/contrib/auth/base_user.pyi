@@ -20,9 +20,6 @@ class AbstractBaseUser(models.Model):
     last_login = models.DateTimeField(blank=True, null=True)
     is_active: bool | BooleanField[bool | Combinable, bool]
 
-    class Meta:
-        abstract: Literal[True]
-
     def get_username(self) -> str: ...
     def natural_key(self) -> tuple[str]: ...
     @property

@@ -58,3 +58,12 @@ STR_PROMISE_FULLNAME = "django.utils.functional._StrPromise"
 
 OBJECT_DOES_NOT_EXIST = "django.core.exceptions.ObjectDoesNotExist"
 MULTIPLE_OBJECTS_RETURNED = "django.core.exceptions.MultipleObjectsReturned"
+
+DJANGO_ABSTRACT_MODELS = frozenset(
+    (
+        "django.contrib.auth.base_user.AbstractBaseUser",
+        ABSTRACT_USER_MODEL_FULLNAME,
+        PERMISSION_MIXIN_CLASS_FULLNAME,
+        "django.contrib.sessions.base_session.AbstractBaseSession",
+    )
+)
