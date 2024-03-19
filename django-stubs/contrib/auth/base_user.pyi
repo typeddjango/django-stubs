@@ -22,8 +22,6 @@ class AbstractBaseUser(models.Model):
     last_login = models.DateTimeField(blank=True, null=True)
     is_active: bool | BooleanField[bool | Combinable, bool]
 
-    Meta: ClassVar[type[_ModelMeta]]
-
     def get_username(self) -> str: ...
     def natural_key(self) -> tuple[str]: ...
     @property

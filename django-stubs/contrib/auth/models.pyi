@@ -63,8 +63,6 @@ class PermissionsMixin(models.Model):
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
 
-    Meta: ClassVar[type[_ModelMeta]]
-
     def get_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_all_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
@@ -87,8 +85,6 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     EMAIL_FIELD: str
     USERNAME_FIELD: str
-
-    Meta: ClassVar[type[_ModelMeta]]
 
     def get_full_name(self) -> str: ...
     def get_short_name(self) -> str: ...
