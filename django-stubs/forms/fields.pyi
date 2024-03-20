@@ -307,6 +307,7 @@ class URLField(CharField):
         localize: bool = ...,
         disabled: bool = ...,
         label_suffix: str | None = ...,
+        assume_scheme: str | None = ...,
     ) -> None: ...
     def to_python(self, value: Any | None) -> str | None: ...
 
@@ -354,7 +355,7 @@ class ChoiceField(Field):
 
 @type_check_only
 class _CoerceCallable(Protocol):
-    def __call__(self, __value: Any) -> Any: ...
+    def __call__(self, value: Any, /) -> Any: ...
 
 class TypedChoiceField(ChoiceField):
     coerce: _CoerceCallable

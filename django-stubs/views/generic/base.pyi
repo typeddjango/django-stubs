@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, Mapping
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
@@ -9,7 +9,7 @@ from django.utils.functional import _Getter
 logger: logging.Logger
 
 class ContextMixin:
-    extra_context: dict[str, Any] | None
+    extra_context: Mapping[str, Any] | None
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
 class View:

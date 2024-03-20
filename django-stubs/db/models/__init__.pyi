@@ -74,6 +74,7 @@ from .fields import URLField as URLField
 from .fields import UUIDField as UUIDField
 from .fields.files import FileField as FileField
 from .fields.files import ImageField as ImageField
+from .fields.generated import GeneratedField as GeneratedField
 from .fields.json import JSONField as JSONField
 from .fields.proxy import OrderWrt as OrderWrt
 from .fields.related import ForeignKey as ForeignKey

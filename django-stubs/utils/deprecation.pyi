@@ -5,11 +5,11 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from typing_extensions import TypeAlias
 
-class RemovedInDjango50Warning(DeprecationWarning): ...
-class RemovedInDjango51Warning(PendingDeprecationWarning): ...
+class RemovedInDjango51Warning(DeprecationWarning): ...
+class RemovedInDjango60Warning(PendingDeprecationWarning): ...
 
-RemovedInNextVersionWarning: TypeAlias = RemovedInDjango50Warning
-RemovedAfterNextVersionWarning: TypeAlias = RemovedInDjango51Warning
+RemovedInNextVersionWarning: TypeAlias = RemovedInDjango51Warning
+RemovedAfterNextVersionWarning: TypeAlias = RemovedInDjango60Warning
 
 class warn_about_renamed_method:
     class_name: str
@@ -32,11 +32,11 @@ class DeprecationInstanceCheck(type):
 
 @type_check_only
 class _GetResponseCallable(Protocol):
-    def __call__(self, __request: HttpRequest) -> HttpResponseBase: ...
+    def __call__(self, request: HttpRequest, /) -> HttpResponseBase: ...
 
 @type_check_only
 class _AsyncGetResponseCallable(Protocol):
-    def __call__(self, __request: HttpRequest) -> Awaitable[HttpResponseBase]: ...
+    def __call__(self, request: HttpRequest, /) -> Awaitable[HttpResponseBase]: ...
 
 class MiddlewareMixin:
     sync_capable: bool

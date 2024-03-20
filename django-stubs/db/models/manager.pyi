@@ -69,9 +69,17 @@ class BaseManager(Generic[_T]):
     async def aget_or_create(
         self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any
     ) -> tuple[_T, bool]: ...
-    def update_or_create(self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_T, bool]: ...
+    def update_or_create(
+        self,
+        defaults: MutableMapping[str, Any] | None = ...,
+        create_defaults: MutableMapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> tuple[_T, bool]: ...
     async def aupdate_or_create(
-        self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any
+        self,
+        defaults: MutableMapping[str, Any] | None = ...,
+        create_defaults: MutableMapping[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> tuple[_T, bool]: ...
     def earliest(self, *fields: str | OrderBy) -> _T: ...
     async def aearliest(self, *fields: str | OrderBy) -> _T: ...

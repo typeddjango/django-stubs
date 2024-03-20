@@ -37,7 +37,7 @@ class RunSQL(Operation):
 
 @type_check_only
 class _CodeCallable(Protocol):
-    def __call__(self, __state_apps: StateApps, __schema_editor: BaseDatabaseSchemaEditor) -> None: ...
+    def __call__(self, state_apps: StateApps, schema_editor: BaseDatabaseSchemaEditor, /) -> None: ...
 
 class RunPython(Operation):
     code: _CodeCallable

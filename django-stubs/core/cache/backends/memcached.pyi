@@ -15,9 +15,6 @@ class BaseMemcachedCache(BaseCache):
     @property
     def client_servers(self) -> Sequence[str]: ...
 
-class MemcachedCache(BaseMemcachedCache):
-    def __init__(self, server: str | Sequence[str], params: dict[str, Any]) -> None: ...
-
 class PyLibMCCache(BaseMemcachedCache):
     def __init__(self, server: str | Sequence[str], params: dict[str, Any]) -> None: ...
     @property

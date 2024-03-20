@@ -24,8 +24,6 @@ _ExecuteWrapper: TypeAlias = Callable[
     [Callable[[str, Any, bool, dict[str, Any]], Any], str, Any, bool, dict[str, Any]], Any
 ]
 
-def timezone_constructor(tzname: str) -> tzinfo: ...
-
 class BaseDatabaseWrapper:
     data_types: dict[str, str]
     data_types_suffix: dict[str, str]

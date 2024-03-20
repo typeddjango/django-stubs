@@ -75,6 +75,10 @@ class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):
 class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
 
+class ClosestPoint(GeomOutputGeoFunc):
+    arity: int
+    geom_param_pos: tuple[int, int]
+
 class Difference(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
     geom_param_pos: Any
