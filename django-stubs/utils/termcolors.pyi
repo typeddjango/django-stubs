@@ -1,7 +1,7 @@
 from collections.abc import Callable, Sequence
 from typing import Any, Literal
 
-color_names: tuple[str]
+color_names: tuple[str, ...]
 foreground: dict[str, str]
 background: dict[str, str]
 RESET: Literal["0"]
