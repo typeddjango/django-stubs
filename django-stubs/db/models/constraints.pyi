@@ -7,7 +7,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query_utils import Q
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self
+from typing_extensions import Self, deprecated
 
 class Deferrable(Enum):
     DEFERRED: str
@@ -15,9 +15,22 @@ class Deferrable(Enum):
 
 class BaseConstraint:
     name: str
+    violation_error_code: str | None
     violation_error_message: _StrOrPromise | None
     default_violation_error_message: _StrOrPromise
-    def __init__(self, name: str, violation_error_message: _StrOrPromise | None = ...) -> None: ...
+    @overload
+    def __init__(
+        self, *, name: str, violation_error_code: str | None = ..., violation_error_message: _StrOrPromise | None = ...
+    ) -> None: ...
+    @overload
+    @deprecated("Passing positional arguments to BaseConstraint is deprecated and will be removed in Django 6.0")
+    def __init__(
+        self,
+        *args: Any,
+        name: str | None = ...,
+        violation_error_code: str | None = ...,
+        violation_error_message: _StrOrPromise | None = ...,
+    ) -> None: ...
     def constraint_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
     def create_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
     def remove_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
@@ -27,7 +40,12 @@ class BaseConstraint:
 class CheckConstraint(BaseConstraint):
     check: Q | BaseExpression
     def __init__(
-        self, *, check: Q | BaseExpression, name: str, violation_error_message: _StrOrPromise | None = ...
+        self,
+        *,
+        check: Q | BaseExpression,
+        name: str,
+        violation_error_code: str | None = ...,
+        violation_error_message: _StrOrPromise | None = ...,
     ) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
@@ -46,6 +64,7 @@ class UniqueConstraint(BaseConstraint):
         deferrable: Deferrable | None = ...,
         include: Sequence[str] | None = ...,
         opclasses: Sequence[Any] = ...,
+        violation_error_code: str | None = ...,
         violation_error_message: _StrOrPromise | None = ...,
     ) -> None: ...
     @overload

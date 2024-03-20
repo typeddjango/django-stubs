@@ -57,7 +57,7 @@ class HttpResponseBase:
         self,
         key: str,
         value: str = ...,
-        max_age: int | None = ...,
+        max_age: int | datetime.timedelta | None = ...,
         expires: str | datetime.datetime | None = ...,
         path: str = ...,
         domain: str | None = ...,

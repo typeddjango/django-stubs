@@ -1,0 +1,36 @@
+-   case: test_register_converter_builtin
+    main: |
+      from django.urls import register_converter
+      from django.urls.converters import IntConverter
+
+      register_converter(IntConverter, "bigint")
+
+-   case: test_register_converter_custom
+    main: |
+      from django.urls import register_converter
+
+      class BigIntConverter:
+          regex = r"[0-9]+"
+
+          def to_python(self, value: str) -> int:
+              return int(value)
+
+          def to_url(self, value: int) -> str:
+              return str(value)
+
+      register_converter(BigIntConverter, "bigint")
+
+-   case: test_register_converter_incorrect_types
+    main: |
+      from django.urls import register_converter
+
+      class BigIntConverter:
+          regex = r"[0-9]+"
+
+          def to_python(self, value: int) -> str:
+              return str(value)
+
+          def to_url(self, value: str) -> int:
+              return int(value)
+
+      register_converter(BigIntConverter, "bigint")  # E: Argument 1 to "register_converter" has incompatible type "Type[BigIntConverter]"; expected "Type[_Converter]"  [arg-type]

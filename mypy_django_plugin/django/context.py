@@ -369,6 +369,9 @@ class DjangoContext:
         else:
             related_model_cls = field.field.model
 
+        if related_model_cls is None:
+            raise UnregisteredModelError
+
         if isinstance(related_model_cls, str):
             if related_model_cls == "self":  # type: ignore[unreachable]
                 # same model

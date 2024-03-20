@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, tzinfo
 from typing import Any
 
 from django.template import Node
 from django.template.base import FilterExpression, NodeList, Parser, Token
-from django.utils.timezone import _TzInfoT
 
 register: Any
 
@@ -11,7 +10,7 @@ class datetimeobject(datetime): ...
 
 def localtime(value: datetime | str | None) -> Any: ...
 def utc(value: datetime | str | None) -> Any: ...
-def do_timezone(value: datetime | str | None, arg: _TzInfoT | str | None) -> Any: ...
+def do_timezone(value: datetime | str | None, arg: tzinfo | str | None) -> Any: ...
 
 class LocalTimeNode(Node):
     nodelist: NodeList
