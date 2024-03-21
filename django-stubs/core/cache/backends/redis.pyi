@@ -4,15 +4,10 @@ from typing import Any, Callable, Iterable, Protocol, SupportsInt, overload, typ
 
 from _typeshed import ReadableBuffer
 from django.core.cache.backends.base import BaseCache
+from redis._parsers import BaseParser
+from redis.client import Redis
+from redis.connection import ConnectionPool
 from typing_extensions import TypeAlias
-
-try:
-    from redis.client import Redis
-    from redis.connection import BaseParser, ConnectionPool
-except ImportError:
-    Redis: TypeAlias = Any
-    BaseParser: TypeAlias = Any
-    ConnectionPool: TypeAlias = Any
 
 @type_check_only
 class _RedisCacheClientSerializer(Protocol):
