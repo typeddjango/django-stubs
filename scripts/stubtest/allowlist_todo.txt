@@ -421,7 +421,6 @@ django.contrib.gis.db.models.PositiveSmallIntegerField.formfield
 django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
 django.contrib.gis.db.models.Q.XOR
 django.contrib.gis.db.models.Q.resolve_expression
-django.contrib.gis.db.models.QuerySet.__contains__
 django.contrib.gis.db.models.QuerySet.__deepcopy__
 django.contrib.gis.db.models.QuerySet.__reversed__
 django.contrib.gis.db.models.QuerySet.__xor__
@@ -968,7 +967,6 @@ django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
 django.db.models.Q.XOR
 django.db.models.Q.resolve_expression
-django.db.models.QuerySet.__contains__
 django.db.models.QuerySet.__deepcopy__
 django.db.models.QuerySet.__reversed__
 django.db.models.QuerySet.__xor__
@@ -1345,7 +1343,6 @@ django.db.models.options.Options.local_concrete_fields
 django.db.models.options.Options.many_to_many
 django.db.models.options.Options.related_objects
 django.db.models.query.EmptyQuerySet.__init__
-django.db.models.query.QuerySet.__contains__
 django.db.models.query.QuerySet.__deepcopy__
 django.db.models.query.QuerySet.__reversed__
 django.db.models.query.QuerySet.__xor__
