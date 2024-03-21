@@ -95,6 +95,12 @@ jobs:
       - name: Run stubtest
         run: bash ./scripts/stubtest.sh
 
+      - name: Run pyright
+        uses: jakebailey/pyright-action@v2
+        with:
+          pylance-version: latest-release
+        continue-on-error: true
+
   matrix-test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
