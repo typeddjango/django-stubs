@@ -1,4 +1,5 @@
 import configparser
+import os
 import sys
 import textwrap
 from functools import partial
@@ -31,6 +32,7 @@ COULD_NOT_LOAD_FILE = "could not load configuration file"
 MISSING_SECTION = "no section [{section}] found"
 MISSING_DJANGO_SETTINGS = "missing required 'django_settings_module' config"
 INVALID_BOOL_SETTING = "invalid {key!r}: the setting must be a boolean"
+DJANGO_SETTINGS_ENV_VAR = "DJANGO_SETTINGS_MODULE"
 
 
 def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
@@ -80,10 +82,10 @@ class DjangoPluginConfig:
         except KeyError:
             toml_exit(MISSING_SECTION.format(section="tool.django-stubs"))
 
-        if "django_settings_module" not in config:
+        self.django_settings_module = config.get("django_settings_module") or os.getenv(DJANGO_SETTINGS_ENV_VAR)
+        if not self.django_settings_module:
             toml_exit(MISSING_DJANGO_SETTINGS)
 
-        self.django_settings_module = config["django_settings_module"]
         if not isinstance(self.django_settings_module, str):
             toml_exit("invalid 'django_settings_module': the setting must be a string")
 
@@ -103,10 +105,12 @@ class DjangoPluginConfig:
         if not parser.has_section(section):
             exit_with_error(MISSING_SECTION.format(section=section))
 
-        if not parser.has_option(section, "django_settings_module"):
-            exit_with_error(MISSING_DJANGO_SETTINGS)
-
-        self.django_settings_module = parser.get(section, "django_settings_module").strip("'\"")
+        if parser.has_option(section, "django_settings_module"):
+            self.django_settings_module = parser.get(section, "django_settings_module").strip("'\"")
+        else:
+            self.django_settings_module = os.getenv(DJANGO_SETTINGS_ENV_VAR)
+            if not self.django_settings_module:
+                exit_with_error(MISSING_DJANGO_SETTINGS)
 
         try:
             self.strict_settings = parser.getboolean(section, "strict_settings", fallback=True)
