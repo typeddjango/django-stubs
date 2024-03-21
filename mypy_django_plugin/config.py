@@ -15,7 +15,7 @@ INI_USAGE = """
 (config)
 ...
 [mypy.plugins.django-stubs]
-django_settings_module = str (required)
+django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
 strict_settings = bool (default: true)
 ...
 """
@@ -23,16 +23,17 @@ TOML_USAGE = """
 (config)
 ...
 [tool.django-stubs]
-django_settings_module = str (required)
+django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
 strict_settings = bool (default: true)
 ...
 """
 INVALID_FILE = "mypy config file is not specified or found"
 COULD_NOT_LOAD_FILE = "could not load configuration file"
 MISSING_SECTION = "no section [{section}] found"
-MISSING_DJANGO_SETTINGS = "missing required 'django_settings_module' config"
-INVALID_BOOL_SETTING = "invalid {key!r}: the setting must be a boolean"
 DJANGO_SETTINGS_ENV_VAR = "DJANGO_SETTINGS_MODULE"
+MISSING_DJANGO_SETTINGS = f"missing required 'django_settings_module' config.\
+ Either specify this config or set your `{DJANGO_SETTINGS_ENV_VAR}` env var"
+INVALID_BOOL_SETTING = "invalid {key!r}: the setting must be a boolean"
 
 
 def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:

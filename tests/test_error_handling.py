@@ -13,7 +13,7 @@ TEMPLATE = """
 (config)
 ...
 [mypy.plugins.django-stubs]
-django_settings_module = str (required)
+django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
 strict_settings = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
@@ -23,7 +23,7 @@ TEMPLATE_TOML = """
 (config)
 ...
 [tool.django-stubs]
-django_settings_module = str (required)
+django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
 strict_settings = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
@@ -48,12 +48,14 @@ def write_to_file(file_contents: str, suffix: Optional[str] = None) -> Generator
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]", "\tnot_django_not_settings_module = badbadmodule"],
-            "missing required 'django_settings_module' config",
+            "missing required 'django_settings_module' config.\
+ Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var",
             id="missing-settings-module",
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]"],
-            "missing required 'django_settings_module' config",
+            "missing required 'django_settings_module' config.\
+ Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var",
             id="no-settings-given",
         ),
         pytest.param(
@@ -114,7 +116,8 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
             [tool.django-stubs]
             not_django_not_settings_module = "badbadmodule"
             """,
-            "missing required 'django_settings_module' config",
+            "missing required 'django_settings_module' config.\
+ Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var",
             id="missing django_settings_module",
         ),
         pytest.param(
@@ -194,13 +197,12 @@ def test_correct_toml_configuration_with_django_setting_from_env(boolean_value: 
 
 
 @pytest.mark.parametrize("boolean_value", ["true", "True", "false", "False"])
-def test_correct_configuration(boolean_value) -> None:
+def test_correct_configuration_with_django_setting_from_env(boolean_value) -> None:
     """Django settings module gets extracted given valid configuration."""
     config_file_contents = "\n".join(
         [
             "[mypy.plugins.django-stubs]",
             "some_other_setting = setting",
-            "django_settings_module = my.module",
             f"strict_settings = {boolean_value}",
         ]
     )
