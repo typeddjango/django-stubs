@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
-from typing import ClassVar, Generic, Protocol, TypeVar, overload
+from typing import ClassVar, Generic, Protocol, TypeVar, overload, type_check_only
 
+from django.db.fields import _ErrorMessagesDict
 from django.utils.functional import _StrPromise, cached_property
 
 class UnorderedObjectListWarning(RuntimeWarning): ...
@@ -10,14 +11,17 @@ class EmptyPage(InvalidPage): ...
 
 _T = TypeVar("_T")
 
+@type_check_only
 class _SupportsPagination(Protocol[_T], Sized, Iterable):
     @overload
-    def __getitem__(self, __index: int) -> _T: ...
+    def __getitem__(self, index: int, /) -> _T: ...
     @overload
-    def __getitem__(self, __index: slice) -> _SupportsPagination[_T]: ...
+    def __getitem__(self, index: slice, /) -> _SupportsPagination[_T]: ...
 
 class Paginator(Generic[_T]):
     ELLIPSIS: ClassVar[_StrPromise]
+    default_error_messages: ClassVar[_ErrorMessagesDict]
+    error_messages: _ErrorMessagesDict
     object_list: _SupportsPagination[_T]
     per_page: int
     orphans: int
@@ -28,6 +32,7 @@ class Paginator(Generic[_T]):
         per_page: int | str,
         orphans: int = ...,
         allow_empty_first_page: bool = ...,
+        error_messages: _ErrorMessagesDict | None = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[Page[_T]]: ...
     def validate_number(self, number: int | float | str) -> int: ...

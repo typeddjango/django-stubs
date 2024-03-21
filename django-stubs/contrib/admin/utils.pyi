@@ -1,7 +1,7 @@
 import datetime
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, TypeVar, overload
+from typing import Any, Literal, TypeVar, overload, type_check_only
 from uuid import UUID
 
 from _typeshed import Unused
@@ -59,6 +59,7 @@ class NestedObjects(Collector):
     def nested(self, format_callback: Callable[[Model], _T]) -> list[_T]: ...
     def can_fast_delete(self, *args: Unused, **kwargs: Unused) -> Literal[False]: ...
 
+@type_check_only
 class _ModelFormatDict(TypedDict):
     verbose_name: str
     verbose_name_plural: str

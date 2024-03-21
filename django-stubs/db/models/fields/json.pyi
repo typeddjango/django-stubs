@@ -1,9 +1,10 @@
 import json
 from collections.abc import Callable
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
+from django.db.models.expressions import Expression
 from django.db.models.fields import TextField
 from django.db.models.lookups import PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler
@@ -13,7 +14,12 @@ from typing_extensions import Self
 from . import Field
 from .mixins import CheckFieldDefaultMixin
 
-class JSONField(CheckFieldDefaultMixin, Field):
+# __set__ value type
+_ST = TypeVar("_ST", contravariant=True, default=Any)
+# __get__ return type
+_GT = TypeVar("_GT", covariant=True, default=Any)
+
+class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     encoder: type[json.JSONEncoder] | None
     decoder: type[json.JSONDecoder] | None
     def __init__(
@@ -24,6 +30,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         decoder: type[json.JSONDecoder] | None = ...,
         **kwargs: Any,
     ) -> None: ...
+    def from_db_value(self, value: str | None, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...
 
 class DataContains(PostgresOperatorLookup): ...
 class ContainedBy(PostgresOperatorLookup): ...

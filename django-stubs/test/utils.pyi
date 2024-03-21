@@ -5,7 +5,7 @@ from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, SupportsIndex, TypeVar
+from typing import Any, Protocol, SupportsIndex, TypeVar, type_check_only
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
@@ -143,6 +143,7 @@ def tag(*tags: str) -> Callable[[_C], _C]: ...
 _Signature: TypeAlias = str
 _TestDatabase: TypeAlias = tuple[str, list[str]]
 
+@type_check_only
 class TimeKeeperProtocol(Protocol):
     @contextmanager
     def timed(self, name: Any) -> Iterator[None]: ...

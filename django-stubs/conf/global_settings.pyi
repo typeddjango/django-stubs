@@ -3,7 +3,7 @@ from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, type_check_only
 
 from typing_extensions import TypeAlias
 
@@ -40,7 +40,6 @@ TIME_ZONE: str
 
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ: bool
-USE_DEPRECATED_PYTZ: bool
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -66,10 +65,6 @@ LANGUAGE_COOKIE_HTTPONLY: bool
 LANGUAGE_COOKIE_SAMESITE: Literal["Lax", "Strict", "None", False] | None
 LANGUAGE_COOKIE_SECURE: bool
 
-# If you set this to True, Django will format dates, numbers and calendars
-# according to user current locale.
-USE_L10N: bool
-
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.
 MANAGERS: _Admins
@@ -86,6 +81,7 @@ SERVER_EMAIL: str
 DATABASES: dict[str, dict[str, Any]]
 
 # Classes used to implement DB routing behavior.
+@type_check_only
 class Router(Protocol):
     def allow_migrate(self, db: str, app_label: str, **hints: Any) -> bool | None: ...
 
@@ -122,6 +118,11 @@ TEMPLATES: list[dict[str, Any]]
 
 # Default form rendering class.
 FORM_RENDERER: str
+
+# RemovedInDjango60Warning: It's a transitional setting helpful in early
+# adoption of "https" as the new default value of forms.URLField.assume_scheme.
+# Set to True to assume "https" during the Django 5.x release cycle.
+FORMS_URLFIELD_ASSUME_HTTPS: bool
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -432,10 +433,6 @@ CSRF_COOKIE_SAMESITE: Literal["Lax", "Strict", "None", False]
 CSRF_HEADER_NAME: str
 CSRF_TRUSTED_ORIGINS: list[str]
 CSRF_USE_SESSIONS: bool
-
-# Whether to mask CSRF cookie value. It's a transitional setting helpful in
-# migrating multiple instance of the same project to Django 4.1+.
-CSRF_COOKIE_MASKED: bool
 
 ############
 # MESSAGES #

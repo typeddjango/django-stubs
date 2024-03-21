@@ -71,3 +71,44 @@
 
         class SuccessMessageFirstView(FormMixin, SuccessMessageMixin):
             pass
+
+-   case: generic_modelchoicefield_label_from_instance
+    main: |
+        from django import forms
+        from myapp.models import Article, Category
+
+        class ArticleChoiceField(forms.ModelChoiceField[Article]):
+            def label_from_instance(self, obj: Article) -> str:
+                return obj.name
+
+        class BrokenArticleChoiceField(forms.ModelChoiceField[Article]):
+            def label_from_instance(self, obj: Article) -> str:
+                return obj.title # E: "Article" has no attribute "title"  [attr-defined]
+
+        class ArticleMultipleChoiceField(forms.ModelMultipleChoiceField[Article]):
+            def label_from_instance(self, obj: Article) -> str:
+                return obj.name
+
+        class ChooseArticleForm(forms.Form):
+            articles = ArticleMultipleChoiceField(
+                queryset=Article.objects.none(),
+            )
+            best_article = ArticleChoiceField(
+                queryset=Article.objects.none(),
+            )
+            best_category = ArticleChoiceField(
+                queryset=Category.objects.none(), # E: Argument "queryset" to "ArticleChoiceField" has incompatible type "_QuerySet[Category, Category]"; expected "Union[Manager[Article], _QuerySet[Article, Article], None]"  [arg-type]
+            )
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Category(models.Model):
+                    title = models.CharField(max_length=128)
+
+                class Article(models.Model):
+                    name = models.CharField(max_length=128)

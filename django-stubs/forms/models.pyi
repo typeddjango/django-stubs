@@ -14,13 +14,13 @@ from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import Widget
-from django.utils.datastructures import _IndexableCollection, _ListOrTuple, _PropertyDescriptor
+from django.utils.datastructures import _IndexableCollection, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 ALL_FIELDS: Literal["__all__"]
 
-_Fields: TypeAlias = _ListOrTuple[str] | Literal["__all__"]
+_Fields: TypeAlias = Collection[str] | Literal["__all__"]
 _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 
 _Labels: TypeAlias = dict[str, str]
@@ -126,7 +126,7 @@ class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
     def initial_form_count(self) -> int: ...
     def get_queryset(self) -> _IndexableCollection[_M]: ...
     def save_new(self, form: _ModelFormT, commit: bool = ...) -> _M: ...
-    def save_existing(self, form: _ModelFormT, instance: _M, commit: bool = ...) -> _M: ...
+    def save_existing(self, form: _ModelFormT, obj: _M, commit: bool = ...) -> _M: ...
     def delete_existing(self, obj: _M, commit: bool = ...) -> None: ...
     saved_forms: list[_ModelFormT]
     def save_m2m(self) -> None: ...
@@ -251,7 +251,7 @@ class ModelChoiceIterator:
     def __bool__(self) -> bool: ...
     def choice(self, obj: Model) -> tuple[ModelChoiceIteratorValue, str]: ...
 
-class ModelChoiceField(ChoiceField):
+class ModelChoiceField(ChoiceField, Generic[_M]):
     disabled: bool
     help_text: _StrOrPromise
     required: bool
@@ -259,12 +259,12 @@ class ModelChoiceField(ChoiceField):
     validators: list[Any]
     iterator: type[ModelChoiceIterator]
     empty_label: _StrOrPromise | None
-    queryset: QuerySet[models.Model] | None
+    queryset: QuerySet[_M] | None
     limit_choices_to: _AllLimitChoicesTo | None
     to_field_name: str | None
     def __init__(
         self,
-        queryset: None | Manager[models.Model] | QuerySet[models.Model],
+        queryset: Manager[_M] | QuerySet[_M] | None,
         *,
         empty_label: _StrOrPromise | None = ...,
         required: bool = ...,
@@ -278,17 +278,17 @@ class ModelChoiceField(ChoiceField):
         **kwargs: Any,
     ) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
-    def label_from_instance(self, obj: Model) -> str: ...
+    def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
         _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
         _FieldChoices | CallableChoiceIterator | ModelChoiceIterator,
     ]
     def prepare_value(self, value: Any) -> Any: ...
-    def to_python(self, value: Any | None) -> Model | None: ...
-    def validate(self, value: Model | None) -> None: ...
+    def to_python(self, value: Any | None) -> _M | None: ...
+    def validate(self, value: _M | None) -> None: ...
     def has_changed(self, initial: Model | int | str | UUID | None, data: int | str | None) -> bool: ...
 
-class ModelMultipleChoiceField(ModelChoiceField):
+class ModelMultipleChoiceField(ModelChoiceField[_M]):
     disabled: bool
     empty_label: _StrOrPromise | None
     help_text: _StrOrPromise
@@ -296,9 +296,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
     show_hidden_initial: bool
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
-    def __init__(self, queryset: None | Manager[Model] | QuerySet[Model], **kwargs: Any) -> None: ...
-    def to_python(self, value: Any) -> list[Model]: ...  # type: ignore[override]
-    def clean(self, value: Any) -> QuerySet[Model]: ...
+    def __init__(self, queryset: Manager[_M] | QuerySet[_M] | None, **kwargs: Any) -> None: ...
+    def to_python(self, value: Any) -> list[_M]: ...  # type: ignore[override]
+    def clean(self, value: Any) -> QuerySet[_M]: ...
     def prepare_value(self, value: Any) -> Any: ...
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore[override]
 

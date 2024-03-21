@@ -1,8 +1,8 @@
 import enum
 import sys
-from typing import Any, TypeVar
+from typing import Any, TypeVar, type_check_only
 
-from typing_extensions import Self
+from typing_extensions import Self, TypeAlias
 
 _Self = TypeVar("_Self")
 
@@ -29,6 +29,8 @@ class ChoicesMeta(enum.EnumMeta):
     @property
     def values(self) -> list[Any]: ...
 
+ChoicesType: TypeAlias = ChoicesMeta
+
 class Choices(enum.Enum, metaclass=ChoicesMeta):
     @property
     def label(self) -> str: ...
@@ -38,6 +40,7 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
     def do_not_call_in_templates(self) -> bool: ...
 
 # fake, to keep simulate class properties
+@type_check_only
 class _IntegerChoicesMeta(ChoicesMeta):
     @property
     def choices(self) -> list[tuple[int, str]]: ...
@@ -50,6 +53,7 @@ class IntegerChoices(int, Choices, metaclass=_IntegerChoicesMeta):
     def value(self) -> int: ...
 
 # fake, to keep simulate class properties
+@type_check_only
 class _TextChoicesMeta(ChoicesMeta):
     @property
     def choices(self) -> list[tuple[str, str]]: ...

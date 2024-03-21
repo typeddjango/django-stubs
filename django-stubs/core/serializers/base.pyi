@@ -75,7 +75,7 @@ class Deserializer:
     def __next__(self) -> Any: ...
 
 class DeserializedObject:
-    object: Any
+    object: Model
     m2m_data: dict[str, Sequence[Any]] | None
     deferred_fields: dict[Field, Any]
     def __init__(

@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Protocol
+from typing import Protocol, type_check_only
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.migrations.migration import Migration
@@ -8,8 +8,9 @@ from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
 
+@type_check_only
 class _ProgressCallbackT(Protocol):
-    def __call__(self, __action: str, __migration: Migration | None = ..., __fake: bool | None = ...) -> None: ...
+    def __call__(self, action: str, migration: Migration | None = ..., fake: bool | None = ..., /) -> None: ...
 
 class MigrationExecutor:
     connection: BaseDatabaseWrapper

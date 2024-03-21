@@ -114,7 +114,6 @@ class BaseDatabaseFeatures:
     supports_expression_indexes: bool
     collate_as_index_expression: bool
     allows_multiple_constraints_on_same_fields: bool
-    supports_boolean_expr_in_select_clause: bool
     supports_comparing_boolean_expr: bool
     supports_json_field: bool
     can_introspect_json_field: bool
@@ -142,4 +141,6 @@ class BaseDatabaseFeatures:
     def supports_explaining_query_execution(self) -> bool: ...
     @cached_property
     def supports_transactions(self) -> bool: ...
+    @cached_property
+    def supports_boolean_expr_in_select_clause(self) -> bool: ...
     def allows_group_by_selected_pks_on_model(self, model: type[Model]) -> bool: ...

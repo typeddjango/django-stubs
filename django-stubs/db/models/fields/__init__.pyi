@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload
+from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload, type_check_only
 
 from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
@@ -33,9 +33,11 @@ _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
+@type_check_only
 class _ChoicesCallable(Protocol):
     def __call__(self) -> _FieldChoices: ...
 
+@type_check_only
 class _FieldDescriptor(Protocol[_F]):
     """
     Accessing fields of a model class (not instance) returns an object conforming to this protocol.

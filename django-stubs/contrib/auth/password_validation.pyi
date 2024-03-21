@@ -1,14 +1,15 @@
 from collections.abc import Mapping, Sequence
 from pathlib import Path, PosixPath
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 
 from django.db.models.base import Model
 from typing_extensions import TypeAlias
 
 _UserModel: TypeAlias = Model
 
+@type_check_only
 class PasswordValidator(Protocol):
-    def validate(self, __password: str, __user: _UserModel | None = ...) -> None: ...
+    def validate(self, password: str, user: _UserModel | None = ..., /) -> None: ...
     def get_help_text(self) -> str: ...
 
 def get_default_password_validators() -> list[PasswordValidator]: ...

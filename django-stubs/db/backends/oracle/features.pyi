@@ -46,6 +46,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes: bool
     supports_slicing_ordering_in_compound: bool
     allows_multiple_constraints_on_same_fields: bool
-    supports_boolean_expr_in_select_clause: bool
     supports_primitives_in_json_field: bool
     supports_json_field_contains: bool

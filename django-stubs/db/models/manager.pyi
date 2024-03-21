@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import AsyncIterator, Collection, Iterable, Iterator, MutableMapping, Sequence
+from collections.abc import AsyncIterator, Callable, Collection, Iterable, Iterator, MutableMapping, Sequence
 from typing import Any, Generic, NoReturn, TypeVar, overload
 
 from django.db.models.base import Model
@@ -12,6 +12,7 @@ from django_stubs_ext import ValuesQuerySet
 _T = TypeVar("_T", bound=Model, covariant=True)
 
 class BaseManager(Generic[_T]):
+    cache: Callable[[], Self]  # django-cacheops
     creation_counter: int
     auto_created: bool
     use_in_migrations: bool
@@ -68,9 +69,17 @@ class BaseManager(Generic[_T]):
     async def aget_or_create(
         self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any
     ) -> tuple[_T, bool]: ...
-    def update_or_create(self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_T, bool]: ...
+    def update_or_create(
+        self,
+        defaults: MutableMapping[str, Any] | None = ...,
+        create_defaults: MutableMapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> tuple[_T, bool]: ...
     async def aupdate_or_create(
-        self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any
+        self,
+        defaults: MutableMapping[str, Any] | None = ...,
+        create_defaults: MutableMapping[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> tuple[_T, bool]: ...
     def earliest(self, *fields: str | OrderBy) -> _T: ...
     async def aearliest(self, *fields: str | OrderBy) -> _T: ...

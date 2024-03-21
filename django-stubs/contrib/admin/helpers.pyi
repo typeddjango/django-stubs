@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any
+from typing import Any, type_check_only
 
 from django import forms
 from django.contrib.admin.options import ModelAdmin
@@ -19,8 +19,7 @@ class ActionForm(forms.Form):
     action: Any
     select_across: Any
 
-checkbox: Any
-
+@type_check_only
 class _PrepopulatedDict(TypedDict):
     field: BoundField
     dependencies: list[BoundField]
@@ -92,6 +91,7 @@ class AdminField:
     def label_tag(self) -> SafeString: ...
     def errors(self) -> SafeString: ...
 
+@type_check_only
 class _FieldDictT(TypedDict):
     name: str
     label: str
