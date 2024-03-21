@@ -15,7 +15,7 @@ INI_USAGE = """
 (config)
 ...
 [mypy.plugins.django-stubs]
-django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
+django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 ...
 """
@@ -23,7 +23,7 @@ TOML_USAGE = """
 (config)
 ...
 [tool.django-stubs]
-django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
+django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 ...
 """

@@ -13,7 +13,7 @@ TEMPLATE = """
 (config)
 ...
 [mypy.plugins.django-stubs]
-django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
+django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
@@ -23,7 +23,7 @@ TEMPLATE_TOML = """
 (config)
 ...
 [tool.django-stubs]
-django_settings_module = str (default: DJANGO_SETTINGS_MODULE env var)
+django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
