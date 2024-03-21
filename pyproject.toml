@@ -6,6 +6,26 @@ include = '\.pyi?$'
 [tool.codespell]
 ignore-words-list = "aadd,acount,nam,asend"
 
+[tool.pyright]
+include = [
+    "django-stubs",
+    "ext/django_stubs_ext",
+    "mypy_django_plugin",
+    "scripts",
+    "tests",
+]
+exclude = [
+    ".github",
+    ".mypy_cache",
+    "build",
+]
+stubPath = "."
+typeCheckingMode = "strict"
+
+pythonVersion = "3.8"
+pythonPlatform = "All"
+
+
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 extend-exclude = [
