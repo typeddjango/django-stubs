@@ -83,9 +83,11 @@ class DjangoPluginConfig:
         except KeyError:
             toml_exit(MISSING_SECTION.format(section="tool.django-stubs"))
 
-        self.django_settings_module = config.get("django_settings_module") or os.getenv(DJANGO_SETTINGS_ENV_VAR)
-        if not self.django_settings_module:
+        django_settings_module = config.get("django_settings_module") or os.getenv(DJANGO_SETTINGS_ENV_VAR)
+        if not django_settings_module:
             toml_exit(MISSING_DJANGO_SETTINGS)
+
+        self.django_settings_module = django_settings_module
 
         if not isinstance(self.django_settings_module, str):
             toml_exit("invalid 'django_settings_module': the setting must be a string")
@@ -107,11 +109,14 @@ class DjangoPluginConfig:
             exit_with_error(MISSING_SECTION.format(section=section))
 
         if parser.has_option(section, "django_settings_module"):
-            self.django_settings_module = parser.get(section, "django_settings_module").strip("'\"")
+            django_settings_module = parser.get(section, "django_settings_module").strip("'\"")
         else:
-            self.django_settings_module = os.getenv(DJANGO_SETTINGS_ENV_VAR)
-            if not self.django_settings_module:
-                exit_with_error(MISSING_DJANGO_SETTINGS)
+            django_settings_module = os.getenv(DJANGO_SETTINGS_ENV_VAR, "")
+
+        if not django_settings_module:
+            exit_with_error(MISSING_DJANGO_SETTINGS)
+
+        self.django_settings_module = django_settings_module
 
         try:
             self.strict_settings = parser.getboolean(section, "strict_settings", fallback=True)
