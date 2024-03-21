@@ -157,7 +157,7 @@ class RequestFactory(_RequestFactory[WSGIRequest]): ...
 
 # A non total duplication of `asgiref.typing.HTTPScope`
 @type_check_only
-class HTTPScope(TypedDict, total=False):
+class _HTTPScope(TypedDict, total=False):
     type: Literal["http"]
     asgi: ASGIVersions
     http_version: str
@@ -175,7 +175,7 @@ class HTTPScope(TypedDict, total=False):
 
 @type_check_only
 class _AsyncRequestFactory(_RequestFactory[_T]):
-    defaults: HTTPScope  # type: ignore[assignment]
+    defaults: _HTTPScope  # type: ignore[assignment]
 
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 
