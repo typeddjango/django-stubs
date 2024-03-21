@@ -1,7 +1,9 @@
+import os
 import tempfile
 import uuid
 from contextlib import contextmanager
 from typing import Any, Generator, List, Optional
+from unittest import mock
 
 import pytest
 
@@ -171,4 +173,42 @@ def test_correct_configuration(boolean_value) -> None:
         config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == "my.module"
+    assert config.strict_settings is (boolean_value.lower() == "true")
+
+
+@pytest.mark.parametrize("boolean_value", ["true", "false"])
+def test_correct_toml_configuration_with_django_setting_from_env(boolean_value: str) -> None:
+    config_file_contents = f"""
+    [tool.django-stubs]
+    some_other_setting = "setting"
+    strict_settings = {boolean_value}
+    """
+    django_settings_env_value = "my.module"
+
+    with write_to_file(config_file_contents, suffix=".toml") as filename:
+        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": django_settings_env_value}):
+            config = DjangoPluginConfig(filename)
+
+    assert config.django_settings_module == django_settings_env_value
+    assert config.strict_settings is (boolean_value == "true")
+
+
+@pytest.mark.parametrize("boolean_value", ["true", "True", "false", "False"])
+def test_correct_configuration(boolean_value) -> None:
+    """Django settings module gets extracted given valid configuration."""
+    config_file_contents = "\n".join(
+        [
+            "[mypy.plugins.django-stubs]",
+            "some_other_setting = setting",
+            "django_settings_module = my.module",
+            f"strict_settings = {boolean_value}",
+        ]
+    )
+    django_settings_env_value = "my.module"
+
+    with write_to_file(config_file_contents) as filename:
+        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": django_settings_env_value}):
+            config = DjangoPluginConfig(filename)
+
+    assert config.django_settings_module == django_settings_env_value
     assert config.strict_settings is (boolean_value.lower() == "true")
