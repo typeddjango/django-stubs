@@ -278,11 +278,11 @@
 -   case: many_to_many_field_converts_to_queryset_of_model_type
     main: |
         from myapp.models import App, Member
-        reveal_type(Member().apps)  # N: Revealed type is "myapp.models.App_ManyRelatedManager"
+        reveal_type(Member().apps)  # N: Revealed type is "myapp.models.App_ManyRelatedManager[myapp.models.Member_apps]"
         reveal_type(Member().apps.get())  # N: Revealed type is "myapp.models.App"
         reveal_type(Member().apps.app_method())  # N: Revealed type is "builtins.str"
         Member().apps.add(App())
-        reveal_type(App().members)  # N: Revealed type is "myapp.models.Member_ManyRelatedManager"
+        reveal_type(App().members)  # N: Revealed type is "myapp.models.Member_ManyRelatedManager[myapp.models.Member_apps]"
         reveal_type(App().members.get())  # N: Revealed type is "myapp.models.Member"
         reveal_type(App().members.member_method())  # N: Revealed type is "builtins.int"
         App().members.add(Member())
@@ -311,7 +311,7 @@
 -   case: many_to_many_works_with_string_if_imported
     main: |
         from myapp.models import Member
-        reveal_type(Member().apps)  # N: Revealed type is "myapp2.models.App_ManyRelatedManager"
+        reveal_type(Member().apps)  # N: Revealed type is "myapp2.models.App_ManyRelatedManager[myapp.models.Member_apps]"
     installed_apps:
         - myapp
         - myapp2
@@ -346,7 +346,7 @@
 -   case: many_to_many_with_self
     main: |
         from myapp.models import User
-        reveal_type(User().friends)  # N: Revealed type is "myapp.models.User_ManyRelatedManager"
+        reveal_type(User().friends)  # N: Revealed type is "myapp.models.User_ManyRelatedManager[myapp.models.User_friends]"
         reveal_type(User().friends.get())  # N: Revealed type is "myapp.models.User"
         reveal_type(User.friends.through.objects.get())  # N: Revealed type is "myapp.models.User_friends"
         reveal_type(User.friends.through._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User_friends]"
@@ -354,6 +354,7 @@
         reveal_type(User.friends.through().from_user_id)  # N: Revealed type is "builtins.int"
         reveal_type(User.friends.through().to_user)  # N: Revealed type is "myapp.models.User"
         reveal_type(User.friends.through().to_user_id)  # N: Revealed type is "builtins.int"
+        reveal_type(User.friends.through)  # N: Revealed type is "Type[myapp.models.User_friends]"
     installed_apps:
         - myapp
     files:
@@ -1114,6 +1115,13 @@
 
         reveal_type(Other.autos.through.objects)
         reveal_type(Other.autos.through._default_manager)
+
+        reveal_type(MyModel().auto_through)
+        reveal_type(MyModel().auto_through.through)
+        reveal_type(MyModel().other_again)
+        reveal_type(MyModel().other_again.through)
+        reveal_type(MyModel().custom_through)
+        reveal_type(MyModel().custom_through.through)
     out: |
         main:2: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:3: note: Revealed type is "myapp.models.Other"
@@ -1140,6 +1148,12 @@
         main:30: note: Revealed type is "def (*objs: Union[myapp.models.MyModel, builtins.int], bulk: builtins.bool =, through_defaults: Union[builtins.dict[builtins.str, Any], None] =)"
         main:32: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:35: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
+        main:36: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
+        main:37: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
+        main:38: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
+        main:39: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
+        main:40: note: Revealed type is "Type[myapp.models.CustomThrough]"
     installed_apps:
         -   myapp
     files:
@@ -1231,7 +1245,7 @@
         reveal_type(Child().parents)
     out: |
         main:2: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[Any, Any]"
-        main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any]"
+        main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any, Any]"
         myapp/models/child:5: error: Need type annotation for "parents"  [var-annotated]
         myapp/models/child:6: error: Need type annotation for "other_parents"  [var-annotated]
     installed_apps:
@@ -1284,11 +1298,11 @@
     main: |
         from myapp.models import Other
         other = Other()
-        reveal_type(other.abstract_of_concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager"
-        reveal_type(other.concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager"
-        reveal_type(other.abstract_of_abstract_parent)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager"
-        reveal_type(other.abstract_parent)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager"
-        reveal_type(other.mymodel)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager"
+        reveal_type(other.abstract_of_concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager[myapp.models.ConcreteParent_m2m_1]"
+        reveal_type(other.concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager[myapp.models.ConcreteParent_m2m_2]"
+        reveal_type(other.abstract_of_abstract_parent)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager[myapp.models.MyModel_m2m_3]"
+        reveal_type(other.abstract_parent)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager[myapp.models.MyModel_m2m_4]"
+        reveal_type(other.mymodel)  # N: Revealed type is "myapp.models.MyModel_ManyRelatedManager[myapp.models.MyModel_m2m_5]"
     installed_apps:
         -   myapp
     files:
