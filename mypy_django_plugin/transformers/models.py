@@ -760,12 +760,14 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     through_model,
                     name="objects",
                     sym_type=Instance(manager_info, [Instance(through_model, [])]),
+                    is_classvar=True,
                 )
                 # Also add manager as '_default_manager' attribute
                 helpers.add_new_sym_for_info(
                     through_model,
                     name="_default_manager",
                     sym_type=Instance(manager_info, [Instance(through_model, [])]),
+                    is_classvar=True,
                 )
 
     @cached_property
