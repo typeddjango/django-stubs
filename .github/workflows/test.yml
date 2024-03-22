@@ -116,6 +116,7 @@ jobs:
         uses: jakebailey/pyright-action@v2
         with:
           pylance-version: latest-release
+          annotate: false
         continue-on-error: true  # TODO: remove this part
 
   matrix-test:
