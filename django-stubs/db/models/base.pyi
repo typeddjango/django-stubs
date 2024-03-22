@@ -5,7 +5,7 @@ from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import BaseConstraint, Field, QuerySet
-from django.db.models.manager import BaseManager, Manager
+from django.db.models.manager import Manager
 from django.db.models.options import Options
 from typing_extensions import Self
 
@@ -24,9 +24,9 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def _default_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def _default_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
     @property
-    def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def _base_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
     # Note: these two metaclass generated attributes don't really exist on the 'Model'
