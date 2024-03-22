@@ -15,7 +15,7 @@ from typing_extensions import Self
 _M = TypeVar("_M", bound=Model)
 _F = TypeVar("_F", bound=Field)
 _From = TypeVar("_From", bound=Model)
-_Through = TypeVar("_Through", bound=Model)
+_Through = TypeVar("_Through", bound=Model, default=Model)
 _To = TypeVar("_To", bound=Model)
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):

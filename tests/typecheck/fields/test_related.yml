@@ -603,7 +603,7 @@
         from myapp.models import Author, Blog, Publisher, Profile
         reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Blog, myapp.models.Author_blogs]"
         reveal_type(Author.blogs.through)  # N: Revealed type is "Type[myapp.models.Author_blogs]"
-        reveal_type(Author().blogs)  # N: Revealed type is "myapp.models.Blog_ManyRelatedManager"
+        reveal_type(Author().blogs)  # N: Revealed type is "myapp.models.Blog_ManyRelatedManager[myapp.models.Author_blogs]"
         reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.Publisher, django.db.models.expressions.Combinable], myapp.models.Publisher]]"
         reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor[django.db.models.fields.related.OneToOneField[Union[myapp.models.Profile, django.db.models.expressions.Combinable], myapp.models.Profile]]"
         reveal_type(Author.file)  # N: Revealed type is "django.db.models.fields.files.FileDescriptor"
@@ -946,8 +946,8 @@
     main: |
         from myapp.models import SalesMan
         sales_man = SalesMan()
-        reveal_type(sales_man.client) # N: Revealed type is "myapp.models.CustomUser_ManyRelatedManager"
-        reveal_type(sales_man.client(manager="staffs")) # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.CustomUser]"
+        reveal_type(sales_man.client) # N: Revealed type is "myapp.models.CustomUser_ManyRelatedManager[myapp.models.SalesMan_client]"
+        reveal_type(sales_man.client(manager="staffs")) # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.CustomUser, myapp.models.SalesMan_client]"
     installed_apps:
         - myapp
     files:
@@ -1279,7 +1279,7 @@
             instance = arg(field=1, unknown=2)
             reveal_type(instance.field)  # N: Revealed type is "Any"
             reveal_type(instance.unknown)  # N: Revealed type is "Any"
-            reveal_type(instance.bad)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any]"
+            reveal_type(instance.bad)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any, Any]"
             return instance
     installed_apps:
         -   myapp

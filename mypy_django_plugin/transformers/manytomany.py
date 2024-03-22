@@ -151,6 +151,17 @@ def get_model_from_expression(
 
 
 def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance, Instance, Instance]]:
+    """
+    Returns a 3-tuple consisting of:
+      1. A `ManyRelatedManager` instance
+      2. The first type parameter instance of 1. when it's a model
+      3. The second type parameter instance of 1. when it's a model
+    When encountering a `ManyRelatedManager` that has populated its 2 first type
+    parameters with models. Otherwise `None` is returned.
+
+    For example: if given a `ManyRelatedManager[A, B]` where `A` and `B` are models the
+    following 3-tuple is returned: `(ManyRelatedManager[A, B], A, B)`.
+    """
     if (
         isinstance(ctx.default_return_type, Instance)
         and ctx.default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER

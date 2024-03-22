@@ -13,12 +13,12 @@ else:
     from typing import Protocol, TypeVar
 
     _T = TypeVar("_T")
-    _M = TypeVar("_M")
+    _Through = TypeVar("_Through")
 
     # Define as `Protocol` to prevent them being used with `isinstance()`.
     # These actually inherit from `BaseManager`.
     class RelatedManager(Protocol[_T]):
         pass
 
-    class ManyRelatedManager(Protocol[_T, _M]):
+    class ManyRelatedManager(Protocol[_T, _Through]):
         pass

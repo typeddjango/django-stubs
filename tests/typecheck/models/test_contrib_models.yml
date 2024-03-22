@@ -163,10 +163,10 @@
 -   case: test_permissions_inherited_reverese_relations
     main: |
         from django.contrib.auth.models import Permission
-        reveal_type(Permission().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager"
+        reveal_type(Permission().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager[django.contrib.auth.models.User_user_permissions]"
 
         from django.contrib.auth.models import Group
-        reveal_type(Group().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager"
+        reveal_type(Group().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager[django.contrib.auth.models.User_groups]"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
         AUTH_USER_MODEL='auth.User'
