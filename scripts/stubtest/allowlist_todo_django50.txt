@@ -2,7 +2,6 @@
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore.
 
-django.contrib.admin.AdminSite.get_model_admin
 django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
 django.contrib.admin.BooleanFieldListFilter.get_facet_counts
 django.contrib.admin.ChoicesFieldListFilter.get_facet_counts
@@ -24,14 +23,12 @@ django.contrib.admin.filters.FacetsMixin
 django.contrib.admin.filters.RelatedFieldListFilter.get_facet_counts
 django.contrib.admin.filters.SimpleListFilter.get_facet_counts
 django.contrib.admin.options.IS_FACETS_VAR
-django.contrib.admin.sites.AdminSite.get_model_admin
 django.contrib.admin.utils.build_q_object_from_lookup_parameters
 django.contrib.admin.utils.get_last_value_from_parameters
 django.contrib.admin.views.main.ChangeList.get_queryset
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
-django.contrib.gis.admin.AdminSite.get_model_admin
 django.contrib.gis.admin.OpenLayersWidget
 django.contrib.gis.admin.options.spherical_mercator_srid
 django.contrib.gis.admin.widgets
