@@ -102,6 +102,13 @@
                   'fields': ('name',),
               }),
           )
+-   case: test_view_on_site_as_callable
+    main: |
+      from django.contrib import admin
+
+      class A(admin.ModelAdmin):
+          def view_on_site(self, obj: "A") -> str:
+              return "http://example.org"
 -   case: errors_on_omitting_fields_from_fieldset_opts
     main: |
       from django.contrib import admin

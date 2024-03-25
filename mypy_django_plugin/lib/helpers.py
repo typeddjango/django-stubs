@@ -265,7 +265,7 @@ def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
     new_typeinfo = TypeInfo(SymbolTable(), classdef, module)
     new_typeinfo.bases = bases
     calculate_mro(new_typeinfo)
-    new_typeinfo.calculate_metaclass_type()
+    new_typeinfo.metaclass_type = new_typeinfo.calculate_metaclass_type()
 
     classdef.info = new_typeinfo
 
@@ -416,6 +416,9 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
 
 
 def is_abstract_model(model: TypeInfo) -> bool:
+    if model.fullname in fullnames.DJANGO_ABSTRACT_MODELS:
+        return True
+
     if not is_model_type(model):
         return False
 

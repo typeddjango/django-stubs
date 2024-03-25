@@ -311,3 +311,88 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         **defaults: Any,
     ) -> None: ...
     async def request(self, **request: Any) -> _MonkeyPatchedASGIResponse: ...
+    async def get(  # type: ignore[override]
+        self,
+        path: str,
+        data: _GetDataType = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def post(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def head(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def options(  # type: ignore[override]
+        self,
+        path: str,
+        data: dict[str, str] | str = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def put(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def patch(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def delete(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def trace(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...

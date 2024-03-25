@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from django.http.request import HttpRequest
@@ -8,10 +9,9 @@ from django.views.generic import View
 
 LANGUAGE_QUERY_PARAMETER: str
 
+def builtin_template_path(name: str) -> Path: ...
 def set_language(request: HttpRequest) -> HttpResponse: ...
 def get_formats() -> dict[str, list[str] | int | str]: ...
-
-js_catalog_template: str
 
 class JavaScriptCatalog(View):
     head: Callable

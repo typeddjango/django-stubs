@@ -19,7 +19,18 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
-from mypy.types import AnyType, CallableType, FunctionLike, Instance, Overloaded, ProperType, TypeOfAny, TypeVarType
+from mypy.types import (
+    AnyType,
+    CallableType,
+    FunctionLike,
+    Instance,
+    Overloaded,
+    ProperType,
+    TypeOfAny,
+    TypeVarType,
+    UnionType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -274,6 +285,13 @@ def resolve_manager_method(ctx: AttributeContext) -> MypyType:
 
     if isinstance(ctx.type, Instance):
         return resolve_manager_method_from_instance(instance=ctx.type, method_name=method_name, ctx=ctx)
+    elif isinstance(ctx.type, UnionType) and all(isinstance(instance, Instance) for instance in ctx.type.items):
+        resolved = tuple(
+            resolve_manager_method_from_instance(instance=instance, method_name=method_name, ctx=ctx)
+            for instance in ctx.type.items
+            if isinstance(instance, Instance)
+        )
+        return get_proper_type(UnionType(resolved))
     else:
         ctx.api.fail(f'Unable to resolve return type of queryset/manager method "{method_name}"', ctx.context)
         return AnyType(TypeOfAny.from_error)

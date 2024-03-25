@@ -31,7 +31,7 @@ dependencies = [
 
 # Keep compatible-mypy major.minor version pinned to what we use in CI (requirements.txt)
 extras_require = {
-    "compatible-mypy": ["mypy~=1.8.0"],
+    "compatible-mypy": ["mypy~=1.9.0"],
 }
 
 setup(
@@ -66,12 +66,12 @@ setup(
         "Programming Language :: Python :: 3.12",
         "Typing :: Typed",
         "Framework :: Django",
-        "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.1",
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
     ],
     project_urls={
+        "Funding": "https://github.com/sponsors/typeddjango",
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",
     },
 )

@@ -1111,6 +1111,9 @@
         reveal_type(Other().autos.custom_qs_method())
         reveal_type(Other().customs.custom_qs_method())
         reveal_type(Other().autos.add)
+
+        reveal_type(Other.autos.through.objects)
+        reveal_type(Other.autos.through._default_manager)
     out: |
         main:2: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:3: note: Revealed type is "myapp.models.Other"
@@ -1135,6 +1138,8 @@
         main:28: note: Revealed type is "builtins.str"
         main:29: note: Revealed type is "builtins.str"
         main:30: note: Revealed type is "def (*objs: Union[myapp.models.MyModel, builtins.int], bulk: builtins.bool =, through_defaults: Union[builtins.dict[builtins.str, Any], None] =)"
+        main:32: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
     installed_apps:
         -   myapp
     files:
