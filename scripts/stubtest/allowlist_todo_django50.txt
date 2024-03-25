@@ -30,7 +30,6 @@ django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
 django.contrib.gis.admin.OpenLayersWidget
-django.contrib.gis.admin.options.spherical_mercator_srid
 django.contrib.gis.admin.widgets
 django.contrib.gis.db.backends.spatialite.schema.SpatialiteSchemaEditor.alter_db_table
 django.contrib.gis.db.models.Case.allowed_default
