@@ -4,8 +4,6 @@ from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
 from typing_extensions import Self
 
-from django_stubs_ext.db.models import ModelMeta as _ModelMeta
-
 class PostGISGeometryColumns(models.Model):
     f_table_catalog: Any
     f_table_schema: Any
@@ -15,7 +13,6 @@ class PostGISGeometryColumns(models.Model):
     srid: Any
     type: Any
     objects: ClassVar[models.Manager[Self]]
-    Meta: ClassVar[type[_ModelMeta]]
 
     @classmethod
     def table_name_col(cls) -> Any: ...
@@ -29,7 +26,6 @@ class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     srtext: Any
     proj4text: Any
     objects: ClassVar[models.Manager[Self]]
-    Meta: ClassVar[type[_ModelMeta]]
 
     @property
     def wkt(self) -> Any: ...

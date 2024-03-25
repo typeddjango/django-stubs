@@ -1,5 +1,5 @@
-from collections.abc import Iterable, Mapping
-from typing import Any, Literal, Sequence, TypeVar
+from collections.abc import Iterable
+from typing import Any, TypeVar
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -7,7 +7,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import _ErrorMessagesDict
-from django.forms.fields import Field, _ClassLevelWidgetT
+from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
 
@@ -28,11 +28,6 @@ class UsernameField(forms.CharField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class BaseUserCreationForm(forms.ModelForm[_User]):
-    class Meta:
-        model: type[AbstractBaseUser] = ...
-        fields: Sequence[str] | Literal["__all__"] = ...
-        field_classes: Mapping[str, type[Field]] = ...
-
     error_messages: _ErrorMessagesDict
     password1: forms.Field
     password2: forms.Field
@@ -44,11 +39,6 @@ class UserCreationForm(BaseUserCreationForm[_User]):
     def clean_username(self) -> str: ...
 
 class UserChangeForm(forms.ModelForm[_User]):
-    class Meta:
-        model: type[AbstractBaseUser] = ...
-        fields: Sequence[str] | Literal["__all__"] = ...
-        field_classes: Mapping[str, type[Field]] = ...
-
     password: forms.Field
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
