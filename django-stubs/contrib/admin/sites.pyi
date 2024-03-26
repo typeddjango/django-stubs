@@ -28,9 +28,6 @@ else:
 _ViewType = TypeVar("_ViewType", bound=Callable[..., HttpResponse])
 _ActionCallback: TypeAlias = Callable[[ModelAdmin, HttpRequest, QuerySet], TemplateResponse | None]
 
-class AlreadyRegistered(Exception): ...
-class NotRegistered(Exception): ...
-
 class AdminSite:
     site_title: _StrOrPromise
     site_header: _StrOrPromise
