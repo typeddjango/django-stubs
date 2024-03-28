@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+
     from typing import ClassVar, List, Literal, Sequence, Tuple, Union
 
     from django.db.models import BaseConstraint, Index, OrderBy
