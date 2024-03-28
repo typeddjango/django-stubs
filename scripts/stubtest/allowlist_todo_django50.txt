@@ -2,36 +2,9 @@
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore.
 
-django.contrib.admin.AdminSite.get_model_admin
-django.contrib.admin.AllValuesFieldListFilter.get_facet_counts
-django.contrib.admin.BooleanFieldListFilter.get_facet_counts
-django.contrib.admin.ChoicesFieldListFilter.get_facet_counts
-django.contrib.admin.DateFieldListFilter.get_facet_counts
-django.contrib.admin.EmptyFieldListFilter.get_facet_counts
-django.contrib.admin.EmptyFieldListFilter.get_lookup_condition
-django.contrib.admin.RelatedFieldListFilter.get_facet_counts
-django.contrib.admin.ShowFacets
-django.contrib.admin.SimpleListFilter.get_facet_counts
-django.contrib.admin.exceptions.AlreadyRegistered
-django.contrib.admin.exceptions.NotRegistered
-django.contrib.admin.filters.AllValuesFieldListFilter.get_facet_counts
-django.contrib.admin.filters.BooleanFieldListFilter.get_facet_counts
-django.contrib.admin.filters.ChoicesFieldListFilter.get_facet_counts
-django.contrib.admin.filters.DateFieldListFilter.get_facet_counts
-django.contrib.admin.filters.EmptyFieldListFilter.get_facet_counts
-django.contrib.admin.filters.EmptyFieldListFilter.get_lookup_condition
-django.contrib.admin.filters.FacetsMixin
-django.contrib.admin.filters.RelatedFieldListFilter.get_facet_counts
-django.contrib.admin.filters.SimpleListFilter.get_facet_counts
-django.contrib.admin.options.IS_FACETS_VAR
-django.contrib.admin.sites.AdminSite.get_model_admin
-django.contrib.admin.utils.build_q_object_from_lookup_parameters
-django.contrib.admin.utils.get_last_value_from_parameters
-django.contrib.admin.views.main.ChangeList.get_queryset
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
-django.contrib.gis.admin.AdminSite.get_model_admin
 django.contrib.gis.admin.OpenLayersWidget
 django.contrib.gis.admin.options.spherical_mercator_srid
 django.contrib.gis.admin.widgets
@@ -88,8 +61,6 @@ django.contrib.sites.migrations.0001_initial
 django.contrib.sites.migrations.0002_alter_domain_unique
 django.contrib.staticfiles.checks.E005
 django.contrib.staticfiles.checks.check_storages
-django.core.files.File.open
-django.core.files.base.File.open
 django.core.handlers.asgi.ASGIHandler.get_script_prefix
 django.core.handlers.asgi.ASGIHandler.listen_for_disconnect
 django.core.handlers.asgi.ASGIHandler.run_get_response

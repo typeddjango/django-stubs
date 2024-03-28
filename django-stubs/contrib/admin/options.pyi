@@ -38,6 +38,7 @@ from typing_extensions import TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
+IS_FACETS_VAR: str
 HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
 
