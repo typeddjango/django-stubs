@@ -130,6 +130,7 @@ class TemporalSubtraction(CombinedExpression):
 class F(_Deconstructible, Combinable):
     name: str
     def __init__(self, name: str) -> None: ...
+    def __getitem__(self, subscript: int | slice) -> Sliced: ...
     def resolve_expression(
         self,
         query: Any = ...,
@@ -152,7 +153,10 @@ class F(_Deconstructible, Combinable):
         nulls_first: bool | None = ...,
         nulls_last: bool | None = ...,
     ) -> OrderBy: ...
-    def copy(self) -> F: ...
+    def copy(self) -> Self: ...
+
+class Sliced(F):
+    def __init__(self, obj: F, subscript: int | slice) -> None: ...
 
 class ResolvedOuterRef(F):
     contains_aggregate: ClassVar[bool]
