@@ -1,10 +1,14 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.contrib.admin import ModelAdmin
-from django.contrib.gis.forms import BaseGeometryWidget
+from django.contrib.gis.forms import OSMWidget
+from django.db.models import Field
+from django.forms.fields import Field as FormField
+from django.http import HttpRequest
 
-spherical_mercator_srid: int
+class GeoModelAdminMixin:
+    gis_widget: ClassVar[type[OSMWidget]]
+    gis_widget_kwargs: ClassVar[dict[str, Any]]
+    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField: ...
 
-class GISModelAdmin(ModelAdmin):
-    gis_widget: BaseGeometryWidget
-    gis_widget_kwargs: dict[str, Any]
+class GISModelAdmin(GeoModelAdminMixin, ModelAdmin): ...
