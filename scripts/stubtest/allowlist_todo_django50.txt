@@ -61,8 +61,6 @@ django.contrib.sites.migrations.0001_initial
 django.contrib.sites.migrations.0002_alter_domain_unique
 django.contrib.staticfiles.checks.E005
 django.contrib.staticfiles.checks.check_storages
-django.core.cache.backends.base.memcached_error_chars_re
-django.core.cache.backends.redis
 django.core.handlers.asgi.ASGIHandler.get_script_prefix
 django.core.handlers.asgi.ASGIHandler.listen_for_disconnect
 django.core.handlers.asgi.ASGIHandler.run_get_response

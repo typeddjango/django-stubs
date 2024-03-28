@@ -57,6 +57,7 @@ django.contrib.gis.geometry.json_regex
 django.contrib.gis.geometry.wkt_regex
 django.contrib.gis.geos.hex_regex
 django.contrib.gis.geos.wkt_regex
+django.core.cache.backends.base.memcached_error_chars_re
 django.core.validators.EmailValidator.domain_regex
 django.core.validators.EmailValidator.literal_regex
 django.core.validators.EmailValidator.user_regex
