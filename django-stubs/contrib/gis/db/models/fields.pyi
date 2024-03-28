@@ -13,8 +13,8 @@ from django.contrib.gis.geos import (
     Polygon,
 )
 from django.core.validators import _ValidatorCallable
-from django.db.models.expressions import Combinable
-from django.db.models.fields import Field, _ErrorMessagesMapping, _FieldChoices
+from django.db.models.expressions import Combinable, Expression
+from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping, _FieldChoices
 from django.utils.functional import _StrOrPromise
 
 # __set__ value type
@@ -51,6 +51,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -95,6 +96,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,

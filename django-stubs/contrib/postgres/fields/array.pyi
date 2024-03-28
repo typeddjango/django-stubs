@@ -3,8 +3,8 @@ from typing import Any, TypeVar
 
 from django.core.validators import _ValidatorCallable
 from django.db.models import Field, Transform
-from django.db.models.expressions import Combinable
-from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping, _FieldChoices
+from django.db.models.expressions import Combinable, Expression
+from django.db.models.fields import NOT_PROVIDED, _ErrorMessagesDict, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.functional import _StrOrPromise
 
@@ -37,6 +37,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
