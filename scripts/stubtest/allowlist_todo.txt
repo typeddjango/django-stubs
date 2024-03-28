@@ -665,7 +665,6 @@ django.core.checks.registry.CheckRegistry.register
 django.core.files.locks.OVERLAPPED
 django.core.files.locks.PVOID
 django.core.files.locks.ULONG_PTR
-django.core.files.uploadedfile.InMemoryUploadedFile.__init__
 django.core.files.uploadedfile.UploadedFile.size
 django.core.files.utils.FileProxyMixin.encoding
 django.core.files.utils.FileProxyMixin.fileno
