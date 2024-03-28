@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from types import TracebackType
-from typing import IO, AnyStr, type_check_only
+from typing import IO, AnyStr, Callable, type_check_only
 
 from django.core.files.utils import FileProxyMixin
 from django.utils.functional import cached_property
@@ -26,7 +26,16 @@ class File(FileProxyMixin[AnyStr], IO[AnyStr]):
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...
-    def open(self, mode: str | None = ...) -> Self: ...
+    def open(
+        self,
+        mode: str | None = None,
+        buffering: int = -1,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
+        closefd: bool = True,
+        opener: Callable[[str, int], int] | None = None,
+    ) -> Self: ...
     def close(self) -> None: ...
     @type_check_only
     def __next__(self) -> AnyStr: ...
@@ -35,7 +44,7 @@ class ContentFile(File[AnyStr]):
     file: IO[AnyStr]
     def __init__(self, content: AnyStr, name: str | None = ...) -> None: ...
     def __bool__(self) -> bool: ...
-    def open(self, mode: str | None = ...) -> Self: ...
+    def open(self, mode: str | None = ...) -> Self: ...  # type: ignore[override]
     def close(self) -> None: ...
     def write(self, data: AnyStr) -> int: ...
 

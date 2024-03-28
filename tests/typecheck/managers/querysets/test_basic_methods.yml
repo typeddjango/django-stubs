@@ -59,6 +59,26 @@
                 class User(models.Model):
                     pass
 
+-   case: queryset_method_of_union
+    main: |
+        from myapp.models import MyModel1, MyModel2
+        import typing
+        kls: typing.Type[typing.Union[MyModel1, MyModel2]] = MyModel1
+        reveal_type(kls.objects)  # N: Revealed type is "Union[django.db.models.manager.Manager[myapp.models.MyModel1], django.db.models.manager.Manager[myapp.models.MyModel2]]"
+        reveal_type(kls.objects.all())  # N: Revealed type is "Union[django.db.models.query._QuerySet[myapp.models.MyModel1, myapp.models.MyModel1], django.db.models.query._QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]]"
+        reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel1(models.Model):
+                    pass
+                class MyModel2(models.Model):
+                    pass
+
 -   case: select_related_returns_queryset
     main: |
         from myapp.models import Book

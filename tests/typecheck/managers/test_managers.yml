@@ -48,7 +48,7 @@
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: Type[_T]) -> None:
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[_T`1]"
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
@@ -59,7 +59,7 @@
     main: |
         from myapp.models import Base, MyModel
         base_instance = Base(MyModel)
-        reveal_type(base_instance.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[myapp.models.MyModel]"
+        reveal_type(base_instance.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -73,12 +73,12 @@
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: Type[_T]) -> None:
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[_T`1]"
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
                     def method(self) -> None:
-                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.BaseManager[myapp.models.MyModel]"
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
 
 -   case: if_custom_manager_defined_it_is_set_to_default_manager
     main: |
@@ -547,12 +547,12 @@
         myapp/models:36: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
         myapp/models:37: note: Revealed type is "django.db.models.manager.Manager[myapp.models.User]"
         myapp/models:39: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Booking]"
-        myapp/models:40: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.Booking]"
+        myapp/models:40: note: Revealed type is "django.db.models.manager.Manager[myapp.models.Booking]"
         myapp/models:42: note: Revealed type is "myapp.models.UnknownManager[myapp.models.TwoUnresolvable]"
         myapp/models:43: note: Revealed type is "myapp.models.UnknownManager[myapp.models.TwoUnresolvable]"
-        myapp/models:44: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.TwoUnresolvable]"
+        myapp/models:44: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
         myapp/models:46: note: Revealed type is "myapp.models.UnknownManager[myapp.models.InvisibleUnresolvable]"
-        myapp/models:47: note: Revealed type is "django.db.models.manager.BaseManager[myapp.models.InvisibleUnresolvable]"
+        myapp/models:47: note: Revealed type is "django.db.models.manager.Manager[myapp.models.InvisibleUnresolvable]"
         myapp/models:49: note: Revealed type is "myapp.models.UnknownRelatedManager[myapp.models.Booking]"
         myapp/models:50: note: Revealed type is "myapp.models.UnknownRelatedManager[myapp.models.Booking]"
         myapp/models:53: note: Revealed type is "def () -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"

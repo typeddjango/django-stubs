@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator
+from re import Pattern
 from typing import Any
 
 from django.core.exceptions import ImproperlyConfigured
@@ -65,5 +66,7 @@ class BaseCache:
     async def adecr_version(self, key: Any, delta: int = ..., version: int | None = ...) -> int: ...
     def close(self, **kwargs: Any) -> None: ...
     async def aclose(self, **kwargs: Any) -> None: ...
+
+memcached_error_chars_re: Pattern[str]
 
 def memcache_key_warnings(key: str) -> Iterator[str]: ...

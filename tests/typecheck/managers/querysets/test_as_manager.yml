@@ -140,6 +140,44 @@
                 class MyModel(models.Model):
                     objects = ModelQuerySet.as_manager()
 
+-   case: includes_custom_queryset_methods_on_unions
+    main: |
+        from myapp.models import MyModel1, MyModel2
+        import typing
+        kls: typing.Type[typing.Union[MyModel1, MyModel2]] = MyModel1
+        reveal_type(kls.objects.custom_queryset_method())  # N: Revealed type is "Union[myapp.models.ModelQuerySet1, myapp.models.ModelQuerySet2]"
+        reveal_type(kls.objects.all().custom_queryset_method())  # N: Revealed type is "Union[myapp.models.ModelQuerySet1, myapp.models.ModelQuerySet2]"
+        reveal_type(kls.objects.returns_thing())  # N: Revealed type is "Union[builtins.int, builtins.str]"
+        reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing import Sequence
+
+                class ModelQuerySet1(models.QuerySet["MyModel1"]):
+                    def custom_queryset_method(self) -> "ModelQuerySet1":
+                        return self.all()
+
+                    def returns_thing(self) -> int:
+                      return 1
+
+                class ModelQuerySet2(models.QuerySet["MyModel2"]):
+                    def custom_queryset_method(self) -> "ModelQuerySet2":
+                        return self.all()
+
+                    def returns_thing(self) -> str:
+                      return "asdf"
+
+                class MyModel1(models.Model):
+                    objects = ModelQuerySet1.as_manager()
+
+                class MyModel2(models.Model):
+                    objects = ModelQuerySet2.as_manager()
+
 -   case: handles_call_outside_of_model_class_definition
     main: |
         from myapp.models import MyModel, MyModelManager
