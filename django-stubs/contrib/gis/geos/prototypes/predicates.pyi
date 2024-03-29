@@ -22,6 +22,7 @@ geos_crosses: Any
 geos_disjoint: Any
 geos_equals: Any
 geos_equalsexact: Any
+geos_equalsidentical: Any
 geos_intersects: Any
 geos_overlaps: Any
 geos_relatepattern: Any

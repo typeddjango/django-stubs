@@ -33,10 +33,7 @@ django.contrib.gis.forms.BoundField.template_name
 django.contrib.gis.forms.ClearableFileInput.checked
 django.contrib.gis.forms.Field.__init__
 django.contrib.gis.forms.fields_for_model
-django.contrib.gis.geos.geometry.GEOSGeometryBase.equals_identical
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
-django.contrib.gis.geos.prototypes.io.default_trim_value
-django.contrib.gis.geos.prototypes.predicates.geos_equalsidentical
 django.contrib.gis.management
 django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
