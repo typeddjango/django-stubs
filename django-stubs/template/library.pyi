@@ -19,15 +19,22 @@ class Library:
     filters: dict[str, Callable[[Any], Any] | Callable[[Any, Any], Any]]
     tags: dict[str, Callable[[Parser, Token], Node]]
     def __init__(self) -> None: ...
+    # @register.tag
     @overload
     def tag(self, name: _CompileC, /) -> _CompileC: ...
+    # register.tag("somename", somefunc)
     @overload
     def tag(self, name: str, compile_function: _CompileC) -> _CompileC: ...
+    # @register.tag()
+    # @register.tag("somename") or @register.tag(name="somename")
     @overload
     def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_CompileC], _CompileC]: ...
     def tag_function(self, func: _CompileC) -> _CompileC: ...
+    # @register.filter
     @overload
     def filter(self, name: _FilterC, /) -> _FilterC: ...
+    # @register.filter()
+    # @register.filter("somename") or @register.filter(name='somename')
     @overload
     def filter(
         self,
@@ -38,6 +45,7 @@ class Library:
         needs_autoescape: bool = ...,
         expects_localtime: bool = ...,
     ) -> Callable[[_FilterC], _FilterC]: ...
+    # register.filter("somename", somefunc)
     @overload
     def filter(
         self,
@@ -48,12 +56,16 @@ class Library:
         needs_autoescape: bool = ...,
         expects_localtime: bool = ...,
     ) -> _FilterC: ...
+    # @register.simple_tag
     @overload
     def simple_tag(self, func: _C, /) -> _C: ...
+    # @register.simple_tag(takes_context=True)
     @overload
     def simple_tag(
         self, *, takes_context: Literal[True], name: str | None = ...
     ) -> Callable[[_TakesContextC], _TakesContextC]: ...
+    # @register.simple_tag(takes_context=False)
+    # @register.simple_tag(...)
     @overload
     def simple_tag(
         self, *, takes_context: Literal[False] | None = ..., name: str | None = ...
