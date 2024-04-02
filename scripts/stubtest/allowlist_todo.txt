@@ -100,7 +100,6 @@ django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.backends.RemoteUserBackend.authenticate
 django.contrib.auth.backends.RemoteUserBackend.configure_user
-django.contrib.auth.base_user.AbstractBaseUser.Meta
 django.contrib.auth.base_user.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
@@ -108,12 +107,10 @@ django.contrib.auth.decorators.login_required
 django.contrib.auth.default_app_config
 django.contrib.auth.forms.AdminPasswordChangeForm
 django.contrib.auth.forms.AuthenticationForm
-django.contrib.auth.forms.BaseUserCreationForm.Meta
 django.contrib.auth.forms.BaseUserCreationForm.declared_fields
 django.contrib.auth.forms.PasswordChangeForm
 django.contrib.auth.forms.PasswordResetForm
 django.contrib.auth.forms.SetPasswordForm
-django.contrib.auth.forms.UserChangeForm.Meta
 django.contrib.auth.forms.UserChangeForm.declared_fields
 django.contrib.auth.forms.UserCreationForm.declared_fields
 django.contrib.auth.forms.UserModel
@@ -127,11 +124,9 @@ django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
 django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
 django.contrib.auth.management.commands.createsuperuser.PASSWORD_FIELD
-django.contrib.auth.models.AbstractBaseUser.Meta
 django.contrib.auth.models.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
-django.contrib.auth.models.AbstractUser.Meta
 django.contrib.auth.models.AbstractUser.date_joined
 django.contrib.auth.models.AbstractUser.email
 django.contrib.auth.models.AbstractUser.email_user
@@ -159,7 +154,6 @@ django.contrib.auth.models.Permission.content_type_id
 django.contrib.auth.models.Permission.id
 django.contrib.auth.models.Permission.name
 django.contrib.auth.models.PermissionManager.__slotnames__
-django.contrib.auth.models.PermissionsMixin.Meta
 django.contrib.auth.models.PermissionsMixin.groups
 django.contrib.auth.models.PermissionsMixin.is_superuser
 django.contrib.auth.models.PermissionsMixin.user_permissions
@@ -210,7 +204,6 @@ django.contrib.contenttypes.models.ContentType.permission_set
 django.contrib.contenttypes.models.ContentTypeManager.__init__
 django.contrib.contenttypes.models.ContentTypeManager.__slotnames__
 django.contrib.flatpages.admin.FlatPageAdmin
-django.contrib.flatpages.forms.FlatpageForm.Meta
 django.contrib.flatpages.forms.FlatpageForm.declared_fields
 django.contrib.flatpages.models.FlatPage.content
 django.contrib.flatpages.models.FlatPage.enable_comments
@@ -634,7 +627,6 @@ django.contrib.sessions.backends.base.SessionBase.get
 django.contrib.sessions.backends.base.SessionBase.setdefault
 django.contrib.sessions.backends.base.SessionBase.update
 django.contrib.sessions.backends.signed_cookies.SessionStore.exists
-django.contrib.sessions.base_session.AbstractBaseSession.Meta
 django.contrib.sessions.base_session.AbstractBaseSession.expire_date
 django.contrib.sessions.base_session.AbstractBaseSession.get_next_by_expire_date
 django.contrib.sessions.base_session.AbstractBaseSession.get_previous_by_expire_date
