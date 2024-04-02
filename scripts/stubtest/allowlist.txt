@@ -388,3 +388,13 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+
+# Ignore missing inner `Meta` class, see PR #2000 for the related discussion
+django.contrib.auth.base_user.AbstractBaseUser.Meta
+django.contrib.auth.forms.BaseUserCreationForm.Meta
+django.contrib.auth.forms.UserChangeForm.Meta
+django.contrib.auth.models.AbstractBaseUser.Meta
+django.contrib.auth.models.AbstractUser.Meta
+django.contrib.auth.models.PermissionsMixin.Meta
+django.contrib.flatpages.forms.FlatpageForm.Meta
+django.contrib.sessions.base_session.AbstractBaseSession.Meta

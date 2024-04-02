@@ -40,7 +40,6 @@ class Model(metaclass=ModelBase):
     # to only exist on subclasses it exists on during runtime.
     objects: ClassVar[Manager[Self]]
 
-    class Meta: ...
     _meta: ClassVar[Options[Self]]
     pk: Any
     _state: ModelState
