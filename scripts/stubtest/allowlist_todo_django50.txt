@@ -12,7 +12,6 @@ django.contrib.gis.db.backends.spatialite.schema.SpatialiteSchemaEditor.alter_db
 django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
-django.contrib.gis.db.models.Field.__init__
 django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.generated
 django.contrib.gis.db.models.FilteredRelation.relabeled_clone
@@ -74,7 +73,6 @@ django.db.backends.base.features.BaseDatabaseFeatures.supports_nulls_distinct_un
 django.db.backends.base.features.BaseDatabaseFeatures.supports_stored_generated_columns
 django.db.backends.base.features.BaseDatabaseFeatures.supports_virtual_generated_columns
 django.db.backends.base.operations.BaseDatabaseOperations.prepare_join_on_clause
-django.db.backends.base.schema.BaseDatabaseSchemaEditor.db_default_sql
 django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
 django.db.backends.mysql.features.DatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field
@@ -107,7 +105,6 @@ django.db.migrations.serializer.BaseUnorderedSequenceSerializer
 django.db.models.Case.allowed_default
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.F.allowed_default
-django.db.models.Field.__init__
 django.db.models.Field._get_flatchoices
 django.db.models.Field.generated
 django.db.models.FilteredRelation.relabeled_clone
@@ -133,7 +130,6 @@ django.db.models.expressions.OrderByList.allowed_default
 django.db.models.expressions.RawSQL.allowed_default
 django.db.models.expressions.Value.allowed_default
 django.db.models.expressions.When.allowed_default
-django.db.models.fields.Field.__init__
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.generated
 django.db.models.fields.related.ForeignKey.cast_db_type

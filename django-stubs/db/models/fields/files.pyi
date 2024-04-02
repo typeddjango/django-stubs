@@ -6,7 +6,8 @@ from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
-from django.db.models.fields import Field, _ErrorMessagesMapping, _FieldChoices
+from django.db.models.expressions import Expression
+from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
@@ -58,6 +59,7 @@ class FileField(Field):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | str = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
