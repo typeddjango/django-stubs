@@ -13,10 +13,6 @@ class SpatialiteGeometryColumns(models.Model):
     type: Any
     objects: ClassVar[models.Manager[Self]]
 
-    class Meta:
-        app_label: str
-        db_table: str
-        managed: bool
     @classmethod
     def table_name_col(cls) -> Any: ...
     @classmethod
@@ -31,9 +27,5 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     srtext: Any
     objects: ClassVar[models.Manager[Self]]
 
-    class Meta:
-        app_label: str
-        db_table: str
-        managed: bool
     @property
     def wkt(self) -> Any: ...

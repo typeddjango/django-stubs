@@ -4,8 +4,9 @@ from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, NoReturn, TypeVar
+from typing import Any, Generic, Literal, NoReturn, TypedDict, TypeVar, type_check_only
 
+from asgiref.typing import ASGIVersions
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
@@ -40,10 +41,11 @@ _T = TypeVar("_T")
 
 def closing_iterator_wrapper(iterable: Iterable[_T], close: Callable[[], Any]) -> Iterator[_T]: ...
 def conditional_content_removal(request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
-
+@type_check_only
 class _WSGIResponse(HttpResponseBase):
     wsgi_request: WSGIRequest
 
+@type_check_only
 class _ASGIResponse(HttpResponseBase):
     asgi_request: ASGIRequest
 
@@ -66,6 +68,7 @@ _GetDataType: TypeAlias = (
     | None
 )
 
+@type_check_only
 class _RequestFactory(Generic[_T]):
     json_encoder: type[JSONEncoder]
     defaults: dict[str, str]
@@ -151,10 +154,33 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
 
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
-class _AsyncRequestFactory(_RequestFactory[_T]): ...
+
+# A non total duplication of `asgiref.typing.HTTPScope`
+@type_check_only
+class _HTTPScope(TypedDict, total=False):
+    type: Literal["http"]
+    asgi: ASGIVersions
+    http_version: str
+    method: str
+    scheme: str
+    path: str
+    raw_path: bytes
+    query_string: bytes
+    root_path: str
+    headers: Iterable[tuple[bytes, bytes]]
+    client: tuple[str, int] | None
+    server: tuple[str, int | None] | None
+    state: dict[str, Any]
+    extensions: dict[str, dict[object, object]] | None
+
+@type_check_only
+class _AsyncRequestFactory(_RequestFactory[_T]):
+    defaults: _HTTPScope  # type: ignore[assignment]
+
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 
 # fakes to distinguish WSGIRequest and ASGIRequest
+@type_check_only
 class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     def json(self) -> Any: ...
     request: dict[str, Any]
@@ -165,6 +191,7 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     resolver_match: ResolverMatch
     redirect_chain: list[tuple[str, int]]
 
+@type_check_only
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
     def json(self) -> Any: ...
     request: dict[str, Any]
@@ -304,3 +331,88 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         **defaults: Any,
     ) -> None: ...
     async def request(self, **request: Any) -> _MonkeyPatchedASGIResponse: ...
+    async def get(  # type: ignore[override]
+        self,
+        path: str,
+        data: _GetDataType = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def post(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def head(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def options(  # type: ignore[override]
+        self,
+        path: str,
+        data: dict[str, str] | str = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def put(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def patch(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def delete(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        content_type: str = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...
+    async def trace(  # type: ignore[override]
+        self,
+        path: str,
+        data: Any = ...,
+        follow: bool = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        **extra: Any,
+    ) -> _MonkeyPatchedASGIResponse: ...

@@ -1,5 +1,5 @@
 from collections.abc import Collection, Iterable, Iterator, Mapping, MutableMapping, MutableSet
-from typing import Any, Generic, NoReturn, Protocol, TypeVar, overload
+from typing import Any, Generic, NoReturn, Protocol, TypeVar, overload, type_check_only
 
 from _typeshed import Incomplete
 from typing_extensions import Self, TypeAlias
@@ -13,6 +13,7 @@ _I = TypeVar("_I", covariant=True)
 # codebase. So we need sometimes to declare exactly list or tuple.
 _ListOrTuple: TypeAlias = list[_K] | tuple[_K, ...] | tuple[()]  # noqa: PYI047
 
+@type_check_only
 class _PropertyDescriptor(Generic[_K, _V]):
     """
     This helper property descriptor allows defining asynmetric getter/setters
@@ -35,7 +36,8 @@ class _PropertyDescriptor(Generic[_K, _V]):
     def __get__(self, instance: Any, owner: Any | None) -> _V: ...
     def __set__(self, instance: Any, value: _K) -> None: ...
 
-class _IndexableCollection(Protocol[_I], Collection[_I]):
+@type_check_only
+class _IndexableCollection(Protocol[_I], Collection[_I]):  # noqa: PYI046
     @overload
     def __getitem__(self, index: int) -> _I: ...
     @overload
@@ -92,10 +94,11 @@ class ImmutableList(tuple[_V, ...]):
     def __new__(cls, *args: Any, warning: str = ..., **kwargs: Any) -> Self: ...
     def complain(self, *args: Any, **kwargs: Any) -> NoReturn: ...
 
+@type_check_only
 class _ItemCallable(Protocol[_V]):
     """Don't mess with arguments when assigning in class body in stub"""
 
-    def __call__(self, __value: _V) -> _V: ...
+    def __call__(self, value: _V, /) -> _V: ...
 
 class DictWrapper(dict[str, _V]):
     func: _ItemCallable[_V]

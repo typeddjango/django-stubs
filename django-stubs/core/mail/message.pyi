@@ -1,6 +1,4 @@
 from collections.abc import Sequence
-from email import charset as Charset
-from email._policybase import Policy
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
@@ -27,30 +25,13 @@ class MIMEMixin:
     def as_string(self, unixfrom: bool = ..., linesep: str = ...) -> str: ...
     def as_bytes(self, unixfrom: bool = ..., linesep: str = ...) -> bytes: ...
 
-class SafeMIMEMessage(MIMEMixin, MIMEMessage):  # type: ignore[misc]
-    defects: list[Any]
-    epilogue: Any
-    policy: Policy
-    preamble: Any
-    def __setitem__(self, name: str, val: str) -> None: ...
+class SafeMIMEMessage(MIMEMixin, MIMEMessage): ...  # type: ignore[misc]
 
 class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore[misc]
-    defects: list[Any]
-    epilogue: None
-    policy: Policy
-    preamble: None
     encoding: str
     def __init__(self, _text: str, _subtype: str = ..., _charset: str = ...) -> None: ...
-    def __setitem__(self, name: str, val: str) -> None: ...
-    def set_payload(
-        self, payload: list[Message] | str | bytes, charset: str | Charset.Charset | None = ...
-    ) -> None: ...
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore[misc]
-    defects: list[Any]
-    epilogue: None
-    policy: Policy
-    preamble: None
     encoding: str
     def __init__(
         self,
@@ -60,7 +41,6 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore[misc]
         encoding: str = ...,
         **_params: Any,
     ) -> None: ...
-    def __setitem__(self, name: str, val: str) -> None: ...
 
 _AttachmentContent: TypeAlias = bytes | EmailMessage | Message | SafeMIMEText | str
 _AttachmentTuple: TypeAlias = (

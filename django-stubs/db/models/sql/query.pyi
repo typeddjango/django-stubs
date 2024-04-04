@@ -66,7 +66,7 @@ class Query(BaseExpression):
     select_related: dict[str, Any] | bool
     max_depth: int
     values_select: tuple
-    annotation_select_mask: set[str] | None
+    annotation_select_mask: list[str] | None
     combinator: str | None
     combinator_all: bool
     combined_queries: tuple

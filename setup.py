@@ -22,17 +22,18 @@ with open("README.md") as f:
 
 dependencies = [
     "django",
+    "asgiref",
     "django-stubs-ext>=5.0.0.dev1",
     "tomli; python_version < '3.11'",
     # Types:
     "typing-extensions",
-    "types-pytz",
     "types-PyYAML",
 ]
 
 # Keep compatible-mypy major.minor version pinned to what we use in CI (requirements.txt)
 extras_require = {
-    "compatible-mypy": ["mypy~=1.7.0"],
+    "compatible-mypy": ["mypy~=1.9.0"],
+    "redis": ["redis"],
 }
 
 setup(
@@ -67,12 +68,12 @@ setup(
         "Programming Language :: Python :: 3.12",
         "Typing :: Typed",
         "Framework :: Django",
-        "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.1",
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
     ],
     project_urls={
+        "Funding": "https://github.com/sponsors/typeddjango",
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",
     },
 )

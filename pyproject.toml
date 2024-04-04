@@ -6,6 +6,26 @@ include = '\.pyi?$'
 [tool.codespell]
 ignore-words-list = "aadd,acount,nam,asend"
 
+[tool.pyright]
+include = [
+    "django-stubs",
+    "ext/django_stubs_ext",
+    "mypy_django_plugin",
+    "scripts",
+    "tests",
+]
+exclude = [
+    ".github",
+    ".mypy_cache",
+    "build",
+]
+stubPath = "."
+typeCheckingMode = "strict"
+
+pythonVersion = "3.8"
+pythonPlatform = "All"
+
+
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 extend-exclude = [
@@ -16,6 +36,8 @@ extend-exclude = [
 ]
 line-length = 120
 target-version = "py38"
+
+[tool.ruff.lint]
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
 select = [
     "B",        # bugbear
@@ -33,7 +55,7 @@ select = [
 ]
 ignore = ["PYI021", "PYI024", "PYI041", "PYI043"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "*.pyi" = [
     "B",
     "E501",
@@ -48,10 +70,10 @@ ignore = ["PYI021", "PYI024", "PYI041", "PYI043"]
 "ext/tests/*.py" = ["INP001"]
 "setup.py" = ["INP001"]
 
-[tool.ruff.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 

@@ -31,9 +31,7 @@ class SQLCompiler:
     col_count: int | None
     def setup_query(self, with_col_aliases: bool = ...) -> None: ...
     has_extra_select: Any
-    def pre_sql_setup(
-        self, with_col_aliases: bool = ...
-    ) -> tuple[
+    def pre_sql_setup(self, with_col_aliases: bool = ...) -> tuple[
         list[tuple[Expression, _AsSqlType, None]],
         list[tuple[Expression, tuple[str, _ParamsT, bool]]],
         list[_AsSqlType],

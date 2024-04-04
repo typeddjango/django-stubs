@@ -4,8 +4,15 @@ from uuid import UUID
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
-from django.db.models.fields import Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _FieldChoices, _LimitChoicesTo
+from django.db.models.expressions import Combinable, Expression
+from django.db.models.fields import (
+    NOT_PROVIDED,
+    Field,
+    _AllLimitChoicesTo,
+    _ErrorMessagesMapping,
+    _FieldChoices,
+    _LimitChoicesTo,
+)
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
 from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor as ForwardOneToOneDescriptor
@@ -56,6 +63,7 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
         db_index: bool = ...,
         rel: ForeignObjectRel | None = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         serialize: bool = ...,
         unique_for_date: str | None = ...,
@@ -110,6 +118,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -166,6 +175,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -207,6 +217,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -285,7 +296,7 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     def __get__(self, instance: None, owner: Any) -> ManyToManyDescriptor[_To, _Through]: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner: Any) -> ManyRelatedManager[_To]: ...
+    def __get__(self, instance: Model, owner: Any) -> ManyRelatedManager[_To, _Through]: ...
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...

@@ -4,7 +4,7 @@ from gettext import NullTranslations
 from re import Pattern
 
 # switch to tuple once https://github.com/python/mypy/issues/11098 is fixed
-from typing import Any, Literal, Protocol, TypeVar
+from typing import Any, Literal, Protocol, TypeVar, type_check_only
 
 from django.http.request import HttpRequest
 from typing_extensions import TypeAlias
@@ -16,8 +16,9 @@ accept_language_re: Pattern[str]
 language_code_re: Pattern[str]
 language_code_prefix_re: Pattern[str]
 
+@type_check_only
 class _PluralCallable(Protocol):
-    def __call__(self, __n: int) -> int: ...
+    def __call__(self, n: int, /) -> int: ...
 
 def reset_cache(*, setting: str, **kwargs: Any) -> None: ...
 

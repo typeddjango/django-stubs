@@ -5,7 +5,7 @@ from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import BaseConstraint, Field, QuerySet
-from django.db.models.manager import BaseManager, Manager
+from django.db.models.manager import Manager
 from django.db.models.options import Options
 from typing_extensions import Self
 
@@ -24,9 +24,9 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def _default_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def _default_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
     @property
-    def _base_manager(cls: type[_Self]) -> BaseManager[_Self]: ...  # type: ignore[misc]
+    def _base_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
     # Note: these two metaclass generated attributes don't really exist on the 'Model'
@@ -40,7 +40,6 @@ class Model(metaclass=ModelBase):
     # to only exist on subclasses it exists on during runtime.
     objects: ClassVar[Manager[Self]]
 
-    class Meta: ...
     _meta: ClassVar[Options[Self]]
     pk: Any
     _state: ModelState
@@ -92,8 +91,8 @@ class Model(metaclass=ModelBase):
         using: str | None = ...,
         update_fields: Iterable[str] | None = ...,
     ) -> None: ...
-    def refresh_from_db(self, using: str | None = ..., fields: Sequence[str] | None = ...) -> None: ...
-    async def arefresh_from_db(self, using: str | None = ..., fields: Sequence[str] | None = ...) -> None: ...
+    def refresh_from_db(self, using: str | None = ..., fields: Iterable[str] | None = ...) -> None: ...
+    async def arefresh_from_db(self, using: str | None = ..., fields: Iterable[str] | None = ...) -> None: ...
     def serializable_value(self, field_name: str) -> Any: ...
     def prepare_database_save(self, field: Field) -> Any: ...
     def get_deferred_fields(self) -> set[str]: ...

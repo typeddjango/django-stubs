@@ -55,6 +55,7 @@ class DjangoTypeMetadata(TypedDict, total=False):
     model_bases: Dict[str, int]
     queryset_bases: Dict[str, int]
     m2m_throughs: Dict[str, str]
+    m2m_managers: Dict[str, str]
 
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
@@ -79,6 +80,20 @@ def get_reverse_manager_info(
 
 def set_reverse_manager_info(model_info: TypeInfo, derived_from: str, fullname: str) -> None:
     get_django_metadata(model_info).setdefault("reverse_managers", {})[derived_from] = fullname
+
+
+def get_many_to_many_manager_info(
+    api: Union[TypeChecker, SemanticAnalyzer], *, to: TypeInfo, derived_from: str
+) -> Optional[TypeInfo]:
+    manager_fullname = get_django_metadata(to).get("m2m_managers", {}).get(derived_from)
+    if not manager_fullname:
+        return None
+
+    return lookup_fully_qualified_typeinfo(api, manager_fullname)
+
+
+def set_many_to_many_manager_info(to: TypeInfo, derived_from: str, manager_info: TypeInfo) -> None:
+    get_django_metadata(to).setdefault("m2m_managers", {})[derived_from] = manager_info.fullname
 
 
 class IncompleteDefnException(Exception):
@@ -265,7 +280,7 @@ def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
     new_typeinfo = TypeInfo(SymbolTable(), classdef, module)
     new_typeinfo.bases = bases
     calculate_mro(new_typeinfo)
-    new_typeinfo.calculate_metaclass_type()
+    new_typeinfo.metaclass_type = new_typeinfo.calculate_metaclass_type()
 
     classdef.info = new_typeinfo
 
@@ -416,6 +431,9 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
 
 
 def is_abstract_model(model: TypeInfo) -> bool:
+    if model.fullname in fullnames.DJANGO_ABSTRACT_MODELS:
+        return True
+
     if not is_model_type(model):
         return False
 

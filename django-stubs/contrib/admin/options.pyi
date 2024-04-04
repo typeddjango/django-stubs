@@ -1,5 +1,6 @@
+import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -37,10 +38,16 @@ from typing_extensions import TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
+IS_FACETS_VAR: str
 HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
 
 _Direction: TypeAlias = Literal[1, 2]
+
+class ShowFacets(enum.Enum):
+    NEVER: str
+    ALLOW: str
+    ALWAYS: str
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -52,10 +59,12 @@ csrf_protect_m: Any
 
 _FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
 
+@type_check_only
 class _OptionalFieldOpts(TypedDict, total=False):
     classes: Sequence[str]
     description: _StrOrPromise
 
+@type_check_only
 class _FieldOpts(_OptionalFieldOpts, total=True):
     fields: _FieldGroups
 
@@ -91,7 +100,6 @@ class BaseModelAdmin(Generic[_ModelT]):
     readonly_fields: _ListOrTuple[str]
     ordering: _ListOrTuple[str] | None
     sortable_by: _ListOrTuple[str] | None
-    view_on_site: bool | Callable[[_ModelT], str]
     show_full_result_count: bool
     checks_class: Any
     model: type[_ModelT]
@@ -99,7 +107,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     admin_site: AdminSite
     def __init__(self) -> None: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
-    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField | None: ...
+    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField: ...
     def formfield_for_choice_field(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> TypedChoiceField: ...
     def get_field_queryset(self, db: str | None, db_field: RelatedField, request: HttpRequest) -> QuerySet | None: ...
     def formfield_for_foreignkey(
@@ -120,7 +128,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     def get_prepopulated_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> dict[str, Sequence[str]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ModelT]: ...
     def get_sortable_by(self, request: HttpRequest) -> _DisplayT[_ModelT]: ...
-    def lookup_allowed(self, lookup: str, value: str) -> bool: ...
+    def lookup_allowed(self, lookup: str, value: str, request: HttpRequest | None = ...) -> bool: ...
     def to_field_allowed(self, request: HttpRequest, to_field: str) -> bool: ...
     def has_add_permission(self, request: HttpRequest) -> bool: ...
     def has_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
@@ -128,6 +136,8 @@ class BaseModelAdmin(Generic[_ModelT]):
     def has_view_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_view_or_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_module_permission(self, request: HttpRequest) -> bool: ...
+    @property
+    def view_on_site(self) -> Callable[[_ModelT], str] | bool: ...
 
 _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
 _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], HttpResponseBase | None]
@@ -148,6 +158,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     save_on_top: bool
     paginator: type
     preserve_filters: bool
+    show_facets: ShowFacets
     inlines: _ListOrTuple[type[InlineModelAdmin]]
     add_form_template: _TemplateForResponseT | None
     change_form_template: _TemplateForResponseT | None
