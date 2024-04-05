@@ -173,16 +173,22 @@ def get_class_fullname(klass: type) -> str:
 def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
     """
     Return the expression for the specific argument.
-    This helper should only be used with non-star arguments.
     """
-    if name not in ctx.callee_arg_names:
-        return None
-    idx = ctx.callee_arg_names.index(name)
-    args = ctx.args[idx]
-    if len(args) != 1:
-        # Either an error or no value passed.
-        return None
-    return args[0]
+    # first check for named arg on function definition
+    if name in ctx.callee_arg_names:
+        idx = ctx.callee_arg_names.index(name)
+        args = ctx.args[idx]
+        if len(args) != 1:
+            # Either an error or no value passed.
+            return None
+        return args[0]
+
+    # check for named arg in function call keyword args
+    if name in ctx.arg_names[1]:
+        idx = ctx.arg_names[1].index(name)
+        return ctx.args[1][idx]
+
+    return None
 
 
 def get_call_argument_type_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[MypyType]:

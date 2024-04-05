@@ -1,0 +1,28 @@
+-   case: test_custom_model_fields_with_passthrough_constructor
+    main: |
+        from myapp.models import User
+        user = User()
+        reveal_type(user.id)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field)  # N: Revealed type is "Union[builtins.int, None]"
+    monkeypatch: true
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models import fields
+
+                from typing import Any, TypeVar
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class MyIntegerField(fields.IntegerField[_ST, _GT]):
+                    def __init__(self, *args: Any, **kwargs: Any) -> None:
+                        super().__init__(*args, **kwargs)
+
+                class User(models.Model):
+                    id = models.AutoField(primary_key=True)
+                    my_custom_field = MyIntegerField(null=True)
