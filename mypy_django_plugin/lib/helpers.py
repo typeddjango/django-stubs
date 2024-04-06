@@ -173,6 +173,7 @@ def get_class_fullname(klass: type) -> str:
 def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
     """
     Return the expression for the specific argument.
+    This helper should only be used with non-star arguments.
     """
     # first check for named arg on function definition
     if name in ctx.callee_arg_names:
