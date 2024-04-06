@@ -1,0 +1,42 @@
+- case: test_custom_queryset_with_passthrough_values_list
+  main: |
+    from typing import Any, TypeVar, Self
+    from django.db.models.base import Model
+    from django.db.models.query import QuerySet
+    from myapp.models import MyUser
+
+    _Model = TypeVar("_Model", bound=Model, covariant=True)
+
+    class CustomQuerySet(QuerySet[_Model]):
+        def values_list(self, *args: Any, **kwargs: Any) -> QuerySet[_Model]:
+            return super().values_list(*args, **kwargs)
+
+    qs = CustomQuerySet[MyUser](model=MyUser)
+
+    # checking that the CustomQuerySet returns same types as MyUser's qs when using "flat" and "named" args which use
+    # "get_call_argument_by_name" helper function in plugin
+    reveal_type(MyUser.objects.values_list('name').get())  # N: Revealed type is "Tuple[builtins.str]"
+    reveal_type(qs.values_list('name').get())  # N: Revealed type is "Tuple[builtins.str]"
+
+    reveal_type(MyUser.objects.values_list('name', flat=True).get())  # N: Revealed type is "builtins.str"
+    reveal_type(qs.values_list('name', flat=True).get())  # N: Revealed type is "builtins.str"
+
+    reveal_type(MyUser.objects.values_list('name', named=True).get())  # N: Revealed type is "Tuple[builtins.str, fallback=main.Row]"
+    reveal_type(qs.values_list('name', named=True).get())  # N: Revealed type is "Tuple[builtins.str, fallback=main.Row1]"
+
+    reveal_type(MyUser.objects.values_list('name', flat=True, named=True).get())
+    reveal_type(qs.values_list('name', flat=True, named=True).get())
+  out: |
+    main:25: error: 'flat' and 'named' can't be used together  [misc]
+    main:25: note: Revealed type is "Any"
+    main:26: error: 'flat' and 'named' can't be used together  [misc]
+    main:26: note: Revealed type is "Any"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class MyUser(models.Model):
+            name = models.CharField(max_length=100)
