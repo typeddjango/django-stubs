@@ -185,9 +185,10 @@ def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: 
         return args[0]
 
     # check for named arg in function call keyword args
-    if name in ctx.arg_names[1]:
-        idx = ctx.arg_names[1].index(name)
-        return ctx.args[1][idx]
+    for arg_group_idx, arg_group in enumerate(ctx.arg_names):
+        if name in arg_group:
+            arg_name_idx = arg_group.index(name)
+            return ctx.args[arg_group_idx][arg_name_idx]
 
     return None
 

@@ -3,10 +3,17 @@
         from myapp.models import User
         user = User()
         reveal_type(user.id)  # N: Revealed type is "builtins.int"
-        reveal_type(user.my_custom_field)  # N: Revealed type is "Union[builtins.int, None]"
+        reveal_type(user.my_custom_field1)  # N: Revealed type is "Union[builtins.int, None]"
+        reveal_type(user.my_custom_field2)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field3)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field4)  # N: Revealed type is "Union[builtins.int, None]"
+        reveal_type(user.my_custom_field5)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field6)  # N: Revealed type is "builtins.int"
     monkeypatch: true
     installed_apps:
         - myapp
+    out: |
+        myapp/models:15: error: "__init__" of "Field" gets multiple values for keyword argument "blank"  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -23,6 +30,15 @@
                     def __init__(self, *args: Any, **kwargs: Any) -> None:
                         super().__init__(*args, **kwargs)
 
+                class MyIntegerFieldBlank(fields.IntegerField[_ST, _GT]):
+                    def __init__(self, *args: Any, blank: bool = True, **kwargs: Any) -> None:
+                        super().__init__(*args, blank=blank, **kwargs)
+
                 class User(models.Model):
                     id = models.AutoField(primary_key=True)
-                    my_custom_field = MyIntegerField(null=True)
+                    my_custom_field1 = MyIntegerField(null=True)
+                    my_custom_field2 = MyIntegerField(null=False)
+                    my_custom_field3 = MyIntegerField()
+                    my_custom_field4 = MyIntegerFieldBlank(null=True)
+                    my_custom_field5 = MyIntegerFieldBlank(null=False)
+                    my_custom_field6 = MyIntegerFieldBlank()
