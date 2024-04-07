@@ -1,6 +1,6 @@
 - case: test_custom_queryset_with_passthrough_values_list
   main: |
-    from typing import Any, TypeVar, Self
+    from typing import Any, TypeVar
     from django.db.models.base import Model
     from django.db.models.query import QuerySet
     from myapp.models import MyUser
