@@ -1,5 +1,5 @@
-from collections.abc import Iterable, Mapping
 import datetime
+from collections.abc import Iterable, Mapping
 from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload, type_check_only
