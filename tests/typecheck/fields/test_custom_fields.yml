@@ -27,7 +27,7 @@
                 from django.db import models
                 from django.db.models import fields
 
-                from typing import Any, TypeVar, Generic
+                from typing import Any, TypeVar, Generic, Union
 
                 _ST = TypeVar("_ST", contravariant=True)
                 _GT = TypeVar("_GT", covariant=True)
@@ -40,7 +40,7 @@
 
                 class SingleTypeField(fields.Field[T, T]): ...
 
-                class CustomValueField(fields.Field[CustomFieldValue | int, CustomFieldValue]): ...
+                class CustomValueField(fields.Field[Union[CustomFieldValue, int], CustomFieldValue]): ...
 
                 class AdditionalTypeVarField(fields.Field[_ST, _GT], Generic[_ST, _GT, T]): ...
 
@@ -48,15 +48,15 @@
 
                 class User(models.Model):
                     id = models.AutoField(primary_key=True)
-                    my_custom_field1 = GenericField[CustomFieldValue | int, CustomFieldValue]()
+                    my_custom_field1 = GenericField[Union[CustomFieldValue, int], CustomFieldValue]()
                     my_custom_field2 = CustomValueField()
                     my_custom_field3 = SingleTypeField[bool]()
-                    my_custom_field4 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool]()
-                    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)
+                    my_custom_field4 = AdditionalTypeVarField[Union[CustomFieldValue, int], CustomFieldValue, bool]()
+                    my_custom_field5 = GenericField[Union[CustomFieldValue, int], CustomFieldValue](null=True)
                     my_custom_field6 = CustomValueField(null=True)
                     my_custom_field7 = SingleTypeField[bool](null=True)
-                    my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)
-                    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue]()
-                    my_custom_field10 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)
+                    my_custom_field8 = AdditionalTypeVarField[Union[CustomFieldValue, int], CustomFieldValue, bool](null=True)
+                    my_custom_field9 = fields.Field[Union[CustomFieldValue, int], CustomFieldValue]()
+                    my_custom_field10 = fields.Field[Union[CustomFieldValue, int], CustomFieldValue](null=True)
                     my_custom_field11 = fields.SmallIntegerField[bool, bool]()
                     my_custom_field12 = CustomSmallIntegerField[bool, bool]()
