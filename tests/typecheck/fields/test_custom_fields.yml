@@ -1,0 +1,62 @@
+-   case: test_custom_model_fields_with_generic_type
+    main: |
+        from myapp.models import User, CustomFieldValue
+        user = User()
+        reveal_type(user.id)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field1)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field2)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field3)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field4)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field5)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
+        # user.my_custom_field6 is incorrectly typed as non-optional
+        # reveal_type(user.my_custom_field6) ## N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
+        reveal_type(user.my_custom_field7)  # N: Revealed type is "Union[builtins.bool, None]"
+        reveal_type(user.my_custom_field8)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
+        reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field10)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
+        # Fields that set _pyi_private_set_type or _pyi_private_get_type retain these types
+        reveal_type(user.my_custom_field11)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field12)  # N: Revealed type is "builtins.int"
+    monkeypatch: true
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models import fields
+
+                from typing import Any, TypeVar, Generic
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                T = TypeVar("T")
+
+                class CustomFieldValue: ...
+
+                class GenericField(fields.Field[_ST, _GT]): ...
+
+                class SingleTypeField(fields.Field[T, T]): ...
+
+                class CustomValueField(fields.Field[CustomFieldValue | int, CustomFieldValue]): ...
+
+                class AdditionalTypeVarField(fields.Field[_ST, _GT], Generic[_ST, _GT, T]): ...
+
+                class CustomSmallIntegerField(fields.SmallIntegerField[_ST, _GT]): ...
+
+                class User(models.Model):
+                    id = models.AutoField(primary_key=True)
+                    my_custom_field1 = GenericField[CustomFieldValue | int, CustomFieldValue]()
+                    my_custom_field2 = CustomValueField()
+                    my_custom_field3 = SingleTypeField[bool]()
+                    my_custom_field4 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool]()
+                    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)
+                    my_custom_field6 = CustomValueField(null=True)
+                    my_custom_field7 = SingleTypeField[bool](null=True)
+                    my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)
+                    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue]()
+                    my_custom_field10 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)
+                    my_custom_field11 = fields.SmallIntegerField[bool, bool]()
+                    my_custom_field12 = CustomSmallIntegerField[bool, bool]()
