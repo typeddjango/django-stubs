@@ -48,6 +48,7 @@ class Q(tree.Node):
 class DeferredAttribute:
     field: Field
     def __init__(self, field: Field) -> None: ...
+    def __get__(self, instance: Model | None, cls: type[Model] | None = None) -> Any: ...
 
 _R = TypeVar("_R", bound=type)
 
