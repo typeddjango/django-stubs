@@ -1417,7 +1417,6 @@ django.db.models.sql.where.WhereNode.set_source_expressions
 django.db.models.sql.where.WhereNode.split_having
 django.db.models.sql.where.WhereNode.split_having_qualify
 django.db.models.sql.where.XOR
-django.db.models.utils.AltersData
 django.db.utils.ConnectionHandler.configure_settings
 django.db.utils.ConnectionHandler.ensure_defaults
 django.db.utils.ConnectionHandler.prepare_test_settings
