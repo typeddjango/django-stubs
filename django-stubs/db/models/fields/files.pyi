@@ -9,11 +9,12 @@ from django.db.models.base import Model
 from django.db.models.expressions import Expression
 from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
+from django.db.models.utils import AltersData
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self
 
-class FieldFile(File):
+class FieldFile(File, AltersData):
     instance: Model
     field: FileField
     storage: Storage
@@ -31,6 +32,10 @@ class FieldFile(File):
     def delete(self, save: bool = ...) -> None: ...
     @property
     def closed(self) -> bool: ...
+    def __getstate__(self) -> dict[str, Any]: ...
+    def __setstate__(self, state: dict[str, Any]) -> None: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class FileDescriptor(DeferredAttribute):
     field: FileField
