@@ -173,6 +173,19 @@ def get_class_fullname(klass: type) -> str:
 def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
     """
     Return the expression for the specific argument.
+
+    It first checks the function definition for the presence of the argument in its parameters, returning the associated
+    expression for the argument if found. This handles the case of getting the expression of `null` in
+
+    >>> def first_case(null: bool=False) -> Any: ...
+    >>> first_case(null=True)
+
+    If not found, it is searched for in the names of actual arguments in the call expression, returning the expression
+    for the argument if found. This handles the case of getting the expression of `null` in
+
+    >>> def second_case(*args, **kwargs) -> Any: ...
+    >>> second_case(null=True)
+
     This helper should only be used with non-star arguments.
     """
     # first check for named arg on function definition
