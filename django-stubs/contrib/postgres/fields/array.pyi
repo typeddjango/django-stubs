@@ -47,6 +47,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
+        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
