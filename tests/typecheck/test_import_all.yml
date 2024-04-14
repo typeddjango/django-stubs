@@ -277,7 +277,6 @@
         import django.db.migrations.recorder
         import django.db.migrations.serializer
         import django.db.migrations.state
-        import django.db.migrations.topological_sort
         import django.db.migrations.utils
         import django.db.migrations.writer
         import django.db.models.aggregates
@@ -426,7 +425,6 @@
         import django.utils.text
         import django.utils.timesince
         import django.utils.timezone
-        import django.utils.topological_sort
         import django.utils.translation
         import django.utils.translation.reloader
         import django.utils.translation.template
