@@ -2,7 +2,7 @@ from typing import Any, ClassVar, Literal
 
 from django.db import models
 from django.db.models.lookups import PostgresOperatorLookup
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range  # type: ignore [import-untyped]
 
 class RangeBoundary(models.Expression):
     lower: str
