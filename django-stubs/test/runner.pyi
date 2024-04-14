@@ -83,6 +83,7 @@ class ParallelTestSuite(TestSuite):
     buffer: bool
     initial_settings: Any
     serialized_contents: Any
+    used_aliases: set[str] | None
     def __init__(
         self, subsuites: list[TestSuite], processes: int, failfast: bool = ..., buffer: bool = ...
     ) -> None: ...
