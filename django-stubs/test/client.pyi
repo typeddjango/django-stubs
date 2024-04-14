@@ -1,4 +1,5 @@
-from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
+from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Callable, Iterable, Iterator, Mapping
+from http import HTTPStatus
 from http.cookies import SimpleCookie
 from io import BytesIO, IOBase
 from json import JSONEncoder
@@ -23,6 +24,7 @@ BOUNDARY: str
 MULTIPART_CONTENT: str
 CONTENT_TYPE_RE: Pattern[str]
 JSON_CONTENT_TYPE_RE: Pattern[str]
+REDIRECT_STATUS_CODES: frozenset[HTTPStatus]
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
@@ -40,6 +42,7 @@ class FakePayload(IOBase):
 _T = TypeVar("_T")
 
 def closing_iterator_wrapper(iterable: Iterable[_T], close: Callable[[], Any]) -> Iterator[_T]: ...
+async def aclosing_iterator_wrapper(iterable: AsyncIterable[_T], close: Callable[[], Any]) -> AsyncIterator[_T]: ...
 def conditional_content_removal(request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
 @type_check_only
 class _WSGIResponse(HttpResponseBase):
