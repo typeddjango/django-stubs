@@ -1566,8 +1566,6 @@ django.template.utils.EngineHandler.__init__
 django.templatetags.i18n.BlockTranslateNode.__init__
 django.templatetags.static.PrefixNode.__init__
 django.templatetags.static.StaticNode.__init__
-django.test.SimpleTestCase.assertFormError
-django.test.SimpleTestCase.assertFormSetError
 django.test.SimpleTestCase.assertTemplateNotUsed
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by
@@ -1607,8 +1605,6 @@ django.test.selenium.SeleniumTestCaseBase.selenium_hub
 django.test.testcases.LiveServerThread.__init__
 django.test.testcases.LiveServerThread.server_class
 django.test.testcases.SerializeMixin.tearDownClass
-django.test.testcases.SimpleTestCase.assertFormError
-django.test.testcases.SimpleTestCase.assertFormSetError
 django.test.testcases.SimpleTestCase.assertTemplateNotUsed
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
