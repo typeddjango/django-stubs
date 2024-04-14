@@ -180,8 +180,5 @@ django.forms.renderers.BaseRenderer.field_template_name
 django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.forms.utils.RenderableFieldMixin
 django.forms.widgets.ClearableFileInput.checked
-django.template.Template.__iter__
 django.template.autoreload
-django.template.base.Template.__iter__
-django.template.defaultfilters.escapeseq
 django.utils.choices
