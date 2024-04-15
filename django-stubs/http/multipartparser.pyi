@@ -10,7 +10,7 @@ class InputStreamExhausted(Exception): ...
 RAW: Literal["raw"]
 FILE: Literal["file"]
 FIELD: Literal["field"]
-FIELD_TYPES: frozenset[Literal["field", "raw"]]
+FIELD_TYPES: frozenset[str]
 
 class MultiPartParser:
     def __init__(
