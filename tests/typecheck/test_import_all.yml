@@ -684,7 +684,5 @@
         import django.views.i18n
         import django.views.static
     mypy_config: |
-        [mypy]
-        ignore_missing_imports = false
         [mypy-redis.*]
         ignore_errors = True
