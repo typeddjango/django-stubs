@@ -63,3 +63,5 @@
             content: |
                 def extra_fn() -> None:
                   pass
+    env:
+        -   MYPYPATH=./extras

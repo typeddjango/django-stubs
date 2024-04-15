@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup
-
-from setuptools import find_packages
+from setuptools import find_packages, setup  # type: ignore[import-untyped]
 
 with open("README.md") as f:
     readme = f.read()
