@@ -61,8 +61,6 @@ django.core.handlers.asgi.ASGIHandler.get_script_prefix
 django.core.handlers.asgi.ASGIHandler.listen_for_disconnect
 django.core.handlers.asgi.ASGIHandler.run_get_response
 django.core.handlers.asgi.get_script_prefix
-django.core.management.commands.inspectdb.Command.normalize_table_name
-django.core.management.commands.optimizemigration
 django.core.serializers.base.PickleSerializer
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
