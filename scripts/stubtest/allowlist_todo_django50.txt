@@ -46,7 +46,6 @@ django.contrib.messages.test
 django.contrib.redirects.migrations.0001_initial
 django.contrib.redirects.migrations.0002_alter_redirect_new_path_help_text
 django.contrib.sessions.migrations.0001_initial
-django.contrib.sessions.serializers.PickleSerializer
 django.contrib.sitemaps.PING_URL
 django.contrib.sitemaps.SitemapNotFound
 django.contrib.sitemaps.management
@@ -57,7 +56,6 @@ django.contrib.sites.migrations.0001_initial
 django.contrib.sites.migrations.0002_alter_domain_unique
 django.contrib.staticfiles.checks.E005
 django.contrib.staticfiles.checks.check_storages
-django.core.serializers.base.PickleSerializer
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
 django.db.backends.base.features.BaseDatabaseFeatures.supports_default_keyword_in_bulk_insert

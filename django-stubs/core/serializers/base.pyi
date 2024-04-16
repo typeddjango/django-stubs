@@ -1,18 +1,11 @@
 from collections.abc import Collection, Iterable, Sequence
 from typing import IO, Any
 
-from _typeshed import ReadableBuffer
 from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 DEFER_FIELD: object
-
-class PickleSerializer:
-    protocol: int
-    def __init__(self, protocol: int | None = ...) -> None: ...
-    def dumps(self, obj: Any) -> bytes: ...
-    def loads(self, data: ReadableBuffer) -> Any: ...
 
 class SerializerDoesNotExist(KeyError): ...
 class SerializationError(Exception): ...
