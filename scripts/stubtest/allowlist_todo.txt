@@ -658,13 +658,7 @@ django.core.files.utils.FileProxyMixin.tell
 django.core.files.utils.FileProxyMixin.truncate
 django.core.files.utils.FileProxyMixin.write
 django.core.files.utils.FileProxyMixin.writelines
-django.core.handlers.asgi.ASGIHandler.handle
 django.core.handlers.asgi.ASGIRequest.FILES
-django.core.handlers.asgi.logger
-django.core.handlers.base.logger
-django.core.handlers.base.reset_urlconf
-django.core.handlers.wsgi.LimitedStream
-django.core.handlers.wsgi.LimitedStream.__init__
 django.core.handlers.wsgi.WSGIRequest.COOKIES
 django.core.handlers.wsgi.WSGIRequest.FILES
 django.core.handlers.wsgi.WSGIRequest.GET
