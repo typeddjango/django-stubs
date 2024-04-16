@@ -2,6 +2,7 @@ from collections.abc import Awaitable, Callable
 from logging import Logger
 from typing import Any
 
+import _typeshed
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
 from django.urls.resolvers import ResolverMatch
@@ -25,4 +26,4 @@ class BaseHandler:
     def make_view_atomic(self, view: Callable[..., HttpResponseBase]) -> Callable[..., HttpResponseBase]: ...
     def process_exception_by_middleware(self, exception: Exception, request: HttpRequest) -> HttpResponse: ...
 
-def reset_urlconf(sender: object, **kwargs: Any) -> None: ...
+def reset_urlconf(sender: _typeshed.Unused, **kwargs: Any) -> None: ...
