@@ -1,4 +1,5 @@
 from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
+from logging import Logger
 from typing import IO, Any, TypeVar
 
 from django.core.handlers import base
@@ -12,6 +13,10 @@ from typing_extensions import TypeAlias
 _ReceiveCallback: TypeAlias = Callable[[], Awaitable[Mapping[str, Any]]]
 
 _SendCallback: TypeAlias = Callable[[Mapping[str, Any]], Awaitable[None]]
+
+logger: Logger
+
+def get_script_prefix(scope: Mapping[str, Any]) -> str: ...
 
 class ASGIRequest(HttpRequest):
     body_receive_timeout: int
@@ -42,6 +47,11 @@ class ASGIHandler(base.BaseHandler):
         receive: _ReceiveCallback,
         send: _SendCallback,
     ) -> None: ...
+    async def handle(
+        self, scope: dict[str, Any], receive: _ReceiveCallback, send: _SendCallback
+    ) -> HttpResponseBase | None: ...
+    async def listen_for_disconnect(self, receive: _ReceiveCallback) -> None: ...
+    async def run_get_response(self, request: HttpRequest) -> HttpResponseBase: ...
     async def read_body(self, receive: _ReceiveCallback) -> IO[bytes]: ...
     def create_request(
         self, scope: Mapping[str, Any], body_file: IO[bytes]
@@ -52,4 +62,3 @@ class ASGIHandler(base.BaseHandler):
     async def send_response(self, response: HttpResponseBase, send: _SendCallback) -> None: ...
     @classmethod
     def chunk_bytes(cls, data: Sequence[_T]) -> Iterator[tuple[Sequence[_T], bool]]: ...
-    def get_script_prefix(self, scope: Mapping[str, Any]) -> str: ...
