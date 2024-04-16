@@ -57,8 +57,6 @@ django.contrib.sites.migrations.0001_initial
 django.contrib.sites.migrations.0002_alter_domain_unique
 django.contrib.staticfiles.checks.E005
 django.contrib.staticfiles.checks.check_storages
-django.core.management.commands.inspectdb.Command.normalize_table_name
-django.core.management.commands.optimizemigration
 django.core.serializers.base.PickleSerializer
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
