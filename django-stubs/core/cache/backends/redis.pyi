@@ -4,9 +4,8 @@ from typing import Any, Callable, Iterable, Protocol, SupportsInt, overload, typ
 
 from _typeshed import ReadableBuffer
 from django.core.cache.backends.base import BaseCache
-from redis._parsers import BaseParser
 from redis.client import Redis
-from redis.connection import ConnectionPool
+from redis.connection import BaseParser, ConnectionPool
 from typing_extensions import TypeAlias
 
 @type_check_only
