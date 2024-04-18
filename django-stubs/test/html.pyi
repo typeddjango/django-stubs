@@ -30,7 +30,6 @@ class RootElement(Element):
 class HTMLParseError(Exception): ...
 
 class Parser(HTMLParser):
-    SELF_CLOSING_TAGS: Any
     root: Any
     open_tags: Any
     element_positions: Any

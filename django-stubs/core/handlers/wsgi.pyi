@@ -1,8 +1,7 @@
 import sys
-from io import BytesIO
+from io import BytesIO, IOBase
 from typing import Any
 
-from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers import base
 from django.http import HttpRequest
 from django.http.response import HttpResponseBase
@@ -12,19 +11,14 @@ if sys.version_info >= (3, 11):
 else:
     from _typeshed.wsgi import StartResponse, WSGIEnvironment
 
-class LimitedStream:
-    stream: BytesIO
-    remaining: int
-    buffer: bytes
-    buf_size: int
-    def __init__(self, stream: BytesIO, limit: int, buf_size: int = ...) -> None: ...
+class LimitedStream(IOBase):
+    limit: int
+    def __init__(self, stream: BytesIO, limit: int) -> None: ...
     def read(self, size: int | None = ...) -> bytes: ...
     def readline(self, size: int | None = ...) -> bytes: ...
 
 class WSGIRequest(HttpRequest):
     environ: WSGIEnvironment
-    session: SessionBase
-    encoding: Any
     def __init__(self, environ: WSGIEnvironment) -> None: ...
 
 class WSGIHandler(base.BaseHandler):
