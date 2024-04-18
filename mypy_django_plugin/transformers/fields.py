@@ -13,7 +13,6 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import FIELD_FULLNAME
 from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers import manytomany
 
@@ -154,7 +153,7 @@ def set_descriptor_types_for_field(
     )
 
     # reconcile set and get types with the base field class
-    base_field_type = next(base for base in default_return_type.type.mro if base.fullname == FIELD_FULLNAME)
+    base_field_type = next(base for base in default_return_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME)
     mapped_instance = map_instance_to_supertype(default_return_type, base_field_type)
     mapped_set_type, mapped_get_type = mapped_instance.args
 
@@ -166,7 +165,10 @@ def set_descriptor_types_for_field(
 
         # the get_type must be optional if the field is nullable
         if (is_get_nullable or is_nullable) and not (isinstance(get_type, NoneType) or helpers.is_optional(get_type)):
-            ctx.api.fail("Field is nullable but generic get type parameter is not optional", ctx.context)
+            ctx.api.fail(
+                f"{default_return_type.type.name} is nullable but its generic get type parameter is not optional",
+                ctx.context,
+            )
 
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 

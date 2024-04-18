@@ -20,11 +20,11 @@
         reveal_type(user.my_custom_field15)  # N: Revealed type is "None"
     monkeypatch: true
     out: |
-      myapp/models:31: error: Field is nullable but generic get type parameter is not optional  [misc]
-      myapp/models:32: error: Field is nullable but generic get type parameter is not optional  [misc]
-      myapp/models:33: error: Field is nullable but generic get type parameter is not optional  [misc]
-      myapp/models:34: error: Field is nullable but generic get type parameter is not optional  [misc]
-      myapp/models:35: error: Field is nullable but generic get type parameter is not optional  [misc]
+      myapp/models:31: error: GenericField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:32: error: CustomValueField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:33: error: SingleTypeField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:34: error: AdditionalTypeVarField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:35: error: Field is nullable but its generic get type parameter is not optional  [misc]
     installed_apps:
         - myapp
     files:
