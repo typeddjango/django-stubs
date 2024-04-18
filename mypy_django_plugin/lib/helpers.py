@@ -204,6 +204,10 @@ def make_optional(typ: MypyType) -> MypyType:
     return UnionType.make_union([typ, NoneTyp()])
 
 
+def is_optional(typ: MypyType) -> bool:
+    return isinstance(typ, UnionType) and any(isinstance(item, NoneTyp) for item in typ.items)
+
+
 # Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
 def parse_bool(expr: Expression) -> Optional[bool]:
     if isinstance(expr, NameExpr):
