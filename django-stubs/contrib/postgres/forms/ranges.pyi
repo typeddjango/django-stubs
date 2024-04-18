@@ -3,7 +3,7 @@ from typing import Any
 from django import forms
 from django.db.models.fields import _ErrorMessagesDict
 from django.forms.widgets import MultiWidget, _OptAttrs
-from psycopg2.extras import Range
+from psycopg2.extras import Range  # type: ignore [import-untyped]
 
 class RangeWidget(MultiWidget):
     def __init__(self, base_widget: forms.Widget | type[forms.Widget], attrs: _OptAttrs | None = ...) -> None: ...
