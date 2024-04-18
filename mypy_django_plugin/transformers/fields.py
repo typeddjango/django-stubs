@@ -7,7 +7,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UninhabitedType, UnionType
+from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -160,13 +160,13 @@ def set_descriptor_types_for_field(
 
     # bail if either mapped_set_type or mapped_get_type have type Never
     if not (isinstance(mapped_set_type, UninhabitedType) or isinstance(mapped_get_type, UninhabitedType)):
-        # only replace set_type and get_type with mapped types if their original value is Any
-        set_type = helpers.convert_any_to_type(
-            set_type, helpers.make_optional(mapped_set_type) if is_set_nullable or is_nullable else mapped_set_type
-        )
-        get_type = helpers.convert_any_to_type(
-            get_type, helpers.make_optional(mapped_get_type) if is_get_nullable or is_nullable else mapped_get_type
-        )
+        # always replace set_type and get_type with (non-Any) mapped types
+        set_type = helpers.convert_any_to_type(mapped_set_type, set_type)
+        get_type = helpers.convert_any_to_type(mapped_get_type, get_type)
+
+        # the get_type must be optional if the field is nullable
+        if (is_get_nullable or is_nullable) and not (isinstance(get_type, NoneType) or helpers.is_optional(get_type)):
+            ctx.api.fail("Field is nullable but generic get type parameter is not optional", ctx.context)
 
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
