@@ -163,7 +163,6 @@ django.forms.ClearableFileInput.checked
 django.forms.Field.__init__
 django.forms.boundfield.BoundField.get_context
 django.forms.boundfield.BoundField.template_name
-django.forms.fields.CallableChoiceIterator
 django.forms.fields.Field.__init__
 django.forms.fields_for_model
 django.forms.forms.BaseForm._html_output
@@ -173,4 +172,3 @@ django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.forms.utils.RenderableFieldMixin
 django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
-django.utils.choices

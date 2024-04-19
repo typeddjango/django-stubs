@@ -7,17 +7,11 @@ from uuid import UUID
 
 from django.core.files import File
 from django.core.validators import _ValidatorCallable
-from django.db.models.fields import (
-    _Choice,
-    _ChoiceNamedGroup,
-    _ChoicesCallable,
-    _ErrorMessagesDict,
-    _ErrorMessagesMapping,
-    _FieldChoices,
-)
+from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
+from django.utils.choices import CallableChoiceIterator, _Choices, _ChoicesCallable
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
@@ -320,21 +314,16 @@ class NullBooleanField(BooleanField):
     def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore[override]
     def validate(self, value: Any) -> None: ...
 
-class CallableChoiceIterator:
-    choices_func: _ChoicesCallable
-    def __init__(self, choices_func: _ChoicesCallable) -> None: ...
-    def __iter__(self) -> Iterator[_Choice | _ChoiceNamedGroup]: ...
-
 class ChoiceField(Field):
     choices: _PropertyDescriptor[
-        _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
-        _FieldChoices | CallableChoiceIterator,
+        _Choices | _ChoicesCallable | CallableChoiceIterator,
+        _Choices | CallableChoiceIterator,
     ]
     widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
-        choices: _FieldChoices | _ChoicesCallable = ...,
+        choices: _Choices | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -365,7 +354,7 @@ class TypedChoiceField(ChoiceField):
         *,
         coerce: _CoerceCallable = ...,
         empty_value: str | None = ...,
-        choices: _FieldChoices | _ChoicesCallable = ...,
+        choices: _Choices | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -393,7 +382,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         *,
         coerce: _CoerceCallable = ...,
         empty_value: list[Any] | None = ...,
-        choices: _FieldChoices | _ChoicesCallable = ...,
+        choices: _Choices | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -469,7 +458,7 @@ class FilePathField(ChoiceField):
         recursive: bool = ...,
         allow_files: bool = ...,
         allow_folders: bool = ...,
-        choices: _FieldChoices | _ChoicesCallable = ...,
+        choices: _Choices | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,

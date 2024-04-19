@@ -4,8 +4,9 @@ from django.core.validators import _ValidatorCallable
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
-from django.db.models.fields import _ErrorMessagesMapping, _FieldChoices
+from django.db.models.fields import _ErrorMessagesMapping
 from django.db.models.sql import Query
+from django.utils.choices import _Choices
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _StrOrPromise
 
@@ -34,7 +35,7 @@ class GeneratedField(models.Field):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _FieldChoices | None = ...,
+        choices: _Choices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,

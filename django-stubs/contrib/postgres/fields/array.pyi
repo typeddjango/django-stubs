@@ -4,8 +4,9 @@ from typing import Any, TypeVar
 from django.core.validators import _ValidatorCallable
 from django.db.models import Field, Transform
 from django.db.models.expressions import Combinable, Expression
-from django.db.models.fields import NOT_PROVIDED, _ErrorMessagesDict, _ErrorMessagesMapping, _FieldChoices
+from django.db.models.fields import NOT_PROVIDED, _ErrorMessagesDict, _ErrorMessagesMapping
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
+from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 
 # __set__ value type
@@ -44,7 +45,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _FieldChoices | None = ...,
+        choices: _Choices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,

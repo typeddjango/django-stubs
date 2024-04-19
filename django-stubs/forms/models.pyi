@@ -5,15 +5,16 @@ from uuid import UUID
 from django.db import models
 from django.db.models import ForeignKey
 from django.db.models.base import Model
-from django.db.models.fields import _AllLimitChoicesTo, _ChoicesCallable, _FieldChoices, _LimitChoicesTo
+from django.db.models.fields import _AllLimitChoicesTo, _LimitChoicesTo
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
-from django.forms.fields import CallableChoiceIterator, ChoiceField, Field, _ClassLevelWidgetT
+from django.forms.fields import ChoiceField, Field, _ClassLevelWidgetT
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import Widget
+from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _Choices, _ChoicesCallable
 from django.utils.datastructures import _IndexableCollection, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
@@ -242,7 +243,7 @@ class InlineForeignKeyField(Field):
 class ModelChoiceIteratorValue:
     def __init__(self, value: Any, instance: Model) -> None: ...
 
-class ModelChoiceIterator:
+class ModelChoiceIterator(BaseChoiceIterator):
     field: ModelChoiceField
     queryset: QuerySet
     def __init__(self, field: ModelChoiceField) -> None: ...
@@ -280,8 +281,8 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
-        _FieldChoices | _ChoicesCallable | CallableChoiceIterator,
-        _FieldChoices | CallableChoiceIterator | ModelChoiceIterator,
+        _Choices | _ChoicesCallable | CallableChoiceIterator,
+        _Choices | CallableChoiceIterator | ModelChoiceIterator,
     ]
     def prepare_value(self, value: Any) -> Any: ...
     def to_python(self, value: Any | None) -> _M | None: ...
