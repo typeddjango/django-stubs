@@ -623,6 +623,7 @@
         import django.utils.asyncio
         import django.utils.autoreload
         import django.utils.cache
+        import django.utils.choices
         import django.utils.connection
         import django.utils.crypto
         import django.utils.datastructures

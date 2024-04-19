@@ -4,10 +4,10 @@ from typing import Any
 from django import forms
 from django.contrib.admin.sites import AdminSite
 from django.core.files.base import File
-from django.db.models.fields import _FieldChoices
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel
 from django.forms.models import ModelChoiceIterator
 from django.forms.widgets import _OptAttrs
+from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -18,7 +18,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         verbose_name: _StrOrPromise,
         is_stacked: bool,
         attrs: _OptAttrs | None = ...,
-        choices: _FieldChoices = ...,
+        choices: _Choices = ...,
     ) -> None: ...
 
 class AdminDateWidget(forms.DateInput):
