@@ -1,18 +1,20 @@
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar, overload
+from typing import Any, Protocol, TypeVar, overload, type_check_only
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
-from django.db.models.fields import Field, _ErrorMessagesT, _FieldChoices
+from django.db.models.expressions import Expression
+from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.query_utils import DeferredAttribute
+from django.db.models.utils import AltersData
 from django.utils._os import _PathCompatible
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self
 
-class FieldFile(File):
+class FieldFile(File, AltersData):
     instance: Model
     field: FileField
     storage: Storage
@@ -25,10 +27,15 @@ class FieldFile(File):
     def url(self) -> str: ...
     @property
     def size(self) -> int: ...
+    def open(self, mode: str = ...) -> Self: ...  # type: ignore[override]
     def save(self, name: str, content: File, save: bool = ...) -> None: ...
     def delete(self, save: bool = ...) -> None: ...
     @property
     def closed(self) -> bool: ...
+    def __getstate__(self) -> dict[str, Any]: ...
+    def __setstate__(self, state: dict[str, Any]) -> None: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...
 
 class FileDescriptor(DeferredAttribute):
     field: FileField
@@ -37,8 +44,9 @@ class FileDescriptor(DeferredAttribute):
 
 _M = TypeVar("_M", bound=Model, contravariant=True)
 
+@type_check_only
 class _UploadToCallable(Protocol[_M]):
-    def __call__(self, __instance: _M, __filename: str) -> _PathCompatible: ...
+    def __call__(self, instance: _M, filename: str, /) -> _PathCompatible: ...
 
 class FileField(Field):
     storage: Storage
@@ -56,6 +64,7 @@ class FileField(Field):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | str = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -68,7 +77,7 @@ class FileField(Field):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # class access
     @overload

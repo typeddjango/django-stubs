@@ -3,15 +3,10 @@ from typing import Any
 
 from django.db.models.base import Model
 
-from .base import DeserializationError as DeserializationError
-from .base import DeserializedObject
-from .base import Deserializer as Deserializer
-from .base import M2MDeserializationError as M2MDeserializationError
-from .base import SerializationError as SerializationError
-from .base import Serializer as Serializer
+from .base import DeserializedObject, Deserializer, Serializer
 from .base import SerializerDoesNotExist as SerializerDoesNotExist
 
-BUILTIN_SERIALIZERS: Any
+BUILTIN_SERIALIZERS: dict[str, str]
 
 class BadSerializer:
     internal_use_only: bool

@@ -25,5 +25,5 @@
 
     reveal_type(check_baz)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (**kwargs: Any) -> typing.Sequence[django.core.checks.messages.CheckMessage]]"
 
-    @register()  # E: Value of type variable "_C" of function cannot be "Callable[[int], Sequence[CheckMessage]]"
+    @register()  # E: Value of type variable "_C" of function cannot be "Callable[[int], Sequence[CheckMessage]]"  [type-var]
     def wrong_args(bla: int) -> Sequence[CheckMessage]: ...

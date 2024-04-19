@@ -10,8 +10,10 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
     MDEF,
+    AssignmentStmt,
     Block,
     ClassDef,
+    Context,
     Expression,
     MemberExpr,
     MypyFile,
@@ -33,7 +35,7 @@ from mypy.plugin import (
     SemanticAnalyzerPluginInterface,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, LiteralType, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
 from mypy.types import Type as MypyType
 from typing_extensions import TypedDict
 
@@ -45,12 +47,15 @@ if TYPE_CHECKING:
 
 
 class DjangoTypeMetadata(TypedDict, total=False):
+    is_abstract_model: bool
     from_queryset_manager: str
     reverse_managers: Dict[str, str]
     baseform_bases: Dict[str, int]
     manager_bases: Dict[str, int]
     model_bases: Dict[str, int]
     queryset_bases: Dict[str, int]
+    m2m_throughs: Dict[str, str]
+    m2m_managers: Dict[str, str]
 
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
@@ -58,17 +63,41 @@ def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
 
 
 def get_django_metadata_bases(
-    model_info: TypeInfo, key: Literal["baseform_bases", "manager_bases", "model_bases", "queryset_bases"]
+    model_info: TypeInfo, key: Literal["baseform_bases", "manager_bases", "queryset_bases"]
 ) -> Dict[str, int]:
     return get_django_metadata(model_info).setdefault(key, cast(Dict[str, int], {}))
 
 
+def get_reverse_manager_info(
+    api: Union[TypeChecker, SemanticAnalyzer], model_info: TypeInfo, derived_from: str
+) -> Optional[TypeInfo]:
+    manager_fullname = get_django_metadata(model_info).get("reverse_managers", {}).get(derived_from)
+    if not manager_fullname:
+        return None
+
+    return lookup_fully_qualified_typeinfo(api, manager_fullname)
+
+
+def set_reverse_manager_info(model_info: TypeInfo, derived_from: str, fullname: str) -> None:
+    get_django_metadata(model_info).setdefault("reverse_managers", {})[derived_from] = fullname
+
+
+def get_many_to_many_manager_info(
+    api: Union[TypeChecker, SemanticAnalyzer], *, to: TypeInfo, derived_from: str
+) -> Optional[TypeInfo]:
+    manager_fullname = get_django_metadata(to).get("m2m_managers", {}).get(derived_from)
+    if not manager_fullname:
+        return None
+
+    return lookup_fully_qualified_typeinfo(api, manager_fullname)
+
+
+def set_many_to_many_manager_info(to: TypeInfo, derived_from: str, manager_info: TypeInfo) -> None:
+    get_django_metadata(to).setdefault("m2m_managers", {})[derived_from] = manager_info.fullname
+
+
 class IncompleteDefnException(Exception):
     pass
-
-
-def is_toml(filename: str) -> bool:
-    return filename.lower().endswith(".toml")
 
 
 def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
@@ -175,6 +204,11 @@ def make_optional(typ: MypyType) -> MypyType:
     return UnionType.make_union([typ, NoneTyp()])
 
 
+def is_optional(typ: MypyType) -> bool:
+    return isinstance(typ, UnionType) and any(isinstance(item, NoneTyp) for item in typ.items)
+
+
+# Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
 def parse_bool(expr: Expression) -> Optional[bool]:
     if isinstance(expr, NameExpr):
         if expr.fullname == "builtins.True":
@@ -217,7 +251,8 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
 
 def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> MypyType:
     if isinstance(field, (RelatedField, ForeignObjectRel)):
-        lookup_type_class = field.related_model
+        # Not using field.related_model because that may have str value "self"
+        lookup_type_class = field.remote_field.model
         rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
         if rel_model_info is None:
             return AnyType(TypeOfAny.from_error)
@@ -249,7 +284,7 @@ def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
     new_typeinfo = TypeInfo(SymbolTable(), classdef, module)
     new_typeinfo.bases = bases
     calculate_mro(new_typeinfo)
-    new_typeinfo.calculate_metaclass_type()
+    new_typeinfo.metaclass_type = new_typeinfo.calculate_metaclass_type()
 
     classdef.info = new_typeinfo
 
@@ -378,7 +413,9 @@ def check_types_compatible(
     api.check_subtype(actual_type, expected_type, ctx.context, error_message, "got", "expected")
 
 
-def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_serialize: bool = False) -> None:
+def add_new_sym_for_info(
+    info: TypeInfo, name: str, sym_type: MypyType, *, no_serialize: bool = False, is_classvar: bool = False
+) -> None:
     # type=: type of the variable itself
     var = Var(name=name, type=sym_type)
     # var.info: type of the object variable is bound to
@@ -386,6 +423,7 @@ def add_new_sym_for_info(info: TypeInfo, *, name: str, sym_type: MypyType, no_se
     var._fullname = info.fullname + "." + name
     var.is_initialized_in_class = True
     var.is_inferred = True
+    var.is_classvar = is_classvar
     info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
 
 
@@ -394,3 +432,68 @@ def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) ->
     if sym is not None and isinstance(sym.node, TypeInfo):
         bases = get_django_metadata_bases(sym.node, "manager_bases")
         bases[fullname] = 1
+
+
+def is_abstract_model(model: TypeInfo) -> bool:
+    if model.fullname in fullnames.DJANGO_ABSTRACT_MODELS:
+        return True
+
+    if not is_model_type(model):
+        return False
+
+    metadata = get_django_metadata(model)
+    if metadata.get("is_abstract_model") is not None:
+        return metadata["is_abstract_model"]
+
+    meta = model.names.get("Meta")
+    # Check if 'abstract' is declared in this model's 'class Meta' as
+    # 'abstract = True' won't be inherited from a parent model.
+    if meta is not None and isinstance(meta.node, TypeInfo) and "abstract" in meta.node.names:
+        for stmt in meta.node.defn.defs.body:
+            if (
+                # abstract =
+                isinstance(stmt, AssignmentStmt)
+                and len(stmt.lvalues) == 1
+                and isinstance(stmt.lvalues[0], NameExpr)
+                and stmt.lvalues[0].name == "abstract"
+            ):
+                # abstract = True (builtins.bool)
+                rhs_is_true = parse_bool(stmt.rvalue) is True
+                # abstract: Literal[True]
+                is_literal_true = isinstance(stmt.type, LiteralType) and stmt.type.value is True
+                metadata["is_abstract_model"] = rhs_is_true or is_literal_true
+                return metadata["is_abstract_model"]
+
+    metadata["is_abstract_model"] = False
+    return False
+
+
+def resolve_lazy_reference(
+    reference: str, *, api: Union[TypeChecker, SemanticAnalyzer], django_context: "DjangoContext", ctx: Context
+) -> Optional[TypeInfo]:
+    """
+    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
+    'TypeInfo' instance.
+    """
+    if "." not in reference:
+        # <object_name> -- needs prefix of <app_label>. We can't implicitly solve
+        # what app label this should be, yet.
+        return None
+
+    # Reference conforms to the structure of a lazy reference: '<app_label>.<object_name>'
+    fullname = django_context.model_class_fullnames_by_label.get(reference)
+    if fullname is not None:
+        model_info = lookup_fully_qualified_typeinfo(api, fullname)
+        if model_info is not None:
+            return model_info
+        elif isinstance(api, SemanticAnalyzer) and not api.final_iteration:
+            # Getting this far, where Django matched the reference but we still can't
+            # find it, we want to defer
+            api.defer()
+    else:
+        api.fail("Could not match lazy reference with any model", ctx)
+    return None
+
+
+def is_model_type(info: TypeInfo) -> bool:
+    return info.metaclass_type is not None and info.metaclass_type.type.has_base(fullnames.MODEL_METACLASS_FULLNAME)

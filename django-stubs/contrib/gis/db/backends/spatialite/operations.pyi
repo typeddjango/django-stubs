@@ -3,6 +3,7 @@ from typing import Any
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.db.backends.sqlite3.operations import DatabaseOperations
+from django.utils.functional import cached_property
 
 class SpatialiteNullCheckOperator(SpatialOperator): ...
 
@@ -18,7 +19,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     disallowed_aggregates: Any
     select: str
     function_names: Any
-    @property
+    @cached_property
     def unsupported_functions(self) -> set[str]: ...  # type: ignore[override]
     @property
     def spatial_version(self) -> Any: ...

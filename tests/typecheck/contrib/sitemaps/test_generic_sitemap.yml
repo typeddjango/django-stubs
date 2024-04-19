@@ -18,7 +18,7 @@
                     "myapp:detail-offer",
                     kwargs={
                         "provider_name": item.provider,
-                        "offer_name": item.trc, # E: "Offer" has no attribute "trc"
+                        "offer_name": item.trc, # E: "Offer" has no attribute "trc"  [attr-defined]
                     },
                 )
 
@@ -44,12 +44,12 @@
             ),
         ]
     out: |
-        main:24: error: Return type "str" of "items" incompatible with return type "Iterable[Offer]" in supertype "Sitemap"
-        main:26: error: Return type "int" of "location" incompatible with return type "str" in supertype "Sitemap"
-        main:26: error: Argument 1 of "location" is incompatible with supertype "Sitemap"; supertype defines the argument type as "Offer"
+        main:24: error: Return type "str" of "items" incompatible with return type "Iterable[Offer]" in supertype "Sitemap"  [override]
+        main:26: error: Return type "int" of "location" incompatible with return type "str" in supertype "Sitemap"  [override]
+        main:26: error: Argument 1 of "location" is incompatible with supertype "Sitemap"; supertype defines the argument type as "Offer"  [override]
         main:26: note: This violates the Liskov substitution principle
         main:26: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
-        main:40: error: Argument 1 to "GenericSitemap" has incompatible type "Dict[str, List[int]]"; expected "Mapping[str, Union[datetime, _QuerySet[Offer, Offer], str]]"
+        main:40: error: Argument 1 to "GenericSitemap" has incompatible type "Dict[str, List[int]]"; expected "Mapping[str, Union[datetime, _QuerySet[Offer, Offer], str]]"  [arg-type]
 
     installed_apps:
         - myapp

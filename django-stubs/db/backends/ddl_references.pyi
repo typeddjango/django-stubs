@@ -1,10 +1,11 @@
 from collections.abc import Sequence
-from typing import Any, Protocol
+from typing import Any, Protocol, type_check_only
 
+@type_check_only
 class _QuoteCallable(Protocol):
     """Get rid of `cannot assign to method`"""
 
-    def __call__(self, __column: str) -> str: ...
+    def __call__(self, column: str, /) -> str: ...
 
 class Reference:
     def references_table(self, table: Any) -> bool: ...
@@ -35,10 +36,11 @@ class Columns(TableColumns):
         self, table: str, columns: list[str], quote_name: _QuoteCallable, col_suffixes: Sequence[str] = ...
     ) -> None: ...
 
+@type_check_only
 class _NameCallable(Protocol):
     """Get rid of `cannot assign to method`"""
 
-    def __call__(self, __table: str, __columns: list[str], __suffix: str) -> str: ...
+    def __call__(self, table: str, columns: list[str], suffix: str, /) -> str: ...
 
 class IndexName(TableColumns):
     columns: list[str]

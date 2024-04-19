@@ -4,6 +4,7 @@ from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 from django import VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
@@ -15,7 +16,7 @@ from django.db.models.lookups import Lookup
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 from django.forms.formsets import BaseFormSet
-from django.forms.models import BaseModelForm, BaseModelFormSet
+from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField
 from django.utils.connection import BaseConnectionHandler
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
@@ -62,8 +63,10 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(BaseFormSet),
     MPGeneric(BaseModelForm),
     MPGeneric(BaseModelFormSet),
+    MPGeneric(ModelChoiceField),
     MPGeneric(Feed),
     MPGeneric(Sitemap),
+    MPGeneric(SuccessMessageMixin),
     MPGeneric(FileProxyMixin),
     MPGeneric(Lookup),
     MPGeneric(BaseConnectionHandler),

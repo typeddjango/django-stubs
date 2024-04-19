@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from decimal import Decimal
 from logging import Logger
 from types import TracebackType
-from typing import Any, Literal, Protocol, overload
+from typing import Any, Literal, Protocol, overload, type_check_only
 from uuid import UUID
 
 from typing_extensions import Self, TypeAlias
@@ -12,9 +12,10 @@ from typing_extensions import Self, TypeAlias
 logger: Logger
 
 # Protocol matching psycopg2.sql.Composable, to avoid depending psycopg2
+@type_check_only
 class _Composable(Protocol):
     def as_string(self, context: Any) -> str: ...
-    def __add__(self, other: _Composable) -> _Composable: ...
+    def __add__(self, other: Self) -> _Composable: ...
     def __mul__(self, n: int) -> _Composable: ...
 
 _ExecuteQuery: TypeAlias = str | _Composable
@@ -69,15 +70,15 @@ class CursorDebugWrapper(CursorWrapper):
     ) -> Generator[None, None, None]: ...
 
 @overload
-def typecast_date(s: None | Literal[""]) -> None: ...  # type: ignore
+def typecast_date(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
 @overload
 def typecast_date(s: str) -> datetime.date: ...
 @overload
-def typecast_time(s: None | Literal[""]) -> None: ...  # type: ignore
+def typecast_time(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
 @overload
 def typecast_time(s: str) -> datetime.time: ...
 @overload
-def typecast_timestamp(s: None | Literal[""]) -> None: ...  # type: ignore
+def typecast_timestamp(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
 @overload
 def typecast_timestamp(s: str) -> datetime.datetime: ...
 def split_identifier(identifier: str) -> tuple[str, str]: ...

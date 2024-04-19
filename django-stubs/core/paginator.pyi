@@ -1,7 +1,8 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
-from typing import Generic, Protocol, TypeVar, overload
+from typing import ClassVar, Generic, Protocol, TypeVar, overload, type_check_only
 
-from typing_extensions import TypeAlias
+from django.db.models.fields import _ErrorMessagesDict
+from django.utils.functional import _StrPromise, cached_property
 
 class UnorderedObjectListWarning(RuntimeWarning): ...
 class InvalidPage(Exception): ...
@@ -10,13 +11,17 @@ class EmptyPage(InvalidPage): ...
 
 _T = TypeVar("_T")
 
+@type_check_only
 class _SupportsPagination(Protocol[_T], Sized, Iterable):
     @overload
-    def __getitem__(self, __index: int) -> _T: ...
+    def __getitem__(self, index: int, /) -> _T: ...
     @overload
-    def __getitem__(self, __index: slice) -> _SupportsPagination[_T]: ...
+    def __getitem__(self, index: slice, /) -> _SupportsPagination[_T]: ...
 
 class Paginator(Generic[_T]):
+    ELLIPSIS: ClassVar[_StrPromise]
+    default_error_messages: ClassVar[_ErrorMessagesDict]
+    error_messages: _ErrorMessagesDict
     object_list: _SupportsPagination[_T]
     per_page: int
     orphans: int
@@ -27,22 +32,21 @@ class Paginator(Generic[_T]):
         per_page: int | str,
         orphans: int = ...,
         allow_empty_first_page: bool = ...,
+        error_messages: _ErrorMessagesDict | None = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[Page[_T]]: ...
     def validate_number(self, number: int | float | str) -> int: ...
     def get_page(self, number: int | float | str | None) -> Page[_T]: ...
     def page(self, number: int | str) -> Page[_T]: ...
-    @property
+    @cached_property
     def count(self) -> int: ...
-    @property
+    @cached_property
     def num_pages(self) -> int: ...
     @property
     def page_range(self) -> range: ...
     def get_elided_page_range(
         self, number: int | float | str = ..., *, on_each_side: int = ..., on_ends: int = ...
     ) -> Iterator[str | int]: ...
-
-QuerySetPaginator: TypeAlias = Paginator
 
 class Page(Sequence[_T]):
     object_list: _SupportsPagination[_T]

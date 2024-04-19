@@ -5,7 +5,7 @@ from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, SupportsIndex, TypeVar
+from typing import Any, Protocol, SupportsIndex, TypeVar, type_check_only
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
@@ -48,7 +48,7 @@ class TestContextDecorator:
     def __init__(self, attr_name: str | None = ..., kwarg_name: str | None = ...) -> None: ...
     def enable(self) -> Any: ...
     def disable(self) -> None: ...
-    def __enter__(self) -> Apps | None: ...  # noqa: Y034
+    def __enter__(self) -> Apps | None: ...
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
@@ -60,6 +60,7 @@ class TestContextDecorator:
     def __call__(self, decorated: _DT) -> _DT: ...
 
 class override_settings(TestContextDecorator):
+    enable_exception: Exception | None
     options: dict[str, Any]
     def __init__(self, **kwargs: Any) -> None: ...
     wrapped: Settings
@@ -142,6 +143,7 @@ def tag(*tags: str) -> Callable[[_C], _C]: ...
 _Signature: TypeAlias = str
 _TestDatabase: TypeAlias = tuple[str, list[str]]
 
+@type_check_only
 class TimeKeeperProtocol(Protocol):
     @contextmanager
     def timed(self, name: Any) -> Iterator[None]: ...

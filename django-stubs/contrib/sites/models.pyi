@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.db import models
 from django.http.request import HttpRequest
@@ -11,7 +11,7 @@ class SiteManager(models.Manager[Site]):
     def get_by_natural_key(self, domain: str) -> Site: ...
 
 class Site(models.Model):
-    objects: SiteManager
+    objects: ClassVar[SiteManager]
 
     domain = models.CharField(max_length=100)
     name = models.CharField(max_length=50)

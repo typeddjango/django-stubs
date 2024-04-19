@@ -73,6 +73,8 @@ class _WKBReader(IOBase):
     destructor: Any
     def read(self, wkb: Any) -> Any: ...
 
+def default_trim_value() -> bool: ...
+
 class WKTWriter(IOBase):
     ptr_type: Any
     destructor: Any

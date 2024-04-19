@@ -1,13 +1,12 @@
 import datetime
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, type_check_only
 
 from django.core.files.base import File
 from django.db.models.fields import _FieldChoices
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import _DataT, _FilesT
 from django.utils.datastructures import _ListOrTuple
-from django.utils.functional import _Getter
 from django.utils.safestring import SafeString
 from typing_extensions import TypeAlias
 
@@ -40,10 +39,11 @@ class Widget(metaclass=MediaDefiningClass):
     supports_microseconds: bool
     attrs: _OptAttrs
     template_name: str
-    media: _Getter[Media] | Media
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
     @property
     def is_hidden(self) -> bool: ...
+    @property
+    def media(self) -> Media: ...
     def subwidgets(self, name: str, value: Any, attrs: _OptAttrs = ...) -> Iterator[dict[str, Any]]: ...
     def format_value(self, value: Any) -> str | None: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
@@ -137,9 +137,9 @@ class TimeInput(DateTimeBaseInput):
     template_name: str
 
 def boolean_check(v: Any) -> bool: ...
-
+@type_check_only
 class _CheckCallable(Protocol):
-    def __call__(self, __value: Any) -> bool: ...
+    def __call__(self, value: Any, /) -> bool: ...
 
 class CheckboxInput(Input):
     check_test: _CheckCallable
@@ -175,7 +175,7 @@ class ChoiceWidget(Widget):
     ) -> dict[str, Any]: ...
     def id_for_label(self, id_: str, index: str = ...) -> str: ...
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
-    def format_value(self, value: Any) -> list[str]: ...  # type: ignore
+    def format_value(self, value: Any) -> list[str]: ...  # type: ignore[override]
 
 class Select(ChoiceWidget):
     input_type: str | None
@@ -189,7 +189,7 @@ class Select(ChoiceWidget):
 
 class NullBooleanSelect(Select):
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
-    def format_value(self, value: Any) -> str: ...  # type: ignore
+    def format_value(self, value: Any) -> str: ...  # type: ignore[override]
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> bool | None: ...
 
 class SelectMultiple(Select):
@@ -227,9 +227,8 @@ class MultiWidget(Widget):
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> list[Any]: ...
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
     def decompress(self, value: Any) -> Any | None: ...
-    media: _Getter[Media]
     @property
-    def needs_multipart_form(self) -> bool: ...  # type: ignore
+    def needs_multipart_form(self) -> bool: ...  # type: ignore[override]
 
 class SplitDateTimeWidget(MultiWidget):
     supports_microseconds: bool
@@ -278,7 +277,7 @@ class SelectDateWidget(Widget):
         empty_label: str | _ListOrTuple[str] | None = ...,
     ) -> None: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
-    def format_value(self, value: Any) -> dict[str, str | int | None]: ...  # type: ignore
+    def format_value(self, value: Any) -> dict[str, str | int | None]: ...  # type: ignore[override]
     def id_for_label(self, id_: str) -> str: ...
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> str | None | Any: ...
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...

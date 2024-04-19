@@ -15,10 +15,11 @@ class AppConfig:
     label: str
     verbose_name: _StrOrPromise
     path: str
-    models_module: str | None
+    models_module: types.ModuleType | None
     # Default auto_field is a cached_property on the base, but is usually subclassed as a str
     # If not subclassing with a str, a type ignore[override] is needed
     models: dict[str, type[Model]]
+    default: bool
     default_auto_field: str | _Getter[str]
     def __init__(self, app_name: str, app_module: types.ModuleType | None) -> None: ...
     @classmethod

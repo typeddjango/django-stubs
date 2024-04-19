@@ -1,4 +1,5 @@
-from collections.abc import Awaitable, Callable, Mapping, Sequence
+import sys
+from collections.abc import Awaitable, Callable, Mapping
 from typing import Any
 from urllib.parse import ParseResult
 
@@ -7,6 +8,11 @@ from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponseBase
+
+if sys.version_info >= (3, 11):
+    from wsgiref.types import StartResponse, WSGIEnvironment
+else:
+    from _typeshed.wsgi import StartResponse, WSGIEnvironment
 
 class StaticFilesHandlerMixin:
     handles_files: bool
@@ -20,17 +26,17 @@ class StaticFilesHandlerMixin:
     def get_response(self, request: HttpRequest) -> HttpResponseBase: ...
     async def get_response_async(self, request: HttpRequest) -> HttpResponseBase: ...
 
-class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore
+class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore[misc]
     application: WSGIHandler
     base_url: ParseResult
     def __init__(self, application: WSGIHandler) -> None: ...
     def __call__(
         self,
-        environ: dict[str, Any],
-        start_response: Callable[[str, Sequence[tuple[str, str]]], None],
+        environ: WSGIEnvironment,
+        start_response: StartResponse,
     ) -> HttpResponseBase: ...
 
-class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore
+class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore[misc]
     application: ASGIHandler
     base_url: ParseResult
     def __init__(self, application: ASGIHandler) -> None: ...

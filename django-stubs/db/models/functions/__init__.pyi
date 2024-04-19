@@ -51,6 +51,7 @@ from .math import Sign as Sign
 from .math import Sin as Sin
 from .math import Sqrt as Sqrt
 from .math import Tan as Tan
+from .text import MD5 as MD5
 from .text import SHA1 as SHA1
 from .text import SHA224 as SHA224
 from .text import SHA256 as SHA256

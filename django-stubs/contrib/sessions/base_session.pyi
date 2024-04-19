@@ -15,6 +15,7 @@ class AbstractBaseSession(models.Model):
     session_data: str
     session_key: str
     objects: Any
+
     @classmethod
     def get_session_store_class(cls) -> type[SessionBase] | None: ...
     def get_decoded(self) -> dict[str, Any]: ...

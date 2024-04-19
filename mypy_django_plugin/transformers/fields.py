@@ -4,14 +4,17 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, Instance, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.helpers import parse_bool
+from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
     from django.contrib.contenttypes.fields import GenericForeignKey
@@ -90,18 +93,20 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     related_model_info = helpers.lookup_class_typeinfo(typechecker_api, related_model)
+    related_model_type: ProperType
     if related_model_info is None:
         # maybe no type stub
         related_model_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_type = Instance(related_model_info, [])  # type: ignore
+        related_model_type = Instance(related_model_info, [])
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
+    related_model_to_set_type: ProperType
     if related_model_to_set_info is None:
         # maybe no type stub
         related_model_to_set_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_to_set_type = Instance(related_model_to_set_info, [])  # type: ignore
+        related_model_to_set_type = Instance(related_model_to_set_info, [])
 
     # replace Any with referred_to_type
     return reparametrize_related_field_type(
@@ -134,18 +139,37 @@ def set_descriptor_types_for_field(
     is_nullable = False
     null_expr = helpers.get_call_argument_by_name(ctx, "null")
     if null_expr is not None:
-        is_nullable = helpers.parse_bool(null_expr) or False
+        is_nullable = parse_bool(null_expr) or False
     # Allow setting field value to `None` when a field is primary key and has a default that can produce a value
     default_expr = helpers.get_call_argument_by_name(ctx, "default")
     primary_key_expr = helpers.get_call_argument_by_name(ctx, "primary_key")
     if default_expr is not None and primary_key_expr is not None:
-        is_set_nullable = helpers.parse_bool(primary_key_expr) or False
+        is_set_nullable = parse_bool(primary_key_expr) or False
 
     set_type, get_type = get_field_descriptor_types(
         default_return_type.type,
         is_set_nullable=is_set_nullable or is_nullable,
         is_get_nullable=is_get_nullable or is_nullable,
     )
+
+    # reconcile set and get types with the base field class
+    base_field_type = next(base for base in default_return_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME)
+    mapped_instance = map_instance_to_supertype(default_return_type, base_field_type)
+    mapped_set_type, mapped_get_type = mapped_instance.args
+
+    # bail if either mapped_set_type or mapped_get_type have type Never
+    if not (isinstance(mapped_set_type, UninhabitedType) or isinstance(mapped_get_type, UninhabitedType)):
+        # always replace set_type and get_type with (non-Any) mapped types
+        set_type = helpers.convert_any_to_type(mapped_set_type, set_type)
+        get_type = helpers.convert_any_to_type(mapped_get_type, get_type)
+
+        # the get_type must be optional if the field is nullable
+        if (is_get_nullable or is_nullable) and not (isinstance(get_type, NoneType) or helpers.is_optional(get_type)):
+            ctx.api.fail(
+                f"{default_return_type.type.name} is nullable but its generic get type parameter is not optional",
+                ctx.context,
+            )
+
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
 
@@ -210,6 +234,10 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     assert isinstance(outer_model_info, TypeInfo)
 
+    if default_return_type.type.has_base(fullnames.MANYTOMANY_FIELD_FULLNAME):
+        return manytomany.fill_model_args_for_many_to_many_field(
+            ctx=ctx, model_info=outer_model_info, default_return_type=default_return_type, django_context=django_context
+        )
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 

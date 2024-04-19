@@ -107,7 +107,7 @@
         reveal_type(MyUser.objects.values_list(flat=True)[0])  # N: Revealed type is "builtins.int"
         reveal_type(MyUser2.objects.values_list(flat=True)[0])  # N: Revealed type is "builtins.str"
     out: |
-        main:3: error: 'flat' is not valid when 'values_list' is called with more than one field
+        main:3: error: 'flat' is not valid when 'values_list' is called with more than one field  [misc]
         main:3: note: Revealed type is "Any"
     installed_apps:
         - myapp
@@ -163,7 +163,7 @@
         from myapp.models import MyUser
         reveal_type(MyUser.objects.values_list('name', flat=True, named=True).get())
     out: |
-        main:2: error: 'flat' and 'named' can't be used together
+        main:2: error: 'flat' and 'named' can't be used together  [misc]
         main:2: note: Revealed type is "Any"
     installed_apps:
         - myapp
@@ -183,11 +183,11 @@
         reveal_type(Blog.objects.values_list('unknown', named=True).get())
         reveal_type(Blog.objects.values_list('publisher__unknown').get())
     out: |
-        main:2: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id
+        main:2: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
         main:2: note: Revealed type is "Any"
-        main:3: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id
+        main:3: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
         main:3: note: Revealed type is "Any"
-        main:4: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id
+        main:4: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
         main:4: note: Revealed type is "Any"
         main:5: note: Revealed type is "Tuple[Any]"
     installed_apps:

@@ -12,7 +12,7 @@ class MultipleObjectMixin(Generic[_M], ContextMixin):
     allow_empty: bool
     queryset: _SupportsPagination[_M] | None
     model: type[_M] | None
-    paginate_by: int
+    paginate_by: int | None
     paginate_orphans: int
     context_object_name: str | None
     paginator_class: type[Paginator]
@@ -35,6 +35,9 @@ class MultipleObjectMixin(Generic[_M], ContextMixin):
     def get_paginate_orphans(self) -> int: ...
     def get_allow_empty(self) -> bool: ...
     def get_context_object_name(self, object_list: _SupportsPagination[_M]) -> str | None: ...
+    def get_context_data(
+        self, *, object_list: _SupportsPagination[_M] | None = ..., **kwargs: Any
+    ) -> dict[str, Any]: ...
 
 class BaseListView(MultipleObjectMixin[_M], View):
     object_list: _SupportsPagination[_M]

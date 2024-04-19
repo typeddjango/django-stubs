@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup
-
-from setuptools import find_packages
+from setuptools import find_packages, setup  # type: ignore[import-untyped]
 
 with open("README.md") as f:
     readme = f.read()
@@ -15,7 +13,7 @@ dependencies = [
 # It's fine to skip django-stubs-ext releases, but when doing a release, update this to newest django-stubs version.
 setup(
     name="django-stubs-ext",
-    version="4.2.2",
+    version="5.0.0.dev1",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -23,7 +21,6 @@ setup(
     license_files=["LICENSE.md"],
     url="https://github.com/typeddjango/django-stubs",
     author="Simula Proxy",
-    author_email="3nki.nam.shub@gmail.com",
     maintainer="Marti Raudsepp",
     maintainer_email="marti@juffo.org",
     py_modules=[],
@@ -38,13 +35,15 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Typing :: Typed",
         "Framework :: Django",
-        "Framework :: Django :: 3.2",
         "Framework :: Django :: 4.1",
         "Framework :: Django :: 4.2",
+        "Framework :: Django :: 5.0",
     ],
     project_urls={
+        "Funding": "https://github.com/sponsors/typeddjango",
         "Release notes": "https://github.com/typeddjango/django-stubs/releases",
     },
 )

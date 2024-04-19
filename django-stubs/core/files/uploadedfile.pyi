@@ -40,8 +40,9 @@ class InMemoryUploadedFile(UploadedFile):
         content_type: str | None,
         size: int | None,
         charset: str | None,
-        content_type_extra: dict[str, str] = ...,
+        content_type_extra: dict[str, str] | None = ...,
     ) -> None: ...
+    def open(self, mode: str | None = ...) -> Self: ...  # type: ignore[override]
 
 class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name: str, content: bytes | None, content_type: str = ...) -> None: ...

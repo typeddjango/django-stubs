@@ -1,5 +1,5 @@
 from collections.abc import Collection, Iterable, Iterator, Mapping, MutableMapping, MutableSet
-from typing import Any, Generic, NoReturn, Protocol, Tuple, TypeVar, overload  # noqa: Y022
+from typing import Any, Generic, NoReturn, Protocol, TypeVar, overload, type_check_only
 
 from _typeshed import Incomplete
 from typing_extensions import Self, TypeAlias
@@ -11,8 +11,9 @@ _I = TypeVar("_I", covariant=True)
 
 # Unfortunately, there's often check `if isinstance(var, (list, tuple))` in django
 # codebase. So we need sometimes to declare exactly list or tuple.
-_ListOrTuple: TypeAlias = list[_K] | tuple[_K, ...] | Tuple[()]  # noqa: Y047
+_ListOrTuple: TypeAlias = list[_K] | tuple[_K, ...] | tuple[()]  # noqa: PYI047
 
+@type_check_only
 class _PropertyDescriptor(Generic[_K, _V]):
     """
     This helper property descriptor allows defining asynmetric getter/setters
@@ -35,7 +36,8 @@ class _PropertyDescriptor(Generic[_K, _V]):
     def __get__(self, instance: Any, owner: Any | None) -> _V: ...
     def __set__(self, instance: Any, value: _K) -> None: ...
 
-class _IndexableCollection(Protocol[_I], Collection[_I]):
+@type_check_only
+class _IndexableCollection(Protocol[_I], Collection[_I]):  # noqa: PYI046
     @overload
     def __getitem__(self, index: int) -> _I: ...
     @overload
@@ -72,11 +74,11 @@ class MultiValueDict(dict[_K, _V]):
     def setdefault(self, key: _K, default: _V) -> _V: ...
     def setlistdefault(self, key: _K, default_list: list[_V] | None = ...) -> list[_V]: ...
     def appendlist(self, key: _K, value: _V) -> None: ...
-    def items(self) -> Iterator[tuple[_K, _V | list[object]]]: ...  # type: ignore
+    def items(self) -> Iterator[tuple[_K, _V | list[object]]]: ...  # type: ignore[override]
     def lists(self) -> Iterable[tuple[_K, list[_V]]]: ...
     def dict(self) -> dict[_K, _V | list[object]]: ...
     def copy(self) -> Self: ...
-    def __getitem__(self, key: _K) -> _V | list[object]: ...  # type: ignore
+    def __getitem__(self, key: _K) -> _V | list[object]: ...  # type: ignore[override]
     def __setitem__(self, key: _K, value: _V) -> None: ...
     # These overrides are needed to convince mypy that this isn't an abstract class
     def __delitem__(self, item: _K) -> None: ...
@@ -92,10 +94,11 @@ class ImmutableList(tuple[_V, ...]):
     def __new__(cls, *args: Any, warning: str = ..., **kwargs: Any) -> Self: ...
     def complain(self, *args: Any, **kwargs: Any) -> NoReturn: ...
 
+@type_check_only
 class _ItemCallable(Protocol[_V]):
     """Don't mess with arguments when assigning in class body in stub"""
 
-    def __call__(self, __value: _V) -> _V: ...
+    def __call__(self, value: _V, /) -> _V: ...
 
 class DictWrapper(dict[str, _V]):
     func: _ItemCallable[_V]

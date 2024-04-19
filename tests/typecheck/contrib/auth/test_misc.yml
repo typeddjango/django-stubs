@@ -4,7 +4,7 @@
       from django.contrib.sessions.middleware import SessionMiddleware
       from django.http import HttpRequest, HttpResponse
 
-      def get_response(__request: HttpRequest) -> HttpResponse:
+      def get_response(request: HttpRequest, /) -> HttpResponse:
           return HttpResponse()
 
       request = HttpRequest()

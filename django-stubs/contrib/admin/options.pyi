@@ -1,12 +1,6 @@
+import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import (  # noqa: Y037  # https://github.com/python/mypy/issues/12211
-    Any,
-    Generic,
-    Literal,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import Any, Generic, Literal, TypeVar, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -44,10 +38,16 @@ from typing_extensions import TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
+IS_FACETS_VAR: str
 HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
 
 _Direction: TypeAlias = Literal[1, 2]
+
+class ShowFacets(enum.Enum):
+    NEVER: str
+    ALLOW: str
+    ALWAYS: str
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -59,10 +59,12 @@ csrf_protect_m: Any
 
 _FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
 
+@type_check_only
 class _OptionalFieldOpts(TypedDict, total=False):
     classes: Sequence[str]
     description: _StrOrPromise
 
+@type_check_only
 class _FieldOpts(_OptionalFieldOpts, total=True):
     fields: _FieldGroups
 
@@ -70,35 +72,34 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 # https://github.com/python/mypy/issues/8921
 # _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
-# https://github.com/python/mypy/issues/12211
-_ListFilterT: TypeAlias = Union[
-    type[ListFilter],
-    Field,
-    str,
-    tuple[Field | str, type[FieldListFilter]],
-    list[Field | str | type[FieldListFilter]],
-]
+_ListFilterT: TypeAlias = (
+    type[ListFilter]
+    | Field[Any, Any]
+    | str
+    | tuple[Field[Any, Any] | str, type[FieldListFilter]]
+    | list[Field[Any, Any] | str | type[FieldListFilter]]
+)
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
 # https://github.com/typeddjango/django-stubs/issues/482
 _ModelT = TypeVar("_ModelT", bound=Model)
+_DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 
 class BaseModelAdmin(Generic[_ModelT]):
-    autocomplete_fields: Sequence[str]
-    raw_id_fields: Sequence[str]
+    autocomplete_fields: _ListOrTuple[str]
+    raw_id_fields: _ListOrTuple[str]
     fields: _FieldGroups | None
-    exclude: Sequence[str] | None
-    fieldsets: Optional[_FieldsetSpec]  # noqa: UP007
+    exclude: _ListOrTuple[str] | None
+    fieldsets: _FieldsetSpec | None
     form: type[forms.ModelForm[_ModelT]]
-    filter_vertical: Sequence[str]
-    filter_horizontal: Sequence[str]
+    filter_vertical: _ListOrTuple[str]
+    filter_horizontal: _ListOrTuple[str]
     radio_fields: Mapping[str, _Direction]
     prepopulated_fields: dict[str, Sequence[str]]
     formfield_overrides: Mapping[type[Field], Mapping[str, Any]]
-    readonly_fields: Sequence[str]
-    ordering: Sequence[str] | None
+    readonly_fields: _ListOrTuple[str]
+    ordering: _ListOrTuple[str] | None
     sortable_by: _ListOrTuple[str] | None
-    view_on_site: bool | Callable[[_ModelT], str]
     show_full_result_count: bool
     checks_class: Any
     model: type[_ModelT]
@@ -106,7 +107,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     admin_site: AdminSite
     def __init__(self) -> None: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
-    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField | None: ...
+    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField: ...
     def formfield_for_choice_field(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> TypedChoiceField: ...
     def get_field_queryset(self, db: str | None, db_field: RelatedField, request: HttpRequest) -> QuerySet | None: ...
     def formfield_for_foreignkey(
@@ -115,19 +116,19 @@ class BaseModelAdmin(Generic[_ModelT]):
     def formfield_for_manytomany(
         self, db_field: ManyToManyField, request: HttpRequest, **kwargs: Any
     ) -> ModelMultipleChoiceField | None: ...
-    def get_autocomplete_fields(self, request: HttpRequest) -> Sequence[str]: ...
+    def get_autocomplete_fields(self, request: HttpRequest) -> _ListOrTuple[str]: ...
     def get_view_on_site_url(self, obj: _ModelT | None = ...) -> str | None: ...
     def get_empty_value_display(self) -> SafeString: ...
-    def get_exclude(self, request: HttpRequest, obj: _ModelT | None = ...) -> Sequence[str] | None: ...
+    def get_exclude(self, request: HttpRequest, obj: _ModelT | None = ...) -> _ListOrTuple[str] | None: ...
     def get_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldGroups: ...
     def get_fieldsets(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldsetSpec: ...
     def get_inlines(self, request: HttpRequest, obj: _ModelT | None) -> list[type[InlineModelAdmin]]: ...
-    def get_ordering(self, request: HttpRequest) -> Sequence[str]: ...
-    def get_readonly_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> Sequence[str]: ...
+    def get_ordering(self, request: HttpRequest) -> _ListOrTuple[str]: ...
+    def get_readonly_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _ListOrTuple[str]: ...
     def get_prepopulated_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> dict[str, Sequence[str]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ModelT]: ...
-    def get_sortable_by(self, request: HttpRequest) -> Sequence[str]: ...
-    def lookup_allowed(self, lookup: str, value: str) -> bool: ...
+    def get_sortable_by(self, request: HttpRequest) -> _DisplayT[_ModelT]: ...
+    def lookup_allowed(self, lookup: str, value: str, request: HttpRequest | None = ...) -> bool: ...
     def to_field_allowed(self, request: HttpRequest, to_field: str) -> bool: ...
     def has_add_permission(self, request: HttpRequest) -> bool: ...
     def has_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
@@ -135,20 +136,21 @@ class BaseModelAdmin(Generic[_ModelT]):
     def has_view_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_view_or_change_permission(self, request: HttpRequest, obj: _ModelT | None = ...) -> bool: ...
     def has_module_permission(self, request: HttpRequest) -> bool: ...
+    @property
+    def view_on_site(self) -> Callable[[_ModelT], str] | bool: ...
 
-_DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
 _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], HttpResponseBase | None]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
-    list_display: _DisplayT
-    list_display_links: _DisplayT | None
+    list_display: _DisplayT[_ModelT]
+    list_display_links: _DisplayT[_ModelT] | None
     list_filter: _ListOrTuple[_ListFilterT]
-    list_select_related: bool | Sequence[str]
+    list_select_related: bool | _ListOrTuple[str]
     list_per_page: int
     list_max_show_all: int
-    list_editable: Sequence[str]
-    search_fields: Sequence[str]
+    list_editable: _ListOrTuple[str]
+    search_fields: _ListOrTuple[str]
     search_help_text: _StrOrPromise | None
     date_hierarchy: str | None
     save_as: bool
@@ -156,7 +158,8 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     save_on_top: bool
     paginator: type
     preserve_filters: bool
-    inlines: Sequence[type[InlineModelAdmin]]
+    show_facets: ShowFacets
+    inlines: _ListOrTuple[type[InlineModelAdmin]]
     add_form_template: _TemplateForResponseT | None
     change_form_template: _TemplateForResponseT | None
     change_list_template: _TemplateForResponseT | None
@@ -208,11 +211,11 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
         self, request: HttpRequest, default_choices: list[tuple[str, str]] = ...
     ) -> list[tuple[str, str]]: ...
     def get_action(self, action: Callable | str) -> tuple[Callable[..., str], str, str] | None: ...
-    def get_list_display(self, request: HttpRequest) -> _DisplayT: ...
-    def get_list_display_links(self, request: HttpRequest, list_display: _DisplayT) -> _DisplayT: ...
-    def get_list_filter(self, request: HttpRequest) -> Sequence[_ListFilterT]: ...
-    def get_list_select_related(self, request: HttpRequest) -> bool | Sequence[str]: ...
-    def get_search_fields(self, request: HttpRequest) -> Sequence[str]: ...
+    def get_list_display(self, request: HttpRequest) -> _DisplayT[_ModelT]: ...
+    def get_list_display_links(self, request: HttpRequest, list_display: _DisplayT[_ModelT]) -> _DisplayT[_ModelT]: ...
+    def get_list_filter(self, request: HttpRequest) -> _ListOrTuple[_ListFilterT]: ...
+    def get_list_select_related(self, request: HttpRequest) -> bool | _ListOrTuple[str]: ...
+    def get_search_fields(self, request: HttpRequest) -> _ListOrTuple[str]: ...
     def get_search_results(
         self, request: HttpRequest, queryset: QuerySet, search_term: str
     ) -> tuple[QuerySet[_ModelT], bool]: ...
@@ -273,7 +276,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def changelist_view(self, request: HttpRequest, extra_context: dict[str, Any] | None = ...) -> HttpResponse: ...
     def get_deleted_objects(
         self, objs: Sequence[_ModelT] | QuerySet[_ModelT], request: HttpRequest
-    ) -> tuple[list[Model], dict[str, int], set[str], list[str]]: ...
+    ) -> tuple[list[str], dict[str, int], set[str], list[str]]: ...
     def delete_view(
         self, request: HttpRequest, object_id: str, extra_context: dict[str, Any] | None = ...
     ) -> HttpResponse: ...
@@ -314,10 +317,10 @@ class InlineModelAdmin(Generic[_ChildModelT, _ParentModelT], BaseModelAdmin[_Chi
         self, request: HttpRequest, obj: _ParentModelT | None = ..., **kwargs: Any
     ) -> type[BaseInlineFormSet[_ChildModelT, _ParentModelT, forms.ModelForm[_ChildModelT]]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ChildModelT]: ...
-    def has_add_permission(self, request: HttpRequest, obj: _ParentModelT | None) -> bool: ...  # type: ignore
-    def has_change_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore
-    def has_delete_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore
-    def has_view_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore
+    def has_add_permission(self, request: HttpRequest, obj: _ParentModelT | None) -> bool: ...  # type: ignore[override]
+    def has_change_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
+    def has_delete_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
+    def has_view_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
 
 class StackedInline(InlineModelAdmin[_ChildModelT, _ParentModelT]):
     template: str

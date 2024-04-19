@@ -2,11 +2,12 @@ from collections.abc import Iterable, Mapping
 from typing import Any
 
 from django.core.validators import MaxLengthValidator, MaxValueValidator, MinLengthValidator, MinValueValidator
+from django.utils.deconstruct import _Deconstructible
 
 class ArrayMaxLengthValidator(MaxLengthValidator): ...
 class ArrayMinLengthValidator(MinLengthValidator): ...
 
-class KeysValidator:
+class KeysValidator(_Deconstructible):
     messages: dict[str, str]
     strict: bool
     def __init__(self, keys: Iterable[str], strict: bool = ..., messages: Mapping[str, str] | None = ...) -> None: ...

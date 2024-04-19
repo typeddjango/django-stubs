@@ -1,11 +1,14 @@
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, type_check_only
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import StateApps
 from django.utils.datastructures import _ListOrTuple
+from typing_extensions import TypeAlias
 
 from .base import Operation
+
+_SqlOperations: TypeAlias = str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[Any] | None]]
 
 class SeparateDatabaseAndState(Operation):
     database_operations: Sequence[Operation]
@@ -17,14 +20,14 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     noop: Literal[""]
-    sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
-    reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]]
+    sql: _SqlOperations
+    reverse_sql: _SqlOperations | None
     state_operations: Sequence[Operation]
     hints: Mapping[str, Any]
     def __init__(
         self,
-        sql: str | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]],
-        reverse_sql: str | None | _ListOrTuple[str | tuple[str, dict[str, Any] | _ListOrTuple[str] | None]] = ...,
+        sql: _SqlOperations,
+        reverse_sql: _SqlOperations | None = ...,
         state_operations: Sequence[Operation] | None = ...,
         hints: Mapping[str, Any] | None = ...,
         elidable: bool = ...,
@@ -32,8 +35,9 @@ class RunSQL(Operation):
     @property
     def reversible(self) -> bool: ...  # type: ignore[override]
 
+@type_check_only
 class _CodeCallable(Protocol):
-    def __call__(self, __state_apps: StateApps, __schema_editor: BaseDatabaseSchemaEditor) -> None: ...
+    def __call__(self, state_apps: StateApps, schema_editor: BaseDatabaseSchemaEditor, /) -> None: ...
 
 class RunPython(Operation):
     code: _CodeCallable

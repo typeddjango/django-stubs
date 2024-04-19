@@ -2,7 +2,22 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Literal, Optional, Sequence, Set, Tuple, Type, Union
+from functools import cached_property
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -13,7 +28,6 @@ from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Exact
 from django.db.models.sql.query import Query
-from django.utils.functional import cached_property
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
@@ -29,13 +43,13 @@ try:
     from django.contrib.postgres.fields import ArrayField
 except ImportError:
 
-    class ArrayField:  # type: ignore
+    class ArrayField:  # type: ignore[no-redef]
         pass
 
 
 if TYPE_CHECKING:
-    from django.apps.registry import Apps  # noqa: F401
-    from django.conf import LazySettings  # noqa: F401
+    from django.apps.registry import Apps
+    from django.conf import LazySettings
     from django.contrib.contenttypes.fields import GenericForeignKey
 
 
@@ -60,11 +74,11 @@ def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
         from django.apps import apps
         from django.conf import settings
 
-        apps.get_swappable_settings_name.cache_clear()  # type: ignore
+        apps.get_swappable_settings_name.cache_clear()  # type: ignore[attr-defined]
         apps.clear_cache()
 
         if not settings.configured:
-            settings._setup()  # type: ignore
+            settings._setup()  # type: ignore[misc]
         apps.populate(settings.INSTALLED_APPS)
 
     assert apps.apps_ready, "Apps are not ready"
@@ -86,15 +100,15 @@ class DjangoContext:
         self.settings = settings
 
     @cached_property
-    def model_modules(self) -> Dict[str, Set[Type[Model]]]:
+    def model_modules(self) -> Dict[str, Dict[str, Type[Model]]]:
         """All modules that contain Django models."""
-        modules: Dict[str, Set[Type[Model]]] = defaultdict(set)
+        modules: Dict[str, Dict[str, Type[Model]]] = defaultdict(dict)
         for concrete_model_cls in self.apps_registry.get_models():
-            modules[concrete_model_cls.__module__].add(concrete_model_cls)
+            modules[concrete_model_cls.__module__][concrete_model_cls.__name__] = concrete_model_cls
             # collect abstract=True models
             for model_cls in concrete_model_cls.mro()[1:]:
                 if issubclass(model_cls, Model) and hasattr(model_cls, "_meta") and model_cls._meta.abstract:
-                    modules[model_cls.__module__].add(model_cls)
+                    modules[model_cls.__module__][model_cls.__name__] = model_cls
         return modules
 
     def get_model_class_by_fullname(self, fullname: str) -> Optional[Type[Model]]:
@@ -109,10 +123,7 @@ class DjangoContext:
             fullname = fullname.replace("__", ".")
 
         module, _, model_cls_name = fullname.rpartition(".")
-        for model_cls in self.model_modules.get(module, set()):
-            if model_cls.__name__ == model_cls_name:
-                return model_cls
-        return None
+        return self.model_modules.get(module, {}).get(model_cls_name)
 
     def get_model_fields(self, model_cls: Type[Model]) -> Iterator["Field[Any, Any]"]:
         for field in model_cls._meta.get_fields():
@@ -206,6 +217,9 @@ class DjangoContext:
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 field_name = field.attname
+                # Can not determine target_field for recursive relationship when model is abstract
+                if field.related_model == "self" and model_cls._meta.abstract:
+                    continue
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
                 # from django-stubs own declaration. This is to align with the setter types declared for
                 # assignment.
@@ -222,7 +236,12 @@ class DjangoContext:
                         expected_types[field_name] = AnyType(TypeOfAny.unannotated)
                         continue
 
-                    related_model = self.get_field_related_model_cls(field)
+                    try:
+                        related_model = self.get_field_related_model_cls(field)
+                    except UnregisteredModelError:
+                        # Recognise the field but don't say anything about its type..
+                        expected_types[field_name] = AnyType(TypeOfAny.from_error)
+                        continue
 
                     if related_model._meta.proxy_for_model is not None:
                         related_model = related_model._meta.proxy_for_model
@@ -270,9 +289,13 @@ class DjangoContext:
     def all_registered_model_class_fullnames(self) -> Set[str]:
         return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
 
-    def get_attname(self, field: "Field[Any, Any]") -> str:
-        attname = field.attname
-        return attname
+    @cached_property
+    def model_class_fullnames_by_label(self) -> Mapping[str, str]:
+        return {
+            klass._meta.label: helpers.get_class_fullname(klass)
+            for klass in self.all_registered_model_classes
+            if klass is not models.Model
+        }
 
     def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: Optional[str]) -> bool:
         if method in ("values", "values_list"):
@@ -297,7 +320,12 @@ class DjangoContext:
         """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
-            target_field = field.target_field
+            try:
+                # We gotta be careful for exceptions when we're triggering '__get__'.
+                # Related model could very well be unresolvable
+                target_field = field.target_field
+            except ValueError:
+                return AnyType(TypeOfAny.from_error)
 
         field_info = helpers.lookup_class_typeinfo(api, target_field.__class__)
         if field_info is None:
@@ -341,8 +369,11 @@ class DjangoContext:
         else:
             related_model_cls = field.field.model
 
+        if related_model_cls is None:
+            raise UnregisteredModelError
+
         if isinstance(related_model_cls, str):
-            if related_model_cls == "self":  # type: ignore
+            if related_model_cls == "self":  # type: ignore[unreachable]
                 # same model
                 related_model_cls = field.model
             elif "." not in related_model_cls:
@@ -363,7 +394,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: Type[Model]
     ) -> Union["Field[Any, Any]", ForeignObjectRel]:
         currently_observed_model = model_cls
-        field: Union["Field[Any, Any]", ForeignObjectRel, GenericForeignKey, None] = None
+        field: Union[Field[Any, Any], ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)

@@ -5,7 +5,6 @@ from typing import Any, overload
 
 from django.core.checks.messages import CheckMessage
 from django.urls import _AnyURL
-from django.urls.converters import UUIDConverter
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from typing_extensions import TypeAlias
@@ -59,7 +58,7 @@ class CheckURLMixin:
 class RegexPattern(CheckURLMixin):
     regex: LocaleRegexDescriptor
     name: str | None
-    converters: dict[Any, Any]
+    converters: dict[str, Any]
     def __init__(self, regex: str, name: str | None = ..., is_endpoint: bool = ...) -> None: ...
     def match(self, path: str) -> tuple[str, tuple, dict[str, str]] | None: ...
     def check(self) -> list[CheckMessage]: ...
@@ -67,14 +66,14 @@ class RegexPattern(CheckURLMixin):
 class RoutePattern(CheckURLMixin):
     regex: LocaleRegexDescriptor
     name: str | None
-    converters: dict[str, UUIDConverter]
+    converters: dict[str, Any]
     def __init__(self, route: str, name: str | None = ..., is_endpoint: bool = ...) -> None: ...
     def match(self, path: str) -> tuple[str, tuple, dict[str, int | str]] | None: ...
     def check(self) -> list[CheckMessage]: ...
 
 class LocalePrefixPattern:
     prefix_default_language: bool
-    converters: dict[Any, Any]
+    converters: dict[str, Any]
     def __init__(self, prefix_default_language: bool = ...) -> None: ...
     @property
     def regex(self) -> Pattern[str]: ...
@@ -87,13 +86,13 @@ class LocalePrefixPattern:
 class URLPattern:
     pattern: _Pattern
     callback: Callable
-    default_args: dict[str, str] | None
+    default_args: dict[str, Any]
     name: str | None
     def __init__(
         self,
         pattern: _Pattern,
         callback: Callable,
-        default_args: dict[str, str] | None = ...,
+        default_args: dict[str, Any] | None = ...,
         name: str | None = ...,
     ) -> None: ...
     def check(self) -> list[CheckMessage]: ...
@@ -103,7 +102,7 @@ class URLPattern:
 
 class URLResolver:
     pattern: _Pattern
-    urlconf_name: str | None | Sequence[_AnyURL]
+    urlconf_name: str | Sequence[_AnyURL] | ModuleType
     callback: None
     default_kwargs: dict[str, Any]
     namespace: str | None
@@ -113,7 +112,7 @@ class URLResolver:
     def __init__(
         self,
         pattern: _Pattern,
-        urlconf_name: str | None | Sequence[_AnyURL],
+        urlconf_name: str | Sequence[_AnyURL] | ModuleType,
         default_kwargs: dict[str, Any] | None = ...,
         app_name: str | None = ...,
         namespace: str | None = ...,

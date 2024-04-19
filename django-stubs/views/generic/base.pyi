@@ -1,19 +1,24 @@
-from collections.abc import Callable
-from typing import Any
+import logging
+from collections.abc import Callable, Sequence
+from typing import Any, Mapping
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
+from django.utils.functional import _Getter
+
+logger: logging.Logger
 
 class ContextMixin:
-    extra_context: dict[str, Any] | None
+    extra_context: Mapping[str, Any] | None
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
 class View:
-    http_method_names: list[str]
+    http_method_names: Sequence[str]
     request: HttpRequest
     args: Any
     kwargs: Any
     def __init__(self, **kwargs: Any) -> None: ...
+    view_is_async: _Getter[bool] | bool
     @classmethod
     def as_view(cls: Any, **initkwargs: Any) -> Callable[..., HttpResponseBase]: ...
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None: ...
@@ -22,7 +27,7 @@ class View:
     def options(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
 
 class TemplateResponseMixin:
-    template_name: str
+    template_name: str | None
     template_engine: str | None
     response_class: type[HttpResponse]
     content_type: str | None

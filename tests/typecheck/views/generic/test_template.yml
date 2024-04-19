@@ -1,0 +1,16 @@
+-   case: generic_template_view_mutable_extra_context
+    main: |
+        from django.views.generic import TemplateView
+
+        class MyTemplateView(TemplateView):
+            template_name = "template.html"
+            extra_context = {}
+
+-   case: generic_template_view_immutable_extra_context
+    main: |
+        from types import MappingProxyType
+        from django.views.generic import TemplateView
+
+        class MyTemplateView(TemplateView):
+            template_name = "template.html"
+            extra_context = MappingProxyType({})

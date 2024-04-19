@@ -3,8 +3,8 @@ from typing import Any, TypeVar
 
 from django.core.validators import _ValidatorCallable
 from django.db.models import Field, Transform
-from django.db.models.expressions import Combinable
-from django.db.models.fields import _ErrorMessagesT, _FieldChoices
+from django.db.models.expressions import Combinable, Expression
+from django.db.models.fields import NOT_PROVIDED, _ErrorMessagesDict, _ErrorMessagesMapping, _FieldChoices
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.functional import _StrOrPromise
 
@@ -18,7 +18,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     _pyi_private_get_type: list[Any]
 
     empty_strings_allowed: bool
-    default_error_messages: _ErrorMessagesT
+    default_error_messages: _ErrorMessagesDict
     base_field: Field
     size: int | None
     default_validators: Sequence[_ValidatorCallable]
@@ -37,6 +37,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
@@ -46,10 +47,11 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         choices: _FieldChoices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
+        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesT | None = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @property
-    def description(self) -> str: ...  # type: ignore
+    def description(self) -> str: ...  # type: ignore[override]
     def get_transform(self, name: Any) -> type[Transform] | None: ...

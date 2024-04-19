@@ -1,0 +1,78 @@
+-   case: test_custom_model_fields_with_generic_type
+    main: |
+        from myapp.models import User, CustomFieldValue
+        user = User()
+        reveal_type(user.id)  # N: Revealed type is "builtins.int"
+        reveal_type(user.my_custom_field1)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field2)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field3)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field4)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field5)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field6)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field7)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field8)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field10)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field11)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field12)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
+        reveal_type(user.my_custom_field13)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
+        reveal_type(user.my_custom_field14)  # N: Revealed type is "Union[builtins.bool, None]"
+        reveal_type(user.my_custom_field15)  # N: Revealed type is "None"
+    monkeypatch: true
+    out: |
+      myapp/models:31: error: GenericField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:32: error: CustomValueField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:33: error: SingleTypeField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:34: error: AdditionalTypeVarField is nullable but its generic get type parameter is not optional  [misc]
+      myapp/models:35: error: Field is nullable but its generic get type parameter is not optional  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models import fields
+
+                from typing import Any, TypeVar, Generic, Union
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                T = TypeVar("T")
+
+                class CustomFieldValue: ...
+
+                class GenericField(fields.Field[_ST, _GT]): ...
+
+                class SingleTypeField(fields.Field[T, T]): ...
+
+                class CustomValueField(fields.Field[Union[CustomFieldValue, int], CustomFieldValue]): ...
+
+                class AdditionalTypeVarField(fields.Field[_ST, _GT], Generic[_ST, _GT, T]): ...
+
+                class CustomSmallIntegerField(fields.SmallIntegerField[_ST, _GT]): ...
+
+                class User(models.Model):
+                    id = models.AutoField(primary_key=True)
+                    my_custom_field1 = GenericField[Union[CustomFieldValue, int], CustomFieldValue]()
+                    my_custom_field2 = CustomValueField()
+                    my_custom_field3 = SingleTypeField[bool]()
+                    my_custom_field4 = AdditionalTypeVarField[Union[CustomFieldValue, int], CustomFieldValue, bool]()
+
+                    # test null=True on fields with non-optional generic types throw error
+                    my_custom_field5 = GenericField[Union[CustomFieldValue, int], CustomFieldValue](null=True)
+                    my_custom_field6 = CustomValueField(null=True)
+                    my_custom_field7 = SingleTypeField[bool](null=True)
+                    my_custom_field8 = AdditionalTypeVarField[Union[CustomFieldValue, int], CustomFieldValue, bool](null=True)
+                    my_custom_field9 = fields.Field[Union[CustomFieldValue, int], CustomFieldValue](null=True)
+
+                    # test overriding fields that set _pyi_private_set_type or _pyi_private_get_type
+                    my_custom_field10 = fields.SmallIntegerField[bool, bool]()
+                    my_custom_field11 = CustomSmallIntegerField[bool, bool]()
+
+                    # test null=True on fields with non-optional generic types throw no errors
+                    my_custom_field12 = fields.Field[Union[CustomFieldValue, int], Union[CustomFieldValue, None]](null=True)
+                    my_custom_field13 = GenericField[Union[CustomFieldValue, int], Union[CustomFieldValue, None]](null=True)
+                    my_custom_field14 = SingleTypeField[Union[bool, None]](null=True)
+                    my_custom_field15 = fields.Field[None, None](null=True)

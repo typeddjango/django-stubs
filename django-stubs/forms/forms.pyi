@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping
 from typing import Any, ClassVar
 
 from django.core.exceptions import ValidationError
@@ -7,14 +7,12 @@ from django.forms.fields import Field
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, MediaDefiningClass
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import _StrOrPromise, cached_property
 from django.utils.safestring import SafeString
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
 class BaseForm(RenderableFormMixin):
-    class Meta:
-        fields: Sequence[str]
     default_renderer: BaseRenderer | type[BaseRenderer] | None
     field_order: Iterable[str] | None
     use_required_attribute: bool
@@ -65,7 +63,7 @@ class BaseForm(RenderableFormMixin):
     def full_clean(self) -> None: ...
     def clean(self) -> dict[str, Any] | None: ...
     def has_changed(self) -> bool: ...
-    @property
+    @cached_property
     def changed_data(self) -> list[str]: ...
     @property
     def media(self) -> Media: ...

@@ -49,7 +49,7 @@
                 class Other(models.Model):
                     ...
     out: |
-      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "SingleObjectMixin" defined the type as "Type[Other]")
-      main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "Optional[_QuerySet[Other, Other]]")
-      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QuerySet[Other, Other]" in supertype "SingleObjectMixin"
-      main:12: error: Incompatible return value type (got "_QuerySet[Other, Other]", expected "_QuerySet[MyModel, MyModel]")
+      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "SingleObjectMixin" defined the type as "Type[Other]")  [assignment]
+      main:8: error: Incompatible types in assignment (expression has type "_QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "Optional[_QuerySet[Other, Other]]")  [assignment]
+      main:10: error: Return type "_QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QuerySet[Other, Other]" in supertype "SingleObjectMixin"  [override]
+      main:12: error: Incompatible return value type (got "_QuerySet[Other, Other]", expected "_QuerySet[MyModel, MyModel]")  [return-value]

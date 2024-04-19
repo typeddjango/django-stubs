@@ -1,7 +1,8 @@
 from collections import namedtuple
 from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, TypeVar
+from typing import Any, ClassVar, Literal, TypeVar
 
+from _typeshed import Incomplete
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression
@@ -40,16 +41,19 @@ class Q(tree.Node):
         summarize: bool = ...,
         for_save: bool = ...,
     ) -> WhereNode: ...
-    def deconstruct(self) -> tuple[str, tuple, dict[str, str]]: ...
+    def flatten(self) -> Iterator[Incomplete]: ...
+    def check(self, against: dict[str, Any], using: str = ...) -> bool: ...
+    def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
 
 class DeferredAttribute:
     field: Field
     def __init__(self, field: Field) -> None: ...
+    def __get__(self, instance: Model | None, cls: type[Model] | None = None) -> Any: ...
 
 _R = TypeVar("_R", bound=type)
 
 class RegisterLookupMixin:
-    class_lookups: list[dict[Any, Any]]
+    class_lookups: ClassVar[dict[str, Any]]
     lookup_name: str
     @classmethod
     def get_lookups(cls) -> dict[str, Any]: ...

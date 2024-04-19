@@ -1,11 +1,11 @@
 from collections.abc import Callable, Sequence
-from typing import Any, TypeVar, Union, overload  # noqa: Y037
+from typing import Any, TypeVar, overload
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.sites import AdminSite
-from django.db.models import Combinable, QuerySet
+from django.db.models import QuerySet
 from django.db.models.base import Model
-from django.db.models.expressions import BaseExpression
+from django.db.models.expressions import BaseExpression, Combinable
 from django.http import HttpRequest, HttpResponseBase
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
@@ -15,7 +15,7 @@ _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
 _Request = TypeVar("_Request", bound=HttpRequest)
 _QuerySet = TypeVar("_QuerySet", bound=QuerySet)
 # This is deliberately different from _DisplayT defined in contrib.admin.options
-_DisplayCallable: TypeAlias = Union[Callable[[_ModelAdmin, _Model], Any], Callable[[_Model], Any]]  # noqa: Y037
+_DisplayCallable: TypeAlias = Callable[[_ModelAdmin, _Model], Any] | Callable[[_Model], Any]
 _DisplayCallableT = TypeVar("_DisplayCallableT", bound=_DisplayCallable)
 _ActionReturn = TypeVar("_ActionReturn", bound=HttpResponseBase | None)
 

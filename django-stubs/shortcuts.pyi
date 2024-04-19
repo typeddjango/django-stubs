@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Literal, Protocol, TypeVar, overload
+from typing import Any, Literal, Protocol, TypeVar, overload, type_check_only
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
@@ -14,25 +14,27 @@ def render(
     status: int | None = ...,
     using: str | None = ...,
 ) -> HttpResponse: ...
-
+@type_check_only
 class SupportsGetAbsoluteUrl(Protocol):
     def get_absolute_url(self) -> str: ...
 
 @overload
 def redirect(
-    to: Callable | str | SupportsGetAbsoluteUrl, *args: Any, permanent: Literal[True], **kwargs: Any
+    to: Callable[..., Any] | str | SupportsGetAbsoluteUrl, *args: Any, permanent: Literal[True], **kwargs: Any
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
-    to: Callable | str | SupportsGetAbsoluteUrl, *args: Any, permanent: Literal[False] = ..., **kwargs: Any
+    to: Callable[..., Any] | str | SupportsGetAbsoluteUrl, *args: Any, permanent: Literal[False] = ..., **kwargs: Any
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(
-    to: Callable | str | SupportsGetAbsoluteUrl, *args: Any, permanent: bool, **kwargs: Any
+    to: Callable[..., Any] | str | SupportsGetAbsoluteUrl, *args: Any, permanent: bool, **kwargs: Any
 ) -> HttpResponseRedirect | HttpResponsePermanentRedirect: ...
 
 _T = TypeVar("_T", bound=Model)
 
 def get_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> _T: ...
+async def aget_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> _T: ...
 def get_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
+async def aget_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
 def resolve_url(to: Callable | Model | str, *args: Any, **kwargs: Any) -> str: ...

@@ -4,7 +4,7 @@ from logging import Logger
 from re import Pattern
 from typing import Any
 
-from django.template.context import Context as Context  # noqa: F401 # Django: imported for backwards compatibility
+from django.template.context import Context as Context  # Django: imported for backwards compatibility
 from django.template.engine import Engine
 from django.template.library import Library
 from django.template.loaders.base import Loader
@@ -57,7 +57,6 @@ class Template:
         name: str | None = ...,
         engine: Engine | None = ...,
     ) -> None: ...
-    def __iter__(self) -> Iterator[Node]: ...
     def render(self, context: Context) -> SafeString: ...
     def compile_nodelist(self) -> NodeList: ...
     def get_exception_info(self, exception: Exception, token: Token) -> dict[str, Any]: ...
