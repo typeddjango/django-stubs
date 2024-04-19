@@ -22,7 +22,7 @@ exclude = [
 stubPath = "."
 typeCheckingMode = "strict"
 
-pythonVersion = "3.12"
+pythonVersion = "3.8"
 pythonPlatform = "All"
 
 

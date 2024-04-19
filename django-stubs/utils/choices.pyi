@@ -1,5 +1,7 @@
 from collections.abc import Iterable, Iterator
-from typing import Any, Protocol, TypeAlias, TypeVar, type_check_only
+from typing import Any, Protocol, TypeVar, type_check_only
+
+from typing_extensions import TypeAlias
 
 _Choice: TypeAlias = tuple[Any, Any]
 _ChoiceNamedGroup: TypeAlias = tuple[str, Iterable[_Choice]]
