@@ -36,7 +36,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     def handle(self) -> None: ...
 
 def run(
-    addr: str,
+    addr: str | bytes | bytearray,
     port: int,
     wsgi_handler: WSGIHandler,
     ipv6: bool = ...,
