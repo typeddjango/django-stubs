@@ -25,12 +25,12 @@ class RangeOperators:
     NOT_GT: Literal["&<"]
     ADJACENT_TO: Literal["-|-"]
 
-_Range = TypeVar("_Range", bound=Range[Any])
+_RangeT = TypeVar("_RangeT", bound=Range[Any])
 
-class RangeField(models.Field[Any, _Range]):
+class RangeField(models.Field[Any, _RangeT]):
     empty_strings_allowed: bool
     base_field: type[models.Field]
-    range_type: type[_Range]
+    range_type: type[_RangeT]
     def get_prep_value(self, value: Any) -> Any | None: ...
     def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
     def to_python(self, value: Any) -> Any: ...
