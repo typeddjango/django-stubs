@@ -8,7 +8,7 @@ from django.forms.utils import _DataT, _FilesT
 from django.utils.choices import _Choices
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _OptAttrs: TypeAlias = dict[str, Any]
 
@@ -40,6 +40,7 @@ class Widget(metaclass=MediaDefiningClass):
     attrs: _OptAttrs
     template_name: str
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
     @property
     def is_hidden(self) -> bool: ...
     @property

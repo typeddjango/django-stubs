@@ -253,7 +253,6 @@
         import django.contrib.postgres.forms
         import django.contrib.postgres.forms.array
         import django.contrib.postgres.forms.hstore
-        import django.contrib.postgres.forms.jsonb
         import django.contrib.postgres.forms.ranges
         import django.contrib.postgres.functions
         import django.contrib.postgres.indexes

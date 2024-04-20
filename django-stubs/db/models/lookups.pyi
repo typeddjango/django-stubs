@@ -71,8 +71,8 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, sql: str, param: Any
     ) -> _AsSqlType: ...
 
-class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup[_T]):
-    postgres_operator: str
+class PostgresOperatorLookup(Lookup[_T]):
+    postgres_operator: str | None
     def as_postgresql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup[_T]): ...
