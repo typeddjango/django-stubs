@@ -8,6 +8,7 @@ class Aggregate(Func):
     filter_template: str
     filter: Any
     allow_distinct: bool
+    empty_result_set_value: int | None
     def __init__(self, *expressions: Any, distinct: bool = ..., filter: Any | None = ..., **extra: Any) -> None: ...
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate): ...

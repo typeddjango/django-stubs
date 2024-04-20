@@ -1,11 +1,14 @@
 from collections.abc import Iterable, Sequence
 from typing import Any, TypeVar
 
+from _typeshed import Unused
 from django.core.validators import _ValidatorCallable
-from django.db.models import Field, Transform
+from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.models import Field
 from django.db.models.expressions import Combinable, Expression
 from django.db.models.fields import NOT_PROVIDED, _ErrorMessagesDict, _ErrorMessagesMapping
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
+from django.db.models.lookups import Transform
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 
@@ -55,4 +58,6 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     ) -> None: ...
     @property
     def description(self) -> str: ...  # type: ignore[override]
-    def get_transform(self, name: Any) -> type[Transform] | None: ...
+    def cast_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
+    def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
+    def get_transform(self, name: str) -> type[Transform] | None: ...
