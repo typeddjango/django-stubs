@@ -19,6 +19,8 @@ exclude = [
     ".mypy_cache",
     "build",
 ]
+reportMissingTypeArgument = "warning"
+reportPrivateUsage = "none"
 stubPath = "."
 typeCheckingMode = "strict"
 
