@@ -290,9 +290,6 @@
         import django.contrib.sessions.serializers
         import django.contrib.sitemaps
         import django.contrib.sitemaps.apps
-        import django.contrib.sitemaps.management
-        import django.contrib.sitemaps.management.commands
-        import django.contrib.sitemaps.management.commands.ping_google
         import django.contrib.sitemaps.views
         import django.contrib.sites
         import django.contrib.sites.admin

@@ -629,10 +629,7 @@ django.contrib.sites.models.Site.redirect_set
 django.contrib.sites.models.SiteManager.__slotnames__
 django.contrib.staticfiles.finders.BaseStorageFinder.storage
 django.contrib.staticfiles.finders.DefaultStorageFinder.storage
-django.contrib.staticfiles.finders.FileSystemFinder.__init__
-django.contrib.staticfiles.management.commands.collectstatic
-django.contrib.staticfiles.management.commands.findstatic.Command.handle_label
-django.contrib.staticfiles.storage
+django.contrib.staticfiles.storage.staticfiles_storage
 django.core.cache.cache
 django.core.checks.registry.CheckRegistry.register
 django.core.files.locks.OVERLAPPED
