@@ -9,3 +9,5 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.sites",
 ]
+
+STATIC_URL = "static/"

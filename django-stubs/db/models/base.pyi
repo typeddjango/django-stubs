@@ -71,14 +71,14 @@ class Model(metaclass=ModelBase):
     def get_constraints(self) -> list[tuple[type[Model], Sequence[BaseConstraint]]]: ...
     def save(
         self,
-        force_insert: bool = ...,
+        force_insert: bool | tuple[ModelBase, ...] = ...,
         force_update: bool = ...,
         using: str | None = ...,
         update_fields: Iterable[str] | None = ...,
     ) -> None: ...
     async def asave(
         self,
-        force_insert: bool = ...,
+        force_insert: bool | tuple[ModelBase, ...] = ...,
         force_update: bool = ...,
         using: str | None = ...,
         update_fields: Iterable[str] | None = ...,
@@ -86,7 +86,7 @@ class Model(metaclass=ModelBase):
     def save_base(
         self,
         raw: bool = ...,
-        force_insert: bool = ...,
+        force_insert: bool | tuple[ModelBase, ...] = ...,
         force_update: bool = ...,
         using: str | None = ...,
         update_fields: Iterable[str] | None = ...,

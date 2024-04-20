@@ -12,8 +12,11 @@ django.conf.locale.*
 # We don't need migrations:
 django.contrib.admin.migrations.*
 django.contrib.auth.migrations.*
-django.contrib.flatpages.migrations.*
 django.contrib.contenttypes.migrations.*
+django.contrib.flatpages.migrations.*
+django.contrib.redirects.migrations.*
+django.contrib.sessions.migrations.*
+django.contrib.sites.migrations.*
 
 # default_storage is actually an instance of DefaultStorage, but it proxies through to a Storage
 django.core.files.storage.default_storage
@@ -195,6 +198,7 @@ django.contrib.gis.gdal.raster.source.GDALRaster.is_vsi_based
 django.contrib.postgres.expressions.ArraySubquery.output_field
 django.contrib.postgres.indexes.PostgresIndex.max_name_length
 django.contrib.sessions.backends.db.SessionStore.model
+django.contrib.staticfiles.management.commands.collectstatic.Command.local
 django.core.files.File.size
 django.core.files.base.File.size
 django.core.files.storage.FileSystemStorage.base_location
