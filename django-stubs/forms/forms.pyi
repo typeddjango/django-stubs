@@ -80,6 +80,6 @@ class BaseForm(RenderableFormMixin):
         errors_on_separate_row: bool,
     ) -> SafeString: ...
 
-class Form(BaseForm):
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     base_fields: ClassVar[dict[str, Field]]
     declared_fields: ClassVar[dict[str, Field]]
