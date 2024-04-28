@@ -45,7 +45,7 @@ class ChangeList:
     is_facets_optional: bool
     to_field: Any
     params: dict[str, Any]
-    filter_params: dict[str, Any]
+    filter_params: dict[str, list[str]]
     remove_facet_link: str
     add_facet_link: str
     list_editable: Sequence[str]
