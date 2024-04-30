@@ -1,6 +1,7 @@
 from collections.abc import Callable, Iterable, Sequence
 from typing import Any, Literal
 
+from django import forms
 from django.contrib.admin.filters import ListFilter
 from django.contrib.admin.options import ModelAdmin, _DisplayT, _ListFilterT
 from django.db.models.base import Model
@@ -17,7 +18,10 @@ SEARCH_VAR: str
 ERROR_FLAG: str
 IGNORED_PARAMS: tuple[str, ...]
 
+class ChangeListSearchForm(forms.Form): ...
+
 class ChangeList:
+    search_form_class: type[forms.Form]
     model: type[Model]
     opts: Options
     lookup_opts: Options
@@ -37,8 +41,13 @@ class ChangeList:
     page_num: int
     show_all: bool
     is_popup: bool
+    add_facets: bool
+    is_facets_optional: bool
     to_field: Any
     params: dict[str, Any]
+    filter_params: dict[str, list[str]]
+    remove_facet_link: str
+    add_facet_link: str
     list_editable: Sequence[str]
     query: str
     queryset: Any
