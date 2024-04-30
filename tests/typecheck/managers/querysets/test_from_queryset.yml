@@ -812,6 +812,6 @@
         reveal_type(Manager[models.Model].from_queryset(NonQSGeneric[int]))
     out: |
         main:12: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[_QuerySet[Model, Model]]"  [arg-type]
+        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
         main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[_QuerySet[Model, Model]]"  [arg-type]
+        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[QuerySet[Model, Model]]"  [arg-type]

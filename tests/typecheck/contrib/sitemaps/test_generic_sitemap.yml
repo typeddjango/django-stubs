@@ -49,7 +49,7 @@
         main:26: error: Argument 1 of "location" is incompatible with supertype "Sitemap"; supertype defines the argument type as "Offer"  [override]
         main:26: note: This violates the Liskov substitution principle
         main:26: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
-        main:40: error: Argument 1 to "GenericSitemap" has incompatible type "Dict[str, List[int]]"; expected "Mapping[str, Union[datetime, _QuerySet[Offer, Offer], str]]"  [arg-type]
+        main:40: error: Argument 1 to "GenericSitemap" has incompatible type "Dict[str, List[int]]"; expected "Mapping[str, Union[datetime, QuerySet[Offer, Offer], str]]"  [arg-type]
 
     installed_apps:
         - myapp
