@@ -14,9 +14,9 @@
                 from django.conf import settings
 
                 def test() -> None:
-                    print(settings.IMMEDIATE_VALUE)
-                    print(settings.CIRCULAR_WITHOUT_HINT)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT'  [misc]
-                    print(settings.CIRCULAR_WITH_HINT)
+                    reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "builtins.int"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT'  [misc]  # N: Revealed type is "Any"
+                    reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "builtins.int"
 
                 def function_returning_int() -> int:
                     return 42
