@@ -8,12 +8,6 @@ from django.core.paginator import Paginator
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 
-PING_URL: str
-
-class SitemapNotFound(Exception): ...
-
-def ping_google(sitemap_url: str | None = ..., ping_url: str = ..., sitemap_uses_https: bool = ...) -> None: ...
-
 _ItemT = TypeVar("_ItemT")
 
 class Sitemap(Generic[_ItemT]):

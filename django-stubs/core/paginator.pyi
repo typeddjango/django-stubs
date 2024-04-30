@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Iterator, Sequence, Sized
 from typing import ClassVar, Generic, Protocol, TypeVar, overload, type_check_only
 
-from django.db.fields import _ErrorMessagesDict
+from django.db.models.fields import _ErrorMessagesDict
 from django.utils.functional import _StrPromise, cached_property
 
 class UnorderedObjectListWarning(RuntimeWarning): ...

@@ -1,8 +1,12 @@
-from typing import Any, ClassVar, Literal
+from typing import Any, ClassVar, Literal, TypeVar
 
+from _typeshed import Unused
+from django.contrib.postgres import forms
 from django.db import models
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import PostgresOperatorLookup
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range  # type: ignore [import-untyped]
 
 class RangeBoundary(models.Expression):
     lower: str
@@ -21,32 +25,41 @@ class RangeOperators:
     NOT_GT: Literal["&<"]
     ADJACENT_TO: Literal["-|-"]
 
-class RangeField(models.Field):
+_RangeT = TypeVar("_RangeT", bound=Range[Any])
+
+class RangeField(models.Field[Any, _RangeT]):
     empty_strings_allowed: bool
-    base_field: models.Field
-    range_type: type[Range]
+    base_field: type[models.Field]
+    range_type: type[_RangeT]
     def get_prep_value(self, value: Any) -> Any | None: ...
+    def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
     def to_python(self, value: Any) -> Any: ...
 
-class IntegerRangeField(RangeField):
-    def __get__(self, instance: Any, owner: Any) -> NumericRange: ...
+class IntegerRangeField(RangeField[NumericRange]):
+    base_field: type[models.IntegerField]
+    form_field: type[forms.IntegerRangeField]
 
-class BigIntegerRangeField(RangeField):
-    def __get__(self, instance: Any, owner: Any) -> NumericRange: ...
+class BigIntegerRangeField(RangeField[NumericRange]):
+    base_field: type[models.BigIntegerField]
+    form_field: type[forms.IntegerRangeField]
 
-class DecimalRangeField(RangeField):
-    def __get__(self, instance: Any, owner: Any) -> NumericRange: ...
+class DecimalRangeField(RangeField[NumericRange]):
+    base_field: type[models.DecimalField]
+    form_field: type[forms.DecimalRangeField]
 
-class DateTimeRangeField(RangeField):
-    def __get__(self, instance: Any, owner: Any) -> DateTimeTZRange: ...
+class DateTimeRangeField(RangeField[DateTimeTZRange]):
+    base_field: type[models.DecimalField]
+    form_field: type[forms.DecimalRangeField]
 
-class DateRangeField(RangeField):
-    def __get__(self, instance: Any, owner: Any) -> DateRange: ...
+class DateRangeField(RangeField[DateRange]):
+    base_field: type[models.DateField]
+    form_field: type[forms.DateRangeField]
 
 class DateTimeRangeContains(PostgresOperatorLookup): ...
 
 class RangeContainedBy(PostgresOperatorLookup):
     type_mapping: dict[str, str]
+    def process_lhs(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class FullyLessThan(PostgresOperatorLookup): ...
 class FullGreaterThan(PostgresOperatorLookup): ...

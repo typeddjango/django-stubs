@@ -1,27 +1,32 @@
 -   case: import_all_modules
     main: |
+        import django
         import django.apps
         import django.apps.config
         import django.apps.registry
+        import django.conf
         import django.conf.global_settings
         import django.conf.locale
         import django.conf.urls
         import django.conf.urls.i18n
         import django.conf.urls.static
+        import django.contrib
+        import django.contrib.admin
         import django.contrib.admin.actions
         import django.contrib.admin.apps
         import django.contrib.admin.checks
         import django.contrib.admin.decorators
+        import django.contrib.admin.exceptions
         import django.contrib.admin.filters
         import django.contrib.admin.forms
         import django.contrib.admin.helpers
+        import django.contrib.admin.migrations
         import django.contrib.admin.models
         import django.contrib.admin.options
         import django.contrib.admin.sites
         import django.contrib.admin.templatetags
         import django.contrib.admin.templatetags.admin_list
         import django.contrib.admin.templatetags.admin_modify
-        import django.contrib.admin.templatetags.admin_static
         import django.contrib.admin.templatetags.admin_urls
         import django.contrib.admin.templatetags.base
         import django.contrib.admin.templatetags.log
@@ -33,10 +38,12 @@
         import django.contrib.admin.views.main
         import django.contrib.admin.widgets
         import django.contrib.admindocs
+        import django.contrib.admindocs.apps
         import django.contrib.admindocs.middleware
         import django.contrib.admindocs.urls
         import django.contrib.admindocs.utils
         import django.contrib.admindocs.views
+        import django.contrib.auth
         import django.contrib.auth.admin
         import django.contrib.auth.apps
         import django.contrib.auth.backends
@@ -48,10 +55,12 @@
         import django.contrib.auth.handlers
         import django.contrib.auth.handlers.modwsgi
         import django.contrib.auth.hashers
+        import django.contrib.auth.management
         import django.contrib.auth.management.commands
         import django.contrib.auth.management.commands.changepassword
         import django.contrib.auth.management.commands.createsuperuser
         import django.contrib.auth.middleware
+        import django.contrib.auth.migrations
         import django.contrib.auth.mixins
         import django.contrib.auth.models
         import django.contrib.auth.password_validation
@@ -60,28 +69,162 @@
         import django.contrib.auth.urls
         import django.contrib.auth.validators
         import django.contrib.auth.views
+        import django.contrib.contenttypes
         import django.contrib.contenttypes.admin
         import django.contrib.contenttypes.apps
         import django.contrib.contenttypes.checks
         import django.contrib.contenttypes.fields
         import django.contrib.contenttypes.forms
+        import django.contrib.contenttypes.management
         import django.contrib.contenttypes.management.commands
         import django.contrib.contenttypes.management.commands.remove_stale_contenttypes
+        import django.contrib.contenttypes.migrations
         import django.contrib.contenttypes.models
         import django.contrib.contenttypes.views
+        import django.contrib.flatpages
+        import django.contrib.flatpages.admin
+        import django.contrib.flatpages.apps
         import django.contrib.flatpages.forms
         import django.contrib.flatpages.middleware
+        import django.contrib.flatpages.migrations
         import django.contrib.flatpages.models
         import django.contrib.flatpages.sitemaps
         import django.contrib.flatpages.templatetags
         import django.contrib.flatpages.templatetags.flatpages
         import django.contrib.flatpages.urls
         import django.contrib.flatpages.views
+        import django.contrib.gis
+        import django.contrib.gis.admin
+        import django.contrib.gis.admin.options
+        import django.contrib.gis.admin.widgets
+        import django.contrib.gis.apps
+        import django.contrib.gis.db
+        import django.contrib.gis.db.backends
+        import django.contrib.gis.db.backends.base
+        import django.contrib.gis.db.backends.base.adapter
+        import django.contrib.gis.db.backends.base.features
+        import django.contrib.gis.db.backends.base.models
+        import django.contrib.gis.db.backends.base.operations
+        import django.contrib.gis.db.backends.mysql
+        import django.contrib.gis.db.backends.mysql.base
+        import django.contrib.gis.db.backends.mysql.features
+        import django.contrib.gis.db.backends.mysql.introspection
+        import django.contrib.gis.db.backends.mysql.operations
+        import django.contrib.gis.db.backends.mysql.schema
+        import django.contrib.gis.db.backends.oracle
+        import django.contrib.gis.db.backends.oracle.adapter
+        import django.contrib.gis.db.backends.oracle.base
+        import django.contrib.gis.db.backends.oracle.features
+        import django.contrib.gis.db.backends.oracle.introspection
+        import django.contrib.gis.db.backends.oracle.models
+        import django.contrib.gis.db.backends.oracle.operations
+        import django.contrib.gis.db.backends.oracle.schema
+        import django.contrib.gis.db.backends.postgis
+        import django.contrib.gis.db.backends.postgis.adapter
+        import django.contrib.gis.db.backends.postgis.base
+        import django.contrib.gis.db.backends.postgis.const
+        import django.contrib.gis.db.backends.postgis.features
+        import django.contrib.gis.db.backends.postgis.introspection
+        import django.contrib.gis.db.backends.postgis.models
+        import django.contrib.gis.db.backends.postgis.operations
+        import django.contrib.gis.db.backends.postgis.pgraster
+        import django.contrib.gis.db.backends.postgis.schema
+        import django.contrib.gis.db.backends.spatialite
+        import django.contrib.gis.db.backends.spatialite.adapter
+        import django.contrib.gis.db.backends.spatialite.base
+        import django.contrib.gis.db.backends.spatialite.client
+        import django.contrib.gis.db.backends.spatialite.features
+        import django.contrib.gis.db.backends.spatialite.introspection
+        import django.contrib.gis.db.backends.spatialite.models
+        import django.contrib.gis.db.backends.spatialite.operations
+        import django.contrib.gis.db.backends.spatialite.schema
+        import django.contrib.gis.db.backends.utils
         import django.contrib.gis.db.models
+        import django.contrib.gis.db.models.aggregates
         import django.contrib.gis.db.models.fields
+        import django.contrib.gis.db.models.functions
+        import django.contrib.gis.db.models.lookups
+        import django.contrib.gis.db.models.proxy
+        import django.contrib.gis.db.models.sql
+        import django.contrib.gis.db.models.sql.conversion
+        import django.contrib.gis.feeds
+        import django.contrib.gis.forms
+        import django.contrib.gis.forms.fields
+        import django.contrib.gis.forms.widgets
+        import django.contrib.gis.gdal
+        import django.contrib.gis.gdal.base
+        import django.contrib.gis.gdal.datasource
+        import django.contrib.gis.gdal.driver
+        import django.contrib.gis.gdal.envelope
+        import django.contrib.gis.gdal.error
+        import django.contrib.gis.gdal.feature
+        import django.contrib.gis.gdal.field
+        import django.contrib.gis.gdal.geometries
+        import django.contrib.gis.gdal.geomtype
+        import django.contrib.gis.gdal.layer
+        import django.contrib.gis.gdal.libgdal
+        import django.contrib.gis.gdal.prototypes
+        import django.contrib.gis.gdal.prototypes.ds
+        import django.contrib.gis.gdal.prototypes.errcheck
+        import django.contrib.gis.gdal.prototypes.generation
+        import django.contrib.gis.gdal.prototypes.geom
+        import django.contrib.gis.gdal.prototypes.raster
+        import django.contrib.gis.gdal.prototypes.srs
+        import django.contrib.gis.gdal.raster
+        import django.contrib.gis.gdal.raster.band
+        import django.contrib.gis.gdal.raster.base
+        import django.contrib.gis.gdal.raster.const
+        import django.contrib.gis.gdal.raster.source
+        import django.contrib.gis.gdal.srs
+        import django.contrib.gis.geoip2
+        import django.contrib.gis.geoip2.base
+        import django.contrib.gis.geoip2.resources
+        import django.contrib.gis.geometry
+        import django.contrib.gis.geos
+        import django.contrib.gis.geos.base
+        import django.contrib.gis.geos.collections
+        import django.contrib.gis.geos.coordseq
+        import django.contrib.gis.geos.error
+        import django.contrib.gis.geos.factory
+        import django.contrib.gis.geos.geometry
+        import django.contrib.gis.geos.io
+        import django.contrib.gis.geos.libgeos
+        import django.contrib.gis.geos.linestring
+        import django.contrib.gis.geos.mutable_list
+        import django.contrib.gis.geos.point
+        import django.contrib.gis.geos.polygon
+        import django.contrib.gis.geos.prepared
+        import django.contrib.gis.geos.prototypes
+        import django.contrib.gis.geos.prototypes.coordseq
+        import django.contrib.gis.geos.prototypes.errcheck
+        import django.contrib.gis.geos.prototypes.geom
+        import django.contrib.gis.geos.prototypes.io
+        import django.contrib.gis.geos.prototypes.misc
+        import django.contrib.gis.geos.prototypes.predicates
+        import django.contrib.gis.geos.prototypes.prepared
+        import django.contrib.gis.geos.prototypes.threadsafe
+        import django.contrib.gis.geos.prototypes.topology
+        import django.contrib.gis.measure
+        import django.contrib.gis.ptr
+        import django.contrib.gis.serializers
+        import django.contrib.gis.serializers.geojson
+        import django.contrib.gis.shortcuts
+        import django.contrib.gis.sitemaps
+        import django.contrib.gis.sitemaps.kml
+        import django.contrib.gis.sitemaps.views
+        import django.contrib.gis.utils
+        import django.contrib.gis.utils.layermapping
+        import django.contrib.gis.utils.ogrinfo
+        import django.contrib.gis.utils.ogrinspect
+        import django.contrib.gis.utils.srs
+        import django.contrib.gis.views
+        import django.contrib.humanize
+        import django.contrib.humanize.apps
         import django.contrib.humanize.templatetags
         import django.contrib.humanize.templatetags.humanize
+        import django.contrib.messages
         import django.contrib.messages.api
+        import django.contrib.messages.apps
         import django.contrib.messages.constants
         import django.contrib.messages.context_processors
         import django.contrib.messages.middleware
@@ -92,36 +235,42 @@
         import django.contrib.messages.storage.session
         import django.contrib.messages.utils
         import django.contrib.messages.views
+        import django.contrib.postgres
         import django.contrib.postgres.aggregates
         import django.contrib.postgres.aggregates.general
         import django.contrib.postgres.aggregates.mixins
         import django.contrib.postgres.aggregates.statistics
+        import django.contrib.postgres.apps
         import django.contrib.postgres.constraints
+        import django.contrib.postgres.expressions
         import django.contrib.postgres.fields
         import django.contrib.postgres.fields.array
         import django.contrib.postgres.fields.citext
         import django.contrib.postgres.fields.hstore
         import django.contrib.postgres.fields.jsonb
-        import django.contrib.postgres.fields.mixins
         import django.contrib.postgres.fields.ranges
         import django.contrib.postgres.fields.utils
         import django.contrib.postgres.forms
         import django.contrib.postgres.forms.array
         import django.contrib.postgres.forms.hstore
-        import django.contrib.postgres.forms.jsonb
         import django.contrib.postgres.forms.ranges
-        import django.contrib.postgres.constraints
         import django.contrib.postgres.functions
         import django.contrib.postgres.indexes
         import django.contrib.postgres.lookups
         import django.contrib.postgres.operations
         import django.contrib.postgres.search
+        import django.contrib.postgres.serializers
         import django.contrib.postgres.signals
         import django.contrib.postgres.utils
         import django.contrib.postgres.validators
         import django.contrib.redirects
+        import django.contrib.redirects.admin
+        import django.contrib.redirects.apps
         import django.contrib.redirects.middleware
+        import django.contrib.redirects.migrations
         import django.contrib.redirects.models
+        import django.contrib.sessions
+        import django.contrib.sessions.apps
         import django.contrib.sessions.backends
         import django.contrib.sessions.backends.base
         import django.contrib.sessions.backends.cache
@@ -131,50 +280,64 @@
         import django.contrib.sessions.backends.signed_cookies
         import django.contrib.sessions.base_session
         import django.contrib.sessions.exceptions
+        import django.contrib.sessions.management
         import django.contrib.sessions.management.commands
         import django.contrib.sessions.management.commands.clearsessions
         import django.contrib.sessions.middleware
+        import django.contrib.sessions.migrations
         import django.contrib.sessions.models
         import django.contrib.sessions.serializers
-        import django.contrib.sitemaps.management.commands
-        import django.contrib.sitemaps.management.commands.ping_google
+        import django.contrib.sitemaps
+        import django.contrib.sitemaps.apps
         import django.contrib.sitemaps.views
         import django.contrib.sites
+        import django.contrib.sites.admin
         import django.contrib.sites.apps
+        import django.contrib.sites.checks
         import django.contrib.sites.management
         import django.contrib.sites.managers
         import django.contrib.sites.middleware
+        import django.contrib.sites.migrations
         import django.contrib.sites.models
         import django.contrib.sites.requests
         import django.contrib.sites.shortcuts
+        import django.contrib.staticfiles
         import django.contrib.staticfiles.apps
         import django.contrib.staticfiles.checks
         import django.contrib.staticfiles.finders
         import django.contrib.staticfiles.handlers
+        import django.contrib.staticfiles.management
         import django.contrib.staticfiles.management.commands
         import django.contrib.staticfiles.management.commands.collectstatic
         import django.contrib.staticfiles.management.commands.findstatic
         import django.contrib.staticfiles.management.commands.runserver
         import django.contrib.staticfiles.storage
-        import django.contrib.staticfiles.templatetags
-        import django.contrib.staticfiles.templatetags.staticfiles
         import django.contrib.staticfiles.testing
         import django.contrib.staticfiles.urls
         import django.contrib.staticfiles.utils
         import django.contrib.staticfiles.views
         import django.contrib.syndication
+        import django.contrib.syndication.apps
         import django.contrib.syndication.views
-        import django.core.cache.backends
+        import django.core
         import django.core.asgi
+        import django.core.cache
+        import django.core.cache.backends
         import django.core.cache.backends.base
         import django.core.cache.backends.db
         import django.core.cache.backends.dummy
         import django.core.cache.backends.filebased
         import django.core.cache.backends.locmem
         import django.core.cache.backends.memcached
+        import django.core.cache.backends.redis
         import django.core.cache.utils
+        import django.core.checks
+        import django.core.checks.async_checks
         import django.core.checks.caches
+        import django.core.checks.compatibility
+        import django.core.checks.compatibility.django_4_0
         import django.core.checks.database
+        import django.core.checks.files
         import django.core.checks.messages
         import django.core.checks.model_checks
         import django.core.checks.registry
@@ -192,6 +355,11 @@
         import django.core.files.locks
         import django.core.files.move
         import django.core.files.storage
+        import django.core.files.storage.base
+        import django.core.files.storage.filesystem
+        import django.core.files.storage.handler
+        import django.core.files.storage.memory
+        import django.core.files.storage.mixins
         import django.core.files.temp
         import django.core.files.uploadedfile
         import django.core.files.uploadhandler
@@ -201,17 +369,43 @@
         import django.core.handlers.base
         import django.core.handlers.exception
         import django.core.handlers.wsgi
+        import django.core.mail
         import django.core.mail.backends
         import django.core.mail.backends.base
+        import django.core.mail.backends.console
+        import django.core.mail.backends.dummy
+        import django.core.mail.backends.filebased
+        import django.core.mail.backends.locmem
+        import django.core.mail.backends.smtp
         import django.core.mail.message
         import django.core.mail.utils
+        import django.core.management
         import django.core.management.base
         import django.core.management.color
         import django.core.management.commands
+        import django.core.management.commands.check
+        import django.core.management.commands.compilemessages
+        import django.core.management.commands.createcachetable
+        import django.core.management.commands.dbshell
+        import django.core.management.commands.diffsettings
         import django.core.management.commands.dumpdata
+        import django.core.management.commands.flush
+        import django.core.management.commands.inspectdb
         import django.core.management.commands.loaddata
         import django.core.management.commands.makemessages
+        import django.core.management.commands.makemigrations
+        import django.core.management.commands.migrate
         import django.core.management.commands.runserver
+        import django.core.management.commands.sendtestemail
+        import django.core.management.commands.shell
+        import django.core.management.commands.showmigrations
+        import django.core.management.commands.sqlflush
+        import django.core.management.commands.sqlmigrate
+        import django.core.management.commands.sqlsequencereset
+        import django.core.management.commands.squashmigrations
+        import django.core.management.commands.startapp
+        import django.core.management.commands.startproject
+        import django.core.management.commands.test
         import django.core.management.commands.testserver
         import django.core.management.sql
         import django.core.management.templates
@@ -230,6 +424,8 @@
         import django.core.signing
         import django.core.validators
         import django.core.wsgi
+        import django.db
+        import django.db.backends
         import django.db.backends.base
         import django.db.backends.base.base
         import django.db.backends.base.client
@@ -242,14 +438,36 @@
         import django.db.backends.ddl_references
         import django.db.backends.dummy
         import django.db.backends.dummy.base
+        import django.db.backends.dummy.features
         import django.db.backends.mysql
+        import django.db.backends.mysql.base
         import django.db.backends.mysql.client
+        import django.db.backends.mysql.compiler
+        import django.db.backends.mysql.creation
+        import django.db.backends.mysql.features
+        import django.db.backends.mysql.introspection
+        import django.db.backends.mysql.operations
+        import django.db.backends.mysql.schema
+        import django.db.backends.mysql.validation
+        import django.db.backends.oracle
+        import django.db.backends.oracle.base
         import django.db.backends.oracle.client
+        import django.db.backends.oracle.creation
+        import django.db.backends.oracle.features
+        import django.db.backends.oracle.functions
+        import django.db.backends.oracle.introspection
+        import django.db.backends.oracle.operations
+        import django.db.backends.oracle.schema
+        import django.db.backends.oracle.utils
+        import django.db.backends.oracle.validation
         import django.db.backends.postgresql
         import django.db.backends.postgresql.base
         import django.db.backends.postgresql.client
         import django.db.backends.postgresql.creation
+        import django.db.backends.postgresql.features
+        import django.db.backends.postgresql.introspection
         import django.db.backends.postgresql.operations
+        import django.db.backends.postgresql.schema
         import django.db.backends.signals
         import django.db.backends.sqlite3
         import django.db.backends.sqlite3.base
@@ -260,6 +478,7 @@
         import django.db.backends.sqlite3.operations
         import django.db.backends.sqlite3.schema
         import django.db.backends.utils
+        import django.db.migrations
         import django.db.migrations.autodetector
         import django.db.migrations.exceptions
         import django.db.migrations.executor
@@ -277,17 +496,20 @@
         import django.db.migrations.recorder
         import django.db.migrations.serializer
         import django.db.migrations.state
-        import django.db.migrations.topological_sort
         import django.db.migrations.utils
         import django.db.migrations.writer
+        import django.db.models
         import django.db.models.aggregates
         import django.db.models.base
+        import django.db.models.constants
         import django.db.models.constraints
         import django.db.models.deletion
-        import django.db.models.expressions
         import django.db.models.enums
+        import django.db.models.expressions
         import django.db.models.fields
         import django.db.models.fields.files
+        import django.db.models.fields.generated
+        import django.db.models.fields.json
         import django.db.models.fields.mixins
         import django.db.models.fields.proxy
         import django.db.models.fields.related
@@ -344,6 +566,7 @@
         import django.middleware.locale
         import django.middleware.security
         import django.shortcuts
+        import django.template
         import django.template.backends
         import django.template.backends.base
         import django.template.backends.django
@@ -390,11 +613,13 @@
         import django.urls.exceptions
         import django.urls.resolvers
         import django.urls.utils
+        import django.utils
         import django.utils._os
         import django.utils.archive
         import django.utils.asyncio
         import django.utils.autoreload
         import django.utils.cache
+        import django.utils.choices
         import django.utils.connection
         import django.utils.crypto
         import django.utils.datastructures
@@ -426,7 +651,6 @@
         import django.utils.text
         import django.utils.timesince
         import django.utils.timezone
-        import django.utils.topological_sort
         import django.utils.translation
         import django.utils.translation.reloader
         import django.utils.translation.template
@@ -435,11 +659,13 @@
         import django.utils.tree
         import django.utils.version
         import django.utils.xmlutils
+        import django.views
         import django.views.csrf
         import django.views.debug
         import django.views.decorators
         import django.views.decorators.cache
         import django.views.decorators.clickjacking
+        import django.views.decorators.common
         import django.views.decorators.csrf
         import django.views.decorators.debug
         import django.views.decorators.gzip
@@ -454,3 +680,6 @@
         import django.views.generic.list
         import django.views.i18n
         import django.views.static
+    mypy_config: |
+        [mypy-redis.*]
+        ignore_errors = True

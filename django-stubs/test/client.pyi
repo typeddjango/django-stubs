@@ -1,11 +1,13 @@
-from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping
+from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Callable, Iterable, Iterator, Mapping
+from http import HTTPStatus
 from http.cookies import SimpleCookie
 from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, NoReturn, TypeVar, type_check_only
+from typing import Any, Generic, Literal, NoReturn, TypedDict, TypeVar, type_check_only
 
+from asgiref.typing import ASGIVersions
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
@@ -22,6 +24,7 @@ BOUNDARY: str
 MULTIPART_CONTENT: str
 CONTENT_TYPE_RE: Pattern[str]
 JSON_CONTENT_TYPE_RE: Pattern[str]
+REDIRECT_STATUS_CODES: frozenset[HTTPStatus]
 
 class RedirectCycleError(Exception):
     last_response: HttpResponseBase
@@ -39,6 +42,7 @@ class FakePayload(IOBase):
 _T = TypeVar("_T")
 
 def closing_iterator_wrapper(iterable: Iterable[_T], close: Callable[[], Any]) -> Iterator[_T]: ...
+async def aclosing_iterator_wrapper(iterable: AsyncIterable[_T], close: Callable[[], Any]) -> AsyncIterator[_T]: ...
 def conditional_content_removal(request: HttpRequest, response: HttpResponseBase) -> HttpResponseBase: ...
 @type_check_only
 class _WSGIResponse(HttpResponseBase):
@@ -154,8 +158,27 @@ class _RequestFactory(Generic[_T]):
 
 class RequestFactory(_RequestFactory[WSGIRequest]): ...
 
+# A non total duplication of `asgiref.typing.HTTPScope`
 @type_check_only
-class _AsyncRequestFactory(_RequestFactory[_T]): ...
+class _HTTPScope(TypedDict, total=False):
+    type: Literal["http"]
+    asgi: ASGIVersions
+    http_version: str
+    method: str
+    scheme: str
+    path: str
+    raw_path: bytes
+    query_string: bytes
+    root_path: str
+    headers: Iterable[tuple[bytes, bytes]]
+    client: tuple[str, int] | None
+    server: tuple[str, int | None] | None
+    state: dict[str, Any]
+    extensions: dict[str, dict[object, object]] | None
+
+@type_check_only
+class _AsyncRequestFactory(_RequestFactory[_T]):
+    defaults: _HTTPScope  # type: ignore[assignment]
 
 class AsyncRequestFactory(_AsyncRequestFactory[ASGIRequest]): ...
 

@@ -13,8 +13,9 @@ from django.contrib.gis.geos import (
     Polygon,
 )
 from django.core.validators import _ValidatorCallable
-from django.db.models.expressions import Combinable
-from django.db.models.fields import Field, _ErrorMessagesMapping, _FieldChoices
+from django.db.models.expressions import Combinable, Expression
+from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
+from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 
 # __set__ value type
@@ -51,15 +52,17 @@ class BaseSpatialField(Field[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _FieldChoices | None = ...,
+        choices: _Choices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
+        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
@@ -95,15 +98,17 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _FieldChoices | None = ...,
+        choices: _Choices | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
+        db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,

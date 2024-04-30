@@ -35,7 +35,6 @@ class _AssertTemplateUsedContext:
     test_case: SimpleTestCase
     template_name: str
     rendered_templates: list[Template]
-    rendered_template_names: list[str]
     context: ContextList
     def __init__(self, test_case: Any, template_name: Any) -> None: ...
     def on_template_render(self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any) -> None: ...
@@ -100,7 +99,6 @@ class SimpleTestCase(unittest.TestCase):
         msg_prefix: str = ...,
         html: bool = ...,
     ) -> None: ...
-    @overload
     def assertFormError(
         self,
         form: Form,
@@ -108,17 +106,7 @@ class SimpleTestCase(unittest.TestCase):
         errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
-    @overload
-    def assertFormError(  # old signature, deprecated in Django 4.1
-        self,
-        response: HttpResponseBase,
-        form: str,
-        field: str | None,
-        errors: list[str] | str,
-        msg_prefix: str = ...,
-    ) -> None: ...
     # assertFormsetError (lowercase "set") deprecated in Django 4.2
-    @overload
     def assertFormsetError(
         self,
         formset: BaseFormSet,
@@ -127,30 +115,9 @@ class SimpleTestCase(unittest.TestCase):
         errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
-    @overload
-    def assertFormsetError(  # old signature, deprecated in Django 4.1
-        self,
-        response: HttpResponseBase,
-        formset: str,
-        form_index: int | None,
-        field: str | None,
-        errors: list[str] | str,
-        msg_prefix: str = ...,
-    ) -> None: ...
-    @overload
     def assertFormSetError(
         self,
         formset: BaseFormSet,
-        form_index: int | None,
-        field: str | None,
-        errors: list[str] | str,
-        msg_prefix: str = ...,
-    ) -> None: ...
-    @overload
-    def assertFormSetError(
-        self,
-        response: HttpResponseBase,
-        formset: str,
         form_index: int | None,
         field: str | None,
         errors: list[str] | str,

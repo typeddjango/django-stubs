@@ -9,7 +9,7 @@
 -   case: raw_connection_psycopg2_composable
     main: |
       from django.db import connection
-      from psycopg2.sql import SQL, Identifier
+      from psycopg2.sql import SQL, Identifier  # type: ignore [import-untyped]
       with connection.cursor() as cursor:
         cursor.execute(SQL("INSERT INTO {} VALUES (%s)").format(Identifier("my_table")), [123])
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup
-
-from setuptools import find_packages
+from setuptools import find_packages, setup  # type: ignore[import-untyped]
 
 with open("README.md") as f:
     readme = f.read()
@@ -15,7 +13,7 @@ dependencies = [
 # It's fine to skip django-stubs-ext releases, but when doing a release, update this to newest django-stubs version.
 setup(
     name="django-stubs-ext",
-    version="5.0.0.dev1",
+    version="5.0.0",
     description="Monkey-patching and extensions for django-stubs",
     long_description=readme,
     long_description_content_type="text/markdown",

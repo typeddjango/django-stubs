@@ -3,6 +3,7 @@ import sys
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
+from mypy.build import PRI_MYPY
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
@@ -99,7 +100,8 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def _new_dependency(self, module: str) -> Tuple[int, str, int]:
-        return 10, module, -1
+        fake_lineno = -1
+        return (PRI_MYPY, module, fake_lineno)
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # for settings

@@ -1,7 +1,8 @@
+import datetime
 from collections.abc import Iterable, Mapping
 from io import BytesIO
 from re import Pattern
-from typing import Any, BinaryIO, Literal, NoReturn, TypeVar, overload, type_check_only
+from typing import Any, BinaryIO, Callable, Literal, NoReturn, TypeVar, overload, type_check_only
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
@@ -55,6 +56,8 @@ class HttpRequest(BytesIO):
     current_app: str
     # django.contrib.auth.middleware.AuthenticationMiddleware:
     user: AbstractBaseUser | AnonymousUser
+    # django.contrib.auth.middleware.AuthenticationMiddleware:
+    auser: Callable[[], AbstractBaseUser | AnonymousUser]
     # django.middleware.locale.LocaleMiddleware:
     LANGUAGE_CODE: str
     # django.contrib.sites.middleware.CurrentSiteMiddleware
@@ -75,7 +78,7 @@ class HttpRequest(BytesIO):
     def get_full_path(self, force_append_slash: bool = ...) -> str: ...
     def get_full_path_info(self, force_append_slash: bool = ...) -> str: ...
     def get_signed_cookie(
-        self, key: str, default: Any = ..., salt: str = ..., max_age: int | None = ...
+        self, key: str, default: Any = ..., salt: str = ..., max_age: int | datetime.timedelta | None = ...
     ) -> str | None: ...
     def get_raw_uri(self) -> str: ...
     def build_absolute_uri(self, location: str | None = ...) -> str: ...

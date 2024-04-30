@@ -1,6 +1,7 @@
 from collections.abc import Callable, Iterable, Sequence
 from typing import Any, Literal
 
+from django import forms
 from django.contrib.admin.filters import ListFilter
 from django.contrib.admin.options import ModelAdmin, _DisplayT, _ListFilterT
 from django.db.models.base import Model
@@ -17,7 +18,10 @@ SEARCH_VAR: str
 ERROR_FLAG: str
 IGNORED_PARAMS: tuple[str, ...]
 
+class ChangeListSearchForm(forms.Form): ...
+
 class ChangeList:
+    search_form_class: type[forms.Form]
     model: type[Model]
     opts: Options
     lookup_opts: Options
@@ -37,8 +41,13 @@ class ChangeList:
     page_num: int
     show_all: bool
     is_popup: bool
+    add_facets: bool
+    is_facets_optional: bool
     to_field: Any
     params: dict[str, Any]
+    filter_params: dict[str, list[str]]
+    remove_facet_link: str
+    add_facet_link: str
     list_editable: Sequence[str]
     query: str
     queryset: Any
@@ -77,7 +86,7 @@ class ChangeList:
     def get_ordering_field(self, field_name: Callable | str) -> Expression | str | None: ...
     def get_ordering(self, request: HttpRequest, queryset: QuerySet) -> list[Expression | str]: ...
     def get_ordering_field_columns(self) -> dict[int, Literal["desc", "asc"]]: ...
-    def get_queryset(self, request: HttpRequest) -> QuerySet: ...
+    def get_queryset(self, request: HttpRequest, exclude_parameters: list[str | None] | None = ...) -> QuerySet: ...
     filter_specs: list[ListFilter]
     has_filters: bool
     has_active_filters: bool

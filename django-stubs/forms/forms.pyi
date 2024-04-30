@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping
 from typing import Any, ClassVar
 
 from django.core.exceptions import ValidationError
@@ -13,9 +13,6 @@ from django.utils.safestring import SafeString
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
 class BaseForm(RenderableFormMixin):
-    class Meta:
-        fields: Sequence[str]
-
     default_renderer: BaseRenderer | type[BaseRenderer] | None
     field_order: Iterable[str] | None
     use_required_attribute: bool
@@ -83,6 +80,6 @@ class BaseForm(RenderableFormMixin):
         errors_on_separate_row: bool,
     ) -> SafeString: ...
 
-class Form(BaseForm):
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     base_fields: ClassVar[dict[str, Field]]
     declared_fields: ClassVar[dict[str, Field]]

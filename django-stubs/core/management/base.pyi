@@ -10,6 +10,7 @@ from django.utils.datastructures import _ListOrTuple
 ALL_CHECKS: Literal["__all__"]
 
 class CommandError(Exception):
+    returncode: int
     def __init__(self, *args: Any, returncode: int = ..., **kwargs: Any) -> None: ...
 
 class SystemCheckError(CommandError): ...

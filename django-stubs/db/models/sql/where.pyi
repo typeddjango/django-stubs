@@ -1,9 +1,9 @@
 from collections.abc import Sequence
 from typing import Any
 
-from db.models import BooleanField
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
+from django.db.models.fields import BooleanField
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
 from django.utils import tree

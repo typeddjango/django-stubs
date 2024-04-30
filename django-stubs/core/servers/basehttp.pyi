@@ -1,9 +1,12 @@
 import socketserver
 from io import BytesIO
-from typing import Any
+from typing import Any, Callable
 from wsgiref import simple_server
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
+
+def get_internal_wsgi_application() -> WSGIHandler: ...
+def is_broken_pipe_error() -> bool: ...
 
 class WSGIServer(simple_server.WSGIServer):
     request_queue_size: int
@@ -32,4 +35,12 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     request_version: str
     def handle(self) -> None: ...
 
-def get_internal_wsgi_application() -> WSGIHandler: ...
+def run(
+    addr: str | bytes | bytearray,
+    port: int,
+    wsgi_handler: WSGIHandler,
+    ipv6: bool = ...,
+    threading: bool = ...,
+    on_bind: Callable[[str], None] | None = ...,
+    server_cls: type[WSGIServer] = ...,
+) -> None: ...

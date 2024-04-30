@@ -3,7 +3,7 @@ from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from types import TracebackType
 from typing import Literal, overload
 
-import zoneinfo
+import zoneinfo  # type: ignore[import-not-found,unused-ignore]
 
 def get_fixed_timezone(offset: timedelta | int) -> timezone: ...
 def get_default_timezone() -> zoneinfo.ZoneInfo: ...

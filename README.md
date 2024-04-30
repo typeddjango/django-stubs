@@ -39,7 +39,7 @@ django_settings_module = "myproject.settings"
 Two things happening here:
 
 1. We need to explicitly list our plugin to be loaded by `mypy`
-2. Our plugin also requires `django` settings module (what you put into `DJANGO_SETTINGS_MODULE` variable) to be specified
+2. You can either specify `django_settings_module` as seen above, or let `django_stubs` use the `DJANGO_SETTINGS_MODULE` variable from your environment.
 
 This fully working [typed boilerplate](https://github.com/wemake-services/wemake-django-template) can serve you as an example.
 
@@ -49,7 +49,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
-| (next release) | 1.9.x        | 5.0            | 4.2, 4.1               | 3.8 - 3.12     |
+| 5.0.0          | 1.10.x       | 5.0            | 4.2, 4.1               | 3.8 - 3.12     |
 | 4.2.7          | 1.7.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.12     |
 | 4.2.6          | 1.6.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.12     |
 | 4.2.5          | 1.6.x        | 4.2            | 4.1, 3.2               | 3.8 - 3.12     |
@@ -96,7 +96,7 @@ django-stubs has a few settings, which you can list in:
 
 The supported settings are:
 
-- `django_settings_module`, a string.
+- `django_settings_module`, a string, default to `os.getenv(DJANGO_SETTINGS_MODULE)`.
 
   Specify the import path of your settings module, the same as Django’s [`DJANGO_SETTINGS_MODULE` environment variable](https://docs.djangoproject.com/en/stable/topics/settings/#designating-the-settings).
 

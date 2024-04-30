@@ -3,12 +3,12 @@ from collections.abc import Iterable, Iterator, Mapping, Sequence
 from typing import Any, Literal, Protocol, type_check_only
 
 from django.core.files.base import File
-from django.db.models.fields import _FieldChoices
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import _DataT, _FilesT
+from django.utils.choices import _Choices
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-from typing_extensions import TypeAlias
+from typing_extensions import Self, TypeAlias
 
 _OptAttrs: TypeAlias = dict[str, Any]
 
@@ -40,6 +40,7 @@ class Widget(metaclass=MediaDefiningClass):
     attrs: _OptAttrs
     template_name: str
     def __init__(self, attrs: _OptAttrs | None = ...) -> None: ...
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
     @property
     def is_hidden(self) -> bool: ...
     @property
@@ -84,7 +85,7 @@ class PasswordInput(Input):
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
 
 class HiddenInput(Input):
-    choices: _FieldChoices
+    choices: _Choices
     input_type: str
     template_name: str
 
@@ -155,8 +156,8 @@ class ChoiceWidget(Widget):
     add_id_index: bool
     checked_attribute: Any
     option_inherits_attrs: bool
-    choices: _FieldChoices
-    def __init__(self, attrs: _OptAttrs | None = ..., choices: _FieldChoices = ...) -> None: ...
+    choices: _Choices
+    def __init__(self, attrs: _OptAttrs | None = ..., choices: _Choices = ...) -> None: ...
     def subwidgets(self, name: str, value: Any, attrs: _OptAttrs = ...) -> Iterator[dict[str, Any]]: ...
     def options(self, name: str, value: list[str], attrs: _OptAttrs | None = ...) -> Iterator[dict[str, Any]]: ...
     def optgroups(

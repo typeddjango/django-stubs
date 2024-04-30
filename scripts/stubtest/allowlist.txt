@@ -12,8 +12,11 @@ django.conf.locale.*
 # We don't need migrations:
 django.contrib.admin.migrations.*
 django.contrib.auth.migrations.*
-django.contrib.flatpages.migrations.*
 django.contrib.contenttypes.migrations.*
+django.contrib.flatpages.migrations.*
+django.contrib.redirects.migrations.*
+django.contrib.sessions.migrations.*
+django.contrib.sites.migrations.*
 
 # default_storage is actually an instance of DefaultStorage, but it proxies through to a Storage
 django.core.files.storage.default_storage
@@ -57,6 +60,7 @@ django.contrib.gis.geometry.json_regex
 django.contrib.gis.geometry.wkt_regex
 django.contrib.gis.geos.hex_regex
 django.contrib.gis.geos.wkt_regex
+django.core.cache.backends.base.memcached_error_chars_re
 django.core.validators.EmailValidator.domain_regex
 django.core.validators.EmailValidator.literal_regex
 django.core.validators.EmailValidator.user_regex
@@ -194,6 +198,7 @@ django.contrib.gis.gdal.raster.source.GDALRaster.is_vsi_based
 django.contrib.postgres.expressions.ArraySubquery.output_field
 django.contrib.postgres.indexes.PostgresIndex.max_name_length
 django.contrib.sessions.backends.db.SessionStore.model
+django.contrib.staticfiles.management.commands.collectstatic.Command.local
 django.core.files.File.size
 django.core.files.base.File.size
 django.core.files.storage.FileSystemStorage.base_location
@@ -387,3 +392,13 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+
+# Ignore missing inner `Meta` class, see PR #2000 for the related discussion
+django.contrib.auth.base_user.AbstractBaseUser.Meta
+django.contrib.auth.forms.BaseUserCreationForm.Meta
+django.contrib.auth.forms.UserChangeForm.Meta
+django.contrib.auth.models.AbstractBaseUser.Meta
+django.contrib.auth.models.AbstractUser.Meta
+django.contrib.auth.models.PermissionsMixin.Meta
+django.contrib.flatpages.forms.FlatpageForm.Meta
+django.contrib.sessions.base_session.AbstractBaseSession.Meta
