@@ -65,7 +65,6 @@ class BaseDatabaseFeatures:
     atomic_transactions: bool
     can_rollback_ddl: bool
     schema_editor_uses_clientside_param_binding: bool
-    supports_atomic_references_rename: bool
     supports_combined_alters: bool
     supports_foreign_keys: bool
     can_create_inline_fk: bool
