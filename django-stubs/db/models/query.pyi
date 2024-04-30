@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import AsyncIterator, Collection, Iterable, Iterator, MutableMapping, Reversible, Sequence, Sized
+from collections.abc import AsyncIterator, Collection, Iterable, Iterator, MutableMapping, Sequence, Sized
 from typing import Any, Generic, NamedTuple, TypeVar, overload
 
 from django.db.backends.utils import _ExecuteQuery
