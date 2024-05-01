@@ -124,12 +124,6 @@ django.db.models.functions.Collate.allowed_default
 django.db.models.functions.Now.as_oracle
 django.db.models.functions.comparison.Collate.allowed_default
 django.db.models.functions.datetime.Now.as_oracle
-django.db.models.lookups.IntegerFieldExact
-django.db.models.lookups.IntegerFieldOverflow
-django.db.models.lookups.IntegerGreaterThan
-django.db.models.lookups.IntegerGreaterThanOrEqual.underflow_exception
-django.db.models.lookups.IntegerLessThan.overflow_exception
-django.db.models.lookups.IntegerLessThanOrEqual
 django.db.models.lookups.Lookup.allowed_default
 django.db.models.query.Prefetch.get_current_querysets
 django.db.models.query_utils.FilteredRelation.relabeled_clone
