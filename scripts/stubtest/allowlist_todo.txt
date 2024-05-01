@@ -496,7 +496,6 @@ django.contrib.humanize.templatetags.humanize.intword_converters
 django.contrib.messages.storage.cookie.CookieStorage.key_salt
 django.contrib.messages.storage.cookie.MessageDecoder.decode
 django.contrib.messages.storage.cookie.MessageEncoder.default
-django.contrib.messages.storage.cookie.MessageSerializer
 django.contrib.postgres.fields.ArrayField.formfield
 django.contrib.postgres.fields.CIText.__init__
 django.contrib.postgres.fields.HStoreField.formfield

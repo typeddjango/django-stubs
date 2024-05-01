@@ -36,11 +36,6 @@ django.contrib.gis.management
 django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
 django.contrib.gis.management.commands.ogrinspect
-django.contrib.messages.storage.cookie.CookieStorage.not_finished_json
-django.contrib.messages.storage.cookie.MessagePartGatherSerializer
-django.contrib.messages.storage.cookie.MessagePartSerializer
-django.contrib.messages.storage.cookie.bisect_keep_left
-django.contrib.messages.storage.cookie.bisect_keep_right
 django.contrib.messages.test
 django.db.backends.base.features.BaseDatabaseFeatures.delete_can_self_reference_subquery
 django.db.backends.base.features.BaseDatabaseFeatures.insert_test_table_with_defaults
