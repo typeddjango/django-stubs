@@ -30,7 +30,6 @@ django.contrib.gis.forms.BaseForm._html_output
 django.contrib.gis.forms.BoundField.get_context
 django.contrib.gis.forms.BoundField.template_name
 django.contrib.gis.forms.ClearableFileInput.checked
-django.contrib.gis.forms.Field.__init__
 django.contrib.gis.forms.fields_for_model
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
 django.contrib.gis.management
@@ -140,10 +139,8 @@ django.forms.BaseForm._html_output
 django.forms.BoundField.get_context
 django.forms.BoundField.template_name
 django.forms.ClearableFileInput.checked
-django.forms.Field.__init__
 django.forms.boundfield.BoundField.get_context
 django.forms.boundfield.BoundField.template_name
-django.forms.fields.Field.__init__
 django.forms.fields_for_model
 django.forms.forms.BaseForm._html_output
 django.forms.models.fields_for_model
