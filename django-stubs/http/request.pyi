@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Iterable, Mapping
 from io import BytesIO
 from re import Pattern
-from typing import Any, BinaryIO, Callable, Literal, NoReturn, TypeVar, overload, type_check_only
+from typing import Any, Awaitable, BinaryIO, Callable, Literal, NoReturn, TypeVar, overload, type_check_only
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
@@ -57,7 +57,7 @@ class HttpRequest(BytesIO):
     # django.contrib.auth.middleware.AuthenticationMiddleware:
     user: AbstractBaseUser | AnonymousUser
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    auser: Callable[[], AbstractBaseUser | AnonymousUser]
+    auser: Callable[[], Awaitable[AbstractBaseUser | AnonymousUser]]
     # django.middleware.locale.LocaleMiddleware:
     LANGUAGE_CODE: str
     # django.contrib.sites.middleware.CurrentSiteMiddleware

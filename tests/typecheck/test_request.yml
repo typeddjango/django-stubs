@@ -106,3 +106,15 @@
         reveal_type(req.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
         req.GET['foo'] = 'bar'  # E: This QueryDict is immutable.  [misc]
         x = 1  # E: Statement is unreachable  [unreachable]
+
+-   case: request_user_auser
+    main: |
+        from django.contrib.auth.base_user import AbstractBaseUser
+        from django.contrib.auth.models import AnonymousUser
+        from django.http.request import HttpRequest
+
+        async def get_user_async(request: HttpRequest) -> AbstractBaseUser | AnonymousUser:
+            return await request.auser()
+
+        def get_user_sync(request: HttpRequest) -> AbstractBaseUser | AnonymousUser:
+            return request.user
