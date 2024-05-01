@@ -66,8 +66,6 @@ django.contrib.admin.views.autocomplete.AutocompleteJsonView.process_request
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.serialize_result
 django.contrib.admin.views.main.ChangeList.search_form_class
 django.contrib.admin.widgets.AutocompleteMixin.media
-django.contrib.admin.widgets.BaseAdminDateWidget
-django.contrib.admin.widgets.BaseAdminTimeWidget
 django.contrib.admin.widgets.FilteredSelectMultiple.Media
 django.contrib.admin.widgets.get_select2_language
 django.contrib.admindocs.utils.non_capturing_group_matcher
