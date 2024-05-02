@@ -61,6 +61,7 @@ class BaseExpression:
     is_summary: bool
     filterable: bool
     window_compatible: bool
+    allowed_default: bool
     def __init__(self, output_field: Field | None = ...) -> None: ...
     def get_db_converters(self, connection: BaseDatabaseWrapper) -> list[Callable]: ...
     def get_source_expressions(self) -> list[Any]: ...
@@ -193,6 +194,7 @@ class RawSQL(Expression):
     def __init__(self, sql: str, params: Sequence[Any], output_field: Field | None = ...) -> None: ...
 
 class Star(Expression): ...
+class DatabaseDefault(Expression): ...
 
 class Col(Expression):
     target: Field
@@ -237,6 +239,7 @@ class Case(Expression):
 
 class Subquery(BaseExpression, Combinable):
     template: str
+    subquery: bool
     query: Query
     extra: dict[Any, Any]
     def __init__(self, queryset: Query | QuerySet, output_field: Field | None = ..., **extra: Any) -> None: ...

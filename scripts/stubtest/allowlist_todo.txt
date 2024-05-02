@@ -388,7 +388,6 @@ django.contrib.gis.db.models.Subquery.as_sql
 django.contrib.gis.db.models.Subquery.empty_result_set_value
 django.contrib.gis.db.models.Subquery.external_aliases
 django.contrib.gis.db.models.Subquery.get_external_cols
-django.contrib.gis.db.models.Subquery.subquery
 django.contrib.gis.db.models.TextField.formfield
 django.contrib.gis.db.models.TimeField.formfield
 django.contrib.gis.db.models.URLField.formfield
@@ -835,7 +834,6 @@ django.db.models.Subquery.as_sql
 django.db.models.Subquery.empty_result_set_value
 django.db.models.Subquery.external_aliases
 django.db.models.Subquery.get_external_cols
-django.db.models.Subquery.subquery
 django.db.models.TextField.formfield
 django.db.models.TimeField.formfield
 django.db.models.URLField.formfield
@@ -894,7 +892,6 @@ django.db.models.expressions.Subquery.as_sql
 django.db.models.expressions.Subquery.empty_result_set_value
 django.db.models.expressions.Subquery.external_aliases
 django.db.models.expressions.Subquery.get_external_cols
-django.db.models.expressions.Subquery.subquery
 django.db.models.expressions.Value.empty_result_set_value
 django.db.models.expressions.Value.for_save
 django.db.models.expressions.When.as_sql
