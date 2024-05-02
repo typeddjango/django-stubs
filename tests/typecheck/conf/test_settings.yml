@@ -1,0 +1,22 @@
+-   case: test_setting_circular_import
+    main: |
+        from myapp import lib
+    custom_settings: |
+        from myapp.lib import function_returning_int
+
+        IMMEDIATE_VALUE = 123
+        CIRCULAR_WITHOUT_HINT = function_returning_int()
+        CIRCULAR_WITH_HINT: int = function_returning_int()
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/lib.py
+            content: |
+                from django.conf import settings
+
+                def test() -> None:
+                    reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "builtins.int"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT'  [misc]  # N: Revealed type is "Any"
+                    reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "builtins.int"
+
+                def function_returning_int() -> int:
+                    return 42

@@ -21,9 +21,6 @@ django.contrib.admin.decorators.action
 django.contrib.admin.decorators.display
 django.contrib.admin.display
 django.contrib.admin.filters.FieldListFilter.title
-django.contrib.admin.forms.AdminAuthenticationForm
-django.contrib.admin.forms.AdminPasswordChangeForm
-django.contrib.admin.helpers.ActionForm
 django.contrib.admin.helpers.AdminForm.fields
 django.contrib.admin.helpers.AdminForm.is_bound
 django.contrib.admin.helpers.AdminReadonlyField.get_admin_url
@@ -68,7 +65,6 @@ django.contrib.admin.views.autocomplete.AutocompleteJsonView.admin_site
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.process_request
 django.contrib.admin.views.autocomplete.AutocompleteJsonView.serialize_result
 django.contrib.admin.views.main.ChangeList.search_form_class
-django.contrib.admin.views.main.ChangeListSearchForm
 django.contrib.admin.widgets.AutocompleteMixin.media
 django.contrib.admin.widgets.BaseAdminDateWidget
 django.contrib.admin.widgets.BaseAdminTimeWidget
@@ -84,17 +80,10 @@ django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.backends.RemoteUserBackend.authenticate
-django.contrib.auth.backends.RemoteUserBackend.configure_user
-django.contrib.auth.base_user.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
 django.contrib.auth.decorators.login_required
-django.contrib.auth.forms.AdminPasswordChangeForm
-django.contrib.auth.forms.AuthenticationForm
 django.contrib.auth.forms.BaseUserCreationForm.declared_fields
-django.contrib.auth.forms.PasswordChangeForm
-django.contrib.auth.forms.PasswordResetForm
-django.contrib.auth.forms.SetPasswordForm
 django.contrib.auth.forms.UserChangeForm.declared_fields
 django.contrib.auth.forms.UserCreationForm.declared_fields
 django.contrib.auth.forms.UserModel
@@ -108,7 +97,6 @@ django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
 django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
 django.contrib.auth.management.commands.createsuperuser.PASSWORD_FIELD
-django.contrib.auth.models.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
 django.contrib.auth.models.AbstractUser.date_joined
@@ -397,7 +385,6 @@ django.contrib.gis.db.models.Subquery.as_sql
 django.contrib.gis.db.models.Subquery.empty_result_set_value
 django.contrib.gis.db.models.Subquery.external_aliases
 django.contrib.gis.db.models.Subquery.get_external_cols
-django.contrib.gis.db.models.Subquery.subquery
 django.contrib.gis.db.models.TextField.formfield
 django.contrib.gis.db.models.TimeField.formfield
 django.contrib.gis.db.models.URLField.formfield
@@ -442,7 +429,6 @@ django.contrib.gis.forms.Field.__deepcopy__
 django.contrib.gis.forms.Field.hidden_widget
 django.contrib.gis.forms.FileField.bound_data
 django.contrib.gis.forms.FileInput.allow_multiple_selected
-django.contrib.gis.forms.Form
 django.contrib.gis.forms.HiddenInput.__slotnames__
 django.contrib.gis.forms.InlineForeignKeyField
 django.contrib.gis.forms.Input
@@ -506,7 +492,6 @@ django.contrib.humanize.templatetags.humanize.intword_converters
 django.contrib.messages.storage.cookie.CookieStorage.key_salt
 django.contrib.messages.storage.cookie.MessageDecoder.decode
 django.contrib.messages.storage.cookie.MessageEncoder.default
-django.contrib.messages.storage.cookie.MessageSerializer
 django.contrib.postgres.fields.ArrayField.formfield
 django.contrib.postgres.fields.CIText.__init__
 django.contrib.postgres.fields.HStoreField.formfield
@@ -846,7 +831,6 @@ django.db.models.Subquery.as_sql
 django.db.models.Subquery.empty_result_set_value
 django.db.models.Subquery.external_aliases
 django.db.models.Subquery.get_external_cols
-django.db.models.Subquery.subquery
 django.db.models.TextField.formfield
 django.db.models.TimeField.formfield
 django.db.models.URLField.formfield
@@ -905,7 +889,6 @@ django.db.models.expressions.Subquery.as_sql
 django.db.models.expressions.Subquery.empty_result_set_value
 django.db.models.expressions.Subquery.external_aliases
 django.db.models.expressions.Subquery.get_external_cols
-django.db.models.expressions.Subquery.subquery
 django.db.models.expressions.Value.empty_result_set_value
 django.db.models.expressions.Value.for_save
 django.db.models.expressions.When.as_sql
@@ -1342,7 +1325,6 @@ django.forms.Field.__deepcopy__
 django.forms.Field.hidden_widget
 django.forms.FileField.bound_data
 django.forms.FileInput.allow_multiple_selected
-django.forms.Form
 django.forms.HiddenInput.__slotnames__
 django.forms.InlineForeignKeyField
 django.forms.Input
@@ -1375,12 +1357,10 @@ django.forms.fields.MultipleChoiceField.hidden_widget
 django.forms.fields.SplitDateTimeField.hidden_widget
 django.forms.forms.BaseForm.__init__
 django.forms.forms.DeclarativeFieldsMetaclass.__new__
-django.forms.forms.Form
 django.forms.formset_factory
 django.forms.formsets.BaseFormSet.__init__
 django.forms.formsets.BaseFormSet.deletion_widget
 django.forms.formsets.BaseFormSet.ordering_widget
-django.forms.formsets.ManagementForm
 django.forms.formsets.ManagementForm.__init__
 django.forms.formsets.formset_factory
 django.forms.inlineformset_factory
