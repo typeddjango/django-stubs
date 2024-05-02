@@ -80,7 +80,6 @@ django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.backends.RemoteUserBackend.authenticate
-django.contrib.auth.backends.RemoteUserBackend.configure_user
 django.contrib.auth.base_user.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
