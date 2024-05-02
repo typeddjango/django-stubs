@@ -80,7 +80,6 @@ django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.backends.RemoteUserBackend.authenticate
-django.contrib.auth.base_user.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
 django.contrib.auth.decorators.login_required
@@ -98,7 +97,6 @@ django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
 django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
 django.contrib.auth.management.commands.createsuperuser.PASSWORD_FIELD
-django.contrib.auth.models.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
 django.contrib.auth.models.AbstractUser.date_joined
