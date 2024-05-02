@@ -14,6 +14,7 @@ class BaseDatabaseFeatures:
     allows_group_by_select_index: bool
     empty_fetchmany_value: Sequence[Any]
     update_can_self_select: bool
+    delete_can_self_reference_subquery: bool
     interprets_empty_strings_as_nulls: bool
     supports_nullable_unique_constraints: bool
     supports_partially_nullable_unique_constraints: bool
@@ -64,7 +65,6 @@ class BaseDatabaseFeatures:
     atomic_transactions: bool
     can_rollback_ddl: bool
     schema_editor_uses_clientside_param_binding: bool
-    supports_atomic_references_rename: bool
     supports_combined_alters: bool
     supports_foreign_keys: bool
     can_create_inline_fk: bool
@@ -75,6 +75,9 @@ class BaseDatabaseFeatures:
     can_introspect_check_constraints: bool
     supports_paramstyle_pyformat: bool
     requires_literal_defaults: bool
+    supports_expression_defaults: bool
+    supports_default_keyword_in_insert: bool
+    supports_default_keyword_in_bulk_insert: bool
     connection_persists_old_columns: bool
     closed_cursor_error_class: type[DatabaseError]
     has_case_insensitive_like: bool
@@ -90,6 +93,7 @@ class BaseDatabaseFeatures:
     supports_select_difference: bool
     supports_slicing_ordering_in_compound: bool
     supports_parentheses_in_compound: bool
+    supports_nulls_distinct_unique_constraints: bool
     requires_compound_order_by_subquery: bool
     supports_aggregate_filter_clause: bool
     supports_index_on_text_field: bool
@@ -128,11 +132,14 @@ class BaseDatabaseFeatures:
     supports_non_deterministic_collations: bool
     supports_comments: bool
     supports_comments_inline: bool
+    supports_stored_generated_columns: bool
+    supports_virtual_generated_columns: bool
     supports_logical_xor: bool
     prohibits_null_characters_in_text_exception: tuple[ValueError | DataError] | None
     supports_unlimited_charfield: bool
     test_collations: dict[str, str | None]
     test_now_utc_template: str | None
+    insert_test_table_with_defaults: str | None
     django_test_expected_failures: set[str]
     django_test_skips: dict[str, set[str]]
     connection: BaseDatabaseWrapper
