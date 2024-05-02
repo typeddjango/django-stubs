@@ -10,7 +10,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 from django.db.models.constants import OnConflict
-from django.db.models.expressions import Case, Expression
+from django.db.models.expressions import Case, Col, Expression
 from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler
 
@@ -111,3 +111,6 @@ class BaseDatabaseOperations:
         self, fields: Any, on_conflict: Any, update_fields: Any, unique_fields: Any
     ) -> str | Any: ...
     def format_for_duration_arithmetic(self, sql: str) -> str: ...
+    def prepare_join_on_clause(
+        self, lhs_table: str, lhs_field: Field, rhs_table: str, rhs_field: Field
+    ) -> tuple[Col, Col]: ...
