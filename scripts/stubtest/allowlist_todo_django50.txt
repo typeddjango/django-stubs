@@ -73,7 +73,6 @@ django.db.backends.sqlite3.features.DatabaseFeatures.supports_stored_generated_c
 django.db.backends.sqlite3.features.DatabaseFeatures.supports_virtual_generated_columns
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
-django.db.migrations.serializer.BaseUnorderedSequenceSerializer
 django.db.models.Case.allowed_default
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.F.allowed_default
