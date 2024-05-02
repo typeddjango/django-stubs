@@ -24,7 +24,6 @@ django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
-django.contrib.gis.db.models.Value.allowed_default
 django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.forms.BaseForm._html_output
 django.contrib.gis.forms.BoundField.get_context
@@ -89,18 +88,12 @@ django.db.models.Func.allowed_default
 django.db.models.Lookup.allowed_default
 django.db.models.Prefetch.get_current_querysets
 django.db.models.Q.identity
-django.db.models.Value.allowed_default
 django.db.models.When.allowed_default
-django.db.models.expressions.BaseExpression.allowed_default
 django.db.models.expressions.Case.allowed_default
 django.db.models.expressions.CombinedExpression.allowed_default
-django.db.models.expressions.DatabaseDefault
 django.db.models.expressions.ExpressionWrapper.allowed_default
 django.db.models.expressions.F.allowed_default
 django.db.models.expressions.Func.allowed_default
-django.db.models.expressions.OrderByList.allowed_default
-django.db.models.expressions.RawSQL.allowed_default
-django.db.models.expressions.Value.allowed_default
 django.db.models.expressions.When.allowed_default
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.generated
@@ -113,9 +106,7 @@ django.db.models.fields.related.ReverseOneToOneDescriptor.get_prefetch_querysets
 django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.get_prefetch_querysets
 django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.get_prefetch_querysets
 django.db.models.fields.reverse_related.ForeignObjectRel.get_joining_fields
-django.db.models.functions.Collate.allowed_default
 django.db.models.functions.Now.as_oracle
-django.db.models.functions.comparison.Collate.allowed_default
 django.db.models.functions.datetime.Now.as_oracle
 django.db.models.lookups.Lookup.allowed_default
 django.db.models.query.Prefetch.get_current_querysets
