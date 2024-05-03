@@ -1,7 +1,7 @@
 from collections import UserList
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import Any, Callable
+from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
@@ -33,7 +33,6 @@ class RenderableFieldMixin(RenderableMixin):
     def as_field_group(self) -> SafeString: ...
     def as_hidden(self) -> SafeString: ...
     def as_widget(self) -> SafeString: ...
-    def __str__(self) -> str: ...
     __html__ = __str__  # type: ignore[override]
 
 class RenderableFormMixin(RenderableMixin):
