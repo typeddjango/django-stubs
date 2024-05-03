@@ -31,7 +31,6 @@ class Jinja2(EngineMixin, BaseRenderer):
 class Jinja2DivFormRenderer(Jinja2):
     form_template_name: str
     formset_template_name: str
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class TemplatesSetting(BaseRenderer):
     def get_template(self, template_name: str) -> Template | None: ...
