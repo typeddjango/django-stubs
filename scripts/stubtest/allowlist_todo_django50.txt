@@ -23,8 +23,6 @@ django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.forms.BaseForm._html_output
-django.contrib.gis.forms.BoundField.get_context
-django.contrib.gis.forms.BoundField.template_name
 django.contrib.gis.forms.ClearableFileInput.checked
 django.contrib.gis.forms.fields_for_model
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
@@ -93,16 +91,11 @@ django.db.models.sql.query.Query.join
 django.db.models.sql.query.Query.resolve_lookup_value
 django.db.models.sql.query.Query.setup_joins
 django.forms.BaseForm._html_output
-django.forms.BoundField.get_context
-django.forms.BoundField.template_name
 django.forms.ClearableFileInput.checked
-django.forms.boundfield.BoundField.get_context
-django.forms.boundfield.BoundField.template_name
 django.forms.fields_for_model
 django.forms.forms.BaseForm._html_output
 django.forms.models.fields_for_model
 django.forms.renderers.BaseRenderer.field_template_name
 django.forms.renderers.Jinja2DivFormRenderer.__init__
-django.forms.utils.RenderableFieldMixin
 django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
