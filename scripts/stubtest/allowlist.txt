@@ -370,6 +370,7 @@ django.forms.formsets.BaseFormSet.forms
 django.forms.formsets.BaseFormSet.management_form
 django.forms.renderers.EngineMixin.engine
 django.forms.renderers.Jinja2.backend
+django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.http.HttpRequest.accepted_types
 django.http.HttpRequest.headers
 django.http.request.HttpRequest.accepted_types
