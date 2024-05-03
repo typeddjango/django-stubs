@@ -97,6 +97,5 @@ django.forms.forms.BaseForm._html_output
 django.forms.models.fields_for_model
 django.forms.renderers.BaseRenderer.field_template_name
 django.forms.renderers.Jinja2DivFormRenderer.__init__
-django.forms.utils.RenderableFieldMixin
 django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
