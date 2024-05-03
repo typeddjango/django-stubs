@@ -21,6 +21,7 @@ class BoundField:
     html_initial_id: str
     label: _StrOrPromise
     help_text: _StrOrPromise
+    renderer: BaseRenderer
     def __init__(self, form: BaseForm, field: Field, name: str) -> None: ...
     @cached_property
     def subwidgets(self) -> list[BoundWidget]: ...
