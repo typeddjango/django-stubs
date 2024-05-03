@@ -216,7 +216,7 @@ def _has_compatible_type_vars(type_info: TypeInfo) -> bool:
         return False
 
     if type_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-        # If it is a subclass of _QuerySet, it is compatible.
+        # If it is a subclass of QuerySet, it is compatible.
         return True
     # check that at least one base is a subclass of queryset with Generic type vars
     return any(_has_compatible_type_vars(sub_base.type) for sub_base in type_info.bases)
