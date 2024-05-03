@@ -227,9 +227,8 @@ class RawQuerySet(Iterable[_Model], Sized):
     def resolve_model_init_order(self) -> tuple[list[str], list[int], list[tuple[str, int]]]: ...
     def using(self, alias: str | None) -> RawQuerySet[_Model]: ...
 
-# Deprecated aliases of QuerySet, for compatibility only.
-_QuerySet: TypeAlias = QuerySet[_T, _Row]
-_QuerySetAny: TypeAlias = QuerySet  # noqa: PYI047
+# Deprecated alias of QuerySet, for compatibility only.
+_QuerySet: TypeAlias = QuerySet
 
 class Prefetch:
     prefetch_through: str
