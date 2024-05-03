@@ -97,7 +97,6 @@
         import django.contrib.gis
         import django.contrib.gis.admin
         import django.contrib.gis.admin.options
-        import django.contrib.gis.admin.widgets
         import django.contrib.gis.apps
         import django.contrib.gis.db
         import django.contrib.gis.db.backends
