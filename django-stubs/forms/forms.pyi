@@ -8,7 +8,6 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.functional import _StrOrPromise, cached_property
-from django.utils.safestring import SafeString
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
@@ -71,14 +70,6 @@ class BaseForm(RenderableFormMixin):
     def hidden_fields(self) -> list[BoundField]: ...
     def visible_fields(self) -> list[BoundField]: ...
     def get_initial_for_field(self, field: Field, field_name: str) -> Any: ...
-    def _html_output(
-        self,
-        normal_row: str,
-        error_row: str,
-        row_ender: str,
-        help_text_html: str,
-        errors_on_separate_row: bool,
-    ) -> SafeString: ...
 
 class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     base_fields: ClassVar[dict[str, Field]]
