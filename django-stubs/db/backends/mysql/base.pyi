@@ -8,6 +8,7 @@ from .creation import DatabaseCreation
 from .features import DatabaseFeatures
 from .introspection import DatabaseIntrospection
 from .operations import DatabaseOperations
+from .schema import DatabaseSchemaEditor
 from .validation import DatabaseValidation
 
 version: Any
@@ -39,20 +40,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     validation_class: type[DatabaseValidation]
 
     vendor: str
-    data_types: Any
-    operators: Any
+    data_types: dict[str, str]
+    operators: dict[str, str]
     pattern_esc: str
-    pattern_ops: Any
-    isolation_levels: Any
+    pattern_ops: dict[str, str]
+    isolation_levels: set[str]
     Database: Any
-    SchemaEditorClass: Any
-    isolation_level: Any
+    SchemaEditorClass: type[DatabaseSchemaEditor]
+    isolation_level: set[str]
     def get_connection_params(self) -> dict[str, Any]: ...
     def get_new_connection(self, conn_params: Any) -> Any: ...
     def init_connection_state(self) -> None: ...
     def create_cursor(self, name: Any | None = ...) -> CursorWrapper: ...
     def disable_constraint_checking(self) -> Literal[True]: ...
-    needs_rollback: Any
+    needs_rollback: bool
     def enable_constraint_checking(self) -> None: ...
     def check_constraints(self, table_names: Any | None = ...) -> None: ...
     def is_usable(self) -> bool: ...
