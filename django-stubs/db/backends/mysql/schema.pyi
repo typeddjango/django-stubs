@@ -2,6 +2,8 @@ from typing import Any
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.mysql.base import DatabaseWrapper
+from django.db.models.base import Model
+from django.db.models.fields import Field
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     connection: DatabaseWrapper
@@ -22,5 +24,5 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     @property
     def sql_rename_column(self) -> str: ...  # type: ignore[override]
     def quote_value(self, value: Any) -> str: ...
-    def skip_default(self, field: Any) -> bool: ...
-    def add_field(self, model: Any, field: Any) -> None: ...
+    def skip_default(self, field: Field) -> bool: ...
+    def add_field(self, model: type[Model], field: Field) -> None: ...
