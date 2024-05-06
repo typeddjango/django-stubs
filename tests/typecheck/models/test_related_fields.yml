@@ -142,3 +142,58 @@
 
         class Other(models.Model):
             field = models.ForeignKey(MyModel, related_name="others", on_delete=models.CASCADE)
+
+
+- case: test_related_fields_with_two_generic_parameters
+  main: |
+        from myapp.models import Address, School, Student
+        reveal_type(Student().school)  # N: Revealed type is "myapp.models.School"
+        reveal_type(Student().address)  # N: Revealed type is "myapp.models.Address"
+        s = Student()
+        s.school = School()
+        s.address = Address()
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class School(models.Model):
+            pass
+
+        class Address(models.Model):
+            pass
+
+        class Student(models.Model):
+            school = models.ForeignKey["School","School"](to="School", on_delete=models.CASCADE)
+            address = models.OneToOneField["Address","Address"](to="Address", on_delete=models.CASCADE)
+
+
+- case: test_related_fields_with_one_generic_parameter
+  expect_fail: True
+  main: |
+        from myapp.models import Address, School, Student
+        reveal_type(Student().school)  # N: Revealed type is "myapp.models.School"
+        reveal_type(Student().address)  # N: Revealed type is "myapp.models.Address"
+        s = Student()
+        s.school = School()
+        s.address = Address()
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class School(models.Model):
+            pass
+
+        class Address(models.Model):
+            pass
+
+        class Student(models.Model):
+            school = models.ForeignKey["School"](to="School", on_delete=models.CASCADE)
+            address = models.OneToOneField["Address"](to="Address", on_delete=models.CASCADE)
