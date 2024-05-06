@@ -3,7 +3,7 @@ import sys
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
-from mypy.build import PRI_MYPY, PRI_HIGH
+from mypy.build import PRI_HIGH, PRI_MYPY
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
