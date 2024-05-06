@@ -5,7 +5,6 @@
 django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
-django.contrib.gis.db.backends.spatialite.schema.SpatialiteSchemaEditor.alter_db_table
 django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
@@ -22,7 +21,6 @@ django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.db.models.When.allowed_default
-django.contrib.gis.forms.BaseForm._html_output
 django.contrib.gis.forms.ClearableFileInput.checked
 django.contrib.gis.forms.fields_for_model
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
@@ -90,12 +88,8 @@ django.db.models.sql.query.Query.build_filtered_relation_q
 django.db.models.sql.query.Query.join
 django.db.models.sql.query.Query.resolve_lookup_value
 django.db.models.sql.query.Query.setup_joins
-django.forms.BaseForm._html_output
 django.forms.ClearableFileInput.checked
 django.forms.fields_for_model
-django.forms.forms.BaseForm._html_output
 django.forms.models.fields_for_model
-django.forms.renderers.BaseRenderer.field_template_name
-django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
