@@ -13,17 +13,19 @@
                 IMMEDIATE_VALUE = 123
                 CIRCULAR_WITH_HINT: int = function_returning_int()
                 CIRCULAR_WITHOUT_HINT_FUNCTION = function_returning_int()
-                CIRCULAR_WITHOUT_HINT_CONST = const_with_circular_import  # E: Cannot determine type of "const_with_circular_import"  [has-type]
+                CIRCULAR_WITHOUT_HINT_CONST = const_with_circular_import
         -   path: myapp/lib.py
             content: |
                 from typing import TYPE_CHECKING
-                from django.conf import settings
+                import django.conf
+
+                settings = django.conf.settings
 
                 def test() -> None:
                     reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "builtins.int"
                     reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "builtins.int"
-                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_FUNCTION)  # N: Revealed type is "builtins.int"
-                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)  # N: Revealed type is "Any"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_FUNCTION)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT_FUNCTION'  [misc]  # N: Revealed type is "Any"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT_CONST'  [misc]  # N: Revealed type is "Any"
 
                 def function_returning_int() -> int:
                     return 42
