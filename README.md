@@ -254,31 +254,6 @@ func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 ```
 
-### How do I check if something is an instance of QuerySet in runtime?
-
-A limitation of making `QuerySet` generic is that you can not use
-it for `isinstance` checks.
-
-```python
-from django.db.models.query import QuerySet
-
-def foo(obj: object) -> None:
-    if isinstance(obj, QuerySet): # Error: Parameterized generics cannot be used with class or instance checks
-        ...
-```
-
-To get around with this issue without making `QuerySet` non-generic,
-Django-stubs provides `django_stubs_ext.QuerySetAny`, a non-generic
-variant of `QuerySet` suitable for runtime type checking:
-
-```python
-from django_stubs_ext import QuerySetAny
-
-def foo(obj: object) -> None:
-    if isinstance(obj, QuerySetAny):  # OK
-        ...
-```
-
 ### Why am I getting incompatible argument type mentioning `_StrPromise`?
 
 The lazy translation functions of Django (such as `gettext_lazy`) return a `Promise` instead of `str`. These two types [cannot be used interchangeably](https://github.com/typeddjango/django-stubs/pull/1139#issuecomment-1232167698). The return type of these functions was therefore [changed](https://github.com/typeddjango/django-stubs/pull/689) to reflect that.

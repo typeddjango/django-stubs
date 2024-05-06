@@ -111,8 +111,8 @@
 -   case: values_of_many_to_many_field
     main: |
         from myapp.models import Author, Book
-        reveal_type(Book.objects.values('authors'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, TypedDict({'authors': builtins.int})]"
-        reveal_type(Author.objects.values('books'))  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Author, TypedDict({'books': builtins.int})]"
+        reveal_type(Book.objects.values('authors'))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'authors': builtins.int})]"
+        reveal_type(Author.objects.values('books'))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Author, TypedDict({'books': builtins.int})]"
     installed_apps:
         - myapp
     files:

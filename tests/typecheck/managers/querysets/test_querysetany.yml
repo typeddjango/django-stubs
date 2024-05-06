@@ -12,12 +12,12 @@
 
     def baz(obj: object) -> None:
       if isinstance(obj, QuerySetAny):
-        reveal_type(obj)             # N: Revealed type is "django.db.models.query._QuerySet[Any, Any]"
+        reveal_type(obj)             # N: Revealed type is "django.db.models.query.QuerySet[Any, Any]"
         foo(obj)
         bar(obj)
 
-      if isinstance(obj, QuerySet):  # E: Parameterized generics cannot be used with class or instance checks  [misc]
-        reveal_type(obj)             # N: Revealed type is "django.db.models.query._QuerySet[Any, Any]"
+      if isinstance(obj, QuerySet):
+        reveal_type(obj)             # N: Revealed type is "django.db.models.query.QuerySet[Any, Any]"
         foo(obj)
         bar(obj)
 - case: queryset_list
@@ -31,7 +31,7 @@
       user_querysets: List[QuerySet[User]] = []
       user_querysets.append(queryset_instance)
       user_querysets.append(queryset)
-      user_querysets.append(queryset_book)  # E: Argument 1 to "append" of "list" has incompatible type "_QuerySet[Book, Book]"; expected "_QuerySet[User, User]"  [arg-type]
+      user_querysets.append(queryset_book)  # E: Argument 1 to "append" of "list" has incompatible type "QuerySet[Book, Book]"; expected "QuerySet[User, User]"  [arg-type]
   installed_apps:
     - myapp
   files:
