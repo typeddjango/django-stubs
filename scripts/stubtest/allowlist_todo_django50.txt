@@ -28,7 +28,6 @@ django.contrib.gis.management
 django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
 django.contrib.gis.management.commands.ogrinspect
-django.contrib.messages.test
 django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
 django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field
 django.db.backends.mysql.features.DatabaseFeatures.supports_expression_defaults
