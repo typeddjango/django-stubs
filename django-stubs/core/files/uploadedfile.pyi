@@ -1,7 +1,7 @@
-from typing import IO
+from typing import IO, TypedDict
 
 from django.core.files.base import File
-from typing_extensions import Self
+from typing_extensions import NotRequired, Self
 
 class UploadedFile(File):
     content_type: str | None
@@ -44,7 +44,9 @@ class InMemoryUploadedFile(UploadedFile):
     ) -> None: ...
     def open(self, mode: str | None = ...) -> Self: ...  # type: ignore[override]
 
+_FileDict = TypedDict("_FileDict", {"filename": str, "content": bytes | None, "content-type": NotRequired[str])
+
 class SimpleUploadedFile(InMemoryUploadedFile):
     def __init__(self, name: str, content: bytes | None, content_type: str = ...) -> None: ...
     @classmethod
-    def from_dict(cls, file_dict: dict[str, str | bytes]) -> Self: ...
+    def from_dict(cls, file_dict: _FileDict) -> Self: ...
