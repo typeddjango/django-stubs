@@ -34,6 +34,7 @@ dependencies = [
 extras_require = {
     "compatible-mypy": ["mypy~=1.10.0"],
     "redis": ["redis"],
+    "oracle": ["oracledb"],
 }
 
 setup(
