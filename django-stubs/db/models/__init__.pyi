@@ -91,6 +91,7 @@ from .lookups import Transform as Transform
 from .manager import Manager as Manager
 from .query import Prefetch as Prefetch
 from .query import QuerySet as QuerySet
+from .query import aprefetch_related_objects as aprefetch_related_objects
 from .query import prefetch_related_objects as prefetch_related_objects
 from .query_utils import FilteredRelation as FilteredRelation
 from .query_utils import Q as Q
