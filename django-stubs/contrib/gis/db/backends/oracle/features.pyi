@@ -1,6 +1,7 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
 from django.db.backends.oracle.features import DatabaseFeatures as OracleDatabaseFeatures
 from django.utils.functional import cached_property
+from typing import Any
 
 class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
     supports_add_srs_entry: bool
