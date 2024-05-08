@@ -22,18 +22,12 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     ) -> None: ...
 
 class BaseAdminDateWidget(forms.DateInput):
-    class Media:
-        js: Sequence[str]
-
     def __init__(self, attrs: _OptAttrs | None = ..., format: str | None = ...) -> None: ...
 
 class AdminDateWidget(BaseAdminDateWidget):
     template_name: str
 
 class BaseAdminTimeWidget(forms.TimeInput):
-    class Media:
-        js: Sequence[str]
-
     def __init__(self, attrs: _OptAttrs | None = ..., format: str | None = ...) -> None: ...
 
 class AdminTimeWidget(BaseAdminTimeWidget):
