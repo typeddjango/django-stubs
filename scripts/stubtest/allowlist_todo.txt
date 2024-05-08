@@ -68,6 +68,8 @@ django.contrib.admin.views.main.ChangeList.search_form_class
 django.contrib.admin.widgets.AutocompleteMixin.media
 django.contrib.admin.widgets.FilteredSelectMultiple.Media
 django.contrib.admin.widgets.get_select2_language
+django.contrib.admin.widgets.BaseAdminTimeWidget.Media
+django.contrib.admin.widgets.BaseAdminDateWidget.Media
 django.contrib.admindocs.utils.non_capturing_group_matcher
 django.contrib.admindocs.utils.remove_non_capturing_groups
 django.contrib.admindocs.utils.replace_metacharacters
