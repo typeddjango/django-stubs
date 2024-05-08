@@ -54,3 +54,19 @@
         QuerySet._iterable_class = int
     out: |
         main:5: error: Incompatible types in assignment (expression has type "Type[int]", variable has type "Type[BaseIterable[Any]]")  [assignment]
+
+-   case: QuerySet_type_vars
+    main: |
+        from django.db.models.query import QuerySet
+        from django.contrib.auth.models import User
+        from django_stubs_ext import ValuesQuerySet
+
+        a: QuerySet[User]
+        reveal_type(a)  # N: Revealed type is "django.db.models.query.QuerySet[django.contrib.auth.models.User, django.contrib.auth.models.User]"
+        b: QuerySet[User, int]
+        reveal_type(b)  # N: Revealed type is "django.db.models.query.QuerySet[django.contrib.auth.models.User, builtins.int]"
+        c: ValuesQuerySet[User, int]
+        reveal_type(c)  # N: Revealed type is "django.db.models.query.QuerySet[django.contrib.auth.models.User, builtins.int]"
+
+        d: QuerySet[int]        # E: Type argument "int" of "QuerySet" must be a subtype of "Model"  [type-var]
+        e: ValuesQuerySet[int]  # E: Type argument "int" of "QuerySet" must be a subtype of "Model"  [type-var]

@@ -13,6 +13,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 from django.utils import tree
+from django.utils.functional import cached_property
 
 PathInfo = namedtuple(
     "PathInfo", ["from_opts", "to_opts", "target_fields", "join_field", "m2m", "direct", "filtered_relation"]
@@ -44,6 +45,8 @@ class Q(tree.Node):
     def flatten(self) -> Iterator[Incomplete]: ...
     def check(self, against: dict[str, Any], using: str = ...) -> bool: ...
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
+    @cached_property
+    def referenced_base_fields(self) -> set[str]: ...
 
 class DeferredAttribute:
     field: Field

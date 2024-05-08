@@ -235,6 +235,7 @@
         import django.contrib.messages.storage.session
         import django.contrib.messages.utils
         import django.contrib.messages.views
+        import django.contrib.messages.test
         import django.contrib.postgres
         import django.contrib.postgres.aggregates
         import django.contrib.postgres.aggregates.general

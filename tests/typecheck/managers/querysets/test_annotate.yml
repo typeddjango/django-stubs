@@ -119,7 +119,7 @@
         from django.db.models.expressions import F
 
         qs = User.objects.annotate(foo=F('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})], django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]]"
+        reveal_type(qs) # N: Revealed type is "django.db.models.query.QuerySet[django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})], django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]]"
 
         annotated = qs.get()
         reveal_type(annotated) # N: Revealed type is "django_stubs_ext.WithAnnotations[myapp__models__User, TypedDict({'foo': Any})]"
@@ -144,7 +144,7 @@
         from django.db.models import Count
 
         qs = User.objects.annotate(Count('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__User], django_stubs_ext.WithAnnotations[myapp__models__User]]"
+        reveal_type(qs) # N: Revealed type is "django.db.models.query.QuerySet[django_stubs_ext.WithAnnotations[myapp__models__User], django_stubs_ext.WithAnnotations[myapp__models__User]]"
 
     installed_apps:
         - myapp
@@ -227,7 +227,7 @@
           return qs.annotate(foo=F('id'))
 
         def add_wrong_annotation(qs: QuerySet[User]) -> QuerySet[WithAnnotations[User, FooDict]]:
-          return qs.annotate(bar=F('id')) # E: Incompatible return value type (got "_QuerySet[WithAnnotations[myapp__models__User, TypedDict({'bar': Any})], WithAnnotations[myapp__models__User, TypedDict({'bar': Any})]]", expected "_QuerySet[WithAnnotations[myapp__models__User, TypedDict('main.FooDict', {'foo': builtins.str})], WithAnnotations[myapp__models__User, TypedDict('main.FooDict', {'foo': builtins.str})]]")  [return-value]
+          return qs.annotate(bar=F('id')) # E: Incompatible return value type (got "QuerySet[WithAnnotations[myapp__models__User, TypedDict({'bar': Any})], WithAnnotations[myapp__models__User, TypedDict({'bar': Any})]]", expected "QuerySet[WithAnnotations[myapp__models__User, TypedDict('main.FooDict', {'foo': builtins.str})], WithAnnotations[myapp__models__User, TypedDict('main.FooDict', {'foo': builtins.str})]]")  [return-value]
 
         qs = add_annotation(qs)
         qs.get().foo
@@ -308,9 +308,9 @@
         # It's possible to provide more precise types than than this, but without inspecting the
         # arguments to .annotate, these are the best types we can infer.
         qs1 = Blog.objects.values('text').annotate(foo=F('id'))
-        reveal_type(qs1) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.dict[builtins.str, Any]]"
+        reveal_type(qs1) # N: Revealed type is "django.db.models.query.QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.dict[builtins.str, Any]]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
-        reveal_type(qs2) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.tuple[Any, ...]]"
+        reveal_type(qs2) # N: Revealed type is "django.db.models.query.QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.tuple[Any, ...]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
         # TODO: Would be nice to infer a NamedTuple which contains the field 'text' (str) + any number of other fields.
         #  The reason it would have to appear to have any other fields is that annotate could potentially be called with
@@ -318,9 +318,9 @@
         #  But it's not trivial to make such a NamedTuple, partly because since it is also an ordinary tuple, it would
         #  have to have an arbitrary length, but still have certain fields at certain indices with specific types.
         #  For now, Any :)
-        reveal_type(qs3) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], Any]"
+        reveal_type(qs3) # N: Revealed type is "django.db.models.query.QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], Any]"
         qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=F('id'))
-        reveal_type(qs4) # N: Revealed type is "django.db.models.query._QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.str]"
+        reveal_type(qs4) # N: Revealed type is "django.db.models.query.QuerySet[django_stubs_ext.WithAnnotations[myapp__models__Blog, TypedDict({'foo': Any})], builtins.str]"
 
 
         before_values_no_params = Blog.objects.values().annotate(foo=F('id')).get()

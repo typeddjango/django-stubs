@@ -4,27 +4,27 @@
         from myapp.models import Blog
 
         qs = Blog.objects.all()
-        reveal_type(qs) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, myapp.models.Blog]"
+        reveal_type(qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
         reveal_type(qs.get(id=1)) # N: Revealed type is "myapp.models.Blog"
         reveal_type(iter(qs)) # N: Revealed type is "typing.Iterator[myapp.models.Blog]"
         reveal_type(qs.iterator()) # N: Revealed type is "typing.Iterator[myapp.models.Blog]"
         reveal_type(qs.first()) # N: Revealed type is "Union[myapp.models.Blog, None]"
         reveal_type(qs.earliest()) # N: Revealed type is "myapp.models.Blog"
         reveal_type(qs[0]) # N: Revealed type is "myapp.models.Blog"
-        reveal_type(qs[:9]) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, myapp.models.Blog]"
+        reveal_type(qs[:9]) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
         reveal_type(qs.create()) # N: Revealed type is "myapp.models.Blog"
         reveal_type(qs.get_or_create()) # N: Revealed type is "Tuple[myapp.models.Blog, builtins.bool]"
         reveal_type(qs.exists()) # N: Revealed type is "builtins.bool"
-        reveal_type(qs.none()) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, myapp.models.Blog]"
+        reveal_type(qs.none()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
         reveal_type(qs.update_or_create()) # N: Revealed type is "Tuple[myapp.models.Blog, builtins.bool]"
         reveal_type(qs.explain()) # N: Revealed type is "builtins.str"
         reveal_type(qs.raw(qs.explain())) # N: Revealed type is "django.db.models.query.RawQuerySet[Any]"
         # .dates / .datetimes
-        reveal_type(Blog.objects.dates("created_at", "day")) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, datetime.date]"
-        reveal_type(Blog.objects.datetimes("created_at", "day")) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, datetime.datetime]"
+        reveal_type(Blog.objects.dates("created_at", "day")) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, datetime.date]"
+        reveal_type(Blog.objects.datetimes("created_at", "day")) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, datetime.datetime]"
 
         # AND-ing QuerySets
-        reveal_type(Blog.objects.all() & Blog.objects.all()) # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Blog, myapp.models.Blog]"
+        reveal_type(Blog.objects.all() & Blog.objects.all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
 
         # bulk methods
         reveal_type(qs.count()) # N: Revealed type is "builtins.int"
@@ -65,7 +65,7 @@
         import typing
         kls: typing.Type[typing.Union[MyModel1, MyModel2]] = MyModel1
         reveal_type(kls.objects)  # N: Revealed type is "Union[django.db.models.manager.Manager[myapp.models.MyModel1], django.db.models.manager.Manager[myapp.models.MyModel2]]"
-        reveal_type(kls.objects.all())  # N: Revealed type is "Union[django.db.models.query._QuerySet[myapp.models.MyModel1, myapp.models.MyModel1], django.db.models.query._QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]]"
+        reveal_type(kls.objects.all())  # N: Revealed type is "Union[django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1], django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]]"
         reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"
     installed_apps:
         - myapp
@@ -82,8 +82,8 @@
 -   case: select_related_returns_queryset
     main: |
         from myapp.models import Book
-        reveal_type(Book.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, myapp.models.Book]"
-        reveal_type(Book.objects.filter(pk=1).select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.Book, myapp.models.Book]"
+        reveal_type(Book.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+        reveal_type(Book.objects.filter(pk=1).select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
     installed_apps:
         - myapp
     files:
