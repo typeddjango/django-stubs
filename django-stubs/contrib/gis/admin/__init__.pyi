@@ -9,4 +9,3 @@ from django.contrib.admin import autodiscover as autodiscover
 from django.contrib.admin import register as register
 from django.contrib.admin import site as site
 from django.contrib.gis.admin.options import GISModelAdmin as GISModelAdmin
-from django.contrib.gis.admin.widgets import OpenLayersWidget as OpenLayersWidget

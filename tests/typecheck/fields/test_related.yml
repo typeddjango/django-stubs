@@ -1058,7 +1058,7 @@
     out: |
         main:2: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor[myapp.models.Other, myapp.models.MyModel]"
-        main:4: note: Revealed type is "django.db.models.query._QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        main:4: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         main:5: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         main:6: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
         main:9: note: Revealed type is "myapp.models.MyModel"

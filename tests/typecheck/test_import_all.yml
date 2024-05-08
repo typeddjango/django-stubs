@@ -81,6 +81,7 @@
         import django.contrib.contenttypes.migrations
         import django.contrib.contenttypes.models
         import django.contrib.contenttypes.views
+        import django.contrib.contenttypes.prefetch
         import django.contrib.flatpages
         import django.contrib.flatpages.admin
         import django.contrib.flatpages.apps
@@ -96,7 +97,6 @@
         import django.contrib.gis
         import django.contrib.gis.admin
         import django.contrib.gis.admin.options
-        import django.contrib.gis.admin.widgets
         import django.contrib.gis.apps
         import django.contrib.gis.db
         import django.contrib.gis.db.backends
@@ -235,6 +235,7 @@
         import django.contrib.messages.storage.session
         import django.contrib.messages.utils
         import django.contrib.messages.views
+        import django.contrib.messages.test
         import django.contrib.postgres
         import django.contrib.postgres.aggregates
         import django.contrib.postgres.aggregates.general

@@ -370,6 +370,7 @@ django.forms.formsets.BaseFormSet.forms
 django.forms.formsets.BaseFormSet.management_form
 django.forms.renderers.EngineMixin.engine
 django.forms.renderers.Jinja2.backend
+django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.http.HttpRequest.accepted_types
 django.http.HttpRequest.headers
 django.http.request.HttpRequest.accepted_types
@@ -392,6 +393,10 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+django.db.models.Q.referenced_base_fields
+django.db.models.query_utils.Q.referenced_base_fields
+django.contrib.gis.db.models.Q.referenced_base_fields
+django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 
 # Ignore missing inner `Meta` class, see PR #2000 for the related discussion
 django.contrib.auth.base_user.AbstractBaseUser.Meta
@@ -402,3 +407,7 @@ django.contrib.auth.models.AbstractUser.Meta
 django.contrib.auth.models.PermissionsMixin.Meta
 django.contrib.flatpages.forms.FlatpageForm.Meta
 django.contrib.sessions.base_session.AbstractBaseSession.Meta
+
+# Custom __str__ that we don't want to overcomplicate:
+django.forms.utils.RenderableMixin.__str__
+django.forms.utils.RenderableMixin.__html__

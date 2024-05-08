@@ -4,7 +4,7 @@ from typing import Any, overload
 from django.forms.fields import Field
 from django.forms.forms import BaseForm
 from django.forms.renderers import BaseRenderer
-from django.forms.utils import ErrorList
+from django.forms.utils import ErrorList, RenderableFieldMixin
 from django.forms.widgets import Widget
 from django.utils.functional import _StrOrPromise, cached_property
 from django.utils.safestring import SafeString
@@ -12,7 +12,7 @@ from typing_extensions import TypeAlias
 
 _AttrsT: TypeAlias = dict[str, str | bool]
 
-class BoundField:
+class BoundField(RenderableFieldMixin):
     form: BaseForm
     field: Field
     name: str
@@ -21,6 +21,7 @@ class BoundField:
     html_initial_id: str
     label: _StrOrPromise
     help_text: _StrOrPromise
+    renderer: BaseRenderer
     def __init__(self, form: BaseForm, field: Field, name: str) -> None: ...
     @cached_property
     def subwidgets(self) -> list[BoundWidget]: ...
@@ -33,6 +34,8 @@ class BoundField:
     def __getitem__(self, idx: slice) -> list[BoundWidget]: ...
     @property
     def errors(self) -> ErrorList: ...
+    @property
+    def template_name(self) -> str: ...
     def as_widget(
         self, widget: Widget | None = ..., attrs: _AttrsT | None = ..., only_initial: bool = ...
     ) -> SafeString: ...

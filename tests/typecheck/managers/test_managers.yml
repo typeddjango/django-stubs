@@ -345,14 +345,14 @@
     main: |
         from myapp.models import User
         reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
-        reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.User, myapp.models.User]"
+        reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User, myapp.models.User]"
         reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
         reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
         reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
-        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query._QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
+        reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
         reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
         reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"

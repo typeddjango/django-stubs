@@ -14,7 +14,7 @@ MANYTOMANY_FIELD_FULLNAME = "django.db.models.fields.related.ManyToManyField"
 DUMMY_SETTINGS_BASE_CLASS = "django.conf._DjangoConfLazyObject"
 AUTH_USER_MODEL_FULLNAME = "django.conf.settings.AUTH_USER_MODEL"
 
-QUERYSET_CLASS_FULLNAME = "django.db.models.query._QuerySet"
+QUERYSET_CLASS_FULLNAME = "django.db.models.query.QuerySet"
 BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
 RELATED_MANAGER_CLASS = "django.db.models.fields.related_descriptors.RelatedManager"

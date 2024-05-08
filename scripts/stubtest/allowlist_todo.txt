@@ -80,8 +80,6 @@ django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.backends.RemoteUserBackend.authenticate
-django.contrib.auth.backends.RemoteUserBackend.configure_user
-django.contrib.auth.base_user.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
 django.contrib.auth.decorators.login_required
@@ -99,7 +97,6 @@ django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
 django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
 django.contrib.auth.management.commands.createsuperuser.PASSWORD_FIELD
-django.contrib.auth.models.AbstractBaseUser.get_session_auth_fallback_hash
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
 django.contrib.auth.models.AbstractUser.date_joined
@@ -211,13 +208,9 @@ django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.mariadb
 django.contrib.gis.db.backends.mysql.base
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.unsupported_geojson_options
 django.contrib.gis.db.backends.mysql.introspection
-django.contrib.gis.db.backends.oracle.adapter
-django.contrib.gis.db.backends.oracle.base
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.supports_tolerance_parameter
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.unsupported_geojson_options
-django.contrib.gis.db.backends.oracle.introspection
-django.contrib.gis.db.backends.oracle.operations
 django.contrib.gis.db.backends.postgis.adapter.PostGISAdapter.prepare
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersection_returns_none
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
@@ -388,7 +381,6 @@ django.contrib.gis.db.models.Subquery.as_sql
 django.contrib.gis.db.models.Subquery.empty_result_set_value
 django.contrib.gis.db.models.Subquery.external_aliases
 django.contrib.gis.db.models.Subquery.get_external_cols
-django.contrib.gis.db.models.Subquery.subquery
 django.contrib.gis.db.models.TextField.formfield
 django.contrib.gis.db.models.TimeField.formfield
 django.contrib.gis.db.models.URLField.formfield
@@ -496,7 +488,6 @@ django.contrib.humanize.templatetags.humanize.intword_converters
 django.contrib.messages.storage.cookie.CookieStorage.key_salt
 django.contrib.messages.storage.cookie.MessageDecoder.decode
 django.contrib.messages.storage.cookie.MessageEncoder.default
-django.contrib.messages.storage.cookie.MessageSerializer
 django.contrib.postgres.fields.ArrayField.formfield
 django.contrib.postgres.fields.CIText.__init__
 django.contrib.postgres.fields.HStoreField.formfield
@@ -597,12 +588,8 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_table_check_constrai
 django.db.backends.mysql.features.DatabaseFeatures.test_collations
 django.db.backends.mysql.introspection
 django.db.backends.mysql.schema.DatabaseSchemaEditor.sql_alter_column_comment
-django.db.backends.oracle.base
 django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_collation_on_charfield
-django.db.backends.oracle.introspection
-django.db.backends.oracle.operations
-django.db.backends.oracle.utils
 django.db.backends.postgresql.base.DatabaseWrapper.Database
 django.db.backends.postgresql.base.DatabaseWrapper.ensure_role
 django.db.backends.postgresql.base.DatabaseWrapper.ops
@@ -836,7 +823,6 @@ django.db.models.Subquery.as_sql
 django.db.models.Subquery.empty_result_set_value
 django.db.models.Subquery.external_aliases
 django.db.models.Subquery.get_external_cols
-django.db.models.Subquery.subquery
 django.db.models.TextField.formfield
 django.db.models.TimeField.formfield
 django.db.models.URLField.formfield
@@ -895,7 +881,6 @@ django.db.models.expressions.Subquery.as_sql
 django.db.models.expressions.Subquery.empty_result_set_value
 django.db.models.expressions.Subquery.external_aliases
 django.db.models.expressions.Subquery.get_external_cols
-django.db.models.expressions.Subquery.subquery
 django.db.models.expressions.Value.empty_result_set_value
 django.db.models.expressions.Value.for_save
 django.db.models.expressions.When.as_sql
