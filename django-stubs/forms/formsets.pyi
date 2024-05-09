@@ -3,6 +3,7 @@ from typing import Any, Generic, TypeVar
 
 from django.db.models.fields import _ErrorMessagesDict
 from django.forms.forms import BaseForm, Form
+from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, Widget
 from django.utils.functional import cached_property
@@ -61,6 +62,8 @@ class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
         error_class: type[ErrorList] = ...,
         form_kwargs: dict[str, Any] | None = ...,
         error_messages: Mapping[str, str] | None = ...,
+        form_renderer: BaseRenderer = ...,
+        renderer: BaseRenderer = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[_F]: ...
     def __getitem__(self, index: int) -> _F: ...
