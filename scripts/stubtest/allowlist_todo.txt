@@ -220,7 +220,6 @@ django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersect
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
-django.contrib.gis.db.backends.postgis.operations.PostGISOperator.check_geography
 django.contrib.gis.db.backends.postgis.schema.PostGISSchemaEditor.rast_index_template
 django.contrib.gis.db.backends.spatialite.base.DatabaseWrapper.ops
 django.contrib.gis.db.backends.spatialite.features.DatabaseFeatures.can_alter_geometry_field
