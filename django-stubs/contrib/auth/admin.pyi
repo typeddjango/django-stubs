@@ -7,11 +7,11 @@ from django.http.response import HttpResponse
 
 csrf_protect_m: Any
 sensitive_post_parameters_m: Any
-_M = TypeVar("_M", bound=AbstractUser)
+_AbstractUserT = TypeVar("_AbstractUserT", bound=AbstractUser)
 
 class GroupAdmin(admin.ModelAdmin[Group]): ...
 
-class UserAdmin(admin.ModelAdmin[_M]):
+class UserAdmin(admin.ModelAdmin[_AbstractUserT]):
     change_user_password_template: Any
     add_fieldsets: Any
     add_form: Any
