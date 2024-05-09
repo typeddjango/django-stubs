@@ -3,7 +3,7 @@ import sys
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
-from mypy.build import PRI_HIGH, PRI_MYPY
+from mypy.build import PRI_MYPY, PRI_MED
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
@@ -106,7 +106,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # for settings
         if file.fullname == "django.conf" and self.django_context.django_settings_module:
-            return [self._new_dependency(self.django_context.django_settings_module, PRI_HIGH)]
+            return [self._new_dependency(self.django_context.django_settings_module, PRI_MED)]
 
         # for values / values_list
         if file.fullname == "django.db.models":
