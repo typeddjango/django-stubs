@@ -25,7 +25,7 @@
                     reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "builtins.int"
                     reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "builtins.int"
                     reveal_type(settings.CIRCULAR_WITHOUT_HINT_FUNCTION)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT_FUNCTION'  [misc]  # N: Revealed type is "Any"
-                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT_CONST'  [misc]  # N: Revealed type is "Any"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)     # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT_CONST'  [misc]     # N: Revealed type is "Any"
 
                 def function_returning_int() -> int:
                     return 42
