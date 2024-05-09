@@ -2,8 +2,6 @@
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore.
 
-django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
-django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
 django.contrib.contenttypes.prefetch
 django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
