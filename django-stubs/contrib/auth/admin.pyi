@@ -5,9 +5,10 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
+_AbstractUserT = TypeVar("_AbstractUserT", bound=AbstractUser)
+
 csrf_protect_m: Any
 sensitive_post_parameters_m: Any
-_AbstractUserT = TypeVar("_AbstractUserT", bound=AbstractUser)
 
 class GroupAdmin(admin.ModelAdmin[Group]): ...
 
