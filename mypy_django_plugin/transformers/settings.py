@@ -38,10 +38,8 @@ def get_type_of_settings_attribute(
             sym = module.names.get(setting_name)
             if sym is not None:
                 if sym.type is None:
-                    ctx.api.fail(
-                        f"Import cycle from Django settings module prevents type inference for {setting_name!r}",
-                        ctx.context,
-                    )
+                    # When analysing a function, mypy will defer analysis to a later pass
+                    typechecker_api.handle_cannot_determine_type(setting_name, ctx.context)
                     return ctx.default_attr_type
                 return sym.type
 
