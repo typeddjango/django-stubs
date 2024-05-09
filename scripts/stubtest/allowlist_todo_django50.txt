@@ -2,9 +2,6 @@
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore.
 
-django.contrib.contenttypes.fields.GenericForeignKey.get_content_type
-django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
-django.contrib.contenttypes.prefetch
 django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
@@ -28,7 +25,6 @@ django.contrib.gis.management
 django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
 django.contrib.gis.management.commands.ogrinspect
-django.contrib.messages.test
 django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
 django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field
 django.db.backends.mysql.features.DatabaseFeatures.supports_expression_defaults
@@ -82,14 +78,21 @@ django.db.models.query_utils.FilteredRelation.resolve_expression
 django.db.models.query_utils.Q.identity
 django.db.models.sql.Query.build_filtered_relation_q
 django.db.models.sql.Query.join
-django.db.models.sql.Query.resolve_lookup_value
 django.db.models.sql.Query.setup_joins
 django.db.models.sql.query.Query.build_filtered_relation_q
 django.db.models.sql.query.Query.join
-django.db.models.sql.query.Query.resolve_lookup_value
 django.db.models.sql.query.Query.setup_joins
 django.forms.ClearableFileInput.checked
 django.forms.fields_for_model
 django.forms.models.fields_for_model
 django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
+
+# Django + Oracle (new errors after 5.0.5 update)
+django.db.backends.oracle.utils.dsn
+django.db.backends.oracle.utils.BulkInsertMapper.NCLOB
+django.db.backends.oracle.introspection.TableInfo
+django.db.backends.oracle.base.DatabaseWrapper.oracledb_version
+django.db.backends.oracle.base.DatabaseWrapper.ops
+django.contrib.gis.db.backends.oracle.operations.OracleOperations.from_text
+django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent

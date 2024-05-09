@@ -21,11 +21,17 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         choices: _Choices = ...,
     ) -> None: ...
 
-class AdminDateWidget(forms.DateInput):
+class BaseAdminDateWidget(forms.DateInput):
     def __init__(self, attrs: _OptAttrs | None = ..., format: str | None = ...) -> None: ...
 
-class AdminTimeWidget(forms.TimeInput):
+class AdminDateWidget(BaseAdminDateWidget):
+    template_name: str
+
+class BaseAdminTimeWidget(forms.TimeInput):
     def __init__(self, attrs: _OptAttrs | None = ..., format: str | None = ...) -> None: ...
+
+class AdminTimeWidget(BaseAdminTimeWidget):
+    template_name: str
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     template_name: str
@@ -70,7 +76,6 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
 class RelatedFieldWidgetWrapper(forms.Widget):
     template_name: str
-    choices: ModelChoiceIterator
     widget: forms.ChoiceWidget
     rel: ManyToOneRel
     can_add_related: bool
@@ -90,6 +95,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     ) -> None: ...
     @property
     def is_hidden(self) -> bool: ...
+    @property
+    def choices(self) -> ModelChoiceIterator: ...
+    @choices.setter
+    def choices(self, value: ModelChoiceIterator) -> None: ...
     def get_related_url(self, info: tuple[str, str], action: str, *args: Any) -> str: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     def value_from_datadict(self, data: Mapping[str, Any], files: Mapping[str, Iterable[File]], name: str) -> Any: ...
