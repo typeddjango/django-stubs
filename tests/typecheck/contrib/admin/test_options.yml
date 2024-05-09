@@ -147,7 +147,7 @@
           pass
 
       class A(admin.ModelAdmin):
-          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[Any, HttpRequest, _QuerySet[Any, Any]], Optional[HttpResponseBase]], str]"  [list-item]
+          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[Any, HttpRequest, QuerySet[Any, Any]], Optional[HttpResponseBase]], str]"  [list-item]
 -   case: errors_for_invalid_model_admin_generic
     main: |
       from django.contrib.admin import ModelAdmin
