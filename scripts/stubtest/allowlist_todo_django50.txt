@@ -19,7 +19,6 @@ django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.forms.ClearableFileInput.checked
-django.contrib.gis.forms.fields_for_model
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
 django.contrib.gis.management
 django.contrib.gis.management.commands
@@ -83,8 +82,6 @@ django.db.models.sql.query.Query.build_filtered_relation_q
 django.db.models.sql.query.Query.join
 django.db.models.sql.query.Query.setup_joins
 django.forms.ClearableFileInput.checked
-django.forms.fields_for_model
-django.forms.models.fields_for_model
 django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
 

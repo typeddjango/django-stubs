@@ -50,6 +50,7 @@ def fields_for_model(
     field_classes: Mapping[str, type[Field]] | None = ...,
     *,
     apply_limit_choices_to: bool = ...,
+    form_declared_fields: _Fields | None = ...,
 ) -> dict[str, Any]: ...
 
 class ModelFormOptions(Generic[_M]):
