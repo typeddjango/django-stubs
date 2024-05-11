@@ -1,5 +1,5 @@
 from collections.abc import Container, Iterator
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 
@@ -14,6 +14,8 @@ from .validation import DatabaseValidation
 version: Any
 django_conversions: Any
 server_version_re: Any
+
+class MySQLDatabase(Protocol): ...
 
 class CursorWrapper:
     codes_for_integrityerror: Any
@@ -40,12 +42,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     validation_class: type[DatabaseValidation]
 
     vendor: str
-    data_types: dict[str, str]
     operators: dict[str, str]
     pattern_esc: str
     pattern_ops: dict[str, str]
     isolation_levels: set[str]
-    Database: Any
+    Database: MySQLDatabase
     SchemaEditorClass: type[DatabaseSchemaEditor]
     isolation_level: set[str]
     def get_connection_params(self) -> dict[str, Any]: ...
@@ -53,7 +54,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def init_connection_state(self) -> None: ...
     def create_cursor(self, name: Any | None = ...) -> CursorWrapper: ...
     def disable_constraint_checking(self) -> Literal[True]: ...
-    needs_rollback: bool
     def enable_constraint_checking(self) -> None: ...
     def check_constraints(self, table_names: Any | None = ...) -> None: ...
     def is_usable(self) -> bool: ...
