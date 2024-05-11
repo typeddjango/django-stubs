@@ -8,10 +8,10 @@ pytest-shard==0.1.2
 
 # Django deps:
 psycopg2-binary
-Django==4.2.11; python_version < '3.10'
-Django==5.0.4; python_version >= '3.10'
+Django==4.2.13; python_version < '3.10'
+Django==5.0.6; python_version >= '3.10'
 -e ./ext
--e .[redis,compatible-mypy]
+-e .[redis,compatible-mypy,oracle]
 
 # Overrides:
 mypy==1.10.0

@@ -1,22 +1,40 @@
 -   case: test_setting_circular_import
     main: |
         from myapp import lib
-    custom_settings: |
-        from myapp.lib import function_returning_int
-
-        IMMEDIATE_VALUE = 123
-        CIRCULAR_WITHOUT_HINT = function_returning_int()
-        CIRCULAR_WITH_HINT: int = function_returning_int()
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = myapp.settings
     files:
         -   path: myapp/__init__.py
+        -   path: myapp/settings.py
+            content: |
+                from myapp.lib import function_returning_int, const_with_circular_import, const_unresolvable_circular
+
+                IMMEDIATE_VALUE = 123
+                CIRCULAR_WITH_HINT: int = function_returning_int()
+                CIRCULAR_WITHOUT_HINT_FUNCTION = function_returning_int()
+                CIRCULAR_WITHOUT_HINT_CONST = const_with_circular_import
+                UNRESOLVABLE_CIRCULAR = const_unresolvable_circular
         -   path: myapp/lib.py
             content: |
-                from django.conf import settings
+                from typing import TYPE_CHECKING
+                import django.conf
+
+                settings = django.conf.settings
 
                 def test() -> None:
                     reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "builtins.int"
-                    reveal_type(settings.CIRCULAR_WITHOUT_HINT)  # E: Import cycle from Django settings module prevents type inference for 'CIRCULAR_WITHOUT_HINT'  [misc]  # N: Revealed type is "Any"
                     reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "builtins.int"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_FUNCTION)  # N: Revealed type is "builtins.int"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)     # N: Revealed type is "builtins.int"
+                    reveal_type(settings.UNRESOLVABLE_CIRCULAR)  # N: Revealed type is "Any"
 
                 def function_returning_int() -> int:
                     return 42
+
+                if TYPE_CHECKING:
+                    const_with_circular_import = settings.IMMEDIATE_VALUE
+                    const_unresolvable_circular = settings.UNRESOLVABLE_CIRCULAR  # E: Cannot determine type of "UNRESOLVABLE_CIRCULAR"  [has-type]
+                else:
+                    const_with_circular_import = 0
+                    const_unresolvable_circular = ...

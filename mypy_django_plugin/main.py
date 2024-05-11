@@ -3,7 +3,7 @@ import sys
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
-from mypy.build import PRI_MYPY
+from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
 from mypy.options import Options
@@ -99,14 +99,14 @@ class NewSemanalDjangoPlugin(Plugin):
             return sym.node
         return None
 
-    def _new_dependency(self, module: str) -> Tuple[int, str, int]:
+    def _new_dependency(self, module: str, priority: int = PRI_MYPY) -> Tuple[int, str, int]:
         fake_lineno = -1
-        return (PRI_MYPY, module, fake_lineno)
+        return (priority, module, fake_lineno)
 
     def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
         # for settings
         if file.fullname == "django.conf" and self.django_context.django_settings_module:
-            return [self._new_dependency(self.django_context.django_settings_module)]
+            return [self._new_dependency(self.django_context.django_settings_module, PRI_MED)]
 
         # for values / values_list
         if file.fullname == "django.db.models":
