@@ -1,4 +1,4 @@
-from typing import Any, Literal, Mapping
+from typing import Any, Literal, MutableMapping
 
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
@@ -18,8 +18,8 @@ class PostGISOperator(SpatialOperator):
     def check_geography(
         self,
         lookup: GISLookup,
-        template_params: Mapping[str, Any],
-    ) -> Mapping[str, Any]: ...
+        template_params: MutableMapping[str, Any],
+    ) -> MutableMapping[str, Any]: ...
 
 class ST_Polygon(Func):
     function: str
