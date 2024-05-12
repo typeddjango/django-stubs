@@ -940,6 +940,7 @@ django.db.models.fields.related.ForeignKey.descriptor_class
 django.db.models.fields.related.ForeignKey.formfield
 django.db.models.fields.related.ForeignKey.get_db_converters
 django.db.models.fields.related.ForeignObject.__get__
+django.db.models.fields.related.ForeignObject.path_infos
 django.db.models.fields.related.ForeignObject.get_extra_restriction
 django.db.models.fields.related.ForeignObject.reverse_path_infos
 django.db.models.fields.related.ForeignObjectRel.__init__
