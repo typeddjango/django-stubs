@@ -424,7 +424,6 @@ django.contrib.gis.forms.EmailInput.__slotnames__
 django.contrib.gis.forms.Field.__deepcopy__
 django.contrib.gis.forms.Field.hidden_widget
 django.contrib.gis.forms.FileField.bound_data
-django.contrib.gis.forms.FileInput.allow_multiple_selected
 django.contrib.gis.forms.HiddenInput.__slotnames__
 django.contrib.gis.forms.InlineForeignKeyField
 django.contrib.gis.forms.Input
@@ -1309,7 +1308,6 @@ django.forms.EmailInput.__slotnames__
 django.forms.Field.__deepcopy__
 django.forms.Field.hidden_widget
 django.forms.FileField.bound_data
-django.forms.FileInput.allow_multiple_selected
 django.forms.HiddenInput.__slotnames__
 django.forms.InlineForeignKeyField
 django.forms.Input
@@ -1366,7 +1364,6 @@ django.forms.renderers.DjangoDivFormRenderer
 django.forms.widgets.ChoiceWidget.subwidgets
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.EmailInput.__slotnames__
-django.forms.widgets.FileInput.allow_multiple_selected
 django.forms.widgets.HiddenInput.__slotnames__
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__

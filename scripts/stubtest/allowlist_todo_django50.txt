@@ -18,7 +18,6 @@ django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.db.models.When.allowed_default
-django.contrib.gis.forms.ClearableFileInput.checked
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
 django.contrib.gis.management
 django.contrib.gis.management.commands
@@ -81,8 +80,6 @@ django.db.models.sql.Query.setup_joins
 django.db.models.sql.query.Query.build_filtered_relation_q
 django.db.models.sql.query.Query.join
 django.db.models.sql.query.Query.setup_joins
-django.forms.ClearableFileInput.checked
-django.forms.widgets.ClearableFileInput.checked
 django.template.autoreload
 
 # Django + Oracle (new errors after 5.0.5 update)

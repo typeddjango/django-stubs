@@ -93,6 +93,7 @@ class MultipleHiddenInput(HiddenInput):
     template_name: str
 
 class FileInput(Input):
+    allow_multiple_selected: bool
     input_type: str
     template_name: str
     needs_multipart_form: bool
@@ -108,6 +109,7 @@ class ClearableFileInput(FileInput):
     initial_text: str
     input_text: str
     template_name: str
+    checked: bool
     def clear_checkbox_name(self, name: str) -> str: ...
     def clear_checkbox_id(self, name: str) -> str: ...
     def is_initial(self, value: File | str | None) -> bool: ...
