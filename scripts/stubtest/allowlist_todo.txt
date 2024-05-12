@@ -642,14 +642,7 @@ django.db.backends.utils.names_digest
 django.db.backends.utils.split_tzname_delta
 django.db.connection
 django.db.migrations.Migration.suggest_name
-django.db.migrations.autodetector.MigrationAutodetector.create_altered_constraints
-django.db.migrations.autodetector.MigrationAutodetector.create_renamed_fields
-django.db.migrations.autodetector.MigrationAutodetector.generate_added_constraints
-django.db.migrations.autodetector.MigrationAutodetector.generate_altered_db_table_comment
 django.db.migrations.autodetector.MigrationAutodetector.generate_removed_altered_index_together
-django.db.migrations.autodetector.MigrationAutodetector.generate_removed_altered_unique_together
-django.db.migrations.autodetector.MigrationAutodetector.generate_removed_constraints
-django.db.migrations.autodetector.MigrationAutodetector.generate_renamed_indexes
 django.db.migrations.graph.MigrationGraph.make_state
 django.db.migrations.graph.Node.__ge__
 django.db.migrations.graph.Node.__gt__
