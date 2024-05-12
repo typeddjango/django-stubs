@@ -1,7 +1,7 @@
 from typing import NamedTuple, Optional, Tuple, Union
 
 from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, StrExpr, TypeInfo
+from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, RefExpr, StrExpr, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import Instance, ProperType, TypeVarType, UninhabitedType
@@ -129,7 +129,7 @@ def get_model_from_expression(
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
     """
-    if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
+    if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo):
         if helpers.is_model_type(expr.node):
             return Instance(expr.node, [])
 
