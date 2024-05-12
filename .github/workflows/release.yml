@@ -26,3 +26,27 @@ jobs:
         run: python -m build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.14
+
+  build-and-publish-ext:
+    runs-on: ubuntu-latest
+    environment:
+      name: release-ext
+      url: https://pypi.org/p/django-stubs-ext
+    permissions:
+      id-token: write
+    steps:
+      - name: Setup python to build package
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build
+        run: python -m pip install build
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build ext package
+        run: python -m build ext/
+      - name: Publish ext to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.8.14
+        with:
+          packages-dir: ext/dist/
