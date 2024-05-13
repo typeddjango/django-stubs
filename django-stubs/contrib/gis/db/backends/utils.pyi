@@ -1,5 +1,5 @@
-from collections.abc import Mapping, Sequence
-from typing import Any
+from collections.abc import Sequence
+from typing import Any, MutableMapping
 
 from django.contrib.gis.db.models.lookups import GISLookup
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -16,6 +16,6 @@ class SpatialOperator:
         self,
         connection: BaseDatabaseWrapper,
         lookup: GISLookup,
-        template_params: Mapping[str, Any],
+        template_params: MutableMapping[str, Any],
         sql_params: Sequence[Any],
     ) -> _AsSqlType: ...
