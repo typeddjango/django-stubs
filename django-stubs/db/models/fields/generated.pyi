@@ -11,7 +11,6 @@ from django.utils.datastructures import DictWrapper
 from django.utils.functional import _StrOrPromise
 
 class GeneratedField(models.Field):
-    generated: Literal[True]
     db_returning: Literal[True]
     _query: Query | None
     output_field: models.Field | None
