@@ -11,7 +11,6 @@ django.contrib.gis.db.models.FilteredRelation.resolve_expression
 django.contrib.gis.db.models.ForeignKey.cast_db_type
 django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.Lookup.allowed_default
-django.contrib.gis.db.models.Prefetch.get_current_querysets
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
@@ -39,7 +38,6 @@ django.db.models.FilteredRelation.resolve_expression
 django.db.models.ForeignKey.cast_db_type
 django.db.models.Func.allowed_default
 django.db.models.Lookup.allowed_default
-django.db.models.Prefetch.get_current_querysets
 django.db.models.Q.identity
 django.db.models.When.allowed_default
 django.db.models.expressions.Case.allowed_default
@@ -57,7 +55,6 @@ django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.get_prefet
 django.db.models.functions.Now.as_oracle
 django.db.models.functions.datetime.Now.as_oracle
 django.db.models.lookups.Lookup.allowed_default
-django.db.models.query.Prefetch.get_current_querysets
 django.db.models.query_utils.FilteredRelation.relabeled_clone
 django.db.models.query_utils.FilteredRelation.resolve_expression
 django.db.models.query_utils.Q.identity
