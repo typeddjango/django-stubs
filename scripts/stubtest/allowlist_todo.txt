@@ -315,8 +315,6 @@ django.contrib.gis.db.models.ForeignObject.reverse_path_infos
 django.contrib.gis.db.models.ForeignObjectRel.__init__
 django.contrib.gis.db.models.ForeignObjectRel.empty_strings_allowed
 django.contrib.gis.db.models.ForeignObjectRel.get_extra_restriction
-django.contrib.gis.db.models.ForeignObjectRel.get_lookups
-django.contrib.gis.db.models.ForeignObjectRel.get_transform
 django.contrib.gis.db.models.ForeignObjectRel.identity
 django.contrib.gis.db.models.ForeignObjectRel.path_infos
 django.contrib.gis.db.models.Func.function
@@ -752,8 +750,6 @@ django.db.models.ForeignObject.reverse_path_infos
 django.db.models.ForeignObjectRel.__init__
 django.db.models.ForeignObjectRel.empty_strings_allowed
 django.db.models.ForeignObjectRel.get_extra_restriction
-django.db.models.ForeignObjectRel.get_lookups
-django.db.models.ForeignObjectRel.get_transform
 django.db.models.ForeignObjectRel.identity
 django.db.models.ForeignObjectRel.path_infos
 django.db.models.Func.function
@@ -994,8 +990,6 @@ django.db.models.fields.related.ForeignObject.reverse_path_infos
 django.db.models.fields.related.ForeignObjectRel.__init__
 django.db.models.fields.related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.related.ForeignObjectRel.get_extra_restriction
-django.db.models.fields.related.ForeignObjectRel.get_lookups
-django.db.models.fields.related.ForeignObjectRel.get_transform
 django.db.models.fields.related.ForeignObjectRel.identity
 django.db.models.fields.related.ForeignObjectRel.path_infos
 django.db.models.fields.related.ManyToManyField.__get__
@@ -1026,8 +1020,6 @@ django.db.models.fields.related_lookups.RelatedLookupMixin.as_sql
 django.db.models.fields.reverse_related.ForeignObjectRel.__init__
 django.db.models.fields.reverse_related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.reverse_related.ForeignObjectRel.get_extra_restriction
-django.db.models.fields.reverse_related.ForeignObjectRel.get_lookups
-django.db.models.fields.reverse_related.ForeignObjectRel.get_transform
 django.db.models.fields.reverse_related.ForeignObjectRel.identity
 django.db.models.fields.reverse_related.ForeignObjectRel.path_infos
 django.db.models.fields.reverse_related.ManyToManyRel.identity
