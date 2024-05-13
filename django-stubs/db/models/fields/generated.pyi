@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Literal
+from typing import Any, ClassVar, Iterable, Literal
 
 from django.core.validators import _ValidatorCallable
 from django.db import models
@@ -11,7 +11,7 @@ from django.utils.datastructures import DictWrapper
 from django.utils.functional import _StrOrPromise
 
 class GeneratedField(models.Field):
-    generated: Literal[True]
+    generated: ClassVar[Literal[True]]
     db_returning: Literal[True]
     _query: Query | None
     output_field: models.Field | None

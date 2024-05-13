@@ -120,6 +120,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     remote_field: ForeignObjectRel | None
     is_relation: bool
     related_model: type[Model] | Literal["self"] | None
+    generated: ClassVar[bool]
     one_to_many: bool | None
     one_to_one: bool | None
     many_to_many: bool | None
