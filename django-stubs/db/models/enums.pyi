@@ -57,6 +57,9 @@ class _IntegerChoicesMeta(ChoicesType):
     @property
     def values(self) -> list[int]: ...
 
+# In reality, the `__init__` overloads provided below should also support
+# all the arguments of `int.__new__`/`str.__new__` (e.g. `base`, `encoding`).
+# They are omitted on purpose to avoid having convoluted stubs for these enums:
 class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesMeta):
     @overload
     def __init__(self, x: ConvertibleToInt) -> None: ...
