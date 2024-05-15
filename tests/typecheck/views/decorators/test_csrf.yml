@@ -1,0 +1,15 @@
+-   case: view_decorator
+    main: |
+      from django.http.request import HttpRequest
+      from django.http.response import HttpResponse
+      from django.views.decorators.csrf import csrf_protect
+
+      @csrf_protect
+      def good_view(request: HttpRequest) -> HttpResponse:
+          return HttpResponse()
+
+      @csrf_protect
+      def bad_view(request: int) -> str:
+          return ""
+    out: |
+      main:9: error: Value of type variable "_ViewFuncT" of "csrf_protect" cannot be "Callable[[int], str]"  [type-var]
