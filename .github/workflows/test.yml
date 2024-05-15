@@ -112,12 +112,17 @@ jobs:
         run: |
           pip install -U pip setuptools wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
-      - name: Run pyright
+      - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
         with:
-          pylance-version: latest-release
+          version: PATH
           annotate: false
         continue-on-error: true  # TODO: remove this part
+      - name: Run pyright on the test cases
+        uses: jakebailey/pyright-action@v2
+        with:
+          version: PATH
+          project: ./pyrightconfig.testcases.json
 
   matrix-test:
     timeout-minutes: 10

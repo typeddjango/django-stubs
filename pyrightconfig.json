@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json",
+    "include": [
+        "django-stubs",
+        "ext/django_stubs_ext",
+        "mypy_django_plugin",
+        "scripts",
+    ],
+    "exclude": [
+        ".github",
+        ".mypy_cache",
+        "build",
+        // test cases use a custom config file
+        "tests/",
+    ],
+    "typeCheckingMode": "strict",
+    "reportMissingTypeArgument": "warning",
+    // Stubs are allowed to use private variables
+    "reportPrivateUsage": "none",
+    "stubPath": ".",
+    "pythonVersion": "3.8",
+    "pythonPlatform": "All",
+}
