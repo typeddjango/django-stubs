@@ -124,6 +124,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     one_to_one: ClassVar[bool | None]
     many_to_many: ClassVar[bool | None]
     many_to_one: ClassVar[bool | None]
+    generated: ClassVar[bool]
     max_length: int | None
     model: type[Model]
     name: str
