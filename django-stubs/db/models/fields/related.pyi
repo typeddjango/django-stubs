@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Generic, Literal, TypeVar, overload
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
 from uuid import UUID
 
 from django.core import validators  # due to weird mypy.stubtest error
@@ -39,14 +39,14 @@ _ST = TypeVar("_ST")
 _GT = TypeVar("_GT")
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
-    one_to_many: bool
-    one_to_one: bool
-    many_to_many: bool
-    many_to_one: bool
+    one_to_many: ClassVar[bool]
+    one_to_one: ClassVar[bool]
+    many_to_many: ClassVar[bool]
+    many_to_one: ClassVar[bool]
     opts: Any
 
     remote_field: ForeignObjectRel
-    rel_class: type[ForeignObjectRel]
+    rel_class: ClassVar[type[ForeignObjectRel]]
     swappable: bool
     def __init__(
         self,
@@ -94,10 +94,10 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
 
 class ForeignObject(RelatedField[_ST, _GT]):
     remote_field: ForeignObjectRel
-    requires_unique_target: bool
-    related_accessor_class: type[ReverseManyToOneDescriptor]
-    forward_related_accessor_class: type[ForwardManyToOneDescriptor]
-    rel_class: type[ForeignObjectRel]
+    requires_unique_target: ClassVar[bool]
+    related_accessor_class: ClassVar[type[ReverseManyToOneDescriptor]]
+    forward_related_accessor_class: ClassVar[type[ForwardManyToOneDescriptor]]
+    rel_class: ClassVar[type[ForeignObjectRel]]
     from_fields: Sequence[str]
     to_fields: Sequence[str | None]  # None occurs in ForeignKey, where to_field defaults to None
     swappable: bool
@@ -173,7 +173,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     _pyi_private_get_type: Any
 
     remote_field: ManyToOneRel
-    rel_class: type[ManyToOneRel]
+    rel_class: ClassVar[type[ManyToOneRel]]
     def __init__(
         self,
         to: type[Model] | str,
@@ -215,7 +215,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     _pyi_private_get_type: Any
 
     remote_field: OneToOneRel
-    rel_class: type[OneToOneRel]
+    rel_class: ClassVar[type[OneToOneRel]]
     def __init__(
         self,
         to: type[Model] | str,
@@ -269,13 +269,13 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     has_null_arg: bool
     swappable: bool
 
-    many_to_many: Literal[True]
-    many_to_one: Literal[False]
-    one_to_many: Literal[False]
-    one_to_one: Literal[False]
+    many_to_many: ClassVar[Literal[True]]
+    many_to_one: ClassVar[Literal[False]]
+    one_to_many: ClassVar[Literal[False]]
+    one_to_one: ClassVar[Literal[False]]
 
     remote_field: ManyToManyRel
-    rel_class: type[ManyToManyRel]
+    rel_class: ClassVar[type[ManyToManyRel]]
     def __init__(
         self,
         to: type[_To] | str,
