@@ -1,8 +1,9 @@
-from typing import Any, Literal
+from typing import Any, Literal, MutableMapping
 
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.lookups import GISLookup
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func
 from django.utils.functional import cached_property
@@ -14,6 +15,11 @@ class PostGISOperator(SpatialOperator):
     raster: bool | Literal["bilateral"]
     def __init__(self, geography: bool = ..., raster: bool | Literal["bilateral"] = ..., **kwargs: Any) -> None: ...
     def check_raster(self, lookup: Any, template_params: Any) -> Any: ...
+    def check_geography(
+        self,
+        lookup: GISLookup,
+        template_params: MutableMapping[str, Any],
+    ) -> MutableMapping[str, Any]: ...
 
 class ST_Polygon(Func):
     function: str
