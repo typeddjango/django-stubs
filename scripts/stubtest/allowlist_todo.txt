@@ -1231,7 +1231,6 @@ django.db.models.sql.Query.names_to_path
 django.db.models.sql.Query.solve_lookup_type
 django.db.models.sql.Query.table_alias
 django.db.models.sql.XOR
-django.db.models.sql.compiler.PositionRef
 django.db.models.sql.compiler.SQLCompiler.__init__
 django.db.models.sql.compiler.SQLCompiler.deferred_to_columns
 django.db.models.sql.compiler.SQLCompiler.get_default_columns
