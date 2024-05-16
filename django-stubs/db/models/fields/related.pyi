@@ -5,14 +5,7 @@ from uuid import UUID
 from django.core import validators  # due to weird mypy.stubtest error
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, Expression
-from django.db.models.fields import (
-    NOT_PROVIDED,
-    Empty,
-    Field,
-    _AllLimitChoicesTo,
-    _ErrorMessagesMapping,
-    _LimitChoicesTo,
-)
+from django.db.models.fields import NOT_PROVIDED, Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
 from django.db.models.fields.related_descriptors import ForwardOneToOneDescriptor as ForwardOneToOneDescriptor
@@ -134,7 +127,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
     ) -> None: ...
-    def __copy__(self) -> Empty: ...
+    def __copy__(self) -> Self: ...
     # class access
     @overload
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor[Self]: ...
