@@ -414,8 +414,6 @@ django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
 django.contrib.gis.forms.ALL_FIELDS
 django.contrib.gis.forms.BaseForm.__init__
 django.contrib.gis.forms.BaseFormSet.__init__
-django.contrib.gis.forms.BaseFormSet.deletion_widget
-django.contrib.gis.forms.BaseFormSet.ordering_widget
 django.contrib.gis.forms.BaseModelForm.__init__
 django.contrib.gis.forms.BaseModelForm.save_m2m
 django.contrib.gis.forms.BaseModelFormSet.model
@@ -1310,8 +1308,6 @@ django.db.utils.DatabaseErrorWrapper.__call__
 django.forms.ALL_FIELDS
 django.forms.BaseForm.__init__
 django.forms.BaseFormSet.__init__
-django.forms.BaseFormSet.deletion_widget
-django.forms.BaseFormSet.ordering_widget
 django.forms.BaseModelForm.__init__
 django.forms.BaseModelForm.save_m2m
 django.forms.BaseModelFormSet.model
@@ -1359,8 +1355,6 @@ django.forms.forms.BaseForm.__init__
 django.forms.forms.DeclarativeFieldsMetaclass.__new__
 django.forms.formset_factory
 django.forms.formsets.BaseFormSet.__init__
-django.forms.formsets.BaseFormSet.deletion_widget
-django.forms.formsets.BaseFormSet.ordering_widget
 django.forms.formsets.ManagementForm.__init__
 django.forms.formsets.formset_factory
 django.forms.inlineformset_factory

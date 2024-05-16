@@ -5,7 +5,7 @@ from django.db.models.fields import _ErrorMessagesDict
 from django.forms.forms import BaseForm, Form
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, RenderableFormMixin, _DataT, _FilesT
-from django.forms.widgets import Media, Widget
+from django.forms.widgets import Media, MediaDefiningClass, Widget
 from django.utils.functional import cached_property
 
 TOTAL_FORM_COUNT: str
@@ -45,8 +45,8 @@ class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
     initial: Sequence[Mapping[str, Any]] | None
     form_kwargs: dict[str, Any]
     error_class: type[ErrorList]
-    deletion_widget: type[Widget]
-    ordering_widget: type[Widget]
+    deletion_widget: MediaDefiningClass
+    ordering_widget: MediaDefiningClass
     default_error_messages: _ErrorMessagesDict
     template_name_div: str
     template_name_p: str
