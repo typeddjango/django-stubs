@@ -7,8 +7,6 @@ django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.F.allowed_default
 django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.generated
-django.contrib.gis.db.models.FilteredRelation.relabeled_clone
-django.contrib.gis.db.models.FilteredRelation.resolve_expression
 django.contrib.gis.db.models.ForeignKey.cast_db_type
 django.contrib.gis.db.models.ForeignObject.get_joining_fields
 django.contrib.gis.db.models.ForeignObject.get_reverse_joining_fields
@@ -39,8 +37,6 @@ django.db.models.ExpressionWrapper.allowed_default
 django.db.models.F.allowed_default
 django.db.models.Field._get_flatchoices
 django.db.models.Field.generated
-django.db.models.FilteredRelation.relabeled_clone
-django.db.models.FilteredRelation.resolve_expression
 django.db.models.ForeignKey.cast_db_type
 django.db.models.ForeignObject.get_joining_fields
 django.db.models.ForeignObject.get_reverse_joining_fields
@@ -71,9 +67,6 @@ django.db.models.functions.Now.as_oracle
 django.db.models.functions.datetime.Now.as_oracle
 django.db.models.lookups.Lookup.allowed_default
 django.db.models.query.Prefetch.get_current_querysets
-django.db.models.query_utils.FilteredRelation.relabeled_clone
-django.db.models.query_utils.FilteredRelation.resolve_expression
-django.db.models.query_utils.Q.identity
 django.db.models.sql.Query.build_filtered_relation_q
 django.db.models.sql.Query.join
 django.db.models.sql.Query.setup_joins

@@ -805,6 +805,7 @@ django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
 django.db.models.Q.XOR
 django.db.models.Q.resolve_expression
+django.db.models.Q.identity
 django.db.models.QuerySet.__deepcopy__
 django.db.models.QuerySet.__reversed__
 django.db.models.QuerySet.__xor__
