@@ -1,7 +1,12 @@
+from datetime import tzinfo
 from typing import Any, ClassVar
 
 from django.db import models
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
+from django.db.models.expressions import Expression
+from django.db.models.fields import Field
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 class TimezoneMixin:
     tzinfo: Any
@@ -33,7 +38,21 @@ class TruncBase(TimezoneMixin, Transform):
     kind: str
     tzinfo: Any
 
-class Trunc(TruncBase): ...
+    def __init__(
+        self, expression: Expression, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
+    ) -> None: ...
+    def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
+
+class Trunc(TruncBase):
+    def __init__(
+        self,
+        expression: Expression,
+        kind: str,
+        output_field: Field | None = ...,
+        tzinfo: tzinfo | None = ...,
+        **extra: Any,
+    ) -> None: ...
+
 class TruncYear(TruncBase): ...
 class TruncQuarter(TruncBase): ...
 class TruncMonth(TruncBase): ...
