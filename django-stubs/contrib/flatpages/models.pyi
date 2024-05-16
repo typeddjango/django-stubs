@@ -2,6 +2,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 
 class FlatPage(models.Model):
+    # Note: do not create `class Meta` here.
     url: models.CharField
     title: models.CharField
     content: models.TextField
