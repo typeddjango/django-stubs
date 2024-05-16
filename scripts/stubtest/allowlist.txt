@@ -398,7 +398,7 @@ django.db.models.query_utils.Q.referenced_base_fields
 django.contrib.gis.db.models.Q.referenced_base_fields
 django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 
-# Ignore missing inner `Meta` class, see PR #2000 for the related discussion
+# Ignore missing inner `Meta` class, see PR #2000 and #2168
 django.contrib.auth.forms.BaseUserCreationForm.Meta
 django.contrib.auth.forms.UserChangeForm.Meta
 django.contrib.flatpages.forms.FlatpageForm.Meta
