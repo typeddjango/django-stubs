@@ -20,7 +20,6 @@ _AsSqlType: TypeAlias = tuple[str, _ParamsT]
 
 class PositionRef(Ref):
     def __init__(self, ordinal: str, refs: str, source: Expression) -> None: ...
-    def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class SQLCompiler:
     query: Query
