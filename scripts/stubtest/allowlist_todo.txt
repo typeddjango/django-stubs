@@ -1169,6 +1169,7 @@ django.db.models.query.prefetch_one_level
 django.db.models.query_utils.InvalidQuery
 django.db.models.query_utils.Q.XOR
 django.db.models.query_utils.Q.resolve_expression
+django.db.models.query_utils.Q.identity
 django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
 django.db.models.query_utils.RegisterLookupMixin.get_class_lookups
 django.db.models.query_utils.RegisterLookupMixin.get_instance_lookups
