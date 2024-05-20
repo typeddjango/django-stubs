@@ -74,12 +74,6 @@ django.db.models.query.Prefetch.get_current_querysets
 django.db.models.query_utils.FilteredRelation.relabeled_clone
 django.db.models.query_utils.FilteredRelation.resolve_expression
 django.db.models.query_utils.Q.identity
-django.db.models.sql.Query.build_filtered_relation_q
-django.db.models.sql.Query.join
-django.db.models.sql.Query.setup_joins
-django.db.models.sql.query.Query.build_filtered_relation_q
-django.db.models.sql.query.Query.join
-django.db.models.sql.query.Query.setup_joins
 django.template.autoreload
 
 # Django + Oracle (new errors after 5.0.5 update)
