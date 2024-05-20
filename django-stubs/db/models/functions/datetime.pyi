@@ -34,6 +34,8 @@ class ExtractSecond(Extract): ...
 class Now(Func):
     output_field: ClassVar[models.DateTimeField]
 
+    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
+
 class TruncBase(TimezoneMixin, Transform):
     kind: str
     tzinfo: Any
