@@ -216,7 +216,6 @@ django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersect
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
-django.contrib.gis.db.backends.postgis.operations.PostGISOperator.check_geography
 django.contrib.gis.db.backends.postgis.schema.PostGISSchemaEditor.rast_index_template
 django.contrib.gis.db.backends.spatialite.base.DatabaseWrapper.ops
 django.contrib.gis.db.backends.spatialite.features.DatabaseFeatures.can_alter_geometry_field
@@ -316,8 +315,6 @@ django.contrib.gis.db.models.ForeignObject.reverse_path_infos
 django.contrib.gis.db.models.ForeignObjectRel.__init__
 django.contrib.gis.db.models.ForeignObjectRel.empty_strings_allowed
 django.contrib.gis.db.models.ForeignObjectRel.get_extra_restriction
-django.contrib.gis.db.models.ForeignObjectRel.get_lookups
-django.contrib.gis.db.models.ForeignObjectRel.get_transform
 django.contrib.gis.db.models.ForeignObjectRel.identity
 django.contrib.gis.db.models.ForeignObjectRel.path_infos
 django.contrib.gis.db.models.Func.function
@@ -410,8 +407,6 @@ django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
 django.contrib.gis.forms.ALL_FIELDS
 django.contrib.gis.forms.BaseForm.__init__
 django.contrib.gis.forms.BaseFormSet.__init__
-django.contrib.gis.forms.BaseFormSet.deletion_widget
-django.contrib.gis.forms.BaseFormSet.ordering_widget
 django.contrib.gis.forms.BaseModelForm.__init__
 django.contrib.gis.forms.BaseModelForm.save_m2m
 django.contrib.gis.forms.BaseModelFormSet.model
@@ -753,8 +748,6 @@ django.db.models.ForeignObject.reverse_path_infos
 django.db.models.ForeignObjectRel.__init__
 django.db.models.ForeignObjectRel.empty_strings_allowed
 django.db.models.ForeignObjectRel.get_extra_restriction
-django.db.models.ForeignObjectRel.get_lookups
-django.db.models.ForeignObjectRel.get_transform
 django.db.models.ForeignObjectRel.identity
 django.db.models.ForeignObjectRel.path_infos
 django.db.models.Func.function
@@ -995,8 +988,6 @@ django.db.models.fields.related.ForeignObject.reverse_path_infos
 django.db.models.fields.related.ForeignObjectRel.__init__
 django.db.models.fields.related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.related.ForeignObjectRel.get_extra_restriction
-django.db.models.fields.related.ForeignObjectRel.get_lookups
-django.db.models.fields.related.ForeignObjectRel.get_transform
 django.db.models.fields.related.ForeignObjectRel.identity
 django.db.models.fields.related.ForeignObjectRel.path_infos
 django.db.models.fields.related.ManyToManyField.__get__
@@ -1027,8 +1018,6 @@ django.db.models.fields.related_lookups.RelatedLookupMixin.as_sql
 django.db.models.fields.reverse_related.ForeignObjectRel.__init__
 django.db.models.fields.reverse_related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.reverse_related.ForeignObjectRel.get_extra_restriction
-django.db.models.fields.reverse_related.ForeignObjectRel.get_lookups
-django.db.models.fields.reverse_related.ForeignObjectRel.get_transform
 django.db.models.fields.reverse_related.ForeignObjectRel.identity
 django.db.models.fields.reverse_related.ForeignObjectRel.path_infos
 django.db.models.fields.reverse_related.ManyToManyRel.identity
@@ -1060,9 +1049,6 @@ django.db.models.functions.Pi.as_oracle
 django.db.models.functions.Radians.as_oracle
 django.db.models.functions.Random
 django.db.models.functions.Round.__init__
-django.db.models.functions.Trunc.__init__
-django.db.models.functions.TruncDate.as_sql
-django.db.models.functions.TruncTime.as_sql
 django.db.models.functions.comparison.Cast.as_mysql
 django.db.models.functions.comparison.Cast.as_oracle
 django.db.models.functions.comparison.Cast.as_postgresql
@@ -1079,12 +1065,7 @@ django.db.models.functions.datetime.Extract.as_sql
 django.db.models.functions.datetime.Extract.lookup_name
 django.db.models.functions.datetime.Now.as_mysql
 django.db.models.functions.datetime.Now.as_postgresql
-django.db.models.functions.datetime.Trunc.__init__
-django.db.models.functions.datetime.TruncBase.__init__
-django.db.models.functions.datetime.TruncBase.as_sql
 django.db.models.functions.datetime.TruncBase.kind
-django.db.models.functions.datetime.TruncDate.as_sql
-django.db.models.functions.datetime.TruncTime.as_sql
 django.db.models.functions.math.Ceil.as_oracle
 django.db.models.functions.math.Cot.as_oracle
 django.db.models.functions.math.Degrees.as_oracle
@@ -1188,6 +1169,7 @@ django.db.models.query.prefetch_one_level
 django.db.models.query_utils.InvalidQuery
 django.db.models.query_utils.Q.XOR
 django.db.models.query_utils.Q.resolve_expression
+django.db.models.query_utils.Q.identity
 django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
 django.db.models.query_utils.RegisterLookupMixin.get_class_lookups
 django.db.models.query_utils.RegisterLookupMixin.get_instance_lookups
@@ -1231,15 +1213,12 @@ django.db.models.sql.Query.names_to_path
 django.db.models.sql.Query.solve_lookup_type
 django.db.models.sql.Query.table_alias
 django.db.models.sql.XOR
-django.db.models.sql.compiler.PositionRef
 django.db.models.sql.compiler.SQLCompiler.__init__
 django.db.models.sql.compiler.SQLCompiler.deferred_to_columns
 django.db.models.sql.compiler.SQLCompiler.get_default_columns
 django.db.models.sql.compiler.SQLCompiler.get_qualify_sql
 django.db.models.sql.compiler.SQLCompiler.get_related_selections
-django.db.models.sql.datastructures.BaseTable.equals
 django.db.models.sql.datastructures.BaseTable.identity
-django.db.models.sql.datastructures.Join.equals
 django.db.models.sql.datastructures.Join.identity
 django.db.models.sql.query.Query.__init__
 django.db.models.sql.query.Query.add_annotation
@@ -1294,8 +1273,6 @@ django.db.utils.DatabaseErrorWrapper.__call__
 django.forms.ALL_FIELDS
 django.forms.BaseForm.__init__
 django.forms.BaseFormSet.__init__
-django.forms.BaseFormSet.deletion_widget
-django.forms.BaseFormSet.ordering_widget
 django.forms.BaseModelForm.__init__
 django.forms.BaseModelForm.save_m2m
 django.forms.BaseModelFormSet.model
@@ -1342,8 +1319,6 @@ django.forms.forms.BaseForm.__init__
 django.forms.forms.DeclarativeFieldsMetaclass.__new__
 django.forms.formset_factory
 django.forms.formsets.BaseFormSet.__init__
-django.forms.formsets.BaseFormSet.deletion_widget
-django.forms.formsets.BaseFormSet.ordering_widget
 django.forms.formsets.ManagementForm.__init__
 django.forms.formsets.formset_factory
 django.forms.inlineformset_factory
