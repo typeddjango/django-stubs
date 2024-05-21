@@ -7,6 +7,7 @@
     ArticleFS(instance=Article())  # E: Argument "instance" to "BaseInlineFormSet" has incompatible type "Article"; expected "Optional[Category]"  [arg-type]
     fs = ArticleFS(instance=Category())
     reveal_type(fs.instance)  # N: Revealed type is "myapp.models.Category"
+    reveal_type(fs.get_queryset())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
   installed_apps:
     - myapp
   files:
