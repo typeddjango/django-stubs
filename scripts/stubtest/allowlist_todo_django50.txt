@@ -44,10 +44,6 @@ django.db.models.expressions.Func.allowed_default
 django.db.models.expressions.When.allowed_default
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.related.ForeignKey.cast_db_type
-django.db.models.fields.related.ForwardManyToOneDescriptor.get_prefetch_querysets
-django.db.models.fields.related.ReverseOneToOneDescriptor.get_prefetch_querysets
-django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.get_prefetch_querysets
-django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.get_prefetch_querysets
 django.db.models.lookups.Lookup.allowed_default
 django.template.autoreload
 
