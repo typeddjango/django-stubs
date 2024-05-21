@@ -53,6 +53,7 @@ class UniqueConstraint(BaseConstraint):
     fields: Sequence[str]
     condition: Q | None
     deferrable: Deferrable | None
+    nulls_distinct: bool | None
 
     @overload
     def __init__(
@@ -64,6 +65,7 @@ class UniqueConstraint(BaseConstraint):
         deferrable: Deferrable | None = ...,
         include: Sequence[str] | None = ...,
         opclasses: Sequence[Any] = ...,
+        nulls_distinct: bool | None = ...,
         violation_error_code: str | None = ...,
         violation_error_message: _StrOrPromise | None = ...,
     ) -> None: ...
