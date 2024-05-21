@@ -238,6 +238,7 @@ django.contrib.gis.db.models.BigIntegerField.formfield
 django.contrib.gis.db.models.BinaryField.get_placeholder
 django.contrib.gis.db.models.BooleanField.formfield
 django.contrib.gis.db.models.Case.as_sql
+django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.CharField.cast_db_type
 django.contrib.gis.db.models.CharField.description
 django.contrib.gis.db.models.CharField.formfield
@@ -256,6 +257,7 @@ django.contrib.gis.db.models.Empty
 django.contrib.gis.db.models.Exists.empty_result_set_value
 django.contrib.gis.db.models.Exists.select_format
 django.contrib.gis.db.models.Expression.identity
+django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.Extent.is_extent
 django.contrib.gis.db.models.Extent3D.is_extent
 django.contrib.gis.db.models.Field.__copy__
@@ -318,6 +320,7 @@ django.contrib.gis.db.models.ForeignObjectRel.get_extra_restriction
 django.contrib.gis.db.models.ForeignObjectRel.identity
 django.contrib.gis.db.models.ForeignObjectRel.path_infos
 django.contrib.gis.db.models.Func.function
+django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.GenericIPAddressField.formfield
 django.contrib.gis.db.models.GeoAggregate
 django.contrib.gis.db.models.GeometryField.contribute_to_class
@@ -330,6 +333,7 @@ django.contrib.gis.db.models.IntegerField.formfield
 django.contrib.gis.db.models.JSONField.formfield
 django.contrib.gis.db.models.JSONField.get_transform
 django.contrib.gis.db.models.Lookup.get_prep_lhs
+django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Lookup.lookup_name
 django.contrib.gis.db.models.Lookup.output_field
 django.contrib.gis.db.models.Lookup.relabeled_clone
@@ -388,6 +392,7 @@ django.contrib.gis.db.models.Value.empty_result_set_value
 django.contrib.gis.db.models.Value.for_save
 django.contrib.gis.db.models.Variance.__init__
 django.contrib.gis.db.models.When.as_sql
+django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.db.models.Window.as_sql
 django.contrib.gis.db.models.Window.as_sqlite
 django.contrib.gis.db.models.aggregates.Extent.is_extent
@@ -673,6 +678,7 @@ django.db.models.BigIntegerField.formfield
 django.db.models.BinaryField.get_placeholder
 django.db.models.BooleanField.formfield
 django.db.models.Case.as_sql
+django.db.models.Case.allowed_default
 django.db.models.CharField.cast_db_type
 django.db.models.CharField.description
 django.db.models.CharField.formfield
@@ -691,6 +697,7 @@ django.db.models.Empty
 django.db.models.Exists.empty_result_set_value
 django.db.models.Exists.select_format
 django.db.models.Expression.identity
+django.db.models.ExpressionWrapper.allowed_default
 django.db.models.Field.__copy__
 django.db.models.Field.__deepcopy__
 django.db.models.Field.__ge__
@@ -751,6 +758,7 @@ django.db.models.ForeignObjectRel.get_extra_restriction
 django.db.models.ForeignObjectRel.identity
 django.db.models.ForeignObjectRel.path_infos
 django.db.models.Func.function
+django.db.models.Func.allowed_default
 django.db.models.GenericIPAddressField.formfield
 django.db.models.ImageField.__get__
 django.db.models.ImageField.attr_class
@@ -762,6 +770,7 @@ django.db.models.JSONField.formfield
 django.db.models.JSONField.get_transform
 django.db.models.Lookup.get_prep_lhs
 django.db.models.Lookup.lookup_name
+django.db.models.Lookup.allowed_default
 django.db.models.Lookup.output_field
 django.db.models.Lookup.relabeled_clone
 django.db.models.Lookup.resolve_expression
@@ -818,6 +827,7 @@ django.db.models.Value.empty_result_set_value
 django.db.models.Value.for_save
 django.db.models.Variance.__init__
 django.db.models.When.as_sql
+django.db.models.When.allowed_default
 django.db.models.Window.as_sql
 django.db.models.Window.as_sqlite
 django.db.models.aggregates.Aggregate.__init__
@@ -849,6 +859,11 @@ django.db.models.expressions.BaseExpression.prefix_references
 django.db.models.expressions.BaseExpression.replace_expressions
 django.db.models.expressions.BaseExpression.select_format
 django.db.models.expressions.Case.as_sql
+django.db.models.expressions.Case.allowed_default
+django.db.models.expressions.CombinedExpression.allowed_default
+django.db.models.expressions.ExpressionWrapper.allowed_default
+django.db.models.expressions.Func.allowed_default
+django.db.models.expressions.When.allowed_default
 django.db.models.expressions.Col.relabeled_clone
 django.db.models.expressions.Exists.empty_result_set_value
 django.db.models.expressions.Exists.select_format
@@ -1083,6 +1098,7 @@ django.db.models.lookups.FieldGetDbPrepValueIterableMixin.batch_process_rhs
 django.db.models.lookups.FieldGetDbPrepValueIterableMixin.process_rhs
 django.db.models.lookups.IExact.process_rhs
 django.db.models.lookups.Lookup.get_prep_lhs
+django.db.models.lookups.Lookup.allowed_default
 django.db.models.lookups.Lookup.lookup_name
 django.db.models.lookups.Lookup.output_field
 django.db.models.lookups.Lookup.relabeled_clone

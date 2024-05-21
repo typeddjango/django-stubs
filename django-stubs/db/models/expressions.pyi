@@ -130,6 +130,7 @@ class TemporalSubtraction(CombinedExpression):
 
 class F(_Deconstructible, Combinable):
     name: str
+    allowed_default: ClassVar[bool]
     def __init__(self, name: str) -> None: ...
     def resolve_expression(
         self,

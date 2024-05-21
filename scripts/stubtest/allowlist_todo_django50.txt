@@ -2,15 +2,9 @@
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore.
 
-django.contrib.gis.db.models.Case.allowed_default
-django.contrib.gis.db.models.ExpressionWrapper.allowed_default
-django.contrib.gis.db.models.F.allowed_default
 django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.ForeignKey.cast_db_type
-django.contrib.gis.db.models.Func.allowed_default
-django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Q.identity
-django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
 django.contrib.gis.management
 django.contrib.gis.management.commands
@@ -27,24 +21,11 @@ django.db.backends.postgresql.features.DatabaseFeatures.supports_nulls_distinct_
 django.db.backends.postgresql.psycopg_any
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
-django.db.models.Case.allowed_default
-django.db.models.ExpressionWrapper.allowed_default
-django.db.models.F.allowed_default
 django.db.models.Field._get_flatchoices
 django.db.models.ForeignKey.cast_db_type
-django.db.models.Func.allowed_default
-django.db.models.Lookup.allowed_default
 django.db.models.Q.identity
-django.db.models.When.allowed_default
-django.db.models.expressions.Case.allowed_default
-django.db.models.expressions.CombinedExpression.allowed_default
-django.db.models.expressions.ExpressionWrapper.allowed_default
-django.db.models.expressions.F.allowed_default
-django.db.models.expressions.Func.allowed_default
-django.db.models.expressions.When.allowed_default
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.related.ForeignKey.cast_db_type
-django.db.models.lookups.Lookup.allowed_default
 django.template.autoreload
 
 # Django + Oracle (new errors after 5.0.5 update)
