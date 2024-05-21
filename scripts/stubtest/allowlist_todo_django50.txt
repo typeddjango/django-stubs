@@ -48,8 +48,6 @@ django.db.models.fields.related.ForwardManyToOneDescriptor.get_prefetch_queryset
 django.db.models.fields.related.ReverseOneToOneDescriptor.get_prefetch_querysets
 django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.get_prefetch_querysets
 django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.get_prefetch_querysets
-django.db.models.functions.Now.as_oracle
-django.db.models.functions.datetime.Now.as_oracle
 django.db.models.lookups.Lookup.allowed_default
 django.db.models.sql.Query.build_filtered_relation_q
 django.db.models.sql.Query.join
