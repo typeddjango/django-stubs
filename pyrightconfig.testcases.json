@@ -1,7 +1,7 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json",
     "include": [
-        "tests/python_files/"
+        "tests/assert_type/"
     ],
     "typeCheckingMode": "strict",
     // Extra strict settings

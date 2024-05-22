@@ -71,7 +71,7 @@ jobs:
         run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} tests
       - name: Run mypy on the test cases
         # TODO: When mypy aligns with pyright, remove the `--no-warn-unused-ignores`.
-        run: mypy tests/python_files --no-warn-unused-ignores
+        run: mypy tests/assert_type --no-warn-unused-ignores
 
   stubtest:
     timeout-minutes: 10
