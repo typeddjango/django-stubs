@@ -231,7 +231,6 @@ django.contrib.gis.db.models.Aggregate.name
 django.contrib.gis.db.models.AutoField.rel_db_type
 django.contrib.gis.db.models.BLANK_CHOICE_DASH
 django.contrib.gis.db.models.BaseConstraint.contains_expressions
-django.contrib.gis.db.models.BaseConstraint.get_violation_error_message
 django.contrib.gis.db.models.BaseConstraint.validate
 django.contrib.gis.db.models.BigAutoField.rel_db_type
 django.contrib.gis.db.models.BigIntegerField.formfield
@@ -671,7 +670,6 @@ django.db.models.Aggregate.name
 django.db.models.AutoField.rel_db_type
 django.db.models.BLANK_CHOICE_DASH
 django.db.models.BaseConstraint.contains_expressions
-django.db.models.BaseConstraint.get_violation_error_message
 django.db.models.BaseConstraint.validate
 django.db.models.BigAutoField.rel_db_type
 django.db.models.BigIntegerField.formfield
@@ -848,7 +846,6 @@ django.db.models.base.method_get_order
 django.db.models.base.method_set_order
 django.db.models.base.subclass_exception
 django.db.models.constraints.BaseConstraint.contains_expressions
-django.db.models.constraints.BaseConstraint.get_violation_error_message
 django.db.models.constraints.BaseConstraint.validate
 django.db.models.constraints.CheckConstraint.validate
 django.db.models.constraints.UniqueConstraint.contains_expressions
