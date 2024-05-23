@@ -13,7 +13,7 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.helpers import parse_bool
+from mypy_django_plugin.lib.helpers import parse_bool, make_optional
 from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
@@ -140,35 +140,27 @@ def set_descriptor_types_for_field(
     null_expr = helpers.get_call_argument_by_name(ctx, "null")
     if null_expr is not None:
         is_nullable = parse_bool(null_expr) or False
+
     # Allow setting field value to `None` when a field is primary key and has a default that can produce a value
     default_expr = helpers.get_call_argument_by_name(ctx, "default")
     primary_key_expr = helpers.get_call_argument_by_name(ctx, "primary_key")
     if default_expr is not None and primary_key_expr is not None:
         is_set_nullable = parse_bool(primary_key_expr) or False
 
-    set_type, get_type = get_field_descriptor_types(
-        default_return_type.type,
-        is_set_nullable=is_set_nullable or is_nullable,
-        is_get_nullable=is_get_nullable or is_nullable,
-    )
-
-    # reconcile set and get types with the base field class
     base_field_type = next(base for base in default_return_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME)
     mapped_instance = map_instance_to_supertype(default_return_type, base_field_type)
-    mapped_set_type, mapped_get_type = mapped_instance.args
+    set_type, get_type = mapped_instance.args
 
-    # bail if either mapped_set_type or mapped_get_type have type Never
-    if not (isinstance(mapped_set_type, UninhabitedType) or isinstance(mapped_get_type, UninhabitedType)):
-        # always replace set_type and get_type with (non-Any) mapped types
-        set_type = helpers.convert_any_to_type(mapped_set_type, set_type)
-        get_type = helpers.convert_any_to_type(mapped_get_type, get_type)
+    # If the base class wasn't explicitly parametrized, assume `Any`:
+    if isinstance(set_type, UninhabitedType):
+        set_type = AnyType(TypeOfAny.from_omitted_generics)
+    if isinstance(get_type, UninhabitedType):
+        get_type = AnyType(TypeOfAny.from_omitted_generics)
 
-        # the get_type must be optional if the field is nullable
-        if (is_get_nullable or is_nullable) and not (isinstance(get_type, NoneType) or helpers.is_optional(get_type)):
-            ctx.api.fail(
-                f"{default_return_type.type.name} is nullable but its generic get type parameter is not optional",
-                ctx.context,
-            )
+    if is_set_nullable or is_nullable:
+        set_type = make_optional(set_type)
+    if is_get_nullable or is_nullable:
+        get_type = make_optional(get_type)
 
     return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
 
