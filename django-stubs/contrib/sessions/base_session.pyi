@@ -11,9 +11,9 @@ class BaseSessionManager(models.Manager[_T]):
     def save(self, session_key: str, session_dict: dict[str, Any], expire_date: datetime) -> _T: ...
 
 class AbstractBaseSession(models.Model):
-    expire_date: datetime
-    session_data: str
-    session_key: str
+    session_key = models.CharField(primary_key=True)
+    session_data = models.TextField()
+    expire_date = models.DateTimeField()
     objects: Any
 
     @classmethod
