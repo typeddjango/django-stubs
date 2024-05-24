@@ -8,9 +8,9 @@ from typing_extensions import assert_type
 class MyIntegerChoices(IntegerChoices):
     A = 1
     B = 2, "B"
-    C = 3, "B", "..."  # type: ignore
+    C = 3, "B", "..."  # pyright: ignore[reportCallIssue]
     D = 4, _("D")
-    E = 5, 1  # type: ignore
+    E = 5, 1  # pyright: ignore[reportArgumentType]
     F = "1"
 
 
@@ -29,8 +29,8 @@ class MyTextChoices(TextChoices):
     A = "a"
     B = "b", "B"
     C = "c", _("C")
-    D = 1  # type: ignore
-    E = "e", 1  # type: ignore
+    D = 1  # pyright: ignore[reportArgumentType]
+    E = "e", 1  # pyright: ignore[reportArgumentType]
 
 
 assert_type(MyTextChoices.A, Literal[MyTextChoices.A])
