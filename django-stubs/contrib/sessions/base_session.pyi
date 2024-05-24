@@ -14,7 +14,6 @@ class AbstractBaseSession(models.Model):
     session_key = models.CharField(primary_key=True)
     session_data = models.TextField()
     expire_date = models.DateTimeField()
-    objects: Any
 
     @classmethod
     def get_session_store_class(cls) -> type[SessionBase] | None: ...
