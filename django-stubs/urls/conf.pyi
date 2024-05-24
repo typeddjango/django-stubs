@@ -11,9 +11,7 @@ from ..http.response import HttpResponseBase
 
 _URLConf: TypeAlias = str | ModuleType | Sequence[_AnyURL]
 
-def include(
-    arg: _URLConf | tuple[_URLConf, str], namespace: str | None = ...
-) -> tuple[Sequence[URLResolver | URLPattern], str | None, str | None]: ...
+def include(arg: _URLConf | tuple[_URLConf, str], namespace: str | None = ...) -> IncludedURLConf: ...
 
 # path()
 @overload

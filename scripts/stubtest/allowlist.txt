@@ -411,3 +411,6 @@ django.contrib.sessions.base_session.AbstractBaseSession.Meta
 # Custom __str__ that we don't want to overcomplicate:
 django.forms.utils.RenderableMixin.__str__
 django.forms.utils.RenderableMixin.__html__
+
+# TypeAlias that does not exist at runtime
+django.conf.urls.IncludedURLConf

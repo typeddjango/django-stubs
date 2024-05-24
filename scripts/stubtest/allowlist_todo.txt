@@ -7,7 +7,6 @@ django.conf.LazySettings.DEFAULT_FILE_STORAGE
 django.conf.LazySettings.STATICFILES_STORAGE
 django.conf.STATICFILES_STORAGE_DEPRECATED_MSG
 django.conf.global_settings.gettext_noop
-django.conf.urls.IncludedURLConf
 django.conf.urls.url
 django.contrib.admin.FieldListFilter.title
 django.contrib.admin.ModelAdmin
