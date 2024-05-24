@@ -1,0 +1,2 @@
+scripts/allowlist_*.txt linguist-language=ini
+pyrightconfig*.json linguist-language=jsonc
