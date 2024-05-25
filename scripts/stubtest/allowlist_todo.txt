@@ -509,6 +509,7 @@ django.contrib.sessions.backends.signed_cookies.SessionStore.exists
 django.contrib.sessions.base_session.AbstractBaseSession.expire_date
 django.contrib.sessions.base_session.AbstractBaseSession.get_next_by_expire_date
 django.contrib.sessions.base_session.AbstractBaseSession.get_previous_by_expire_date
+django.contrib.sessions.base_session.AbstractBaseSession.objects
 django.contrib.sessions.base_session.AbstractBaseSession.session_data
 django.contrib.sessions.base_session.AbstractBaseSession.session_key
 django.contrib.sessions.base_session.BaseSessionManager.__slotnames__
