@@ -1,4 +1,4 @@
-from collections.abc import Collection, Iterable, Iterator, Mapping, MutableMapping, MutableSet, Sized
+from collections.abc import Collection, Iterable, Iterator, Mapping, MutableMapping, MutableSet
 from typing import Any, Generic, NoReturn, Protocol, TypeVar, overload, type_check_only
 
 from _typeshed import Incomplete
@@ -38,17 +38,6 @@ class _PropertyDescriptor(Generic[_K, _V]):
 
 @type_check_only
 class _IndexableCollection(Protocol[_I], Collection[_I]):  # noqa: PYI046
-    @overload
-    def __getitem__(self, index: int) -> _I: ...
-    @overload
-    def __getitem__(self, index: slice) -> Self: ...
-
-@type_check_only
-class _QuerySetLike(Protocol[_I], Iterable[_I], Sized):  # noqa: PYI046
-    """
-    Abstract collection type reflecting methods provided by QuerySet.
-    """
-
     @overload
     def __getitem__(self, index: int) -> _I: ...
     @overload
