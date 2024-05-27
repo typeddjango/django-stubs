@@ -1,7 +1,6 @@
-from typing import assert_type
-
 from django.apps.config import AppConfig
 from django.utils.functional import cached_property
+from typing_extensions import assert_type
 
 
 class FooConfig(AppConfig):
