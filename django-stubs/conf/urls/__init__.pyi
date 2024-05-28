@@ -12,7 +12,7 @@ handler403: str | Callable[..., HttpResponse]
 handler404: str | Callable[..., HttpResponse]
 handler500: str | Callable[..., HttpResponse]
 
-IncludedURLConf: TypeAlias = tuple[Sequence[URLResolver | URLPattern], str | None, str | None]
+_IncludedURLConf: TypeAlias = tuple[Sequence[URLResolver | URLPattern], str | None, str | None]
 
 # Deprecated
 @overload
@@ -21,7 +21,7 @@ def url(
 ) -> URLPattern: ...
 @overload
 def url(
-    regex: str, view: IncludedURLConf, kwargs: dict[str, Any] | None = ..., name: str | None = ...
+    regex: str, view: _IncludedURLConf, kwargs: dict[str, Any] | None = ..., name: str | None = ...
 ) -> URLResolver: ...
 @overload
 def url(

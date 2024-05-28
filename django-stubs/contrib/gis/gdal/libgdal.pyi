@@ -1,10 +1,9 @@
 import sys
+from _ctypes import _CData
 from collections.abc import Callable, Sequence
 from ctypes import CDLL, _FuncPointer, _NamedFuncPointer
 from logging import Logger
 from typing import Any
-
-from _ctypes import _CData
 
 logger: Logger
 lib_path: str | None

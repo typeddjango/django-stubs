@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json",
+    "include": [
+        "tests/assert_type/"
+    ],
+    "typeCheckingMode": "strict",
+    // Extra strict settings
+    "reportShadowedImports": "error", // Don't accidentally name a file something that shadows stdlib
+    "reportImplicitStringConcatenation": "error",
+    "reportUninitializedInstanceVariable": "error",
+    "reportUnnecessaryTypeIgnoreComment": "error",
+    // Don't use '# type: ignore' to suppress with pyright
+    "enableTypeIgnoreComments": false,
+    // If a test case uses this anti-pattern, there's likely a reason and annoying to `type: ignore`.
+    // Let Ruff flag it (B006)
+    "reportCallInDefaultInitializer": "none",
+    // Too strict and not needed for type testing
+    "reportMissingSuperCall": "none",
+    // Stubs are allowed to use private variables. We may want to test those.
+    "reportPrivateUsage": "none",
+    // Stubs don't need the actual modules to be installed
+    "reportMissingModuleSource": "none",
+}

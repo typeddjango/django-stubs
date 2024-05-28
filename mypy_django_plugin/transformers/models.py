@@ -14,6 +14,7 @@ from mypy.nodes import (
     CallExpr,
     Context,
     Expression,
+    FakeInfo,
     NameExpr,
     RefExpr,
     Statement,
@@ -640,6 +641,10 @@ class ProcessManyToManyFields(ModelClassInitializer):
         while model_bases:
             model = model_bases.popleft()
             yield from model.defs.body
+            if isinstance(model.info, FakeInfo):
+                # While loading from cache ClassDef infos are faked and 'FakeInfo' doesn't have
+                # all attributes of a 'TypeInfo' set. See #2184
+                continue
             for base in model.info.bases:
                 # Only produce any additional statements from abstract model bases, as they
                 # simulate regular python inheritance. Avoid concrete models, and any of their
