@@ -411,3 +411,28 @@ django.contrib.sessions.base_session.AbstractBaseSession.Meta
 # Custom __str__ that we don't want to overcomplicate:
 django.forms.utils.RenderableMixin.__str__
 django.forms.utils.RenderableMixin.__html__
+
+# Dynamically added in ManyToManyField.contribute_to_class()
+django.db.models.ManyToManyField.m2m_db_table
+django.db.models.fields.related.ManyToManyField.m2m_db_table
+django.contrib.gis.db.models.ManyToManyField.m2m_db_table
+
+# Dynamically added in ManyToManyField.contribute_to_related_class()
+django.db.models.ManyToManyField.m2m_column_name
+django.db.models.ManyToManyField.m2m_field_name
+django.db.models.ManyToManyField.m2m_reverse_field_name
+django.db.models.ManyToManyField.m2m_reverse_name
+django.db.models.ManyToManyField.m2m_reverse_target_field_name
+django.db.models.ManyToManyField.m2m_target_field_name
+django.db.models.fields.related.ManyToManyField.m2m_column_name
+django.db.models.fields.related.ManyToManyField.m2m_field_name
+django.db.models.fields.related.ManyToManyField.m2m_reverse_field_name
+django.db.models.fields.related.ManyToManyField.m2m_reverse_name
+django.db.models.fields.related.ManyToManyField.m2m_reverse_target_field_name
+django.db.models.fields.related.ManyToManyField.m2m_target_field_name
+django.contrib.gis.db.models.ManyToManyField.m2m_column_name
+django.contrib.gis.db.models.ManyToManyField.m2m_field_name
+django.contrib.gis.db.models.ManyToManyField.m2m_reverse_field_name
+django.contrib.gis.db.models.ManyToManyField.m2m_reverse_name
+django.contrib.gis.db.models.ManyToManyField.m2m_reverse_target_field_name
+django.contrib.gis.db.models.ManyToManyField.m2m_target_field_name
