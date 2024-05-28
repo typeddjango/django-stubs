@@ -411,3 +411,8 @@ django.contrib.sessions.base_session.AbstractBaseSession.Meta
 # Custom __str__ that we don't want to overcomplicate:
 django.forms.utils.RenderableMixin.__str__
 django.forms.utils.RenderableMixin.__html__
+
+# Keyword only in stubs
+django.db.models.(\w*)Field.__init__
+django.db.models.fields.(\w*)Field.__init__
+django.contrib.gis.db.models.(\w*)Field.__init__

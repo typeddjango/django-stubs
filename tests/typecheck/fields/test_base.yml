@@ -1,4 +1,15 @@
 -   case: test_model_fields_classes_present_as_primitives
+    parametrized:
+        -   mypy_section: |
+                [mypy]
+                plugins =
+                    mypy_django_plugin.main
+        -   mypy_section: |
+                [mypy]
+                disable_error_code = var-annotated
+                plugins =
+    mypy_config: |
+        {{ mypy_section }}
     main: |
         from myapp.models import User
         user = User(small_int=1, name='user', slug='user', text='user')
@@ -75,6 +86,17 @@
                     my_pk = models.IntegerField(primary_key=True)
 
 -   case: blank_and_null_char_field_allows_none
+    parametrized:
+        -   mypy_section: |
+                [mypy]
+                plugins =
+                    mypy_django_plugin.main
+        -   mypy_section: |
+                [mypy]
+                disable_error_code = var-annotated
+                plugins =
+    mypy_config: |
+        {{ mypy_section }}
     main: |
         from myapp.models import MyModel
         MyModel(nulltext="")

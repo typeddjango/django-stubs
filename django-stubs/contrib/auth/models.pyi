@@ -8,6 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
 from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeAlias
@@ -23,9 +24,9 @@ class Permission(models.Model):
     content_type_id: int
     objects: ClassVar[PermissionManager]
 
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    codename = models.CharField(max_length=100)
+    name: models.CharField[str | int | Combinable, str]
+    content_type: models.ForeignKey[ContentType | Combinable, ContentType]
+    codename: models.CharField[str | int | Combinable, str]
     def natural_key(self) -> tuple[str, str, str]: ...
 
 class GroupManager(models.Manager[Group]):
@@ -34,7 +35,7 @@ class GroupManager(models.Manager[Group]):
 class Group(models.Model):
     objects: ClassVar[GroupManager]
 
-    name = models.CharField(max_length=150)
+    name: models.CharField[str | int | Combinable, str]
     permissions = models.ManyToManyField(Permission)
     def natural_key(self) -> tuple[str]: ...
 
