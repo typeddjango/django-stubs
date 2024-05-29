@@ -41,14 +41,14 @@ class TruncBase(TimezoneMixin, Transform):
     tzinfo: Any
 
     def __init__(
-        self, expression: Expression, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
+        self, expression: Expression | str, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
     ) -> None: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class Trunc(TruncBase):
     def __init__(
         self,
-        expression: Expression,
+        expression: Expression | str,
         kind: str,
         output_field: Field | None = ...,
         tzinfo: tzinfo | None = ...,
