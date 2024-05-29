@@ -4,7 +4,7 @@ from typing import Any, ClassVar
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import Expression
+from django.db.models.expressions import Combinable
 from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
@@ -16,7 +16,7 @@ class Extract(TimezoneMixin, Transform):
     lookup_name: str
     output_field: ClassVar[models.IntegerField]
     def __init__(
-        self, expression: Any, lookup_name: str | None = ..., tzinfo: Any | None = ..., **extra: Any
+        self, expression: Combinable | str, lookup_name: str | None = ..., tzinfo: Any | None = ..., **extra: Any
     ) -> None: ...
 
 class ExtractYear(Extract): ...
@@ -41,14 +41,14 @@ class TruncBase(TimezoneMixin, Transform):
     tzinfo: Any
 
     def __init__(
-        self, expression: Expression, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
+        self, expression: Combinable | str, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
     ) -> None: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class Trunc(TruncBase):
     def __init__(
         self,
-        expression: Expression,
+        expression: Combinable | str,
         kind: str,
         output_field: Field | None = ...,
         tzinfo: tzinfo | None = ...,
