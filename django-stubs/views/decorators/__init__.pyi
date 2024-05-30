@@ -1,15 +1,14 @@
-from collections.abc import Awaitable, Callable
-from typing import TypeVar
+from typing import Any, TypeVar, Protocol
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
-from typing_extensions import Concatenate
 
-# Examples:
-# def (request: HttpRequest, path_param: str) -> HttpResponseBase
-# async def (request: HttpRequest) -> HttpResponseBase
-_ViewFuncT = TypeVar(  # noqa: PYI018
-    "_ViewFuncT",
-    bound=Callable[Concatenate[HttpRequest, ...], HttpResponseBase]
-    | Callable[Concatenate[HttpRequest, ...], Awaitable[HttpResponseBase]],
-)
+# `*args: Any, **kwargs: Any` means any extra argument(s) can be provided, or none.
+class _View(Protocol):
+    def __call__(self, request: HttpRequest, /, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
+
+class _AsyncView(Protocol):
+    async def __call__(self, request: HttpRequest, /, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
+
+
+_ViewFuncT = TypeVar("_ViewFuncT", bound=_View | _AsyncView)  # noqa: PYI018
