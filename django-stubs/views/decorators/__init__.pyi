@@ -1,4 +1,4 @@
-from typing import Any, TypeVar, Protocol
+from typing import Any, Protocol, TypeVar
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
@@ -9,6 +9,5 @@ class _View(Protocol):
 
 class _AsyncView(Protocol):
     async def __call__(self, request: HttpRequest, /, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
-
 
 _ViewFuncT = TypeVar("_ViewFuncT", bound=_View | _AsyncView)  # noqa: PYI018
