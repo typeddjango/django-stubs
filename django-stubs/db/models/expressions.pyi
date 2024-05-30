@@ -14,8 +14,7 @@ from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
 from typing_extensions import Self, TypeAlias
 
-class SQLiteNumericMixin:
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
+class SQLiteNumericMixin: ...
 
 _Numeric: TypeAlias = float | Decimal
 

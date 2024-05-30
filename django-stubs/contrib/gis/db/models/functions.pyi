@@ -2,10 +2,8 @@ from typing import Any, ClassVar
 
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField
-from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import BinaryField, BooleanField, FloatField, Func, IntegerField, TextField
 from django.db.models import Transform as StandardTransform
-from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.functional import cached_property
 
 NUMERIC_TYPES: Any
@@ -21,18 +19,14 @@ class GeomOutputGeoFunc(GeoFunc):
     @cached_property
     def output_field(self) -> GeometryField: ...
 
-class SQLiteDecimalToFloatMixin:
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
-
+class SQLiteDecimalToFloatMixin: ...
 class OracleToleranceMixin:
     tolerance: float
-    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Area(OracleToleranceMixin, GeoFunc):
     arity: int
     @cached_property
     def output_field(self) -> AreaField: ...
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Azimuth(GeoFunc):
     output_field: ClassVar[FloatField]
@@ -44,13 +38,11 @@ class AsGeoJSON(GeoFunc):
     def __init__(
         self, expression: Any, bbox: bool = ..., crs: bool = ..., precision: int = ..., **extra: Any
     ) -> None: ...
-    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class AsGML(GeoFunc):
     geom_param_pos: Any
     output_field: ClassVar[TextField]
     def __init__(self, expression: Any, version: int = ..., precision: int = ..., **extra: Any) -> None: ...
-    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class AsKML(GeoFunc):
     output_field: ClassVar[TextField]
@@ -70,7 +62,6 @@ class AsWKT(GeoFunc):
 
 class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):
     def __init__(self, expression: Any, num_seg: int = ..., **extra: Any) -> None: ...
-    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
@@ -92,10 +83,6 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     geom_param_pos: Any
     spheroid: Any
     def __init__(self, expr1: Any, expr2: Any, spheroid: Any | None = ..., **extra: Any) -> None: ...
-    def as_postgresql(
-        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
-    ) -> _AsSqlType: ...
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Envelope(GeomOutputGeoFunc):
     arity: int
@@ -114,7 +101,6 @@ class FromWKT(GeoFunc):
 class GeoHash(GeoFunc):
     output_field: ClassVar[TextField]
     def __init__(self, expression: Any, precision: Any | None = ..., **extra: Any) -> None: ...
-    def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class GeometryDistance(GeoFunc):
     output_field: ClassVar[FloatField]
@@ -134,15 +120,10 @@ class IsEmpty(GeoFuncMixin, StandardTransform):
 class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):
     lookup_name: str
     output_field: ClassVar[BooleanField]
-    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     spheroid: Any
     def __init__(self, expr1: Any, spheroid: bool = ..., **extra: Any) -> None: ...
-    def as_postgresql(
-        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
-    ) -> _AsSqlType: ...
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class LineLocatePoint(GeoFunc):
     output_field: ClassVar[FloatField]
@@ -165,10 +146,6 @@ class NumPoints(GeoFunc):
 
 class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     arity: int
-    def as_postgresql(
-        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
-    ) -> _AsSqlType: ...
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
@@ -189,9 +166,7 @@ class SymDifference(OracleToleranceMixin, GeomOutputGeoFunc):
 class Transform(GeomOutputGeoFunc):
     def __init__(self, expression: Any, srid: Any, **extra: Any) -> None: ...
 
-class Translate(Scale):
-    def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
-
+class Translate(Scale): ...
 class Union(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
     geom_param_pos: Any
