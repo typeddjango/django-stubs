@@ -35,3 +35,13 @@
         main:4: note: Possible overload variants:
         main:4: note:     .*
         main:4: note:     .*
+
+-   case: model_level_check_contraint_should_allow_lookups
+    main: |
+        from django.db.models import CheckConstraint, F
+        from django.db.models.lookups import LessThan
+
+        CheckConstraint(
+            name="less_than_constraint",
+            check=LessThan(F("months"), 1)
+        )
