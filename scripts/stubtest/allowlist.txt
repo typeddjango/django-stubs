@@ -436,3 +436,9 @@ django.contrib.gis.db.models.ManyToManyField.m2m_reverse_field_name
 django.contrib.gis.db.models.ManyToManyField.m2m_reverse_name
 django.contrib.gis.db.models.ManyToManyField.m2m_reverse_target_field_name
 django.contrib.gis.db.models.ManyToManyField.m2m_target_field_name
+
+# as_ methods for expressions
+django.*.as_oracle
+django.*.as_mysql
+django.*.as_sqlite
+django.*.as_postgresql
