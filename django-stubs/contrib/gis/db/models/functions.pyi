@@ -20,6 +20,7 @@ class GeomOutputGeoFunc(GeoFunc):
     def output_field(self) -> GeometryField: ...
 
 class SQLiteDecimalToFloatMixin: ...
+
 class OracleToleranceMixin:
     tolerance: float
 
@@ -167,6 +168,7 @@ class Transform(GeomOutputGeoFunc):
     def __init__(self, expression: Any, srid: Any, **extra: Any) -> None: ...
 
 class Translate(Scale): ...
+
 class Union(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
     geom_param_pos: Any
