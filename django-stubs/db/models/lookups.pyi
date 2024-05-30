@@ -1,9 +1,9 @@
-from collections.abc import Iterable, Mapping
-from typing import Any, Generic, Literal, TypeVar, Sequence
+from collections.abc import Iterable
+from typing import Any, Generic, Literal, Sequence, TypeVar
 
 from django.core.exceptions import EmptyResultSet
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models.expressions import Expression, Func, Combinable
+from django.db.models.expressions import Combinable, Expression, Func
 from django.db.models.fields import BooleanField
 from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
