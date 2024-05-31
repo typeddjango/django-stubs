@@ -1038,7 +1038,6 @@ django.db.models.functions.NullIf.as_oracle
 django.db.models.functions.Pi.as_oracle
 django.db.models.functions.Radians.as_oracle
 django.db.models.functions.Random
-django.db.models.functions.Round.__init__
 django.db.models.functions.comparison.Cast.as_mysql
 django.db.models.functions.comparison.Cast.as_oracle
 django.db.models.functions.comparison.Cast.as_postgresql
@@ -1062,7 +1061,6 @@ django.db.models.functions.math.Degrees.as_oracle
 django.db.models.functions.math.Pi.as_oracle
 django.db.models.functions.math.Radians.as_oracle
 django.db.models.functions.math.Random
-django.db.models.functions.math.Round.__init__
 django.db.models.functions.mixins.FixDecimalInputMixin.as_postgresql
 django.db.models.functions.mixins.FixDurationInputMixin.as_mysql
 django.db.models.functions.mixins.FixDurationInputMixin.as_oracle
