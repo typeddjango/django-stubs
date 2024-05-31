@@ -1354,11 +1354,6 @@ django.http.request.HttpRequest.readlines
 django.http.request.UploadHandlerList
 django.http.request.parse_accept_header
 django.http.response.StreamingHttpResponse.content
-django.middleware.cache.CacheMiddleware.__init__
-django.middleware.cache.CacheMiddleware.cache
-django.middleware.cache.FetchFromCacheMiddleware.cache
-django.middleware.cache.UpdateCacheMiddleware.cache
-django.middleware.gzip.GZipMiddleware.max_random_bytes
 django.template.EngineHandler.__init__
 django.template.Library.filter_function
 django.template.Library.simple_tag
