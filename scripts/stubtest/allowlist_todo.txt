@@ -561,9 +561,6 @@ django.core.management.commands.makemessages.TranslatableFile.__gt__
 django.core.management.commands.makemessages.TranslatableFile.__le__
 django.core.management.commands.makemessages.TranslatableFile.__lt__
 django.core.management.commands.makemessages.TranslatableFile.path
-django.core.management.utils.find_formatters
-django.core.management.utils.run_formatters
-django.core.management.utils.sentinel
 django.core.servers.basehttp.ServerHandler.__init__
 django.core.servers.basehttp.ThreadedWSGIServer.__init__
 django.db.backends.ddl_references.Expressions
