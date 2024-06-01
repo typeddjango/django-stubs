@@ -1,5 +1,6 @@
+import re
 from collections.abc import Iterator, Mapping
-from typing import IO, Any, Literal
+from typing import IO, Any, ClassVar, Literal
 
 from django.http.request import QueryDict
 from django.utils.datastructures import ImmutableList, MultiValueDict
@@ -13,6 +14,7 @@ FIELD: Literal["field"]
 FIELD_TYPES: frozenset[str]
 
 class MultiPartParser:
+    boundary_re: ClassVar[re.Pattern[str]]
     def __init__(
         self,
         META: Mapping[str, Any],
@@ -23,6 +25,7 @@ class MultiPartParser:
     def parse(self) -> tuple[QueryDict, MultiValueDict]: ...
     def handle_file_complete(self, old_field_name: str, counters: list[int]) -> None: ...
     def sanitize_file_name(self, file_name: str) -> str | None: ...
+    def IE_sanitize(self, file_name: str) -> str | None: ...
 
 class LazyStream:
     length: int | None
