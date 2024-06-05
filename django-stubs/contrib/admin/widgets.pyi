@@ -6,7 +6,7 @@ from django.contrib.admin.sites import AdminSite
 from django.core.files.base import File
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel
 from django.forms.models import ModelChoiceIterator
-from django.forms.widgets import _OptAttrs
+from django.forms.widgets import ChoiceWidget, _OptAttrs
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 
@@ -76,7 +76,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
 class RelatedFieldWidgetWrapper(forms.Widget):
     template_name: str
-    widget: forms.ChoiceWidget
+    widget: ChoiceWidget
     rel: ManyToOneRel
     can_add_related: bool
     can_change_related: bool
@@ -85,7 +85,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     admin_site: AdminSite
     def __init__(
         self,
-        widget: forms.ChoiceWidget,
+        widget: ChoiceWidget,
         rel: ManyToOneRel,
         admin_site: AdminSite,
         can_add_related: bool | None = ...,

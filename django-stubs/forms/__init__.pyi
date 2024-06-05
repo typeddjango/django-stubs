@@ -52,7 +52,6 @@ from .models import modelform_factory as modelform_factory
 from .models import modelformset_factory as modelformset_factory
 from .widgets import CheckboxInput as CheckboxInput
 from .widgets import CheckboxSelectMultiple as CheckboxSelectMultiple
-from .widgets import ChoiceWidget as ChoiceWidget
 from .widgets import ClearableFileInput as ClearableFileInput
 from .widgets import DateInput as DateInput
 from .widgets import DateTimeBaseInput as DateTimeBaseInput
