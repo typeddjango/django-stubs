@@ -9,7 +9,7 @@
         @admin.display
         def display_bare(self) -> str: ...
 
-        @admin.display(boolean=True, ordering="field", description="Something", empty_value="...")
+        @admin.display(ordering="field", description="Something", empty_value="...")
         def display_fancy(self) -> bool: ...
 
         # Can also be a property
@@ -17,13 +17,13 @@
         @admin.display
         def display_property(self) -> str: ...
 
-        @admin.display  # E: Decorators on top of @property are not supported  [misc]
+        @admin.display  # E: Decorators on top of @property are not supported  \[misc\]
         @property
         def incorrect_property(self) -> str: ...
 
         def method(self) -> None:
-            reveal_type(self.display_bare)  # N: Revealed type is "def () -> builtins.str"
-            reveal_type(self.display_fancy)  # N: Revealed type is "def () -> builtins.bool"
+            reveal_type(self.display_bare)  # N: Revealed type is "def \(\) -> builtins.str"
+            reveal_type(self.display_fancy)  # N: Revealed type is "def \(\) -> builtins.bool"
             reveal_type(self.display_fancy())  # N: Revealed type is "builtins.bool"
             reveal_type(self.display_property)  # N: Revealed type is "builtins.str"
 
@@ -51,8 +51,62 @@
         @admin.display
         def admin_display_bare(self, obj: MyModel) -> str: ...
 
-        @admin.display(boolean=True, ordering="field", description="Something", empty_value="Nuf")
+        @admin.display(boolean=True, ordering="field", description="Something")
         def admin_display_fancy(self, obj: MyModel) -> bool: ...
+
+    # 'boolean' and 'empty_value' are mutually exclusive arguments
+    # Erroneous
+    admin.display(lambda: 1, boolean=True, empty_value="str")
+    admin.display(lambda: 1, boolean=False, empty_value="str")
+    # Valid
+    admin.display(lambda: 1, boolean=True, empty_value=None)
+    admin.display(lambda: 1, boolean=False, empty_value=None)
+    admin.display(lambda: 1, boolean=True)
+    admin.display(lambda: 1, boolean=False)
+    admin.display(lambda: 1, boolean=None, empty_value="str")
+    admin.display(lambda: 1, boolean=None, empty_value=None)
+    admin.display(lambda: 1, empty_value="str")
+    admin.display(lambda: 1, empty_value=None)
+    admin.display(lambda: 1)
+    # Erroneous
+    admin.display(boolean=True, empty_value="str")
+    admin.display(boolean=False, empty_value="str")
+    # Valid
+    admin.display(boolean=True, empty_value=None)
+    admin.display(boolean=False, empty_value=None)
+    admin.display(boolean=True)
+    admin.display(boolean=False)
+    admin.display(boolean=None, empty_value="str")
+    admin.display(boolean=None, empty_value=None)
+    admin.display(empty_value="str")
+    admin.display(empty_value=None)
+    admin.display()
+  regex: true
+  out: |
+      main:57: error: No overload variant of "display" matches argument types "Callable\[\[\], int\]", "bool", "str"  \[call-overload\]
+      main:57: note: Possible overload variants:
+      main:57: note:     .*
+      main:57: note:     .*
+      main:57: note:     .*
+      main:57: note:     .*
+      main:58: error: No overload variant of "display" matches argument types "Callable\[\[\], int\]", "bool", "str"  \[call-overload\]
+      main:58: note: Possible overload variants:
+      main:58: note:     .*
+      main:58: note:     .*
+      main:58: note:     .*
+      main:58: note:     .*
+      main:70: error: No overload variant of "display" matches argument types "bool", "str"  \[call-overload\]
+      main:70: note: Possible overload variants:
+      main:70: note:     .*
+      main:70: note:     .*
+      main:70: note:     .*
+      main:70: note:     .*
+      main:71: error: No overload variant of "display" matches argument types "bool", "str"  \[call-overload\]
+      main:71: note: Possible overload variants:
+      main:71: note:     .*
+      main:71: note:     .*
+      main:71: note:     .*
+      main:71: note:     .*
 
 - case: test_admin_decorators_action
   main: |
