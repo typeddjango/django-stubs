@@ -141,13 +141,15 @@
     main: |
       from django.contrib import admin
       from django.http.request import HttpRequest
-      from django.db.models.query import QuerySet
+      from django.db import models
+
+      class MyModel(models.Model): ...
 
       def an_action(modeladmin: None) -> None:
           pass
 
-      class A(admin.ModelAdmin):
-          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[Any, HttpRequest, QuerySet[Any, Any]], Optional[HttpResponseBase]], str]"  [list-item]
+      class A(admin.ModelAdmin[MyModel]):
+          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[A, HttpRequest, QuerySet[MyModel, MyModel]], Optional[HttpResponseBase]], str]"  [list-item]
 -   case: errors_for_invalid_model_admin_generic
     main: |
       from django.contrib.admin import ModelAdmin

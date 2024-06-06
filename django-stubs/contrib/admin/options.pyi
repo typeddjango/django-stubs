@@ -34,7 +34,7 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import TypeAlias, TypedDict
+from typing_extensions import Self, TypeAlias, TypedDict
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
@@ -139,7 +139,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     @property
     def view_on_site(self) -> Callable[[_ModelT], str] | bool: ...
 
-_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin)
+_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin[Any])
 _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], HttpResponseBase | None]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
@@ -167,7 +167,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     delete_selected_confirmation_template: _TemplateForResponseT | None
     object_history_template: _TemplateForResponseT | None
     popup_response_template: _TemplateForResponseT | None
-    actions: Sequence[_ActionCallable[Any, _ModelT] | str] | None
+    actions: Sequence[_ActionCallable[Self, _ModelT] | str] | None
     action_form: Any
     actions_on_top: bool
     actions_on_bottom: bool
