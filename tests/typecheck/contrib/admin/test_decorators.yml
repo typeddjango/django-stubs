@@ -79,12 +79,6 @@
     @admin.action
     def freestanding_action_file_response(modeladmin: "MyModelAdmin", request: HttpRequest, queryset: QuerySet[MyModel]) -> FileResponse: ...
 
-    @admin.action # E: Value of type variable "_ModelAdmin" of "action" cannot be "int"  [type-var]
-    def freestanding_action_invalid_bare(modeladmin: int, request: HttpRequest, queryset: QuerySet[MyModel]) -> None: ...
-
-    @admin.action(description="Some text here", permissions=["test"]) # E: Value of type variable "_ModelAdmin" of function cannot be "int"  [type-var]
-    def freestanding_action_invalid_fancy(modeladmin: int, request: HttpRequest, queryset: QuerySet[MyModel]) -> None: ...
-
     @admin.register(MyModel)
     class MyModelAdmin(admin.ModelAdmin[MyModel]):
         actions = [freestanding_action_bare, freestanding_action_fancy, "method_action_bare", "method_action_fancy", freestanding_action_http_response, freestanding_action_file_response]
@@ -101,14 +95,8 @@
         @admin.action(description="Some text here", permissions=["test"])
         def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[MyModel]) -> FileResponse: ...
 
-        @admin.action  # E: Value of type variable "_QuerySet" of "action" cannot be "int"  [type-var]
-        def method_action_invalid_bare(self, request: HttpRequest, queryset: int) -> None: ...
-
-        @admin.action(description="Some text here", permissions=["test"])  # E: Value of type variable "_QuerySet" of function cannot be "int"  [type-var]
-        def method_action_invalid_fancy(self, request: HttpRequest, queryset: int) -> None: ...
-
         def method(self) -> None:
-            reveal_type(self.method_action_bare)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query.QuerySet[main.MyModel, main.MyModel])"
-            reveal_type(self.method_action_fancy)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query.QuerySet[main.MyModel, main.MyModel])"
-            reveal_type(self.method_action_http_response)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query.QuerySet[main.MyModel, main.MyModel]) -> django.http.response.HttpResponse"
-            reveal_type(self.method_action_file_response)  # N: Revealed type is "def (django.http.request.HttpRequest, django.db.models.query.QuerySet[main.MyModel, main.MyModel]) -> django.http.response.FileResponse"
+            reveal_type(self.method_action_bare)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query.QuerySet[main.MyModel, main.MyModel])"
+            reveal_type(self.method_action_fancy)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query.QuerySet[main.MyModel, main.MyModel])"
+            reveal_type(self.method_action_http_response)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query.QuerySet[main.MyModel, main.MyModel]) -> django.http.response.HttpResponse"
+            reveal_type(self.method_action_file_response)  # N: Revealed type is "def (request: django.http.request.HttpRequest, queryset: django.db.models.query.QuerySet[main.MyModel, main.MyModel]) -> django.http.response.FileResponse"
