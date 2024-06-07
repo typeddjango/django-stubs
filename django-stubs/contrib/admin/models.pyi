@@ -1,8 +1,12 @@
+from datetime import date, datetime
 from typing import Any, ClassVar
 from uuid import UUID
 
+from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
 
 ADDITION: int
 CHANGE: int
@@ -21,13 +25,17 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> LogEntry: ...
 
 class LogEntry(models.Model):
-    action_time: models.DateTimeField
-    user: models.ForeignKey
-    content_type: models.ForeignKey
-    object_id: models.TextField
-    object_repr: models.CharField
-    action_flag: models.PositiveSmallIntegerField
-    change_message: models.TextField
+    id: models.AutoField[str | int | Combinable | None, int]
+    pk: models.AutoField[str | int | Combinable | None, int]
+    action_time: models.DateTimeField[str | datetime | date | Combinable, datetime]
+    user: models.ForeignKey[AbstractUser | Combinable, AbstractUser]
+    user_id: Any
+    content_type: models.ForeignKey[ContentType | Combinable | None, ContentType | None]
+    content_type_id: int | None
+    object_id: models.TextField[str | int | Combinable | None, str | None]
+    object_repr: models.CharField[str | int | Combinable, str]
+    action_flag: models.PositiveSmallIntegerField[float | int | str | Combinable, int]
+    change_message: models.TextField[str | int | Combinable, str]
     objects: ClassVar[LogEntryManager]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...

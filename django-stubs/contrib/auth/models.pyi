@@ -1,5 +1,6 @@
 from collections.abc import Iterable
-from typing import Any, ClassVar, Literal, TypeVar
+from datetime import date, datetime
+from typing import Any, ClassVar, Literal, TypeVar, type_check_only
 
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
@@ -8,6 +9,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
+from django.db.models.fields.related_descriptors import ManyToManyDescriptor
 from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeAlias
@@ -20,22 +23,40 @@ class PermissionManager(models.Manager[Permission]):
     def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...
 
 class Permission(models.Model):
-    content_type_id: int
     objects: ClassVar[PermissionManager]
 
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    codename = models.CharField(max_length=100)
+    id: models.AutoField[str | int | Combinable | None, int]
+    pk: models.AutoField[str | int | Combinable | None, int]
+    name: models.CharField[str | int | Combinable, str]
+    content_type: models.ForeignKey[ContentType | Combinable, ContentType]
+    content_type_id: int
+    codename: models.CharField[str | int | Combinable, str]
+    group_set: ManyToManyDescriptor[Group, Group_permissions]
     def natural_key(self) -> tuple[str, str, str]: ...
 
 class GroupManager(models.Manager[Group]):
     def get_by_natural_key(self, name: str) -> Group: ...
 
+# This is a model that only exists in Django's model registry and doesn't have any
+# class statement form. It's the through model between 'Group' and 'Permission'.
+@type_check_only
+class Group_permissions(models.Model):
+    objects: ClassVar[models.Manager[Self]]
+
+    id: models.AutoField[str | int | Combinable | None, int]
+    pk: models.AutoField[str | int | Combinable | None, int]
+    group: models.ForeignKey[Group | Combinable, Group]
+    group_id: int
+    permission: models.ForeignKey[Permission | Combinable, Permission]
+    permission_id: int
+
 class Group(models.Model):
     objects: ClassVar[GroupManager]
 
-    name = models.CharField(max_length=150)
-    permissions = models.ManyToManyField(Permission)
+    id: models.AutoField[str | int | Combinable | None, int]
+    pk: models.AutoField[str | int | Combinable | None, int]
+    name: models.CharField[str | int | Combinable, str]
+    permissions: models.ManyToManyField[Permission, Group_permissions]
     def natural_key(self) -> tuple[str]: ...
 
 _T = TypeVar("_T", bound=Model)
@@ -57,9 +78,9 @@ class UserManager(BaseUserManager[_T]):
     ) -> QuerySet[_T]: ...
 
 class PermissionsMixin(models.Model):
-    is_superuser = models.BooleanField()
-    groups = models.ManyToManyField(Group)
-    user_permissions = models.ManyToManyField(Permission)
+    is_superuser: models.BooleanField[bool | Combinable, bool]
+    groups: models.ManyToManyField[Group, Any]
+    user_permissions: models.ManyToManyField[Permission, Any]
 
     def get_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
@@ -71,13 +92,13 @@ class PermissionsMixin(models.Model):
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
     username_validator: UnicodeUsernameValidator
 
-    username = models.CharField(max_length=150)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
-    email = models.EmailField(blank=True)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
+    username: models.CharField[str | int | Combinable, str]
+    first_name: models.CharField[str | int | Combinable, str]
+    last_name: models.CharField[str | int | Combinable, str]
+    email: models.EmailField[str | Combinable, str]
+    is_staff: models.BooleanField[bool | Combinable, bool]
+    is_active: models.BooleanField[bool | Combinable, bool]
+    date_joined: models.DateTimeField[str | datetime | date | Combinable, datetime]
 
     objects: ClassVar[UserManager[Self]]
 
@@ -90,7 +111,9 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         self, subject: _StrOrPromise, message: _StrOrPromise, from_email: str = ..., **kwargs: Any
     ) -> None: ...
 
-class User(AbstractUser): ...
+class User(AbstractUser):
+    id: models.AutoField[str | int | Combinable | None, int]
+    pk: models.AutoField[str | int | Combinable | None, int]
 
 class AnonymousUser:
     id: Any
