@@ -8,4 +8,4 @@ _T = TypeVar("_T", bound=Session)
 class SessionManager(BaseSessionManager[_T]): ...
 
 class Session(AbstractBaseSession):
-    objects: ClassVar[SessionManager[Self]]
+    objects: ClassVar[SessionManager[Self]]  # type: ignore[assignment]
