@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, MutableMapping, Sequence, Sized
+from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
 from typing import Any, Generic, NamedTuple, overload
 
 from django.db.backends.utils import _ExecuteQuery
@@ -98,9 +98,7 @@ class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
         self, objs: Iterable[_Model], fields: Iterable[str], batch_size: int | None = ...
     ) -> int: ...
     def get_or_create(self, defaults: Mapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_Model, bool]: ...
-    async def aget_or_create(
-        self, defaults: Mapping[str, Any] | None = ..., **kwargs: Any
-    ) -> tuple[_Model, bool]: ...
+    async def aget_or_create(self, defaults: Mapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_Model, bool]: ...
     def update_or_create(
         self,
         defaults: Mapping[str, Any] | None = ...,
