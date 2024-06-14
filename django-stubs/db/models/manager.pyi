@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import AsyncIterator, Callable, Collection, Iterable, Iterator, MutableMapping, Sequence
+from collections.abc import AsyncIterator, Callable, Collection, Iterable, Iterator, Mapping, Sequence
 from typing import Any, Generic, NoReturn, TypeVar, overload
 
 from django.db.models.base import Model
@@ -63,20 +63,18 @@ class BaseManager(Generic[_T]):
     ) -> list[_T]: ...
     def bulk_update(self, objs: Iterable[_T], fields: Sequence[str], batch_size: int | None = ...) -> int: ...
     async def abulk_update(self, objs: Iterable[_T], fields: Sequence[str], batch_size: int | None = ...) -> int: ...
-    def get_or_create(self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_T, bool]: ...
-    async def aget_or_create(
-        self, defaults: MutableMapping[str, Any] | None = ..., **kwargs: Any
-    ) -> tuple[_T, bool]: ...
+    def get_or_create(self, defaults: Mapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_T, bool]: ...
+    async def aget_or_create(self, defaults: Mapping[str, Any] | None = ..., **kwargs: Any) -> tuple[_T, bool]: ...
     def update_or_create(
         self,
-        defaults: MutableMapping[str, Any] | None = ...,
-        create_defaults: MutableMapping[str, Any] | None = ...,
+        defaults: Mapping[str, Any] | None = ...,
+        create_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> tuple[_T, bool]: ...
     async def aupdate_or_create(
         self,
-        defaults: MutableMapping[str, Any] | None = ...,
-        create_defaults: MutableMapping[str, Any] | None = ...,
+        defaults: Mapping[str, Any] | None = ...,
+        create_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> tuple[_T, bool]: ...
     def earliest(self, *fields: str | OrderBy) -> _T: ...
