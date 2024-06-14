@@ -66,7 +66,7 @@ class Options(Generic[_M]):
     required_db_features: list[str]
     required_db_vendor: Literal["sqlite", "postgresql", "mysql", "oracle"] | None
     meta: type | None
-    pk: Field | None
+    pk: Field
     auto_field: AutoField | None
     abstract: bool
     managed: bool
