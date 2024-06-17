@@ -46,6 +46,7 @@ from .math import Mod as Mod
 from .math import Pi as Pi
 from .math import Power as Power
 from .math import Radians as Radians
+from .math import Random as Random
 from .math import Round as Round
 from .math import Sign as Sign
 from .math import Sin as Sin
