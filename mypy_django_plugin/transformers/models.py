@@ -531,8 +531,8 @@ class AddReverseLookups(ModelClassInitializer):
             )
             return
 
-        # Create a reverse manager subclassed from the default manager of this model
-        # and 'RelatedManager'
+        # Create a reverse manager subclassed from the default manager of the related
+        # model and 'RelatedManager'
         related_manager = Instance(related_manager_info, [Instance(to_model_info, [])])
         # The reverse manager is based on the related model's manager, so it makes most sense to add the new
         # related manager in that module
