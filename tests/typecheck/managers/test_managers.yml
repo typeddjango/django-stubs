@@ -530,15 +530,15 @@
                     reveal_type([booking for booking in Booking.objects.all().filter()])
 
 
-                    # Check QuerySet methods on UnknownRelatedManager
+                    # Check QuerySet methods for unresolvable manager
                     reveal_type(user.booking_set.all)
                     reveal_type(user.booking_set.custom)
                     reveal_type(user.booking_set.all().filter)
                     reveal_type(user.booking_set.all().custom)
                     reveal_type(user.booking_set.all().first())
     out: |
-        myapp/models:13: error: Couldn't resolve related manager for relation 'booking' (from myapp.models.Booking.myapp.Booking.renter).  [django-manager-missing]
-        myapp/models:13: error: Couldn't resolve related manager for relation 'bookingowner_set' (from myapp.models.Booking.myapp.Booking.owner).  [django-manager-missing]
+        myapp/models:13: error: Couldn't resolve related manager 'booking_set' for relation 'myapp.models.Booking.renter'.  [django-manager-missing]
+        myapp/models:13: error: Couldn't resolve related manager 'bookingowner_set' for relation 'myapp.models.Booking.owner'.  [django-manager-missing]
         myapp/models:20: error: Could not resolve manager type for "myapp.models.Booking.objects"  [django-manager-missing]
         myapp/models:23: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.objects"  [django-manager-missing]
         myapp/models:24: error: Could not resolve manager type for "myapp.models.TwoUnresolvable.second_objects"  [django-manager-missing]
@@ -553,8 +553,8 @@
         myapp/models:44: note: Revealed type is "django.db.models.manager.Manager[myapp.models.TwoUnresolvable]"
         myapp/models:46: note: Revealed type is "myapp.models.UnknownManager[myapp.models.InvisibleUnresolvable]"
         myapp/models:47: note: Revealed type is "django.db.models.manager.Manager[myapp.models.InvisibleUnresolvable]"
-        myapp/models:49: note: Revealed type is "myapp.models.UnknownRelatedManager[myapp.models.Booking]"
-        myapp/models:50: note: Revealed type is "myapp.models.UnknownRelatedManager[myapp.models.Booking]"
+        myapp/models:49: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Booking]"
+        myapp/models:50: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Booking]"
         myapp/models:53: note: Revealed type is "def () -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:54: note: Revealed type is "Any"
         myapp/models:55: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
@@ -563,9 +563,11 @@
         myapp/models:58: note: Revealed type is "myapp.models.Booking"
         myapp/models:59: note: Revealed type is "builtins.list[myapp.models.Booking]"
         myapp/models:60: note: Revealed type is "builtins.list[myapp.models.Booking]"
-        myapp/models:64: note: Revealed type is "def () -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:64: note: Revealed type is "def () -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:65: error: "RelatedManager[Booking]" has no attribute "custom"  [attr-defined]
         myapp/models:65: note: Revealed type is "Any"
-        myapp/models:66: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:66: note: Revealed type is "def (*args: Any, **kwargs: Any) -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:67: error: "QuerySet[Booking, Booking]" has no attribute "custom"  [attr-defined]
         myapp/models:67: note: Revealed type is "Any"
         myapp/models:68: note: Revealed type is "Union[myapp.models.Booking, None]"
 
