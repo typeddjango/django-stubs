@@ -1,7 +1,11 @@
 from typing import Any, ClassVar
 
+from django.contrib.admin.models import LogEntry
+from django.contrib.auth.models import Permission
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
+from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
 from django.db.models.query import QuerySet
 
 class ContentTypeManager(models.Manager[ContentType]):
@@ -12,13 +16,16 @@ class ContentTypeManager(models.Manager[ContentType]):
     def clear_cache(self) -> None: ...
 
 class ContentType(models.Model):
-    id: int
-    app_label: models.CharField
-    model: models.CharField
+    id: models.AutoField[str | int | Combinable | None, int]
+    pk: models.AutoField[str | int | Combinable | None, int]
+    app_label: models.CharField[str | int | Combinable, str]
+    model: models.CharField[str | int | Combinable, str]
+    logentry_set: ReverseManyToOneDescriptor[LogEntry]
+    permission_set: ReverseManyToOneDescriptor[Permission]
     objects: ClassVar[ContentTypeManager]
     @property
     def name(self) -> str: ...
     def model_class(self) -> type[Model] | None: ...
     def get_object_for_this_type(self, **kwargs: Any) -> Model: ...
-    def get_all_objects_for_this_type(self, **kwargs: Any) -> QuerySet: ...
+    def get_all_objects_for_this_type(self, **kwargs: Any) -> QuerySet[Model]: ...
     def natural_key(self) -> tuple[str, str]: ...

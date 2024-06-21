@@ -509,7 +509,6 @@ django.contrib.sessions.models.SessionManager.__slotnames__
 django.contrib.sitemaps.views.SitemapIndexItem
 django.contrib.sites.admin.SiteAdmin
 django.contrib.sites.models.Site.domain
-django.contrib.sites.models.Site.flatpage_set
 django.contrib.sites.models.Site.id
 django.contrib.sites.models.Site.name
 django.contrib.sites.models.SiteManager.__slotnames__

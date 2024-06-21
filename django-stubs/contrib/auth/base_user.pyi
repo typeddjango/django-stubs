@@ -1,9 +1,9 @@
+from datetime import date, datetime
 from typing import Any, ClassVar, Literal, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable
-from django.db.models.fields import BooleanField
 
 _T = TypeVar("_T", bound=Model)
 
@@ -16,9 +16,9 @@ class BaseUserManager(models.Manager[_T]):
 class AbstractBaseUser(models.Model):
     REQUIRED_FIELDS: ClassVar[list[str]]
 
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_active: bool | BooleanField[bool | Combinable, bool]
+    password: models.CharField[str | int | Combinable, str]
+    last_login: models.DateTimeField[str | datetime | date | Combinable, datetime | None]
+    is_active: bool | models.BooleanField[bool | Combinable, bool]
 
     def get_username(self) -> str: ...
     def natural_key(self) -> tuple[str]: ...
