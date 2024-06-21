@@ -12,6 +12,7 @@ from django.core.paginator import Paginator
 from django.db.models.expressions import ExpressionWrapper
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
 from django.db.models.lookups import Lookup
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
@@ -71,6 +72,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(Lookup),
     MPGeneric(BaseConnectionHandler),
     MPGeneric(ExpressionWrapper),
+    MPGeneric(ReverseManyToOneDescriptor),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
