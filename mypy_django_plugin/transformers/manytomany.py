@@ -4,7 +4,7 @@ from mypy.checker import TypeChecker
 from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, Node, RefExpr, StrExpr, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import Instance, ProperType, TypeVarType, UninhabitedType
+from mypy.types import Instance, ProperType, UninhabitedType
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -198,40 +198,5 @@ def refine_many_to_many_related_manager(ctx: MethodContext) -> MypyType:
         checker, to=related_model_instance.type, derived_from="_default_manager"
     )
     if related_manager_info is None:
-        default_manager_node = related_model_instance.type.names.get("_default_manager")
-        if default_manager_node is None or not isinstance(default_manager_node.type, Instance):
-            return ctx.default_return_type
-
-        # Create a reusable generic subclass that is generic over a 'through' model,
-        # explicitly declared it'd could have looked something like below
-        #
-        # class X(models.Model): ...
-        # _Through = TypeVar("_Through", bound=models.Model)
-        # class X_ManyRelatedManager(ManyRelatedManager[X, _Through], type(X._default_manager), Generic[_Through]): ...
-        _through_type_var = many_related_manager.type.defn.type_vars[1]
-        assert isinstance(_through_type_var, TypeVarType)
-        generic_to_many_related_manager = many_related_manager.copy_modified(
-            args=[
-                # Keep the same '_To' as the (parent) `ManyRelatedManager` instance
-                many_related_manager.args[0],
-                # But reset the '_Through' `TypeVar` declared for `ManyRelatedManager`
-                _through_type_var.copy_modified(),
-            ]
-        )
-        related_manager_info = helpers.add_new_class_for_module(
-            module=checker.modules[related_model_instance.type.module_name],
-            name=f"{related_model_instance.type.name}_ManyRelatedManager",
-            bases=[generic_to_many_related_manager, default_manager_node.type],
-        )
-        # Reuse the '_Through' `TypeVar` from `ManyRelatedManager` in our subclass
-        related_manager_info.defn.type_vars = [_through_type_var.copy_modified()]
-        related_manager_info.add_type_vars()
-        related_manager_info.metadata["django"] = {"related_manager_to_model": related_model_instance.type.fullname}
-        # Track the existence of our manager subclass, by tying it to model it operates on
-        helpers.set_many_to_many_manager_info(
-            to=related_model_instance.type,
-            derived_from="_default_manager",
-            manager_info=related_manager_info,
-        )
-
+        return ctx.default_return_type
     return Instance(related_manager_info, [through_model_instance])
