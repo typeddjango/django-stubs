@@ -1,7 +1,7 @@
 from typing import NamedTuple, Optional, Tuple, Union
 
 from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, RefExpr, StrExpr, TypeInfo
+from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, Node, RefExpr, StrExpr, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import Instance, ProperType, TypeVarType, UninhabitedType
@@ -12,12 +12,12 @@ from mypy_django_plugin.lib import fullnames, helpers
 
 
 class M2MThrough(NamedTuple):
-    arg: Optional[Expression]
+    arg: Optional[Node]
     model: ProperType
 
 
 class M2MTo(NamedTuple):
-    arg: Expression
+    arg: Node
     model: ProperType
     self: bool  # ManyToManyField('self', ...)
 

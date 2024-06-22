@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, Optional, Union, cast
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
@@ -114,12 +114,17 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     )
 
 
+class FieldDescriptorTypes(NamedTuple):
+    set: MypyType
+    get: MypyType
+
+
 def get_field_descriptor_types(
     field_info: TypeInfo, *, is_set_nullable: bool, is_get_nullable: bool
-) -> Tuple[MypyType, MypyType]:
+) -> FieldDescriptorTypes:
     set_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_set_type", is_nullable=is_set_nullable)
     get_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_get_nullable)
-    return set_type, get_type
+    return FieldDescriptorTypes(set=set_type, get=get_type)
 
 
 def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
