@@ -1035,6 +1035,36 @@
                 class Book(PrintedGood):
                     name = models.CharField()
 
+-   case: test_explicit_reverse_many_to_one_descriptor
+    main: |
+        from myapp.models import Other
+        reveal_type(Other.explicit_descriptor)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[myapp.models.MyModel]"
+        reveal_type(Other().explicit_descriptor)  # N: Revealed type is "myapp.models.MyModel_RelatedManager"
+        reveal_type(Other().explicit_descriptor.custom_method())  # N: Revealed type is "builtins.int"
+    installed_apps:
+        -   myapp
+    monkeypatch: true
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models/__init__.py
+            content: |
+                from typing import ClassVar
+                from django.db import models
+                from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
+
+                class Other(models.Model):
+                    explicit_descriptor: ClassVar[ReverseManyToOneDescriptor["MyModel"]]
+
+                class CustomManager(models.Manager["MyModel"]):
+                    def custom_method(self) -> int: ...
+
+                class MyModel(models.Model):
+                    rel = models.ForeignKey(
+                        Other, on_delete=models.CASCADE, related_name="explicit_descriptor"
+                    )
+
+                    objects = CustomManager()
+
 -   case: test_reverse_one_to_one_descriptor
     main: |
         from myapp.models import MyModel, Other
