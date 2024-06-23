@@ -27,7 +27,7 @@ from mypy.plugin import AnalyzeTypeContext, AttributeContext, CheckerPluginInter
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
-from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, get_proper_type
+from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -608,9 +608,15 @@ class AddExtraFieldMethods(ModelClassInitializer):
 
 class ProcessManyToManyFields(ModelClassInitializer):
     """
-    Processes 'ManyToManyField()' fields and generates any implicit through tables that
-    Django also generates. It won't do anything if the model is abstract or for fields
-    where an explicit 'through' argument has been passed.
+    Processes 'ManyToManyField()' fields and;
+
+    - Generates any implicit through tables that Django also generates. It won't do
+      anything if the model is abstract or for fields where an explicit 'through'
+      argument has been passed.
+    - Creates related managers for both ends of the many to many relationship
+
+    TODO: Move the 'related_name' contribution from 'AddReverseLookups' to here. As it
+          makes sense to add it when processing ManyToManyField
     """
 
     def statements(self) -> Iterable[Statement]:
@@ -675,6 +681,11 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     model_fullname=f"{self.model_classdef.info.module_name}.{through_model_name}",
                     m2m_args=args,
                 )
+                # Create a 'ManyRelatedManager' class for the processed model
+                self.create_many_related_manager(Instance(self.model_classdef.info, []))
+                if isinstance(args.to.model, Instance):
+                    # Create a 'ManyRelatedManager' class for the related model
+                    self.create_many_related_manager(args.to.model)
 
     @cached_property
     def default_pk_instance(self) -> Instance:
@@ -714,6 +725,10 @@ class ProcessManyToManyFields(ModelClassInitializer):
     @cached_property
     def fk_field_types(self) -> FieldDescriptorTypes:
         return get_field_descriptor_types(self.fk_field, is_set_nullable=False, is_get_nullable=False)
+
+    @cached_property
+    def many_related_manager(self) -> TypeInfo:
+        return self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MANY_RELATED_MANAGER)
 
     def get_pk_instance(self, model: TypeInfo, /) -> Instance:
         """
@@ -851,6 +866,47 @@ class ProcessManyToManyFields(ModelClassInitializer):
                 through = M2MThrough(arg=through_arg, model=through_model)
 
         return M2MArguments(to=to, through=through)
+
+    def create_many_related_manager(self, model: Instance) -> None:
+        """
+        Creates a generic manager that subclasses both 'ManyRelatedManager' and the
+        default manager of the given model. These are normally used on both models
+        involved in a ManyToManyField.
+
+        The manager classes are generic over a '_Through' model, meaning that they can
+        be reused for multiple many to many relations.
+        """
+        if helpers.get_many_to_many_manager_info(self.api, to=model.type, derived_from="_default_manager") is not None:
+            return
+
+        default_manager_node = model.type.names.get("_default_manager")
+        if default_manager_node is None:
+            raise helpers.IncompleteDefnException()
+        elif not isinstance(default_manager_node.type, Instance):
+            return
+
+        # Create a reusable generic subclass that is generic over a 'through' model,
+        # explicitly declared it'd could have looked something like below
+        #
+        # class X(models.Model): ...
+        # _Through = TypeVar("_Through", bound=models.Model)
+        # class X_ManyRelatedManager(ManyRelatedManager[X, _Through], type(X._default_manager), Generic[_Through]): ...
+        through_type_var = self.many_related_manager.defn.type_vars[1]
+        assert isinstance(through_type_var, TypeVarType)
+        generic_to_many_related_manager = Instance(self.many_related_manager, [model, through_type_var.copy_modified()])
+        related_manager_info = helpers.add_new_class_for_module(
+            module=self.api.modules[model.type.module_name],
+            name=f"{model.type.name}_ManyRelatedManager",
+            bases=[generic_to_many_related_manager, default_manager_node.type],
+        )
+        # Reuse the '_Through' `TypeVar` from `ManyRelatedManager` in our subclass
+        related_manager_info.defn.type_vars = [through_type_var.copy_modified()]
+        related_manager_info.add_type_vars()
+        # Track the existence of our manager subclass, by tying it to the model it
+        # operates on
+        helpers.set_many_to_many_manager_info(
+            to=model.type, derived_from="_default_manager", manager_info=related_manager_info
+        )
 
 
 class MetaclassAdjustments(ModelClassInitializer):

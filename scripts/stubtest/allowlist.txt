@@ -27,6 +27,13 @@ django.core.files.storage.default_storage
 django.contrib.admin.models.LogEntry_RelatedManager
 django.contrib.auth.models.Permission_RelatedManager
 
+# '<Model>_ManyRelatedManager' entries are plugin generated and these subclasses only exist
+# _locally/dynamically_ runtime -- Created via
+# 'django.db.models.fields.related_descriptors.create_forward_many_to_many_manager'
+django.contrib.auth.models.Group_ManyRelatedManager
+django.contrib.auth.models.Permission_ManyRelatedManager
+django.contrib.auth.models.User_ManyRelatedManager
+
 # BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
 django.utils.archive.BaseArchive.list
 django.utils.archive.BaseArchive.extract
