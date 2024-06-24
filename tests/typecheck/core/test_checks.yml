@@ -67,5 +67,5 @@
   out: |
     main:6: error: No overload variant matches argument type "Callable[[int], Sequence[CheckMessage]]"  [call-overload]
     main:6: note: Possible overload variants:
-    main:6: note:     def [_C <: _CheckCallable] register(self, _C, /, *tags: str, **kwargs: Any) -> _ProcessedCheckCallable[_C]
-    main:6: note:     def register(self, *tags: str, **kwargs: Any) -> Callable[[_C], _ProcessedCheckCallable[_C]]
+    main:6: note:     def [_C <: _CheckCallable] register(self, check: _C, *tags: str, **kwargs: Any) -> _ProcessedCheckCallable[_C]
+    main:6: note:     def register(self, check: Optional[str] = ..., *tags: str, **kwargs: Any) -> Callable[[_C], _ProcessedCheckCallable[_C]]
