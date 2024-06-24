@@ -27,3 +27,45 @@
 
     @register()  # E: Value of type variable "_C" of function cannot be "Callable[[int], Sequence[CheckMessage]]"  [type-var]
     def wrong_args(bla: int) -> Sequence[CheckMessage]: ...
+- case: test_checks_register_as_function
+  main: |
+    from typing import Any, Sequence, Optional, Union, List
+
+    from django.apps.config import AppConfig
+    from django.core.checks import register, Warning, CheckMessage
+
+    def foo(app_configs: Union[Sequence[AppConfig], None], databases: Optional[Sequence[str]], **kwargs: Any) -> List[Warning]:
+        if databases and 'databass' in databases:
+            return [Warning("Naughty list")]
+        return []
+
+    registered_foo = register(foo, "foo", deploy=True)
+
+    reveal_type(registered_foo)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (app_configs: Union[typing.Sequence[django.apps.config.AppConfig], None], databases: Union[typing.Sequence[builtins.str], None], **kwargs: Any) -> builtins.list[django.core.checks.messages.Warning]]"
+    reveal_type(registered_foo.tags)  # N: Revealed type is "typing.Sequence[builtins.str]"
+
+
+    def bar(*, app_configs: Union[Sequence[AppConfig], None], **kwargs: Any) -> Sequence[CheckMessage]: ...
+
+    registered_bar = register(bar)
+
+    reveal_type(registered_bar)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (*, app_configs: Union[typing.Sequence[django.apps.config.AppConfig], None], **kwargs: Any) -> typing.Sequence[django.core.checks.messages.CheckMessage]]"
+
+    def baz(**kwargs: Any) -> Sequence[CheckMessage]: ...
+
+    registered_baz = register(baz)
+
+    reveal_type(registered_baz)  # N: Revealed type is "django.core.checks.registry._ProcessedCheckCallable[def (**kwargs: Any) -> typing.Sequence[django.core.checks.messages.CheckMessage]]"
+- case: test_checks_register_as_function_wrong_function_args
+  main: |
+    from typing import Sequence
+
+    from django.core.checks import register, CheckMessage
+
+    def wrong_args2(bla: int) -> Sequence[CheckMessage]: ...
+    register(wrong_args2)
+  out: |
+    main:6: error: No overload variant matches argument type "Callable[[int], Sequence[CheckMessage]]"  [call-overload]
+    main:6: note: Possible overload variants:
+    main:6: note:     def [_C <: _CheckCallable] register(self, _C, /, *tags: str, **kwargs: Any) -> _ProcessedCheckCallable[_C]
+    main:6: note:     def register(self, *tags: str, **kwargs: Any) -> Callable[[_C], _ProcessedCheckCallable[_C]]
