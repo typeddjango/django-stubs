@@ -14,5 +14,5 @@ Django==5.0.6; python_version >= '3.10'
 -e .[redis,compatible-mypy,oracle]
 
 # Overrides:
-mypy==1.10.0
+mypy==1.10.1
 pyright==1.1.368
