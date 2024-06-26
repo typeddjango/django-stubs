@@ -22,7 +22,7 @@ class BaseDatabaseOperations:
     integer_field_ranges: dict[str, tuple[int, int]]
     set_operators: dict[str, str]
     cast_data_types: dict[Any, Any]
-    cast_char_field_without_max_length: Any
+    cast_char_field_without_max_length: str | None
     PRECEDING: str
     FOLLOWING: str
     UNBOUNDED_PRECEDING: str
