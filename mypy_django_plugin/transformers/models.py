@@ -463,34 +463,43 @@ class AddReverseLookups(ModelClassInitializer):
 
     def process_relation(self, relation: ForeignObjectRel) -> None:
         attname = relation.get_accessor_name()
-        if attname is None or attname in self.model_classdef.info.names:
-            # No reverse accessor or already declared. Note that this would also leave any
-            # explicitly declared(i.e. non-inferred) reverse accessors alone
+        if attname is None:
+            # No reverse accessor.
             return
 
         to_model_cls = self.django_context.get_field_related_model_cls(relation)
         to_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(to_model_cls)
 
+        reverse_lookup_declared = attname in self.model_classdef.info.names
         if isinstance(relation, OneToOneRel):
-            self.add_new_node_to_model_class(
-                attname,
-                Instance(
-                    self.reverse_one_to_one_descriptor,
-                    [Instance(self.model_classdef.info, []), Instance(to_model_info, [])],
-                ),
-            )
+            if not reverse_lookup_declared:
+                self.add_new_node_to_model_class(
+                    attname,
+                    Instance(
+                        self.reverse_one_to_one_descriptor,
+                        [Instance(self.model_classdef.info, []), Instance(to_model_info, [])],
+                    ),
+                )
             return
-
         elif isinstance(relation, ManyToManyRel):
-            # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime.
-            assert relation.through is not None
-            through_fullname = helpers.get_class_fullname(relation.through)
-            through_model_info = self.lookup_typeinfo_or_incomplete_defn_error(through_fullname)
-            self.add_new_node_to_model_class(
-                attname,
-                Instance(self.many_to_many_descriptor, [Instance(to_model_info, []), Instance(through_model_info, [])]),
-            )
+            if not reverse_lookup_declared:
+                # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime.
+                assert relation.through is not None
+                through_fullname = helpers.get_class_fullname(relation.through)
+                through_model_info = self.lookup_typeinfo_or_incomplete_defn_error(through_fullname)
+                self.add_new_node_to_model_class(
+                    attname,
+                    Instance(
+                        self.many_to_many_descriptor, [Instance(to_model_info, []), Instance(through_model_info, [])]
+                    ),
+                    is_classvar=True,
+                )
             return
+        elif not reverse_lookup_declared:
+            # ManyToOneRel
+            self.add_new_node_to_model_class(
+                attname, Instance(self.reverse_many_to_one_descriptor, [Instance(to_model_info, [])]), is_classvar=True
+            )
 
         related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
         # TODO: Support other reverse managers than `_default_manager`
@@ -525,10 +534,6 @@ class AddReverseLookups(ModelClassInitializer):
                     self.ctx.cls,
                     code=MANAGER_MISSING,
                 )
-
-            self.add_new_node_to_model_class(
-                attname, Instance(self.reverse_many_to_one_descriptor, [Instance(to_model_info, [])])
-            )
             return
 
         # Create a reverse manager subclassed from the default manager of the related
@@ -547,9 +552,6 @@ class AddReverseLookups(ModelClassInitializer):
             to_model_info,
             derived_from="_default_manager",
             fullname=new_related_manager_info.fullname,
-        )
-        self.add_new_node_to_model_class(
-            attname, Instance(self.reverse_many_to_one_descriptor, [Instance(to_model_info, [])])
         )
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
