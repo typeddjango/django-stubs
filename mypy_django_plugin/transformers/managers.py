@@ -454,6 +454,10 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
         for name, sym in class_mro_info.names.items():
             if not isinstance(sym.node, (FuncDef, OverloadedFuncDef, Decorator)):
                 continue
+            # private, magic methods are not copied
+            # https://github.com/django/django/blob/5.0.4/django/db/models/manager.py#L101
+            elif name.startswith("_"):
+                continue
             # Insert the queryset method name as a class member. Note that the type of
             # the method is set as Any. Figuring out the type is the job of the
             # 'resolve_manager_method' attribute hook, which comes later.
