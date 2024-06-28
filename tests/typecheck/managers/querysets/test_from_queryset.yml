@@ -43,6 +43,31 @@
                 class MyModelWithoutSelf(models.Model):
                     objects = ManagerWithoutSelf()
 
+-   case: from_queryset_model_inheritance
+    main: |
+        from myapp.models import Base, Sub
+        reveal_type(Base.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.Base]"
+        reveal_type(Sub.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.Sub]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import ClassVar
+                from typing_extensions import Self
+                from django.db.models import Model
+                from django.db.models.manager import BaseManager
+                from django.db.models.query import QuerySet
+
+                MyManager = BaseManager.from_queryset(QuerySet, "MyManager")
+
+                class Base(Model):
+                    objects: ClassVar[MyManager[Self]] = MyManager()
+
+                class Sub(Base):
+                    pass
+
 -   case: from_queryset_with_base_manager
     main: |
         from myapp.models import MyModel

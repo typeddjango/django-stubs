@@ -583,6 +583,7 @@
         -   path: myapp/models.py
             content: |
                 from typing import ClassVar, TypeVar
+                from typing_extensions import Self
                 from django.db import models
 
                 T = TypeVar("T", bound="MyModel")
@@ -597,7 +598,7 @@
                     pass
 
                 class MySubModel(MyModel):
-                    objects: ClassVar[MySubManager["MySubModel"]] = MySubManager()
+                    objects: ClassVar[MySubManager[Self]] = MySubManager()
 
 -   case: subclass_manager_without_type_parameters_disallow_any_generics
     main: |

@@ -33,10 +33,14 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if outer_model_info is None or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME):
+    if (
+        outer_model_info is None
+        or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)
+        or outer_model_info.self_type is None
+    ):
         return default_return_type
 
-    return helpers.reparametrize_instance(default_return_type, [Instance(outer_model_info, [])])
+    return helpers.reparametrize_instance(default_return_type, [outer_model_info.self_type])
 
 
 def get_field_type_from_lookup(
