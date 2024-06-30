@@ -12,6 +12,7 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
+from django.db.transaction import Atomic
 from django.utils.functional import cached_property
 from typing_extensions import Self, TypeAlias
 
@@ -62,6 +63,7 @@ class BaseDatabaseWrapper:
     ops: BaseDatabaseOperations
     validation: BaseDatabaseValidation
     operators: MutableMapping[str, str]
+    atomic_blocks: list[Atomic]
     def __init__(self, settings_dict: dict[str, Any], alias: str = ...) -> None: ...
     def ensure_timezone(self) -> bool: ...
     @cached_property
