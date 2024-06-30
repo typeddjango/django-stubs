@@ -4,7 +4,7 @@ from typing import Any, ClassVar
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import Combinable
+from django.db.models.expressions import Combinable, Expression
 from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
@@ -44,6 +44,7 @@ class TruncBase(TimezoneMixin, Transform):
         self, expression: Combinable | str, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
     ) -> None: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
+    def convert_value(self, value: Any, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...
 
 class Trunc(TruncBase):
     def __init__(
