@@ -60,6 +60,27 @@
                 class Child4(Child1):
                     value4 = models.IntegerField()
 
+-   case: mro_is_walked_for_field_annotations
+    main: |
+        from myapp.models import Child
+        Child.objects.create(dct={"hello": "world"})  # no errors
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from __future__ import annotations
+
+                from django.db import models
+
+                class JSONField(models.TextField): pass  # incomplete
+
+                class Base(models.Model):
+                    dct: models.Field[dict[str, str], dict[str, str]] = JSONField()
+
+                class Child(Base): pass
+
 -   case: optional_id_fields_for_create_is_error_if_not_autofield
     main: |
         from myapp.models import Publisher, Book
