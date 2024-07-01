@@ -28,12 +28,28 @@ def display(
     boolean: bool | None = ...,
     ordering: str | Combinable | BaseExpression | None = ...,
     description: _StrOrPromise | None = ...,
+    empty_value: None = ...,
+) -> _F: ...
+@overload
+def display(
+    function: _F,
+    boolean: None = ...,
+    ordering: str | Combinable | BaseExpression | None = ...,
+    description: _StrOrPromise | None = ...,
     empty_value: str | None = ...,
 ) -> _F: ...
 @overload
 def display(
     *,
     boolean: bool | None = ...,
+    ordering: str | Combinable | BaseExpression | None = ...,
+    description: _StrOrPromise | None = ...,
+    empty_value: None = ...,
+) -> Callable[[_F], _F]: ...
+@overload
+def display(
+    *,
+    boolean: None = ...,
     ordering: str | Combinable | BaseExpression | None = ...,
     description: _StrOrPromise | None = ...,
     empty_value: str | None = ...,
