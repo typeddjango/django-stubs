@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any
+from typing import Any, ClassVar
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
@@ -67,7 +67,7 @@ class GenericRel(ForeignObjectRel):
     ) -> None: ...
 
 class GenericRelation(ForeignObject):
-    rel_class: Any
+    rel_class: ClassVar[Any]
     mti_inherited: bool
     object_id_field_name: str
     content_type_field_name: str
