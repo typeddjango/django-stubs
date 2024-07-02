@@ -203,7 +203,7 @@ class DjangoContext:
         def get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
             if info is None:
                 return None
-            field_node = info.names.get(field_name)
+            field_node = info.get(field_name)
             if field_node is None or not isinstance(field_node.type, Instance):
                 return None
             elif not field_node.type.args:
