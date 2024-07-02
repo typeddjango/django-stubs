@@ -1,42 +1,90 @@
 from collections.abc import Callable, Collection, Iterable, Mapping, Sequence, Sized
-from typing import Any, TypeVar, overload
+from typing import Any, Literal, TypeVar, overload
 
 from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeString
+from typing_extensions import Concatenate
 
 from .base import Node, Template
 
 class InvalidTemplateLibrary(Exception): ...
 
 _C = TypeVar("_C", bound=Callable[..., Any])
+_CompileC = TypeVar("_CompileC", bound=Callable[[Parser, Token], Node])
+_FilterC = TypeVar("_FilterC", bound=Callable[[Any], Any] | Callable[[Any, Any], Any])
+_TakesContextC = TypeVar("_TakesContextC", bound=Callable[Concatenate[Context, ...], Any])
 
 class Library:
-    filters: dict[str, Callable]
-    tags: dict[str, Callable]
+    filters: dict[str, Callable[[Any], Any] | Callable[[Any, Any], Any]]
+    tags: dict[str, Callable[[Parser, Token], Node]]
     def __init__(self) -> None: ...
+    # @register.tag
     @overload
-    def tag(self, name: _C) -> _C: ...
+    def tag(self, name: _CompileC, /) -> _CompileC: ...
+    # register.tag("somename", somefunc)
     @overload
-    def tag(self, name: str, compile_function: _C) -> _C: ...
+    def tag(self, name: str, compile_function: _CompileC) -> _CompileC: ...
+    # @register.tag()
+    # @register.tag("somename") or @register.tag(name="somename")
     @overload
-    def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_C], _C]: ...
-    def tag_function(self, func: _C) -> _C: ...
+    def tag(self, name: str | None = ..., compile_function: None = ...) -> Callable[[_CompileC], _CompileC]: ...
+    def tag_function(self, func: _CompileC) -> _CompileC: ...
+    # @register.filter
     @overload
-    def filter(self, name: _C, filter_func: None = ..., **flags: Any) -> _C: ...
+    def filter(self, name: _FilterC, /) -> _FilterC: ...
+    # @register.filter()
+    # @register.filter("somename") or @register.filter(name='somename')
     @overload
-    def filter(self, name: str | None, filter_func: _C, **flags: Any) -> _C: ...
+    def filter(
+        self,
+        *,
+        name: str | None = ...,
+        filter_func: None = ...,
+        is_safe: bool = ...,
+        needs_autoescape: bool = ...,
+        expects_localtime: bool = ...,
+    ) -> Callable[[_FilterC], _FilterC]: ...
+    # register.filter("somename", somefunc)
     @overload
-    def filter(self, name: str | None = ..., filter_func: None = ..., **flags: Any) -> Callable[[_C], _C]: ...
+    def filter(
+        self,
+        name: str,
+        filter_func: _FilterC,
+        *,
+        is_safe: bool = ...,
+        needs_autoescape: bool = ...,
+        expects_localtime: bool = ...,
+    ) -> _FilterC: ...
+    # @register.simple_tag
     @overload
-    def simple_tag(self, func: _C) -> _C: ...
+    def simple_tag(self, func: _C, /) -> _C: ...
+    # @register.simple_tag(takes_context=True)
     @overload
-    def simple_tag(self, takes_context: bool | None = ..., name: str | None = ...) -> Callable[[_C], _C]: ...
+    def simple_tag(
+        self, *, takes_context: Literal[True], name: str | None = ...
+    ) -> Callable[[_TakesContextC], _TakesContextC]: ...
+    # @register.simple_tag(takes_context=False)
+    # @register.simple_tag(...)
+    @overload
+    def simple_tag(
+        self, *, takes_context: Literal[False] | None = ..., name: str | None = ...
+    ) -> Callable[[_C], _C]: ...
+    @overload
     def inclusion_tag(
         self,
         filename: Template | str,
-        func: Callable | None = ...,
-        takes_context: bool | None = ...,
+        func: Callable[..., Any] | None = ...,
+        *,
+        takes_context: Literal[True],
+        name: str | None = ...,
+    ) -> Callable[[_TakesContextC], _TakesContextC]: ...
+    @overload
+    def inclusion_tag(
+        self,
+        filename: Template | str,
+        func: Callable[..., Any] | None = ...,
+        takes_context: Literal[False] | None = ...,
         name: str | None = ...,
     ) -> Callable[[_C], _C]: ...
 
