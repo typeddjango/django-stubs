@@ -1407,7 +1407,6 @@ django.test.testcases.SerializeMixin.tearDownClass
 django.test.testcases.SimpleTestCase.assertTemplateNotUsed
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
-django.test.utils.setup_databases
 django.urls.ResolverMatch.__iter__
 django.urls.conf.path
 django.urls.conf.re_path

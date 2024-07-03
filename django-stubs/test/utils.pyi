@@ -164,6 +164,7 @@ def setup_databases(
     debug_sql: bool = ...,
     parallel: int = ...,
     aliases: Mapping[str, Any] | None = ...,
+    serialized_aliases: Iterable[str] | None = ...,
     **kwargs: Any,
 ) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
 def teardown_databases(
