@@ -101,7 +101,9 @@ def get_values_list_row_type(
         elif named:
             column_types: OrderedDict[str, MypyType] = OrderedDict()
             for field in django_context.get_model_fields(model_cls):
-                column_type = django_context.get_field_get_type(typechecker_api, model_info, field, method="values_list")
+                column_type = django_context.get_field_get_type(
+                    typechecker_api, model_info, field, method="values_list"
+                )
                 column_types[field.attname] = column_type
             if is_annotated:
                 # Return a NamedTuple with a fallback so that it's possible to access any field
