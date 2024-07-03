@@ -47,6 +47,26 @@
                     name = models.CharField(max_length=100)
                     age = models.IntegerField()
 
+-   case: values_list_types_are_field_types
+    main: |
+        from myapp.models import Concrete
+        ret = list(Concrete.objects.values_list('id', 'data'))
+        reveal_type(ret)  # N: Revealed type is "builtins.list[Tuple[builtins.int, builtins.dict[builtins.str, builtins.str]]]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from __future__ import annotations
+                from django.db import models
+
+                class JSONField(models.TextField): pass  # incomplete
+
+                class Concrete(models.Model):
+                    id = models.IntegerField()
+                    data: models.Field[dict[str, str], dict[str, str]] = JSONField()
+
 -   case: values_list_supports_queryset_methods
     main: |
         from myapp.models import MyUser

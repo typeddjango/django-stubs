@@ -91,6 +91,35 @@ class LookupsAreUnsupported(Exception):
     pass
 
 
+def _get_field_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[Instance]:
+    if info is None:
+        return None
+    field_node = info.get(field_name)
+    if field_node is None or not isinstance(field_node.type, Instance):
+        return None
+    # Field declares a set and a get type arg. Fallback to `None` when we can't find any args
+    elif len(field_node.type.args) != 2:
+        return None
+    else:
+        return field_node.type
+
+
+def _get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
+    field_type = _get_field_type_from_model_type_info(info, field_name)
+    if field_type is not None:
+        return field_type.args[0]
+    else:
+        return None
+
+
+def _get_field_get_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
+    field_type = _get_field_type_from_model_type_info(info, field_name)
+    if field_type is not None:
+        return field_type.args[1]
+    else:
+        return None
+
+
 class DjangoContext:
     def __init__(self, django_settings_module: str) -> None:
         self.django_settings_module = django_settings_module
@@ -152,12 +181,12 @@ class DjangoContext:
     ) -> MypyType:
         if isinstance(field, (RelatedField, ForeignObjectRel)):
             related_model_cls = self.get_field_related_model_cls(field)
-            primary_key_field = self.get_primary_key_field(related_model_cls)
-            primary_key_type = self.get_field_get_type(api, primary_key_field, method="init")
-
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
             if rel_model_info is None:
                 return AnyType(TypeOfAny.explicit)
+
+            primary_key_field = self.get_primary_key_field(related_model_cls)
+            primary_key_type = self.get_field_get_type(api, rel_model_info, primary_key_field, method="init")
 
             model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
             return helpers.make_optional(model_and_primary_key_type)
@@ -200,19 +229,6 @@ class DjangoContext:
             field_set_type = self.get_field_set_type(api, primary_key_field, method=method)
             expected_types["pk"] = field_set_type
 
-        def get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
-            if info is None:
-                return None
-            field_node = info.get(field_name)
-            if field_node is None or not isinstance(field_node.type, Instance):
-                return None
-            elif not field_node.type.args:
-                # Field declares a set and a get type arg. Fallback to `None` when we can't find any args
-                return None
-
-            set_type = field_node.type.args[0]
-            return set_type
-
         model_info = helpers.lookup_class_typeinfo(api, model_cls)
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
@@ -223,7 +239,7 @@ class DjangoContext:
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
                 # from django-stubs own declaration. This is to align with the setter types declared for
                 # assignment.
-                field_set_type = get_field_set_type_from_model_type_info(
+                field_set_type = _get_field_set_type_from_model_type_info(
                     model_info, field_name
                 ) or self.get_field_set_type(api, field, method=method)
                 expected_types[field_name] = field_set_type
@@ -340,9 +356,19 @@ class DjangoContext:
         return field_set_type
 
     def get_field_get_type(
-        self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel], *, method: str
+        self,
+        api: TypeChecker,
+        model_info: Optional[TypeInfo],
+        field: Union["Field[Any, Any]", ForeignObjectRel],
+        *,
+        method: str,
     ) -> MypyType:
         """Get a type of __get__ for this specific Django field."""
+        if isinstance(field, Field):
+            get_type = _get_field_get_type_from_model_type_info(model_info, field.attname)
+            if get_type is not None:
+                return get_type
+
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
             return AnyType(TypeOfAny.unannotated)
@@ -350,10 +376,11 @@ class DjangoContext:
         is_nullable = self.get_field_nullability(field, method)
         if isinstance(field, RelatedField):
             related_model_cls = self.get_field_related_model_cls(field)
+            rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
 
             if method in ("values", "values_list"):
                 primary_key_field = self.get_primary_key_field(related_model_cls)
-                return self.get_field_get_type(api, primary_key_field, method=method)
+                return self.get_field_get_type(api, rel_model_info, primary_key_field, method=method)
 
             model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
             if model_info is None:
