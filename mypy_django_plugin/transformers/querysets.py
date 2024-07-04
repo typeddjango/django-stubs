@@ -66,10 +66,12 @@ def get_field_type_from_lookup(
     elif (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
         lookup_field, ForeignObjectRel
     ):
-        related_model_cls = django_context.get_field_related_model_cls(lookup_field)
-        lookup_field = django_context.get_primary_key_field(related_model_cls)
+        model_cls = django_context.get_field_related_model_cls(lookup_field)
+        lookup_field = django_context.get_primary_key_field(model_cls)
 
-    field_get_type = django_context.get_field_get_type(helpers.get_typechecker_api(ctx), lookup_field, method=method)
+    api = helpers.get_typechecker_api(ctx)
+    model_info = helpers.lookup_class_typeinfo(api, model_cls)
+    field_get_type = django_context.get_field_get_type(api, model_info, lookup_field, method=method)
     return field_get_type
 
 
@@ -87,6 +89,7 @@ def get_values_list_row_type(
         return AnyType(TypeOfAny.from_error)
 
     typechecker_api = helpers.get_typechecker_api(ctx)
+    model_info = helpers.lookup_class_typeinfo(typechecker_api, model_cls)
     if len(field_lookups) == 0:
         if flat:
             primary_key_field = django_context.get_primary_key_field(model_cls)
@@ -98,7 +101,9 @@ def get_values_list_row_type(
         elif named:
             column_types: OrderedDict[str, MypyType] = OrderedDict()
             for field in django_context.get_model_fields(model_cls):
-                column_type = django_context.get_field_get_type(typechecker_api, field, method="values_list")
+                column_type = django_context.get_field_get_type(
+                    typechecker_api, model_info, field, method="values_list"
+                )
                 column_types[field.attname] = column_type
             if is_annotated:
                 # Return a NamedTuple with a fallback so that it's possible to access any field
