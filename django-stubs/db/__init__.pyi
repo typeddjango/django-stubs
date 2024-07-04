@@ -16,7 +16,7 @@ from .utils import ProgrammingError as ProgrammingError
 
 connections: ConnectionHandler
 router: ConnectionRouter
-# Actually DefaultConnectionProxy, but quacks exactly like BaseDatabaseWrapper, it's not worth distinguishing the two.
+# Actually ConnectionProxy, but quacks exactly like BaseDatabaseWrapper, it's not worth distinguishing the two.
 connection: BaseDatabaseWrapper
 
 def close_old_connections(**kwargs: Any) -> None: ...
