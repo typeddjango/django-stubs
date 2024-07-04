@@ -1340,7 +1340,6 @@ django.template.Library.filter_function
 django.template.Library.simple_tag
 django.template.Node.__iter__
 django.template.VariableDoesNotExist.__init__
-django.template.backends.django.get_template_tag_modules
 django.template.base.Context
 django.template.base.FilterExpression.is_var
 django.template.base.Node.__iter__
