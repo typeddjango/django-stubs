@@ -315,8 +315,9 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
         # This is just a deferral run where our work is already finished
         return
 
-    new_manager_info = create_manager_info_from_from_queryset_call(semanal_api, ctx.call, ctx.name)
-    if new_manager_info is None:
+    try:
+        new_manager_info = create_manager_info_from_from_queryset_call(semanal_api, ctx.call, ctx.name)
+    except helpers.IncompleteDefnException:
         if not ctx.api.final_iteration:
             # XXX: hack for python/mypy#17402
             ph = PlaceholderNode(ctx.api.qualified_name(ctx.name), ctx.call, ctx.call.line, becomes_typeinfo=True)
@@ -324,8 +325,10 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             ctx.api.defer()
         return
 
-    # So that the plugin will reparameterize the manager when it is constructed inside of a Model definition
-    helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
+    if new_manager_info is not None:
+        # So that the plugin will reparameterize the manager when it is constructed
+        # inside of a Model definition
+        helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
 
 
 def register_dynamically_created_manager(fullname: str, manager_name: str, manager_base: TypeInfo) -> None:
@@ -345,27 +348,35 @@ def create_manager_info_from_from_queryset_call(
     """
 
     if (
-        # Check that this is a from_queryset call on a manager subclass
+        # Check that this is a from_queryset call
         not isinstance(call_expr.callee, MemberExpr)
         or not isinstance(call_expr.callee.expr, RefExpr)
-        or not isinstance(call_expr.callee.expr.node, TypeInfo)
-        or not call_expr.callee.expr.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
         or not call_expr.callee.name == "from_queryset"
-        # Check that the call has one or two arguments and that the first is a
-        # QuerySet subclass
+        # Check that the call has one or two arguments
         or not 1 <= len(call_expr.args) <= 2
         or not isinstance(call_expr.args[0], RefExpr)
-        or not isinstance(call_expr.args[0].node, TypeInfo)
-        or not call_expr.args[0].node.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
     ):
         return None
 
     base_manager_info, queryset_info = call_expr.callee.expr.node, call_expr.args[0].node
-    if queryset_info.fullname is None:
+    if (
+        # Handle potentially forwarded types
+        not isinstance(base_manager_info, TypeInfo)
+        or not isinstance(queryset_info, TypeInfo)
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
         # so this isn't a problem.
-        return None  # type: ignore[unreachable]
+        or queryset_info.fullname is None
+    ):
+        raise helpers.IncompleteDefnException
+    elif (
+        # Check that the from_queryset call is on a manager subclass and that a first
+        # argument is a QuerySet subclass. Otherwise we've encountered a function call
+        # that is not relevant for us
+        not base_manager_info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        or not queryset_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
+    ):
+        return None
 
     if len(call_expr.args) == 2 and isinstance(call_expr.args[1], StrExpr):
         manager_name = call_expr.args[1].value
@@ -384,17 +395,13 @@ def create_manager_info_from_from_queryset_call(
         new_manager_info = manager_sym.node
     else:
         # Create a new `TypeInfo` instance for the manager type
-        try:
-            new_manager_info = create_manager_class(
-                api=api,
-                base_manager_info=base_manager_info,
-                name=manager_name,
-                line=call_expr.line,
-                with_unique_name=name is not None and name != manager_name,
-            )
-        except helpers.IncompleteDefnException:
-            return None
-
+        new_manager_info = create_manager_class(
+            api=api,
+            base_manager_info=base_manager_info,
+            name=manager_name,
+            line=call_expr.line,
+            with_unique_name=name is not None and name != manager_name,
+        )
         populate_manager_from_queryset(new_manager_info, queryset_info)
         register_dynamically_created_manager(
             fullname=new_manager_info.fullname,

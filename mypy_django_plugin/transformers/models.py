@@ -338,14 +338,15 @@ class AddManagers(ModelClassInitializer):
 
             if manager_info is None:
                 # We couldn't find a manager type, see if we should create one
-                manager_info = self.create_manager_from_from_queryset(manager_name)
+                try:
+                    manager_info = self.create_manager_from_from_queryset(manager_name)
+                except helpers.IncompleteDefnException:
+                    incomplete_manager_defs.add(manager_name)
+                    continue
 
-            if manager_info is None:
-                incomplete_manager_defs.add(manager_name)
-                continue
-
-            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
-            self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
+            if manager_info is not None:
+                manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+                self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
             if not self.api.final_iteration:
