@@ -847,6 +847,41 @@
                     self.ttl = ttl
                     super().__init__(*a, **k)
 
+-   case: test_from_queryset_with_deferral
+    main: |
+        from myapp.models import Concrete
+        reveal_type(Concrete.objects.qs_meth())  # N: Revealed type is "builtins.int"
+        reveal_type(Concrete.objects.manager_meth())  # N: Revealed type is "builtins.str"
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar, ClassVar
+                from typing_extensions import Self
+                from django.db import models
+                from django.db.models.manager import Manager
+
+                M = TypeVar("M", bound=models.Model, covariant=True)
+
+                # bogus forward-`metaclass=` to trigger second semanal pass similar to #2224
+                class CustomQuerySet(models.QuerySet[M], metaclass=MCS):
+                    def qs_meth(self) -> int:
+                        return 1
+
+                _base = Manager.from_queryset(CustomQuerySet)
+
+                class CustomBase(_base[M]):
+                    def manager_meth(self) -> str:
+                        return 'hi'
+
+                class Concrete(models.Model):
+                    objects: ClassVar[CustomBase[Self]] = CustomBase()
+
+                class MCS(type): pass
+
 -   case: test_queryset_arg_as_unsupported_expressions
     main: |
         from typing import Union, Generic, TypeVar
