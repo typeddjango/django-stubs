@@ -122,6 +122,14 @@ class Options(Generic[_M]):
     def get_fields(
         self, include_parents: bool = ..., include_hidden: bool = ...
     ) -> list[Field[Any, Any] | ForeignObjectRel | GenericForeignKey]: ...
+    def _get_fields(
+        self,
+        forward: bool = ...,
+        reverse: bool = ...,
+        include_parents: bool | object = ...,
+        include_hidden: bool = ...,
+        topmost_call: bool = ...,
+    ) -> list[Field[Any, Any] | ForeignObjectRel | GenericForeignKey]: ...
     @cached_property
     def total_unique_constraints(self) -> list[UniqueConstraint]: ...
     @cached_property
