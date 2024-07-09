@@ -10,7 +10,7 @@ from django.core.checks import CheckMessage
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseBase
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject, _StrOrPromise
@@ -25,7 +25,7 @@ else:
 
     all_sites: MutableSet[AdminSite]
 
-_ViewType = TypeVar("_ViewType", bound=Callable[..., HttpResponse])
+_ViewType = TypeVar("_ViewType", bound=Callable[..., HttpResponseBase])
 _ModelT = TypeVar("_ModelT", bound=Model)
 _ActionCallback: TypeAlias = Callable[[ModelAdmin, HttpRequest, QuerySet], TemplateResponse | None]
 
