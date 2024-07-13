@@ -361,8 +361,8 @@ def create_manager_info_from_from_queryset_call(
     base_manager_info, queryset_info = call_expr.callee.expr.node, call_expr.args[0].node
     if (
         # Handle potentially forwarded types
-        not isinstance(base_manager_info, TypeInfo)
-        or not isinstance(queryset_info, TypeInfo)
+        base_manager_info is None
+        or queryset_info is None
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
         # so this isn't a problem.
@@ -370,10 +370,12 @@ def create_manager_info_from_from_queryset_call(
     ):
         raise helpers.IncompleteDefnException
     elif (
+        not isinstance(base_manager_info, TypeInfo)
+        or not isinstance(queryset_info, TypeInfo)
         # Check that the from_queryset call is on a manager subclass and that a first
         # argument is a QuerySet subclass. Otherwise we've encountered a function call
         # that is not relevant for us
-        not base_manager_info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        or not base_manager_info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
         or not queryset_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME)
     ):
         return None
