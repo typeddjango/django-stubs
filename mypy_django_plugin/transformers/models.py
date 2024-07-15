@@ -767,7 +767,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
     def create_through_table_class(
         self, field_name: str, model_name: str, model_fullname: str, m2m_args: M2MArguments
-    ) -> TypeInfo | None:
+    ) -> Optional[TypeInfo]:
         if not isinstance(m2m_args.to.model, Instance):
             return None
         elif m2m_args.through is not None:
