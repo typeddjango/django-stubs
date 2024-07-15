@@ -1403,3 +1403,72 @@
                 class MyModel(models.Model):
                     m2m_1 = models.ManyToManyField(other_models.Other, related_name="auto_through")
                     m2m_2 = models.ManyToManyField(other_models.Other, related_name="custom_through", through=Through)
+
+-   case: test_m2m_from_abstract_model
+    main: |
+        from myapp.models import First, Second
+        reveal_type(First().others)  # N: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.First_others]"
+        reveal_type(First().others.get())  # N: Revealed type is "myapp.models.Other"
+        reveal_type(First.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Other, myapp.models.First_others]"
+        reveal_type(First.others.through)  # N: Revealed type is "Type[myapp.models.First_others]"
+        reveal_type(First.others.through.objects.get())  # N: Revealed type is "myapp.models.First_others"
+
+        reveal_type(Second().others)  # N: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.Second_others]"
+        reveal_type(Second().others.get())  # N: Revealed type is "myapp.models.Other"
+        reveal_type(Second.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Other, myapp.models.Second_others]"
+        reveal_type(Second.others.through)  # N: Revealed type is "Type[myapp.models.Second_others]"
+        reveal_type(Second.others.through.objects.get())  # N: Revealed type is "myapp.models.Second_others"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Other(models.Model):
+                    ...
+
+                class Parent(models.Model):
+                    others = models.ManyToManyField(Other)
+
+                    class Meta:
+                        abstract = True
+
+                class First(Parent):
+                    ...
+
+                class Second(Parent):
+                    ...
+
+-   case: test_m2m_self_on_abstract_model
+    main: |
+        from myapp.models import First, Second
+        reveal_type(First().others)  # N: Revealed type is "myapp.models.First_ManyRelatedManager[myapp.models.First_others]"
+        reveal_type(First().others.get())  # N: Revealed type is "myapp.models.First"
+        reveal_type(First.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.First, myapp.models.First_others]"
+        reveal_type(First.others.through)  # N: Revealed type is "Type[myapp.models.First_others]"
+        reveal_type(First.others.through.objects.get())  # N: Revealed type is "myapp.models.First_others"
+
+        reveal_type(Second().others)  # N: Revealed type is "myapp.models.Second_ManyRelatedManager[myapp.models.Second_others]"
+        reveal_type(Second().others.get())  # N: Revealed type is "myapp.models.Second"
+        reveal_type(Second.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Second, myapp.models.Second_others]"
+        reveal_type(Second.others.through)  # N: Revealed type is "Type[myapp.models.Second_others]"
+        reveal_type(Second.others.through.objects.get())  # N: Revealed type is "myapp.models.Second_others"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Parent(models.Model):
+                    others = models.ManyToManyField("self")
+
+                    class Meta:
+                        abstract = True
+
+                class First(Parent):
+                    ...
+
+                class Second(Parent):
+                    ...

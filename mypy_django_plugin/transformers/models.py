@@ -18,7 +18,6 @@ from mypy.nodes import (
     NameExpr,
     RefExpr,
     Statement,
-    StrExpr,
     SymbolTableNode,
     TypeInfo,
     Var,
@@ -41,7 +40,7 @@ from mypy_django_plugin.transformers.managers import (
     MANAGER_METHODS_RETURNING_QUERYSET,
     create_manager_info_from_from_queryset_call,
 )
-from mypy_django_plugin.transformers.manytomany import M2MArguments, M2MThrough, M2MTo, get_model_from_expression
+from mypy_django_plugin.transformers.manytomany import M2MArguments, M2MThrough, M2MTo
 
 
 class ModelClassInitializer:
@@ -677,12 +676,27 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     continue
                 # Get the names of the implicit through model that will be generated
                 through_model_name = f"{self.model_classdef.name}_{m2m_field_name}"
-                self.create_through_table_class(
+                through_model = self.create_through_table_class(
                     field_name=m2m_field_name,
                     model_name=through_model_name,
                     model_fullname=f"{self.model_classdef.info.module_name}.{through_model_name}",
                     m2m_args=args,
                 )
+                container = self.model_classdef.info.get_containing_type_info(m2m_field_name)
+                if (
+                    through_model is not None
+                    and container is not None
+                    and container.fullname != self.model_classdef.info.fullname
+                    and helpers.is_abstract_model(container)
+                ):
+                    # ManyToManyField is inherited from an abstract parent class, so in
+                    # order to get the to and the through model argument right we
+                    # override the ManyToManyField attribute on the current class
+                    helpers.add_new_sym_for_info(
+                        self.model_classdef.info,
+                        name=m2m_field_name,
+                        sym_type=Instance(self.m2m_field, [args.to.model, Instance(through_model, [])]),
+                    )
                 # Create a 'ManyRelatedManager' class for the processed model
                 self.create_many_related_manager(Instance(self.model_classdef.info, []))
                 if isinstance(args.to.model, Instance):
@@ -718,6 +732,13 @@ class ProcessManyToManyFields(ModelClassInitializer):
         return info
 
     @cached_property
+    def m2m_field(self) -> TypeInfo:
+        info = self.lookup_typeinfo(fullnames.MANYTOMANY_FIELD_FULLNAME)
+        if info is None:
+            raise helpers.IncompleteDefnException()
+        return info
+
+    @cached_property
     def manager_info(self) -> TypeInfo:
         info = self.lookup_typeinfo(fullnames.MANAGER_CLASS_FULLNAME)
         if info is None:
@@ -746,18 +767,17 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
     def create_through_table_class(
         self, field_name: str, model_name: str, model_fullname: str, m2m_args: M2MArguments
-    ) -> None:
-        if (
-            not isinstance(m2m_args.to.model, Instance)
+    ) -> TypeInfo | None:
+        if not isinstance(m2m_args.to.model, Instance):
+            return None
+        elif m2m_args.through is not None:
             # Call has explicit 'through=', no need to create any implicit through table
-            or m2m_args.through is not None
-        ):
-            return
+            return m2m_args.through.model.type if isinstance(m2m_args.through.model, Instance) else None
 
         # If through model is already declared there's nothing more we should do
         through_model = self.lookup_typeinfo(model_fullname)
         if through_model is not None:
-            return
+            return through_model
         # Declare a new, empty, implicitly generated through model class named: '<Model>_<field_name>'
         through_model = self.add_new_class_for_current_module(model_name, bases=[Instance(self.model_base, [])])
         # We attempt to be a bit clever here and store the generated through model's fullname in
@@ -823,6 +843,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
             sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
             is_classvar=True,
         )
+        return through_model
 
     def resolve_many_to_many_arguments(self, call: CallExpr, /, context: Context) -> Optional[M2MArguments]:
         """
@@ -848,22 +869,24 @@ class ProcessManyToManyFields(ModelClassInitializer):
             return None
 
         # Resolve the type of the 'to' argument expression
-        to_model: Optional[ProperType]
-        if isinstance(to_arg, StrExpr) and to_arg.value == "self":
-            to_model = Instance(self.model_classdef.info, [])
-            to_self = True
-        else:
-            to_model = get_model_from_expression(to_arg, api=self.api, django_context=self.django_context)
-            to_self = False
+        to_model = helpers.get_model_from_expression(
+            to_arg, self_model=self.model_classdef.info, api=self.api, django_context=self.django_context
+        )
         if to_model is None:
             return None
-        to = M2MTo(arg=to_arg, model=to_model, self=to_self)
+        to = M2MTo(
+            arg=to_arg,
+            model=to_model,
+            self=to_model.type == self.model_classdef.info,
+        )
 
         # Resolve the type of the 'through' argument expression
         through_arg = look_for["through"]
         through = None
         if through_arg is not None:
-            through_model = get_model_from_expression(through_arg, api=self.api, django_context=self.django_context)
+            through_model = helpers.get_model_from_expression(
+                through_arg, self_model=self.model_classdef.info, api=self.api, django_context=self.django_context
+            )
             if through_model is not None:
                 through = M2MThrough(arg=through_arg, model=through_model)
 

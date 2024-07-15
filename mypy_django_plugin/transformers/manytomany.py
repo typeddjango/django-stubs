@@ -1,9 +1,7 @@
-from typing import NamedTuple, Optional, Tuple, Union
+from typing import NamedTuple, Optional, Tuple
 
-from mypy.checker import TypeChecker
-from mypy.nodes import AssignmentStmt, Expression, MemberExpr, NameExpr, Node, RefExpr, StrExpr, TypeInfo
+from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.semanal import SemanticAnalyzer
 from mypy.types import Instance, ProperType, UninhabitedType
 from mypy.types import Type as MypyType
 
@@ -72,24 +70,21 @@ def get_m2m_arguments(
 ) -> Optional[M2MArguments]:
     checker = helpers.get_typechecker_api(ctx)
     to_arg = ctx.args[0][0]
-    to_model: Optional[ProperType]
-    if isinstance(to_arg, StrExpr) and to_arg.value == "self":
-        to_model = Instance(model_info, [])
-        to_self = True
-    else:
-        to_model = get_model_from_expression(to_arg, api=checker, django_context=django_context)
-        to_self = False
-
+    to_model = helpers.get_model_from_expression(
+        to_arg, self_model=model_info, api=checker, django_context=django_context
+    )
     if to_model is None:
         # 'ManyToManyField()' requires the 'to' argument
         return None
-    to = M2MTo(arg=to_arg, model=to_model, self=to_self)
+    to = M2MTo(arg=to_arg, model=to_model, self=to_model.type == model_info)
 
     through = None
     if len(ctx.args) > 5 and ctx.args[5]:
         # 'ManyToManyField(..., through=)' was called
         through_arg = ctx.args[5][0]
-        through_model = get_model_from_expression(through_arg, api=checker, django_context=django_context)
+        through_model = helpers.get_model_from_expression(
+            through_arg, self_model=model_info, api=checker, django_context=django_context
+        )
         if through_model is not None:
             through = M2MThrough(arg=through_arg, model=through_model)
     elif not helpers.is_abstract_model(model_info):
@@ -117,37 +112,6 @@ def get_m2m_arguments(
                         through = M2MThrough(arg=through_arg, model=Instance(through_model_info, []))
 
     return M2MArguments(to=to, through=through)
-
-
-def get_model_from_expression(
-    expr: Expression,
-    *,
-    api: Union[TypeChecker, SemanticAnalyzer],
-    django_context: DjangoContext,
-) -> Optional[ProperType]:
-    """
-    Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
-    argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
-    """
-    if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo):
-        if helpers.is_model_type(expr.node):
-            return Instance(expr.node, [])
-
-    lazy_reference = None
-    if isinstance(expr, StrExpr):
-        lazy_reference = expr.value
-    elif (
-        isinstance(expr, MemberExpr)
-        and isinstance(expr.expr, NameExpr)
-        and f"{expr.expr.fullname}.{expr.name}" == fullnames.AUTH_USER_MODEL_FULLNAME
-    ):
-        lazy_reference = django_context.settings.AUTH_USER_MODEL
-
-    if lazy_reference is not None:
-        model_info = helpers.resolve_lazy_reference(lazy_reference, api=api, django_context=django_context, ctx=expr)
-        if model_info is not None:
-            return Instance(model_info, [])
-    return None
 
 
 def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance, Instance, Instance]]:
