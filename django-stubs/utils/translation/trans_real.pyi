@@ -10,7 +10,7 @@ from django.http.request import HttpRequest
 from typing_extensions import TypeAlias
 
 CONTEXT_SEPARATOR: Literal["\x04"]
-ACCEPT_LANGUAGE_HEADER_MAX_LENGTH: int
+LANGUAGE_CODE_MAX_LENGTH: int
 
 accept_language_re: Pattern[str]
 language_code_re: Pattern[str]

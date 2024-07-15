@@ -401,6 +401,9 @@ django.urls.resolvers.URLPattern.lookup_str
 django.urls.resolvers.URLResolver.url_patterns
 django.urls.resolvers.URLResolver.urlconf_module
 django.utils.connection.BaseConnectionHandler.settings
+django.utils.html.Urlizer.trailing_punctuation_chars_has_semicolon
+django.utils.html.Urlizer.trailing_punctuation_chars_no_semicolon
+django.utils.html.Urlizer.wrapping_punctuation_openings
 django.db.models.Q.referenced_base_fields
 django.db.models.query_utils.Q.referenced_base_fields
 django.contrib.gis.db.models.Q.referenced_base_fields
