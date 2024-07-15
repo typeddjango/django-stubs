@@ -15,7 +15,7 @@
         reveal_type(User().is_anonymous)  # N: Revealed type is "Literal[False]"
         reveal_type(User().groups.get())  # N: Revealed type is "django.contrib.auth.models.Group"
         reveal_type(User().user_permissions.get())  # N: Revealed type is "django.contrib.auth.models.Permission"
-        reveal_type(User.groups)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Group, django.db.models.base.Model]"
+        reveal_type(User.groups)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Group, django.contrib.auth.models.User_groups]"
         reveal_type(User.user_permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.db.models.base.Model]"
 
         from django.contrib.auth.models import AnonymousUser
