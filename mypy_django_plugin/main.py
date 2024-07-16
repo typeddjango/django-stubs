@@ -174,7 +174,7 @@ class NewSemanalDjangoPlugin(Plugin):
             if info.has_base(fullnames.FIELD_FULLNAME):
                 return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
-            if helpers.is_model_subclass_info(info, self.django_context):
+            if helpers.is_model_type(info):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
 
         return None

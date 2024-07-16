@@ -302,10 +302,6 @@ class DjangoContext:
         return all_model_bases
 
     @cached_property
-    def all_registered_model_class_fullnames(self) -> Set[str]:
-        return {helpers.get_class_fullname(cls) for cls in self.all_registered_model_classes}
-
-    @cached_property
     def model_class_fullnames_by_label(self) -> Mapping[str, str]:
         return {
             klass._meta.label: helpers.get_class_fullname(klass)
