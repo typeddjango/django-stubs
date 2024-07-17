@@ -24,7 +24,7 @@ def _get_current_field_from_assignment(
     ctx: FunctionContext, django_context: DjangoContext
 ) -> Optional[Union["Field[Any, Any]", ForeignObjectRel, "GenericForeignKey"]]:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
+    if outer_model_info is None or not helpers.is_model_type(outer_model_info):
         return None
 
     field_name = None
@@ -234,7 +234,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if outer_model_info is None or not helpers.is_model_subclass_info(outer_model_info, django_context):
+    if outer_model_info is None or not helpers.is_model_type(outer_model_info):
         return ctx.default_return_type
 
     assert isinstance(outer_model_info, TypeInfo)
