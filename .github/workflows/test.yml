@@ -69,9 +69,9 @@ jobs:
       # Must match `shard` definition in the test matrix:
       - name: Run pytest tests
         run: |
-          PYTHONPATH='.' pytest
-            --num-shards=4 --shard-id=${{ matrix.shard }}
-            --mypy-only-local-stub
+          PYTHONPATH='.' pytest \
+            --num-shards=4 --shard-id=${{ matrix.shard }} \
+            --mypy-only-local-stub \
             tests
       - name: Run mypy on the test cases
         run: mypy tests/assert_type
