@@ -75,7 +75,7 @@ def lookup_field(
     name: Callable | str, obj: Model, model_admin: BaseModelAdmin | None = ...
 ) -> tuple[Field | None, str | None, Any]: ...
 @overload
-def label_for_field(  # type: ignore[overload-overlap]
+def label_for_field(
     name: Callable | str,
     model: type[Model],
     model_admin: BaseModelAdmin | None = ...,
