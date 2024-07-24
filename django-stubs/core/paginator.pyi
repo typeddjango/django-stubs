@@ -51,12 +51,12 @@ class Paginator(Generic[_T]):
 class Page(Sequence[_T]):
     object_list: _SupportsPagination[_T]
     number: int
-    paginator: Paginator
+    paginator: Paginator[_T]
     def __init__(
         self,
         object_list: _SupportsPagination[_T],
         number: int,
-        paginator: Paginator,
+        paginator: Paginator[_T],
     ) -> None: ...
     @overload
     def __getitem__(self, index: int) -> _T: ...
