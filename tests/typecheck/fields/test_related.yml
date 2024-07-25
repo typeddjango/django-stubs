@@ -1472,3 +1472,29 @@
 
                 class Second(Parent):
                     ...
+
+-   case: test_m2m_models_manager_filter_kwargs_checked
+    main: |
+        from myapp.models import MyModel, Other
+        MyModel.objects.filter(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
+        MyModel.objects.get(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
+        MyModel.objects.exclude(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
+        other = Other()
+        other.mymodel_set.filter(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+        other.mymodel_set.get(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+        other.mymodel_set.exclude(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+        MyModel.others.through.objects.filter(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+        MyModel.others.through.objects.get(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+        MyModel.others.through.objects.exclude(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Other(models.Model):
+                    ...
+
+                class MyModel(models.Model):
+                    others = models.ManyToManyField(Other)
