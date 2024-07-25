@@ -343,7 +343,8 @@ class AddManagers(ModelClassInitializer):
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            assert self.model_classdef.info.self_type is not None
+            manager_type = Instance(manager_info, [self.model_classdef.info.self_type])
             self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
