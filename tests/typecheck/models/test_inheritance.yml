@@ -109,3 +109,44 @@
                         abstract = True
                 class User(Mixin1, Mixin2):
                     name = models.TextField()
+
+-   case: test_manager_typevar_through_bounds
+    main: |
+        from myapp.models import ResultProcessorConcrete
+        reveal_type(ResultProcessorConcrete().f())  # N: Revealed type is "myapp.models.Concrete"
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from __future__ import annotations
+
+                from django.db.models import Model
+                from django.db.models.manager import Manager
+                from typing import TypeVar, Generic, ClassVar
+                from typing_extensions import Self
+
+                M = TypeVar("M", bound=Model, covariant=True)
+
+                class BaseManager(Manager[M]): ...
+
+                class Base(Model):
+                    custom_objects: ClassVar[BaseManager[Self]] = BaseManager()
+
+                class Bound(Base): pass
+
+                T = TypeVar("T", bound=Bound)
+
+                class ResultProcessorBase(Generic[T]):
+                    @property
+                    def model_cls(self) -> type[T]:
+                        raise NotImplementedError
+
+                    def f(self) -> T:
+                        return self.model_cls.custom_objects.get()
+
+                class Concrete(Bound): pass
+
+                class ResultProcessorConcrete(ResultProcessorBase[Concrete]):
+                    pass

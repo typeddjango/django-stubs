@@ -326,7 +326,7 @@ class AddManagers(ModelClassInitializer):
 
         incomplete_manager_defs = set()
         for manager_name, manager in model_cls._meta.managers_map.items():
-            manager_node = self.model_classdef.info.names.get(manager_name, None)
+            manager_node = self.model_classdef.info.get(manager_name)
             manager_fullname = helpers.get_class_fullname(manager.__class__)
             manager_info = self.lookup_manager(manager_fullname, manager)
 
@@ -343,7 +343,8 @@ class AddManagers(ModelClassInitializer):
                 incomplete_manager_defs.add(manager_name)
                 continue
 
-            manager_type = Instance(manager_info, [Instance(self.model_classdef.info, [])])
+            assert self.model_classdef.info.self_type is not None
+            manager_type = Instance(manager_info, [self.model_classdef.info.self_type])
             self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
@@ -359,9 +360,10 @@ class AddManagers(ModelClassInitializer):
                 # setting _some_ type
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 if fallback_manager_info is not None:
+                    assert self.model_classdef.info.self_type is not None
                     self.add_new_node_to_model_class(
                         manager_name,
-                        Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])]),
+                        Instance(fallback_manager_info, [self.model_classdef.info.self_type]),
                         is_classvar=True,
                     )
 
