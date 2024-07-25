@@ -132,7 +132,7 @@ class DjangoContext:
     def model_modules(self) -> Dict[str, Dict[str, Type[Model]]]:
         """All modules that contain Django models."""
         modules: Dict[str, Dict[str, Type[Model]]] = defaultdict(dict)
-        for concrete_model_cls in self.apps_registry.get_models():
+        for concrete_model_cls in self.apps_registry.get_models(include_auto_created=True, include_swapped=True):
             modules[concrete_model_cls.__module__][concrete_model_cls.__name__] = concrete_model_cls
             # collect abstract=True models
             for model_cls in concrete_model_cls.mro()[1:]:
