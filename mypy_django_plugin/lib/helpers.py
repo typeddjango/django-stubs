@@ -33,7 +33,6 @@ from mypy.plugin import (
     DynamicClassDefContext,
     FunctionContext,
     MethodContext,
-    SemanticAnalyzerPluginInterface,
 )
 from mypy.semanal import SemanticAnalyzer
 from mypy.types import AnyType, Instance, LiteralType, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
@@ -63,9 +62,7 @@ def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
     return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
 
 
-def get_django_metadata_bases(
-    model_info: TypeInfo, key: Literal["baseform_bases", "manager_bases", "queryset_bases"]
-) -> Dict[str, int]:
+def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases", "queryset_bases"]) -> Dict[str, int]:
     return get_django_metadata(model_info).setdefault(key, cast(Dict[str, int], {}))
 
 
@@ -420,13 +417,6 @@ def add_new_sym_for_info(
     var.is_inferred = True
     var.is_classvar = is_classvar
     info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
-
-
-def add_new_manager_base(api: SemanticAnalyzerPluginInterface, fullname: str) -> None:
-    sym = api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = get_django_metadata_bases(sym.node, "manager_bases")
-        bases[fullname] = 1
 
 
 def is_abstract_model(model: TypeInfo) -> bool:
