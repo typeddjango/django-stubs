@@ -906,3 +906,10 @@
         main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
         main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
         main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
+
+-   case: test_from_queryset_handles_passed_a_non_queryset
+    main: |
+        from typing import Any
+        from django.db import models
+        class Invalid: ...
+        manager = models.Manager[Any].from_queryset(Invalid)  # E: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[Invalid]"; expected "Type[QuerySet[Any, Any]]"  [arg-type]
