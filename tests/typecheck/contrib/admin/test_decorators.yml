@@ -17,7 +17,7 @@
         @admin.display
         def display_property(self) -> str: ...
 
-        @admin.display  # E: Decorators on top of @property are not supported  [misc]
+        @admin.display  # E: Decorators on top of @property are not supported  [prop-decorator]
         @property
         def incorrect_property(self) -> str: ...
 
