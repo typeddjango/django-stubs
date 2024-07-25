@@ -360,9 +360,10 @@ class AddManagers(ModelClassInitializer):
                 # setting _some_ type
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 if fallback_manager_info is not None:
+                    assert self.model_classdef.info.self_type is not None
                     self.add_new_node_to_model_class(
                         manager_name,
-                        Instance(fallback_manager_info, [Instance(self.model_classdef.info, [])]),
+                        Instance(fallback_manager_info, [self.model_classdef.info.self_type]),
                         is_classvar=True,
                     )
 
