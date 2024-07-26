@@ -20,6 +20,7 @@ from mypy.nodes import (
 from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
+from mypy.subtypes import find_member
 from mypy.types import (
     AnyType,
     CallableType,
@@ -28,6 +29,7 @@ from mypy.types import (
     Overloaded,
     ProperType,
     TypeOfAny,
+    TypeType,
     TypeVarType,
     UnionType,
     get_proper_type,
@@ -121,15 +123,11 @@ def _process_dynamic_method(
     variables = method_type.variables
     ret_type = method_type.ret_type
 
-    if not is_fallback_queryset:
-        queryset_instance = Instance(queryset_info, manager_instance.args)
-    else:
-        # The fallback queryset inherits _QuerySet, which has two generics
-        # instead of the one exposed on QuerySet. That means that we need
-        # to add the model twice. In real code it's not possible to inherit
-        # from _QuerySet, as it doesn't exist at runtime, so this fix is
-        # only needed for plugin-generated querysets.
-        queryset_instance = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
+    manager_model = find_member("model", manager_instance, manager_instance)
+    assert isinstance(manager_model, TypeType), manager_model
+    manager_model_type = manager_model.item
+
+    queryset_instance = Instance(queryset_info, (manager_model_type,) * len(queryset_info.type_vars))
 
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
