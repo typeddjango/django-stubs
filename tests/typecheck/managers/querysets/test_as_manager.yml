@@ -28,7 +28,7 @@
                     def just_int(self) -> int: ...
 
                 class MyModel(models.Model):
-                    objects = MyQuerySet.as_manager()  # type: ignore[var-annotated]
+                    objects = MyQuerySet.as_manager()
 
                 class QuerySetWithoutSelf(models.QuerySet["MyModelWithoutSelf"]):
                     def method(self) -> "QuerySetWithoutSelf":
@@ -75,7 +75,7 @@
                     ...
 
                 class MyModel(models.Model):
-                    objects = MyQuerySet.as_manager()  # type: ignore[var-annotated]
+                    objects = MyQuerySet.as_manager()
 
 -   case: model_gets_generated_manager_as_default_manager
     main: |
@@ -285,7 +285,7 @@
                   objects = MyModelQuerySet.as_manager()
 
               class MyOtherModel(models.Model):
-                  objects = _MyModelQuerySet2.as_manager()  # type: ignore
+                  objects = _MyModelQuerySet2.as_manager()
 
 -   case: handles_type_vars
     main: |
