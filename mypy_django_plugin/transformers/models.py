@@ -934,7 +934,6 @@ class ProcessManyToManyFields(ModelClassInitializer):
         helpers.set_many_to_many_manager_info(
             to=model.type, derived_from="_default_manager", manager_info=related_manager_info
         )
-        helpers.add_new_manager_base(self.api, related_manager_info.fullname)
 
 
 class MetaclassAdjustments(ModelClassInitializer):

@@ -324,9 +324,6 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
             ctx.api.defer()
         return
 
-    # So that the plugin will reparameterize the manager when it is constructed inside of a Model definition
-    helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
-
 
 def register_dynamically_created_manager(fullname: str, manager_name: str, manager_base: TypeInfo) -> None:
     manager_base.metadata.setdefault("from_queryset_managers", {})
@@ -557,9 +554,6 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
             manager_name=manager_class_name,
             manager_base=manager_base,
         )
-
-        # So that the plugin will reparameterize the manager when it is constructed inside of a Model definition
-        helpers.add_new_manager_base(semanal_api, new_manager_info.fullname)
 
     # Whenever `<QuerySet>.as_manager()` isn't called at class level, we want to ensure
     # that the variable is an instance of our generated manager. Instead of the return

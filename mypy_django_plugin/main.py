@@ -1,6 +1,6 @@
 import itertools
 import sys
-from functools import partial
+from functools import cached_property, partial
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 
 from mypy.build import PRI_MED, PRI_MYPY
@@ -19,7 +19,6 @@ from mypy.plugin import (
 )
 from mypy.types import Type as MypyType
 
-import mypy_django_plugin.transformers.orm_lookups
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -31,6 +30,7 @@ from mypy_django_plugin.transformers import (
     manytomany,
     manytoone,
     meta,
+    orm_lookups,
     querysets,
     request,
     settings,
@@ -60,10 +60,6 @@ def transform_form_class(ctx: ClassDefContext) -> None:
     forms.make_meta_nested_class_inherit_from_any(ctx)
 
 
-def add_new_manager_base_hook(ctx: ClassDefContext) -> None:
-    helpers.add_new_manager_base(ctx.api, ctx.cls.fullname)
-
-
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -79,15 +75,6 @@ class NewSemanalDjangoPlugin(Plugin):
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
             bases = helpers.get_django_metadata_bases(model_sym.node, "queryset_bases")
             bases[fullnames.QUERYSET_CLASS_FULLNAME] = 1
-            return bases
-        else:
-            return {}
-
-    def _get_current_manager_bases(self) -> Dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.MANAGER_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "manager_bases")
-            bases[fullnames.MANAGER_CLASS_FULLNAME] = 1
             return bases
         else:
             return {}
@@ -165,10 +152,6 @@ class NewSemanalDjangoPlugin(Plugin):
         if fullname == "django.contrib.auth.get_user_model":
             return partial(settings.get_user_model_hook, django_context=self.django_context)
 
-        manager_bases = self._get_current_manager_bases()
-        if fullname in manager_bases:
-            return querysets.determine_proper_manager_type
-
         info = self._get_typeinfo_or_none(fullname)
         if info:
             if info.has_base(fullnames.FIELD_FULLNAME):
@@ -177,7 +160,25 @@ class NewSemanalDjangoPlugin(Plugin):
             if helpers.is_model_type(info):
                 return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
 
+            if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return querysets.determine_proper_manager_type
+
         return None
+
+    @cached_property
+    def manager_and_queryset_method_hooks(self) -> Dict[str, Callable[[MethodContext], MypyType]]:
+        typecheck_filtering_method = partial(orm_lookups.typecheck_queryset_filter, django_context=self.django_context)
+        return {
+            "values": partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context),
+            "values_list": partial(
+                querysets.extract_proper_type_queryset_values_list, django_context=self.django_context
+            ),
+            "annotate": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
+            "create": partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context),
+            "filter": typecheck_filtering_method,
+            "get": typecheck_filtering_method,
+            "exclude": typecheck_filtering_method,
+        }
 
     def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
         class_fullname, _, method_name = fullname.rpartition(".")
@@ -208,37 +209,16 @@ class NewSemanalDjangoPlugin(Plugin):
             }
             return hooks.get(class_fullname)
 
-        manager_classes = self._get_current_manager_bases()
-
-        if method_name == "values":
+        if method_name in self.manager_and_queryset_method_hooks:
             info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
-                return partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context)
-
-        elif method_name == "values_list":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
-                return partial(querysets.extract_proper_type_queryset_values_list, django_context=self.django_context)
-
-        elif method_name == "annotate":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME) or class_fullname in manager_classes:
-                return partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context)
-
+            if info and helpers.has_any_of_bases(
+                info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]
+            ):
+                return self.manager_and_queryset_method_hooks[method_name]
         elif method_name == "get_field":
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
                 return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
-
-        elif method_name == "create":
-            # We need `BASE_MANAGER_CLASS_FULLNAME` to check abstract models.
-            if class_fullname in manager_classes or class_fullname == fullnames.BASE_MANAGER_CLASS_FULLNAME:
-                return partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context)
-        elif method_name in {"filter", "get", "exclude"} and class_fullname in manager_classes:
-            return partial(
-                mypy_django_plugin.transformers.orm_lookups.typecheck_queryset_filter,
-                django_context=self.django_context,
-            )
 
         return None
 
@@ -261,10 +241,6 @@ class NewSemanalDjangoPlugin(Plugin):
         sym = self.lookup_fully_qualified(fullname)
         if sym is not None and isinstance(sym.node, TypeInfo) and helpers.is_model_type(sym.node):
             return partial(process_model_class, django_context=self.django_context)
-
-        # Base class is a Manager class definition
-        if fullname in self._get_current_manager_bases():
-            return add_new_manager_base_hook
 
         # Base class is a Form class definition
         if fullname in self._get_current_form_bases():

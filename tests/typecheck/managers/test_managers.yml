@@ -653,3 +653,20 @@
                         def get_instance(self) -> int:
                             pass
                     objects = MyManager()
+
+-   case: test_typechecks_filter_methods_of_queryset_type
+    main: |
+        from myapp.models import MyModel
+        MyModel.objects.filter(id=1).filter(invalid=1)  # E: Cannot resolve keyword 'invalid' into field. Choices are: id  [misc]
+        MyModel.objects.filter(id=1).get(invalid=1)  # E: Cannot resolve keyword 'invalid' into field. Choices are: id  [misc]
+        MyModel.objects.filter(id=1).exclude(invalid=1)  # E: Cannot resolve keyword 'invalid' into field. Choices are: id  [misc]
+        MyModel.objects.filter(id=1).create(invalid=1)  # E: Unexpected attribute "invalid" for model "MyModel"  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyModel(models.Model): ...
