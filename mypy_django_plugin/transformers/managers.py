@@ -15,11 +15,11 @@ from mypy.nodes import (
     StrExpr,
     SymbolTableNode,
     TypeInfo,
-    Var,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
+from mypy.subtypes import find_member
 from mypy.types import (
     AnyType,
     CallableType,
@@ -28,6 +28,7 @@ from mypy.types import (
     Overloaded,
     ProperType,
     TypeOfAny,
+    TypeType,
     TypeVarType,
     UnionType,
     get_proper_type,
@@ -121,15 +122,11 @@ def _process_dynamic_method(
     variables = method_type.variables
     ret_type = method_type.ret_type
 
-    if not is_fallback_queryset:
-        queryset_instance = Instance(queryset_info, manager_instance.args)
-    else:
-        # The fallback queryset inherits _QuerySet, which has two generics
-        # instead of the one exposed on QuerySet. That means that we need
-        # to add the model twice. In real code it's not possible to inherit
-        # from _QuerySet, as it doesn't exist at runtime, so this fix is
-        # only needed for plugin-generated querysets.
-        queryset_instance = Instance(queryset_info, [manager_instance.args[0], manager_instance.args[0]])
+    manager_model = find_member("model", manager_instance, manager_instance)
+    assert isinstance(manager_model, TypeType), manager_model
+    manager_model_type = manager_model.item
+
+    queryset_instance = Instance(queryset_info, (manager_model_type,) * len(queryset_info.type_vars))
 
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
@@ -554,23 +551,9 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
             manager_name=manager_class_name,
             manager_base=manager_base,
         )
+        queryset_info.metadata.setdefault("django_as_manager_names", {})
+        queryset_info.metadata["django_as_manager_names"][semanal_api.cur_mod_id] = new_manager_info.name
 
-    # Whenever `<QuerySet>.as_manager()` isn't called at class level, we want to ensure
-    # that the variable is an instance of our generated manager. Instead of the return
-    # value of `.as_manager()`. Though model argument is populated as `Any`.
-    # `transformers.models.AddManagers` will populate a model's manager(s), when it
-    # finds it on class level.
-    var = Var(name=ctx.name, type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]))
-    var.info = new_manager_info
-    var._fullname = f"{current_module.fullname}.{ctx.name}"
-    var.is_inferred = True
-    # Note: Order of `add_symbol_table_node` calls matters. Depending on what level
-    # we've found the `.as_manager()` call. Point here being that we want to replace the
-    # `.as_manager` return value with our newly created manager.
-    added = semanal_api.add_symbol_table_node(
-        ctx.name, SymbolTableNode(semanal_api.current_symbol_kind(), var, plugin_generated=True)
-    )
-    assert added
     # Add the new manager to the current module
     added = semanal_api.add_symbol_table_node(
         # We'll use `new_manager_info.name` instead of `manager_class_name` here
@@ -580,6 +563,26 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
     )
     assert added
+
+
+def construct_as_manager_instance(ctx: MethodContext, *, info: TypeInfo) -> MypyType:
+    api = helpers.get_typechecker_api(ctx)
+    module = helpers.get_current_module(api)
+    try:
+        manager_name = info.metadata["django_as_manager_names"][module.fullname]
+    except KeyError:
+        return ctx.default_return_type
+
+    manager_node = api.lookup(manager_name)
+    if not isinstance(manager_node.node, TypeInfo):
+        return ctx.default_return_type
+
+    # Whenever `<QuerySet>.as_manager()` isn't called at class level, we want to ensure
+    # that the variable is an instance of our generated manager. Instead of the return
+    # value of `.as_manager()`. Though model argument is populated as `Any`.
+    # `transformers.models.AddManagers` will populate a model's manager(s), when it
+    # finds it on class level.
+    return Instance(manager_node.node, [AnyType(TypeOfAny.from_omitted_generics)])
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:

@@ -14,13 +14,15 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from typing import List, Dict
+                from typing import List, Dict, TypeVar, ClassVar
                 from typing_extensions import Self
 
-                class BaseQuerySet(models.QuerySet):
+                M = TypeVar("M", bound=models.Model, covariant=True)
+
+                class BaseQuerySet(models.QuerySet[M]):
                     def example_dict(self) -> Dict[str, Self]: ...
 
-                class MyQuerySet(BaseQuerySet):
+                class MyQuerySet(BaseQuerySet[M]):
                     def example_simple(self) -> Self: ...
                     def example_list(self) -> List[Self]: ...
                     def just_int(self) -> int: ...
@@ -64,9 +66,12 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import TypeVar
                 from django.db import models
 
-                class MyQuerySet(models.QuerySet):
+                M = TypeVar("M", bound=models.Model, covariant=True)
+
+                class MyQuerySet(models.QuerySet[M]):
                     ...
 
                 class MyModel(models.Model):
@@ -183,7 +188,7 @@
         from myapp.models import MyModel, MyModelManager
         reveal_type(MyModelManager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Any]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
     installed_apps:
         - myapp
     files:
@@ -204,7 +209,7 @@
         from myapp.models import MyModel, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Any]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
     installed_apps:
         - myapp
     files:
@@ -280,7 +285,7 @@
                   objects = MyModelQuerySet.as_manager()
 
               class MyOtherModel(models.Model):
-                  objects = _MyModelQuerySet2.as_manager()  # type: ignore
+                  objects = _MyModelQuerySet2.as_manager()
 
 -   case: handles_type_vars
     main: |
@@ -346,8 +351,8 @@
         from myapp.models import MyModel
         reveal_type(MyModel.objects_1)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects_2)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects_1.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects_2.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects_1.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
+        reveal_type(MyModel.objects_2.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
     installed_apps:
         - myapp
     files:
