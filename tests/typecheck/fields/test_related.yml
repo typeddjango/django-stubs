@@ -727,10 +727,9 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 class TransactionQuerySet(models.QuerySet):
                     pass
-                TransactionManager = BaseManager.from_queryset(TransactionQuerySet)
+                TransactionManager = models.Manager.from_queryset(TransactionQuerySet)
                 class Transaction(models.Model):
                     pk = 0
                     objects = TransactionManager()
@@ -742,7 +741,7 @@
                 Transaction().test()
 
 
--   case: foreign_key_relationship_for_models_with_custom_manager_unsolvable
+-   case: foreign_key_relationship_for_models_with_custom_manager_solvable_via_as_manager_type
     main: |
         from myapp.models import Transaction
     installed_apps:
@@ -752,30 +751,27 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 class TransactionQuerySet(models.QuerySet):
                     def custom(self) -> None:
                         pass
 
-                def TransactionManager() -> BaseManager:
-                    return BaseManager.from_queryset(TransactionQuerySet)()
+                def TransactionManager() -> models.Manager:
+                    return models.Manager.from_queryset(TransactionQuerySet)()
 
                 class Transaction(models.Model):
                     objects = TransactionManager()
                     def test(self) -> None:
-                        reveal_type(self.transactionlog_set)
-                        # We use a fallback Any type:
-                        reveal_type(Transaction.objects)
-                        reveal_type(Transaction.objects.custom())
+                        reveal_type(self.transactionlog_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
+                        # We get a lucky shot here as long as the plugin predeclares a
+                        # manager for `.as_manager` for every base class of QuerySet.
+                        # It's just lucky that the runtime's manager name is the same
+                        # name as for the predeclared manager. Resolving this wouldn't
+                        # be possible without inspection of the runtime
+                        reveal_type(Transaction.objects)  # N: Revealed type is "myapp.models.ManagerFromTransactionQuerySet[myapp.models.Transaction]"
+                        reveal_type(Transaction.objects.custom())  # N: Revealed type is "None"
 
                 class TransactionLog(models.Model):
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
-    out: |
-        myapp/models:11: error: Could not resolve manager type for "myapp.models.Transaction.objects"  [django-manager-missing]
-        myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
-        myapp/models:15: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Transaction]"
-        myapp/models:16: note: Revealed type is "Any"
-
 
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
     main: |
@@ -913,12 +909,11 @@
         -   path: myapp/models/purchase.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 from .querysets import PurchaseQuerySet
                 from .store import Store
                 from .user import User
 
-                PurchaseManager = BaseManager.from_queryset(PurchaseQuerySet)
+                PurchaseManager = models.Manager.from_queryset(PurchaseQuerySet)
                 class Purchase(models.Model):
                     objects = PurchaseManager()
                     store = models.ForeignKey(to=Store, on_delete=models.CASCADE, related_name='purchases')
@@ -936,7 +931,6 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
 
                 class User(models.Model):
                     purchases: int
@@ -945,7 +939,7 @@
                     def queryset_method(self) -> "PurchaseQuerySet":
                         return self.all()
 
-                PurchaseManager = BaseManager.from_queryset(PurchaseQuerySet)
+                PurchaseManager = models.Manager.from_queryset(PurchaseQuerySet)
                 class Purchase(models.Model):
                     objects = PurchaseManager()
                     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='purchases')

@@ -51,7 +51,7 @@
     Recursive(parent=Recursive(parent=None))
     Concrete(parent=Concrete(parent=None))
   out: |
-    main:4: error: "Type[Recursive]" has no attribute "objects"  [attr-defined]
+    main:4: error: Unexpected attribute "parent" for model "Recursive"  [misc]
     main:5: error: Cannot instantiate abstract class "Recursive" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
     main:5: error: Unexpected attribute "parent" for model "Recursive"  [misc]
   installed_apps:
