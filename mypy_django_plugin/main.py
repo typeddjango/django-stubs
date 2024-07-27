@@ -37,8 +37,7 @@ from mypy_django_plugin.transformers import (
 )
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
-    construct_as_manager_instance,
-    create_new_manager_class_from_as_manager_method,
+    add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
     reparametrize_any_manager_hook,
     resolve_manager_method,
@@ -209,10 +208,6 @@ class NewSemanalDjangoPlugin(Plugin):
                 fullnames.REVERSE_MANY_TO_ONE_DESCRIPTOR: manytoone.refine_many_to_one_related_manager,
             }
             return hooks.get(class_fullname)
-        elif method_name == "as_manager":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return partial(construct_as_manager_instance, info=info)
 
         if method_name in self.manager_and_queryset_method_hooks:
             info = self._get_typeinfo_or_none(class_fullname)
@@ -250,6 +245,10 @@ class NewSemanalDjangoPlugin(Plugin):
         # Base class is a Form class definition
         if fullname in self._get_current_form_bases():
             return transform_form_class
+
+        # Base class is a QuerySet class definition
+        if sym is not None and isinstance(sym.node, TypeInfo) and sym.node.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            return add_as_manager_to_queryset_class
         return None
 
     def get_attribute_hook(self, fullname: str) -> Optional[Callable[[AttributeContext], MypyType]]:
@@ -308,10 +307,6 @@ class NewSemanalDjangoPlugin(Plugin):
             info = self._get_typeinfo_or_none(class_name)
             if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return create_new_manager_class_from_from_queryset_method
-        elif method_name == "as_manager":
-            info = self._get_typeinfo_or_none(class_name)
-            if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-                return create_new_manager_class_from_as_manager_method
         return None
 
     def report_config_data(self, ctx: ReportConfigContext) -> Dict[str, Any]:

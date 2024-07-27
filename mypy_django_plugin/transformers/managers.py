@@ -16,7 +16,8 @@ from mypy.nodes import (
     SymbolTableNode,
     TypeInfo,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
+from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
@@ -482,44 +483,37 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
         )
 
 
-def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext) -> None:
-    """
-    Insert a new manager class node for a
-
-    ```
-    <manager name> = <QuerySet>.as_manager()
-    ```
-    """
+def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     semanal_api = helpers.get_semanal_api(ctx)
-    # Don't redeclare the manager class if we've already defined it.
-    manager_node = semanal_api.lookup_current_scope(ctx.name)
-    if manager_node and manager_node.type is not None:
-        # This is just a deferral run where our work is already finished
+
+    def _defer() -> None:
+        if not semanal_api.final_iteration:
+            semanal_api.defer()
+
+    queryset_info = semanal_api.type
+    if queryset_info is None:
+        return _defer()
+
+    # either a manual `as_manager` definition or this is a deferral pass
+    if "as_manager" in queryset_info.names:
         return
+
+    base_as_manager = queryset_info.get("as_manager")
+    if (
+        base_as_manager is None
+        or not isinstance(base_as_manager.type, CallableType)
+        or not isinstance(base_as_manager.type.ret_type, Instance)
+    ):
+        return
+
+    base_ret_type = base_as_manager.type.ret_type.type
 
     manager_sym = semanal_api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
-    assert manager_sym is not None
+    if manager_sym is None or not isinstance(manager_sym.node, TypeInfo):
+        return _defer()
+
     manager_base = manager_sym.node
-    if manager_base is None:
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
-        return
-
-    assert isinstance(manager_base, TypeInfo)
-
-    callee = ctx.call.callee
-    assert isinstance(callee, MemberExpr)
-    assert isinstance(callee.expr, RefExpr)
-
-    queryset_info = callee.expr.node
-    if queryset_info is None:
-        if not semanal_api.final_iteration:
-            semanal_api.defer()
-        return
-
-    assert isinstance(queryset_info, TypeInfo)
-
-    manager_class_name = manager_base.name + "From" + queryset_info.name
+    manager_class_name = f"{manager_base.name}From{queryset_info.name}"
     current_module = semanal_api.modules[semanal_api.cur_mod_id]
     existing_sym = current_module.names.get(manager_class_name)
     if (
@@ -535,15 +529,13 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
         try:
             new_manager_info = create_manager_class(
                 api=semanal_api,
-                base_manager_info=manager_base,
+                base_manager_info=base_ret_type,
                 name=manager_class_name,
-                line=ctx.call.line,
+                line=queryset_info.line,
                 with_unique_name=True,
             )
         except helpers.IncompleteDefnException:
-            if not semanal_api.final_iteration:
-                semanal_api.defer()
-            return
+            return _defer()
 
         populate_manager_from_queryset(new_manager_info, queryset_info)
         register_dynamically_created_manager(
@@ -551,38 +543,23 @@ def create_new_manager_class_from_as_manager_method(ctx: DynamicClassDefContext)
             manager_name=manager_class_name,
             manager_base=manager_base,
         )
-        queryset_info.metadata.setdefault("django_as_manager_names", {})
-        queryset_info.metadata["django_as_manager_names"][semanal_api.cur_mod_id] = new_manager_info.name
 
     # Add the new manager to the current module
-    added = semanal_api.add_symbol_table_node(
-        # We'll use `new_manager_info.name` instead of `manager_class_name` here
-        # to handle possible name collisions, as it's unique.
-        new_manager_info.name,
+    # We'll use `new_manager_info.name` instead of `manager_class_name` here
+    # to handle possible name collisions, as it's unique.
+    current_module.names[new_manager_info.name] = (
         # Note that the generated manager type is always inserted at module level
-        SymbolTableNode(GDEF, new_manager_info, plugin_generated=True),
+        SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
     )
-    assert added
 
-
-def construct_as_manager_instance(ctx: MethodContext, *, info: TypeInfo) -> MypyType:
-    api = helpers.get_typechecker_api(ctx)
-    module = helpers.get_current_module(api)
-    try:
-        manager_name = info.metadata["django_as_manager_names"][module.fullname]
-    except KeyError:
-        return ctx.default_return_type
-
-    manager_node = api.lookup(manager_name)
-    if not isinstance(manager_node.node, TypeInfo):
-        return ctx.default_return_type
-
-    # Whenever `<QuerySet>.as_manager()` isn't called at class level, we want to ensure
-    # that the variable is an instance of our generated manager. Instead of the return
-    # value of `.as_manager()`. Though model argument is populated as `Any`.
-    # `transformers.models.AddManagers` will populate a model's manager(s), when it
-    # finds it on class level.
-    return Instance(manager_node.node, [AnyType(TypeOfAny.from_omitted_generics)])
+    add_method_to_class(
+        semanal_api,
+        ctx.cls,
+        "as_manager",
+        args=[],
+        return_type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]),
+        is_classmethod=True,
+    )
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
