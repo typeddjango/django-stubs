@@ -1515,7 +1515,6 @@
                 class Author(models.Model):
                     ...
 
-
                 class Book(models.Model):
                     featured = models.BooleanField(default=False)
                     authors = models.ManyToManyField(Author)
