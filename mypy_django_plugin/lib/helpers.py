@@ -98,7 +98,7 @@ def set_manager_to_model(manager: TypeInfo, to_model: TypeInfo) -> None:
     get_django_metadata(manager)["manager_to_model"] = to_model.fullname
 
 
-def get_manager_to_model(manager: TypeInfo) -> str | None:
+def get_manager_to_model(manager: TypeInfo) -> Optional[str]:
     return get_django_metadata(manager).get("manager_to_model")
 
 
