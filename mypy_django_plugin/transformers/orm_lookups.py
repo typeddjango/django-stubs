@@ -18,7 +18,8 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     if not isinstance(ctx.type, Instance) or not ctx.type.args or not isinstance(ctx.type.args[0], Instance):
         return ctx.default_return_type
 
-    model_cls_fullname = ctx.type.args[0].type.fullname
+    manager_info = ctx.type.type
+    model_cls_fullname = helpers.get_manager_to_model(manager_info) or ctx.type.args[0].type.fullname
     model_cls = django_context.get_model_class_by_fullname(model_cls_fullname)
     if model_cls is None:
         return ctx.default_return_type
