@@ -1498,3 +1498,24 @@
 
                 class MyModel(models.Model):
                     others = models.ManyToManyField(Other)
+
+-   case: test_reverse_m2m_relation_checks_other_model
+    main: |
+        from myapp.models import Author
+        Author().book_set.filter(featured=True)
+        Author().book_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    ...
+
+
+                class Book(models.Model):
+                    featured = models.BooleanField(default=False)
+                    authors = models.ManyToManyField(Author)

@@ -94,6 +94,14 @@ def set_many_to_many_manager_info(to: TypeInfo, derived_from: str, manager_info:
     get_django_metadata(to).setdefault("m2m_managers", {})[derived_from] = manager_info.fullname
 
 
+def set_manager_to_model(manager: TypeInfo, to_model: TypeInfo) -> None:
+    get_django_metadata(manager)["manager_to_model"] = to_model.fullname
+
+
+def get_manager_to_model(manager: TypeInfo) -> str | None:
+    return get_django_metadata(manager).get("manager_to_model")
+
+
 class IncompleteDefnException(Exception):
     pass
 
