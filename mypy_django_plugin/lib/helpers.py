@@ -56,6 +56,7 @@ class DjangoTypeMetadata(TypedDict, total=False):
     queryset_bases: Dict[str, int]
     m2m_throughs: Dict[str, str]
     m2m_managers: Dict[str, str]
+    manager_to_model: str
 
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
