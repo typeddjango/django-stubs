@@ -1480,9 +1480,9 @@
         MyModel.objects.get(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
         MyModel.objects.exclude(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
         other = Other()
-        other.mymodel_set.filter(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
-        other.mymodel_set.get(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
-        other.mymodel_set.exclude(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
+        other.mymodel_set.filter(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
+        other.mymodel_set.get(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
+        other.mymodel_set.exclude(xyz__isnull=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, others  [misc]
         MyModel.others.through.objects.filter(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
         MyModel.others.through.objects.get(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
         MyModel.others.through.objects.exclude(xyz__isnull=False)  # E: Cannot resolve keyword 'xyz' into field. Choices are: id, mymodel, mymodel_id, other, other_id  [misc]
