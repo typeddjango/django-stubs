@@ -61,7 +61,6 @@ class SimpleTestCase(unittest.TestCase):
     client: Client
     async_client_class: type[AsyncClient]
     async_client: AsyncClient
-    allow_database_queries: bool
     # TODO: str -> Literal['__all__']
     databases: set[str] | str
     def __call__(self, result: unittest.TestResult | None = ...) -> None: ...
@@ -131,7 +130,7 @@ class SimpleTestCase(unittest.TestCase):
         count: int | None = ...,
     ) -> _AssertTemplateUsedContext | None: ...
     def assertTemplateNotUsed(
-        self, response: HttpResponseBase | str = ..., template_name: str | None = ..., msg_prefix: str = ...
+        self, response: HttpResponseBase | str | None = ..., template_name: str | None = ..., msg_prefix: str = ...
     ) -> _AssertTemplateNotUsedContext | None: ...
     def assertRaisesMessage(
         self, expected_exception: type[Exception], expected_message: str, *args: Any, **kwargs: Any
