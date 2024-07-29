@@ -1502,14 +1502,36 @@
 -   case: test_reverse_m2m_relation_checks_other_model
     main: |
         from myapp.models import Author
+        # With builtin manager/queryset
         Author().book_set.filter(featured=True)
         Author().book_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().book_set.values_list("featured")
+        Author().book_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().book_set.values("featured")
+        Author().book_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().book_set.filter(featured=True).values_list("featured")
+        Author().book_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().book_set.filter(featured=True).values("featured")
+        Author().book_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+
+        # With a custom manager/queryset
+        Author().other_set.filter(featured=True)
+        Author().other_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().other_set.values_list("featured")
+        Author().other_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().other_set.values("featured")
+        Author().other_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().other_set.filter(featured=True).values_list("featured")
+        Author().other_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        Author().other_set.filter(featured=True).values("featured")
+        Author().other_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing_extensions import Self
                 from django.db import models
 
                 class Author(models.Model):
@@ -1518,3 +1540,12 @@
                 class Book(models.Model):
                     featured = models.BooleanField(default=False)
                     authors = models.ManyToManyField(Author)
+
+                class OtherQuerySet(models.QuerySet["Other"]):
+                    def custom(self) -> Self: ...
+
+                OtherManager = models.Manager.from_queryset(OtherQuerySet)
+                class Other(models.Model):
+                    featured = models.BooleanField()
+                    authors = models.ManyToManyField(Author)
+                    objects = OtherManager()
