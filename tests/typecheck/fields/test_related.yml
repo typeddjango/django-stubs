@@ -86,6 +86,29 @@
                                                   related_name='books')
                     publisher2 = models.ForeignKey(to=Publisher, related_name='books2', on_delete=models.CASCADE)
 
+-   case: foreign_key_subclass
+    main: |
+        from myapp.models import A
+        reveal_type(A.objects.get().b)  # N: Revealed type is "myapp.models.B"
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class MyForeignKey(models.ForeignKey[_ST, _GT]): ...
+
+                class B(models.Model): ...
+
+                class A(models.Model):
+                    b = models.ForeignKey(B, on_delete=models.CASCADE)
+
 -   case: to_parameter_as_string_with_application_name__model_imported
     main: |
         from myapp2.models import Book
