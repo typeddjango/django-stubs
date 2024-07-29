@@ -1,7 +1,7 @@
 # Dev tools:
 black==24.4.2
 pre-commit==3.5.0; python_version < '3.9'
-pre-commit==3.7.1; python_version >= '3.9'
+pre-commit==3.8.0; python_version >= '3.9'
 pytest==8.3.2
 pytest-mypy-plugins==3.1.2
 pytest-shard==0.1.2
