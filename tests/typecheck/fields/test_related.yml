@@ -800,6 +800,31 @@
                 class User(AbstractUser):
                     pass
 
+-   case: nullable_foreign_key_with_init_overridden
+    main: |
+        from myapp.models import A
+        reveal_type(A.objects.get().b)  # N: Revealed type is "Union[myapp.models.B, None]"
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any, TypeVar
+                from django.db import models
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class FK(models.ForeignKey[_ST, _GT]):
+                    def __init__(self, *args: Any, **kwargs: Any) -> None:
+                        kwargs.setdefault('on_delete', models.CASCADE)
+                        super().__init__(*args, **kwargs)
+
+                class B(models.Model): ...
+
+                class A(models.Model):
+                    b = FK(B, null=True, on_delete=models.CASCADE)
 
 -   case: related_manager_is_a_subclass_of_default_manager
     main: |

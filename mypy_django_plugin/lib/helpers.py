@@ -10,6 +10,7 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
     MDEF,
+    ArgKind,
     AssignmentStmt,
     Block,
     ClassDef,
@@ -182,6 +183,12 @@ def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: 
     Return the expression for the specific argument.
     This helper should only be used with non-star arguments.
     """
+    # try and pull the named argument from the caller first
+    for kinds, argnames, args in zip(ctx.arg_kinds, ctx.arg_names, ctx.args):
+        for kind, argname, arg in zip(kinds, argnames, args):
+            if kind == ArgKind.ARG_NAMED and argname == name:
+                return arg
+
     if name not in ctx.callee_arg_names:
         return None
     idx = ctx.callee_arg_names.index(name)
