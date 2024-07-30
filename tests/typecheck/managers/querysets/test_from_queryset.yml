@@ -946,3 +946,25 @@
         main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
         main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
         main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
+
+-   case: test_reverse_manager_with_foreign_key
+    main: |
+        from myapp.models import B
+        reveal_type(B().a_set.filter(field="something"))  # N: Revealed type is "myapp.models.QS"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class B(models.Model): ...
+
+                class QS(models.QuerySet["A"]): ...
+
+                Manager = models.Manager.from_queryset(QS)
+                class A(models.Model):
+                    field = models.CharField()
+                    b = models.ForeignKey(B, on_delete=models.CASCADE)
+                    objects = Manager()
