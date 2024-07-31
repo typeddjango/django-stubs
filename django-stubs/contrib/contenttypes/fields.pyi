@@ -66,7 +66,7 @@ class GenericRel(ForeignObjectRel):
         limit_choices_to: dict[str, Any] | Callable[[], Any] | None = ...,
     ) -> None: ...
 
-class GenericRelation(ForeignObject):
+class GenericRelation(ForeignObject[Any, Any]):
     rel_class: Any
     mti_inherited: bool
     object_id_field_name: str
