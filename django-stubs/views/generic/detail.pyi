@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 _M = TypeVar("_M", bound=models.Model)
 
 class SingleObjectMixin(Generic[_M], ContextMixin):
-    model: type[_M] | None
+    model: type[_M]
     queryset: models.query.QuerySet[_M] | None
     slug_field: str
     context_object_name: str | None

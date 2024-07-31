@@ -9,12 +9,11 @@ from typing_extensions import assert_type
 class MyModel(models.Model): ...
 
 
-class MyDetailView(SingleObjectMixin[MyModel]):
-    model = MyModel
+class MyDetailView(SingleObjectMixin[MyModel]): ...
 
 
 detail_view = MyDetailView()
-assert_type(detail_view.model, Type[MyModel])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(detail_view.model, Type[MyModel])
 assert_type(detail_view.queryset, Optional[models.QuerySet[MyModel, MyModel]])
 assert_type(detail_view.get_context_object_name(MyModel()), str)
 assert_type(detail_view.get_context_object_name(1), Optional[str])
