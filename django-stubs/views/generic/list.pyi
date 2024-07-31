@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any, Generic, Protocol, TypeVar, overload
+from typing import Any, Generic, Protocol, TypeVar, overload, type_check_only
 
 from django.core.paginator import Page, Paginator, _SupportsPagination
 from django.db.models import Model, QuerySet
@@ -8,6 +8,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 _M = TypeVar("_M", bound=Model)
 
+@type_check_only
 class _HasModel(Protocol):
     @property
     def model(self) -> type[Model]: ...
