@@ -1,12 +1,16 @@
 from collections.abc import Sequence
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Protocol, TypeVar, overload
 
 from django.core.paginator import Page, Paginator, _SupportsPagination
 from django.db.models import Model, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
-_M = TypeVar("_M", bound=Model, covariant=True)
+_M = TypeVar("_M", bound=Model)
+
+class HasModel(Protocol):
+    @property
+    def model(self) -> type[Model]: ...
 
 class MultipleObjectMixin(Generic[_M], ContextMixin):
     allow_empty: bool
@@ -34,7 +38,10 @@ class MultipleObjectMixin(Generic[_M], ContextMixin):
     ) -> Paginator: ...
     def get_paginate_orphans(self) -> int: ...
     def get_allow_empty(self) -> bool: ...
-    def get_context_object_name(self, object_list: _SupportsPagination[_M]) -> str | None: ...
+    @overload
+    def get_context_object_name(self, object_list: HasModel) -> str: ...
+    @overload
+    def get_context_object_name(self, object_list: Any) -> str | None: ...
     def get_context_data(
         self, *, object_list: _SupportsPagination[_M] | None = ..., **kwargs: Any
     ) -> dict[str, Any]: ...

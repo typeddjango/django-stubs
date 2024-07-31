@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, overload
 
 from django.db import models
 from django.http import HttpRequest, HttpResponse
@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 _M = TypeVar("_M", bound=models.Model)
 
 class SingleObjectMixin(Generic[_M], ContextMixin):
-    model: type[_M]
+    model: type[_M] | None
     queryset: models.query.QuerySet[_M] | None
     slug_field: str
     context_object_name: str | None
@@ -17,7 +17,10 @@ class SingleObjectMixin(Generic[_M], ContextMixin):
     def get_object(self, queryset: models.query.QuerySet[_M] | None = ...) -> _M: ...
     def get_queryset(self) -> models.query.QuerySet[_M]: ...
     def get_slug_field(self) -> str: ...
-    def get_context_object_name(self, obj: _M) -> str | None: ...
+    @overload
+    def get_context_object_name(self, obj: _M) -> str: ...
+    @overload
+    def get_context_object_name(self, obj: Any) -> str | None: ...
 
 class BaseDetailView(SingleObjectMixin[_M], View):
     object: _M
