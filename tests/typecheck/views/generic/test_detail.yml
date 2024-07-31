@@ -37,8 +37,8 @@
             def get_queryset(self) -> QuerySet[MyModel]:
                 self.get_object(super().get_queryset())
                 return super().get_queryset()
-    custom_settings: |
-        INSTALLED_APPS = ('myapp',)
+    installed_apps:
+        - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -49,7 +49,7 @@
                 class Other(models.Model):
                     ...
     out: |
-      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "SingleObjectMixin" defined the type as "Type[Other]")  [assignment]
+      main:7: error: Incompatible types in assignment (expression has type "Type[MyModel]", base class "SingleObjectMixin" defined the type as "Optional[Type[Other]]")  [assignment]
       main:8: error: Incompatible types in assignment (expression has type "QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "Optional[QuerySet[Other, Other]]")  [assignment]
       main:10: error: Return type "QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "QuerySet[Other, Other]" in supertype "SingleObjectMixin"  [override]
       main:12: error: Incompatible return value type (got "QuerySet[Other, Other]", expected "QuerySet[MyModel, MyModel]")  [return-value]

@@ -131,7 +131,6 @@ django.db.backends.base.base.BaseDatabaseWrapper.ops
 django.db.backends.base.base.BaseDatabaseWrapper.ops_class
 
 # Attributes defaulting to None messing with mypy
-django.views.generic.detail.SingleObjectMixin.model
 django.views.generic.edit.BaseDeleteView.form_class
 
 # Dynamically added via django.core.management.color.make_style
