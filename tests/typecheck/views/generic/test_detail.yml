@@ -37,8 +37,8 @@
             def get_queryset(self) -> QuerySet[MyModel]:
                 self.get_object(super().get_queryset())
                 return super().get_queryset()
-    custom_settings: |
-        INSTALLED_APPS = ('myapp',)
+    installed_apps:
+        - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
