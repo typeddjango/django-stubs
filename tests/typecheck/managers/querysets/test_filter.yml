@@ -258,6 +258,7 @@
 
 - case: alias_and_annotate_can_be_used_with_dynamic_new_fields
   main: |
+    from django.db import models
     from myapp.models import Blog
 
     Blog.objects.alias(
