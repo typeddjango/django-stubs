@@ -254,3 +254,28 @@
                     username = models.TextField()
                     username2 = models.TextField()
                     age = models.IntegerField()
+
+
+- case: alias_and_annotate_can_be_used_with_dynamic_new_fields
+  main: |
+    from myapp.models import Blog
+
+    Blog.objects.alias(
+        alias_entries=models.Count("entry"),
+    ).annotate(
+        annotate_entries=models.Count("entry"),
+    ).filter(alias_entries__gt=5, annotate_entries__gt=5)
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class Blog(models.Model):
+            pass
+
+        class Entry(models.Model):
+            blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
