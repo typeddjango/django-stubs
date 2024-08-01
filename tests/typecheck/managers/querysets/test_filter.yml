@@ -279,7 +279,7 @@
         alias_entries__gt=5,
     )
 
-    Blog.objects.alias(
+    Blog.objects.alias(  # E: Cannot resolve keyword 'alias_e' into field. Choices are: entry, id  [misc]
         alias_entries=models.Count("entry"),
     ).filter(
         # Wrong name:
