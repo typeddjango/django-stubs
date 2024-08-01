@@ -267,6 +267,25 @@
         annotate_entries=models.Count("entry"),
     ).filter(alias_entries__gt=5, annotate_entries__gt=5)
 
+    Blog.objects.alias(
+        alias_entries=models.Count("entry"),
+    ).filter(
+        alias_entries=5,
+    )
+
+    Blog.objects.alias(
+        alias_entries=models.Count("entry"),
+    ).filter(
+        alias_entries__gt=5,
+    )
+
+    Blog.objects.alias(
+        alias_entries=models.Count("entry"),
+    ).filter(
+        # Wrong name:
+        alias_e=5,
+    )
+
   installed_apps:
     - myapp
   files:
