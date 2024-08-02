@@ -242,7 +242,7 @@ _Through = TypeVar("_Through", bound=Model)
 _To = TypeVar("_To", bound=Model)
 
 class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
-    description: str
+    description: _StrOrPromise
     has_null_arg: bool
     swappable: bool
 
