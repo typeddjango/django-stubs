@@ -277,7 +277,6 @@ django.contrib.gis.db.models.Field.get_pk_value_on_save
 django.contrib.gis.db.models.Field.rel_db_type
 django.contrib.gis.db.models.Field.select_format
 django.contrib.gis.db.models.Field.unique
-django.contrib.gis.db.models.FieldDoesNotExist
 django.contrib.gis.db.models.FileField.__get__
 django.contrib.gis.db.models.FileField.attr_class
 django.contrib.gis.db.models.FileField.contribute_to_class
@@ -701,7 +700,6 @@ django.db.models.Field.get_pk_value_on_save
 django.db.models.Field.rel_db_type
 django.db.models.Field.select_format
 django.db.models.Field.unique
-django.db.models.FieldDoesNotExist
 django.db.models.FileField.__get__
 django.db.models.FileField.attr_class
 django.db.models.FileField.contribute_to_class
@@ -907,7 +905,6 @@ django.db.models.fields.Field.get_pk_value_on_save
 django.db.models.fields.Field.rel_db_type
 django.db.models.fields.Field.select_format
 django.db.models.fields.Field.unique
-django.db.models.fields.FieldDoesNotExist
 django.db.models.fields.FilePathField.formfield
 django.db.models.fields.FloatField.formfield
 django.db.models.fields.GenericIPAddressField.formfield
