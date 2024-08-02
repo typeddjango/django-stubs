@@ -8,7 +8,6 @@ from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload,
 from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
-from django.core.exceptions import FieldDoesNotExist as FieldDoesNotExist
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.db.models.expressions import Col, Combinable, Expression

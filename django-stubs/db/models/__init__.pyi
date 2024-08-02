@@ -55,7 +55,6 @@ from .fields import DecimalField as DecimalField
 from .fields import DurationField as DurationField
 from .fields import EmailField as EmailField
 from .fields import Field as Field
-from .fields import FieldDoesNotExist as FieldDoesNotExist
 from .fields import FilePathField as FilePathField
 from .fields import FloatField as FloatField
 from .fields import GenericIPAddressField as GenericIPAddressField
