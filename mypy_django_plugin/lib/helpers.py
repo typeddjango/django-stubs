@@ -533,3 +533,7 @@ def get_model_from_expression(
         if model_info is not None:
             return Instance(model_info, [])
     return None
+
+
+def fill_manager(manager: TypeInfo, typ: MypyType) -> Instance:
+    return Instance(manager, [typ] if manager.is_generic() else [])
