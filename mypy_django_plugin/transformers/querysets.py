@@ -48,6 +48,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
         outer_model_info is None
         or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)
         or outer_model_info.self_type is None
+        or not default_return_type.type.is_generic()
     ):
         return default_return_type
 
