@@ -583,14 +583,14 @@
 -   case: test_queryset_in_model_class_body
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.custom)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.custom().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
     installed_apps:
         - myapp
     files:
@@ -613,7 +613,10 @@
 -   case: test_queryset_in_model_class_body_subclass
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.BaseModel"
+        reveal_type(MyModel.objects.filter())  # N: Revealed type is "myapp.models.BaseQuerySet"
+        reveal_type(MyModel.objects.filter().get())  # N: Revealed type is "myapp.models.BaseModel"
     installed_apps:
         - myapp
     files:
