@@ -10,7 +10,7 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 ## Installation
 
 ```bash
-pip install django-stubs[compatible-mypy]
+pip install 'django-stubs[compatible-mypy]'
 ```
 
 To make mypy aware of the plugin, you need to add
