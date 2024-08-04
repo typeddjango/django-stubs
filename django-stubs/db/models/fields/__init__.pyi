@@ -356,7 +356,9 @@ class SlugField(CharField[_ST, _GT]):
         allow_unicode: bool = ...,
     ) -> None: ...
 
-class EmailField(CharField[_ST, _GT]): ...
+class EmailField(CharField[_ST, _GT]):
+    _pyi_private_set_type: str | Combinable
+    _pyi_private_get_type: str
 
 class URLField(CharField[_ST, _GT]):
     def __init__(
