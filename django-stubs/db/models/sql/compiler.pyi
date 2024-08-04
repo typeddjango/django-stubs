@@ -13,9 +13,9 @@ from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQ
 from django.utils.functional import cached_property
 from typing_extensions import TypeAlias
 
-_ParamT: TypeAlias = str | int
+_ParamT: TypeAlias = Any
 
-_ParamsT: TypeAlias = list[_ParamT]
+_ParamsT: TypeAlias = tuple[_ParamT, ...]
 _AsSqlType: TypeAlias = tuple[str, _ParamsT]
 
 class PositionRef(Ref):
