@@ -22,6 +22,7 @@ from django.utils.connection import BaseConnectionHandler
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
+from django.db.models.query import RawQuerySet
 
 __all__ = ["monkeypatch"]
 
@@ -78,6 +79,7 @@ _need_generic: List[MPGeneric[Any]] = [
     MPGeneric(BaseManager, (3, 1)),
     # These types do have native `__class_getitem__` method since django 4.1:
     MPGeneric(ForeignKey, (4, 1)),
+    MPGeneric(RawQuerySet),
 ]
 
 
