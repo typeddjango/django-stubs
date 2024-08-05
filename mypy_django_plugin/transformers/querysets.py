@@ -15,8 +15,8 @@ from mypy.typevars import fill_typevars
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
-from mypy_django_plugin.lib.helpers import is_annotated_model_fullname, parse_bool
-from mypy_django_plugin.transformers.models import get_or_create_annotated_type
+from mypy_django_plugin.lib.helpers import parse_bool
+from mypy_django_plugin.transformers.models import get_annotated_type
 
 
 def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Optional[Instance]:
@@ -177,7 +177,12 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
+    is_annotated = helpers.is_annotated_model(model_type.type)
+    model_cls = (
+        django_context.get_model_class_by_fullname(model_type.type.bases[0].type.fullname)
+        if is_annotated
+        else django_context.get_model_class_by_fullname(model_type.type.fullname)
+    )
     if model_cls is None:
         return default_return_type
 
@@ -201,7 +206,6 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     flat = flat or False
     named = named or False
 
-    is_annotated = is_annotated_model_fullname(model_type.type.fullname)
     row_type = get_values_list_row_type(
         ctx, django_context, model_cls, is_annotated=is_annotated, flat=flat, named=named
     )
@@ -237,25 +241,48 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     if model_type is None:
         return AnyType(TypeOfAny.from_omitted_generics)
 
-    api = ctx.api
+    api = helpers.get_typechecker_api(ctx)
 
-    field_types = model_type.type.metadata.get("annotated_field_types")
+    field_types: Optional[Dict[str, MypyType]] = None
     kwargs = gather_kwargs(ctx)
     if kwargs:
         # For now, we don't try to resolve the output_field of the field would be, but use Any.
-        added_field_types = {name: AnyType(TypeOfAny.implementation_artifact) for name, typ in kwargs.items()}
-        if field_types is not None:
-            # Annotate was called more than once, so add/update existing field types
-            field_types.update(added_field_types)
-        else:
-            field_types = added_field_types
+        # NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
+        # get stuck with mypy interpreting an overload ambiguity towards the
+        # overloaded 'Field.__get__' method when its 'model' argument gets matched. This
+        # is because the model argument gets matched with a model subclass that is
+        # parametrized with a type that contains the 'Any' below and then mypy runs in
+        # to a (false?) ambiguity, due to 'Any', and can't decide what overload/return
+        # type to select
+        #
+        # Example:
+        #   class MyModel(models.Model):
+        #       field = models.CharField()
+        #
+        #   # Our plugin auto generates the following subclass
+        #   class MyModel_WithAnnotations(MyModel, django_stubs_ext.Annotations[_Annotations]):
+        #       ...
+        #   # Assume
+        #   x = MyModel.objects.annotate(foo=F("id")).get()
+        #   reveal_type(x)  # MyModel_WithAnnotations[TypedDict({"foo": Any})]
+        #   # Then, on an attribute access of 'field' like
+        #   reveal_type(x.field)
+        #
+        # Now 'CharField.__get__', which is overloaded, is passed 'x' as the 'model'
+        # argument and mypy consider it ambiguous to decide which overload method to
+        # select due to the 'Any' in 'TypedDict({"foo": Any})'. But if we specify the
+        # 'Any' as 'TypeOfAny.special_form' mypy doesn't consider the model instance to
+        # contain 'Any' and the ambiguity goes away.
+        field_types = {name: AnyType(TypeOfAny.special_form) for name, _ in kwargs.items()}
 
     fields_dict = None
     if field_types is not None:
-        fields_dict = helpers.make_typeddict(
-            api, fields=OrderedDict(field_types), required_keys=set(field_types.keys())
-        )
-    annotated_type = get_or_create_annotated_type(api, model_type, fields_dict=fields_dict)
+        fields_dict = helpers.make_typeddict(api, fields=field_types, required_keys=set(field_types.keys()))
+
+    if fields_dict is not None:
+        annotated_type = get_annotated_type(api, model_type, fields_dict=fields_dict)
+    else:
+        annotated_type = model_type
 
     row_type: MypyType
     if len(default_return_type.args) > 1:
@@ -306,9 +333,6 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
     if model_cls is None:
-        return default_return_type
-
-    if is_annotated_model_fullname(model_type.type.fullname):
         return default_return_type
 
     field_lookups = resolve_field_lookups(ctx.args[0], django_context)

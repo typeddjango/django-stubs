@@ -296,7 +296,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "typing_extensions.Annotated",
             "django_stubs_ext.annotations.WithAnnotations",
         ):
-            return partial(handle_annotated_type, django_context=self.django_context)
+            return partial(handle_annotated_type, fullname=fullname)
         else:
             return None
 

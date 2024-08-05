@@ -1,8 +1,9 @@
 # Regression test for #893
--   case: annotated_should_not_iterfere
+-   case: annotated_should_not_interfere
     main: |
         from dataclasses import dataclass
-        from typing_extensions import Annotated
+        from typing_extensions import Annotated, TypedDict
+        from myapp.models import Blog
 
         class IntegerType:
             def __init__(self, min_value: int, max_value: int) -> None:
@@ -11,3 +12,21 @@
         @dataclass(unsafe_hash=True)
         class RatingComposite:
             max_value: Annotated[int, IntegerType(min_value=1, max_value=10)] = 5
+
+        class Obj(TypedDict):
+            foo: int
+
+        class X:
+            x: Annotated[Blog, Obj]
+        reveal_type(X().x)  # N: Revealed type is "myapp.models.Blog"
+        reveal_type(X().x.foo)  # E: "Blog" has no attribute "foo"  [attr-defined]  # N: Revealed type is "Any"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)

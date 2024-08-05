@@ -19,7 +19,7 @@ BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
 RELATED_MANAGER_CLASS = "django.db.models.fields.related_descriptors.RelatedManager"
 
-WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.WithAnnotations"
+WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.WithAnnotations"
 ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.Annotations"
 
 BASEFORM_CLASS_FULLNAME = "django.forms.forms.BaseForm"

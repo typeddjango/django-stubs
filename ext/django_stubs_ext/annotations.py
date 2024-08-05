@@ -17,7 +17,7 @@ _T = TypeVar("_T", bound=Model)
 
 WithAnnotations = Annotated[_T, Annotations[_Annotations]]
 """Alias to make it easy to annotate the model `_T` as having annotations
-`_Annotations` (a `TypedDict` or `Any` if not provided).
+`_Annotations` (a `TypedDict`).
 
-Use as `WithAnnotations[MyModel]` or `WithAnnotations[MyModel, MyTypedDict]`.
+Use as `WithAnnotations[MyModel, MyTypedDict]`.
 """
