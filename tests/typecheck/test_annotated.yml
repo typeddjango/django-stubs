@@ -19,6 +19,7 @@
         class X:
             x: Annotated[Blog, Obj]
         reveal_type(X().x)  # N: Revealed type is "myapp.models.Blog"
+        reveal_type(X().x.foo)  # E: "Blog" has no attribute "foo"  [attr-defined]  # N: Revealed type is "Any"
 
     installed_apps:
         - myapp

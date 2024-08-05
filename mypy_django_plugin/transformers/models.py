@@ -220,7 +220,7 @@ class AddAnnotateUtilities(ModelClassInitializer):
         class MyModel(models.Model):
             ...
 
-        class MyModel_AnnotatedWith(MyModel, django_stubs_ext.Annotations[_Annotations]):
+        class MyModel@AnnotatedWith(MyModel, django_stubs_ext.Annotations[_Annotations]):
             ...
     """
 
@@ -228,7 +228,7 @@ class AddAnnotateUtilities(ModelClassInitializer):
         annotations = self.lookup_typeinfo_or_incomplete_defn_error("django_stubs_ext.Annotations")
         object_does_not_exist = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OBJECT_DOES_NOT_EXIST)
         multiple_objects_returned = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MULTIPLE_OBJECTS_RETURNED)
-        annotated_model_name = self.model_classdef.info.name + "_AnnotatedWith"
+        annotated_model_name = self.model_classdef.info.name + "@AnnotatedWith"
         annotated_model = self.lookup_typeinfo(self.model_classdef.info.module_name + "." + annotated_model_name)
         if annotated_model is None:
             model_type = fill_typevars_with_any(self.model_classdef.info)
@@ -1115,6 +1115,10 @@ def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: Dj
 
 
 def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
+    """
+    Replaces the 'WithAnnotations' type with a type that can represent an annotated
+    model.
+    """
     is_with_annotations = fullname == fullnames.WITH_ANNOTATIONS_FULLNAME
     args = ctx.type.args
     if not args:
@@ -1149,13 +1153,7 @@ def get_annotated_type(
     api: Union[SemanticAnalyzer, TypeChecker], model_type: Instance, fields_dict: TypedDictType
 ) -> ProperType:
     """
-
-    Get or create the type for a model for which you getting/setting any attr is allowed.
-
-    The generated type is an subclass of the model and django._AnyAttrAllowed.
-    The generated type is placed in the django_stubs_ext module, with the name WithAnnotations[ModelName].
-    If the user wanted to annotate their code using this type, then this is the annotation they would use.
-    This is a bit of a hack to make a pretty type for error messages and which would make sense for users.
+    Get a model type that can be used to represent an annotated model
     """
     if model_type.extra_attrs:
         extra_attrs = ExtraAttrs(
@@ -1180,7 +1178,7 @@ def get_annotated_type(
                 required_keys={*model_type.args[0].required_keys, *fields_dict.required_keys},
             )
     else:
-        annotated_model = helpers.lookup_fully_qualified_typeinfo(api, model_type.type.fullname + "_AnnotatedWith")
+        annotated_model = helpers.lookup_fully_qualified_typeinfo(api, model_type.type.fullname + "@AnnotatedWith")
 
     if annotated_model is None:
         return model_type
