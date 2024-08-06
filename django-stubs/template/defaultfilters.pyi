@@ -2,13 +2,18 @@ from collections.abc import Callable
 from datetime import date as _date
 from datetime import datetime
 from datetime import time as _time
-from typing import Any
+from typing import Any, TypeVar
 
+from django.template.library import Library
 from django.utils.safestring import SafeString
+from typing_extensions import Concatenate, ParamSpec
 
-register: Any
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
 
-def stringfilter(func: Callable) -> Callable: ...
+register: Library
+
+def stringfilter(func: Callable[Concatenate[str, _P], _R]) -> Callable[Concatenate[object, _P], _R]: ...
 def addslashes(value: str) -> str: ...
 def capfirst(value: str) -> str: ...
 def escapejs_filter(value: str) -> SafeString: ...
