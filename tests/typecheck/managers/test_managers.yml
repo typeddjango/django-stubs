@@ -761,3 +761,53 @@
                     generic_manager = models.Manager()
                     generic_manager_from_generic_queryset = GenericManagerFromGenericQuerySet()
                     generic_manager_from_populated_queryset = GenericManagerFromPopulatedQuerySet()
+
+# Regression test for #2304
+-   case: test_objects_managers_is_kept_with_specific_import_graph
+    main: |
+        from zerver.models import RealmFilter
+        reveal_type(RealmFilter.objects)  # N: Revealed type is "django.db.models.manager.Manager[zerver.models.linkifiers.RealmFilter]"
+    installed_apps:
+        - django.contrib.auth
+        - django.contrib.contenttypes
+        - confirmation
+        - zerver
+    files:
+        -   path: confirmation/__init__.py
+        -   path: confirmation/models.py
+            content: |
+                from django.db import models
+                from zerver.models import Realm
+                class Confirmation(models.Model):
+                    realm = models.ForeignKey(Realm, on_delete=models.CASCADE)
+        -   path: zerver/__init__.py
+        -   path: zerver/models/__init__.py
+            content: |
+                from zerver.models.linkifiers import RealmFilter as RealmFilter
+                from zerver.models.realms import Realm as Realm
+                from zerver.models.streams import Stream as Stream
+                from zerver.models.users import UserProfile as UserProfile
+                RealmFilter.objects
+        -   path: zerver/models/linkifiers.py
+            content: |
+                from django.db import models
+                class RealmFilter(models.Model):
+                    pass
+        -   path: zerver/models/realms.py
+            content: |
+                from django.db import models
+                class Realm(models.Model):
+                    pass
+        -   path: zerver/models/streams.py
+            content: |
+                from django.db import models
+                from zerver.models.realms import Realm
+                from zerver.models.users import UserProfile
+                class Stream(models.Model):
+                    realm = models.ForeignKey(Realm, on_delete=models.RESTRICT)
+                    creator = models.ForeignKey(UserProfile, on_delete=models.RESTRICT)
+        -   path: zerver/models/users.py
+            content: |
+                from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+                class UserProfile(AbstractBaseUser, PermissionsMixin):
+                    pass
