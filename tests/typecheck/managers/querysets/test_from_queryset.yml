@@ -14,13 +14,12 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 from typing import List, Dict, TypeVar
                 from typing_extensions import Self
 
                 M = TypeVar("M", covariant=True, bound=models.Model)
 
-                class CustomManager(BaseManager[M]):
+                class CustomManager(models.Manager[M]):
                     def test_custom_manager(self) -> Self: ...
 
                 class BaseQuerySet(models.QuerySet[M]):
@@ -40,7 +39,7 @@
                     def method(self) -> "QuerySetWithoutSelf":
                         return self
 
-                ManagerWithoutSelf = BaseManager.from_queryset(QuerySetWithoutSelf)
+                ManagerWithoutSelf = models.Manager.from_queryset(QuerySetWithoutSelf)
 
                 class MyModelWithoutSelf(models.Model):
                     objects = ManagerWithoutSelf()
@@ -58,11 +57,10 @@
             content: |
                 from typing import ClassVar
                 from typing_extensions import Self
-                from django.db.models import Model
-                from django.db.models.manager import BaseManager
+                from django.db.models import Model, Manager
                 from django.db.models.query import QuerySet
 
-                MyManager = BaseManager.from_queryset(QuerySet, "MyManager")
+                MyManager = Manager.from_queryset(QuerySet, "MyManager")
 
                 class Base(Model):
                     objects: ClassVar[MyManager[Self]] = MyManager()
@@ -95,13 +93,13 @@
                         return 'hello'
                 NewManager = BaseManager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
-                    objects = NewManager()
+                    objects = NewManager()  # E: Incompatible types in assignment (expression has type "BaseManagerFromModelQuerySet[Self]", base class "Model" defined the type as "Manager[MyModel]")  [assignment]
 
 -   case: from_queryset_queryset_imported_from_other_module
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
@@ -139,10 +137,9 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 from .querysets import ModelQuerySet
 
-                NewManager = BaseManager.from_queryset(ModelQuerySet)
+                NewManager = models.Manager.from_queryset(ModelQuerySet)
                 class MyModel(models.Model):
                     objects = NewManager()
 
@@ -159,7 +156,6 @@
                 from typing import TypeVar, TYPE_CHECKING
 
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 if TYPE_CHECKING:
                     from .models import MyModel
 
@@ -174,10 +170,9 @@
         - path: myapp/models.py
           content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 from .querysets import MyModelQuerySet
 
-                class TypedManager(BaseManager["MyModel"]): ...
+                class TypedManager(models.Manager["MyModel"]): ...
 
                 NewManager = TypedManager.from_queryset(MyModelQuerySet)
                 class MyModel(models.Model):
@@ -195,7 +190,6 @@
                 from typing import TypeVar, TYPE_CHECKING
 
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 if TYPE_CHECKING:
                     from .models import MyModel
 
@@ -211,17 +205,16 @@
         - path: myapp/models.py
           content: |
             from django.db import models
-            from django.db.models.manager import BaseManager
             from .querysets import MyModelQuerySet
 
-            NewManager = BaseManager.from_queryset(MyModelQuerySet)
+            NewManager = models.Manager.from_queryset(MyModelQuerySet)
             class MyModel(models.Model):
                 objects = NewManager()
 
 -   case: from_queryset_generated_manager_imported_from_other_module
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.querysets.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.querysets.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
@@ -237,7 +230,6 @@
             content: |
                 from typing import TYPE_CHECKING, Iterable, Sequence
                 from django.db import models
-                from django.db.models.manager import BaseManager
                 if TYPE_CHECKING:
                     from .models import MyModel
 
@@ -257,7 +249,7 @@
                     def queryset_method_4(self, arg: Sequence) -> None:
                         return None
 
-                NewManager = BaseManager.from_queryset(ModelQuerySet)
+                NewManager = models.Manager.from_queryset(ModelQuerySet)
 
         -   path: myapp/models.py
             content: |
@@ -402,7 +394,7 @@
 -   case: from_queryset_with_class_inheritance
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
     installed_apps:
@@ -412,14 +404,13 @@
         - path: myapp/models.py
           content: |
               from django.db import models
-              from django.db.models.manager import BaseManager
               class BaseQuerySet(models.QuerySet):
                   def queryset_method(self) -> str:
                       return 'hello'
               class ModelQuerySet(BaseQuerySet):
                   pass
 
-              NewManager = BaseManager.from_queryset(ModelQuerySet)
+              NewManager = models.Manager.from_queryset(ModelQuerySet)
               class MyModel(models.Model):
                   objects = NewManager()
 
@@ -668,12 +659,12 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from django.db.models.manager import BaseManager
+                from django.db.models.manager import Manager
 
                 class MyQuerySet(models.QuerySet["MyModel"]):
                     ...
 
-                MyManager = BaseManager.from_queryset(MyQuerySet)
+                MyManager = Manager.from_queryset(MyQuerySet)
                 class MyModel(models.Model):
                     objects = MyManager()
 
@@ -744,9 +735,9 @@
 
 -   case: handles_name_collision_with_generated_type
     main: |
-        from myapp.models import MyModel, BaseManagerFromModelQuerySet
-        reveal_type(BaseManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[Never]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet[myapp.models.MyModel]"
+        from myapp.models import MyModel, ManagerFromModelQuerySet
+        reveal_type(ManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Never]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -754,21 +745,20 @@
         - path: myapp/models.py
           content: |
               from django.db import models
-              from django.db.models.manager import BaseManager
 
               class ModelQuerySet(models.QuerySet["MyModel"]):
                   ...
 
-              BaseManagerFromModelQuerySet = BaseManager.from_queryset(ModelQuerySet)
+              ManagerFromModelQuerySet = models.Manager.from_queryset(ModelQuerySet)
               class MyModel(models.Model):
-                  objects = BaseManagerFromModelQuerySet()
+                  objects = ManagerFromModelQuerySet()
 
 -   case: resolves_name_collision_with_other_module_level_object
     main: |
-        from myapp.models import MyModel, Generated, BaseManagerFromModelQuerySet
-        reveal_type(BaseManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
-        reveal_type(Generated())  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[Never]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromModelQuerySet1[myapp.models.MyModel]"
+        from myapp.models import MyModel, Generated, ManagerFromModelQuerySet
+        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
+        reveal_type(Generated())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[Never]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -776,13 +766,12 @@
         - path: myapp/models.py
           content: |
               from django.db import models
-              from django.db.models.manager import BaseManager
 
               class ModelQuerySet(models.QuerySet["MyModel"]):
                   ...
 
-              BaseManagerFromModelQuerySet = 1
-              Generated = BaseManager.from_queryset(ModelQuerySet)
+              ManagerFromModelQuerySet = 1
+              Generated = models.Manager.from_queryset(ModelQuerySet)
               class MyModel(models.Model):
                   objects = Generated()
 

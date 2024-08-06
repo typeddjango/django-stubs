@@ -36,8 +36,7 @@ class Model(metaclass=ModelBase):
     # and re-add them to correct concrete subclasses of 'Model'
     DoesNotExist: Final[type[ObjectDoesNotExist]]
     MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
-    # This 'objects' attribute will be deleted, via the plugin, in favor of managing it
-    # to only exist on subclasses it exists on during runtime.
+
     objects: ClassVar[Manager[Self]]
 
     _meta: ClassVar[Options[Self]]

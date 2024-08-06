@@ -373,10 +373,17 @@ class AddManagers(ModelClassInitializer):
         assert manager_info is not None
         # Reparameterize dynamically created manager with model type
         manager_type = helpers.fill_manager(manager_info, Instance(self.model_classdef.info, []))
+        manager_node = self.model_classdef.info.get(manager_name)
+        if manager_node and isinstance(manager_node.node, Var):
+            manager_node.node.type = manager_type
         self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
     def run_with_model_cls(self, model_cls: Type[Model]) -> None:
         manager_info: Optional[TypeInfo]
+
+        def cast_var_to_classvar(symbol: Optional[SymbolTableNode]) -> None:
+            if symbol and isinstance(symbol.node, Var):
+                symbol.node.is_classvar = True
 
         incomplete_manager_defs = set()
         for manager_name, manager in model_cls._meta.managers_map.items():
@@ -399,7 +406,24 @@ class AddManagers(ModelClassInitializer):
 
             assert self.model_classdef.info.self_type is not None
             manager_type = helpers.fill_manager(manager_info, self.model_classdef.info.self_type)
-            self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
+            # It seems that the type checker fetches a Var from expressions, but looks
+            # through the symbol table for the type(at some later stage?). Currently we
+            # don't overwrite the reference mypy holds from an expression to a Var
+            # instance when adding a new node, we only overwrite the reference to the
+            # Var in the symbol table. That means there's a lingering Var instance
+            # attached to expressions and if we don't flip that to a ClassVar, the
+            # checker will emit an error for overriding a class variable with an
+            # instance variable. As mypy seems to check that via the expression and not
+            # the symbol table. Optimally we want to just set a type on the existing Var
+            # like:
+            # manager_node.node.type = manager_type
+            # but for some reason that doesn't work. It only works replacing the
+            # existing Var with a new one in the symbol table.
+            cast_var_to_classvar(manager_node)
+            if manager_fullname == manager_info.fullname and manager_node and isinstance(manager_node.node, Var):
+                manager_node.node.type = manager_type
+            else:
+                self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
             if not self.api.final_iteration:
@@ -414,6 +438,7 @@ class AddManagers(ModelClassInitializer):
                 # setting _some_ type
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 if fallback_manager_info is not None:
+                    cast_var_to_classvar(self.model_classdef.info.get(manager_name))
                     assert self.model_classdef.info.self_type is not None
                     manager_type = helpers.fill_manager(fallback_manager_info, self.model_classdef.info.self_type)
                     self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
@@ -1011,12 +1036,6 @@ class MetaclassAdjustments(ModelClassInitializer):
             and not multiple_objects_returned.plugin_generated
         ):
             del ctx.cls.info.names["MultipleObjectsReturned"]
-
-        objects = ctx.cls.info.names.get("objects")
-        if objects is not None and isinstance(objects.node, Var) and not objects.plugin_generated:
-            del ctx.cls.info.names["objects"]
-
-        return
 
     def get_exception_bases(self, name: str) -> List[Instance]:
         bases = []
