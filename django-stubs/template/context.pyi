@@ -50,7 +50,11 @@ class Context(BaseContext):
     render_context: RenderContext
     template: Template | None
     def __init__(
-        self, dict_: Any | None = None, autoescape: bool = True, use_l10n: bool | None = None, use_tz: bool | None = None
+        self,
+        dict_: Any | None = None,
+        autoescape: bool = True,
+        use_l10n: bool | None = None,
+        use_tz: bool | None = None,
     ) -> None: ...
     @contextmanager
     def bind_template(self, template: Template) -> Iterator[None]: ...
