@@ -103,7 +103,10 @@ class SQLCompiler:
     ) -> CursorWrapper: ...
     @overload
     def execute_sql(
-        self, result_type: Literal["no results"] | None = "no results", chunked_fetch: bool = False, chunk_size: int = 100
+        self,
+        result_type: Literal["no results"] | None = "no results",
+        chunked_fetch: bool = False,
+        chunk_size: int = 100,
     ) -> None: ...
     @overload
     def execute_sql(
