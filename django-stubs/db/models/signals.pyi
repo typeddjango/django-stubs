@@ -10,17 +10,17 @@ class ModelSignal(Signal):
     def connect(  # type: ignore[override]
         self,
         receiver: Callable,
-        sender: type[Model] | str | None = ...,
-        weak: bool = ...,
-        dispatch_uid: str | None = ...,
-        apps: Apps | None = ...,
+        sender: type[Model] | str | None = None,
+        weak: bool = True,
+        dispatch_uid: str | None = None,
+        apps: Apps | None = None,
     ) -> None: ...
     def disconnect(  # type: ignore[override]
         self,
-        receiver: Callable | None = ...,
-        sender: type[Model] | str | None = ...,
-        dispatch_uid: str | None = ...,
-        apps: Apps | None = ...,
+        receiver: Callable | None = None,
+        sender: type[Model] | str | None = None,
+        dispatch_uid: str | None = None,
+        apps: Apps | None = None,
     ) -> bool | None: ...
 
 pre_init: ModelSignal

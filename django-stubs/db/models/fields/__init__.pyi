@@ -153,29 +153,29 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     non_db_attrs: tuple[str, ...]
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _Choices | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
@@ -196,18 +196,18 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def db_parameters(self, connection: BaseDatabaseWrapper) -> dict[str, str | None]: ...
     def pre_save(self, model_instance: Model, add: bool) -> Any: ...
     def get_prep_value(self, value: Any) -> Any: ...
-    def get_db_prep_value(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool = ...) -> Any: ...
+    def get_db_prep_value(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool = False) -> Any: ...
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def get_internal_type(self) -> str: ...
     # TODO: plugin support
     def formfield(
         self,
-        form_class: type[forms.Field] | None = ...,
-        choices_form_class: type[forms.ChoiceField] | None = ...,
+        form_class: type[forms.Field] | None = None,
+        choices_form_class: type[forms.ChoiceField] | None = None,
         **kwargs: Any,
     ) -> forms.Field: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
-    def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = ...) -> None: ...
+    def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = False) -> None: ...
     def to_python(self, value: Any) -> Any: ...
     @cached_property
     def validators(self) -> list[validators._ValidatorCallable]: ...
@@ -216,10 +216,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def clean(self, value: Any, model_instance: Model | None) -> Any: ...
     def get_choices(
         self,
-        include_blank: bool = ...,
+        include_blank: bool = True,
         blank_choice: _ChoicesList = ...,
-        limit_choices_to: _LimitChoicesTo | None = ...,
-        ordering: Sequence[str] = ...,
+        limit_choices_to: _LimitChoicesTo | None = None,
+        ordering: Sequence[str] = (),
     ) -> BlankChoiceIterator | _ChoicesList: ...
     def _get_flatchoices(self) -> list[_Choice]: ...
     @property
@@ -227,7 +227,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def has_default(self) -> bool: ...
     def get_default(self) -> Any: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
-    def get_col(self, alias: str, output_field: Field | None = ...) -> Col: ...
+    def get_col(self, alias: str, output_field: Field | None = None) -> Col: ...
     @cached_property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
@@ -266,10 +266,10 @@ class DecimalField(Field[_ST, _GT]):
     decimal_places: int
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        max_digits: int | None = ...,
-        decimal_places: int | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
         *,
         primary_key: bool = ...,
         unique: bool = ...,
@@ -321,7 +321,7 @@ class CharField(Field[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         *,
-        db_collation: str | None = ...,
+        db_collation: str | None = None,
     ) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
@@ -351,9 +351,9 @@ class SlugField(CharField[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         *,
-        max_length: int | None = ...,
-        db_index: bool = ...,
-        allow_unicode: bool = ...,
+        max_length: int | None = 50,
+        db_index: bool = True,
+        allow_unicode: bool = False,
     ) -> None: ...
 
 class EmailField(CharField[_ST, _GT]):
@@ -362,8 +362,8 @@ class EmailField(CharField[_ST, _GT]):
 class URLField(CharField[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
         *,
         primary_key: bool = ...,
         max_length: int | None = ...,
@@ -420,7 +420,7 @@ class TextField(Field[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         *,
-        db_collation: str | None = ...,
+        db_collation: str | None = None,
     ) -> None: ...
 
 class BooleanField(Field[_ST, _GT]):
@@ -446,10 +446,10 @@ class GenericIPAddressField(Field[_ST, _GT]):
     protocol: str
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: Any | None = ...,
-        protocol: str = ...,
-        unpack_ipv4: bool = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: Any | None = None,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
         primary_key: bool = ...,
         unique: bool = ...,
         blank: bool = ...,
@@ -479,10 +479,10 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     auto_now_add: bool
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        auto_now: bool = ...,
-        auto_now_add: bool = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
         *,
         primary_key: bool = ...,
         max_length: int | None = ...,
@@ -511,10 +511,10 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     auto_now_add: bool
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        auto_now: bool = ...,
-        auto_now_add: bool = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
         *,
         primary_key: bool = ...,
         unique: bool = ...,
@@ -546,7 +546,7 @@ class UUIDField(Field[_ST, _GT]):
     _pyi_lookup_exact_type: uuid.UUID | str
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
+        verbose_name: _StrOrPromise | None = None,
         *,
         name: str | None = ...,
         primary_key: bool = ...,
@@ -581,13 +581,13 @@ class FilePathField(Field[_ST, _GT]):
     allow_folders: bool
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        path: str | Callable[..., str] = ...,
-        match: str | None = ...,
-        recursive: bool = ...,
-        allow_files: bool = ...,
-        allow_folders: bool = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        path: str | Callable[..., str] = "",
+        match: str | None = None,
+        recursive: bool = False,
+        allow_files: bool = True,
+        allow_folders: bool = False,
         *,
         primary_key: bool = ...,
         max_length: int = ...,

@@ -11,7 +11,7 @@ ALL_CHECKS: Literal["__all__"]
 
 class CommandError(Exception):
     returncode: int
-    def __init__(self, *args: Any, returncode: int = ..., **kwargs: Any) -> None: ...
+    def __init__(self, *args: Any, returncode: int = 1, **kwargs: Any) -> None: ...
 
 class SystemCheckError(CommandError): ...
 
@@ -19,7 +19,7 @@ class CommandParser(ArgumentParser):
     missing_args_message: str | None
     called_from_command_line: bool | None
     def __init__(
-        self, *, missing_args_message: str | None = ..., called_from_command_line: bool | None = ..., **kwargs: Any
+        self, *, missing_args_message: str | None = None, called_from_command_line: bool | None = None, **kwargs: Any
     ) -> None: ...
     def error(self, message: str) -> Any: ...
 
@@ -37,12 +37,12 @@ class OutputWrapper(TextIOBase):
     @style_func.setter
     def style_func(self, style_func: Callable[[str], str] | None) -> None: ...
     ending: str
-    def __init__(self, out: TextIO, ending: str = ...) -> None: ...
+    def __init__(self, out: TextIO, ending: str = "\n") -> None: ...
     def __getattr__(self, name: str) -> Callable: ...
     def flush(self) -> None: ...
     def isatty(self) -> bool: ...
     def write(  # type: ignore[override]
-        self, msg: str = ..., style_func: Callable[[str], str] | None = ..., ending: str | None = ...
+        self, msg: str = "", style_func: Callable[[str], str] | None = None, ending: str | None = None
     ) -> None: ...
 
 class BaseCommand:
@@ -58,10 +58,10 @@ class BaseCommand:
     style: Style
     def __init__(
         self,
-        stdout: TextIO | None = ...,
-        stderr: TextIO | None = ...,
-        no_color: bool = ...,
-        force_color: bool = ...,
+        stdout: TextIO | None = None,
+        stderr: TextIO | None = None,
+        no_color: bool = False,
+        force_color: bool = False,
     ) -> None: ...
     def get_version(self) -> str: ...
     def create_parser(self, prog_name: str, subcommand: str, **kwargs: Any) -> CommandParser: ...
@@ -72,12 +72,12 @@ class BaseCommand:
     def execute(self, *args: Any, **options: Any) -> str | None: ...
     def check(
         self,
-        app_configs: Sequence[AppConfig] | None = ...,
-        tags: Sequence[str] | None = ...,
-        display_num_errors: bool = ...,
-        include_deployment_checks: bool = ...,
-        fail_level: int = ...,
-        databases: Sequence[str] | None = ...,
+        app_configs: Sequence[AppConfig] | None = None,
+        tags: Sequence[str] | None = None,
+        display_num_errors: bool = False,
+        include_deployment_checks: bool = False,
+        fail_level: int = 40,
+        databases: Sequence[str] | None = None,
     ) -> None: ...
     def check_migrations(self) -> None: ...
     def handle(self, *args: Any, **options: Any) -> str | None: ...

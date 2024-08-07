@@ -13,7 +13,7 @@ class PostgresIndex(Index):
     @cached_property
     def max_name_length(self) -> int: ...  # type: ignore[override]
     def create_sql(
-        self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
+        self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = "", **kwargs: Any
     ) -> Statement: ...
     def check_supported(self, schema_editor: BaseDatabaseSchemaEditor) -> None: ...
     def get_with_params(self) -> Sequence[str]: ...
@@ -22,8 +22,8 @@ class BloomIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        length: int | None = ...,
-        columns: _ListOrTuple[int] = ...,
+        length: int | None = None,
+        columns: _ListOrTuple[int] = (),
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,
@@ -36,8 +36,8 @@ class BrinIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        autosummarize: bool | None = ...,
-        pages_per_range: int | None = ...,
+        autosummarize: bool | None = None,
+        pages_per_range: int | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,
@@ -50,7 +50,7 @@ class BTreeIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        fillfactor: int | None = ...,
+        fillfactor: int | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,
@@ -63,8 +63,8 @@ class GinIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        fastupdate: bool | None = ...,
-        gin_pending_list_limit: int | None = ...,
+        fastupdate: bool | None = None,
+        gin_pending_list_limit: int | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,
@@ -77,8 +77,8 @@ class GistIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        buffering: bool | None = ...,
-        fillfactor: int | None = ...,
+        buffering: bool | None = None,
+        fillfactor: int | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,
@@ -91,7 +91,7 @@ class HashIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        fillfactor: int | None = ...,
+        fillfactor: int | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,
@@ -104,7 +104,7 @@ class SpGistIndex(PostgresIndex):
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        fillfactor: int | None = ...,
+        fillfactor: int | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,

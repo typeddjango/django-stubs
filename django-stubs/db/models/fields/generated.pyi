@@ -21,7 +21,7 @@ class GeneratedField(models.Field):
         *,
         expression: Expression,
         output_field: models.Field,
-        db_persist: bool | None = ...,
+        db_persist: bool | None = None,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,

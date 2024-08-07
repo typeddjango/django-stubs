@@ -12,8 +12,8 @@ def b62_encode(s: int) -> str: ...
 def b62_decode(s: str) -> int: ...
 def b64_encode(s: bytes) -> bytes: ...
 def b64_decode(s: bytes) -> bytes: ...
-def base64_hmac(salt: bytes | str, value: bytes | str, key: bytes | str, algorithm: str = ...) -> str: ...
-def get_cookie_signer(salt: str = ...) -> TimestampSigner: ...
+def base64_hmac(salt: bytes | str, value: bytes | str, key: bytes | str, algorithm: str = "sha1") -> str: ...
+def get_cookie_signer(salt: str = "django.core.signing.get_cookie_signer") -> TimestampSigner: ...
 @type_check_only
 class Serializer(Protocol):
     def dumps(self, obj: Any) -> bytes: ...
@@ -25,18 +25,18 @@ class JSONSerializer:
 
 def dumps(
     obj: Any,
-    key: bytes | str | None = ...,
-    salt: bytes | str = ...,
+    key: bytes | str | None = None,
+    salt: bytes | str = "django.core.signing",
     serializer: type[Serializer] = ...,
-    compress: bool = ...,
+    compress: bool = False,
 ) -> str: ...
 def loads(
     s: str,
-    key: bytes | str | None = ...,
-    salt: bytes | str = ...,
+    key: bytes | str | None = None,
+    salt: bytes | str = "django.core.signing",
     serializer: type[Serializer] = ...,
-    max_age: int | timedelta | None = ...,
-    fallback_keys: list[str | bytes] | None = ...,
+    max_age: int | timedelta | None = None,
+    fallback_keys: list[str | bytes] | None = None,
 ) -> Any: ...
 
 class Signer:
@@ -49,31 +49,31 @@ class Signer:
     def __init__(
         self,
         *,
-        key: bytes | str | None = ...,
-        sep: str = ...,
-        salt: bytes | str | None = ...,
-        algorithm: str | None = ...,
-        fallback_keys: list[bytes | str] | None = ...,
+        key: bytes | str | None = None,
+        sep: str = ":",
+        salt: bytes | str | None = None,
+        algorithm: str | None = None,
+        fallback_keys: list[bytes | str] | None = None,
     ) -> None: ...
     @overload
     @deprecated("Passing positional arguments to Signer is deprecated and will be removed in Django 5.1")
     def __init__(
         self,
         *args: Any,
-        key: bytes | str | None = ...,
-        sep: str = ...,
-        salt: bytes | str | None = ...,
-        algorithm: str | None = ...,
-        fallback_keys: list[bytes | str] | None = ...,
+        key: bytes | str | None = None,
+        sep: str = ":",
+        salt: bytes | str | None = None,
+        algorithm: str | None = None,
+        fallback_keys: list[bytes | str] | None = None,
     ) -> None: ...
-    def signature(self, value: bytes | str, key: bytes | str | None = ...) -> str: ...
+    def signature(self, value: bytes | str, key: bytes | str | None = None) -> str: ...
     def sign(self, value: str) -> str: ...
     def unsign(self, signed_value: str) -> str: ...
     def sign_object(
         self,
         obj: Any,
         serializer: type[Serializer] = ...,
-        compress: bool = ...,
+        compress: bool = False,
     ) -> str: ...
     def unsign_object(
         self,
@@ -85,4 +85,4 @@ class Signer:
 class TimestampSigner(Signer):
     def timestamp(self) -> str: ...
     def sign(self, value: str) -> str: ...
-    def unsign(self, value: str, max_age: int | timedelta | None = ...) -> str: ...
+    def unsign(self, value: str, max_age: int | timedelta | None = None) -> str: ...

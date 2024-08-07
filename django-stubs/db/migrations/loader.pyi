@@ -20,9 +20,9 @@ class MigrationLoader:
     def __init__(
         self,
         connection: BaseDatabaseWrapper | None,
-        load: bool = ...,
-        ignore_no_migrations: bool = ...,
-        replace_migrations: bool = ...,
+        load: bool = True,
+        ignore_no_migrations: bool = False,
+        replace_migrations: bool = True,
     ) -> None: ...
     @classmethod
     def migrations_module(cls, app_label: str) -> tuple[str | None, bool]: ...
@@ -40,5 +40,5 @@ class MigrationLoader:
     def check_consistent_history(self, connection: BaseDatabaseWrapper) -> None: ...
     def detect_conflicts(self) -> dict[str, list[str]]: ...
     def project_state(
-        self, nodes: tuple[str, str] | Sequence[tuple[str, str]] | None = ..., at_end: bool = ...
+        self, nodes: tuple[str, str] | Sequence[tuple[str, str]] | None = None, at_end: bool = True
     ) -> ProjectState: ...

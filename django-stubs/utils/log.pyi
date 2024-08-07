@@ -17,9 +17,9 @@ class AdminEmailHandler(logging.Handler):
     email_backend: str | None
     def __init__(
         self,
-        include_html: bool = ...,
-        email_backend: str | None = ...,
-        reporter_class: str | None = ...,
+        include_html: bool = False,
+        email_backend: str | None = None,
+        reporter_class: str | None = None,
     ) -> None: ...
     def send_mail(self, subject: _StrOrPromise, message: _StrOrPromise, *args: Any, **kwargs: Any) -> None: ...
     def connection(self) -> Any: ...
@@ -45,9 +45,9 @@ class ServerFormatter(logging.Formatter):
 def log_response(
     message: str,
     *args: Any,
-    response: HttpResponse | None = ...,
-    request: HttpRequest | None = ...,
+    response: HttpResponse | None = None,
+    request: HttpRequest | None = None,
     logger: Logger = ...,
-    level: str | None = ...,
-    exception: BaseException | None = ...,
+    level: str | None = None,
+    exception: BaseException | None = None,
 ) -> None: ...

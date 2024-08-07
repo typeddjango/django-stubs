@@ -10,5 +10,5 @@ class Serializer(base.Serializer):
     def get_dump_object(self, obj: Model) -> dict[str, Any]: ...
 
 def Deserializer(
-    object_list: list[dict[str, Any]], *, using: str = ..., ignorenonexistent: bool = ..., **options: Any
+    object_list: list[dict[str, Any]], *, using: str = "default", ignorenonexistent: bool = False, **options: Any
 ) -> Iterator[DeserializedObject]: ...

@@ -43,8 +43,8 @@ class TranslateNode(Node):
         self,
         filter_expression: FilterExpression,
         noop: bool,
-        asvar: str | None = ...,
-        message_context: FilterExpression | None = ...,
+        asvar: str | None = None,
+        message_context: FilterExpression | None = None,
     ) -> None: ...
     def render(self, context: Context) -> str: ...
 
@@ -61,16 +61,16 @@ class BlockTranslateNode(Node):
         self,
         extra_context: dict[str, FilterExpression],
         singular: list[Token],
-        plural: list[Token] = ...,
-        countervar: str | None = ...,
-        counter: FilterExpression | None = ...,
-        message_context: FilterExpression | None = ...,
-        trimmed: bool = ...,
-        asvar: str | None = ...,
-        tag_name: str = ...,
+        plural: list[Token] | None = None,
+        countervar: str | None = None,
+        counter: FilterExpression | None = None,
+        message_context: FilterExpression | None = None,
+        trimmed: bool = False,
+        asvar: str | None = None,
+        tag_name: str = "blocktranslate",
     ) -> None: ...
     def render_token_list(self, tokens: list[Token]) -> tuple[str, list[str]]: ...
-    def render(self, context: Context, nested: bool = ...) -> str: ...
+    def render(self, context: Context, nested: bool = False) -> str: ...
 
 class LanguageNode(Node):
     nodelist: NodeList

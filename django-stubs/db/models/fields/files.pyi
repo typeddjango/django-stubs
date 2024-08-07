@@ -28,9 +28,9 @@ class FieldFile(File, AltersData):
     def url(self) -> str: ...
     @property
     def size(self) -> int: ...
-    def open(self, mode: str = ...) -> Self: ...  # type: ignore[override]
-    def save(self, name: str, content: File, save: bool = ...) -> None: ...
-    def delete(self, save: bool = ...) -> None: ...
+    def open(self, mode: str = "rb") -> Self: ...  # type: ignore[override]
+    def save(self, name: str, content: File, save: bool = True) -> None: ...
+    def delete(self, save: bool = True) -> None: ...
     @property
     def closed(self) -> bool: ...
     def __getstate__(self) -> dict[str, Any]: ...
@@ -41,7 +41,7 @@ class FieldFile(File, AltersData):
 class FileDescriptor(DeferredAttribute):
     field: FileField
     def __set__(self, instance: Model, value: Any | None) -> None: ...
-    def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> FieldFile | FileDescriptor: ...
+    def __get__(self, instance: Model | None, cls: type[Model] | None = None) -> FieldFile | FileDescriptor: ...
 
 _M = TypeVar("_M", bound=Model, contravariant=True)
 
@@ -54,10 +54,10 @@ class FileField(Field):
     upload_to: _PathCompatible | _UploadToCallable
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        upload_to: _PathCompatible | _UploadToCallable = ...,
-        storage: Storage | Callable[[], Storage] | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        upload_to: _PathCompatible | _UploadToCallable = "",
+        storage: Storage | Callable[[], Storage] | None = None,
         *,
         max_length: int | None = ...,
         unique: bool = ...,
@@ -97,15 +97,15 @@ class ImageFileDescriptor(FileDescriptor):
 
 class ImageFieldFile(ImageFile, FieldFile):
     field: ImageField
-    def delete(self, save: bool = ...) -> None: ...
+    def delete(self, save: bool = True) -> None: ...
 
 class ImageField(FileField):
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        width_field: str | None = ...,
-        height_field: str | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        width_field: str | None = None,
+        height_field: str | None = None,
         **kwargs: Any,
     ) -> None: ...
     # class access
@@ -117,4 +117,4 @@ class ImageField(FileField):
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
-    def update_dimension_fields(self, instance: Model, force: bool = ..., *args: Any, **kwargs: Any) -> None: ...
+    def update_dimension_fields(self, instance: Model, force: bool = False, *args: Any, **kwargs: Any) -> None: ...

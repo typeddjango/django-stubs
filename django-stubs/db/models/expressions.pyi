@@ -62,7 +62,7 @@ class BaseExpression:
     filterable: bool
     window_compatible: bool
     allowed_default: bool
-    def __init__(self, output_field: Field | None = ...) -> None: ...
+    def __init__(self, output_field: Field | None = None) -> None: ...
     def get_db_converters(self, connection: BaseDatabaseWrapper) -> list[Callable]: ...
     def get_source_expressions(self) -> list[Any]: ...
     def set_source_expressions(self, exprs: Sequence[Combinable | Expression]) -> None: ...
@@ -76,11 +76,11 @@ class BaseExpression:
     def contains_subquery(self) -> bool: ...
     def resolve_expression(
         self,
-        query: Any = ...,
-        allow_joins: bool = ...,
-        reuse: set[str] | None = ...,
-        summarize: bool = ...,
-        for_save: bool = ...,
+        query: Any | None = None,
+        allow_joins: bool = True,
+        reuse: set[str] | None = None,
+        summarize: bool = False,
+        for_save: bool = False,
     ) -> Self: ...
     @property
     def conditional(self) -> bool: ...
@@ -119,7 +119,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
     connector: str
     lhs: Combinable
     rhs: Combinable
-    def __init__(self, lhs: Combinable, connector: str, rhs: Combinable, output_field: Field | None = ...) -> None: ...
+    def __init__(self, lhs: Combinable, connector: str, rhs: Combinable, output_field: Field | None = None) -> None: ...
 
 class DurationExpression(CombinedExpression):
     def compile(self, side: Combinable, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
@@ -134,11 +134,11 @@ class F(_Deconstructible, Combinable):
     def __init__(self, name: str) -> None: ...
     def resolve_expression(
         self,
-        query: Any = ...,
-        allow_joins: bool = ...,
-        reuse: set[str] | None = ...,
-        summarize: bool = ...,
-        for_save: bool = ...,
+        query: Any | None = None,
+        allow_joins: bool = True,
+        reuse: set[str] | None = None,
+        summarize: bool = False,
+        for_save: bool = False,
     ) -> Expression: ...
     def replace_expressions(self, replacements: Mapping[F, Any]) -> F: ...
     def asc(
@@ -174,25 +174,25 @@ class Func(SQLiteNumericMixin, Expression):
     arity: int | None
     source_expressions: list[Expression]
     extra: dict[Any, Any]
-    def __init__(self, *expressions: Any, output_field: Field | None = ..., **extra: Any) -> None: ...
+    def __init__(self, *expressions: Any, output_field: Field | None = None, **extra: Any) -> None: ...
     def as_sql(
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
-        function: str | None = ...,
-        template: str | None = ...,
-        arg_joiner: str | None = ...,
+        function: str | None = None,
+        template: str | None = None,
+        arg_joiner: str | None = None,
         **extra_context: Any,
     ) -> _AsSqlType: ...
 
 class Value(Expression):
     value: Any
-    def __init__(self, value: Any, output_field: Field | None = ...) -> None: ...
+    def __init__(self, value: Any, output_field: Field | None = None) -> None: ...
 
 class RawSQL(Expression):
     params: list[Any]
     sql: str
-    def __init__(self, sql: str, params: Sequence[Any], output_field: Field | None = ...) -> None: ...
+    def __init__(self, sql: str, params: Sequence[Any], output_field: Field | None = None) -> None: ...
 
 class Star(Expression): ...
 
@@ -204,7 +204,7 @@ class Col(Expression):
     alias: str
     contains_column_references: Literal[True]
     possibly_multivalued: Literal[False]
-    def __init__(self, alias: str, target: Field, output_field: Field | None = ...) -> None: ...
+    def __init__(self, alias: str, target: Field, output_field: Field | None = None) -> None: ...
 
 class Ref(Expression):
     def __init__(self, refs: str, source: Expression) -> None: ...
@@ -228,7 +228,7 @@ class When(Expression):
     template: str
     condition: Any
     result: Any
-    def __init__(self, condition: Any = ..., then: Any = ..., **lookups: Any) -> None: ...
+    def __init__(self, condition: Any | None = None, then: Any | None = None, **lookups: Any) -> None: ...
 
 class Case(Expression):
     template: str
@@ -237,7 +237,7 @@ class Case(Expression):
     default: Any
     extra: Any
     def __init__(
-        self, *cases: Any, default: Any | None = ..., output_field: Field | None = ..., **extra: Any
+        self, *cases: Any, default: Any | None = None, output_field: Field | None = None, **extra: Any
     ) -> None: ...
 
 class Subquery(BaseExpression, Combinable):
@@ -245,7 +245,7 @@ class Subquery(BaseExpression, Combinable):
     subquery: bool
     query: Query
     extra: dict[Any, Any]
-    def __init__(self, queryset: Query | QuerySet, output_field: Field | None = ..., **extra: Any) -> None: ...
+    def __init__(self, queryset: Query | QuerySet, output_field: Field | None = None, **extra: Any) -> None: ...
 
 class Exists(Subquery):
     output_field: ClassVar[fields.BooleanField]
@@ -260,9 +260,9 @@ class OrderBy(Expression):
     def __init__(
         self,
         expression: Expression | F | Subquery,
-        descending: bool = ...,
-        nulls_first: bool | None = ...,
-        nulls_last: bool | None = ...,
+        descending: bool = False,
+        nulls_first: bool | None = None,
+        nulls_last: bool | None = None,
     ) -> None: ...
     def asc(self) -> None: ...  # type: ignore[override]
     def desc(self) -> None: ...  # type: ignore[override]
@@ -276,16 +276,16 @@ class Window(SQLiteNumericMixin, Expression):
     def __init__(
         self,
         expression: BaseExpression,
-        partition_by: str | Iterable[BaseExpression | F] | F | BaseExpression | None = ...,
-        order_by: Sequence[BaseExpression | F | str] | BaseExpression | F | str | None = ...,
-        frame: WindowFrame | None = ...,
-        output_field: Field | None = ...,
+        partition_by: str | Iterable[BaseExpression | F] | F | BaseExpression | None = None,
+        order_by: Sequence[BaseExpression | F | str] | BaseExpression | F | str | None = None,
+        frame: WindowFrame | None = None,
+        output_field: Field | None = None,
     ) -> None: ...
 
 class WindowFrame(Expression):
     template: str
     frame_type: str
-    def __init__(self, start: int | None = ..., end: int | None = ...) -> None: ...
+    def __init__(self, start: int | None = None, end: int | None = None) -> None: ...
     def window_frame_start_end(
         self, connection: BaseDatabaseWrapper, start: int | None, end: int | None
     ) -> tuple[int, int]: ...
