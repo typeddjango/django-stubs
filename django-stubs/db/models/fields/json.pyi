@@ -24,10 +24,10 @@ class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     decoder: type[json.JSONDecoder] | None
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        encoder: type[json.JSONEncoder] | None = ...,
-        decoder: type[json.JSONDecoder] | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        encoder: type[json.JSONEncoder] | None = None,
+        decoder: type[json.JSONDecoder] | None = None,
         **kwargs: Any,
     ) -> None: ...
     def from_db_value(self, value: str | None, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...

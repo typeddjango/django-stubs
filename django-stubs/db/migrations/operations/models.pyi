@@ -27,9 +27,9 @@ class CreateModel(ModelOperation):
         self,
         name: str,
         fields: list[tuple[str, Field]],
-        options: dict[str, Any] | None = ...,
-        bases: Sequence[type[Any] | str] | None = ...,
-        managers: Sequence[tuple[str, Manager]] | None = ...,
+        options: dict[str, Any] | None = None,
+        bases: Sequence[type[Any] | str] | None = None,
+        managers: Sequence[tuple[str, Manager]] | None = None,
     ) -> None: ...
 
 class DeleteModel(ModelOperation): ...
@@ -132,8 +132,8 @@ class RenameIndex(IndexOperation):
         self,
         model_name: str,
         new_name: str,
-        old_name: str | None = ...,
-        old_fields: Sequence[str] | None = ...,
+        old_name: str | None = None,
+        old_fields: Sequence[str] | None = None,
     ) -> None: ...
     @cached_property
     def old_name_lower(self) -> str: ...

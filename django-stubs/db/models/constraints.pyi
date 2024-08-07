@@ -20,16 +20,16 @@ class BaseConstraint:
     default_violation_error_message: _StrOrPromise
     @overload
     def __init__(
-        self, *, name: str, violation_error_code: str | None = ..., violation_error_message: _StrOrPromise | None = ...
+        self, *, name: str, violation_error_code: str | None = None, violation_error_message: _StrOrPromise | None = None
     ) -> None: ...
     @overload
     @deprecated("Passing positional arguments to BaseConstraint is deprecated and will be removed in Django 6.0")
     def __init__(
         self,
         *args: Any,
-        name: str | None = ...,
-        violation_error_code: str | None = ...,
-        violation_error_message: _StrOrPromise | None = ...,
+        name: str | None = None,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
     def constraint_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
     def create_sql(self, model: type[Model] | None, schema_editor: BaseDatabaseSchemaEditor | None) -> str: ...
@@ -45,8 +45,8 @@ class CheckConstraint(BaseConstraint):
         *,
         check: Q | BaseExpression,
         name: str,
-        violation_error_code: str | None = ...,
-        violation_error_message: _StrOrPromise | None = ...,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
 
 class UniqueConstraint(BaseConstraint):
@@ -61,26 +61,26 @@ class UniqueConstraint(BaseConstraint):
         self,
         *expressions: str | BaseExpression | Combinable,
         fields: None = None,
-        name: str | None = ...,
-        condition: Q | None = ...,
-        deferrable: Deferrable | None = ...,
-        include: Sequence[str] | None = ...,
-        opclasses: Sequence[Any] = ...,
-        nulls_distinct: bool | None = ...,
-        violation_error_code: str | None = ...,
-        violation_error_message: _StrOrPromise | None = ...,
+        name: str | None = None,
+        condition: Q | None = None,
+        deferrable: Deferrable | None = None,
+        include: Sequence[str] | None = None,
+        opclasses: Sequence[Any] = (),
+        nulls_distinct: bool | None = None,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
     @overload
     def __init__(
         self,
         *,
         fields: Sequence[str],
-        name: str | None = ...,
-        condition: Q | None = ...,
-        deferrable: Deferrable | None = ...,
-        include: Sequence[str] | None = ...,
-        opclasses: Sequence[Any] = ...,
-        nulls_distinct: bool | None = ...,
-        violation_error_code: str | None = ...,
-        violation_error_message: _StrOrPromise | None = ...,
+        name: str | None = None,
+        condition: Q | None = None,
+        deferrable: Deferrable | None = None,
+        include: Sequence[str] | None = None,
+        opclasses: Sequence[Any] = (),
+        nulls_distinct: bool | None = None,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...

@@ -30,7 +30,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     def __init__(
         self,
         base_field: Field,
-        size: int | None = ...,
+        size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,

@@ -14,14 +14,14 @@ class MigrationAutodetector:
     questioner: MigrationQuestioner
     existing_apps: set[Any]
     def __init__(
-        self, from_state: ProjectState, to_state: ProjectState, questioner: MigrationQuestioner | None = ...
+        self, from_state: ProjectState, to_state: ProjectState, questioner: MigrationQuestioner | None = None
     ) -> None: ...
     def changes(
         self,
         graph: MigrationGraph,
-        trim_to_apps: set[str] | None = ...,
-        convert_apps: set[str] | None = ...,
-        migration_name: str | None = ...,
+        trim_to_apps: set[str] | None = None,
+        convert_apps: set[str] | None = None,
+        migration_name: str | None = None,
     ) -> dict[str, list[Migration]]: ...
     def deep_deconstruct(self, obj: Any) -> Any: ...
     def only_relation_agnostic_fields(
@@ -32,8 +32,8 @@ class MigrationAutodetector:
         self,
         app_label: str,
         operation: Operation,
-        dependencies: Iterable[tuple[str, str, str | None, bool | str]] | None = ...,
-        beginning: bool = ...,
+        dependencies: Iterable[tuple[str, str, str | None, bool | str]] | None = None,
+        beginning: bool = False,
     ) -> None: ...
     def swappable_first_key(self, item: tuple[str, str]) -> tuple[str, str]: ...
     renamed_models: Any
@@ -65,7 +65,7 @@ class MigrationAutodetector:
     def generate_altered_order_with_respect_to(self) -> None: ...
     def generate_altered_managers(self) -> None: ...
     def arrange_for_graph(
-        self, changes: dict[str, list[Migration]], graph: MigrationGraph, migration_name: str | None = ...
+        self, changes: dict[str, list[Migration]], graph: MigrationGraph, migration_name: str | None = None
     ) -> dict[str, list[Migration]]: ...
     @classmethod
     def parse_number(cls, name: str) -> int: ...

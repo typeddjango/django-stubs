@@ -13,38 +13,38 @@ from .message import forbid_multi_line_headers as forbid_multi_line_headers
 from .utils import DNS_NAME as DNS_NAME
 from .utils import CachedDnsName as CachedDnsName
 
-def get_connection(backend: str | None = ..., fail_silently: bool = ..., **kwds: Any) -> Any: ...
+def get_connection(backend: str | None = None, fail_silently: bool = False, **kwds: Any) -> Any: ...
 def send_mail(
     subject: _StrOrPromise,
     message: _StrOrPromise,
     from_email: str | None,
     recipient_list: Sequence[str],
-    fail_silently: bool = ...,
-    auth_user: str | None = ...,
-    auth_password: str | None = ...,
-    connection: Any | None = ...,
-    html_message: str | None = ...,
+    fail_silently: bool = False,
+    auth_user: str | None = None,
+    auth_password: str | None = None,
+    connection: Any | None = None,
+    html_message: str | None = None,
 ) -> int: ...
 def send_mass_mail(
     datatuple: Iterable[tuple[str, str, str | None, list[str]]],
-    fail_silently: bool = ...,
-    auth_user: str | None = ...,
-    auth_password: str | None = ...,
-    connection: Any | None = ...,
+    fail_silently: bool = False,
+    auth_user: str | None = None,
+    auth_password: str | None = None,
+    connection: Any | None = None,
 ) -> int: ...
 def mail_admins(
     subject: _StrOrPromise,
     message: _StrOrPromise,
-    fail_silently: bool = ...,
-    connection: Any | None = ...,
-    html_message: str | None = ...,
+    fail_silently: bool = False,
+    connection: Any | None = None,
+    html_message: str | None = None,
 ) -> None: ...
 def mail_managers(
     subject: _StrOrPromise,
     message: _StrOrPromise,
-    fail_silently: bool = ...,
-    connection: Any | None = ...,
-    html_message: str | None = ...,
+    fail_silently: bool = False,
+    connection: Any | None = None,
+    html_message: str | None = None,
 ) -> None: ...
 
 outbox: list[EmailMessage]

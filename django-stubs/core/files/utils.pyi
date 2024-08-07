@@ -3,7 +3,7 @@ from typing import IO, Any, AnyStr, Generic
 
 from django.utils._os import _PathCompatible
 
-def validate_file_name(name: _PathCompatible, allow_relative_path: bool = ...) -> _PathCompatible: ...
+def validate_file_name(name: _PathCompatible, allow_relative_path: bool = False) -> _PathCompatible: ...
 
 class FileProxyMixin(Generic[AnyStr]):
     file: IO[AnyStr] | None

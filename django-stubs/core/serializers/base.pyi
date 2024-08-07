@@ -43,12 +43,12 @@ class Serializer:
         self,
         queryset: Iterable[Model],
         *,
-        stream: IO[str] | None = ...,
-        fields: Collection[str] | None = ...,
-        use_natural_foreign_keys: bool = ...,
-        use_natural_primary_keys: bool = ...,
-        progress_output: IO[str] | None = ...,
-        object_count: int = ...,
+        stream: IO[str] | None = None,
+        fields: Collection[str] | None = None,
+        use_natural_foreign_keys: bool = False,
+        use_natural_primary_keys: bool = False,
+        progress_output: IO[str] | None = None,
+        object_count: int = 0,
         **options: Any,
     ) -> Any: ...
     def start_serialization(self) -> None: ...
@@ -74,11 +74,11 @@ class DeserializedObject:
     def __init__(
         self,
         obj: Model,
-        m2m_data: dict[str, Sequence[Any]] | None = ...,
-        deferred_fields: dict[Field, Any] | None = ...,
+        m2m_data: dict[str, Sequence[Any]] | None = None,
+        deferred_fields: dict[Field, Any] | None = None,
     ) -> None: ...
-    def save(self, save_m2m: bool = ..., using: str | None = ..., **kwargs: Any) -> None: ...
-    def save_deferred_fields(self, using: str | None = ...) -> None: ...
+    def save(self, save_m2m: bool = True, using: str | None = None, **kwargs: Any) -> None: ...
+    def save_deferred_fields(self, using: str | None = None) -> None: ...
 
 def build_instance(Model: type[Model], data: dict[str, Any], db: str) -> Model: ...
 def deserialize_m2m_values(

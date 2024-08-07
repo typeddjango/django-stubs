@@ -37,7 +37,7 @@ class WhereNode(tree.Node):
 class NothingNode:
     contains_aggregate: bool
     def as_sql(
-        self, compiler: SQLCompiler | None = ..., connection: BaseDatabaseWrapper | None = ...
+        self, compiler: SQLCompiler | None = None, connection: BaseDatabaseWrapper | None = None
     ) -> _AsSqlType: ...
 
 class ExtraWhere:
@@ -46,7 +46,7 @@ class ExtraWhere:
     params: Sequence[int] | Sequence[str] | None
     def __init__(self, sqls: Sequence[str], params: Sequence[int] | Sequence[str] | None) -> None: ...
     def as_sql(
-        self, compiler: SQLCompiler | None = ..., connection: BaseDatabaseWrapper | None = ...
+        self, compiler: SQLCompiler | None = None, connection: BaseDatabaseWrapper | None = None
     ) -> _AsSqlType: ...
 
 class SubqueryConstraint:

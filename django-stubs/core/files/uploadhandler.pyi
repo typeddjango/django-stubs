@@ -10,7 +10,7 @@ class UploadFileException(Exception): ...
 
 class StopUpload(UploadFileException):
     connection_reset: bool
-    def __init__(self, connection_reset: bool = ...) -> None: ...
+    def __init__(self, connection_reset: bool = False) -> None: ...
 
 class SkipFile(UploadFileException): ...
 class StopFutureHandlers(UploadFileException): ...
@@ -24,14 +24,14 @@ class FileUploadHandler:
     content_type_extra: dict[str, str] | None
     request: HttpRequest | None
     field_name: str
-    def __init__(self, request: HttpRequest | None = ...) -> None: ...
+    def __init__(self, request: HttpRequest | None = None) -> None: ...
     def handle_raw_input(
         self,
         input_data: IO[bytes],
         META: dict[str, str],
         content_length: int,
         boundary: str,
-        encoding: str | None = ...,
+        encoding: str | None = None,
     ) -> tuple[QueryDict, MultiValueDict[str, UploadedFile]] | None: ...
     def new_file(
         self,
@@ -39,8 +39,8 @@ class FileUploadHandler:
         file_name: str,
         content_type: str,
         content_length: int | None,
-        charset: str | None = ...,
-        content_type_extra: dict[str, str] | None = ...,
+        charset: str | None = None,
+        content_type_extra: dict[str, str] | None = None,
     ) -> None: ...
     def receive_data_chunk(self, raw_data: bytes, start: int) -> bytes | None: ...
     def file_complete(self, file_size: int) -> UploadedFile | None: ...
@@ -71,7 +71,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         META: dict[str, str],
         content_length: int,
         boundary: str,
-        encoding: str | None = ...,
+        encoding: str | None = None,
     ) -> tuple[QueryDict, MultiValueDict[str, UploadedFile]] | None: ...
     def new_file(
         self,

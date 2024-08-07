@@ -30,9 +30,9 @@ class Paginator(Generic[_T]):
         self,
         object_list: _SupportsPagination[_T],
         per_page: int | str,
-        orphans: int = ...,
-        allow_empty_first_page: bool = ...,
-        error_messages: _ErrorMessagesDict | None = ...,
+        orphans: int = 0,
+        allow_empty_first_page: bool = True,
+        error_messages: _ErrorMessagesDict | None = None,
     ) -> None: ...
     def __iter__(self) -> Iterator[Page[_T]]: ...
     def validate_number(self, number: int | float | str) -> int: ...
@@ -45,7 +45,7 @@ class Paginator(Generic[_T]):
     @property
     def page_range(self) -> range: ...
     def get_elided_page_range(
-        self, number: int | float | str = ..., *, on_each_side: int = ..., on_ends: int = ...
+        self, number: int | float | str = 1, *, on_each_side: int = 3, on_ends: int = 2
     ) -> Iterator[str | int]: ...
 
 class Page(Sequence[_T]):

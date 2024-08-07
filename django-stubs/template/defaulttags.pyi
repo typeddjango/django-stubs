@@ -26,7 +26,7 @@ class CycleNode(Node):
     variable_name: str | None
     silent: bool
     def __init__(
-        self, cyclevars: list[FilterExpression], variable_name: str | None = ..., silent: bool = ...
+        self, cyclevars: list[FilterExpression], variable_name: str | None = None, silent: bool = False
     ) -> None: ...
     def reset(self, context: Context) -> None: ...
 
@@ -40,7 +40,7 @@ class FilterNode(Node):
 class FirstOfNode(Node):
     vars: list[FilterExpression]
     asvar: str | None
-    def __init__(self, variables: list[FilterExpression], asvar: str | None = ...) -> None: ...
+    def __init__(self, variables: list[FilterExpression], asvar: str | None = None) -> None: ...
 
 class ForNode(Node):
     loopvars: list[str] | str
@@ -55,7 +55,7 @@ class ForNode(Node):
         sequence: FilterExpression | str,
         is_reversed: bool,
         nodelist_loop: list[str] | NodeList,
-        nodelist_empty: list[str] | NodeList | None = ...,
+        nodelist_empty: list[str] | NodeList | None = None,
     ) -> None: ...
 
 class IfChangedNode(Node):
@@ -107,7 +107,7 @@ class LoadNode(Node): ...
 class NowNode(Node):
     format_string: str
     asvar: str | None
-    def __init__(self, format_string: str, asvar: str | None = ...) -> None: ...
+    def __init__(self, format_string: str, asvar: str | None = None) -> None: ...
 
 class ResetCycleNode(Node):
     node: CycleNode
@@ -149,7 +149,7 @@ class WidthRatioNode(Node):
         val_expr: FilterExpression,
         max_expr: FilterExpression,
         max_width: FilterExpression,
-        asvar: str | None = ...,
+        asvar: str | None = None,
     ) -> None: ...
 
 class WithNode(Node):
@@ -160,7 +160,7 @@ class WithNode(Node):
         var: str | None,
         name: str | None,
         nodelist: NodeList | Sequence[Node],
-        extra_context: dict[str, Any] | None = ...,
+        extra_context: dict[str, Any] | None = None,
     ) -> None: ...
 
 def autoescape(parser: Parser, token: Token) -> AutoEscapeControlNode: ...

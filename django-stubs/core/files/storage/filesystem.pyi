@@ -10,10 +10,10 @@ class FileSystemStorage(_Deconstructible, Storage, StorageSettingsMixin):
 
     def __init__(
         self,
-        location: _PathCompatible | None = ...,
-        base_url: str | None = ...,
-        file_permissions_mode: int | None = ...,
-        directory_permissions_mode: int | None = ...,
+        location: _PathCompatible | None = None,
+        base_url: str | None = None,
+        file_permissions_mode: int | None = None,
+        directory_permissions_mode: int | None = None,
     ) -> None: ...
     @cached_property
     def base_location(self) -> _PathCompatible: ...
