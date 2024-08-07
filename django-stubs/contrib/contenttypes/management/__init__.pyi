@@ -18,7 +18,7 @@ class RenameContentType(migrations.RunPython):
     def rename_backward(self, apps: StateApps, schema_editor: DatabaseSchemaEditor) -> None: ...
 
 def inject_rename_contenttypes_operations(
-    plan: list[tuple[Migration, bool]] | None = None, apps: StateApps = ..., using: str = 'default', **kwargs: Any
+    plan: list[tuple[Migration, bool]] | None = None, apps: StateApps = ..., using: str = "default", **kwargs: Any
 ) -> None: ...
 def get_contenttypes_and_models(
     app_config: AppConfig, using: str, ContentType: type[ContentType]
@@ -27,7 +27,7 @@ def create_contenttypes(
     app_config: AppConfig,
     verbosity: int = 2,
     interactive: bool = True,
-    using: str = 'default',
+    using: str = "default",
     apps: Apps = ...,
     **kwargs: Any,
 ) -> None: ...

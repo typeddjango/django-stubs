@@ -69,7 +69,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore[misc]
         *,
         config: _Expression | None = None,
         invert: bool = False,
-        search_type: str = 'plain',
+        search_type: str = "plain",
     ) -> None: ...
     def as_sql(  # type: ignore[override]
         self,

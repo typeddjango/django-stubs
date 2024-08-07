@@ -70,7 +70,7 @@ class SQLCompiler:
         name: str,
         opts: Any,
         alias: str | None = None,
-        default_order: str = 'ASC',
+        default_order: str = "ASC",
         already_seen: set[tuple[tuple[tuple[str, str]] | None, tuple[tuple[str, str]]]] | None = None,
     ) -> list[tuple[Expression, bool]]: ...
     def get_from_clause(self) -> tuple[list[str], _ParamsT]: ...
@@ -103,7 +103,7 @@ class SQLCompiler:
     ) -> CursorWrapper: ...
     @overload
     def execute_sql(
-        self, result_type: Literal["no results"] | None = 'multi', chunked_fetch: bool = False, chunk_size: int = 100
+        self, result_type: Literal["no results"] | None = "multi", chunked_fetch: bool = False, chunk_size: int = 100
     ) -> None: ...
     @overload
     def execute_sql(

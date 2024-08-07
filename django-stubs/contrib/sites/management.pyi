@@ -7,7 +7,7 @@ def create_default_site(
     app_config: AppConfig,
     verbosity: int = 2,
     interactive: bool = True,
-    using: str = 'default',
+    using: str = "default",
     apps: Apps = ...,
     **kwargs: Any,
 ) -> None: ...

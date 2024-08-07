@@ -20,7 +20,11 @@ class BaseConstraint:
     default_violation_error_message: _StrOrPromise
     @overload
     def __init__(
-        self, *, name: str, violation_error_code: str | None = None, violation_error_message: _StrOrPromise | None = None
+        self,
+        *,
+        name: str,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
     @overload
     @deprecated("Passing positional arguments to BaseConstraint is deprecated and will be removed in Django 6.0")

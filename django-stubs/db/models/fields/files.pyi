@@ -28,7 +28,7 @@ class FieldFile(File, AltersData):
     def url(self) -> str: ...
     @property
     def size(self) -> int: ...
-    def open(self, mode: str = 'rb') -> Self: ...  # type: ignore[override]
+    def open(self, mode: str = "rb") -> Self: ...  # type: ignore[override]
     def save(self, name: str, content: File, save: bool = True) -> None: ...
     def delete(self, save: bool = True) -> None: ...
     @property
@@ -56,7 +56,7 @@ class FileField(Field):
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        upload_to: _PathCompatible | _UploadToCallable = '',
+        upload_to: _PathCompatible | _UploadToCallable = "",
         storage: Storage | Callable[[], Storage] | None = None,
         *,
         max_length: int | None = ...,

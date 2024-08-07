@@ -50,7 +50,11 @@ class Urlizer:
     mailto_template: str
     url_template: str
     def __call__(
-        self, text: Incomplete, trim_url_limit: Incomplete | None = None, nofollow: bool = False, autoescape: bool = False
+        self,
+        text: Incomplete,
+        trim_url_limit: Incomplete | None = None,
+        nofollow: bool = False,
+        autoescape: bool = False,
     ) -> Incomplete: ...
     def handle_word(
         self,

@@ -80,7 +80,7 @@ ip_address_validator_map: dict[str, _IPValidator]
 
 def ip_address_validators(protocol: str, unpack_ipv4: bool) -> _IPValidator: ...
 def int_list_validator(
-    sep: str = ',', message: _StrOrPromise | None = None, code: str = 'invalid', allow_negative: bool = False
+    sep: str = ",", message: _StrOrPromise | None = None, code: str = "invalid", allow_negative: bool = False
 ) -> RegexValidator: ...
 
 validate_comma_separated_integer_list: RegexValidator

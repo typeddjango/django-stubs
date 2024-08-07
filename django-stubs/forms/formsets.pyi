@@ -56,7 +56,7 @@ class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
         self,
         data: _DataT | None = None,
         files: _FilesT | None = None,
-        auto_id: str = 'id_%s',
+        auto_id: str = "id_%s",
         prefix: str | None = None,
         initial: Sequence[Mapping[str, Any]] | None = None,
         error_class: type[ErrorList] = ...,

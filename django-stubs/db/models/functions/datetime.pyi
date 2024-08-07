@@ -41,7 +41,11 @@ class TruncBase(TimezoneMixin, Transform):
     tzinfo: Any
 
     def __init__(
-        self, expression: Combinable | str, output_field: Field | None = None, tzinfo: tzinfo | None = None, **extra: Any
+        self,
+        expression: Combinable | str,
+        output_field: Field | None = None,
+        tzinfo: tzinfo | None = None,
+        **extra: Any,
     ) -> None: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 

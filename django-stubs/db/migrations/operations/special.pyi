@@ -15,7 +15,9 @@ class SeparateDatabaseAndState(Operation):
     state_operations: Sequence[Operation]
 
     def __init__(
-        self, database_operations: Sequence[Operation] | None = None, state_operations: Sequence[Operation] | None = None
+        self,
+        database_operations: Sequence[Operation] | None = None,
+        state_operations: Sequence[Operation] | None = None,
     ) -> None: ...
 
 class RunSQL(Operation):

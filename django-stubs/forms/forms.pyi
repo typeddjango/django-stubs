@@ -36,7 +36,7 @@ class BaseForm(RenderableFormMixin):
         self,
         data: _DataT | None = None,
         files: _FilesT | None = None,
-        auto_id: bool | str = 'id_%s',
+        auto_id: bool | str = "id_%s",
         prefix: str | None = None,
         initial: Mapping[str, Any] | None = None,
         error_class: type[ErrorList] = ...,

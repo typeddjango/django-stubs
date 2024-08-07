@@ -22,20 +22,20 @@ def forbid_multi_line_headers(name: str, val: str, encoding: str) -> tuple[str, 
 def sanitize_address(addr: tuple[str, str] | str, encoding: str) -> str: ...
 
 class MIMEMixin:
-    def as_string(self, unixfrom: bool = False, linesep: str = '\n') -> str: ...
-    def as_bytes(self, unixfrom: bool = False, linesep: str = '\n') -> bytes: ...
+    def as_string(self, unixfrom: bool = False, linesep: str = "\n") -> str: ...
+    def as_bytes(self, unixfrom: bool = False, linesep: str = "\n") -> bytes: ...
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage): ...  # type: ignore[misc]
 
 class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore[misc]
     encoding: str
-    def __init__(self, _text: str, _subtype: str = 'plain', _charset: str = None) -> None: ...
+    def __init__(self, _text: str, _subtype: str = "plain", _charset: str = None) -> None: ...
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore[misc]
     encoding: str
     def __init__(
         self,
-        _subtype: str = 'mixed',
+        _subtype: str = "mixed",
         boundary: Any | None = None,
         _subparts: Any | None = None,
         encoding: str = None,
@@ -63,8 +63,8 @@ class EmailMessage:
     connection: Any
     def __init__(
         self,
-        subject: _StrOrPromise = '',
-        body: _StrOrPromise | None = '',
+        subject: _StrOrPromise = "",
+        body: _StrOrPromise | None = "",
         from_email: str | None = None,
         to: Sequence[str] | None = None,
         bcc: Sequence[str] | None = None,
@@ -92,8 +92,8 @@ class EmailMultiAlternatives(EmailMessage):
     alternatives: list[tuple[_AttachmentContent, str]]
     def __init__(
         self,
-        subject: _StrOrPromise = '',
-        body: _StrOrPromise | None = '',
+        subject: _StrOrPromise = "",
+        body: _StrOrPromise | None = "",
         from_email: str | None = None,
         to: Sequence[str] | None = None,
         bcc: Sequence[str] | None = None,

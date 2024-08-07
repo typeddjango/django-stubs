@@ -19,7 +19,7 @@ class SimpleArrayField(forms.CharField):
         self,
         base_field: forms.Field,
         *,
-        delimiter: str = ',',
+        delimiter: str = ",",
         max_length: int | None = None,
         min_length: int | None = None,
         **kwargs: Any,
