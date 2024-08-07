@@ -60,7 +60,7 @@ class UniqueConstraint(BaseConstraint):
     def __init__(
         self,
         *expressions: str | BaseExpression | Combinable,
-        fields: None = ...,
+        fields: None = None,
         name: str | None = ...,
         condition: Q | None = ...,
         deferrable: Deferrable | None = ...,
