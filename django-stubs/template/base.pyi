@@ -132,7 +132,7 @@ class FilterExpression:
 class Variable:
     var: dict[Any, Any] | str
     literal: SafeString | float | None
-    lookups: tuple[str] | None
+    lookups: tuple[str, ...] | None
     translate: bool
     message_context: str | None
     def __init__(self, var: dict[Any, Any] | str) -> None: ...

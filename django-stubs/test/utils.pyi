@@ -125,7 +125,7 @@ class LoggingCaptureMixin:
     def tearDown(self) -> None: ...
 
 class isolate_apps(TestContextDecorator):
-    installed_apps: tuple[str]
+    installed_apps: tuple[str, ...]
     def __init__(self, *installed_apps: Any, **kwargs: Any) -> None: ...
     old_apps: Apps
 

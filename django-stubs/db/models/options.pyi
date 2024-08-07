@@ -53,8 +53,8 @@ class Options(Generic[_M]):
     db_table: str
     ordering: Sequence[str] | None
     indexes: list[Any]
-    unique_together: Sequence[tuple[str]]  # Are always normalized
-    index_together: Sequence[tuple[str]]  # Are always normalized
+    unique_together: Sequence[tuple[str, ...]]  # Are always normalized
+    index_together: Sequence[tuple[str, ...]]  # Are always normalized
     select_on_save: bool
     default_permissions: Sequence[str]
     permissions: list[Any]
