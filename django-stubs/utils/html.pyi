@@ -10,6 +10,7 @@ from django.utils.functional import SimpleLazyObject, _StrOrPromise
 from django.utils.safestring import SafeData, SafeString
 
 VOID_ELEMENTS: set[str]
+MAX_URL_LENGTH: int
 
 def escape(text: Any) -> SafeString: ...
 def escapejs(value: Any) -> SafeString: ...
