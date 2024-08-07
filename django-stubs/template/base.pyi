@@ -34,7 +34,7 @@ class TokenType(Enum):
 class VariableDoesNotExist(Exception):
     msg: str
     params: tuple[dict[str, str] | str]
-    def __init__(self, msg: str, params: tuple[dict[str, str] | str] = ()) -> None: ...
+    def __init__(self, msg: str, params: tuple[dict[str, str] | str] = ...) -> None: ...
 
 class Origin:
     name: str

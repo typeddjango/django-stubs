@@ -202,7 +202,7 @@ class RawQuerySet(Iterable[_Model], Sized):
         raw_query: RawQuery | str,
         model: type[Model] | None = None,
         query: Query | None = None,
-        params: tuple[Any] = (),
+        params: tuple[Any, ...] = (),
         translations: dict[str, str] | None = None,
         using: str | None = None,
         hints: dict[str, Model] | None = None,
