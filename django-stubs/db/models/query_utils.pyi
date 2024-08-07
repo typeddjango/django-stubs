@@ -36,7 +36,7 @@ class Q(tree.Node):
     def __invert__(self) -> Q: ...
     def resolve_expression(
         self,
-        query: Query = None,
+        query: Query | None = None,
         allow_joins: bool = True,
         reuse: set[str] | None = None,
         summarize: bool = False,

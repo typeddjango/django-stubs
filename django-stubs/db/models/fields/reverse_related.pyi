@@ -41,7 +41,7 @@ class ForeignObjectRel(FieldCacheMixin):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         parent_link: bool = False,
-        on_delete: Callable = None,
+        on_delete: Callable | None = None,
     ) -> None: ...
     @cached_property
     def hidden(self) -> bool: ...
@@ -97,7 +97,7 @@ class ManyToOneRel(ForeignObjectRel):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         parent_link: bool = False,
-        on_delete: Callable = None,
+        on_delete: Callable | None = None,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
     def get_accessor_name(self, model: type[Model] | None = None) -> str: ...
@@ -113,7 +113,7 @@ class OneToOneRel(ManyToOneRel):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         parent_link: bool = False,
-        on_delete: Callable = None,
+        on_delete: Callable | None = None,
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):

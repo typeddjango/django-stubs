@@ -76,7 +76,7 @@ class BaseExpression:
     def contains_subquery(self) -> bool: ...
     def resolve_expression(
         self,
-        query: Any = None,
+        query: Any | None = None,
         allow_joins: bool = True,
         reuse: set[str] | None = None,
         summarize: bool = False,
@@ -134,7 +134,7 @@ class F(_Deconstructible, Combinable):
     def __init__(self, name: str) -> None: ...
     def resolve_expression(
         self,
-        query: Any = None,
+        query: Any | None = None,
         allow_joins: bool = True,
         reuse: set[str] | None = None,
         summarize: bool = False,
@@ -228,7 +228,7 @@ class When(Expression):
     template: str
     condition: Any
     result: Any
-    def __init__(self, condition: Any = None, then: Any = None, **lookups: Any) -> None: ...
+    def __init__(self, condition: Any | None = None, then: Any | None = None, **lookups: Any) -> None: ...
 
 class Case(Expression):
     template: str

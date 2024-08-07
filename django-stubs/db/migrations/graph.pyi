@@ -51,6 +51,6 @@ class MigrationGraph:
         self,
         nodes: None | tuple[str, str] | Sequence[tuple[str, str]] = None,
         at_end: bool = True,
-        real_apps: list[str] = None,
+        real_apps: list[str] | None = None,
     ) -> ProjectState: ...
     def __contains__(self, node: tuple[str, str]) -> bool: ...

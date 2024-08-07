@@ -61,7 +61,7 @@ class BlockTranslateNode(Node):
         self,
         extra_context: dict[str, FilterExpression],
         singular: list[Token],
-        plural: list[Token] = None,
+        plural: list[Token] | None = None,
         countervar: str | None = None,
         counter: FilterExpression | None = None,
         message_context: FilterExpression | None = None,
