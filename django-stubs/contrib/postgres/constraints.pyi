@@ -24,7 +24,7 @@ class ExclusionConstraint(BaseConstraint):
         index_type: str | None = None,
         condition: Q | None = None,
         deferrable: Deferrable | None = None,
-        include: list[str] | tuple[str] | None = None,
+        include: list[str] | tuple[str, ...] | None = None,
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...

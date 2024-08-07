@@ -17,7 +17,7 @@ class Engine:
     dirs: list[str]
     app_dirs: bool
     autoescape: bool
-    context_processors: list[str] | tuple[str]
+    context_processors: list[str] | tuple[str, ...]
     debug: bool
     loaders: Sequence[_Loader]
     string_if_invalid: str
@@ -30,7 +30,7 @@ class Engine:
         self,
         dirs: list[str] | None = None,
         app_dirs: bool = False,
-        context_processors: list[str] | tuple[str] | None = None,
+        context_processors: list[str] | tuple[str, ...] | None = None,
         debug: bool = False,
         loaders: Sequence[_Loader] | None = None,
         string_if_invalid: str = "",
