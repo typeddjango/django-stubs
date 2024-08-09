@@ -36,6 +36,7 @@ from mypy.plugin import (
     MethodContext,
 )
 from mypy.semanal import SemanticAnalyzer
+from mypy.typeanal import make_optional_type
 from mypy.types import (
     AnyType,
     Instance,
@@ -232,10 +233,6 @@ def get_call_argument_type_by_name(ctx: Union[FunctionContext, MethodContext], n
     return arg_types[0]
 
 
-def make_optional(typ: MypyType) -> MypyType:
-    return UnionType.make_union([typ, NoneTyp()])
-
-
 def is_optional(typ: MypyType) -> bool:
     typ = get_proper_type(typ)
     return isinstance(typ, UnionType) and any(isinstance(get_proper_type(item), NoneTyp) for item in typ.items)
@@ -277,7 +274,7 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
             return AnyType(TypeOfAny.explicit)
 
         if is_nullable:
-            descriptor_type = make_optional(descriptor_type)
+            descriptor_type = make_optional_type(descriptor_type)
         return descriptor_type
     return AnyType(TypeOfAny.explicit)
 
@@ -289,7 +286,7 @@ def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> M
         rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
         if rel_model_info is None:
             return AnyType(TypeOfAny.from_error)
-        return make_optional(Instance(rel_model_info, []))
+        return make_optional_type(Instance(rel_model_info, []))
 
     field_info = lookup_class_typeinfo(api, field.__class__)
     if field_info is None:
