@@ -472,11 +472,23 @@ class DjangoContext:
             raise LookupsAreUnsupported()
         return self._resolve_field_from_parts(field_parts, model_cls)
 
-    def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
+    def resolve_lookup_expected_type(
+        self, ctx: MethodContext, model_cls: Type[Model], lookup: str, model_instance: Instance
+    ) -> MypyType:
         try:
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
-            ctx.api.fail(exc.args[0], ctx.context)
+            if (
+                helpers.is_annotated_model(model_instance.type)
+                and model_instance.extra_attrs
+                and lookup in model_instance.extra_attrs.attrs
+            ):
+                return model_instance.extra_attrs.attrs[lookup]
+
+            msg = exc.args[0]
+            if model_instance.extra_attrs:
+                msg = ", ".join((msg, *model_instance.extra_attrs.attrs.keys()))
+            ctx.api.fail(msg, ctx.context)
             return AnyType(TypeOfAny.from_error)
 
         if solved_lookup is None:
