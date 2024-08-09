@@ -54,7 +54,6 @@ class CheckConstraint(BaseConstraint):
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
-
     @overload
     def __init__(
         self,
