@@ -44,11 +44,23 @@ class BaseConstraint:
 
 class CheckConstraint(BaseConstraint):
     check: Q | BaseExpression
+
+    @overload
     def __init__(
         self,
         *,
-        check: Q | BaseExpression,
         name: str,
+        check: Q | BaseExpression,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        *,
+        name: str,
+        condition: Q | BaseExpression,
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
