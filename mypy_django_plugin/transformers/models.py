@@ -556,36 +556,38 @@ class AddReverseLookups(ModelClassInitializer):
         related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
         # TODO: Support other reverse managers than `_default_manager`
         default_manager = to_model_info.names.get("_default_manager")
-        if default_manager is None and not self.api.final_iteration:
-            raise helpers.IncompleteDefnException()
-        elif (
+        if default_manager is None:
+            if not self.api.final_iteration:
+                raise helpers.IncompleteDefnException()
             # When we get no default manager we can't customize the reverse manager any
-            # further and will just fall back to the manager declared on the descriptor
-            default_manager is None
+            # further and will just fall back to the manager declared on the descriptor.
+            # If a django model has a Manager class that cannot be resolved statically
+            # (if it is generated in a way where we cannot import it, like
+            # `objects = my_manager_factory()`)
+            #
+            # See https://github.com/typeddjango/django-stubs/pull/993
+            # for more information on when this error can occur.
+            self.ctx.api.fail(
+                (
+                    f"Couldn't resolve related manager {attname!r} for relation "
+                    f"'{to_model_info.fullname}.{relation.field.name}'."
+                ),
+                self.ctx.cls,
+                code=MANAGER_MISSING,
+            )
+            return
+
+        default_manager_type = get_proper_type(default_manager.type)
+        if (
             # '_default_manager' attribute is a node type we can't process
-            or not isinstance(default_manager.type, Instance)
+            not isinstance(default_manager_type, Instance)
             # Already has a related manager subclassed from the default manager
             or helpers.get_reverse_manager_info(self.api, model_info=to_model_info, derived_from="_default_manager")
             is not None
             # When the default manager isn't custom there's no need to create a new type
             # as `RelatedManager` has `models.Manager` as base
-            or default_manager.type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME
+            or default_manager_type.type.fullname == fullnames.MANAGER_CLASS_FULLNAME
         ):
-            if default_manager is None and self.api.final_iteration:
-                # If a django model has a Manager class that cannot be
-                # resolved statically (if it is generated in a way where we
-                # cannot import it, like `objects = my_manager_factory()`),
-                #
-                # See https://github.com/typeddjango/django-stubs/pull/993
-                # for more information on when this error can occur.
-                self.ctx.api.fail(
-                    (
-                        f"Couldn't resolve related manager {attname!r} for relation "
-                        f"'{to_model_info.fullname}.{relation.field.name}'."
-                    ),
-                    self.ctx.cls,
-                    code=MANAGER_MISSING,
-                )
             return
 
         # Create a reverse manager subclassed from the default manager of the related
@@ -596,7 +598,7 @@ class AddReverseLookups(ModelClassInitializer):
         new_related_manager_info = helpers.add_new_class_for_module(
             module=self.api.modules[to_model_info.module_name],
             name=f"{to_model_info.name}_RelatedManager",
-            bases=[related_manager, default_manager.type],
+            bases=[related_manager, default_manager_type],
         )
         # Stash the new reverse manager type fullname on the related model, so we don't duplicate
         # or have to create it again for other reverse relations
@@ -814,8 +816,10 @@ class ProcessManyToManyFields(ModelClassInitializer):
         contains_from_pk_info = model.get_containing_type_info("pk")
         if contains_from_pk_info is not None:
             pk = contains_from_pk_info.names["pk"].node
-            if isinstance(pk, Var) and isinstance(pk.type, Instance):
-                return pk.type
+            if isinstance(pk, Var):
+                pk_type = get_proper_type(pk.type)
+                if isinstance(pk_type, Instance):
+                    return pk_type
         return self.default_pk_instance
 
     def create_through_table_class(
@@ -960,7 +964,8 @@ class ProcessManyToManyFields(ModelClassInitializer):
         default_manager_node = model.type.names.get("_default_manager")
         if default_manager_node is None:
             raise helpers.IncompleteDefnException()
-        elif not isinstance(default_manager_node.type, Instance):
+        default_manager_type = get_proper_type(default_manager_node.type)
+        if not isinstance(default_manager_type, Instance):
             return
 
         # Create a reusable generic subclass that is generic over a 'through' model,
@@ -975,7 +980,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
         related_manager_info = helpers.add_new_class_for_module(
             module=self.api.modules[model.type.module_name],
             name=f"{model.type.name}_ManyRelatedManager",
-            bases=[generic_to_many_related_manager, default_manager_node.type],
+            bases=[generic_to_many_related_manager, default_manager_type],
         )
         # Reuse the '_Through' `TypeVar` from `ManyRelatedManager` in our subclass
         related_manager_info.defn.type_vars = [through_type_var.copy_modified()]
@@ -1123,7 +1128,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     args = ctx.type.args
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
-    type_arg = ctx.api.analyze_type(args[0])
+    type_arg = get_proper_type(ctx.api.analyze_type(args[0]))
     if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
         return type_arg
 
@@ -1171,12 +1176,14 @@ def get_annotated_type(
     annotated_model: Optional[TypeInfo]
     if helpers.is_annotated_model(model_type.type):
         annotated_model = model_type.type
-        if model_type.args and isinstance(model_type.args[0], TypedDictType):
-            fields_dict = helpers.make_typeddict(
-                api,
-                fields={**model_type.args[0].items, **fields_dict.items},
-                required_keys={*model_type.args[0].required_keys, *fields_dict.required_keys},
-            )
+        if model_type.args:
+            annotations = get_proper_type(model_type.args[0])
+            if isinstance(annotations, TypedDictType):
+                fields_dict = helpers.make_typeddict(
+                    api,
+                    fields={**annotations.items, **fields_dict.items},
+                    required_keys={*annotations.required_keys, *fields_dict.required_keys},
+                )
     else:
         annotated_model = helpers.lookup_fully_qualified_typeinfo(api, model_type.type.fullname + "@AnnotatedWith")
 

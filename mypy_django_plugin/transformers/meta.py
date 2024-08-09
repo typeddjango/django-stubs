@@ -1,6 +1,6 @@
 from django.core.exceptions import FieldDoesNotExist
 from mypy.plugin import MethodContext
-from mypy.types import AnyType, Instance, TypeOfAny
+from mypy.types import AnyType, Instance, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -22,7 +22,7 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     if len(ctx.type.args) == 0:
         return ctx.default_return_type
 
-    model_type = ctx.type.args[0]
+    model_type = get_proper_type(ctx.type.args[0])
     if not isinstance(model_type, Instance):
         return ctx.default_return_type
 

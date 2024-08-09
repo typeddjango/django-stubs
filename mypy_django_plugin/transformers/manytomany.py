@@ -2,7 +2,7 @@ from typing import NamedTuple, Optional, Tuple
 
 from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import Instance, ProperType, UninhabitedType
+from mypy.types import Instance, ProperType, UninhabitedType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -29,30 +29,37 @@ def fill_model_args_for_many_to_many_field(
     *,
     ctx: FunctionContext,
     model_info: TypeInfo,
-    default_return_type: Instance,
     django_context: DjangoContext,
-) -> Instance:
-    if not ctx.args or not ctx.args[0] or len(default_return_type.args) < 2:
-        return default_return_type
+) -> MypyType:
+    default_return_type = get_proper_type(ctx.default_return_type)
+    if (
+        not ctx.args
+        or not ctx.args[0]
+        or not isinstance(default_return_type, Instance)
+        or len(default_return_type.args) < 2
+    ):
+        return ctx.default_return_type
 
     args = get_m2m_arguments(ctx=ctx, model_info=model_info, django_context=django_context)
     if args is None:
-        return default_return_type
+        return ctx.default_return_type
 
+    default_to_arg = get_proper_type(default_return_type.args[0])
     to_arg: MypyType
-    if isinstance(default_return_type.args[0], UninhabitedType):
+    if isinstance(default_to_arg, UninhabitedType):
         to_arg = args.to.model
     else:
         # Avoid overwriting a decent 'to' argument
         to_arg = default_return_type.args[0]
 
-    if isinstance(default_return_type.args[1], UninhabitedType):
+    default_through_arg = get_proper_type(default_return_type.args[1])
+    if isinstance(default_through_arg, UninhabitedType):
         if helpers.is_abstract_model(model_info):
             # Many to many on abstract models doesn't create any implicit, concrete
             # through model, so we populate it with the upper bound to avoid error messages
             through_arg = default_return_type.type.defn.type_vars[1].upper_bound
         elif args.through is None:
-            through_arg = default_return_type.args[1]
+            through_arg = default_through_arg
         else:
             through_arg = args.through.model
     else:
@@ -126,23 +133,24 @@ def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance
     For example: if given a `ManyRelatedManager[A, B]` where `A` and `B` are models the
     following 3-tuple is returned: `(ManyRelatedManager[A, B], A, B)`.
     """
+    default_return_type = get_proper_type(ctx.default_return_type)
     if (
-        isinstance(ctx.default_return_type, Instance)
-        and ctx.default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER
+        isinstance(default_return_type, Instance)
+        and default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER
     ):
         # This is a call to '__get__' overload with a model instance of 'ManyToManyDescriptor'.
         # Returning a 'ManyRelatedManager'. Which we want to, just like Django, build from the
         # default manager of the related model.
-        many_related_manager = ctx.default_return_type
+        many_related_manager = default_return_type
         # Require first and second type argument of 'ManyRelatedManager' to be models
         if (
             len(many_related_manager.args) >= 2
-            and isinstance(many_related_manager.args[0], Instance)
-            and helpers.is_model_type(many_related_manager.args[0].type)
-            and isinstance(many_related_manager.args[1], Instance)
-            and helpers.is_model_type(many_related_manager.args[1].type)
+            and isinstance((_To := get_proper_type(many_related_manager.args[0])), Instance)
+            and helpers.is_model_type(_To.type)
+            and isinstance((_Through := get_proper_type(many_related_manager.args[1])), Instance)
+            and helpers.is_model_type(_Through.type)
         ):
-            return many_related_manager, many_related_manager.args[0], many_related_manager.args[1]
+            return many_related_manager, _To, _Through
 
     return None
 

@@ -1,5 +1,5 @@
 from mypy.plugin import MethodContext
-from mypy.types import AnyType, Instance, TypeOfAny
+from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -17,15 +17,14 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     if (
         not isinstance(ctx.type, Instance)
         or not ctx.type.args
-        or not isinstance(ctx.type.args[0], Instance)
-        or not helpers.is_model_type(ctx.type.args[0].type)
+        or not isinstance((model_type := get_proper_type(ctx.type.args[0])), Instance)
+        or not helpers.is_model_type(model_type.type)
     ):
         return ctx.default_return_type
 
     api = helpers.get_typechecker_api(ctx)
     manager_info = ctx.type.type
-    model_type = ctx.type.args[0]
-    model_cls_fullname = helpers.get_manager_to_model(manager_info) or ctx.type.args[0].type.fullname
+    model_cls_fullname = helpers.get_manager_to_model(manager_info) or model_type.type.fullname
     model_info = helpers.lookup_fully_qualified_typeinfo(api, model_cls_fullname)
     if model_info is None:
         return ctx.default_return_type
@@ -40,6 +39,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     for lookup_kwarg, provided_type in zip(lookup_kwargs, provided_lookup_types):
         if lookup_kwarg is None:
             continue
+        provided_type = get_proper_type(provided_type)
         if isinstance(provided_type, Instance) and provided_type.type.has_base(
             fullnames.COMBINABLE_EXPRESSION_FULLNAME
         ):
@@ -66,7 +66,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     return ctx.default_return_type
 
 
-def resolve_combinable_type(combinable_type: Instance, django_context: DjangoContext) -> MypyType:
+def resolve_combinable_type(combinable_type: Instance, django_context: DjangoContext) -> ProperType:
     if combinable_type.type.fullname != fullnames.F_EXPRESSION_FULLNAME:
         # Combinables aside from F expressions are unsupported
         return AnyType(TypeOfAny.explicit)

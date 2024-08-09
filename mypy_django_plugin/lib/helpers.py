@@ -36,7 +36,17 @@ from mypy.plugin import (
     MethodContext,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.types import AnyType, Instance, LiteralType, NoneTyp, TupleType, TypedDictType, TypeOfAny, UnionType
+from mypy.types import (
+    AnyType,
+    Instance,
+    LiteralType,
+    NoneTyp,
+    TupleType,
+    TypedDictType,
+    TypeOfAny,
+    UnionType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 from typing_extensions import TypedDict
 
@@ -227,7 +237,8 @@ def make_optional(typ: MypyType) -> MypyType:
 
 
 def is_optional(typ: MypyType) -> bool:
-    return isinstance(typ, UnionType) and any(isinstance(item, NoneTyp) for item in typ.items)
+    typ = get_proper_type(typ)
+    return isinstance(typ, UnionType) and any(isinstance(get_proper_type(item), NoneTyp) for item in typ.items)
 
 
 # Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
@@ -365,21 +376,23 @@ def make_tuple(api: "TypeChecker", fields: List[MypyType]) -> TupleType:
 
 
 def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
-    if isinstance(typ, UnionType):
+    proper_type = get_proper_type(typ)
+    if isinstance(proper_type, UnionType):
         converted_items = []
-        for item in typ.items:
+        for item in proper_type.items:
             converted_items.append(convert_any_to_type(item, referred_to_type))
         return UnionType.make_union(converted_items, line=typ.line, column=typ.column)
-    if isinstance(typ, Instance):
+    if isinstance(proper_type, Instance):
         args = []
-        for default_arg in typ.args:
+        for default_arg in proper_type.args:
+            default_arg = get_proper_type(default_arg)
             if isinstance(default_arg, AnyType):
                 args.append(referred_to_type)
             else:
                 args.append(default_arg)
-        return reparametrize_instance(typ, args)
+        return reparametrize_instance(proper_type, args)
 
-    if isinstance(typ, AnyType):
+    if isinstance(proper_type, AnyType):
         return referred_to_type
 
     return typ
@@ -468,7 +481,8 @@ def is_abstract_model(model: TypeInfo) -> bool:
                 # abstract = True (builtins.bool)
                 rhs_is_true = parse_bool(stmt.rvalue) is True
                 # abstract: Literal[True]
-                is_literal_true = isinstance(stmt.type, LiteralType) and stmt.type.value is True
+                stmt_type = get_proper_type(stmt.type)
+                is_literal_true = isinstance(stmt_type, LiteralType) and stmt_type.value is True
                 metadata["is_abstract_model"] = rhs_is_true or is_literal_true
                 return metadata["is_abstract_model"]
 

@@ -1,5 +1,5 @@
 from mypy.plugin import AttributeContext, MethodContext
-from mypy.types import Instance, UninhabitedType, UnionType
+from mypy.types import Instance, UninhabitedType, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -37,7 +37,7 @@ def set_auth_user_model_as_type_for_request_user(ctx: AttributeContext, django_c
 
 
 def check_querydict_is_mutable(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    ret_type = ctx.default_return_type
+    ret_type = get_proper_type(ctx.default_return_type)
     if isinstance(ret_type, UninhabitedType):
         ctx.api.fail("This QueryDict is immutable.", ctx.context)
-    return ret_type
+    return ctx.default_return_type
