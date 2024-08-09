@@ -79,7 +79,7 @@ def label_for_field(
     name: Callable | str,
     model: type[Model],
     model_admin: BaseModelAdmin | None = ...,
-    return_attr: Literal[True] = ...,
+    return_attr: Literal[True] = True,
     form: BaseForm | None = ...,
 ) -> tuple[str, Callable | str | None]: ...
 @overload
@@ -87,7 +87,7 @@ def label_for_field(
     name: Callable | str,
     model: type[Model],
     model_admin: BaseModelAdmin | None = ...,
-    return_attr: Literal[False] = ...,
+    return_attr: Literal[False] = False,
     form: BaseForm | None = ...,
 ) -> str: ...
 def help_text_for_field(name: str, model: type[Model]) -> str: ...

@@ -10,7 +10,7 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 ## Installation
 
 ```bash
-pip install django-stubs[compatible-mypy]
+pip install 'django-stubs[compatible-mypy]'
 ```
 
 To make mypy aware of the plugin, you need to add
@@ -49,6 +49,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
+| 5.0.4          | 1.11.x       | 5.0            | 4.2                    | 3.8 - 3.12     |
 | 5.0.3          | 1.11.x       | 5.0            | 4.2                    | 3.8 - 3.12     |
 | 5.0.2          | 1.10.x       | 5.0            | 4.2                    | 3.8 - 3.12     |
 | 5.0.1          | 1.10.x       | 5.0            | 4.2                    | 3.8 - 3.12     |
@@ -210,11 +211,11 @@ class MyManager(models.Manager["MyModel"]):
 
 ### How do I annotate cases where I called QuerySet.annotate?
 
-Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model]`, which indicates that the `Model` has
-been annotated, meaning it allows getting/setting extra attributes on the model instance.
+Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model, <Annotations>]`, which indicates that
+the `Model` has been annotated, meaning it requires extra attributes on the model instance.
 
-Optionally, you can provide a `TypedDict` of these attributes,
-e.g. `WithAnnotations[MyModel, MyTypedDict]`, to specify which annotated attributes are present.
+You should provide a `TypedDict` of these attributes, e.g. `WithAnnotations[MyModel, MyTypedDict]`, to specify which
+annotated attributes are present.
 
 Currently, the mypy plugin can recognize that specific names were passed to `QuerySet.annotate` and
 include them in the type, but does not record the types of these attributes.
@@ -234,21 +235,11 @@ class MyModel(models.Model):
     username = models.CharField(max_length=100)
 
 
-def func(m: WithAnnotations[MyModel]) -> str:
-    return m.asdf  # OK, since the model is annotated as allowing any attribute
-
-
-func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
-func(
-    MyModel.objects.get(id=1)
-)  # Error, since this model will not allow access to any attribute
-
-
 class MyTypedDict(TypedDict):
     foo: str
 
 
-def func2(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
+def func(m: WithAnnotations[MyModel, MyTypedDict]) -> str:
     print(m.bar)  # Error, since field "bar" is not in MyModel or MyTypedDict.
     return m.foo  # OK, since we said field "foo" was allowed
 

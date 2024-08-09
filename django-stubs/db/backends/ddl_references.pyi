@@ -33,7 +33,7 @@ class Columns(TableColumns):
     quote_name: _QuoteCallable
     col_suffixes: Sequence[str]
     def __init__(
-        self, table: str, columns: list[str], quote_name: _QuoteCallable, col_suffixes: Sequence[str] = ...
+        self, table: str, columns: list[str], quote_name: _QuoteCallable, col_suffixes: Sequence[str] = ()
     ) -> None: ...
 
 @type_check_only
@@ -52,7 +52,7 @@ class IndexName(TableColumns):
 class IndexColumns(Columns):
     opclasses: Any
     def __init__(
-        self, table: Any, columns: Any, quote_name: Any, col_suffixes: Any = ..., opclasses: Any = ...
+        self, table: Any, columns: Any, quote_name: Any, col_suffixes: Any = (), opclasses: Any = ()
     ) -> None: ...
 
 class ForeignKeyName(TableColumns):

@@ -86,6 +86,29 @@
                                                   related_name='books')
                     publisher2 = models.ForeignKey(to=Publisher, related_name='books2', on_delete=models.CASCADE)
 
+-   case: foreign_key_subclass
+    main: |
+        from myapp.models import A
+        reveal_type(A.objects.get().b)  # N: Revealed type is "myapp.models.B"
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class MyForeignKey(models.ForeignKey[_ST, _GT]): ...
+
+                class B(models.Model): ...
+
+                class A(models.Model):
+                    b = models.ForeignKey(B, on_delete=models.CASCADE)
+
 -   case: to_parameter_as_string_with_application_name__model_imported
     main: |
         from myapp2.models import Book
@@ -777,6 +800,31 @@
                 class User(AbstractUser):
                     pass
 
+-   case: nullable_foreign_key_with_init_overridden
+    main: |
+        from myapp.models import A
+        reveal_type(A.objects.get().b)  # N: Revealed type is "Union[myapp.models.B, None]"
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any, TypeVar
+                from django.db import models
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class FK(models.ForeignKey[_ST, _GT]):
+                    def __init__(self, *args: Any, **kwargs: Any) -> None:
+                        kwargs.setdefault('on_delete', models.CASCADE)
+                        super().__init__(*args, **kwargs)
+
+                class B(models.Model): ...
+
+                class A(models.Model):
+                    b = FK(B, null=True, on_delete=models.CASCADE)
 
 -   case: related_manager_is_a_subclass_of_default_manager
     main: |
@@ -1502,14 +1550,36 @@
 -   case: test_reverse_m2m_relation_checks_other_model
     main: |
         from myapp.models import Author
+        # With builtin manager/queryset
         Author().book_set.filter(featured=True)
         Author().book_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().book_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, Tuple[builtins.bool]]"
+        Author().book_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().book_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': builtins.bool})]"
+        Author().book_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().book_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, Tuple[builtins.bool]]"
+        Author().book_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().book_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': builtins.bool})]"
+        Author().book_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+
+        # With a custom manager/queryset
+        Author().other_set.filter(featured=True)
+        Author().other_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().other_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, Tuple[builtins.bool]]"
+        Author().other_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().other_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': builtins.bool})]"
+        Author().other_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().other_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, Tuple[builtins.bool]]"
+        Author().other_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
+        reveal_type(Author().other_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': builtins.bool})]"
+        Author().other_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing_extensions import Self
                 from django.db import models
 
                 class Author(models.Model):
@@ -1518,3 +1588,12 @@
                 class Book(models.Model):
                     featured = models.BooleanField(default=False)
                     authors = models.ManyToManyField(Author)
+
+                class OtherQuerySet(models.QuerySet["Other"]):
+                    def custom(self) -> Self: ...
+
+                OtherManager = models.Manager.from_queryset(OtherQuerySet)
+                class Other(models.Model):
+                    featured = models.BooleanField()
+                    authors = models.ManyToManyField(Author)
+                    objects = OtherManager()

@@ -10,8 +10,8 @@ def add_message(
     request: HttpRequest | None,
     level: int,
     message: _StrOrPromise,
-    extra_tags: str = ...,
-    fail_silently: bool | str = ...,
+    extra_tags: str = "",
+    fail_silently: bool | str = False,
 ) -> None: ...
 def get_messages(request: HttpRequest) -> list[Any] | BaseStorage: ...
 def get_level(request: HttpRequest) -> int: ...
@@ -19,30 +19,30 @@ def set_level(request: HttpRequest, level: int) -> bool: ...
 def debug(
     request: HttpRequest,
     message: _StrOrPromise,
-    extra_tags: str = ...,
-    fail_silently: bool | str = ...,
+    extra_tags: str = "",
+    fail_silently: bool | str = False,
 ) -> None: ...
 def info(
     request: HttpRequest,
     message: _StrOrPromise,
-    extra_tags: str = ...,
-    fail_silently: bool | str = ...,
+    extra_tags: str = "",
+    fail_silently: bool | str = False,
 ) -> None: ...
 def success(
     request: HttpRequest,
     message: _StrOrPromise,
-    extra_tags: str = ...,
-    fail_silently: bool | str = ...,
+    extra_tags: str = "",
+    fail_silently: bool | str = False,
 ) -> None: ...
 def warning(
     request: HttpRequest,
     message: _StrOrPromise,
-    extra_tags: str = ...,
-    fail_silently: bool | str = ...,
+    extra_tags: str = "",
+    fail_silently: bool | str = False,
 ) -> None: ...
 def error(
     request: HttpRequest,
     message: _StrOrPromise,
-    extra_tags: str = ...,
-    fail_silently: bool | str = ...,
+    extra_tags: str = "",
+    fail_silently: bool | str = False,
 ) -> None: ...

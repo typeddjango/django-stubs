@@ -31,14 +31,14 @@ class SearchVector(SearchVectorCombinable, Func):
     arg_joiner: str
     output_field: ClassVar[SearchVectorField]
     def __init__(
-        self, *expressions: _Expression, config: _Expression | None = ..., weight: Any | None = ...
+        self, *expressions: _Expression, config: _Expression | None = None, weight: Any | None = None
     ) -> None: ...
     def as_sql(  # type: ignore[override]
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
-        function: str | None = ...,
-        template: str | None = ...,
+        function: str | None = None,
+        template: str | None = None,
     ) -> _AsSqlType: ...
 
 class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
@@ -48,7 +48,7 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field | None = ...,
+        output_field: Field | None = None,
     ) -> None: ...
 
 class SearchQueryCombinable:
@@ -65,18 +65,18 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore[misc]
     def __init__(
         self,
         value: _Expression,
-        output_field: Field | None = ...,
+        output_field: Field | None = None,
         *,
-        config: _Expression | None = ...,
-        invert: bool = ...,
-        search_type: str = ...,
+        config: _Expression | None = None,
+        invert: bool = False,
+        search_type: str = "plain",
     ) -> None: ...
     def as_sql(  # type: ignore[override]
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
-        function: str | None = ...,
-        template: str | None = ...,
+        function: str | None = None,
+        template: str | None = None,
     ) -> _AsSqlType: ...
     def __invert__(self) -> Self: ...  # type: ignore[override]
 
@@ -87,7 +87,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field | None = ...,
+        output_field: Field | None = None,
     ) -> None: ...
 
 class SearchRank(Func):
@@ -96,9 +96,9 @@ class SearchRank(Func):
         self,
         vector: SearchVector | _Expression,
         query: SearchQuery | _Expression,
-        weights: Any | None = ...,
-        normalization: Any | None = ...,
-        cover_density: bool = ...,
+        weights: Any | None = None,
+        normalization: Any | None = None,
+        cover_density: bool = False,
     ) -> None: ...
 
 class SearchHeadline(Func):
@@ -110,22 +110,22 @@ class SearchHeadline(Func):
         expression: _Expression,
         query: _Expression,
         *,
-        config: _Expression | None = ...,
-        start_sel: Any | None = ...,
-        stop_sel: Any | None = ...,
-        max_words: int | None = ...,
-        min_words: int | None = ...,
-        short_word: str | None = ...,
-        highlight_all: bool | None = ...,
-        max_fragments: int | None = ...,
-        fragment_delimiter: str | None = ...,
+        config: _Expression | None = None,
+        start_sel: Any | None = None,
+        stop_sel: Any | None = None,
+        max_words: int | None = None,
+        min_words: int | None = None,
+        short_word: str | None = None,
+        highlight_all: bool | None = None,
+        max_fragments: int | None = None,
+        fragment_delimiter: str | None = None,
     ) -> None: ...
     def as_sql(  # type: ignore[override]
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
-        function: str | None = ...,
-        template: str | None = ...,
+        function: str | None = None,
+        template: str | None = None,
     ) -> _AsSqlType: ...
 
 class TrigramBase(Func):

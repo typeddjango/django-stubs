@@ -10,6 +10,7 @@ from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
     MDEF,
+    ArgKind,
     AssignmentStmt,
     Block,
     ClassDef,
@@ -40,7 +41,6 @@ from mypy.types import Type as MypyType
 from typing_extensions import TypedDict
 
 from mypy_django_plugin.lib import fullnames
-from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
 if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
@@ -48,6 +48,7 @@ if TYPE_CHECKING:
 
 class DjangoTypeMetadata(TypedDict, total=False):
     is_abstract_model: bool
+    is_annotated_model: bool
     from_queryset_manager: str
     reverse_managers: Dict[str, str]
     baseform_bases: Dict[str, int]
@@ -101,6 +102,14 @@ def set_manager_to_model(manager: TypeInfo, to_model: TypeInfo) -> None:
 
 def get_manager_to_model(manager: TypeInfo) -> Optional[str]:
     return get_django_metadata(manager).get("manager_to_model")
+
+
+def mark_as_annotated_model(model: TypeInfo) -> None:
+    get_django_metadata(model)["is_annotated_model"] = True
+
+
+def is_annotated_model(model: TypeInfo) -> bool:
+    return get_django_metadata(model).get("is_annotated_model", False)
 
 
 class IncompleteDefnException(Exception):
@@ -182,6 +191,12 @@ def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: 
     Return the expression for the specific argument.
     This helper should only be used with non-star arguments.
     """
+    # try and pull the named argument from the caller first
+    for kinds, argnames, args in zip(ctx.arg_kinds, ctx.arg_names, ctx.args):
+        for kind, argname, arg in zip(kinds, argnames, args):
+            if kind == ArgKind.ARG_NAMED and argname == name:
+                return arg
+
     if name not in ctx.callee_arg_names:
         return None
     idx = ctx.callee_arg_names.index(name)
@@ -278,10 +293,6 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
-def is_annotated_model_fullname(model_cls_fullname: str) -> bool:
-    return model_cls_fullname.startswith(WITH_ANNOTATIONS_FULLNAME + "[")
-
-
 def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
     # make new class expression
     classdef = ClassDef(name, Block([]))
@@ -375,9 +386,12 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 
 
 def make_typeddict(
-    api: CheckerPluginInterface, fields: "OrderedDict[str, MypyType]", required_keys: Set[str]
+    api: Union[SemanticAnalyzer, CheckerPluginInterface], fields: Dict[str, MypyType], required_keys: Set[str]
 ) -> TypedDictType:
-    fallback_type = api.named_generic_type("typing._TypedDict", [])
+    if isinstance(api, CheckerPluginInterface):
+        fallback_type = api.named_generic_type("typing._TypedDict", [])
+    else:
+        fallback_type = api.named_type("typing._TypedDict", [])
     typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback_type)
     return typed_dict_type
 
@@ -526,3 +540,7 @@ def get_model_from_expression(
         if model_info is not None:
             return Instance(model_info, [])
     return None
+
+
+def fill_manager(manager: TypeInfo, typ: MypyType) -> Instance:
+    return Instance(manager, [typ] if manager.is_generic() else [])

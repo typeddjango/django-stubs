@@ -38,7 +38,7 @@
 -   case: can_override_abstract_user_manager
     main: |
         from myapp.models import MyBaseUser, MyUser
-        reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseUserManager[myapp.models.MyBaseUser]"
+        reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseUserManager"
         reveal_type(MyBaseUser.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyBaseUser, myapp.models.MyBaseUser]"
         reveal_type(MyUser.objects)  # N: Revealed type is "myapp.models.MyUserManager"
         reveal_type(MyUser.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyUser, myapp.models.MyUser]"

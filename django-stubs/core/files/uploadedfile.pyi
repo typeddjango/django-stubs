@@ -11,12 +11,12 @@ class UploadedFile(File):
     name: str | None
     def __init__(
         self,
-        file: IO | None = ...,
-        name: str | None = ...,
-        content_type: str | None = ...,
-        size: int | None = ...,
-        charset: str | None = ...,
-        content_type_extra: dict[str, str] | None = ...,
+        file: IO | None = None,
+        name: str | None = None,
+        content_type: str | None = None,
+        size: int | None = None,
+        charset: str | None = None,
+        content_type_extra: dict[str, str] | None = None,
     ) -> None: ...
 
 class TemporaryUploadedFile(UploadedFile):
@@ -26,7 +26,7 @@ class TemporaryUploadedFile(UploadedFile):
         content_type: str | None,
         size: int | None,
         charset: str | None,
-        content_type_extra: dict[str, str] | None = ...,
+        content_type_extra: dict[str, str] | None = None,
     ) -> None: ...
     def temporary_file_path(self) -> str: ...
 
@@ -40,11 +40,11 @@ class InMemoryUploadedFile(UploadedFile):
         content_type: str | None,
         size: int | None,
         charset: str | None,
-        content_type_extra: dict[str, str] | None = ...,
+        content_type_extra: dict[str, str] | None = None,
     ) -> None: ...
-    def open(self, mode: str | None = ...) -> Self: ...  # type: ignore[override]
+    def open(self, mode: str | None = None) -> Self: ...  # type: ignore[override]
 
 class SimpleUploadedFile(InMemoryUploadedFile):
-    def __init__(self, name: str, content: bytes | None, content_type: str = ...) -> None: ...
+    def __init__(self, name: str, content: bytes | None, content_type: str = "text/plain") -> None: ...
     @classmethod
     def from_dict(cls, file_dict: dict[str, str | bytes]) -> Self: ...

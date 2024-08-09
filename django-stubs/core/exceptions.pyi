@@ -38,8 +38,8 @@ class ValidationError(Exception):
         self,
         # Accepts arbitrarily nested data structure, mypy doesn't allow describing it accurately.
         message: _StrOrPromise | ValidationError | dict[str, Any] | list[Any],
-        code: str | None = ...,
-        params: dict[str, Any] | None = ...,
+        code: str | None = None,
+        params: dict[str, Any] | None = None,
     ) -> None: ...
     @property
     def message_dict(self) -> dict[str, list[str]]: ...

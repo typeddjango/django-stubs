@@ -1,9 +1,8 @@
 from typing import TypeVar
 
-from django.contrib.sites.models import Site
 from django.db import models
 
-_T = TypeVar("_T", bound=Site)
+_T = TypeVar("_T", bound=models.Model)
 
 class CurrentSiteManager(models.Manager[_T]):
-    def __init__(self, field_name: str | None = ...) -> None: ...
+    def __init__(self, field_name: str | None = None) -> None: ...

@@ -34,17 +34,17 @@ class BaseForm(RenderableFormMixin):
     template_name_label: str
     def __init__(
         self,
-        data: _DataT | None = ...,
-        files: _FilesT | None = ...,
-        auto_id: bool | str = ...,
-        prefix: str | None = ...,
-        initial: Mapping[str, Any] | None = ...,
+        data: _DataT | None = None,
+        files: _FilesT | None = None,
+        auto_id: bool | str = "id_%s",
+        prefix: str | None = None,
+        initial: Mapping[str, Any] | None = None,
         error_class: type[ErrorList] = ...,
-        label_suffix: str | None = ...,
-        empty_permitted: bool = ...,
-        field_order: Iterable[str] | None = ...,
-        use_required_attribute: bool | None = ...,
-        renderer: BaseRenderer | None = ...,
+        label_suffix: str | None = None,
+        empty_permitted: bool = False,
+        field_order: Iterable[str] | None = None,
+        use_required_attribute: bool | None = None,
+        renderer: BaseRenderer | None = None,
     ) -> None: ...
     def order_fields(self, field_order: Iterable[str] | None) -> None: ...
     def __iter__(self) -> Iterator[BoundField]: ...
@@ -58,7 +58,7 @@ class BaseForm(RenderableFormMixin):
     def template_name(self) -> str: ...
     def non_field_errors(self) -> ErrorList: ...
     def add_error(self, field: str | None, error: ValidationError | _StrOrPromise) -> None: ...
-    def has_error(self, field: str | None, code: str | None = ...) -> bool: ...
+    def has_error(self, field: str | None, code: str | None = None) -> bool: ...
     def full_clean(self) -> None: ...
     def clean(self) -> dict[str, Any] | None: ...
     def has_changed(self) -> bool: ...

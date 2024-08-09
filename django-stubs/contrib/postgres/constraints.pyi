@@ -21,14 +21,14 @@ class ExclusionConstraint(BaseConstraint):
         *,
         name: str,
         expressions: Sequence[tuple[str | Combinable, str]],
-        index_type: str | None = ...,
-        condition: Q | None = ...,
-        deferrable: Deferrable | None = ...,
-        include: list[str] | tuple[str] | None = ...,
-        violation_error_code: str | None = ...,
-        violation_error_message: _StrOrPromise | None = ...,
+        index_type: str | None = None,
+        condition: Q | None = None,
+        deferrable: Deferrable | None = None,
+        include: list[str] | tuple[str, ...] | None = None,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
     def check_supported(self, schema_editor: BaseDatabaseSchemaEditor) -> None: ...
     def validate(
-        self, model: type[Model], instance: Model, exclude: Iterable[str] | None = ..., using: str = ...
+        self, model: type[Model], instance: Model, exclude: Iterable[str] | None = None, using: str = "default"
     ) -> None: ...

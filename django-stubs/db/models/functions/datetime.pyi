@@ -16,7 +16,7 @@ class Extract(TimezoneMixin, Transform):
     lookup_name: str
     output_field: ClassVar[models.IntegerField]
     def __init__(
-        self, expression: Combinable | str, lookup_name: str | None = ..., tzinfo: Any | None = ..., **extra: Any
+        self, expression: Combinable | str, lookup_name: str | None = None, tzinfo: Any | None = None, **extra: Any
     ) -> None: ...
 
 class ExtractYear(Extract): ...
@@ -41,7 +41,11 @@ class TruncBase(TimezoneMixin, Transform):
     tzinfo: Any
 
     def __init__(
-        self, expression: Combinable | str, output_field: Field | None = ..., tzinfo: tzinfo | None = ..., **extra: Any
+        self,
+        expression: Combinable | str,
+        output_field: Field | None = None,
+        tzinfo: tzinfo | None = None,
+        **extra: Any,
     ) -> None: ...
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
@@ -50,8 +54,8 @@ class Trunc(TruncBase):
         self,
         expression: Combinable | str,
         kind: str,
-        output_field: Field | None = ...,
-        tzinfo: tzinfo | None = ...,
+        output_field: Field | None = None,
+        tzinfo: tzinfo | None = None,
         **extra: Any,
     ) -> None: ...
 

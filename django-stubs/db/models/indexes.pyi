@@ -24,17 +24,17 @@ class Index:
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        fields: Sequence[str] = ...,
-        name: str | None = ...,
-        db_tablespace: str | None = ...,
-        opclasses: Sequence[str] = ...,
-        condition: Q | None = ...,
-        include: Sequence[str] | None = ...,
+        fields: Sequence[str] = (),
+        name: str | None = None,
+        db_tablespace: str | None = None,
+        opclasses: Sequence[str] = (),
+        condition: Q | None = None,
+        include: Sequence[str] | None = None,
     ) -> None: ...
     @property
     def contains_expressions(self) -> bool: ...
     def create_sql(
-        self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = ..., **kwargs: Any
+        self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, using: str = "", **kwargs: Any
     ) -> Statement: ...
     def remove_sql(self, model: type[Model], schema_editor: BaseDatabaseSchemaEditor, **kwargs: Any) -> str: ...
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
@@ -44,15 +44,15 @@ class Index:
 class IndexExpression(Func):
     template: str
     wrapper_classes: Sequence[Expression]
-    def set_wrapper_classes(self, connection: Any | None = ...) -> None: ...
+    def set_wrapper_classes(self, connection: Any | None = None) -> None: ...
     @classmethod
     def register_wrappers(cls, *wrapper_classes: Expression) -> None: ...
     def resolve_expression(
         self,
-        query: Any | None = ...,
-        allow_joins: bool = ...,
-        reuse: set[str] | None = ...,
-        summarize: bool = ...,
-        for_save: bool = ...,
+        query: Any | None = None,
+        allow_joins: bool = True,
+        reuse: set[str] | None = None,
+        summarize: bool = False,
+        for_save: bool = False,
     ) -> IndexExpression: ...
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...

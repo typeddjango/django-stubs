@@ -22,23 +22,23 @@ def forbid_multi_line_headers(name: str, val: str, encoding: str) -> tuple[str, 
 def sanitize_address(addr: tuple[str, str] | str, encoding: str) -> str: ...
 
 class MIMEMixin:
-    def as_string(self, unixfrom: bool = ..., linesep: str = ...) -> str: ...
-    def as_bytes(self, unixfrom: bool = ..., linesep: str = ...) -> bytes: ...
+    def as_string(self, unixfrom: bool = False, linesep: str = "\n") -> str: ...
+    def as_bytes(self, unixfrom: bool = False, linesep: str = "\n") -> bytes: ...
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage): ...  # type: ignore[misc]
 
 class SafeMIMEText(MIMEMixin, MIMEText):  # type: ignore[misc]
     encoding: str
-    def __init__(self, _text: str, _subtype: str = ..., _charset: str = ...) -> None: ...
+    def __init__(self, _text: str, _subtype: str = "plain", _charset: str | None = None) -> None: ...
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):  # type: ignore[misc]
     encoding: str
     def __init__(
         self,
-        _subtype: str = ...,
-        boundary: Any | None = ...,
-        _subparts: Any | None = ...,
-        encoding: str = ...,
+        _subtype: str = "mixed",
+        boundary: Any | None = None,
+        _subparts: Any | None = None,
+        encoding: str | None = None,
         **_params: Any,
     ) -> None: ...
 
@@ -63,45 +63,49 @@ class EmailMessage:
     connection: Any
     def __init__(
         self,
-        subject: _StrOrPromise = ...,
-        body: _StrOrPromise | None = ...,
-        from_email: str | None = ...,
-        to: Sequence[str] | None = ...,
-        bcc: Sequence[str] | None = ...,
-        connection: Any | None = ...,
-        attachments: Sequence[MIMEBase | _AttachmentTuple] | None = ...,
-        headers: dict[str, str] | None = ...,
-        cc: Sequence[str] | None = ...,
-        reply_to: Sequence[str] | None = ...,
+        subject: _StrOrPromise = "",
+        body: _StrOrPromise | None = "",
+        from_email: str | None = None,
+        to: Sequence[str] | None = None,
+        bcc: Sequence[str] | None = None,
+        connection: Any | None = None,
+        attachments: Sequence[MIMEBase | _AttachmentTuple] | None = None,
+        headers: dict[str, str] | None = None,
+        cc: Sequence[str] | None = None,
+        reply_to: Sequence[str] | None = None,
     ) -> None: ...
-    def get_connection(self, fail_silently: bool = ...) -> Any: ...
+    def get_connection(self, fail_silently: bool = False) -> Any: ...
     # TODO: when typeshed gets more types for email.Message, move it to MIMEMessage, now it has too many false-positives
     def message(self) -> Any: ...
     def recipients(self) -> list[str]: ...
-    def send(self, fail_silently: bool = ...) -> int: ...
+    def send(self, fail_silently: bool = False) -> int: ...
     @overload
-    def attach(self, filename: MIMEBase = ..., content: None = ..., mimetype: None = ...) -> None: ...
+    def attach(self, filename: MIMEBase | None = None, content: None = None, mimetype: None = None) -> None: ...
     @overload
-    def attach(self, filename: None = ..., content: _AttachmentContent = ..., mimetype: str = ...) -> None: ...
+    def attach(
+        self, filename: None = None, content: _AttachmentContent | None = None, mimetype: str | None = None
+    ) -> None: ...
     @overload
-    def attach(self, filename: str = ..., content: _AttachmentContent = ..., mimetype: str | None = ...) -> None: ...
-    def attach_file(self, path: str, mimetype: str | None = ...) -> None: ...
+    def attach(
+        self, filename: str | None = None, content: _AttachmentContent | None = None, mimetype: str | None = None
+    ) -> None: ...
+    def attach_file(self, path: str, mimetype: str | None = None) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
     alternative_subtype: str
     alternatives: list[tuple[_AttachmentContent, str]]
     def __init__(
         self,
-        subject: _StrOrPromise = ...,
-        body: _StrOrPromise | None = ...,
-        from_email: str | None = ...,
-        to: Sequence[str] | None = ...,
-        bcc: Sequence[str] | None = ...,
-        connection: Any | None = ...,
-        attachments: Sequence[MIMEBase | _AttachmentTuple] | None = ...,
-        headers: dict[str, str] | None = ...,
-        alternatives: list[tuple[_AttachmentContent, str]] | None = ...,
-        cc: Sequence[str] | None = ...,
-        reply_to: Sequence[str] | None = ...,
+        subject: _StrOrPromise = "",
+        body: _StrOrPromise | None = "",
+        from_email: str | None = None,
+        to: Sequence[str] | None = None,
+        bcc: Sequence[str] | None = None,
+        connection: Any | None = None,
+        attachments: Sequence[MIMEBase | _AttachmentTuple] | None = None,
+        headers: dict[str, str] | None = None,
+        alternatives: list[tuple[_AttachmentContent, str]] | None = None,
+        cc: Sequence[str] | None = None,
+        reply_to: Sequence[str] | None = None,
     ) -> None: ...
     def attach_alternative(self, content: _AttachmentContent, mimetype: str) -> None: ...

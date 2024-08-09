@@ -9,9 +9,9 @@ class MigrationQuestioner:
     dry_run: bool | None
     def __init__(
         self,
-        defaults: dict[str, bool] | None = ...,
-        specified_apps: set[str] | None = ...,
-        dry_run: bool | None = ...,
+        defaults: dict[str, bool] | None = None,
+        specified_apps: set[str] | None = None,
+        dry_run: bool | None = None,
     ) -> None: ...
     def ask_initial(self, app_label: str) -> bool: ...
     def ask_not_null_addition(self, field_name: str, model_name: str) -> Any: ...

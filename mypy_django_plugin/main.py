@@ -223,9 +223,6 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
-        if fullname == fullnames.MODEL_CLASS_FULLNAME:
-            return MetaclassAdjustments.adjust_model_class
-
         sym = self.lookup_fully_qualified(fullname)
         if (
             sym is not None
@@ -235,6 +232,11 @@ class NewSemanalDjangoPlugin(Plugin):
             return reparametrize_any_manager_hook
         else:
             return None
+
+    def get_metaclass_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+        if fullname == fullnames.MODEL_METACLASS_FULLNAME:
+            return MetaclassAdjustments.adjust_model_class
+        return None
 
     def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
         # Base class is a Model class definition
@@ -296,7 +298,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "typing_extensions.Annotated",
             "django_stubs_ext.annotations.WithAnnotations",
         ):
-            return partial(handle_annotated_type, django_context=self.django_context)
+            return partial(handle_annotated_type, fullname=fullname)
         else:
             return None
 

@@ -22,11 +22,11 @@ class RegexValidator(_Deconstructible):
     flags: int
     def __init__(
         self,
-        regex: _Regex | None = ...,
-        message: _StrOrPromise | None = ...,
-        code: str | None = ...,
-        inverse_match: bool | None = ...,
-        flags: RegexFlag | None = ...,
+        regex: _Regex | None = None,
+        message: _StrOrPromise | None = None,
+        code: str | None = None,
+        inverse_match: bool | None = None,
+        flags: RegexFlag | None = None,
     ) -> None: ...
     def __call__(self, value: Any) -> None: ...
 
@@ -41,7 +41,7 @@ class URLValidator(RegexValidator):
     schemes: Sequence[str]
     unsafe_chars: frozenset[str]
     max_length: int
-    def __init__(self, schemes: Sequence[str] | None = ..., **kwargs: Any) -> None: ...
+    def __init__(self, schemes: Sequence[str] | None = None, **kwargs: Any) -> None: ...
     def __call__(self, value: Any) -> None: ...
 
 integer_validator: RegexValidator
@@ -57,9 +57,9 @@ class EmailValidator(_Deconstructible):
     domain_allowlist: Sequence[str]
     def __init__(
         self,
-        message: _StrOrPromise | None = ...,
-        code: str | None = ...,
-        allowlist: Sequence[str] | None = ...,
+        message: _StrOrPromise | None = None,
+        code: str | None = None,
+        allowlist: Sequence[str] | None = None,
     ) -> None: ...
     def __call__(self, value: str | None) -> None: ...
     def validate_domain_part(self, domain_part: str) -> bool: ...
@@ -80,7 +80,7 @@ ip_address_validator_map: dict[str, _IPValidator]
 
 def ip_address_validators(protocol: str, unpack_ipv4: bool) -> _IPValidator: ...
 def int_list_validator(
-    sep: str = ..., message: _StrOrPromise | None = ..., code: str = ..., allow_negative: bool = ...
+    sep: str = ",", message: _StrOrPromise | None = None, code: str = "invalid", allow_negative: bool = False
 ) -> RegexValidator: ...
 
 validate_comma_separated_integer_list: RegexValidator
@@ -89,7 +89,7 @@ class BaseValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
     limit_value: Any
-    def __init__(self, limit_value: Any | Callable[[], Any], message: _StrOrPromise | None = ...) -> None: ...
+    def __init__(self, limit_value: Any | Callable[[], Any], message: _StrOrPromise | None = None) -> None: ...
     def __call__(self, value: Any) -> None: ...
     def compare(self, a: Any, b: Any) -> bool: ...
     def clean(self, x: Any) -> Any: ...
@@ -101,7 +101,7 @@ class MinValueValidator(BaseValidator): ...
 class StepValueValidator(BaseValidator):
     offset: int | None
     def __init__(
-        self, limit_value: Any | Callable[[], Any], message: _StrOrPromise | None = ..., offset: int | None = ...
+        self, limit_value: Any | Callable[[], Any], message: _StrOrPromise | None = None, offset: int | None = None
     ) -> None: ...
 
 class MinLengthValidator(BaseValidator):
@@ -124,9 +124,9 @@ class FileExtensionValidator(_Deconstructible):
     allowed_extensions: Collection[str] | None
     def __init__(
         self,
-        allowed_extensions: Collection[str] | None = ...,
-        message: _StrOrPromise | None = ...,
-        code: str | None = ...,
+        allowed_extensions: Collection[str] | None = None,
+        message: _StrOrPromise | None = None,
+        code: str | None = None,
     ) -> None: ...
     def __call__(self, value: File) -> None: ...
 
@@ -136,5 +136,5 @@ def validate_image_file_extension(value: File) -> None: ...
 class ProhibitNullCharactersValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
-    def __init__(self, message: _StrOrPromise | None = ..., code: str | None = ...) -> None: ...
+    def __init__(self, message: _StrOrPromise | None = None, code: str | None = None) -> None: ...
     def __call__(self, value: Any) -> None: ...

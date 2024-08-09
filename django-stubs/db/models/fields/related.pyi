@@ -27,9 +27,9 @@ RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 def resolve_relation(scope_model: type[Model], relation: str | type[Model]) -> str | type[Model]: ...
 
 # __set__ value type
-_ST = TypeVar("_ST")
+_ST = TypeVar("_ST", contravariant=True)
 # __get__ return type
-_GT = TypeVar("_GT", default=_ST)
+_GT = TypeVar("_GT", covariant=True, default=_ST)
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     one_to_many: bool
@@ -43,9 +43,9 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     swappable: bool
     def __init__(
         self,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
         *,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
@@ -97,12 +97,12 @@ class ForeignObject(RelatedField[_ST, _GT]):
         on_delete: Callable[..., None],
         from_fields: Sequence[str],
         to_fields: Sequence[str],
-        rel: ForeignObjectRel | None = ...,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        swappable: bool = ...,
+        rel: ForeignObjectRel | None = None,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        swappable: bool = True,
         *,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
@@ -155,12 +155,12 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         self,
         to: type[Model] | str,
         on_delete: Callable[..., None],
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        to_field: str | None = ...,
-        db_constraint: bool = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        to_field: str | None = None,
+        db_constraint: bool = True,
         *,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
@@ -197,7 +197,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         self,
         to: type[Model] | str,
         on_delete: Any,
-        to_field: str | None = ...,
+        to_field: str | None = None,
         *,
         related_name: str | None = ...,
         related_query_name: str | None = ...,
@@ -242,7 +242,7 @@ _Through = TypeVar("_Through", bound=Model)
 _To = TypeVar("_To", bound=Model)
 
 class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
-    description: str
+    description: _StrOrPromise
     has_null_arg: bool
     swappable: bool
 
@@ -256,15 +256,15 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     def __init__(
         self,
         to: type[_To] | str,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        symmetrical: bool | None = ...,
-        through: type[_Through] | str | None = ...,
-        through_fields: tuple[str, str] | None = ...,
-        db_constraint: bool = ...,
-        db_table: str | None = ...,
-        swappable: bool = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        symmetrical: bool | None = None,
+        through: type[_Through] | str | None = None,
+        through_fields: tuple[str, str] | None = None,
+        db_constraint: bool = True,
+        db_table: str | None = None,
+        swappable: bool = True,
         *,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
@@ -296,8 +296,8 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
-    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
-    def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
+    def get_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
+    def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
     def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...
     def m2m_db_table(self) -> str: ...
     def m2m_column_name(self) -> str: ...

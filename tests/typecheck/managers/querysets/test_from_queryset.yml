@@ -583,14 +583,14 @@
 -   case: test_queryset_in_model_class_body
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.custom)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.custom().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
     installed_apps:
         - myapp
     files:
@@ -613,7 +613,10 @@
 -   case: test_queryset_in_model_class_body_subclass
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.BaseModel"
+        reveal_type(MyModel.objects.filter())  # N: Revealed type is "myapp.models.BaseQuerySet"
+        reveal_type(MyModel.objects.filter().get())  # N: Revealed type is "myapp.models.BaseModel"
     installed_apps:
         - myapp
     files:
@@ -946,3 +949,25 @@
         main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
         main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
         main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[Any]]"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
+
+-   case: test_reverse_manager_with_foreign_key
+    main: |
+        from myapp.models import B
+        reveal_type(B().a_set.filter(field="something"))  # N: Revealed type is "myapp.models.QS"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class B(models.Model): ...
+
+                class QS(models.QuerySet["A"]): ...
+
+                Manager = models.Manager.from_queryset(QS)
+                class A(models.Model):
+                    field = models.CharField()
+                    b = models.ForeignKey(B, on_delete=models.CASCADE)
+                    objects = Manager()

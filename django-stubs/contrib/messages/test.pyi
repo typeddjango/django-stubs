@@ -5,5 +5,5 @@ from django.http.response import HttpResponse
 
 class MessagesTestMixin:
     def assertMessages(
-        self, response: HttpResponse, expected_messages: list[Any] | BaseStorage, *, ordered: bool = ...
+        self, response: HttpResponse, expected_messages: list[Any] | BaseStorage, *, ordered: bool = True
     ) -> None: ...

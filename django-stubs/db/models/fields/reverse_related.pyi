@@ -37,11 +37,11 @@ class ForeignObjectRel(FieldCacheMixin):
         self,
         field: ForeignObject,
         to: type[Model] | str,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        on_delete: Callable = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        on_delete: Callable | None = None,
     ) -> None: ...
     @cached_property
     def hidden(self) -> bool: ...
@@ -71,10 +71,10 @@ class ForeignObjectRel(FieldCacheMixin):
     # and `self.limit_choices_to` is callable.
     def get_choices(
         self,
-        include_blank: bool = ...,
+        include_blank: bool = True,
         blank_choice: _ChoicesList = ...,
-        limit_choices_to: _LimitChoicesTo | None = ...,
-        ordering: Sequence[str] = ...,
+        limit_choices_to: _LimitChoicesTo | None = None,
+        ordering: Sequence[str] = (),
     ) -> _ChoicesList: ...
     def is_hidden(self) -> bool: ...
     def get_joining_columns(self) -> tuple: ...
@@ -83,8 +83,8 @@ class ForeignObjectRel(FieldCacheMixin):
         self, where_class: type[WhereNode], alias: str, related_alias: str
     ) -> StartsWith | WhereNode | None: ...
     def set_field_name(self) -> None: ...
-    def get_accessor_name(self, model: type[Model] | None = ...) -> str | None: ...
-    def get_path_info(self, filtered_relation: FilteredRelation | None = ...) -> list[PathInfo]: ...
+    def get_accessor_name(self, model: type[Model] | None = None) -> str | None: ...
+    def get_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
     field: ForeignKey
@@ -93,14 +93,14 @@ class ManyToOneRel(ForeignObjectRel):
         field: ForeignKey,
         to: type[Model] | str,
         field_name: str,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        on_delete: Callable = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        on_delete: Callable | None = None,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
-    def get_accessor_name(self, model: type[Model] | None = ...) -> str: ...
+    def get_accessor_name(self, model: type[Model] | None = None) -> str: ...
 
 class OneToOneRel(ManyToOneRel):
     field: OneToOneField
@@ -109,11 +109,11 @@ class OneToOneRel(ManyToOneRel):
         field: OneToOneField,
         to: type[Model] | str,
         field_name: str | None,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        on_delete: Callable = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        on_delete: Callable | None = None,
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
@@ -125,12 +125,12 @@ class ManyToManyRel(ForeignObjectRel):
         self,
         field: ManyToManyField[Any, Any],
         to: type[Model] | str,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        symmetrical: bool = ...,
-        through: type[Model] | str | None = ...,
-        through_fields: tuple[str, str] | None = ...,
-        db_constraint: bool = ...,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        symmetrical: bool = True,
+        through: type[Model] | str | None = None,
+        through_fields: tuple[str, str] | None = None,
+        db_constraint: bool = True,
     ) -> None: ...
     def get_related_field(self) -> Field: ...

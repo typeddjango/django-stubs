@@ -17,7 +17,7 @@ class Engine:
     dirs: list[str]
     app_dirs: bool
     autoescape: bool
-    context_processors: list[str] | tuple[str]
+    context_processors: list[str] | tuple[str, ...]
     debug: bool
     loaders: Sequence[_Loader]
     string_if_invalid: str
@@ -28,16 +28,16 @@ class Engine:
     template_builtins: list[Library]
     def __init__(
         self,
-        dirs: list[str] | None = ...,
-        app_dirs: bool = ...,
-        context_processors: list[str] | tuple[str] | None = ...,
-        debug: bool = ...,
-        loaders: Sequence[_Loader] | None = ...,
-        string_if_invalid: str = ...,
-        file_charset: str = ...,
-        libraries: dict[str, str] | None = ...,
-        builtins: list[str] | None = ...,
-        autoescape: bool = ...,
+        dirs: list[str] | None = None,
+        app_dirs: bool = False,
+        context_processors: list[str] | tuple[str, ...] | None = None,
+        debug: bool = False,
+        loaders: Sequence[_Loader] | None = None,
+        string_if_invalid: str = "",
+        file_charset: str = "utf-8",
+        libraries: dict[str, str] | None = None,
+        builtins: list[str] | None = None,
+        autoescape: bool = True,
     ) -> None: ...
     @staticmethod
     def get_default() -> Engine: ...
@@ -50,9 +50,9 @@ class Engine:
     def get_template_loaders(self, template_loaders: Sequence[_Loader]) -> list[Loader]: ...
     def find_template_loader(self, loader: _Loader) -> Loader: ...
     def find_template(
-        self, name: str, dirs: None = ..., skip: list[Origin] | None = ...
+        self, name: str, dirs: None = None, skip: list[Origin] | None = None
     ) -> tuple[Template, Origin]: ...
     def from_string(self, template_code: str) -> Template: ...
     def get_template(self, template_name: str) -> Template: ...
-    def render_to_string(self, template_name: str, context: dict[str, Any] | None = ...) -> SafeString: ...
+    def render_to_string(self, template_name: str, context: dict[str, Any] | None = None) -> SafeString: ...
     def select_template(self, template_name_list: list[str]) -> Template: ...

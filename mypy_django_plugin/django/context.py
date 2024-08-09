@@ -36,7 +36,6 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import WITH_ANNOTATIONS_FULLNAME
 
 # This import fails when `psycopg2` is not installed, avoid crashing the plugin.
 try:
@@ -142,15 +141,6 @@ class DjangoContext:
 
     def get_model_class_by_fullname(self, fullname: str) -> Optional[Type[Model]]:
         """Returns None if Model is abstract"""
-        annotated_prefix = WITH_ANNOTATIONS_FULLNAME + "["
-        if fullname.startswith(annotated_prefix):
-            # For our "annotated models", extract the original model fullname
-            fullname = fullname[len(annotated_prefix) :].rstrip("]")
-            if "," in fullname:
-                # Remove second type arg, which might be present
-                fullname = fullname[: fullname.index(",")]
-            fullname = fullname.replace("__", ".")
-
         module, _, model_cls_name = fullname.rpartition(".")
         return self.model_modules.get(module, {}).get(model_cls_name)
 
@@ -482,11 +472,23 @@ class DjangoContext:
             raise LookupsAreUnsupported()
         return self._resolve_field_from_parts(field_parts, model_cls)
 
-    def resolve_lookup_expected_type(self, ctx: MethodContext, model_cls: Type[Model], lookup: str) -> MypyType:
+    def resolve_lookup_expected_type(
+        self, ctx: MethodContext, model_cls: Type[Model], lookup: str, model_instance: Instance
+    ) -> MypyType:
         try:
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
-            ctx.api.fail(exc.args[0], ctx.context)
+            if (
+                helpers.is_annotated_model(model_instance.type)
+                and model_instance.extra_attrs
+                and lookup in model_instance.extra_attrs.attrs
+            ):
+                return model_instance.extra_attrs.attrs[lookup]
+
+            msg = exc.args[0]
+            if model_instance.extra_attrs:
+                msg = ", ".join((msg, *model_instance.extra_attrs.attrs.keys()))
+            ctx.api.fail(msg, ctx.context)
             return AnyType(TypeOfAny.from_error)
 
         if solved_lookup is None:

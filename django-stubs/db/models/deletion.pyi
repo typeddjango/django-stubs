@@ -68,29 +68,29 @@ class Collector:
     def add(
         self,
         objs: _IndexableCollection[Model],
-        source: type[Model] | None = ...,
-        nullable: bool = ...,
-        reverse_dependency: bool = ...,
+        source: type[Model] | None = None,
+        nullable: bool = False,
+        reverse_dependency: bool = False,
     ) -> list[Model]: ...
-    def add_dependency(self, model: type[Model], dependency: type[Model], reverse_dependency: bool = ...) -> None: ...
+    def add_dependency(self, model: type[Model], dependency: type[Model], reverse_dependency: bool = False) -> None: ...
     def add_field_update(self, field: Field, value: Any, objs: _IndexableCollection[Model]) -> None: ...
     def add_restricted_objects(self, field: Field, objs: _IndexableCollection[Model]) -> None: ...
     def clear_restricted_objects_from_set(self, model: type[Model], objs: set[Model]) -> None: ...
     def clear_restricted_objects_from_queryset(self, model: type[Model], qs: QuerySet[Model]) -> None: ...
-    def can_fast_delete(self, objs: Model | Iterable[Model], from_field: Field | None = ...) -> bool: ...
+    def can_fast_delete(self, objs: Model | Iterable[Model], from_field: Field | None = None) -> bool: ...
     def get_del_batches(
         self, objs: _IndexableCollection[Model], fields: Iterable[Field]
     ) -> Sequence[Sequence[Model]]: ...
     def collect(
         self,
         objs: _IndexableCollection[Model | None],
-        source: type[Model] | None = ...,
-        nullable: bool = ...,
-        collect_related: bool = ...,
-        source_attr: str | None = ...,
-        reverse_dependency: bool = ...,
-        keep_parents: bool = ...,
-        fail_on_restricted: bool = ...,
+        source: type[Model] | None = None,
+        nullable: bool = False,
+        collect_related: bool = True,
+        source_attr: str | None = None,
+        reverse_dependency: bool = False,
+        keep_parents: bool = False,
+        fail_on_restricted: bool = True,
     ) -> None: ...
     def related_objects(
         self, related_model: type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]

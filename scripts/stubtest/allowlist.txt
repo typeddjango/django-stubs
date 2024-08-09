@@ -450,3 +450,25 @@ django.contrib.gis.db.models.ManyToManyField.m2m_target_field_name
 
 # Defined inside a signature (using the walrus operator)
 django.core.management.utils.sentinel
+
+# Plugin generated model instances for '.annotate' support
+django.contrib.admin.models.LogEntry@AnnotatedWith
+django.contrib.auth.base_user.AbstractBaseUser@AnnotatedWith
+django.contrib.auth.models.AbstractUser@AnnotatedWith
+django.contrib.auth.models.Group@AnnotatedWith
+django.contrib.auth.models.Permission@AnnotatedWith
+django.contrib.auth.models.PermissionsMixin@AnnotatedWith
+django.contrib.auth.models.User@AnnotatedWith
+django.contrib.contenttypes.models.ContentType@AnnotatedWith
+django.contrib.flatpages.models.FlatPage@AnnotatedWith
+django.contrib.gis.db.backends.oracle.models.OracleGeometryColumns@AnnotatedWith
+django.contrib.gis.db.backends.oracle.models.OracleSpatialRefSys@AnnotatedWith
+django.contrib.gis.db.backends.postgis.models.PostGISGeometryColumns@AnnotatedWith
+django.contrib.gis.db.backends.postgis.models.PostGISSpatialRefSys@AnnotatedWith
+django.contrib.gis.db.backends.spatialite.models.SpatialiteGeometryColumns@AnnotatedWith
+django.contrib.gis.db.backends.spatialite.models.SpatialiteSpatialRefSys@AnnotatedWith
+django.contrib.redirects.models.Redirect@AnnotatedWith
+django.contrib.sessions.base_session.AbstractBaseSession@AnnotatedWith
+django.contrib.sessions.models.Session@AnnotatedWith
+django.contrib.sites.models.Site@AnnotatedWith
+django.db.migrations.recorder.Migration@AnnotatedWith

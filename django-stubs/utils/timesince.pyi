@@ -7,9 +7,9 @@ MONTHS_DAYS: tuple[int, ...]
 
 def timesince(
     d: date,
-    now: date | None = ...,
-    reversed: bool = ...,
-    time_strings: dict[str, str] | None = ...,
-    depth: int = ...,
+    now: date | None = None,
+    reversed: bool = False,
+    time_strings: dict[str, str] | None = None,
+    depth: int = 2,
 ) -> str: ...
-def timeuntil(d: date, now: date | None = ..., time_strings: dict[str, str] | None = ..., depth: int = ...) -> str: ...
+def timeuntil(d: date, now: date | None = None, time_strings: dict[str, str] | None = None, depth: int = 2) -> str: ...

@@ -8,9 +8,9 @@ class TemplateDoesNotExist(Exception):
     def __init__(
         self,
         msg: Origin | str,
-        tried: list[tuple[Origin, str]] | None = ...,
-        backend: BaseEngine | None = ...,
-        chain: list[TemplateDoesNotExist] | None = ...,
+        tried: list[tuple[Origin, str]] | None = None,
+        backend: BaseEngine | None = None,
+        chain: list[TemplateDoesNotExist] | None = None,
     ) -> None: ...
 
 class TemplateSyntaxError(Exception): ...

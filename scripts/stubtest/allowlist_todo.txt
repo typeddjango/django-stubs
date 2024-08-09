@@ -277,7 +277,6 @@ django.contrib.gis.db.models.Field.get_pk_value_on_save
 django.contrib.gis.db.models.Field.rel_db_type
 django.contrib.gis.db.models.Field.select_format
 django.contrib.gis.db.models.Field.unique
-django.contrib.gis.db.models.FieldDoesNotExist
 django.contrib.gis.db.models.FileField.__get__
 django.contrib.gis.db.models.FileField.attr_class
 django.contrib.gis.db.models.FileField.contribute_to_class
@@ -309,7 +308,6 @@ django.contrib.gis.db.models.ForeignObject.path_infos
 django.contrib.gis.db.models.ForeignObject.related_accessor_class
 django.contrib.gis.db.models.ForeignObject.requires_unique_target
 django.contrib.gis.db.models.ForeignObject.reverse_path_infos
-django.contrib.gis.db.models.ForeignObjectRel.__init__
 django.contrib.gis.db.models.ForeignObjectRel.empty_strings_allowed
 django.contrib.gis.db.models.ForeignObjectRel.get_extra_restriction
 django.contrib.gis.db.models.ForeignObjectRel.identity
@@ -339,7 +337,6 @@ django.contrib.gis.db.models.ManyToManyField.formfield
 django.contrib.gis.db.models.ManyToManyField.path_infos
 django.contrib.gis.db.models.ManyToManyField.reverse_path_infos
 django.contrib.gis.db.models.ManyToManyRel.identity
-django.contrib.gis.db.models.ManyToOneRel.__init__
 django.contrib.gis.db.models.ManyToOneRel.identity
 django.contrib.gis.db.models.Model.add_to_class
 django.contrib.gis.db.models.ObjectDoesNotExist
@@ -347,7 +344,6 @@ django.contrib.gis.db.models.OneToOneField.__get__
 django.contrib.gis.db.models.OneToOneField.formfield
 django.contrib.gis.db.models.OneToOneField.forward_related_accessor_class
 django.contrib.gis.db.models.OneToOneField.related_accessor_class
-django.contrib.gis.db.models.OneToOneRel.__init__
 django.contrib.gis.db.models.OrderBy.as_oracle
 django.contrib.gis.db.models.OrderBy.as_sql
 django.contrib.gis.db.models.PositiveBigIntegerField.formfield
@@ -357,7 +353,6 @@ django.contrib.gis.db.models.PositiveIntegerField.integer_field_class
 django.contrib.gis.db.models.PositiveSmallIntegerField.formfield
 django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
 django.contrib.gis.db.models.Q.XOR
-django.contrib.gis.db.models.Q.resolve_expression
 django.contrib.gis.db.models.QuerySet.__deepcopy__
 django.contrib.gis.db.models.QuerySet.__reversed__
 django.contrib.gis.db.models.QuerySet.__xor__
@@ -430,7 +425,6 @@ django.contrib.gis.forms.SelectDateWidget.select_widget
 django.contrib.gis.forms.SelectDateWidget.use_fieldset
 django.contrib.gis.forms.SplitDateTimeField.hidden_widget
 django.contrib.gis.forms.TextInput.__slotnames__
-django.contrib.gis.forms.Widget.subwidgets
 django.contrib.gis.forms.Widget.use_fieldset
 django.contrib.gis.forms.formset_factory
 django.contrib.gis.forms.inlineformset_factory
@@ -539,16 +533,12 @@ django.core.handlers.asgi.ASGIRequest.FILES
 django.core.handlers.wsgi.WSGIRequest.COOKIES
 django.core.handlers.wsgi.WSGIRequest.FILES
 django.core.handlers.wsgi.WSGIRequest.GET
-django.core.mail.SafeMIMEMultipart.__init__
-django.core.mail.SafeMIMEText.__init__
 django.core.mail.backends.filebased.EmailBackend.__init__
 django.core.mail.backends.locmem.EmailBackend.send_messages
 django.core.mail.backends.smtp.EmailBackend.__init__
 django.core.mail.backends.smtp.EmailBackend.connection_class
 django.core.mail.backends.smtp.EmailBackend.ssl_context
 django.core.mail.make_msgid
-django.core.mail.message.SafeMIMEMultipart.__init__
-django.core.mail.message.SafeMIMEText.__init__
 django.core.mail.outbox
 django.core.management.commands.makemessages.TranslatableFile.__ge__
 django.core.management.commands.makemessages.TranslatableFile.__gt__
@@ -624,7 +614,6 @@ django.db.backends.utils.split_tzname_delta
 django.db.connection
 django.db.migrations.Migration.suggest_name
 django.db.migrations.autodetector.MigrationAutodetector.generate_removed_altered_index_together
-django.db.migrations.graph.MigrationGraph.make_state
 django.db.migrations.graph.Node.__ge__
 django.db.migrations.graph.Node.__gt__
 django.db.migrations.graph.Node.__le__
@@ -701,7 +690,6 @@ django.db.models.Field.get_pk_value_on_save
 django.db.models.Field.rel_db_type
 django.db.models.Field.select_format
 django.db.models.Field.unique
-django.db.models.FieldDoesNotExist
 django.db.models.FileField.__get__
 django.db.models.FileField.attr_class
 django.db.models.FileField.contribute_to_class
@@ -733,7 +721,6 @@ django.db.models.ForeignObject.path_infos
 django.db.models.ForeignObject.related_accessor_class
 django.db.models.ForeignObject.requires_unique_target
 django.db.models.ForeignObject.reverse_path_infos
-django.db.models.ForeignObjectRel.__init__
 django.db.models.ForeignObjectRel.empty_strings_allowed
 django.db.models.ForeignObjectRel.get_extra_restriction
 django.db.models.ForeignObjectRel.identity
@@ -761,7 +748,6 @@ django.db.models.ManyToManyField.formfield
 django.db.models.ManyToManyField.path_infos
 django.db.models.ManyToManyField.reverse_path_infos
 django.db.models.ManyToManyRel.identity
-django.db.models.ManyToOneRel.__init__
 django.db.models.ManyToOneRel.identity
 django.db.models.Model.add_to_class
 django.db.models.ObjectDoesNotExist
@@ -769,7 +755,6 @@ django.db.models.OneToOneField.__get__
 django.db.models.OneToOneField.formfield
 django.db.models.OneToOneField.forward_related_accessor_class
 django.db.models.OneToOneField.related_accessor_class
-django.db.models.OneToOneRel.__init__
 django.db.models.OrderBy.as_oracle
 django.db.models.OrderBy.as_sql
 django.db.models.PositiveBigIntegerField.formfield
@@ -779,7 +764,6 @@ django.db.models.PositiveIntegerField.integer_field_class
 django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
 django.db.models.Q.XOR
-django.db.models.Q.resolve_expression
 django.db.models.QuerySet.__deepcopy__
 django.db.models.QuerySet.__reversed__
 django.db.models.QuerySet.__xor__
@@ -907,7 +891,6 @@ django.db.models.fields.Field.get_pk_value_on_save
 django.db.models.fields.Field.rel_db_type
 django.db.models.fields.Field.select_format
 django.db.models.fields.Field.unique
-django.db.models.fields.FieldDoesNotExist
 django.db.models.fields.FilePathField.formfield
 django.db.models.fields.FloatField.formfield
 django.db.models.fields.GenericIPAddressField.formfield
@@ -972,7 +955,6 @@ django.db.models.fields.related.ForeignObject.path_infos
 django.db.models.fields.related.ForeignObject.related_accessor_class
 django.db.models.fields.related.ForeignObject.requires_unique_target
 django.db.models.fields.related.ForeignObject.reverse_path_infos
-django.db.models.fields.related.ForeignObjectRel.__init__
 django.db.models.fields.related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.related.ForeignObjectRel.get_extra_restriction
 django.db.models.fields.related.ForeignObjectRel.identity
@@ -983,28 +965,23 @@ django.db.models.fields.related.ManyToManyField.formfield
 django.db.models.fields.related.ManyToManyField.path_infos
 django.db.models.fields.related.ManyToManyField.reverse_path_infos
 django.db.models.fields.related.ManyToManyRel.identity
-django.db.models.fields.related.ManyToOneRel.__init__
 django.db.models.fields.related.ManyToOneRel.identity
 django.db.models.fields.related.OneToOneField.__get__
 django.db.models.fields.related.OneToOneField.formfield
 django.db.models.fields.related.OneToOneField.forward_related_accessor_class
 django.db.models.fields.related.OneToOneField.related_accessor_class
-django.db.models.fields.related.OneToOneRel.__init__
 django.db.models.fields.related.RelatedField.formfield
 django.db.models.fields.related.lazy_related_operation
 django.db.models.fields.related_descriptors.ForeignKeyDeferredAttribute.__set__
 django.db.models.fields.related_lookups.MultiColSource.contains_over_clause
 django.db.models.fields.related_lookups.MultiColSource.resolve_expression
 django.db.models.fields.related_lookups.RelatedLookupMixin.as_sql
-django.db.models.fields.reverse_related.ForeignObjectRel.__init__
 django.db.models.fields.reverse_related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.reverse_related.ForeignObjectRel.get_extra_restriction
 django.db.models.fields.reverse_related.ForeignObjectRel.identity
 django.db.models.fields.reverse_related.ForeignObjectRel.path_infos
 django.db.models.fields.reverse_related.ManyToManyRel.identity
-django.db.models.fields.reverse_related.ManyToOneRel.__init__
 django.db.models.fields.reverse_related.ManyToOneRel.identity
-django.db.models.fields.reverse_related.OneToOneRel.__init__
 django.db.models.functions.Cast.as_mysql
 django.db.models.functions.Cast.as_oracle
 django.db.models.functions.Cast.as_postgresql
@@ -1141,14 +1118,12 @@ django.db.models.query.QuerySet.__deepcopy__
 django.db.models.query.QuerySet.__reversed__
 django.db.models.query.QuerySet.__xor__
 django.db.models.query.RawQuerySet.__aiter__
-django.db.models.query.RawQuerySet.__init__
 django.db.models.query.RelatedPopulator
 django.db.models.query.get_related_populators
 django.db.models.query.normalize_prefetch_lookups
 django.db.models.query.prefetch_one_level
 django.db.models.query_utils.InvalidQuery
 django.db.models.query_utils.Q.XOR
-django.db.models.query_utils.Q.resolve_expression
 django.db.models.query_utils.Q.identity
 django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
 django.db.models.query_utils.RegisterLookupMixin.get_class_lookups
@@ -1228,7 +1203,6 @@ django.forms.SelectDateWidget.select_widget
 django.forms.SelectDateWidget.use_fieldset
 django.forms.SplitDateTimeField.hidden_widget
 django.forms.TextInput.__slotnames__
-django.forms.Widget.subwidgets
 django.forms.Widget.use_fieldset
 django.forms.boundfield.BoundWidget.__html__
 django.forms.fields.ChoiceField.__deepcopy__
@@ -1259,7 +1233,6 @@ django.forms.models.inlineformset_factory
 django.forms.models.modelform_factory
 django.forms.models.modelformset_factory
 django.forms.renderers.DjangoDivFormRenderer
-django.forms.widgets.ChoiceWidget.subwidgets
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.EmailInput.__slotnames__
 django.forms.widgets.HiddenInput.__slotnames__
@@ -1273,13 +1246,11 @@ django.forms.widgets.RadioSelect.use_fieldset
 django.forms.widgets.SelectDateWidget.select_widget
 django.forms.widgets.SelectDateWidget.use_fieldset
 django.forms.widgets.TextInput.__slotnames__
-django.forms.widgets.Widget.subwidgets
 django.forms.widgets.Widget.use_fieldset
 django.http.HttpRequest.__init__
 django.http.StreamingHttpResponse.content
 django.http.request.HttpRequest.__init__
 django.http.response.StreamingHttpResponse.content
-django.template.EngineHandler.__init__
 django.template.Library.filter_function
 django.template.Library.simple_tag
 django.template.Node.__iter__
@@ -1304,11 +1275,6 @@ django.template.loaders.cached.Loader.get_dirs
 django.template.smartif.EndToken
 django.template.smartif.key
 django.template.smartif.op
-django.template.utils.EngineHandler.__init__
-django.templatetags.i18n.BlockTranslateNode.__init__
-django.templatetags.static.PrefixNode.__init__
-django.templatetags.static.StaticNode.__init__
-django.test.SimpleTestCase.assertTemplateNotUsed
 django.test.runner.DiscoverRunner.log
 django.test.runner.DiscoverRunner.reorder_by
 django.test.runner.DummyList
@@ -1347,7 +1313,6 @@ django.test.selenium.SeleniumTestCaseBase.selenium_hub
 django.test.testcases.LiveServerThread.__init__
 django.test.testcases.LiveServerThread.server_class
 django.test.testcases.SerializeMixin.tearDownClass
-django.test.testcases.SimpleTestCase.assertTemplateNotUsed
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
 django.urls.ResolverMatch.__iter__
