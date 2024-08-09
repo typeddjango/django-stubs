@@ -13,8 +13,7 @@ from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
-from mypy_django_plugin.lib import helpers
-from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
+from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers.models import get_annotated_type
 
@@ -123,7 +122,7 @@ def get_values_list_row_type(
                     typechecker_api,
                     "Row",
                     column_types,
-                    extra_bases=[typechecker_api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])],
+                    extra_bases=[typechecker_api.named_generic_type(fullnames.ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])],
                 )
             else:
                 return helpers.make_oneoff_named_tuple(typechecker_api, "Row", column_types)
