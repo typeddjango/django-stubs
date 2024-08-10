@@ -14,7 +14,6 @@ from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import ANY_ATTR_ALLOWED_CLASS_FULLNAME
 from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers.models import get_annotated_type
 
@@ -33,7 +32,7 @@ def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker)
         if not len(base_type.args):
             continue
         model = get_proper_type(base_type.args[0])
-        if isinstance(model, Instance) and model.type.has_base(fullnames.MODEL_CLASS_FULLNAME):
+        if isinstance(model, Instance) and helpers.is_model_type(model.type):
             return model
     return None
 
@@ -45,7 +44,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if (
         outer_model_info is None
-        or not outer_model_info.has_base(fullnames.MODEL_CLASS_FULLNAME)
+        or not helpers.is_model_type(outer_model_info)
         or outer_model_info.self_type is None
         or not default_return_type.type.is_generic()
     ):
@@ -122,7 +121,7 @@ def get_values_list_row_type(
                     typechecker_api,
                     "Row",
                     column_types,
-                    extra_bases=[typechecker_api.named_generic_type(ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])],
+                    extra_bases=[typechecker_api.named_generic_type(fullnames.ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])],
                 )
             else:
                 return helpers.make_oneoff_named_tuple(typechecker_api, "Row", column_types)
@@ -299,9 +298,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
                 row_type = AnyType(TypeOfAny.implementation_artifact)
             else:
                 row_type = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
-        elif isinstance(original_row_type, Instance) and original_row_type.type.has_base(
-            fullnames.MODEL_CLASS_FULLNAME
-        ):
+        elif isinstance(original_row_type, Instance) and helpers.is_model_type(original_row_type.type):
             row_type = annotated_type
     else:
         row_type = annotated_type

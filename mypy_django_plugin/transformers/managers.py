@@ -142,6 +142,7 @@ def _process_dynamic_method(
             typed_var
             and isinstance((model_arg := get_proper_type(typed_var[0])), Instance)
             and model_arg.type.has_base(fullnames.MODEL_CLASS_FULLNAME)
+            and helpers.is_model_type(model_arg.type)
         ):
             ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, model_arg)
             args_types = [

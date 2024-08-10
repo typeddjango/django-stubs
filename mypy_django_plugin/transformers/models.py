@@ -44,7 +44,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME, MODEL_CLASS_FULLNAME
+from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME
 from mypy_django_plugin.transformers.fields import FieldDescriptorTypes, get_field_descriptor_types
 from mypy_django_plugin.transformers.managers import (
     MANAGER_METHODS_RETURNING_QUERYSET,
@@ -1129,7 +1129,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
     type_arg = get_proper_type(ctx.api.analyze_type(args[0]))
-    if not isinstance(type_arg, Instance) or not type_arg.type.has_base(MODEL_CLASS_FULLNAME):
+    if not isinstance(type_arg, Instance) or not helpers.is_model_type(type_arg.type):
         return type_arg
 
     fields_dict = None
