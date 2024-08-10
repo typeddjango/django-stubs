@@ -474,5 +474,6 @@ django.contrib.sites.models.Site@AnnotatedWith
 django.db.migrations.recorder.Migration@AnnotatedWith
 
 # These are `UserModel = get_user_model()` lines, the plugin updates them to correct types
+django.contrib.auth.backends.UserModel
 django.contrib.auth.forms.UserModel
 django.contrib.auth.views.UserModel
