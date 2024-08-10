@@ -31,6 +31,7 @@ from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
+from mypy.typeanal import make_optional_type
 from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
@@ -182,7 +183,7 @@ class DjangoContext:
             primary_key_type = self.get_field_get_type(api, rel_model_info, primary_key_field, method="init")
 
             model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
-            return helpers.make_optional(model_and_primary_key_type)
+            return make_optional_type(model_and_primary_key_type)
 
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
         if field_info is None:
