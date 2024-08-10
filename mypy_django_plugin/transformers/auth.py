@@ -1,30 +1,38 @@
-from mypy.plugin import FunctionContext
-from mypy.types import Instance, NoneType, UnionType, get_proper_type
+from mypy.nodes import TypeInfo
+from mypy.plugin import AnalyzeTypeContext
+from mypy.semanal import SemanticAnalyzer
+from mypy.typeanal import TypeAnalyser
+from mypy.types import PlaceholderType, ProperType
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars_with_any
 
 from mypy_django_plugin.django.context import DjangoContext
-from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib import fullnames, helpers
 
 
-def update_authenticate_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
+    assert isinstance(ctx.api, TypeAnalyser)
+    assert isinstance(ctx.api.api, SemanticAnalyzer)
+
+    def get_abstract_base_user(api: SemanticAnalyzer) -> ProperType:
+        sym = api.lookup_fully_qualified(fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME)
+        assert isinstance(sym.node, TypeInfo)
+        return fill_typevars_with_any(sym.node)
+
     if not django_context.is_contrib_auth_installed:
-        return ctx.default_return_type
+        return get_abstract_base_user(ctx.api.api)
 
     auth_user_model = django_context.settings.AUTH_USER_MODEL
-    api = helpers.get_typechecker_api(ctx)
     model_info = helpers.resolve_lazy_reference(
-        auth_user_model, api=api, django_context=django_context, ctx=ctx.context
+        auth_user_model, api=ctx.api.api, django_context=django_context, ctx=ctx.context
     )
     if model_info is None:
-        return ctx.default_return_type
+        fullname = django_context.model_class_fullnames_by_label.get(auth_user_model)
+        if fullname is not None:
+            # When we've tried to resolve 'AUTH_USER_MODEL' but got no class back but
+            # we notice that its value is recognised we'll return a placeholder for
+            # the class as we expect it to exist later on.
+            return PlaceholderType(fullname=fullname, args=[], line=ctx.context.line)
+        return get_abstract_base_user(ctx.api.api)
 
-    optional_model = UnionType([fill_typevars_with_any(model_info), NoneType()], ctx.context.line, ctx.context.column)
-    default_return_type = get_proper_type(ctx.default_return_type)
-    if isinstance(default_return_type, Instance) and default_return_type.type.fullname == "typing.Coroutine":
-        if len(default_return_type.args) == 3:
-            return default_return_type.copy_modified(
-                args=[default_return_type.args[0], default_return_type.args[1], optional_model]
-            )
-        return ctx.default_return_type
-    return optional_model
+    return fill_typevars_with_any(model_info)

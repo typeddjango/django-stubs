@@ -1,5 +1,4 @@
 -   case: request_object_has_user_of_type_auth_user_model
-    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         reveal_type(HttpRequest().user)  # N: Revealed type is "Union[myapp.models.MyUser, django.contrib.auth.models.AnonymousUser]"
@@ -16,7 +15,6 @@
                 class MyUser(models.Model):
                     pass
 -   case: request_object_user_can_be_descriminated
-    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
@@ -29,7 +27,6 @@
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 -   case: request_object_user_without_auth_and_contenttypes_apps
-    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
@@ -37,7 +34,6 @@
         if request.user.is_authenticated:
             reveal_type(request.user) # N: Revealed type is "django.contrib.auth.base_user.AbstractBaseUser"
 -   case: request_object_user_without_auth_but_with_contenttypes_apps
-    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
@@ -47,7 +43,6 @@
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes',)
 -   case: subclass_request_not_changed_user_type
-    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         class MyRequest(HttpRequest):
@@ -59,7 +54,6 @@
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 
 -   case: subclass_request_changed_user_type
-    disable_cache: true
     main: |
         from django.http.request import HttpRequest
         from django.contrib.auth.models import User
