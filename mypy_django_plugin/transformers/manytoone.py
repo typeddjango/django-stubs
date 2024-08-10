@@ -1,7 +1,7 @@
 from typing import Optional
 
 from mypy.plugin import MethodContext
-from mypy.types import Instance
+from mypy.types import Instance, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
@@ -15,21 +15,22 @@ def get_model_of_related_manager(ctx: MethodContext) -> Optional[Instance]:
     For example: if given a `RelatedManager[A]` where `A` is a model then `A` is
     returned.
     """
+    default_return_type = get_proper_type(ctx.default_return_type)
     if (
-        isinstance(ctx.default_return_type, Instance)
-        and ctx.default_return_type.type.fullname == fullnames.RELATED_MANAGER_CLASS
+        isinstance(default_return_type, Instance)
+        and default_return_type.type.fullname == fullnames.RELATED_MANAGER_CLASS
     ):
         # This is a call to '__get__' overload with a model instance of
         # 'ReverseManyToOneDescriptor'. Returning a 'RelatedManager'. Which we want to,
         # just like Django, build from the default manager of the related model.
-        related_manager = ctx.default_return_type
+        related_manager = default_return_type
         # Require first type argument of 'RelatedManager' to be a model
         if (
             len(related_manager.args) >= 1
-            and isinstance(related_manager.args[0], Instance)
-            and helpers.is_model_type(related_manager.args[0].type)
+            and isinstance((_To := get_proper_type(related_manager.args[0])), Instance)
+            and helpers.is_model_type(_To.type)
         ):
-            return related_manager.args[0]
+            return _To
 
     return None
 

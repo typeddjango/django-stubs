@@ -29,17 +29,16 @@ def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker)
                 return to_model_instance
 
     for base_type in [queryset_type, *queryset_type.type.bases]:
-        if (
-            len(base_type.args)
-            and isinstance(base_type.args[0], Instance)
-            and helpers.is_model_type(base_type.args[0].type)
-        ):
-            return base_type.args[0]
+        if not len(base_type.args):
+            continue
+        model = get_proper_type(base_type.args[0])
+        if isinstance(model, Instance) and helpers.is_model_type(model.type):
+            return model
     return None
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
-    default_return_type = ctx.default_return_type
+    default_return_type = get_proper_type(ctx.default_return_type)
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
@@ -285,7 +284,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     row_type: MypyType
     if len(default_return_type.args) > 1:
-        original_row_type: MypyType = default_return_type.args[1]
+        original_row_type = get_proper_type(default_return_type.args[1])
         row_type = original_row_type
         if isinstance(original_row_type, TypedDictType):
             row_type = api.named_generic_type(

@@ -31,7 +31,7 @@ from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.nodes import TypeInfo
 from mypy.plugin import MethodContext
-from mypy.types import AnyType, Instance, TypeOfAny, UnionType
+from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -94,13 +94,16 @@ def _get_field_type_from_model_type_info(info: Optional[TypeInfo], field_name: s
     if info is None:
         return None
     field_node = info.get(field_name)
-    if field_node is None or not isinstance(field_node.type, Instance):
+    if field_node is None:
+        return None
+    field_type = get_proper_type(field_node.type)
+    if not isinstance(field_type, Instance):
         return None
     # Field declares a set and a get type arg. Fallback to `None` when we can't find any args
-    elif len(field_node.type.args) != 2:
+    elif len(field_type.args) != 2:
         return None
     else:
-        return field_node.type
+        return field_type
 
 
 def _get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
@@ -517,19 +520,18 @@ class DjangoContext:
             return AnyType(TypeOfAny.explicit)
 
         for lookup_base in helpers.iter_bases(lookup_info):
-            if lookup_base.args and isinstance(lookup_base.args[0], Instance):
-                lookup_type: MypyType = lookup_base.args[0]
+            if lookup_base.args and isinstance((lookup_type := get_proper_type(lookup_base.args[0])), Instance):
                 # if it's Field, consider lookup_type a __get__ of current field
                 if isinstance(lookup_type, Instance) and lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
                     field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
                     if field_info is None:
                         return AnyType(TypeOfAny.explicit)
-                    lookup_type = helpers.get_private_descriptor_type(
-                        field_info, "_pyi_private_get_type", is_nullable=field.null
+                    lookup_type = get_proper_type(
+                        helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=field.null)
                     )
                 return lookup_type
 
         return AnyType(TypeOfAny.explicit)
 
-    def resolve_f_expression_type(self, f_expression_type: Instance) -> MypyType:
+    def resolve_f_expression_type(self, f_expression_type: Instance) -> ProperType:
         return AnyType(TypeOfAny.explicit)

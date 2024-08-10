@@ -123,7 +123,7 @@ def _process_dynamic_method(
     variables = method_type.variables
     ret_type = method_type.ret_type
 
-    manager_model = find_member("model", manager_instance, manager_instance)
+    manager_model = get_proper_type(find_member("model", manager_instance, manager_instance))
     assert isinstance(manager_model, TypeType), manager_model
     manager_model_type = manager_model.item
 
@@ -138,10 +138,15 @@ def _process_dynamic_method(
     args_types = method_type.arg_types[1:]
     if _has_compatible_type_vars(base_that_has_method):
         typed_var = manager_instance.args or queryset_info.bases[0].args
-        if typed_var and isinstance(typed_var[0], Instance) and helpers.is_model_type(typed_var[0].type):
-            ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, typed_var[0])
+        if (
+            typed_var
+            and isinstance((model_arg := get_proper_type(typed_var[0])), Instance)
+            and model_arg.type.has_base(fullnames.MODEL_CLASS_FULLNAME)
+            and helpers.is_model_type(model_arg.type)
+        ):
+            ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, model_arg)
             args_types = [
-                _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, typed_var[0])
+                _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, model_arg)
                 for arg_type in args_types
             ]
     if base_that_has_method.self_type:
@@ -239,9 +244,11 @@ def _replace_type_var(ret_type: MypyType, to_replace: str, replace_by: MypyType)
     """
     if isinstance(ret_type, TypeVarType) and ret_type.fullname == to_replace:
         return replace_by
-    elif isinstance(ret_type, Instance):
+    elif isinstance((instance := get_proper_type(ret_type)), Instance):
         # Since it is an instance, recursively find the type var for all its args.
-        ret_type.args = tuple(_replace_type_var(item, to_replace, replace_by) for item in ret_type.args)
+        instance.args = tuple(_replace_type_var(item, to_replace, replace_by) for item in instance.args)
+        return instance
+
     if isinstance(ret_type, ProperType) and hasattr(ret_type, "item"):
         # For example TypeType has an item. find the type_var for this item
         ret_type.item = _replace_type_var(ret_type.item, to_replace, replace_by)
@@ -263,9 +270,10 @@ def resolve_manager_method(ctx: AttributeContext) -> MypyType:
     an attribute on a class that has 'django.db.models.BaseManager' as a base.
     """
     # Skip (method) type that is currently something other than Any of type `implementation_artifact`
-    if not isinstance(ctx.default_attr_type, AnyType):
+    default_attr_type = get_proper_type(ctx.default_attr_type)
+    if not isinstance(default_attr_type, AnyType):
         return ctx.default_attr_type
-    elif ctx.default_attr_type.type_of_any != TypeOfAny.implementation_artifact:
+    elif default_attr_type.type_of_any != TypeOfAny.implementation_artifact:
         return ctx.default_attr_type
 
     # (Current state is:) We wouldn't end up here when looking up a method from a custom _manager_.
@@ -280,13 +288,15 @@ def resolve_manager_method(ctx: AttributeContext) -> MypyType:
 
     if isinstance(ctx.type, Instance):
         return resolve_manager_method_from_instance(instance=ctx.type, method_name=method_name, ctx=ctx)
-    elif isinstance(ctx.type, UnionType) and all(isinstance(instance, Instance) for instance in ctx.type.items):
+    elif isinstance(ctx.type, UnionType) and all(
+        isinstance(get_proper_type(item), Instance) for item in ctx.type.items
+    ):
         resolved = tuple(
             resolve_manager_method_from_instance(instance=instance, method_name=method_name, ctx=ctx)
-            for instance in ctx.type.items
-            if isinstance(instance, Instance)
+            for item in ctx.type.items
+            if isinstance((instance := get_proper_type(item)), Instance)
         )
-        return get_proper_type(UnionType(resolved))
+        return UnionType(resolved)
     else:
         ctx.api.fail(f'Unable to resolve return type of queryset/manager method "{method_name}"', ctx.context)
         return AnyType(TypeOfAny.from_error)
@@ -495,15 +505,16 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         return
 
     base_as_manager = queryset_info.get("as_manager")
-    if (
-        base_as_manager is None
-        or not isinstance(base_as_manager.type, CallableType)
-        or not isinstance(base_as_manager.type.ret_type, Instance)
-    ):
+    if base_as_manager is None:
+        return
+    base_as_manager_type = get_proper_type(base_as_manager.type)
+    if not isinstance(base_as_manager_type, CallableType):
+        return
+    base_as_manager_ret_type = get_proper_type(base_as_manager_type.ret_type)
+    if not isinstance(base_as_manager_ret_type, Instance):
         return
 
-    base_ret_type = base_as_manager.type.ret_type.type
-
+    base_ret_type = base_as_manager_ret_type.type
     manager_sym = semanal_api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
     if manager_sym is None or not isinstance(manager_sym.node, TypeInfo):
         return _defer()
@@ -588,15 +599,11 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
         (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
         None,
     )
-    if parent_manager is None:
+    if parent_manager is None or len(parent_manager.args) != 1:
         return
 
-    is_missing_params = (
-        len(parent_manager.args) == 1
-        and isinstance(parent_manager.args[0], AnyType)
-        and parent_manager.args[0].type_of_any is TypeOfAny.from_omitted_generics
-    )
-    if not is_missing_params:
+    model_param = get_proper_type(parent_manager.args[0])
+    if not isinstance(model_param, AnyType) or model_param.type_of_any is not TypeOfAny.from_omitted_generics:
         return
 
     type_vars = tuple(parent_manager.type.defn.type_vars)

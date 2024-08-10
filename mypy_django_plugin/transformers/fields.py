@@ -7,7 +7,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.plugin import FunctionContext
-from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType
+from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext
@@ -160,7 +160,7 @@ def set_descriptor_types_for_field(
     # reconcile set and get types with the base field class
     base_field_type = next(base for base in default_return_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME)
     mapped_instance = map_instance_to_supertype(default_return_type, base_field_type)
-    mapped_set_type, mapped_get_type = mapped_instance.args
+    mapped_set_type, mapped_get_type = tuple(get_proper_type(arg) for arg in mapped_instance.args)
 
     # bail if either mapped_set_type or mapped_get_type have type Never
     if not (isinstance(mapped_set_type, UninhabitedType) or isinstance(mapped_get_type, UninhabitedType)):
@@ -169,7 +169,9 @@ def set_descriptor_types_for_field(
         get_type = helpers.convert_any_to_type(mapped_get_type, get_type)
 
         # the get_type must be optional if the field is nullable
-        if (is_get_nullable or is_nullable) and not (isinstance(get_type, NoneType) or helpers.is_optional(get_type)):
+        if (is_get_nullable or is_nullable) and not (
+            isinstance(get_proper_type(get_type), NoneType) or helpers.is_optional(get_type)
+        ):
             ctx.api.fail(
                 f"{default_return_type.type.name} is nullable but its generic get type parameter is not optional",
                 ctx.context,
@@ -181,11 +183,12 @@ def set_descriptor_types_for_field(
 def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = set_descriptor_types_for_field(ctx)
 
-    base_field_arg_type = helpers.get_call_argument_type_by_name(ctx, "base_field")
+    base_field_arg_type = get_proper_type(helpers.get_call_argument_type_by_name(ctx, "base_field"))
     if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
         return default_return_type
 
     def drop_combinable(_type: MypyType) -> Optional[MypyType]:
+        _type = get_proper_type(_type)
         if isinstance(_type, Instance) and _type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
             return None
         elif isinstance(_type, UnionType):
@@ -230,7 +233,7 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
 
 
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    default_return_type = ctx.default_return_type
+    default_return_type = get_proper_type(ctx.default_return_type)
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
@@ -241,7 +244,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     if default_return_type.type.has_base(fullnames.MANYTOMANY_FIELD_FULLNAME):
         return manytomany.fill_model_args_for_many_to_many_field(
-            ctx=ctx, model_info=outer_model_info, default_return_type=default_return_type, django_context=django_context
+            ctx=ctx, model_info=outer_model_info, django_context=django_context
         )
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
