@@ -151,11 +151,13 @@ class NewSemanalDjangoPlugin(Plugin):
 
     @cached_property
     def contrib_auth_hooks(self) -> Dict[str, Callable[[FunctionContext], MypyType]]:
+        authenticate_hook = partial(update_authenticate_hook, django_context=self.django_context)
         return {
             "django.contrib.auth.get_user_model": partial(
                 settings.get_user_model_hook, django_context=self.django_context
             ),
-            "django.contrib.auth.authenticate": partial(update_authenticate_hook, django_context=self.django_context),
+            "django.contrib.auth.authenticate": authenticate_hook,
+            "django.contrib.auth.aauthenticate": authenticate_hook,
         }
 
     def get_function_hook(self, fullname: str) -> Optional[Callable[[FunctionContext], MypyType]]:

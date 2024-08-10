@@ -1,7 +1,9 @@
 -   case: test_authenticate_returns_configured_auth_user_model
     main: |
-        from django.contrib.auth import authenticate
+        from django.contrib.auth import authenticate, aauthenticate
         reveal_type(authenticate())  # N: Revealed type is "Union[myapp.models.MyUser, None]"
+        async def f() -> None:
+            reveal_type(await aauthenticate())  # N: Revealed type is "Union[myapp.models.MyUser, None]"
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
         AUTH_USER_MODEL = "myapp.MyUser"
@@ -16,8 +18,10 @@
 
 -   case: test_authenticate_returns_stubs_types_when_contrib_auth_is_not_installed
     main: |
-        from django.contrib.auth import authenticate
+        from django.contrib.auth import authenticate, aauthenticate
         reveal_type(authenticate())  # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, None]"
+        async def f() -> None:
+            reveal_type(await aauthenticate())  # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, None]"
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "myapp")
     files:
@@ -31,8 +35,10 @@
 
 -   case: test_authenticate_returns_builtin_auth_user_per_default
     main: |
-        from django.contrib.auth import authenticate
+        from django.contrib.auth import authenticate, aauthenticate
         reveal_type(authenticate())  # N: Revealed type is "Union[django.contrib.auth.models.User, None]"
+        async def f() -> None:
+            reveal_type(await aauthenticate())  # N: Revealed type is "Union[django.contrib.auth.models.User, None]"
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
     files:
