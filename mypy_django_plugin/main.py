@@ -35,6 +35,7 @@ from mypy_django_plugin.transformers import (
     request,
     settings,
 )
+from mypy_django_plugin.transformers.auth import update_authenticate_hook
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
@@ -148,9 +149,19 @@ class NewSemanalDjangoPlugin(Plugin):
             self._new_dependency("django.db.models.query"),
         ]
 
+    @cached_property
+    def contrib_auth_hooks(self) -> Dict[str, Callable[[FunctionContext], MypyType]]:
+        return {
+            "django.contrib.auth.get_user_model": partial(
+                settings.get_user_model_hook, django_context=self.django_context
+            ),
+            "django.contrib.auth.authenticate": partial(update_authenticate_hook, django_context=self.django_context),
+        }
+
     def get_function_hook(self, fullname: str) -> Optional[Callable[[FunctionContext], MypyType]]:
-        if fullname == "django.contrib.auth.get_user_model":
-            return partial(settings.get_user_model_hook, django_context=self.django_context)
+        auth_hook = self.contrib_auth_hooks.get(fullname)
+        if auth_hook is not None:
+            return auth_hook
 
         info = self._get_typeinfo_or_none(fullname)
         if info:
