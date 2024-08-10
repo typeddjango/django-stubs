@@ -6,8 +6,9 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
+from typing_extensions import TypeAlias
 
-UserModel: type[_UserModel]
+UserModel: TypeAlias = type[_UserModel]
 
 class RedirectURLMixin:
     next_page: str | None

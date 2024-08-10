@@ -10,8 +10,9 @@ from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
+from typing_extensions import TypeAlias
 
-UserModel: type[_UserModel]
+UserModel: TypeAlias = type[_UserModel]
 _User = TypeVar("_User", bound=AbstractBaseUser)
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
