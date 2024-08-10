@@ -111,15 +111,14 @@ class NewSemanalDjangoPlugin(Plugin):
             return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
-        if self.django_context.settings:
-            if file.fullname == "django.contrib.auth" or file.fullname in {"django.http", "django.http.request"}:
-                auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
-                try:
-                    auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
-                except LookupError:
-                    # get_user_model() model app is not installed
-                    return []
-                return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
+        if file.fullname == "django.contrib.auth" or file.fullname in {"django.http", "django.http.request"}:
+            auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
+            try:
+                auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
+            except LookupError:
+                # get_user_model() model app is not installed
+                return []
+            return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
         # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
@@ -326,7 +325,10 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def report_config_data(self, ctx: ReportConfigContext) -> Dict[str, Any]:
         # Cache would be cleared if any settings do change.
-        return self.plugin_config.to_json()
+        extra_data = {}
+        if ctx.id == "django.contrib.auth":
+            extra_data["AUTH_USER_MODEL"] = self.django_context.settings.AUTH_USER_MODEL
+        return self.plugin_config.to_json(extra_data)
 
 
 def plugin(version: str) -> Type[NewSemanalDjangoPlugin]:
