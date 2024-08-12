@@ -536,3 +536,7 @@ class DjangoContext:
 
     def resolve_f_expression_type(self, f_expression_type: Instance) -> ProperType:
         return AnyType(TypeOfAny.explicit)
+
+    @cached_property
+    def is_contrib_auth_installed(self) -> bool:
+        return "django.contrib.auth" in self.settings.INSTALLED_APPS

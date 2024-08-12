@@ -21,13 +21,12 @@
                     pass
 
 -   case: get_user_model_returns_proper_class
-    disable_cache: true
     main: |
         from django.contrib.auth import get_user_model
         UserModel = get_user_model()
         reveal_type(UserModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyUser]"
     custom_settings: |
-        INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp')
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
         AUTH_USER_MODEL = 'myapp.MyUser'
     files:
         -   path: myapp/__init__.py

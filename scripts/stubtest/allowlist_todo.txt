@@ -85,7 +85,6 @@ django.contrib.auth.decorators.login_required
 django.contrib.auth.forms.BaseUserCreationForm.declared_fields
 django.contrib.auth.forms.UserChangeForm.declared_fields
 django.contrib.auth.forms.UserCreationForm.declared_fields
-django.contrib.auth.forms.UserModel
 django.contrib.auth.hashers.Argon2PasswordHasher.params
 django.contrib.auth.hashers.SHA1PasswordHasher.__init__
 django.contrib.auth.hashers.ScryptPasswordHasher

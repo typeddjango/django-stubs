@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from typing import Any, TypeVar
 
 from django import forms
-from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.base_user import AbstractBaseUser, _UserModel
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -10,8 +10,9 @@ from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
+from typing_extensions import TypeAlias
 
-UserModel: type[AbstractBaseUser]
+UserModel: TypeAlias = type[_UserModel]
 _User = TypeVar("_User", bound=AbstractBaseUser)
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
@@ -47,11 +48,11 @@ class AuthenticationForm(forms.Form):
     password: forms.Field
     error_messages: _ErrorMessagesDict
     request: HttpRequest | None
-    user_cache: Any
+    user_cache: _UserModel | None
     username_field: models.Field
     def __init__(self, request: HttpRequest | None = ..., *args: Any, **kwargs: Any) -> None: ...
     def confirm_login_allowed(self, user: AbstractBaseUser) -> None: ...
-    def get_user(self) -> AbstractBaseUser: ...
+    def get_user(self) -> _UserModel: ...
     def get_invalid_login_error(self) -> ValidationError: ...
     def clean(self) -> dict[str, Any]: ...
 
@@ -66,7 +67,7 @@ class PasswordResetForm(forms.Form):
         to_email: str,
         html_email_template_name: str | None = ...,
     ) -> None: ...
-    def get_users(self, email: str) -> Iterable[AbstractBaseUser]: ...
+    def get_users(self, email: str) -> Iterable[_UserModel]: ...
     def save(
         self,
         domain_override: str | None = ...,

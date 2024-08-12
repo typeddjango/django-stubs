@@ -123,9 +123,10 @@ class DjangoPluginConfig:
         except ValueError:
             exit_with_error(INVALID_BOOL_SETTING.format(key="strict_settings"))
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, extra_data: Dict[str, Any]) -> Dict[str, Any]:
         """We use this method to reset mypy cache via `report_config_data` hook."""
         return {
             "django_settings_module": self.django_settings_module,
             "strict_settings": self.strict_settings,
+            **dict(sorted(extra_data.items())),
         }

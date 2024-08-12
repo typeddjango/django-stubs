@@ -1,23 +1,11 @@
 from mypy.nodes import MemberExpr
-from mypy.plugin import AttributeContext, FunctionContext
-from mypy.types import AnyType, Instance, TypeOfAny, TypeType
+from mypy.plugin import AttributeContext
+from mypy.types import AnyType, TypeOfAny
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
-
-
-def get_user_model_hook(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    auth_user_model = django_context.settings.AUTH_USER_MODEL
-    model_cls = django_context.apps_registry.get_model(auth_user_model)
-    model_cls_fullname = helpers.get_class_fullname(model_cls)
-
-    model_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), model_cls_fullname)
-    if model_info is None:
-        return AnyType(TypeOfAny.unannotated)
-
-    return TypeType(Instance(model_info, []))
 
 
 def get_type_of_settings_attribute(

@@ -1,0 +1,95 @@
+-   case: test_objects_using_auth_user_model_picks_up_configured_type
+    main: |
+        from typing import Union
+        from django.contrib.auth import authenticate, aauthenticate, get_user, get_user_model, login
+        from django.contrib.auth.backends import ModelBackend
+        from django.contrib.auth.decorators import user_passes_test
+        from django.contrib.auth.models import AnonymousUser
+        from django.http import HttpRequest, HttpResponse
+        from myapp.models import MyUser
+
+        reveal_type(authenticate())  # N: Revealed type is "Union[myapp.models.MyUser, None]"
+        async def f() -> None:
+            reveal_type(await aauthenticate())  # N: Revealed type is "Union[myapp.models.MyUser, None]"
+        reveal_type(get_user_model())  # N: Revealed type is "Type[myapp.models.MyUser]"
+        reveal_type(login)  # N: Revealed type is "def (request: django.http.request.HttpRequest, user: Union[myapp.models.MyUser, None], backend: Union[Type[django.contrib.auth.backends.BaseBackend], builtins.str, None] =)"
+        reveal_type(get_user)  # N: Revealed type is "def (request: Union[django.http.request.HttpRequest, django.test.client.Client]) -> Union[myapp.models.MyUser, django.contrib.auth.models.AnonymousUser]"
+        reveal_type(ModelBackend().authenticate(None))  # N: Revealed type is "Union[myapp.models.MyUser, None]"
+
+        def check_user(user: Union[MyUser, AnonymousUser]) -> bool: return True
+        @user_passes_test(check_user)
+        def view(request: HttpRequest) -> HttpResponse: ...
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
+        AUTH_USER_MODEL = "myapp.MyUser"
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.db import models
+
+              class MyUser(models.Model):
+                  ...
+
+-   case: test_objects_using_auth_user_model_uses_builtin_auth_user_per_default
+    main: |
+        from typing import Union
+        from django.contrib.auth import authenticate, aauthenticate, get_user, get_user_model, login
+        from django.contrib.auth.backends import ModelBackend
+        from django.contrib.auth.decorators import user_passes_test
+        from django.contrib.auth.models import AnonymousUser, User
+        from django.http import HttpRequest, HttpResponse
+
+        reveal_type(authenticate())  # N: Revealed type is "Union[django.contrib.auth.models.User, None]"
+        async def f() -> None:
+            reveal_type(await aauthenticate())  # N: Revealed type is "Union[django.contrib.auth.models.User, None]"
+        reveal_type(get_user_model())  # N: Revealed type is "Type[django.contrib.auth.models.User]"
+        reveal_type(login)  # N: Revealed type is "def (request: django.http.request.HttpRequest, user: Union[django.contrib.auth.models.User, None], backend: Union[Type[django.contrib.auth.backends.BaseBackend], builtins.str, None] =)"
+        reveal_type(get_user)  # N: Revealed type is "def (request: Union[django.http.request.HttpRequest, django.test.client.Client]) -> Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]"
+        reveal_type(ModelBackend().authenticate(None))  # N: Revealed type is "Union[django.contrib.auth.models.User, None]"
+
+        def check_user(user: Union[User, AnonymousUser]) -> bool: return True
+        @user_passes_test(check_user)
+        def view(request: HttpRequest) -> HttpResponse: ...
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.db import models
+
+              class MyUser(models.Model):
+                  ...
+
+-   case: test_objects_for_auth_user_model_returns_stub_types_when_contrib_auth_is_not_installed
+    main: |
+        from typing import Union
+        from django.contrib.auth import authenticate, aauthenticate, get_user, get_user_model, login
+        from django.contrib.auth.backends import ModelBackend
+        from django.contrib.auth.base_user import AbstractBaseUser
+        from django.contrib.auth.decorators import user_passes_test
+        from django.contrib.auth.models import AnonymousUser
+        from django.http import HttpRequest, HttpResponse
+
+        reveal_type(authenticate())  # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, None]"
+        async def f() -> None:
+            reveal_type(await aauthenticate())  # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, None]"
+        reveal_type(get_user_model())  # N: Revealed type is "Type[django.contrib.auth.base_user.AbstractBaseUser]"
+        reveal_type(login)  # N: Revealed type is "def (request: django.http.request.HttpRequest, user: Union[django.contrib.auth.base_user.AbstractBaseUser, None], backend: Union[Type[django.contrib.auth.backends.BaseBackend], builtins.str, None] =)"
+        reveal_type(get_user)  # N: Revealed type is "def (request: Union[django.http.request.HttpRequest, django.test.client.Client]) -> Union[django.contrib.auth.base_user.AbstractBaseUser, django.contrib.auth.models.AnonymousUser]"
+        reveal_type(ModelBackend().authenticate(None))  # N: Revealed type is "Union[django.contrib.auth.base_user.AbstractBaseUser, None]"
+
+        def check_user(user: Union[AbstractBaseUser, AnonymousUser]) -> bool: return True
+        @user_passes_test(check_user)
+        def view(request: HttpRequest) -> HttpResponse: ...
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "myapp")
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.db import models
+
+              class MyUser(models.Model):
+                  ...

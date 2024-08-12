@@ -2,10 +2,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path, PosixPath
 from typing import Any, Protocol, type_check_only
 
-from django.db.models.base import Model
-from typing_extensions import TypeAlias
-
-_UserModel: TypeAlias = Model
+from django.contrib.auth.base_user import _UserModel
 
 @type_check_only
 class PasswordValidator(Protocol):
