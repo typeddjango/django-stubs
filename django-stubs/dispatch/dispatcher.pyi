@@ -36,4 +36,5 @@ def receiver(
     sender: object | None = ...,
     weak: bool = ...,
     dispatch_uid: Hashable | None = ...,
+    **named: Any,
 ) -> Callable[[_F], _F]: ...
