@@ -236,6 +236,7 @@
         reveal_type(MyModel.objects.dummy_override())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_mixin(MyModel()))  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.example_union())  # N: Revealed type is "Union[myapp.models.MyModel, builtins.list[myapp.models.MyModel]]"
         reveal_type(MyOtherModel.objects.example())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.example_2())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.override())  # N: Revealed type is "myapp.models.MyOtherModel"
@@ -245,13 +246,14 @@
         reveal_type(MyOtherModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.test_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
         reveal_type(MyOtherModel.objects.test_sub_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
+        reveal_type(MyOtherModel.objects.example_union())  # N: Revealed type is "Union[myapp.models.MyOtherModel, builtins.list[myapp.models.MyOtherModel]]"
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-              from typing import TypeVar, Generic
+              from typing import TypeVar, Generic, Union, List
               from django.db import models
               from typing_extensions import Self
 
@@ -263,6 +265,7 @@
 
               class OtherMixin(models.QuerySet[T]):
                   def example_other_mixin(self) -> T: ...
+                  def example_union(self) -> Union[T, List[T]]: ...
 
               class _MyModelQuerySet(OtherMixin[T], models.QuerySet[T], Generic[T]):
                   def example(self) -> T: ...
