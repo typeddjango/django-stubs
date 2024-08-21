@@ -2,10 +2,6 @@
 # Unsorted: there are real problems and things we can really ignore.
 
 django.__main__
-django.conf.DEFAULT_FILE_STORAGE_DEPRECATED_MSG
-django.conf.LazySettings.DEFAULT_FILE_STORAGE
-django.conf.LazySettings.STATICFILES_STORAGE
-django.conf.STATICFILES_STORAGE_DEPRECATED_MSG
 django.conf.global_settings.gettext_noop
 django.conf.urls.url
 django.contrib.admin.FieldListFilter.title
@@ -86,10 +82,7 @@ django.contrib.auth.forms.BaseUserCreationForm.declared_fields
 django.contrib.auth.forms.UserChangeForm.declared_fields
 django.contrib.auth.forms.UserCreationForm.declared_fields
 django.contrib.auth.hashers.Argon2PasswordHasher.params
-django.contrib.auth.hashers.SHA1PasswordHasher.__init__
 django.contrib.auth.hashers.ScryptPasswordHasher
-django.contrib.auth.hashers.UnsaltedMD5PasswordHasher.__init__
-django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher.__init__
 django.contrib.auth.hashers.must_update_salt
 django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
@@ -445,8 +438,6 @@ django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_PREFIX
 django.contrib.gis.gdal.raster.const.VSI_MEM_FILESYSTEM_BASE_PATH
 django.contrib.gis.gdal.srs.SpatialReference.pretty_wkt
 django.contrib.gis.gdal.srs.SpatialReference.xml
-django.contrib.gis.geoip2.GeoIP2
-django.contrib.gis.geoip2.GeoIP2Exception
 django.contrib.gis.geoip2.base
 django.contrib.gis.geos.Point.tuple
 django.contrib.gis.geos.geometry.GEOSGeometryBase.geojson
@@ -467,11 +458,9 @@ django.contrib.messages.storage.cookie.CookieStorage.key_salt
 django.contrib.messages.storage.cookie.MessageDecoder.decode
 django.contrib.messages.storage.cookie.MessageEncoder.default
 django.contrib.postgres.fields.ArrayField.formfield
-django.contrib.postgres.fields.CIText.__init__
 django.contrib.postgres.fields.HStoreField.formfield
 django.contrib.postgres.fields.RangeField.formfield
 django.contrib.postgres.fields.array.ArrayField.formfield
-django.contrib.postgres.fields.citext.CIText.__init__
 django.contrib.postgres.fields.hstore.HStoreField.formfield
 django.contrib.postgres.fields.ranges.RangeField.formfield
 django.contrib.postgres.forms.BaseRangeField.hidden_widget
@@ -561,7 +550,6 @@ django.db.backends.mysql.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_collation_on_charfield
 django.db.backends.postgresql.base.DatabaseWrapper.Database
-django.db.backends.postgresql.base.DatabaseWrapper.ensure_role
 django.db.backends.postgresql.base.DatabaseWrapper.ops
 django.db.backends.postgresql.base.DatabaseWrapper.tzinfo_factory
 django.db.backends.postgresql.base.INETARRAY
@@ -612,7 +600,6 @@ django.db.backends.utils.names_digest
 django.db.backends.utils.split_tzname_delta
 django.db.connection
 django.db.migrations.Migration.suggest_name
-django.db.migrations.autodetector.MigrationAutodetector.generate_removed_altered_index_together
 django.db.migrations.graph.Node.__ge__
 django.db.migrations.graph.Node.__gt__
 django.db.migrations.graph.Node.__le__
