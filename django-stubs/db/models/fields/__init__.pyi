@@ -10,7 +10,7 @@ from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
-from django.db.models.expressions import Col, Combinable, Expression
+from django.db.models.expressions import Col, Combinable, Expression, Func
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
@@ -234,6 +234,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_attname(self) -> str: ...
     def get_attname_column(self) -> tuple[str, str]: ...
     def value_to_string(self, obj: Model) -> str: ...
+    def slice_expression(self, expression: Expression, start: int, end: int | None) -> Func: ...
 
 class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: float | int | str | Combinable
