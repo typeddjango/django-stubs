@@ -44,11 +44,24 @@ class BaseConstraint:
 
 class CheckConstraint(BaseConstraint):
     check: Q | BaseExpression
+    condition: Q | BaseExpression
+
+    @overload
+    @deprecated("The check keyword argument is deprecated in favor of condition and will be removed in Django 6.0")
     def __init__(
         self,
         *,
-        check: Q | BaseExpression,
         name: str,
+        check: Q | BaseExpression,
+        violation_error_code: str | None = None,
+        violation_error_message: _StrOrPromise | None = None,
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        *,
+        name: str,
+        condition: Q | BaseExpression,
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
