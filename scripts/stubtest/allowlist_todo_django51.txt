@@ -12,7 +12,6 @@ django.contrib.admin.models.LogEntryManager.log_actions
 django.contrib.admin.options.ModelAdmin.log_deletions
 django.contrib.auth.base_user.BaseUserManager.make_random_password
 django.contrib.auth.checks.check_middleware
-django.contrib.auth.decorators.login_not_required
 django.contrib.auth.forms.AdminPasswordChangeForm.clean_password2
 django.contrib.auth.forms.AdminPasswordChangeForm.usable_password_help_text
 django.contrib.auth.forms.BaseUserCreationForm.clean_password2
