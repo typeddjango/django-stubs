@@ -1,36 +1,35 @@
 from collections.abc import Callable, Iterable, Iterator
+from html.parser import HTMLParser
 from io import BytesIO
-from re import Match, Pattern
+from re import Pattern
 from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
-from django.utils.functional import SimpleLazyObject, _StrOrPromise
+from django.utils.functional import SimpleLazyObject, _StrOrPromise, cached_property
 
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
 _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
 
 def capfirst(x: _StrOrPromiseOrNoneT) -> _StrOrPromiseOrNoneT: ...
 
-re_notag: Pattern[str]
-re_prt: Pattern[str]
-
-class WordsRegex:
-    @staticmethod
-    def search(text: str, pos: int) -> Match | FakeMatch: ...
-
-class FakeMatch:
-    def __init__(self, text: str, end: int) -> None: ...
-    def __getitem__(self, group: int) -> str | None: ...
-    def end(self, group: int = 0) -> int: ...
-
-re_words: type[WordsRegex]
-re_chars: Pattern[str]
-re_tag: Pattern[str]
 re_newlines: Pattern[str]
 re_camel_case: Pattern[str]
 
 def wrap(text: _StrOrPromiseT, width: int) -> _StrOrPromiseT: ...
 def add_truncation_text(text: str, truncate: str | None = None) -> str: ...
+def calculate_truncate_chars_length(length: int, replacement: str | None) -> int: ...
+
+class TruncateHTMLParser(HTMLParser):
+    TruncationCompleted: ClassVar[type[Exception]]
+    def __init__(self, *, length: int, replacement: str | None, convert_charrefs: bool = True) -> None: ...
+    @cached_property
+    def void_elements(self) -> frozenset[str]: ...
+
+class TruncateCharsHTMLParser(TruncateHTMLParser):
+    def process(self, data: str) -> tuple[str, str]: ...
+
+class TruncateWordsHTMLParser(TruncateHTMLParser):
+    def process(self, data: str) -> tuple[str, str]: ...
 
 class Truncator(SimpleLazyObject):
     MAX_LENGTH_HTML: ClassVar[int]
