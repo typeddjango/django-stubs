@@ -1,5 +1,8 @@
 from collections.abc import Callable
+from inspect import _ParameterKind
 from typing import Any
+
+ARG_KINDS: frozenset[_ParameterKind]
 
 def get_func_args(func: Callable[..., Any]) -> list[str]: ...
 def get_func_full_args(func: Callable[..., Any]) -> list[tuple[str, str] | tuple[str]]: ...

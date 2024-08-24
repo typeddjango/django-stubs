@@ -389,20 +389,6 @@ django.test.utils.garbage_collect
 django.urls.converters.get_converter
 django.urls.resolvers.LocaleRegexRouteDescriptor
 django.urls.resolvers.whitespace_set
-django.utils.deprecation.RemovedInDjango51Warning
-django.utils.html.VOID_ELEMENTS
-django.utils.inspect.ARG_KINDS
-django.utils.text.FakeMatch
-django.utils.text.TruncateCharsHTMLParser
-django.utils.text.TruncateHTMLParser
-django.utils.text.TruncateWordsHTMLParser
-django.utils.text.WordsRegex
-django.utils.text.calculate_truncate_chars_length
-django.utils.text.re_words
-django.utils.version.PY313
-django.utils.version.PY36
-django.utils.version.PY37
-django.utils.version.PYPY
 
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore:

@@ -5,10 +5,9 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from typing_extensions import TypeAlias
 
-class RemovedInDjango51Warning(DeprecationWarning): ...
+class RemovedInNextVersionWarning(DeprecationWarning): ...
 class RemovedInDjango60Warning(PendingDeprecationWarning): ...
 
-RemovedInNextVersionWarning: TypeAlias = RemovedInDjango51Warning
 RemovedAfterNextVersionWarning: TypeAlias = RemovedInDjango60Warning
 
 class warn_about_renamed_method:
