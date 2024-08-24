@@ -477,3 +477,7 @@ django.db.migrations.recorder.Migration@AnnotatedWith
 django.contrib.auth.backends.UserModel
 django.contrib.auth.forms.UserModel
 django.contrib.auth.views.UserModel
+
+# Using the definitions from `dict` (from typeshed)
+django.contrib.sessions.backends.base.SessionBase.get
+django.contrib.sessions.backends.base.SessionBase.setdefault
