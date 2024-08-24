@@ -1,5 +1,5 @@
-from typing import Any
 from logging import Logger
+from typing import Any
 
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 

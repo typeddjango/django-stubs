@@ -1,8 +1,8 @@
+from _collections_abc import dict_items, dict_keys, dict_values
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from typing import Any, TypeVar, overload
 
-from collections.abc import Iterable
-from _collections_abc import dict_keys, dict_values, dict_items
 from _typeshed import SupportsKeysAndGetItem
 
 VALID_KEY_CHARS: Any
