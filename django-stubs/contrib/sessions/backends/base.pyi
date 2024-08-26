@@ -1,7 +1,7 @@
 from _collections_abc import dict_items, dict_keys, dict_values
 from collections.abc import Iterable
 from datetime import datetime, timedelta
-from typing import Any, TypeVar, overload
+from typing import Any, overload
 
 from _typeshed import SupportsKeysAndGetItem
 
@@ -9,8 +9,6 @@ VALID_KEY_CHARS: Any
 
 class CreateError(Exception): ...
 class UpdateError(Exception): ...
-
-_T = TypeVar("_T")
 
 class SessionBase(dict[str, Any]):
     TEST_COOKIE_NAME: str
@@ -27,13 +25,9 @@ class SessionBase(dict[str, Any]):
     @overload
     async def aget(self, key: str, default: Any) -> Any: ...
     @overload
-    async def aget(self, key: str, default: _T) -> Any | _T: ...  # type: ignore[misc]
-    @overload
     async def apop(self, key: str) -> Any: ...
     @overload
     async def apop(self, key: str, default: Any) -> Any: ...
-    @overload
-    async def apop(self, key: str, default: _T) -> Any | _T: ...  # type: ignore[misc]
     async def asetdefault(self, key: str, value: Any) -> Any: ...
     def set_test_cookie(self) -> None: ...
     async def aset_test_cookie(self) -> None: ...
