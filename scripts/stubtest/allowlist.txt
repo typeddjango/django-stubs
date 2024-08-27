@@ -474,3 +474,6 @@ django.db.migrations.recorder.Migration@AnnotatedWith
 django.contrib.auth.backends.UserModel
 django.contrib.auth.forms.UserModel
 django.contrib.auth.views.UserModel
+
+# Limited stubtest support for enums (https://github.com/python/mypy/issues/16806)
+django.db.migrations.operations.base.OperationCategory.__new__
