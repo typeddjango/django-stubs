@@ -471,9 +471,6 @@ django.contrib.redirects.models.Redirect.new_path
 django.contrib.redirects.models.Redirect.old_path
 django.contrib.redirects.models.Redirect.site
 django.contrib.redirects.models.Redirect.site_id
-django.contrib.sessions.backends.base.SessionBase.get
-django.contrib.sessions.backends.base.SessionBase.setdefault
-django.contrib.sessions.backends.base.SessionBase.update
 django.contrib.sessions.backends.signed_cookies.SessionStore.exists
 django.contrib.sessions.base_session.AbstractBaseSession.expire_date
 django.contrib.sessions.base_session.AbstractBaseSession.get_next_by_expire_date
