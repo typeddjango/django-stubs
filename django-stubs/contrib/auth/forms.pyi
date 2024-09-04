@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, TypeVar
+from logging import Logger
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser, _UserModel
@@ -11,6 +12,8 @@ from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
 from typing_extensions import TypeAlias
+
+logger: Logger
 
 UserModel: TypeAlias = type[_UserModel]
 _User = TypeVar("_User", bound=AbstractBaseUser)
