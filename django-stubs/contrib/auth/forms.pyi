@@ -1,6 +1,6 @@
 from collections.abc import Iterable
-from typing import Any, TypeVar
 from logging import Logger
+from typing import Any, TypeVar
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser, _UserModel
