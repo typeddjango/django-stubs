@@ -31,6 +31,9 @@ _Choices: TypeAlias = (
     _ChoicesSequence | _ChoicesMapping | type[Choices] | Callable[[], _ChoicesSequence | _ChoicesMapping]
 )
 _LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
+_Choices: TypeAlias = (
+    _ChoicesSequence | _ChoicesMapping | type[Choices] | Callable[[], _ChoicesSequence | _ChoicesMapping]
+)
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
