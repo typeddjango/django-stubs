@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Mapping
 from typing import Any, Protocol, TypeVar, type_check_only
 
 from typing_extensions import TypeAlias
@@ -6,6 +6,7 @@ from typing_extensions import TypeAlias
 _Choice: TypeAlias = tuple[Any, Any]
 _ChoiceNamedGroup: TypeAlias = tuple[str, Iterable[_Choice]]
 _Choices: TypeAlias = Iterable[_Choice | _ChoiceNamedGroup]
+_ChoicesMapping: TypeAlias = Mapping[Any, Any] | Mapping[str, Mapping[Any, Any]]  # noqa: PYI047
 
 @type_check_only
 class _ChoicesCallable(Protocol):
@@ -18,10 +19,12 @@ class BaseChoiceIterator:
 class BlankChoiceIterator(BaseChoiceIterator):
     choices: _Choices
     blank_choice: _Choices
+
     def __init__(self, choices: _Choices, blank_choice: _Choices) -> None: ...
 
 class CallableChoiceIterator(BaseChoiceIterator):
     func: _ChoicesCallable
+
     def __init__(self, func: _ChoicesCallable) -> None: ...
 
 _V = TypeVar("_V")

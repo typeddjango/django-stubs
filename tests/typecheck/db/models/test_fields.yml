@@ -1,0 +1,159 @@
+-   case: db_models_fields_choices
+    main: |
+        from collections.abc import Callable, Mapping, Sequence
+        from datetime import date, time
+        from decimal import Decimal
+        from typing import TypeVar, Tuple
+        from uuid import UUID
+
+        from django.db import models
+
+        _T = TypeVar("_T")
+
+
+        def to_named_seq(func: Callable[[], _T]) -> Callable[[], Sequence[Tuple[str, _T]]]:
+            def inner() -> Sequence[Tuple[str, _T]]:
+                return [("title", func())]
+
+            return inner
+
+
+        def to_named_mapping(func: Callable[[], _T]) -> Callable[[], Mapping[str, _T]]:
+            def inner() -> Mapping[str, _T]:
+                return {"title": func()}
+
+            return inner
+
+
+        def str_tuple() -> Sequence[Tuple[str, str]]:
+            return (("foo", "bar"), ("fuzz", "bazz"))
+
+
+        def str_mapping() -> Mapping[str, str]:
+            return {"foo": "bar", "fuzz": "bazz"}
+
+
+        def int_tuple() -> Sequence[Tuple[int, str]]:
+            return ((1, "bar"), (2, "bazz"))
+
+
+        def int_mapping() -> Mapping[int, str]:
+            return {3: "bar", 4: "bazz"}
+
+
+        def dec_tuple() -> Sequence[Tuple[Decimal, str]]:
+            return ((Decimal(1), "bar"), (Decimal(2), "bazz"))
+
+
+        def dec_mapping() -> Mapping[Decimal, str]:
+            return {Decimal(3): "bar", Decimal(4): "bazz"}
+
+
+        def url_tuple() -> Sequence[Tuple[str, str]]:
+            return (("https://python.org", "bar"), ("https://mypy-lang.org", "bazz"))
+
+
+        def url_mapping() -> Mapping[str, str]:
+            return {"https://python.org": "bar", "https://mypy-lang.org": "bazz"}
+
+
+        def date_tuple() -> Sequence[Tuple[date, str]]:
+            return ((date.today(), "bar"), (date(2024, 1, 1), "bazz"))
+
+
+        def date_mapping() -> Mapping[date, str]:
+            return {date.today(): "bar", date(2024, 1, 1): "bazz"}
+
+
+        def time_tuple() -> Sequence[Tuple[time, str]]:
+            return ((time(0, 0, 2), "bar"), (time(0, 0, 1), "bazz"))
+
+
+        def time_mapping() -> Mapping[time, str]:
+            return {time(0, 0, 2): "bar", time(0, 0, 1): "bazz"}
+
+
+        def uuid_tuple() -> Sequence[Tuple[UUID, str]]:
+            return ((UUID(), "bar"), (UUID(), "bazz"))
+
+
+        def uuid_mapping() -> Mapping[UUID, str]:
+            return {UUID(): "bar", UUID(): "bazz"}
+
+
+        class NewModel(models.Model):
+            class TextChoices(models.TextChoices):
+                FIRST = "foo", "bar"
+                SECOND = "foo2", "bar"
+
+            class IntegerChoices(models.IntegerChoices):
+                FIRST = 1, "bar"
+                SECOND = 2, "bar"
+
+            char1 = models.CharField[str, str](max_length=200, choices=TextChoices)
+            char2 = models.CharField[str, str](max_length=200, choices=str_tuple)
+            char3 = models.CharField[str, str](max_length=200, choices=str_mapping)
+            char4 = models.CharField[str, str](max_length=200, choices=str_tuple())
+            char5 = models.CharField[str, str](max_length=200, choices=str_mapping())
+            char6 = models.CharField[str, str](max_length=200, choices=to_named_seq(str_tuple))
+            char7 = models.CharField[str, str](max_length=200, choices=to_named_seq(str_tuple)())
+            char8 = models.CharField[str, str](max_length=200, choices=to_named_mapping(str_mapping))
+            char9 = models.CharField[str, str](max_length=200, choices=to_named_mapping(str_mapping)())
+
+            int1 = models.IntegerField[int, int](choices=IntegerChoices)
+            int2 = models.IntegerField[int, int](choices=int_tuple)
+            int3 = models.IntegerField[int, int](choices=int_mapping)
+            int4 = models.IntegerField[int, int](choices=int_tuple())
+            int5 = models.IntegerField[int, int](choices=int_mapping())
+            int6 = models.IntegerField[int, int](choices=to_named_seq(str_tuple))
+            int7 = models.IntegerField[int, int](choices=to_named_seq(str_tuple)())
+            int8 = models.IntegerField[int, int](choices=to_named_mapping(str_mapping))
+            int9 = models.IntegerField[int, int](choices=to_named_mapping(str_mapping)())
+
+            dec1 = models.DecimalField[Decimal, Decimal](choices=dec_tuple)
+            dec2 = models.DecimalField[Decimal, Decimal](choices=dec_mapping)
+            dec3 = models.DecimalField[Decimal, Decimal](choices=dec_tuple())
+            dec4 = models.DecimalField[Decimal, Decimal](choices=dec_mapping())
+
+            slug1 = models.SlugField[str, str](choices=TextChoices)
+            slug4 = models.SlugField[str, str](choices=str_tuple)
+            slug5 = models.SlugField[str, str](choices=str_mapping)
+            slug2 = models.SlugField[str, str](choices=str_tuple())
+            slug3 = models.SlugField[str, str](choices=str_mapping())
+
+            url1 = models.URLField[str, str](choices=str_tuple)
+            url2 = models.URLField[str, str](choices=str_mapping)
+            url3 = models.URLField[str, str](choices=str_tuple())
+            url4 = models.URLField[str, str](choices=str_mapping())
+
+            text1 = models.TextField[str, str](choices=TextChoices)
+            text2 = models.TextField[str, str](choices=str_tuple)
+            text3 = models.TextField[str, str](choices=str_mapping)
+            text4 = models.TextField[str, str](choices=str_tuple())
+            text5 = models.TextField[str, str](choices=str_mapping())
+
+            ip1 = models.GenericIPAddressField[int, int](choices=int_tuple)
+            ip2 = models.GenericIPAddressField[int, int](choices=int_mapping)
+            ip3 = models.GenericIPAddressField[int, int](choices=int_tuple())
+            ip4 = models.GenericIPAddressField[int, int](choices=int_mapping())
+
+            date1 = models.DateField[date, date](choices=date_tuple)
+            date2 = models.DateField[date, date](choices=date_mapping)
+            date3 = models.DateField[date, date](choices=date_tuple())
+            date4 = models.DateField[date, date](choices=date_mapping())
+
+            time1 = models.TimeField[time, time](choices=time_tuple)
+            time2 = models.TimeField[time, time](choices=time_mapping)
+            time3 = models.TimeField[time, time](choices=time_tuple())
+            time4 = models.TimeField[time, time](choices=time_mapping())
+
+            uuid1 = models.UUIDField[UUID, UUID](choices=uuid_tuple)
+            uuid2 = models.UUIDField[UUID, UUID](choices=uuid_mapping)
+            uuid3 = models.UUIDField[UUID, UUID](choices=uuid_tuple())
+            uuid4 = models.UUIDField[UUID, UUID](choices=uuid_mapping())
+
+            path1 = models.FilePathField[str, str](choices=TextChoices)
+            path2 = models.FilePathField[str, str](choices=str_tuple)
+            path3 = models.FilePathField[str, str](choices=str_mapping)
+            path4 = models.FilePathField[str, str](choices=str_tuple())
+            path5 = models.FilePathField[str, str](choices=str_mapping())
