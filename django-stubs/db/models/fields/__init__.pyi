@@ -9,12 +9,13 @@ from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models import Model
+from django.db.models import Choices, Model
 from django.db.models.expressions import Col, Combinable, Expression, Func
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
-from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _Choices, _ChoicesCallable
+from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesMapping
+from django.utils.choices import _Choices as _ChoicesSequence
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
 from typing_extensions import Self, TypeAlias
@@ -27,6 +28,9 @@ BLANK_CHOICE_DASH: list[tuple[str, str]]
 _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 _LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
+_Choices: TypeAlias = (
+    _ChoicesSequence | _ChoicesMapping | type[Choices] | Callable[[], _ChoicesSequence | _ChoicesMapping]
+)
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
