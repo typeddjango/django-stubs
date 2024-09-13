@@ -115,3 +115,34 @@ If it does, please add the new generic class to the `_need_generic` list in the 
 We only add hints for private attributes when it has some demonstrated real-world use case.
 That means from a third-party package or some well described snippet for a project.
 This rule helps us avoid tying in too closely to Django’s undocumented internals.
+
+
+## Releasing `django-stubs`
+
+1. Open a pull request that updates `setup.py`, `ext/setup.py` and `README.md`
+   (anyone can open this PR, not just maintainers):
+
+    - Increase `version=` value within `setup(...)` call in **both** files. The versions must be in sync.
+    - Update `django-stubs-ext>=` dependency in root `setup.py` to the same version number.
+    - Version number `major.minor.patch` is formed as follows:
+
+      `major.minor` version must match newest supported Django release.
+
+      `patch` is sequentially increasing for each stubs release. Reset to `0` if `major.minor` was updated.
+
+    - Use pull request title "Version x.y.z release" by convention.
+    - Add a new row at the top of ['Version compatibility' table in README.md](README.md#version-compatibility).
+
+2. Ensure the CI succeeds. A maintainer must merge this PR. If it's just a verison bump, no need
+   to wait for a second maintainer's approval.
+
+3. A maintainer must [сreate a new GitHub release](https://github.com/typeddjango/django-stubs/releases/new):
+
+    - Under "Choose a tag" enter the new version number. Do **not** use `v` prefix.
+    - Click "Generate release notes".
+    - Delete all release notes lines containing `by @pre-commit-ci` or `by @dependabot`, as these
+      are irrelevant for our users.
+
+4. Once you feel brave enough, click "Publish release".
+
+5. Check that the [release workflow](https://github.com/typeddjango/django-stubs/actions/workflows/release.yml) succeeds.
