@@ -133,7 +133,7 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
     - Use pull request title "Version x.y.z release" by convention.
     - Add a new row at the top of ['Version compatibility' table in README.md](README.md#version-compatibility).
 
-2. Ensure the CI succeeds. A maintainer must merge this PR. If it's just a verison bump, no need
+2. Ensure the CI succeeds. A maintainer must merge this PR. If it's just a version bump, no need
    to wait for a second maintainer's approval.
 
 3. A maintainer must [сreate a new GitHub release](https://github.com/typeddjango/django-stubs/releases/new):
