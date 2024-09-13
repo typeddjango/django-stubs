@@ -140,6 +140,8 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
 
     - Under "Choose a tag" enter the new version number. Do **not** use `v` prefix.
     - Click "Generate release notes".
+    - Look for merged PRs with the ['release notes reminder' label](https://github.com/typeddjango/django-stubs/issues?q=is%3Aopen+is%3Aissue+label%3A%22release+notes+reminder%22)
+      and move them to a separate section at the top, so that they stand out. Remove the label from PRs.
     - Delete all release notes lines containing `by @pre-commit-ci` or `by @dependabot`, as these
       are irrelevant for our users.
 
