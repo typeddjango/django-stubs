@@ -122,16 +122,16 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
 1. Open a pull request that updates `setup.py`, `ext/setup.py` and `README.md`
    (anyone can open this PR, not just maintainers):
 
-    - Increase `version=` value within `setup(...)` call in **both** files. The versions must be in sync.
-    - Update `django-stubs-ext>=` dependency in root `setup.py` to the same version number.
     - Version number `major.minor.patch` is formed as follows:
 
       `major.minor` version must match newest supported Django release.
 
       `patch` is sequentially increasing for each stubs release. Reset to `0` if `major.minor` was updated.
 
-    - Use pull request title "Version x.y.z release" by convention.
+    - Update the `version=` value within `setup(...)` call in **both** `setup.py` files. The versions must be in sync.
+    - Update `django-stubs-ext>=` dependency in root `setup.py` to the same version number.
     - Add a new row at the top of ['Version compatibility' table in README.md](README.md#version-compatibility).
+    - Use pull request title "Version x.y.z release" by convention.
 
 2. Ensure the CI succeeds. A maintainer must merge this PR. If it's just a version bump, no need
    to wait for a second maintainer's approval.
