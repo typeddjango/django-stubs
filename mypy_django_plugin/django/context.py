@@ -482,12 +482,12 @@ class DjangoContext:
         try:
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
-            if (
-                helpers.is_annotated_model(model_instance.type)
-                and model_instance.extra_attrs
-                and lookup in model_instance.extra_attrs.attrs
-            ):
-                return model_instance.extra_attrs.attrs[lookup]
+            if helpers.is_annotated_model(model_instance.type) and model_instance.extra_attrs:
+                # If the field comes from .annotate(), we assume Any for it
+                # and allow chaining any lookups.
+                lookup_base_field, *_ = lookup.split("__")
+                if lookup_base_field in model_instance.extra_attrs.attrs:
+                    return model_instance.extra_attrs.attrs[lookup_base_field]
 
             msg = exc.args[0]
             if model_instance.extra_attrs:

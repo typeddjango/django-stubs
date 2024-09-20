@@ -257,7 +257,7 @@
                     username = models.CharField(max_length=100)
 
 
--   case: annotate_currently_allows_lookups_of_non_existent_field
+-   case: annotate_rejects_lookups_of_non_existent_field
     main: |
         from myapp.models import User
         from django.db.models.expressions import F
@@ -395,3 +395,27 @@
 
         class Entry(models.Model):
             blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+- case: test_annotate_allows_any_lookups_in_filter
+  main: |
+    from django.db import models
+    from myapp.models import Blog
+
+    qs = Blog.objects.annotate(distance=0)
+    reveal_type(qs)
+    reveal_type(qs.filter(distance=10))
+    reveal_type(qs.filter(distance__lt=10))
+    qs.filter(distance__lt__lt=10)
+    qs.filter(distance__unknown_lookup=10)
+  out: |
+    main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
+    main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
+    main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class Blog(models.Model): pass
