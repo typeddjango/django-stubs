@@ -402,10 +402,15 @@
     from myapp.models import Blog
 
     qs = Blog.objects.annotate(distance=0)
-    qs.filter(distance=10)
-    qs.filter(distance__lt=10)
+    reveal_type(qs)
+    reveal_type(qs.filter(distance=10))
+    reveal_type(qs.filter(distance__lt=10))
     qs.filter(distance__lt__lt=10)
     qs.filter(distance__unknown_lookup=10)
+  out: |
+    main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
+    main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
+    main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
   installed_apps:
     - myapp
   files:
