@@ -512,7 +512,13 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     if base_as_manager is None:
         return
 
-    base_ret_type: Optional[TypeInfo] = None
+    manager_sym = semanal_api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
+    if manager_sym is None or not isinstance(manager_sym.node, TypeInfo):
+        return _defer()
+
+    manager_base = manager_sym.node
+    base_ret_type = manager_base
+
     if base_as_manager.fullname != f"{fullnames.QUERYSET_CLASS_FULLNAME}.as_manager":
         base_as_manager_type = get_proper_type(base_as_manager.type)
         if not isinstance(base_as_manager_type, CallableType):
@@ -523,11 +529,6 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
 
         base_ret_type = base_as_manager_ret_type.type
 
-    manager_sym = semanal_api.lookup_fully_qualified_or_none(fullnames.MANAGER_CLASS_FULLNAME)
-    if manager_sym is None or not isinstance(manager_sym.node, TypeInfo):
-        return _defer()
-
-    manager_base = manager_sym.node
     manager_class_name = f"{manager_base.name}From{queryset_info.name}"
     current_module = semanal_api.modules[semanal_api.cur_mod_id]
     existing_sym = current_module.names.get(manager_class_name)
@@ -544,7 +545,7 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         try:
             new_manager_info = create_manager_class(
                 api=semanal_api,
-                base_manager_info=base_ret_type or manager_base,
+                base_manager_info=base_ret_type,
                 name=manager_class_name,
                 line=queryset_info.line,
                 with_unique_name=True,
