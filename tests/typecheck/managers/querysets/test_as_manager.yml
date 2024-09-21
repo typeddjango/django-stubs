@@ -431,3 +431,47 @@
                     class MyQuerySet(models.QuerySet):
                         pass
                     objects = MyQuerySet.as_manager()
+
+-   case: queryset_as_manager_foreignkey_cycle
+    main: |
+        from payments.models import Payout
+        reveal_type(Payout.objects)  # N: Revealed type is "payments.models.ManagerFromPayoutQuerySet[payments.models.Payout]"
+
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "payments", "accounts")
+        AUTH_USER_MODEL = "accounts.Account"
+    files:
+        -   path: payments/__init__.py
+        -   path: payments/models.py
+            content: |
+                from __future__ import annotations
+
+                from typing_extensions import Self
+
+                from django.contrib.auth import get_user_model
+                from django.db import models
+
+                UserModel = get_user_model()
+
+                class Transaction(models.Model):
+                    user = models.ForeignKey(
+                        UserModel, on_delete=models.CASCADE, related_name="transactions"
+                    )
+
+                class PayoutQuerySet(models.QuerySet["Payout"]):
+                    def unapplied(self) -> Self:
+                        return self
+
+                class Payout(models.Model):
+                    triggered_by = models.ForeignKey(
+                        Transaction, on_delete=models.CASCADE, related_name="payouts"
+                    )
+
+                    objects = PayoutQuerySet.as_manager()
+
+        -   path: accounts/__init__.py
+        -   path: accounts/models.py
+            content: |
+                from django.contrib.auth.models import AbstractUser
+
+                class Account(AbstractUser): pass
