@@ -71,6 +71,7 @@ setup(
         "Framework :: Django",
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
+        "Framework :: Django :: 5.1",
     ],
     project_urls={
         "Funding": "https://github.com/sponsors/typeddjango",

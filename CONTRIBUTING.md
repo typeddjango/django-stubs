@@ -132,6 +132,7 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
     - Update `django-stubs-ext>=` dependency in root `setup.py` to the same version number.
     - Add a new row at the top of ['Version compatibility' table in README.md](README.md#version-compatibility).
     - Use pull request title "Version x.y.z release" by convention.
+    - Add the correct classifiers to `setup.py` if support is added for a new Python or Django version
 
 2. Ensure the CI succeeds. A maintainer must merge this PR. If it's just a version bump, no need
    to wait for a second maintainer's approval.
