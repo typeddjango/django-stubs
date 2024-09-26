@@ -4,8 +4,7 @@ from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeAlias, TypeVar, overload, type_check_only
 
-from django.contrib.auth.base_user import _UserModel
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import _AnyUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
@@ -55,9 +54,9 @@ class HttpRequest(BytesIO):
     # django.contrib.admin views:
     current_app: str
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    user: _UserModel | AnonymousUser
+    user: _AnyUser
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    auser: Callable[[], Awaitable[_UserModel | AnonymousUser]]
+    auser: Callable[[], Awaitable[_AnyUser]]
     # django.middleware.locale.LocaleMiddleware:
     LANGUAGE_CODE: str
     # django.contrib.sites.middleware.CurrentSiteMiddleware
