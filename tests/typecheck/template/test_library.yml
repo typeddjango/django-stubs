@@ -57,6 +57,16 @@
 
         reveal_type(some_function) # N: Revealed type is "def (value: builtins.int) -> builtins.int"
 
+-   case: register_simple_tag_via_call
+    main: |
+        from django import template
+        register = template.Library()
+
+        def f(s: str) -> str:
+            return s * 2
+
+        reveal_type(register.simple_tag(f, name='double')) # N: Revealed type is "def (s: builtins.str) -> builtins.str"
+
 -   case: register_tag_no_args
     main: |
         from django import template
