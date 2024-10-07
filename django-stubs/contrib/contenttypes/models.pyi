@@ -12,6 +12,7 @@ class ContentTypeManager(models.Manager[ContentType]):
     def clear_cache(self) -> None: ...
 
 class ContentType(models.Model):
+    # Note: do not create `class Meta` here.
     id: int
     app_label: models.CharField
     model: models.CharField
