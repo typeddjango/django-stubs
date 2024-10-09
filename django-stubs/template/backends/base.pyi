@@ -3,7 +3,6 @@ from typing import Any, Protocol, type_check_only
 
 from django.http.request import HttpRequest
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeString
 
 class BaseEngine:
     name: str
@@ -24,4 +23,4 @@ class _EngineTemplate(Protocol):
         self,
         context: dict[str, Any] | None = ...,
         request: HttpRequest | None = ...,
-    ) -> SafeString: ...
+    ) -> str: ...
