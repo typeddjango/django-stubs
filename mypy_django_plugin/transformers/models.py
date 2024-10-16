@@ -1183,6 +1183,7 @@ def get_annotated_type(
                     api,
                     fields={**annotations.items, **fields_dict.items},
                     required_keys={*annotations.required_keys, *fields_dict.required_keys},
+                    readonly_keys={*annotations.readonly_keys, *fields_dict.readonly_keys},
                 )
     else:
         annotated_model = helpers.lookup_fully_qualified_typeinfo(api, model_type.type.fullname + "@AnnotatedWith")
