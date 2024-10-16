@@ -32,7 +32,7 @@ dependencies = [
 
 # Keep compatible-mypy major.minor version pinned to what we use in CI (requirements.txt)
 extras_require = {
-    "compatible-mypy": ["mypy~=1.11.0"],
+    "compatible-mypy": ["mypy~=1.12.0"],
     "redis": ["redis"],
     "oracle": ["oracledb"],
 }
