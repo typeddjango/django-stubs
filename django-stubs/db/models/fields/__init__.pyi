@@ -9,12 +9,13 @@ from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models import Model
+from django.db.models import Choices, Model
 from django.db.models.expressions import Col, Combinable, Expression, Func
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.forms import Widget
-from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _Choices, _ChoicesCallable
+from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesMapping
+from django.utils.choices import _Choices as _ChoicesSequence
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
 from typing_extensions import Self, TypeAlias
@@ -26,6 +27,9 @@ BLANK_CHOICE_DASH: list[tuple[str, str]]
 
 _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
+_Choices: TypeAlias = (
+    _ChoicesSequence | _ChoicesMapping | type[Choices] | Callable[[], _ChoicesSequence | _ChoicesMapping]
+)
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
@@ -151,6 +155,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
     non_db_attrs: tuple[str, ...]
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -265,6 +270,7 @@ class DecimalField(Field[_ST, _GT]):
     # attributes
     max_digits: int
     decimal_places: int
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -296,6 +302,7 @@ class CharField(Field[_ST, _GT]):
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -395,6 +402,7 @@ class TextField(Field[_ST, _GT]):
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = ...,
@@ -445,6 +453,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
     default_error_messages: _ErrorMessagesDict
     unpack_ipv4: bool
     protocol: str
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -478,6 +487,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -510,6 +520,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -545,6 +556,7 @@ class UUIDField(Field[_ST, _GT]):
     _pyi_private_set_type: str | uuid.UUID
     _pyi_private_get_type: uuid.UUID
     _pyi_lookup_exact_type: uuid.UUID | str
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -580,6 +592,7 @@ class FilePathField(Field[_ST, _GT]):
     recursive: bool
     allow_files: bool
     allow_folders: bool
+
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -618,6 +631,7 @@ class DurationField(Field[_ST, _GT]):
 
 class AutoFieldMixin:
     db_returning: bool
+
     def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
 
 class AutoFieldMeta(type): ...
