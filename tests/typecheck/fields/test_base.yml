@@ -171,7 +171,7 @@
             message = models.BinaryField()
         obj = EncodedMessage(b'\x010')
 
-        reveal_type(obj.message) # N: Revealed type is "Union[builtins.bytes, builtins.memoryview]"
+        reveal_type(obj.message) # N: Revealed type is "Union[builtins.bytes, builtins.memoryview[builtins.int]]"
 
 -  case: test_small_auto_field_class_presents_as_int
    main: |
