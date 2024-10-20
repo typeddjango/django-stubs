@@ -275,7 +275,12 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     fields_dict = None
     if field_types is not None:
-        fields_dict = helpers.make_typeddict(api, fields=field_types, required_keys=set(field_types.keys()))
+        fields_dict = helpers.make_typeddict(
+            api,
+            fields=field_types,
+            required_keys=set(field_types.keys()),
+            readonly_keys=set(),
+        )
 
     if fields_dict is not None:
         annotated_type = get_annotated_type(api, model_type, fields_dict=fields_dict)
@@ -349,5 +354,5 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
         column_types[field_lookup] = field_lookup_type
 
-    row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()))
+    row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
     return helpers.reparametrize_instance(default_return_type, [model_type, row_type])

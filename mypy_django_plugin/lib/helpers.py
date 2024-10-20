@@ -396,13 +396,21 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 
 
 def make_typeddict(
-    api: Union[SemanticAnalyzer, CheckerPluginInterface], fields: Dict[str, MypyType], required_keys: Set[str]
+    api: Union[SemanticAnalyzer, CheckerPluginInterface],
+    fields: Dict[str, MypyType],
+    required_keys: Set[str],
+    readonly_keys: Set[str],
 ) -> TypedDictType:
     if isinstance(api, CheckerPluginInterface):
         fallback_type = api.named_generic_type("typing._TypedDict", [])
     else:
         fallback_type = api.named_type("typing._TypedDict", [])
-    typed_dict_type = TypedDictType(fields, required_keys=required_keys, fallback=fallback_type)
+    typed_dict_type = TypedDictType(
+        fields,
+        required_keys=required_keys,
+        readonly_keys=readonly_keys,
+        fallback=fallback_type,
+    )
     return typed_dict_type
 
 
