@@ -368,6 +368,7 @@
     qs.filter(annotate_wrong__gt=5)
 
     qs2 = qs.alias(alias_entries=models.Count("entry"))
+    qs2.filter(alias_entries__gt=5)
     qs2.filter(alias_wrong__gt=5, annotate_wrong__gt=5)
 
     Blog.objects.annotate().filter(xyz=1)
@@ -378,10 +379,10 @@
     )
   out: |
     main:6: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz  [misc]
-    main:9: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz  [misc]
-    main:9: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz  [misc]
-    main:11: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
-    main:13: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:10: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:10: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:12: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:14: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
   installed_apps:
     - myapp
   files:
