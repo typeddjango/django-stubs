@@ -6,9 +6,6 @@ django.conf.global_settings.gettext_noop
 django.conf.urls.url
 django.contrib.admin.FieldListFilter.title
 django.contrib.admin.ModelAdmin
-django.contrib.admin.ModelAdmin.log_addition
-django.contrib.admin.ModelAdmin.log_change
-django.contrib.admin.ModelAdmin.log_deletion
 django.contrib.admin.StackedInline
 django.contrib.admin.TabularInline
 django.contrib.admin.action
@@ -42,9 +39,6 @@ django.contrib.admin.options.InlineModelAdmin
 django.contrib.admin.options.InlineModelAdmin.model
 django.contrib.admin.options.InlineModelAdmin.template
 django.contrib.admin.options.ModelAdmin
-django.contrib.admin.options.ModelAdmin.log_addition
-django.contrib.admin.options.ModelAdmin.log_change
-django.contrib.admin.options.ModelAdmin.log_deletion
 django.contrib.admin.options.StackedInline
 django.contrib.admin.options.TabularInline
 django.contrib.admin.site
@@ -176,9 +170,6 @@ django.contrib.flatpages.models.FlatPage.url
 django.contrib.gis.admin.GISModelAdmin
 django.contrib.gis.admin.GISModelAdmin.gis_widget
 django.contrib.gis.admin.ModelAdmin
-django.contrib.gis.admin.ModelAdmin.log_addition
-django.contrib.gis.admin.ModelAdmin.log_change
-django.contrib.gis.admin.ModelAdmin.log_deletion
 django.contrib.gis.admin.StackedInline
 django.contrib.gis.admin.TabularInline
 django.contrib.gis.admin.action
