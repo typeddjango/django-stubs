@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from typing import Any
 
+FUNCTION_TYPES: tuple[type, ...]
+
 class BaseSerializer:
     value: Any
     def __init__(self, value: Any) -> None: ...
