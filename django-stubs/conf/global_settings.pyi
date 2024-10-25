@@ -176,9 +176,6 @@ SECRET_KEY: str | bytes
 # are used to allow rotation of the SECRET_KEY.
 SECRET_KEY_FALLBACKS: list[str | bytes]
 
-# Default file storage mechanism that holds media.
-DEFAULT_FILE_STORAGE: str
-
 STORAGES: dict[str, dict[str, Any]]
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
@@ -486,9 +483,6 @@ FIXTURE_DIRS: list[str]
 
 # A list of locations of additional static files
 STATICFILES_DIRS: list[str]
-
-# The default file storage backend used during the build process
-STATICFILES_STORAGE: str
 
 # List of finder classes that know how to find static files in
 # various locations.

@@ -3,8 +3,6 @@
 # Only discrepancies that appeared after Django 5.0 -> 5.1 update.
 # Unsorted: there are real problems and things we can really ignore:
 
-django.conf.global_settings.DEFAULT_FILE_STORAGE
-django.conf.global_settings.STATICFILES_STORAGE
 django.contrib.admin.ModelAdmin.log_deletions
 django.contrib.admin.helpers.Fieldset.is_collapsible
 django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
