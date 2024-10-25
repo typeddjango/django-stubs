@@ -190,7 +190,6 @@ django.db.migrations.operations.models.RenameModel.category
 django.db.migrations.operations.special.RunPython.category
 django.db.migrations.operations.special.RunSQL.category
 django.db.migrations.operations.special.SeparateDatabaseAndState.category
-django.db.migrations.serializer.FUNCTION_TYPES
 django.db.models.CharField.slice_expression
 django.db.models.CheckConstraint.__init__
 django.db.models.Field.slice_expression
