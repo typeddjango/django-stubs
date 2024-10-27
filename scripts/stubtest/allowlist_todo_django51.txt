@@ -6,7 +6,6 @@
 django.contrib.admin.ModelAdmin.log_deletions
 django.contrib.admin.helpers.Fieldset.is_collapsible
 django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
-django.contrib.admin.models.LogEntryManager.log_actions
 django.contrib.admin.options.ModelAdmin.log_deletions
 django.contrib.auth.base_user.BaseUserManager.make_random_password
 django.contrib.auth.checks.check_middleware

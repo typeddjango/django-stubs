@@ -2,6 +2,7 @@ from typing import Any, ClassVar
 from uuid import UUID
 
 from django.db import models
+from django.db.models import QuerySet
 from django.db.models.base import Model
 
 ADDITION: int
@@ -19,6 +20,15 @@ class LogEntryManager(models.Manager[LogEntry]):
         action_flag: int,
         change_message: Any = ...,
     ) -> LogEntry: ...
+    def log_actions(
+        self,
+        user_id: int,
+        queryset: QuerySet[Model],
+        action_flag: int,
+        change_message: str | list[Any] = "",
+        *,
+        single_object: bool = False,
+    ) -> LogEntry | list[LogEntry]: ...
 
 class LogEntry(models.Model):
     action_time: models.DateTimeField
