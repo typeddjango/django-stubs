@@ -2,7 +2,7 @@ from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from enum import Enum
 from logging import Logger
 from re import Pattern
-from typing import Any
+from typing import Any, cast
 
 from django.template.context import Context as Context  # Django: imported for backwards compatibility
 from django.template.engine import Engine
@@ -26,10 +26,10 @@ tag_re: Pattern[str]
 logger: Logger
 
 class TokenType(Enum):
-    TEXT: int
-    VAR: int
-    BLOCK: int
-    COMMENT: int
+    TEXT = cast(int, ...)
+    VAR = cast(int, ...)
+    BLOCK = cast(int, ...)
+    COMMENT = cast(int, ...)
 
 class VariableDoesNotExist(Exception):
     msg: str

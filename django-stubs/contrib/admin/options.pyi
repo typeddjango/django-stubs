@@ -1,6 +1,6 @@
 import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar, type_check_only
+from typing import Any, Generic, Literal, TypeVar, cast, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -45,9 +45,9 @@ VERTICAL: Literal[2]
 _Direction: TypeAlias = Literal[1, 2]
 
 class ShowFacets(enum.Enum):
-    NEVER: str
-    ALLOW: str
-    ALWAYS: str
+    NEVER = cast(str, ...)
+    ALLOW = cast(str, ...)
+    ALWAYS = cast(str, ...)
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
