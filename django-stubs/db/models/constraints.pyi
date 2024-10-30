@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from enum import Enum
-from typing import Any, overload, cast
+from typing import Any, cast, overload
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.base import Model
