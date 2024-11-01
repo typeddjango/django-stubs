@@ -68,6 +68,9 @@ We rely on different `django` and `mypy` versions:
 | 1.15.0         | 1.0.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
 | 1.14.0         | 0.990+       | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
 
+What "partial" support means, and why we don't pin to the exact Django/mypy version, is explained in
+https://github.com/typeddjango/django-stubs/discussions/2101#discussioncomment-9276632.
+
 ## Features
 
 ### Type checking of Model Meta attributes
