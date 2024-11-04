@@ -63,7 +63,7 @@ def get_field_type_from_lookup(
     silent_on_error: bool = False,
 ) -> Optional[MypyType]:
     try:
-        lookup_field = django_context.resolve_lookup_into_field(model_cls, lookup)
+        lookup_field, model_cls = django_context.resolve_lookup_into_field(model_cls, lookup)
     except FieldError as exc:
         if not silent_on_error:
             ctx.api.fail(exc.args[0], ctx.context)

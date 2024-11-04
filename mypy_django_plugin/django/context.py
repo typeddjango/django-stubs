@@ -409,7 +409,7 @@ class DjangoContext:
 
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: Type[Model]
-    ) -> Union["Field[Any, Any]", ForeignObjectRel]:
+    ) -> Tuple[Union["Field[Any, Any]", ForeignObjectRel], Type[Model]]:
         currently_observed_model = model_cls
         field: Union[Field[Any, Any], ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
@@ -429,7 +429,7 @@ class DjangoContext:
 
         # Guaranteed by `query.solve_lookup_type` before.
         assert isinstance(field, (Field, ForeignObjectRel))
-        return field
+        return field, currently_observed_model
 
     def solve_lookup_type(
         self, model_cls: Type[Model], lookup: str
@@ -467,10 +467,10 @@ class DjangoContext:
 
     def resolve_lookup_into_field(
         self, model_cls: Type[Model], lookup: str
-    ) -> Union["Field[Any, Any]", ForeignObjectRel, None]:
+    ) -> Tuple[Union["Field[Any, Any]", ForeignObjectRel, None], Type[Model]]:
         solved_lookup = self.solve_lookup_type(model_cls, lookup)
         if solved_lookup is None:
-            return None
+            return None, model_cls
         lookup_parts, field_parts, is_expression = solved_lookup
         if lookup_parts:
             raise LookupsAreUnsupported()
@@ -501,7 +501,7 @@ class DjangoContext:
         if is_expression:
             return AnyType(TypeOfAny.explicit)
 
-        field = self._resolve_field_from_parts(field_parts, model_cls)
+        field, _ = self._resolve_field_from_parts(field_parts, model_cls)
 
         lookup_cls = None
         if lookup_parts:

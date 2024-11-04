@@ -1,6 +1,7 @@
 *.egg-info
 .DS_Store
 .idea/
+.vscode/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
