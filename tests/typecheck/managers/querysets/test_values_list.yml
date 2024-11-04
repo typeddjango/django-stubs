@@ -325,7 +325,7 @@
 -   case: handles_field_with_same_name_on_other_model
     main: |
         from myapp.models import A
-        reveal_type(A.objects.values_list("b__name").get())  # N: Revealed type is "Tuple[builtins.str]"
+        reveal_type(A.objects.values_list("name", "b__name").get())  # N: Revealed type is "Tuple[builtins.int, builtins.str]"
     installed_apps:
         - myapp
     files:
@@ -339,4 +339,4 @@
 
                 class A(models.Model):
                     b = models.ForeignKey(B, on_delete=models.CASCADE)
-                    name = models.CharField(null=True)
+                    name = models.IntegerField()
