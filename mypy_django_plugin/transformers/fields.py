@@ -237,7 +237,10 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
     assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if outer_model_info is None or not helpers.is_model_type(outer_model_info):
+    if outer_model_info is None or (
+        not helpers.is_model_type(outer_model_info)
+        and not helpers.is_registered_model_type(outer_model_info, django_context)
+    ):
         return ctx.default_return_type
 
     assert isinstance(outer_model_info, TypeInfo)

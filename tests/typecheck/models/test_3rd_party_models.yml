@@ -1,8 +1,15 @@
 -   case: handles_type_annotations_on_3rd_party_models
+    installed_apps:
+        - django_extensions
+        - myapp
     main: |
-        from django.db import models
-        from django_extensions.db.models import TimeStampedModel # type: ignore [import-untyped]
+        from myapp.models import A
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django_extensions.db.models import TimeStampedModel # type: ignore[import-untyped]
 
-        class A(TimeStampedModel):
-            name = models.CharField()
-            count = models.IntegerField()
+                class A(TimeStampedModel):
+                    name = models.CharField()

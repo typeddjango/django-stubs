@@ -526,6 +526,10 @@ def is_model_type(info: TypeInfo) -> bool:
     return info.metaclass_type is not None and info.metaclass_type.type.has_base(fullnames.MODEL_METACLASS_FULLNAME)
 
 
+def is_registered_model_type(info: TypeInfo, django_context: "DjangoContext") -> bool:
+    return info.fullname in {get_class_fullname(cls) for cls in django_context.all_registered_model_classes}
+
+
 def get_model_from_expression(
     expr: Expression,
     *,
