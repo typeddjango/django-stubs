@@ -7,14 +7,13 @@ from uuid import UUID
 from _typeshed import Unused
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.db.models.base import Model
 from django.db.models.deletion import Collector
 from django.db.models.fields import Field, reverse_related
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
-from django.forms.forms import BaseForm
+from django.forms.forms import BaseForm, Form
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
@@ -100,5 +99,5 @@ def get_model_from_relation(field: Field | reverse_related.ForeignObjectRel) -> 
 def reverse_field_path(model: type[Model], path: str) -> tuple[type[Model], str]: ...
 def get_fields_from_path(model: type[Model], path: str) -> list[Field]: ...
 def construct_change_message(
-    form: AdminPasswordChangeForm, formsets: Iterable[BaseFormSet], add: bool
+    form: Form, formsets: Iterable[BaseFormSet], add: bool
 ) -> list[dict[str, dict[str, list[str]]]]: ...
