@@ -21,6 +21,7 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> LogEntry: ...
 
 class LogEntry(models.Model):
+    # Note: do not create `class Meta` here.
     action_time: models.DateTimeField
     user: models.ForeignKey
     content_type: models.ForeignKey
