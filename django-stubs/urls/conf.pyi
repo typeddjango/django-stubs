@@ -1,6 +1,6 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Coroutine, Sequence
 from types import ModuleType
-from typing import Any, Coroutine, overload
+from typing import Any, overload
 
 from django.urls import URLPattern, URLResolver, _AnyURL
 from django.utils.functional import _StrOrPromise

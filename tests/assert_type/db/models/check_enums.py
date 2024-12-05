@@ -1,4 +1,4 @@
-from typing import List, Literal, Tuple
+from typing import Literal
 
 from django.db.models import IntegerChoices, TextChoices
 from django.utils.translation import gettext_lazy as _
@@ -40,7 +40,7 @@ assert_type(MyTextChoices.A.value, str)
 
 # Assertions related to the metaclass:
 
-assert_type(MyIntegerChoices.values, List[int])
-assert_type(MyIntegerChoices.choices, List[Tuple[int, str]])
-assert_type(MyTextChoices.values, List[str])
-assert_type(MyTextChoices.choices, List[Tuple[str, str]])
+assert_type(MyIntegerChoices.values, list[int])
+assert_type(MyIntegerChoices.choices, list[tuple[int, str]])
+assert_type(MyTextChoices.values, list[str])
+assert_type(MyTextChoices.choices, list[tuple[str, str]])

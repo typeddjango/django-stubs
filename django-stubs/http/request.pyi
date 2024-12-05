@@ -1,8 +1,8 @@
 import datetime
-from collections.abc import Iterable, Mapping
+from collections.abc import Awaitable, Iterable, Mapping
 from io import BytesIO
 from re import Pattern
-from typing import Any, Awaitable, BinaryIO, Callable, Literal, NoReturn, TypeVar, overload, type_check_only
+from typing import Any, BinaryIO, Callable, Literal, NoReturn, TypeVar, overload, type_check_only
 
 from django.contrib.auth.base_user import _UserModel
 from django.contrib.auth.models import AnonymousUser

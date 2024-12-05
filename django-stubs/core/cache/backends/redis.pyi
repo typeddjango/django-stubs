@@ -1,6 +1,6 @@
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from datetime import timedelta
-from typing import Any, Callable, Iterable, Protocol, SupportsInt, overload, type_check_only
+from typing import Any, Callable, Protocol, SupportsInt, overload, type_check_only
 
 from _typeshed import ReadableBuffer
 from django.core.cache.backends.base import BaseCache

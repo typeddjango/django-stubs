@@ -1,5 +1,6 @@
 import json
-from typing import Any, Callable, Sequence
+from collections.abc import Sequence
+from typing import Any, Callable
 
 from django.contrib.messages.storage.base import BaseStorage
 

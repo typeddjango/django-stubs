@@ -1,8 +1,9 @@
 import os
 import tempfile
 import uuid
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator, List, Optional
+from typing import Any, Optional
 from unittest import mock
 
 import pytest
@@ -65,7 +66,7 @@ def write_to_file(file_contents: str, suffix: Optional[str] = None) -> Generator
         ),
     ],
 )
-def test_misconfiguration_handling(capsys: Any, config_file_contents: List[str], message_part: str) -> None:
+def test_misconfiguration_handling(capsys: Any, config_file_contents: list[str], message_part: str) -> None:
     """Invalid configuration raises `SystemExit` with a precise error message."""
     contents = "\n".join(config_file_contents).expandtabs(4)
     with write_to_file(contents) as filename:
