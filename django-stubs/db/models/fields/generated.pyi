@@ -1,4 +1,5 @@
-from typing import Any, ClassVar, Iterable, Literal
+from collections.abc import Iterable
+from typing import Any, ClassVar, Literal
 
 from django.core.validators import _ValidatorCallable
 from django.db import models

@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Literal, Optional, Set, Union, cast
+from collections.abc import Iterable, Iterator
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Set, Union, cast
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField

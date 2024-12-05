@@ -1,6 +1,7 @@
 import builtins
+from collections.abc import Iterable
 from contextlib import suppress
-from typing import Iterable, List, Optional, Protocol
+from typing import List, Optional, Protocol
 
 import pytest
 from _pytest.fixtures import FixtureRequest

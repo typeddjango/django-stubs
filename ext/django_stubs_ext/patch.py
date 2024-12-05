@@ -1,5 +1,6 @@
 import builtins
-from typing import Any, Generic, Iterable, List, Optional, Tuple, Type, TypeVar
+from collections.abc import Iterable
+from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
 
 from django import VERSION
 from django.contrib.admin import ModelAdmin

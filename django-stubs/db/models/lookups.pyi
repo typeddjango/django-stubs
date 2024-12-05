@@ -1,5 +1,5 @@
-from collections.abc import Iterable
-from typing import Any, Generic, Literal, Sequence, TypeVar
+from collections.abc import Iterable, Sequence
+from typing import Any, Generic, Literal, TypeVar
 
 from django.core.exceptions import EmptyResultSet
 from django.db.backends.base.base import BaseDatabaseWrapper

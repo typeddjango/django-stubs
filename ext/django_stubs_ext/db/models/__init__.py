@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import ClassVar, List, Literal, Sequence, Tuple, Union
+    from collections.abc import Sequence
+    from typing import ClassVar, List, Literal, Tuple, Union
 
     from django.db.models import BaseConstraint, Index, OrderBy
 

@@ -1,23 +1,10 @@
 import os
 import sys
 from collections import defaultdict
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from functools import cached_property
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterable,
-    Iterator,
-    Literal,
-    Mapping,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Set, Tuple, Type, Union
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models

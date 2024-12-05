@@ -1,8 +1,9 @@
 import os
 import tempfile
 import uuid
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator, List, Optional
+from typing import Any, List, Optional
 from unittest import mock
 
 import pytest
