@@ -4,7 +4,7 @@ import sys
 import textwrap
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Dict, NoReturn, Optional
+from typing import Any, Callable, NoReturn, Optional
 
 if sys.version_info[:2] >= (3, 11):
     import tomllib
@@ -79,7 +79,7 @@ class DjangoPluginConfig:
             toml_exit(COULD_NOT_LOAD_FILE)
 
         try:
-            config: Dict[str, Any] = data["tool"]["django-stubs"]
+            config: dict[str, Any] = data["tool"]["django-stubs"]
         except KeyError:
             toml_exit(MISSING_SECTION.format(section="tool.django-stubs"))
 
@@ -123,7 +123,7 @@ class DjangoPluginConfig:
         except ValueError:
             exit_with_error(INVALID_BOOL_SETTING.format(key="strict_settings"))
 
-    def to_json(self, extra_data: Dict[str, Any]) -> Dict[str, Any]:
+    def to_json(self, extra_data: dict[str, Any]) -> dict[str, Any]:
         """We use this method to reset mypy cache via `report_config_data` hook."""
         return {
             "django_settings_module": self.django_settings_module,

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from typing import Any
@@ -14,11 +14,11 @@ if TYPE_CHECKING:
         Django documentation: https://docs.djangoproject.com/en/stable/topics/db/multi-db/#automatic-database-routing
         """
 
-        def db_for_read(self, model: Type[Model], **hints: Any) -> Optional[str]: ...
+        def db_for_read(self, model: type[Model], **hints: Any) -> Optional[str]: ...
 
-        def db_for_write(self, model: Type[Model], **hints: Any) -> Optional[str]: ...
+        def db_for_write(self, model: type[Model], **hints: Any) -> Optional[str]: ...
 
-        def allow_relation(self, obj1: Type[Model], obj2: Type[Model], **hints: Any) -> Optional[bool]: ...
+        def allow_relation(self, obj1: type[Model], obj2: type[Model], **hints: Any) -> Optional[bool]: ...
 
         def allow_migrate(
             self, db: str, app_label: str, model_name: Optional[str] = None, **hints: Any

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Type, Union
+from typing import Union
 
 from django.db.models.base import Model
 from mypy.plugin import FunctionContext, MethodContext
@@ -10,8 +10,8 @@ from mypy_django_plugin.lib import helpers
 
 
 def get_actual_types(
-    ctx: Union[MethodContext, FunctionContext], expected_keys: List[str]
-) -> List[Tuple[str, MypyType]]:
+    ctx: Union[MethodContext, FunctionContext], expected_keys: list[str]
+) -> list[tuple[str, MypyType]]:
     actual_types = []
     # positionals
     for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
@@ -32,7 +32,7 @@ def get_actual_types(
 
 
 def typecheck_model_method(
-    ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext, model_cls: Type[Model], method: str
+    ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext, model_cls: type[Model], method: str
 ) -> MypyType:
     typechecker_api = helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)

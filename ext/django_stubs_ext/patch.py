@@ -1,6 +1,6 @@
 import builtins
 from collections.abc import Iterable
-from typing import Any, Generic, List, Optional, Tuple, Type, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 from django import VERSION
 from django.contrib.admin import ModelAdmin
@@ -27,7 +27,7 @@ from django.views.generic.list import MultipleObjectMixin
 __all__ = ["monkeypatch"]
 
 _T = TypeVar("_T")
-_VersionSpec = Tuple[int, int]
+_VersionSpec = tuple[int, int]
 
 
 class MPGeneric(Generic[_T]):
@@ -40,7 +40,7 @@ class MPGeneric(Generic[_T]):
     possible issues we may run into with this method.
     """
 
-    def __init__(self, cls: Type[_T], version: Optional[_VersionSpec] = None) -> None:
+    def __init__(self, cls: type[_T], version: Optional[_VersionSpec] = None) -> None:
         """Set the data fields, basic constructor."""
         self.version = version
         self.cls = cls
@@ -53,7 +53,7 @@ class MPGeneric(Generic[_T]):
 # certain django classes need to be generic, but lack the __class_getitem__ dunder needed to
 # annotate them: https://github.com/typeddjango/django-stubs/issues/507
 # this list stores them so `monkeypatch` can fix them when called
-_need_generic: List[MPGeneric[Any]] = [
+_need_generic: list[MPGeneric[Any]] = [
     MPGeneric(ModelAdmin),
     MPGeneric(SingleObjectMixin),
     MPGeneric(FormMixin),

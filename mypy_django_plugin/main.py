@@ -1,7 +1,7 @@
 import itertools
 import sys
 from functools import cached_property, partial
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Callable, Optional
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
@@ -70,7 +70,7 @@ class NewSemanalDjangoPlugin(Plugin):
         sys.path.extend(options.mypy_path)
         self.django_context = DjangoContext(self.plugin_config.django_settings_module)
 
-    def _get_current_queryset_bases(self) -> Dict[str, int]:
+    def _get_current_queryset_bases(self) -> dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
             bases = helpers.get_django_metadata_bases(model_sym.node, "queryset_bases")
@@ -79,7 +79,7 @@ class NewSemanalDjangoPlugin(Plugin):
         else:
             return {}
 
-    def _get_current_form_bases(self) -> Dict[str, int]:
+    def _get_current_form_bases(self) -> dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
             bases = helpers.get_django_metadata_bases(model_sym.node, "baseform_bases")
@@ -96,11 +96,11 @@ class NewSemanalDjangoPlugin(Plugin):
             return sym.node
         return None
 
-    def _new_dependency(self, module: str, priority: int = PRI_MYPY) -> Tuple[int, str, int]:
+    def _new_dependency(self, module: str, priority: int = PRI_MYPY) -> tuple[int, str, int]:
         fake_lineno = -1
         return (priority, module, fake_lineno)
 
-    def get_additional_deps(self, file: MypyFile) -> List[Tuple[int, str, int]]:
+    def get_additional_deps(self, file: MypyFile) -> list[tuple[int, str, int]]:
         # for settings
         if file.fullname == "django.conf" and self.django_context.django_settings_module:
             return [self._new_dependency(self.django_context.django_settings_module, PRI_MED)]
@@ -162,7 +162,7 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     @cached_property
-    def manager_and_queryset_method_hooks(self) -> Dict[str, Callable[[MethodContext], MypyType]]:
+    def manager_and_queryset_method_hooks(self) -> dict[str, Callable[[MethodContext], MypyType]]:
         typecheck_filtering_method = partial(orm_lookups.typecheck_queryset_filter, django_context=self.django_context)
         return {
             "values": partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context),
@@ -305,7 +305,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 return create_new_manager_class_from_from_queryset_method
         return None
 
-    def report_config_data(self, ctx: ReportConfigContext) -> Dict[str, Any]:
+    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {}
         # In all places we use '_UserModel' alias as a type we want to clear cache if
@@ -315,5 +315,5 @@ class NewSemanalDjangoPlugin(Plugin):
         return self.plugin_config.to_json(extra_data)
 
 
-def plugin(version: str) -> Type[NewSemanalDjangoPlugin]:
+def plugin(version: str) -> type[NewSemanalDjangoPlugin]:
     return NewSemanalDjangoPlugin

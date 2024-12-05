@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -51,7 +51,7 @@ def temp_environ() -> Iterator[None]:
         os.environ.update(environ)
 
 
-def initialize_django(settings_module: str) -> Tuple["Apps", "LazySettings"]:
+def initialize_django(settings_module: str) -> tuple["Apps", "LazySettings"]:
     with temp_environ():
         os.environ["DJANGO_SETTINGS_MODULE"] = settings_module
 
@@ -119,9 +119,9 @@ class DjangoContext:
         self.settings = settings
 
     @cached_property
-    def model_modules(self) -> Dict[str, Dict[str, Type[Model]]]:
+    def model_modules(self) -> dict[str, dict[str, type[Model]]]:
         """All modules that contain Django models."""
-        modules: Dict[str, Dict[str, Type[Model]]] = defaultdict(dict)
+        modules: dict[str, dict[str, type[Model]]] = defaultdict(dict)
         for concrete_model_cls in self.apps_registry.get_models(include_auto_created=True, include_swapped=True):
             modules[concrete_model_cls.__module__][concrete_model_cls.__name__] = concrete_model_cls
             # collect abstract=True models
@@ -130,28 +130,28 @@ class DjangoContext:
                     modules[model_cls.__module__][model_cls.__name__] = model_cls
         return modules
 
-    def get_model_class_by_fullname(self, fullname: str) -> Optional[Type[Model]]:
+    def get_model_class_by_fullname(self, fullname: str) -> Optional[type[Model]]:
         """Returns None if Model is abstract"""
         module, _, model_cls_name = fullname.rpartition(".")
         return self.model_modules.get(module, {}).get(model_cls_name)
 
-    def get_model_fields(self, model_cls: Type[Model]) -> Iterator["Field[Any, Any]"]:
+    def get_model_fields(self, model_cls: type[Model]) -> Iterator["Field[Any, Any]"]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 yield field
 
-    def get_model_foreign_keys(self, model_cls: Type[Model]) -> Iterator["ForeignKey[Any, Any]"]:
+    def get_model_foreign_keys(self, model_cls: type[Model]) -> Iterator["ForeignKey[Any, Any]"]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignKey):
                 yield field
 
-    def get_model_related_fields(self, model_cls: Type[Model]) -> Iterator["RelatedField[Any, Any]"]:
+    def get_model_related_fields(self, model_cls: type[Model]) -> Iterator["RelatedField[Any, Any]"]:
         """Get model forward relations"""
         for field in model_cls._meta.get_fields():
             if isinstance(field, RelatedField):
                 yield field
 
-    def get_model_relations(self, model_cls: Type[Model]) -> Iterator[ForeignObjectRel]:
+    def get_model_relations(self, model_cls: type[Model]) -> Iterator[ForeignObjectRel]:
         """Get model reverse relations"""
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignObjectRel):
@@ -178,7 +178,7 @@ class DjangoContext:
         return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
     def get_related_target_field(
-        self, related_model_cls: Type[Model], field: "ForeignKey[Any, Any]"
+        self, related_model_cls: type[Model], field: "ForeignKey[Any, Any]"
     ) -> "Optional[Field[Any, Any]]":
         # ForeginKey only supports one `to_fields` item (ForeignObject supports many)
         assert len(field.to_fields) == 1
@@ -191,14 +191,14 @@ class DjangoContext:
         else:
             return self.get_primary_key_field(related_model_cls)
 
-    def get_primary_key_field(self, model_cls: Type[Model]) -> "Field[Any, Any]":
+    def get_primary_key_field(self, model_cls: type[Model]) -> "Field[Any, Any]":
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 if field.primary_key:
                     return field
         raise ValueError("No primary key defined")
 
-    def get_expected_types(self, api: TypeChecker, model_cls: Type[Model], *, method: str) -> Dict[str, MypyType]:
+    def get_expected_types(self, api: TypeChecker, model_cls: type[Model], *, method: str) -> dict[str, MypyType]:
         contenttypes_in_apps = self.apps_registry.is_installed("django.contrib.contenttypes")
         if contenttypes_in_apps:
             from django.contrib.contenttypes.fields import GenericForeignKey
@@ -271,7 +271,7 @@ class DjangoContext:
         return expected_types
 
     @cached_property
-    def all_registered_model_classes(self) -> Set[Type[models.Model]]:
+    def all_registered_model_classes(self) -> set[type[models.Model]]:
         model_classes = self.apps_registry.get_models()
 
         all_model_bases = set()
@@ -367,7 +367,7 @@ class DjangoContext:
         else:
             return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
-    def get_field_related_model_cls(self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]) -> Type[Model]:
+    def get_field_related_model_cls(self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]) -> type[Model]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:
@@ -395,8 +395,8 @@ class DjangoContext:
         return related_model_cls
 
     def _resolve_field_from_parts(
-        self, field_parts: Iterable[str], model_cls: Type[Model]
-    ) -> Tuple[Union["Field[Any, Any]", ForeignObjectRel], Type[Model]]:
+        self, field_parts: Iterable[str], model_cls: type[Model]
+    ) -> tuple[Union["Field[Any, Any]", ForeignObjectRel], type[Model]]:
         currently_observed_model = model_cls
         field: Union[Field[Any, Any], ForeignObjectRel, GenericForeignKey, None] = None
         for field_part in field_parts:
@@ -419,8 +419,8 @@ class DjangoContext:
         return field, currently_observed_model
 
     def solve_lookup_type(
-        self, model_cls: Type[Model], lookup: str
-    ) -> Optional[Tuple[Sequence[str], Sequence[str], Union[Expression, Literal[False]]]]:
+        self, model_cls: type[Model], lookup: str
+    ) -> Optional[tuple[Sequence[str], Sequence[str], Union[Expression, Literal[False]]]]:
         query = Query(model_cls)
         if (lookup == "pk" or lookup.startswith("pk__")) and query.get_meta().pk is None:
             # Primary key lookup when no primary key field is found, model is presumably
@@ -453,8 +453,8 @@ class DjangoContext:
         return sub_query[0], entire_query_parts, sub_query[2]
 
     def resolve_lookup_into_field(
-        self, model_cls: Type[Model], lookup: str
-    ) -> Tuple[Union["Field[Any, Any]", ForeignObjectRel, None], Type[Model]]:
+        self, model_cls: type[Model], lookup: str
+    ) -> tuple[Union["Field[Any, Any]", ForeignObjectRel, None], type[Model]]:
         solved_lookup = self.solve_lookup_type(model_cls, lookup)
         if solved_lookup is None:
             return None, model_cls
@@ -464,7 +464,7 @@ class DjangoContext:
         return self._resolve_field_from_parts(field_parts, model_cls)
 
     def resolve_lookup_expected_type(
-        self, ctx: MethodContext, model_cls: Type[Model], lookup: str, model_instance: Instance
+        self, ctx: MethodContext, model_cls: type[Model], lookup: str, model_instance: Instance
     ) -> MypyType:
         try:
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
