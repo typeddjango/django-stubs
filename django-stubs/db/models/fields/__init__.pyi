@@ -26,6 +26,7 @@ BLANK_CHOICE_DASH: list[tuple[str, str]]
 
 _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
+_LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
@@ -39,7 +40,7 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _LimitChoicesToCallable | _ChoicesCallable  # noqa: PYI047
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
