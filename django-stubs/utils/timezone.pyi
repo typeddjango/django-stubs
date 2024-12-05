@@ -1,4 +1,4 @@
-import zoneinfo  # type: ignore[import-not-found,unused-ignore]
+import zoneinfo
 from contextlib import ContextDecorator
 from datetime import date, datetime, time, timedelta, timezone, tzinfo
 from types import TracebackType
