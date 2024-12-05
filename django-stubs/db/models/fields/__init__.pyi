@@ -30,6 +30,7 @@ _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 _Choices: TypeAlias = (
     _ChoicesSequence | _ChoicesMapping | type[Choices] | Callable[[], _ChoicesSequence | _ChoicesMapping]
 )
+_LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
@@ -43,7 +44,7 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _LimitChoicesToCallable | _ChoicesCallable  # noqa: PYI047
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
