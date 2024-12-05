@@ -11,6 +11,7 @@ from django.utils.safestring import SafeData, SafeString
 
 VOID_ELEMENTS: frozenset[str]
 MAX_URL_LENGTH: int
+MAX_STRIP_TAGS_DEPTH: int
 
 def escape(text: Any) -> SafeString: ...
 def escapejs(value: Any) -> SafeString: ...
