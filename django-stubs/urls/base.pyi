@@ -1,7 +1,6 @@
 from collections.abc import Callable, Sequence
 from typing import Any, Literal
 
-from django.http.response import HttpResponse
 from django.urls.resolvers import ResolverMatch
 
 def resolve(path: str, urlconf: str | None = ...) -> ResolverMatch: ...
