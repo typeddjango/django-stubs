@@ -46,17 +46,7 @@ django.contrib.gis.db.models.functions.FromWKB.output_field
 django.contrib.gis.db.models.functions.FromWKT.output_field
 django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.forms.RadioSelect.__slotnames__
-django.contrib.gis.gdal.OGRGeometry.centroid
-django.contrib.gis.gdal.OGRGeometry.is_3d
-django.contrib.gis.gdal.OGRGeometry.is_measured
-django.contrib.gis.gdal.OGRGeometry.set_3d
-django.contrib.gis.gdal.OGRGeometry.set_measured
 django.contrib.gis.gdal.geometries.LineString.m
-django.contrib.gis.gdal.geometries.OGRGeometry.centroid
-django.contrib.gis.gdal.geometries.OGRGeometry.is_3d
-django.contrib.gis.gdal.geometries.OGRGeometry.is_measured
-django.contrib.gis.gdal.geometries.OGRGeometry.set_3d
-django.contrib.gis.gdal.geometries.OGRGeometry.set_measured
 django.contrib.gis.gdal.geometries.Point.m
 django.contrib.gis.gdal.prototypes.ds.GDAL_OF_ALL
 django.contrib.gis.gdal.prototypes.ds.GDAL_OF_RASTER
