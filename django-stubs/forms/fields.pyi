@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, Protocol, type_check_only
+from typing import Any, ClassVar, Protocol, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -32,7 +32,7 @@ class Field:
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
     default_validators: list[_ValidatorCallable]
-    default_error_messages: _ErrorMessagesDict
+    default_error_messages: ClassVar[_ErrorMessagesDict]
     empty_values: Sequence[Any]
     show_hidden_initial: bool
     help_text: _StrOrPromise
@@ -547,7 +547,7 @@ class InvalidJSONInput(str): ...
 class JSONString(str): ...
 
 class JSONField(CharField):
-    default_error_messages: _ErrorMessagesDict
+    default_error_messages: ClassVar[_ErrorMessagesDict]
     widget: _ClassLevelWidgetT
     encoder: Any
     decoder: Any

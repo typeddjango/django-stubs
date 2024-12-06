@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Sequence
-from typing import Any, TypeVar
+from typing import Any, ClassVar, TypeVar
 
 from _typeshed import Unused
 from django.core.validators import _ValidatorCallable
@@ -22,7 +22,7 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
     _pyi_private_get_type: list[Any]
 
     empty_strings_allowed: bool
-    default_error_messages: _ErrorMessagesDict
+    default_error_messages: ClassVar[_ErrorMessagesDict]
     base_field: Field
     size: int | None
     default_validators: Sequence[_ValidatorCallable]
