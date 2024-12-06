@@ -4,7 +4,7 @@ from typing import Any, TypeVar, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, deprecated
 
 _Self = TypeVar("_Self")
 
@@ -21,6 +21,7 @@ else:
     class IntEnum(int, ReprEnum): ...
     class StrEnum(str, ReprEnum): ...
 
+@deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
 class ChoicesMeta(EnumType):
     # There's a contradiction between mypy and PYI019 regarding metaclasses. Where mypy
     # disallows 'typing_extensions.Self' on metaclasses, while PYI019 try to enforce

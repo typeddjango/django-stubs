@@ -6,6 +6,7 @@ from .base import Storage
 from .mixins import StorageSettingsMixin
 
 class FileSystemStorage(_Deconstructible, Storage, StorageSettingsMixin):
+    # RemovedInDjango60Warning
     OS_OPEN_FLAGS: int
 
     def __init__(
