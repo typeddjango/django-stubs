@@ -6,7 +6,7 @@ from django.urls.resolvers import ResolverMatch
 
 def resolve(path: str, urlconf: str | None = ...) -> ResolverMatch: ...
 def reverse(
-    viewname: Callable[..., HttpResponse] | str | None,
+    viewname: Callable[..., HttpResponseBase] | str | None,
     urlconf: str | None = ...,
     args: Sequence[Any] | None = ...,
     kwargs: dict[str, Any] | None = ...,
