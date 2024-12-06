@@ -1,5 +1,5 @@
 from collections.abc import Iterator, Mapping, Sequence, Sized
-from typing import Any, Generic, TypeVar
+from typing import Any, ClassVar, Generic, TypeVar
 
 from django.db.models.fields import _ErrorMessagesDict
 from django.forms.forms import BaseForm, Form
@@ -47,7 +47,7 @@ class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
     error_class: type[ErrorList]
     deletion_widget: MediaDefiningClass
     ordering_widget: MediaDefiningClass
-    default_error_messages: _ErrorMessagesDict
+    default_error_messages: ClassVar[_ErrorMessagesDict]
     template_name_div: str
     template_name_p: str
     template_name_table: str
