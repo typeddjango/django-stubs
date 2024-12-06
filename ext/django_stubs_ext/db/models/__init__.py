@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import ClassVar, List, Literal, Sequence, Tuple, Union
+    from collections.abc import Sequence
+    from typing import ClassVar, Literal, Union
 
     from django.db.models import BaseConstraint, Index, OrderBy
 
@@ -27,16 +28,16 @@ if TYPE_CHECKING:
         managed: ClassVar[bool]  # default: True
         order_with_respect_to: ClassVar[str]
         ordering: ClassVar[Sequence[Union[str, OrderBy]]]
-        permissions: ClassVar[List[Tuple[str, str]]]
+        permissions: ClassVar[list[tuple[str, str]]]
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False
-        required_db_features: ClassVar[List[str]]
+        required_db_features: ClassVar[list[str]]
         required_db_vendor: ClassVar[Literal["sqlite", "postgresql", "mysql", "oracle"]]
         select_on_save: ClassVar[bool]  # default: False
-        indexes: ClassVar[List[Index]]
+        indexes: ClassVar[list[Index]]
         unique_together: ClassVar[Union[Sequence[Sequence[str]], Sequence[str]]]
         index_together: ClassVar[Union[Sequence[Sequence[str]], Sequence[str]]]  # Deprecated in Django 4.2
-        constraints: ClassVar[List[BaseConstraint]]
+        constraints: ClassVar[list[BaseConstraint]]
         verbose_name: ClassVar[StrOrPromise]
         verbose_name_plural: ClassVar[StrOrPromise]
 

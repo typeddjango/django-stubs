@@ -1,4 +1,5 @@
-from typing import Any, ClassVar, Iterable, Literal, TypeVar, overload
+from collections.abc import Iterable
+from typing import Any, ClassVar, Literal, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model

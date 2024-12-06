@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, List, Literal, Optional, Set, Union, cast
+from collections.abc import Iterable, Iterator
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -61,13 +62,13 @@ class DjangoTypeMetadata(TypedDict, total=False):
     is_abstract_model: bool
     is_annotated_model: bool
     from_queryset_manager: str
-    reverse_managers: Dict[str, str]
-    baseform_bases: Dict[str, int]
-    manager_bases: Dict[str, int]
-    model_bases: Dict[str, int]
-    queryset_bases: Dict[str, int]
-    m2m_throughs: Dict[str, str]
-    m2m_managers: Dict[str, str]
+    reverse_managers: dict[str, str]
+    baseform_bases: dict[str, int]
+    manager_bases: dict[str, int]
+    model_bases: dict[str, int]
+    queryset_bases: dict[str, int]
+    m2m_throughs: dict[str, str]
+    m2m_managers: dict[str, str]
     manager_to_model: str
 
 
@@ -75,8 +76,8 @@ def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
     return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
 
 
-def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases", "queryset_bases"]) -> Dict[str, int]:
-    return get_django_metadata(model_info).setdefault(key, cast(Dict[str, int], {}))
+def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases", "queryset_bases"]) -> dict[str, int]:
+    return get_django_metadata(model_info).setdefault(key, cast(dict[str, int], {}))
 
 
 def get_reverse_manager_info(
@@ -127,7 +128,7 @@ class IncompleteDefnException(Exception):
     pass
 
 
-def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolTableNode]:
+def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) -> Optional[SymbolTableNode]:
     if "." not in fullname:
         return None
     if "[" in fullname and "]" in fullname:
@@ -140,7 +141,7 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) 
     else:
         module, cls_name = fullname.rsplit(".", 1)
 
-    parent_classes: List[str] = []
+    parent_classes: list[str] = []
     while True:
         module_file = all_modules.get(module)
         if module_file:
@@ -166,7 +167,7 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: Dict[str, MypyFile]) 
     return sym
 
 
-def lookup_fully_qualified_generic(name: str, all_modules: Dict[str, MypyFile]) -> Optional[SymbolNode]:
+def lookup_fully_qualified_generic(name: str, all_modules: dict[str, MypyFile]) -> Optional[SymbolNode]:
     sym = lookup_fully_qualified_sym(name, all_modules)
     if sym is None:
         return None
@@ -189,7 +190,7 @@ def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type]) -> Optional[T
     return field_info
 
 
-def reparametrize_instance(instance: Instance, new_args: List[MypyType]) -> Instance:
+def reparametrize_instance(instance: Instance, new_args: list[MypyType]) -> Instance:
     return Instance(instance.type, args=new_args, line=instance.line, column=instance.column)
 
 
@@ -301,7 +302,7 @@ def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]
     return None
 
 
-def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
+def create_type_info(name: str, module: str, bases: list[Instance]) -> TypeInfo:
     # make new class expression
     classdef = ClassDef(name, Block([]))
     classdef.fullname = module + "." + name
@@ -320,8 +321,8 @@ def create_type_info(name: str, module: str, bases: List[Instance]) -> TypeInfo:
 def add_new_class_for_module(
     module: MypyFile,
     name: str,
-    bases: List[Instance],
-    fields: Optional[Dict[str, MypyType]] = None,
+    bases: list[Instance],
+    fields: Optional[dict[str, MypyType]] = None,
     no_serialize: bool = False,
 ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
@@ -355,7 +356,7 @@ def get_current_module(api: TypeChecker) -> MypyFile:
 
 
 def make_oneoff_named_tuple(
-    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: Optional[List[Instance]] = None
+    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: Optional[list[Instance]] = None
 ) -> TupleType:
     current_module = get_current_module(api)
     if extra_bases is None:
@@ -366,7 +367,7 @@ def make_oneoff_named_tuple(
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
 
-def make_tuple(api: "TypeChecker", fields: List[MypyType]) -> TupleType:
+def make_tuple(api: "TypeChecker", fields: list[MypyType]) -> TupleType:
     # fallback for tuples is any builtins.tuple instance
     fallback = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
     return TupleType(fields, fallback=fallback)
@@ -397,9 +398,9 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 
 def make_typeddict(
     api: Union[SemanticAnalyzer, CheckerPluginInterface],
-    fields: Dict[str, MypyType],
-    required_keys: Set[str],
-    readonly_keys: Set[str],
+    fields: dict[str, MypyType],
+    required_keys: set[str],
+    readonly_keys: set[str],
 ) -> TypedDictType:
     if isinstance(api, CheckerPluginInterface):
         fallback_type = api.named_generic_type("typing._TypedDict", [])

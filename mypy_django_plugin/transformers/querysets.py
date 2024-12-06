@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional, Sequence, Type
+from collections.abc import Sequence
+from typing import Optional
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
@@ -56,14 +57,14 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
 def get_field_type_from_lookup(
     ctx: MethodContext,
     django_context: DjangoContext,
-    model_cls: Type[Model],
+    model_cls: type[Model],
     *,
     method: str,
     lookup: str,
     silent_on_error: bool = False,
 ) -> Optional[MypyType]:
     try:
-        lookup_field = django_context.resolve_lookup_into_field(model_cls, lookup)
+        lookup_field, model_cls = django_context.resolve_lookup_into_field(model_cls, lookup)
     except FieldError as exc:
         if not silent_on_error:
             ctx.api.fail(exc.args[0], ctx.context)
@@ -88,7 +89,7 @@ def get_field_type_from_lookup(
 def get_values_list_row_type(
     ctx: MethodContext,
     django_context: DjangoContext,
-    model_cls: Type[Model],
+    model_cls: type[Model],
     *,
     is_annotated: bool,
     flat: bool,
@@ -210,7 +211,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
 
 
-def gather_kwargs(ctx: MethodContext) -> Optional[Dict[str, MypyType]]:
+def gather_kwargs(ctx: MethodContext) -> Optional[dict[str, MypyType]]:
     num_args = len(ctx.arg_kinds)
     kwargs = {}
     named = (ARG_NAMED, ARG_NAMED_OPT)
@@ -241,7 +242,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     api = helpers.get_typechecker_api(ctx)
 
-    field_types: Optional[Dict[str, MypyType]] = None
+    field_types: Optional[dict[str, MypyType]] = None
     kwargs = gather_kwargs(ctx)
     if kwargs:
         # For now, we don't try to resolve the output_field of the field would be, but use Any.
@@ -310,7 +311,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     return helpers.reparametrize_instance(default_return_type, [annotated_type, row_type])
 
 
-def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[List[str]]:
+def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[list[str]]:
     field_lookups = []
     for field_lookup_expr in lookup_exprs:
         field_lookup = helpers.resolve_string_attribute_value(field_lookup_expr, django_context)

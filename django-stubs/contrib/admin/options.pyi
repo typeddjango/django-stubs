@@ -1,13 +1,12 @@
 import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar, type_check_only
+from typing import Any, Generic, Literal, TypeVar, cast, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.views.main import ChangeList
-from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
 from django.core.paginator import Paginator
@@ -45,9 +44,9 @@ VERTICAL: Literal[2]
 _Direction: TypeAlias = Literal[1, 2]
 
 class ShowFacets(enum.Enum):
-    NEVER: str
-    ALLOW: str
-    ALWAYS: str
+    NEVER = cast(str, ...)
+    ALLOW = cast(str, ...)
+    ALWAYS = cast(str, ...)
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -225,7 +224,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def _get_edited_object_pks(self, request: HttpRequest, prefix: str) -> list[str]: ...
     def _get_list_editable_queryset(self, request: HttpRequest, prefix: str) -> QuerySet[_ModelT]: ...
     def construct_change_message(
-        self, request: HttpRequest, form: AdminPasswordChangeForm, formsets: Iterable[BaseFormSet], add: bool = ...
+        self, request: HttpRequest, form: forms.Form, formsets: Iterable[BaseFormSet], add: bool = ...
     ) -> list[dict[str, dict[str, list[str]]]]: ...
     def message_user(
         self,

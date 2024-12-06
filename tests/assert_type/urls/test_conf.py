@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from django.conf.urls.i18n import urlpatterns as i18n_urlpatterns
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
@@ -11,11 +9,11 @@ from django.utils.translation import gettext_lazy as _
 from typing_extensions import assert_type
 
 # Test 'path' accepts mix of pattern and resolver object
-include1: Tuple[List[_AnyURL], None, None] = ([], None, None)
+include1: tuple[list[_AnyURL], None, None] = ([], None, None)
 assert_type(path("test/", include1), URLResolver)
 
 # Test 'path' accepts pattern resolver union subset
-include2: Tuple[List[URLPattern], None, None] = ([], None, None)
+include2: tuple[list[URLPattern], None, None] = ([], None, None)
 assert_type(path("test/", include2), URLResolver)
 
 # Test 'path'
@@ -35,7 +33,7 @@ assert_type(re_path("^v1/", v1), URLPattern)
 assert_type(re_path("^v2/", v2), URLPattern)
 
 # Test 'include'
-patterns1: List[_AnyURL] = []
+patterns1: list[_AnyURL] = []
 assert_type(re_path(_("^foo/"), include(patterns1)), URLResolver)
 assert_type(re_path("^foo/", include(patterns1, namespace="foo")), URLResolver)
 assert_type(re_path("^foo/", include((patterns1, "foo"), namespace="foo")), URLResolver)

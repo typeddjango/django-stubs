@@ -322,3 +322,21 @@
                 class Blog(models.Model):
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100, blank=True)
+-   case: handles_field_with_same_name_on_other_model
+    main: |
+        from myapp.models import A
+        reveal_type(A.objects.values_list("name", "b__name").get())  # N: Revealed type is "Tuple[builtins.int, builtins.str]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class B(models.Model):
+                    name = models.CharField()
+
+                class A(models.Model):
+                    b = models.ForeignKey(B, on_delete=models.CASCADE)
+                    name = models.IntegerField()

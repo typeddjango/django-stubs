@@ -1226,7 +1226,7 @@
         main:26: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:28: note: Revealed type is "builtins.str"
         main:29: note: Revealed type is "builtins.str"
-        main:30: note: Revealed type is "def (*objs: Union[myapp.models.MyModel, builtins.int], bulk: builtins.bool =, through_defaults: Union[builtins.dict[builtins.str, Any], None] =)"
+        main:30: note: Revealed type is "def (*objs: Union[myapp.models.MyModel, builtins.int], through_defaults: Union[typing.Mapping[builtins.str, Any], None] =)"
         main:32: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:35: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"

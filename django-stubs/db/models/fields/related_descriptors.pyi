@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from typing import Any, Generic, NoReturn, TypeVar, overload, type_check_only
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -102,10 +102,22 @@ class RelatedManager(Manager[_To], Generic[_To]):
     async def aadd(self, *objs: _To | int, bulk: bool = ...) -> None: ...
     def remove(self, *objs: _To | int, bulk: bool = ...) -> None: ...
     async def aremove(self, *objs: _To | int, bulk: bool = ...) -> None: ...
-    def set(self, objs: QuerySet[_To] | Iterable[_To | int], *, bulk: bool = ..., clear: bool = ...) -> None: ...
-    async def aset(self, objs: QuerySet[_To] | Iterable[_To | int], *, bulk: bool = ..., clear: bool = ...) -> None: ...
-    def clear(self) -> None: ...
-    async def aclear(self) -> None: ...
+    def clear(self, *, clear: bool = ...) -> None: ...
+    async def aclear(self, *, clear: bool = ...) -> None: ...
+    def set(
+        self,
+        objs: QuerySet[_To] | Iterable[_To | int],
+        *,
+        bulk: bool = ...,
+        clear: bool = ...,
+    ) -> None: ...
+    async def aset(
+        self,
+        objs: QuerySet[_To] | Iterable[_To | int],
+        *,
+        bulk: bool = ...,
+        clear: bool = ...,
+    ) -> None: ...
     def __call__(self, *, manager: str) -> RelatedManager[_To]: ...
 
 def create_reverse_many_to_one_manager(
@@ -142,28 +154,72 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
 class ManyRelatedManager(Manager[_To], Generic[_To, _Through]):
     related_val: tuple[int, ...]
     through: type[_Through]
-    def add(self, *objs: _To | int, bulk: bool = ..., through_defaults: dict[str, Any] | None = ...) -> None: ...
-    async def aadd(self, *objs: _To | int, bulk: bool = ..., through_defaults: dict[str, Any] | None = ...) -> None: ...
-    def remove(self, *objs: _To | int, bulk: bool = ...) -> None: ...
-    async def aremove(self, *objs: _To | int, bulk: bool = ...) -> None: ...
+    def add(
+        self,
+        *objs: _To | int,
+        through_defaults: Mapping[str, Any] | None = ...,
+    ) -> None: ...
+    async def aadd(
+        self,
+        *objs: _To | int,
+        through_defaults: Mapping[str, Any] | None = ...,
+    ) -> None: ...
+    def remove(self, *objs: _To | int) -> None: ...
+    async def aremove(self, *objs: _To | int) -> None: ...
+    def clear(self) -> None: ...
+    async def aclear(self) -> None: ...
     def set(
         self,
         objs: QuerySet[_To] | Iterable[_To | int],
         *,
-        bulk: bool = ...,
         clear: bool = ...,
-        through_defaults: dict[str, Any] | None = ...,
+        through_defaults: Mapping[str, Any] | None = ...,
     ) -> None: ...
     async def aset(
         self,
         objs: QuerySet[_To] | Iterable[_To | int],
         *,
-        bulk: bool = ...,
         clear: bool = ...,
-        through_defaults: dict[str, Any] | None = ...,
+        through_defaults: Mapping[str, Any] | None = ...,
     ) -> None: ...
-    def clear(self) -> None: ...
-    async def aclear(self) -> None: ...
+    def create(
+        self,
+        *,
+        through_defaults: Mapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> _To: ...
+    async def acreate(
+        self,
+        *,
+        through_defaults: Mapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> _To: ...
+    def get_or_create(
+        self,
+        defaults: Mapping[str, Any] | None = ...,
+        through_defaults: Mapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> tuple[_To, bool]: ...
+    async def aget_or_create(
+        self,
+        defaults: Mapping[str, Any] | None = ...,
+        through_defaults: Mapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> tuple[_To, bool]: ...
+    def update_or_create(
+        self,
+        defaults: Mapping[str, Any] | None = ...,
+        create_defaults: Mapping[str, Any] | None = ...,
+        through_defaults: Mapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> tuple[_To, bool]: ...
+    async def aupdate_or_create(
+        self,
+        defaults: Mapping[str, Any] | None = ...,
+        create_defaults: Mapping[str, Any] | None = ...,
+        through_defaults: Mapping[str, Any] | None = ...,
+        **kwargs: Any,
+    ) -> tuple[_To, bool]: ...
     def __call__(self, *, manager: str) -> ManyRelatedManager[_To, _Through]: ...
 
 def create_forward_many_to_many_manager(

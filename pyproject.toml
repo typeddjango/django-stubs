@@ -1,21 +1,10 @@
-[tool.black]
-target-version = ['py38']
-line-length = 120
-include = '\.pyi?$'
-
 [tool.codespell]
 ignore-words-list = "aadd,acount,nam,asend"
 
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
-extend-exclude = [
-    ".*/",
-    "django-source",
-    "stubgen",
-    "out",
-]
 line-length = 120
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/

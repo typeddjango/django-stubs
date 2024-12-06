@@ -1,6 +1,7 @@
 from collections import deque
+from collections.abc import Iterable
 from functools import cached_property
-from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import Any, Optional, Union, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
@@ -98,7 +99,7 @@ class ModelClassInitializer:
             self.model_classdef.info, name=name, sym_type=typ, no_serialize=no_serialize, is_classvar=is_classvar
         )
 
-    def add_new_class_for_current_module(self, name: str, bases: List[Instance]) -> TypeInfo:
+    def add_new_class_for_current_module(self, name: str, bases: list[Instance]) -> TypeInfo:
         current_module = self.api.modules[self.model_classdef.info.module_name]
         new_class_info = helpers.add_new_class_for_module(current_module, name=name, bases=bases)
         return new_class_info
@@ -109,7 +110,7 @@ class ModelClassInitializer:
             return
         self.run_with_model_cls(model_cls)
 
-    def get_generated_manager_mappings(self, base_manager_fullname: str) -> Dict[str, str]:
+    def get_generated_manager_mappings(self, base_manager_fullname: str) -> dict[str, str]:
         base_manager_info = self.lookup_typeinfo(base_manager_fullname)
         if base_manager_info is None or "from_queryset_managers" not in base_manager_info.metadata:
             return {}
@@ -206,7 +207,7 @@ class ModelClassInitializer:
 
         return queryset_info
 
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         raise NotImplementedError(f"Implement this in subclass {self.__class__.__name__}")
 
 
@@ -275,7 +276,7 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         auto_field = model_cls._meta.auto_field
         if auto_field:
             self.create_autofield(
@@ -304,7 +305,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
 
 class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # We also need to override existing `pk` definition from `stubs`:
         auto_field = model_cls._meta.pk
         if auto_field:
@@ -316,7 +317,7 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
 
 
 class AddRelatedModelsId(ModelClassInitializer):
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         for field in self.django_context.get_model_foreign_keys(model_cls):
             try:
                 related_model_cls = self.django_context.get_field_related_model_cls(field)
@@ -375,7 +376,7 @@ class AddManagers(ModelClassInitializer):
         manager_type = helpers.fill_manager(manager_info, Instance(self.model_classdef.info, []))
         self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         manager_info: Optional[TypeInfo]
 
         incomplete_manager_defs = set()
@@ -474,7 +475,7 @@ class AddManagers(ModelClassInitializer):
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         if "_default_manager" in self.model_classdef.info.names:
             return None
 
@@ -608,7 +609,7 @@ class AddReverseLookups(ModelClassInitializer):
             fullname=new_related_manager_info.fullname,
         )
 
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # add related managers etc.
         processing_incomplete = False
         for relation in self.django_context.get_model_relations(model_cls):
@@ -622,7 +623,7 @@ class AddReverseLookups(ModelClassInitializer):
 
 
 class AddExtraFieldMethods(ModelClassInitializer):
-    def run_with_model_cls(self, model_cls: Type[Model]) -> None:
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # get_FOO_display for choices
         for field in self.django_context.get_model_fields(model_cls):
             if field.choices:
@@ -907,7 +908,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
         Inspect a 'ManyToManyField(...)' call to collect argument data on any 'to' and
         'through' arguments.
         """
-        look_for: Dict[str, Optional[Expression]] = {"to": None, "through": None}
+        look_for: dict[str, Optional[Expression]] = {"to": None, "through": None}
         # Look for 'to', being declared as the first positional argument
         if call.arg_kinds[0].is_positional():
             look_for["to"] = call.args[0]
@@ -1023,7 +1024,7 @@ class MetaclassAdjustments(ModelClassInitializer):
 
         return
 
-    def get_exception_bases(self, name: str) -> List[Instance]:
+    def get_exception_bases(self, name: str) -> list[Instance]:
         bases = []
         for model_base in self.model_classdef.info.direct_base_classes():
             exception_base_sym = model_base.names.get(name)

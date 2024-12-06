@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional, Tuple
+from typing import NamedTuple, Optional
 
 from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
@@ -121,7 +121,7 @@ def get_m2m_arguments(
     return M2MArguments(to=to, through=through)
 
 
-def get_related_manager_and_model(ctx: MethodContext) -> Optional[Tuple[Instance, Instance, Instance]]:
+def get_related_manager_and_model(ctx: MethodContext) -> Optional[tuple[Instance, Instance, Instance]]:
     """
     Returns a 3-tuple consisting of:
       1. A `ManyRelatedManager` instance

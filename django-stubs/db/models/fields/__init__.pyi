@@ -26,6 +26,7 @@ BLANK_CHOICE_DASH: list[tuple[str, str]]
 
 _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
+_LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
 
 _F = TypeVar("_F", bound=Field, covariant=True)
 
@@ -39,7 +40,7 @@ class _FieldDescriptor(Protocol[_F]):
     @property
     def field(self) -> _F: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _ChoicesCallable  # noqa: PYI047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _LimitChoicesToCallable | _ChoicesCallable  # noqa: PYI047
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
@@ -146,7 +147,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     creation_counter: int
     auto_creation_counter: int
     default_validators: Sequence[validators._ValidatorCallable]
-    default_error_messages: _ErrorMessagesDict
+    default_error_messages: ClassVar[_ErrorMessagesDict]
     hidden: bool
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
@@ -442,7 +443,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
-    default_error_messages: _ErrorMessagesDict
+    default_error_messages: ClassVar[_ErrorMessagesDict]
     unpack_ipv4: bool
     protocol: str
     def __init__(

@@ -1,6 +1,7 @@
 import builtins
+from collections.abc import Iterable
 from contextlib import suppress
-from typing import Iterable, List, Optional, Protocol
+from typing import Optional, Protocol
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -29,7 +30,7 @@ def make_generic_classes(
     request: FixtureRequest,
     monkeypatch: MonkeyPatch,
 ) -> _MakeGenericClasses:
-    _extra_classes: List[type] = []
+    _extra_classes: list[type] = []
 
     def fin() -> None:
         for el in _need_generic:

@@ -49,6 +49,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
+| 5.1.1          | 1.13.x       | 5.1            | 4.2                    | 3.8 - 3.12     |
 | 5.1.0          | 1.11.x       | 5.1            | 4.2                    | 3.8 - 3.12     |
 | 5.0.4          | 1.11.x       | 5.0            | 4.2                    | 3.8 - 3.12     |
 | 5.0.3          | 1.11.x       | 5.0            | 4.2                    | 3.8 - 3.12     |
@@ -66,6 +67,9 @@ We rely on different `django` and `mypy` versions:
 | 1.16.0         | 1.1.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
 | 1.15.0         | 1.0.x        | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
 | 1.14.0         | 0.990+       | 4.1            | 4.0, 3.2               | 3.7 - 3.11     |
+
+What "partial" support means, and why we don't pin to the exact Django/mypy version, is explained in
+https://github.com/typeddjango/django-stubs/discussions/2101#discussioncomment-9276632.
 
 ## Features
 

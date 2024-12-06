@@ -160,6 +160,8 @@ django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor.related_man
 django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_extent
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.supports_geometry_field_unique_index
+django.contrib.gis.geoip2.GeoIP2.is_country
+django.contrib.gis.geoip2.GeoIP2.is_city
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.from_text
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.gis_operators
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.mariadb

@@ -34,7 +34,10 @@ class SQLCompiler:
     col_count: int | None
     def setup_query(self, with_col_aliases: bool = False) -> None: ...
     has_extra_select: Any
-    def pre_sql_setup(self, with_col_aliases: bool = False) -> tuple[
+    def pre_sql_setup(
+        self,
+        with_col_aliases: bool = False,
+    ) -> tuple[
         list[tuple[Expression, _AsSqlType, None]],
         list[tuple[Expression, tuple[str, _ParamsT, bool]]],
         list[_AsSqlType],
@@ -48,7 +51,8 @@ class SQLCompiler:
         self, expressions: list[Expression], having: list[Expression] | tuple
     ) -> list[Expression]: ...
     def get_select(
-        self, with_col_aliases: bool = False
+        self,
+        with_col_aliases: bool = False,
     ) -> tuple[list[tuple[Expression, _AsSqlType, str | None]], dict[str, Any] | None, dict[str, int]]: ...
     def _order_by_pairs(self) -> None: ...
     def get_order_by(self) -> list[tuple[Expression, tuple[str, _ParamsT, bool]]]: ...
