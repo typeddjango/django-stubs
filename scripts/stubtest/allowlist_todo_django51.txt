@@ -5,7 +5,6 @@
 
 django.contrib.admin.helpers.Fieldset.is_collapsible
 django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
-django.contrib.admin.models.LogEntryManager.log_actions
 django.contrib.auth.base_user.BaseUserManager.make_random_password
 django.contrib.auth.checks.check_middleware
 django.contrib.auth.forms.AdminPasswordChangeForm.clean_password2
