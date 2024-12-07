@@ -13,6 +13,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
+from typing_extensions import deprecated
 
 class GenericForeignKey(FieldCacheMixin):
     # django-stubs implementation only fields
@@ -45,6 +46,9 @@ class GenericForeignKey(FieldCacheMixin):
     def get_content_type(
         self, obj: Model | None = ..., id: int | None = ..., using: str | None = ..., model: type[Model] | None = ...
     ) -> ContentType: ...
+    @deprecated(
+        "get_prefetch_queryset() is deprecated and will be removed in Django 6.0. Use get_prefetch_querysets() instead."
+    )
     def get_prefetch_queryset(
         self, instances: list[Model] | QuerySet, queryset: QuerySet | None = ...
     ) -> tuple[list[Model], Callable, Callable, bool, str, bool]: ...

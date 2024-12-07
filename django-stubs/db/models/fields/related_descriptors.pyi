@@ -10,7 +10,7 @@ from django.db.models.manager import BaseManager, Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
-from typing_extensions import Self
+from typing_extensions import Self, deprecated
 
 _M = TypeVar("_M", bound=Model)
 _F = TypeVar("_F", bound=Field)
@@ -28,6 +28,9 @@ class ForwardManyToOneDescriptor(Generic[_F]):
     def RelatedObjectDoesNotExist(self) -> type[ObjectDoesNotExist]: ...
     def is_cached(self, instance: Model) -> bool: ...
     def get_queryset(self, **hints: Any) -> QuerySet[Any]: ...
+    @deprecated(
+        "get_prefetch_queryset() is deprecated and will be removed in Django 6.0. Use get_prefetch_querysets() instead."
+    )
     def get_prefetch_queryset(
         self, instances: list[Model], queryset: QuerySet[Any] | None = None
     ) -> tuple[QuerySet[Any], Callable[..., Any], Callable[..., Any], bool, str, bool]: ...
@@ -60,6 +63,9 @@ class ReverseOneToOneDescriptor(Generic[_From, _To]):
     def RelatedObjectDoesNotExist(self) -> type[ObjectDoesNotExist]: ...
     def is_cached(self, instance: _From) -> bool: ...
     def get_queryset(self, **hints: Any) -> QuerySet[_To]: ...
+    @deprecated(
+        "get_prefetch_queryset() is deprecated and will be removed in Django 6.0. Use get_prefetch_querysets() instead."
+    )
     def get_prefetch_queryset(
         self, instances: list[_From], queryset: QuerySet[_To] | None = None
     ) -> tuple[QuerySet[_To], Callable[..., Any], Callable[..., Any], bool, str, bool]: ...

@@ -4,6 +4,7 @@ from uuid import UUID
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import Model
+from typing_extensions import deprecated
 
 ADDITION: int
 CHANGE: int
@@ -11,6 +12,7 @@ DELETION: int
 ACTION_FLAG_CHOICES: Any
 
 class LogEntryManager(models.Manager[LogEntry]):
+    @deprecated("log_action() is deprecated and will be removed in Django 6.0. Use log_action_new() instead.")
     def log_action(
         self,
         user_id: int,

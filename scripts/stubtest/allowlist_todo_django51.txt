@@ -3,10 +3,8 @@
 # Only discrepancies that appeared after Django 5.0 -> 5.1 update.
 # Unsorted: there are real problems and things we can really ignore:
 
-django.contrib.admin.ModelAdmin.log_deletions
 django.contrib.admin.helpers.Fieldset.is_collapsible
 django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
-django.contrib.admin.options.ModelAdmin.log_deletions
 django.contrib.auth.base_user.BaseUserManager.make_random_password
 django.contrib.auth.checks.check_middleware
 django.contrib.auth.forms.AdminPasswordChangeForm.clean_password2
@@ -24,7 +22,6 @@ django.contrib.auth.models.BaseUserManager.make_random_password
 django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
-django.contrib.gis.admin.ModelAdmin.log_deletions
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.models.CharField.slice_expression
 django.contrib.gis.db.models.CheckConstraint.__init__
@@ -45,17 +42,7 @@ django.contrib.gis.db.models.functions.FromWKB.output_field
 django.contrib.gis.db.models.functions.FromWKT.output_field
 django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.forms.RadioSelect.__slotnames__
-django.contrib.gis.gdal.OGRGeometry.centroid
-django.contrib.gis.gdal.OGRGeometry.is_3d
-django.contrib.gis.gdal.OGRGeometry.is_measured
-django.contrib.gis.gdal.OGRGeometry.set_3d
-django.contrib.gis.gdal.OGRGeometry.set_measured
 django.contrib.gis.gdal.geometries.LineString.m
-django.contrib.gis.gdal.geometries.OGRGeometry.centroid
-django.contrib.gis.gdal.geometries.OGRGeometry.is_3d
-django.contrib.gis.gdal.geometries.OGRGeometry.is_measured
-django.contrib.gis.gdal.geometries.OGRGeometry.set_3d
-django.contrib.gis.gdal.geometries.OGRGeometry.set_measured
 django.contrib.gis.gdal.geometries.Point.m
 django.contrib.gis.gdal.prototypes.ds.GDAL_OF_ALL
 django.contrib.gis.gdal.prototypes.ds.GDAL_OF_RASTER

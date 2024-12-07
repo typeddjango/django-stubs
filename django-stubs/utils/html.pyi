@@ -8,6 +8,7 @@ from typing import Any
 from _typeshed import Incomplete
 from django.utils.functional import SimpleLazyObject, _StrOrPromise
 from django.utils.safestring import SafeData, SafeString
+from typing_extensions import deprecated
 
 VOID_ELEMENTS: frozenset[str]
 MAX_URL_LENGTH: int
@@ -19,6 +20,7 @@ def json_script(value: Any, element_id: str | None = None, encoder: type[JSONEnc
 
 # conditional_escape could use a protocol to be more precise, see https://github.com/typeddjango/django-stubs/issues/1474
 def conditional_escape(text: _StrOrPromise | SafeData) -> SafeString: ...
+@deprecated("Calling format_html() without passing args or kwargs is deprecated.")
 def format_html(format_string: str, *args: Any, **kwargs: Any) -> SafeString: ...
 def format_html_join(sep: str, format_string: str, args_generator: Iterable[Iterable[Any]]) -> SafeString: ...
 def linebreaks(value: Any, autoescape: bool = False) -> str: ...
