@@ -292,7 +292,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "django_stubs_ext.annotations.WithAnnotations",
         ):
             return partial(handle_annotated_type, fullname=fullname)
-        elif fullname == "django.contrib.auth.base_user._UserModel":
+        elif fullname == "django.contrib.auth.models._User":
             return partial(get_user_model, django_context=self.django_context)
         return None
 
@@ -308,7 +308,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {}
-        # In all places we use '_UserModel' alias as a type we want to clear cache if
+        # In all places we use '_User' alias as a type we want to clear cache if
         # AUTH_USER_MODEL setting changes
         if ctx.id.startswith("django.contrib.auth") or ctx.id in {"django.http.request", "django.test.client"}:
             extra_data["AUTH_USER_MODEL"] = self.django_context.settings.AUTH_USER_MODEL
