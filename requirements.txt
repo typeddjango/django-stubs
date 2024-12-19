@@ -13,4 +13,4 @@ Django==5.1.4; python_version >= '3.10'
 
 # Overrides:
 mypy==1.13.0
-pyright==1.1.390
+pyright==1.1.391
