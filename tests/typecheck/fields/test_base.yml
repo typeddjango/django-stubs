@@ -27,7 +27,7 @@
         booking = Booking()
         reveal_type(booking.id)  # N: Revealed type is "builtins.int"
         reveal_type(booking.time_range)  # N: Revealed type is "Any"
-        reveal_type(booking.some_decimal)  # N: Revealed type is "_decimal.Decimal"
+        reveal_type(booking.some_decimal)  # N: Revealed type is "decimal.Decimal"
     installed_apps:
         - myapp
     files:

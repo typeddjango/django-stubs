@@ -17,9 +17,9 @@ else:
     _enum_property = property
     EnumType = enum.EnumMeta
 
-    class ReprEnum(enum.Enum): ...
-    class IntEnum(int, ReprEnum): ...
-    class StrEnum(str, ReprEnum): ...
+    class ReprEnum(enum.Enum): ...  # type: ignore[misc]
+    class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
+    class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
 
 @deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
 class ChoicesMeta(EnumType):
@@ -42,7 +42,7 @@ class ChoicesMeta(EnumType):
 
 ChoicesType: TypeAlias = ChoicesMeta
 
-class Choices(enum.Enum, metaclass=ChoicesType):
+class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
     @property
     def label(self) -> str: ...
     @_enum_property
@@ -61,7 +61,7 @@ class _IntegerChoicesMeta(ChoicesType):
 # In reality, the `__init__` overloads provided below should also support
 # all the arguments of `int.__new__`/`str.__new__` (e.g. `base`, `encoding`).
 # They are omitted on purpose to avoid having convoluted stubs for these enums:
-class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesMeta):
+class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesMeta):  # type: ignore[misc]
     @overload
     def __init__(self, x: ConvertibleToInt) -> None: ...
     @overload
@@ -77,7 +77,7 @@ class _TextChoicesMeta(ChoicesType):
     @property
     def values(self) -> list[str]: ...
 
-class TextChoices(Choices, StrEnum, metaclass=_TextChoicesMeta):
+class TextChoices(Choices, StrEnum, metaclass=_TextChoicesMeta):  # type: ignore[misc]
     @overload
     def __init__(self, object: str) -> None: ...
     @overload

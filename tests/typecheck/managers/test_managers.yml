@@ -680,8 +680,8 @@
     installed_apps:
         - myapp
     out: |
-        main:2: note: Revealed type is "myapp.models.MyModel.MyManager"
-        main:3: note: Revealed type is "Any"
+        main:2: note: Revealed type is "myapp.models.MyModel.MyManager[myapp.models.MyModel]"
+        main:3: note: Revealed type is "myapp.models.MyModel"
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
