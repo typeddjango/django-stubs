@@ -1,7 +1,7 @@
 # Dev tools:
 pre-commit==4.0.1
 pytest==8.3.4
-pytest-mypy-plugins==3.1.2
+pytest-mypy-plugins==3.2.0
 pytest-shard==0.1.2
 
 # Django deps:
