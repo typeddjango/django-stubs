@@ -15,5 +15,4 @@ stubtest django \
     --ignore-positional-only \
     --allowlist scripts/stubtest/allowlist.txt \
     --allowlist scripts/stubtest/allowlist_todo.txt \
-    --allowlist scripts/stubtest/allowlist_todo_django51.txt \
-    --generate-allowlist
+    --allowlist scripts/stubtest/allowlist_todo_django51.txt
