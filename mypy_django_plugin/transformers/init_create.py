@@ -86,7 +86,7 @@ def redefine_and_typecheck_model_acreate(ctx: MethodContext, django_context: Dja
         return ctx.default_return_type
 
     # default_return_type at this point should be of type Coroutine[Any, Any, <Model>]
-    model = default_return_type.args[-1]
+    model = get_proper_type(default_return_type.args[-1])
     if not isinstance(model, Instance):
         return ctx.default_return_type
 
