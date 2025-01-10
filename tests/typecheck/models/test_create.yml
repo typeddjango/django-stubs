@@ -161,7 +161,7 @@
         import asyncio
         from myapp.models import User
         async def amain() -> None:
-            await User.objects.acreate(pk=1, name='Max', age=10)
+            reveal_type(await User.objects.acreate(pk=1, name='Max', age=10))  # N: Revealed type is "myapp.models.User"
             await User.objects.acreate(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
     installed_apps:
         - myapp
