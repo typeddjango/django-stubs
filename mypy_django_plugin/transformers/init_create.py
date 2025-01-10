@@ -76,3 +76,23 @@ def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: Djan
         return ctx.default_return_type
 
     return typecheck_model_method(ctx, django_context, model_cls, "create")
+
+
+def redefine_and_typecheck_model_acreate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    default_return_type = get_proper_type(ctx.default_return_type)
+
+    if not isinstance(default_return_type, Instance):
+        # only work with ctx.default_return_type = model Instance
+        return ctx.default_return_type
+
+    # default_return_type at this point should be of type Coroutine[Any, Any, <Model>]
+    model = default_return_type.args[-1]
+    if not isinstance(model, Instance):
+        return ctx.default_return_type
+
+    model_fullname = model.type.fullname
+    model_cls = django_context.get_model_class_by_fullname(model_fullname)
+    if model_cls is None:
+        return ctx.default_return_type
+
+    return typecheck_model_method(ctx, django_context, model_cls, "acreate")
