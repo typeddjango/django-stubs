@@ -172,6 +172,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "alias": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
             "annotate": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
             "create": partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context),
+            "acreate": partial(init_create.redefine_and_typecheck_model_acreate, django_context=self.django_context),
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
