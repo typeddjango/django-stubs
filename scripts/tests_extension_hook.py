@@ -23,7 +23,7 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
     if monkeypatch:
         custom_settings = "import django_stubs_ext\ndjango_stubs_ext.monkeypatch()\n" + custom_settings
 
-    django_settings_section = "\n[mypy.plugins.django-stubs]\n" "django_settings_module = mysettings"
+    django_settings_section = "\n[mypy.plugins.django-stubs]\ndjango_settings_module = mysettings"
     if not test_item.additional_mypy_config:
         test_item.additional_mypy_config = django_settings_section
     else:
