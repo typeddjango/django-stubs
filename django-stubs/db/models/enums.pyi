@@ -4,7 +4,7 @@ from typing import Any, TypeVar, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias, deprecated
+from typing_extensions import deprecated
 
 _Self = TypeVar("_Self")
 

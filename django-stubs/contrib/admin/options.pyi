@@ -1,6 +1,6 @@
 import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar, cast, type_check_only, overload
+from typing import Any, Generic, Literal, TypeVar, cast, overload, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
