@@ -47,7 +47,7 @@ class CheckConstraint(BaseConstraint):
     condition: Q | BaseExpression
 
     @overload
-    @deprecated("The check keyword argument is deprecated in favor of condition and will be removed in Django 6.0")
+    @deprecated("check keyword argument is deprecated in favor of condition and will be removed in Django 6.0")
     def __init__(
         self,
         *,

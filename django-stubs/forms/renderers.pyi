@@ -30,7 +30,7 @@ class Jinja2(EngineMixin, BaseRenderer):
     def backend(self) -> type[Jinja2R]: ...
 
 @deprecated(
-    "The Jinja2DivFormRenderer transitional form renderer is deprecated and will be removed in Django 6.0. Use Jinja2 instead."
+    "Jinja2DivFormRenderer transitional form renderer is deprecated and will be removed in Django 6.0. Use Jinja2 instead."
 )
 class Jinja2DivFormRenderer(Jinja2):
     form_template_name: str

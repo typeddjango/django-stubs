@@ -21,8 +21,7 @@ else:
     class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
     class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
 
-@deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
-class ChoicesMeta(EnumType):
+class ChoicesType(EnumType):
     # There's a contradiction between mypy and PYI019 regarding metaclasses. Where mypy
     # disallows 'typing_extensions.Self' on metaclasses, while PYI019 try to enforce
     # 'typing_extensions.Self' for '__new__' methods.. We've chosen to ignore the
@@ -40,7 +39,8 @@ class ChoicesMeta(EnumType):
     @property
     def values(self) -> list[Any]: ...
 
-ChoicesType: TypeAlias = ChoicesMeta
+@deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
+class ChoicesMeta(ChoicesType): ...
 
 class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
     @property
