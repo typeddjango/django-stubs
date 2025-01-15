@@ -1,0 +1,13 @@
+- case: test_contenttypes_models
+  main: |
+    from django.contrib.contenttypes.models import ContentType
+
+    c = ContentType.objects.create(app_label='abc', model='abc')
+    reveal_type(c.id)  # N: Revealed type is "builtins.int"
+    reveal_type(c.app_label)  # N: Revealed type is "builtins.str"
+    reveal_type(c.model)  # N: Revealed type is "builtins.str"
+
+    ContentType.objects.create(app_label=[])  # E: Incompatible type for "app_label" of "ContentType" (got "List[Any]", expected "Union[str, int, Combinable]")  [misc]
+
+  custom_settings: |
+    INSTALLED_APPS = ("django.contrib.contenttypes",)

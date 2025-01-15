@@ -13,8 +13,8 @@ class ContentTypeManager(models.Manager[ContentType]):
 
 class ContentType(models.Model):
     id: int
-    app_label: models.CharField
-    model: models.CharField
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
     objects: ClassVar[ContentTypeManager]
     @property
     def name(self) -> str: ...
