@@ -166,11 +166,16 @@ def set_descriptor_types_for_field(
     if not (isinstance(mapped_set_type, UninhabitedType) or isinstance(mapped_get_type, UninhabitedType)):
         # always replace set_type and get_type with (non-Any) mapped types
         set_type = helpers.convert_any_to_type(mapped_set_type, set_type)
-        get_type = helpers.convert_any_to_type(mapped_get_type, get_type)
+        get_type = get_proper_type(helpers.convert_any_to_type(mapped_get_type, get_type))
 
         # the get_type must be optional if the field is nullable
-        if (is_get_nullable or is_nullable) and not (
-            isinstance(get_proper_type(get_type), NoneType) or helpers.is_optional(get_type)
+        if (
+            (is_get_nullable or is_nullable)
+            and not (
+                isinstance(get_type, NoneType)
+                or helpers.is_optional(get_type)
+                or isinstance(get_type, AnyType)
+            )
         ):
             ctx.api.fail(
                 f"{default_return_type.type.name} is nullable but its generic get type parameter is not optional",
