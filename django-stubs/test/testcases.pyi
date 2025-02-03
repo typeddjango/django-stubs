@@ -152,13 +152,13 @@ class SimpleTestCase(unittest.TestCase):
     def assertInHTML(self, needle: str, haystack: str, count: int | None = ..., msg_prefix: str = ...) -> None: ...
     def assertJSONEqual(
         self,
-        raw: str,
+        raw: str | bytes | bytearray,
         expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
     def assertJSONNotEqual(
         self,
-        raw: str,
+        raw: str | bytes | bytearray,
         expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
         msg: str | None = ...,
     ) -> None: ...
