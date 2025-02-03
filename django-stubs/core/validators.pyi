@@ -43,6 +43,8 @@ class DomainNameValidator(RegexValidator):
     def __init__(self, accept_idna: bool = True, **kwargs: Any) -> None: ...
     def __call__(self, value: Any) -> None: ...
 
+validate_domain_name: DomainNameValidator
+
 class URLValidator(RegexValidator):
     ul: str
     ipv4_re: str
