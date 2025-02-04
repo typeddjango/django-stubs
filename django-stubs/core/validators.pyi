@@ -30,6 +30,21 @@ class RegexValidator(_Deconstructible):
     ) -> None: ...
     def __call__(self, value: Any) -> None: ...
 
+class DomainNameValidator(RegexValidator):
+    ul: str
+    hostname_re: str
+    domain_re: str
+    tld_re: str
+    ascii_only_hostname_re: str
+    ascii_only_domain_re: str
+    ascii_only_tld_re: str
+    max_length: int
+
+    def __init__(self, *, accept_idna: bool = True, **kwargs: Any) -> None: ...
+    def __call__(self, value: Any) -> None: ...
+
+validate_domain_name: DomainNameValidator
+
 class URLValidator(RegexValidator):
     ul: str
     ipv4_re: str

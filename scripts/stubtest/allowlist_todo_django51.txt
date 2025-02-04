@@ -100,8 +100,6 @@ django.core.files.storage.filesystem.FileSystemStorage.__init__
 django.core.files.storage.filesystem.FileSystemStorage.is_name_available
 django.core.files.storage.get_storage_class
 django.core.signing.Signer.__init__
-django.core.validators.DomainNameValidator
-django.core.validators.validate_domain_name
 django.db.backends.base.features.BaseDatabaseFeatures.supports_frame_exclusion
 django.db.backends.base.operations.BaseDatabaseOperations.bulk_insert_sql
 django.db.backends.base.operations.BaseDatabaseOperations.force_group_by
