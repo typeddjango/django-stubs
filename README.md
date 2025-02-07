@@ -49,6 +49,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
+| 5.1.3          | 1.13+        | 5.1            | 4.2                    | 3.9 - 3.13     |
 | 5.1.2          | 1.13+        | 5.1            | 4.2                    | 3.9 - 3.13     |
 | 5.1.1          | 1.13.x       | 5.1            | 4.2                    | 3.8 - 3.12     |
 | 5.1.0          | 1.11.x       | 5.1            | 4.2                    | 3.8 - 3.12     |
