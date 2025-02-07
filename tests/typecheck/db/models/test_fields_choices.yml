@@ -1,0 +1,97 @@
+- case: db_models_charfield_invalid_choices
+  main: |
+    from django.db import models
+
+    class MyModel(models.Model):
+        char1 = models.CharField(max_length=200, choices='test')
+  out: |
+    main:4: error: Argument "choices" to "CharField" has incompatible type "str"; expected "Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any], Type[Choices], Callable[[], Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any]]], None]"  [arg-type]
+    main:4: note: Following member(s) of "str" have conflicts:
+    main:4: note:     Expected:
+    main:4: note:         def __iter__(self) -> Iterator[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]]
+    main:4: note:     Got:
+    main:4: note:         def __iter__(self) -> Iterator[str]
+
+- case: db_models_integerfield_invalid_choices
+  main: |
+    from django.db import models
+
+    class MyModel(models.Model):
+        int1 = models.IntegerField(choices='test')
+  out: |
+    main:4: error: Argument "choices" to "IntegerField" has incompatible type "str"; expected "Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any], Type[Choices], Callable[[], Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any]]], None]"  [arg-type]
+    main:4: note: Following member(s) of "str" have conflicts:
+    main:4: note:     Expected:
+    main:4: note:         def __iter__(self) -> Iterator[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]]
+    main:4: note:     Got:
+    main:4: note:         def __iter__(self) -> Iterator[str]
+
+- case: db_models_valid_choices
+  main: |
+    from collections.abc import Callable, Mapping, Sequence
+    from typing import TypeVar
+
+    from django.db import models
+    from typing_extensions import assert_type
+
+    _T = TypeVar("_T")
+
+
+    def to_named_seq(func: Callable[[], _T]) -> Callable[[], Sequence[tuple[str, _T]]]:
+        def inner() -> Sequence[tuple[str, _T]]:
+            return [("title", func())]
+
+        return inner
+
+
+    def to_named_mapping(func: Callable[[], _T]) -> Callable[[], Mapping[str, _T]]:
+        def inner() -> Mapping[str, _T]:
+            return {"title": func()}
+
+        return inner
+
+
+    def str_tuple() -> Sequence[tuple[str, str]]:
+        return (("foo", "bar"), ("fuzz", "bazz"))
+
+
+    def str_mapping() -> Mapping[str, str]:
+        return {"foo": "bar", "fuzz": "bazz"}
+
+
+    def int_tuple() -> Sequence[tuple[int, str]]:
+        return ((1, "bar"), (2, "bazz"))
+
+
+    def int_mapping() -> Mapping[int, str]:
+        return {3: "bar", 4: "bazz"}
+
+
+    class TestModel(models.Model):
+        class TextChoices(models.TextChoices):
+            FIRST = "foo", "bar"
+            SECOND = "foo2", "bar"
+
+        class IntegerChoices(models.IntegerChoices):
+            FIRST = 1, "bar"
+            SECOND = 2, "bar"
+
+        char1 = models.CharField(max_length=5, choices=TextChoices, default="foo")
+        char2 = models.CharField(max_length=5, choices=str_tuple, default="foo")
+        char3 = models.CharField(max_length=5, choices=str_mapping, default="foo")
+        char4 = models.CharField(max_length=5, choices=str_tuple(), default="foo")
+        char5 = models.CharField(max_length=5, choices=str_mapping(), default="foo")
+        char6 = models.CharField(max_length=5, choices=to_named_seq(str_tuple), default="foo")
+        char7 = models.CharField(max_length=5, choices=to_named_mapping(str_mapping), default="foo")
+        char8 = models.CharField(max_length=5, choices=to_named_seq(str_tuple)(), default="foo")
+        char9 = models.CharField(max_length=5, choices=to_named_mapping(str_mapping)(), default="foo")
+
+        int1 = models.IntegerField(choices=IntegerChoices, default=1)
+        int2 = models.IntegerField(choices=int_tuple, default=1)
+        int3 = models.IntegerField(choices=int_mapping, default=1)
+        int4 = models.IntegerField(choices=int_tuple(), default=1)
+        int5 = models.IntegerField(choices=int_mapping(), default=1)
+        int6 = models.IntegerField(choices=to_named_seq(int_tuple), default=1)
+        int7 = models.IntegerField(choices=to_named_seq(int_mapping), default=1)
+        int8 = models.IntegerField(choices=to_named_seq(int_tuple)(), default=1)
+        int9 = models.IntegerField(choices=to_named_seq(int_mapping)(), default=1)
