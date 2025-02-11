@@ -227,7 +227,7 @@ class RawQuerySet(Iterable[_Model], Sized):
     def using(self, alias: str | None) -> RawQuerySet[_Model]: ...
 
 # Deprecated alias of QuerySet, for compatibility only.
-_QuerySet: TypeAlias = QuerySet
+_QuerySet: TypeAlias = QuerySet  # noqa: PYI047
 
 class Prefetch:
     prefetch_through: str
