@@ -189,7 +189,15 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     request: dict[str, Any]
     client: Client
     templates: list[Template]
+
+    # `context` and `context_data` are populated based on whether you use the standard template
+    # backend or a custom one respectively.
+    # `context_data` only exists if the response was successful too as the return type changes.
+    # `HTTPResponse` when API failed and `TemplateResponse` when successful.
+    # https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.Response.context
     context: ContextList | dict[str, Any]
+    context_data: ContextList | dict[str, Any]
+
     content: bytes
     resolver_match: ResolverMatch
     redirect_chain: list[tuple[str, int]]
@@ -200,7 +208,15 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
     request: dict[str, Any]
     client: AsyncClient
     templates: list[Template]
+
+    # `context` and `context_data` are populated based on whether you use the standard template
+    # backend or a custom one respectively.
+    # `context_data` only exists if the response was successful too as the return type changes.
+    # `HTTPResponse` when API failed and `TemplateResponse` when successful.
+    # https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.Response.context
     context: ContextList | dict[str, Any]
+    context_data: ContextList | dict[str, Any]
+
     content: bytes
     resolver_match: ResolverMatch
     redirect_chain: list[tuple[str, int]]
