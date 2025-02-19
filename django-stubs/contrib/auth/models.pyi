@@ -93,8 +93,8 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 class User(AbstractUser): ...
 
 class AnonymousUser:
-    id: Any
-    pk: Any
+    id: None
+    pk: None
     username: Literal[""]
     is_staff: Literal[False]
     is_active: Literal[False]
