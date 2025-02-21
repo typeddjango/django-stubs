@@ -11,26 +11,26 @@
         print(annotated_user.asdf) # E: "User@AnnotatedWith[TypedDict({'foo': Any})]" has no attribute "asdf"  [attr-defined]
         print(unannotated_user.asdf) # E: "User" has no attribute "asdf"  [attr-defined]
 
-        def func(user: Annotated[User, Annotations]) -> str:  # E: Missing required TypedDict parameter for generic type Annotations  [misc]
-            return user.asdf  # E: "User" has no attribute "asdf"  [attr-defined]
+        def func(user: Annotated[User, Annotations]) -> None:  # E: Missing required TypedDict parameter for generic type Annotations  [misc]
+            user.asdf  # E: "User" has no attribute "asdf"  [attr-defined]
 
         # Due to the error on 'func' it should fall back to expecting 'User'
-        reveal_type(func)  # N: Revealed type is "def (user: myapp.models.User) -> builtins.str"
+        reveal_type(func)  # N: Revealed type is "def (user: myapp.models.User)"
         func(unannotated_user)
         func(annotated_user)
 
-        def func2(user: WithAnnotations[User]) -> str:
-            return user.asdf  # E: "User" has no attribute "asdf"  [attr-defined]
+        def func2(user: WithAnnotations[User]) -> None:
+            user.asdf  # E: "User" has no attribute "asdf"  [attr-defined]
 
         # With only one argument to 'WithAnnotations' it should fall back to expecting 'User'
-        reveal_type(func2)  # N: Revealed type is "def (user: myapp.models.User) -> builtins.str"
+        reveal_type(func2)  # N: Revealed type is "def (user: myapp.models.User)"
         func2(unannotated_user)
         func2(annotated_user)
 
-        def func3(user: WithAnnotations) -> str: ...
+        def func3(user: WithAnnotations) -> None: ...
 
         # With no arguments to 'WithAnnotations' it should become 'Any'
-        reveal_type(func3)  # N: Revealed type is "def (user: Any) -> builtins.str"
+        reveal_type(func3)  # N: Revealed type is "def (user: Any)"
         func3(unannotated_user)
         func3(annotated_user)
     installed_apps:

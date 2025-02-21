@@ -227,7 +227,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models/__init__.py
             content: |
-                from .app import App
+                from .app import App as App
         -   path: myapp/models/app.py
             content: |
                 from django.db import models
@@ -254,7 +254,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models/__init__.py
             content: |
-                from .user import User
+                from .user import User as User
         -   path: myapp/models/user.py
             content: |
                 from django.db import models
@@ -279,9 +279,9 @@
         -   path: myapp/__init__.py
         -   path: myapp/models/__init__.py
             content: |
-                from .user import User
-                from .profile import Profile
-                from .app import App
+                from .user import User as User
+                from .profile import Profile as Profile
+                from .app import App as App
         -   path: myapp/models/user.py
             content: |
                 from django.db import models
@@ -466,8 +466,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models/__init__.py
             content: |
-                from .publisher import Publisher
-                from .book import Book
+                from .publisher import Publisher as Publisher
+                from .book import Book as Book
         -   path: myapp/models/publisher.py
             content: |
                 from django.db import models
@@ -489,7 +489,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models/__init__.py
             content: |
-                from .book import Book
+                from .book import Book as Book
         -   path: myapp/models/publisher.py
             content: |
                 from django.db import models
@@ -836,7 +836,8 @@
         reveal_type(Order().products)  # N: Revealed type is "myapp.models.Product_RelatedManager"
         reveal_type(Order().products.get())  # N: Revealed type is "myapp.models.Product"
         reveal_type(Order().products.queryset_method())  # N: Revealed type is "builtins.int"
-        if 1 == 2:
+        cond: bool
+        if cond:
             manager = User().products
         else:
             manager = Order().products
@@ -1338,8 +1339,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models/__init__.py
             content: |
-                from .child import Child
-                from .parent import Parent
+                from .child import Child as Child
+                from .parent import Parent as Parent
         -   path: myapp/models/parent.py
             content: |
                 from django.db import models
