@@ -83,7 +83,8 @@
 
         class BrokenArticleChoiceField(forms.ModelChoiceField[Article]):
             def label_from_instance(self, obj: Article) -> str:
-                return obj.title # E: "Article" has no attribute "title"  [attr-defined]
+                obj.title # E: "Article" has no attribute "title"  [attr-defined]
+                return 'a'
 
         class ArticleMultipleChoiceField(forms.ModelMultipleChoiceField[Article]):
             def label_from_instance(self, obj: Article) -> str:

@@ -156,7 +156,7 @@
         -   path: myapp/models/__init__.py
             content: |
                 from django.db import models
-                from .main import Inventory
+                from .main import Inventory as Inventory
                 class Band(models.Model):
                     pass
         -   path: myapp/models/main.py
