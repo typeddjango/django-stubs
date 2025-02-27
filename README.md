@@ -310,9 +310,10 @@ reveal_type(settings.EXISTS_AT_RUNTIME)  # N: Any
 reveal_type(settings.MISSING)  # E: 'Settings' object has no attribute 'MISSING'
 ```
 
-### How to user `type[Model]` with `.objects` manager?
+### How to use `type[Model]` annotation with `.objects` attribute?
 
-Let's say you have this code:
+Let's say you have a function similar to this one,
+which accepts a model type and accesses its `.object` attribute:
 
 ```python
 from django.db import models
@@ -321,17 +322,17 @@ def assert_zero_count(model_type: type[models.Model]) -> None:
     assert model_type.objects.count() == 0
 ```
 
-This code will raise:
+This code will raise an error from mypy:
 
 ```
 error: "type[Model]" has no attribute "objects"  [attr-defined]
 ```
 
-It is a common error: some `type[models.Model]` types won't have `.objects` available.
+It is a common problem: some `type[models.Model]` types won't have `.objects` available.
 Notable example: [abstract models](https://docs.djangoproject.com/en/5.1/topics/db/models/#abstract-base-classes).
 See [the reasoning here](https://github.com/typeddjango/django-stubs/issues/1684).
 
-So, instead you should write:
+So, instead for the general case you should write:
 
 ```python
 def assert_zero_count(model_type: type[models.Model]) -> None:
