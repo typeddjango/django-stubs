@@ -310,7 +310,7 @@ reveal_type(settings.EXISTS_AT_RUNTIME)  # N: Any
 reveal_type(settings.MISSING)  # E: 'Settings' object has no attribute 'MISSING'
 ```
 
-### How to `type[Model]` with `.objects` manager?
+### How to user `type[Model]` with `.objects` manager?
 
 Let's say you have this code:
 
