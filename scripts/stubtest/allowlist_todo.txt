@@ -3,7 +3,6 @@
 
 django.__main__
 django.conf.global_settings.gettext_noop
-django.conf.urls.url
 django.contrib.admin.FieldListFilter.title
 django.contrib.admin.ModelAdmin
 django.contrib.admin.StackedInline
@@ -233,7 +232,6 @@ django.contrib.gis.db.models.DurationField.get_db_converters
 django.contrib.gis.db.models.EmailField.formfield
 django.contrib.gis.db.models.Empty
 django.contrib.gis.db.models.Exists.empty_result_set_value
-django.contrib.gis.db.models.Exists.select_format
 django.contrib.gis.db.models.Expression.identity
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.Extent.is_extent
@@ -258,7 +256,6 @@ django.contrib.gis.db.models.Field.get_db_converters
 django.contrib.gis.db.models.Field.get_filter_kwargs_for_object
 django.contrib.gis.db.models.Field.get_pk_value_on_save
 django.contrib.gis.db.models.Field.rel_db_type
-django.contrib.gis.db.models.Field.select_format
 django.contrib.gis.db.models.Field.unique
 django.contrib.gis.db.models.FileField.__get__
 django.contrib.gis.db.models.FileField.attr_class
@@ -295,7 +292,6 @@ django.contrib.gis.db.models.ForeignObjectRel.empty_strings_allowed
 django.contrib.gis.db.models.ForeignObjectRel.get_extra_restriction
 django.contrib.gis.db.models.ForeignObjectRel.identity
 django.contrib.gis.db.models.ForeignObjectRel.path_infos
-django.contrib.gis.db.models.Func.function
 django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.GenericIPAddressField.formfield
 django.contrib.gis.db.models.GeoAggregate
@@ -312,7 +308,6 @@ django.contrib.gis.db.models.Lookup.get_prep_lhs
 django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Lookup.lookup_name
 django.contrib.gis.db.models.Lookup.output_field
-django.contrib.gis.db.models.Lookup.select_format
 django.contrib.gis.db.models.Manager.__slotnames__
 django.contrib.gis.db.models.ManyToManyField.__get__
 django.contrib.gis.db.models.ManyToManyField.contribute_to_class
@@ -363,13 +358,11 @@ django.contrib.gis.db.models.Window.as_sqlite
 django.contrib.gis.db.models.aggregates.Extent.is_extent
 django.contrib.gis.db.models.aggregates.Extent3D.is_extent
 django.contrib.gis.db.models.aggregates.GeoAggregate.as_sql
-django.contrib.gis.db.models.aggregates.GeoAggregate.function
 django.contrib.gis.db.models.fields.GeometryField.contribute_to_class
 django.contrib.gis.db.models.fields.RasterField.contribute_to_class
 django.contrib.gis.db.models.functions.Area.as_sql
 django.contrib.gis.db.models.functions.GeoFuncMixin.__init__
 django.contrib.gis.db.models.functions.GeoFuncMixin.as_sql
-django.contrib.gis.db.models.functions.GeoFuncMixin.function
 django.contrib.gis.db.models.functions.GeoFuncMixin.name
 django.contrib.gis.db.models.functions.GeoFuncMixin.resolve_expression
 django.contrib.gis.db.models.functions.Length.as_sql
@@ -639,7 +632,6 @@ django.db.models.DurationField.get_db_converters
 django.db.models.EmailField.formfield
 django.db.models.Empty
 django.db.models.Exists.empty_result_set_value
-django.db.models.Exists.select_format
 django.db.models.Expression.identity
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.Field.__copy__
@@ -662,7 +654,6 @@ django.db.models.Field.get_db_converters
 django.db.models.Field.get_filter_kwargs_for_object
 django.db.models.Field.get_pk_value_on_save
 django.db.models.Field.rel_db_type
-django.db.models.Field.select_format
 django.db.models.Field.unique
 django.db.models.FileField.__get__
 django.db.models.FileField.attr_class
@@ -699,7 +690,6 @@ django.db.models.ForeignObjectRel.empty_strings_allowed
 django.db.models.ForeignObjectRel.get_extra_restriction
 django.db.models.ForeignObjectRel.identity
 django.db.models.ForeignObjectRel.path_infos
-django.db.models.Func.function
 django.db.models.Func.allowed_default
 django.db.models.GenericIPAddressField.formfield
 django.db.models.ImageField.__get__
@@ -714,7 +704,6 @@ django.db.models.Lookup.get_prep_lhs
 django.db.models.Lookup.lookup_name
 django.db.models.Lookup.allowed_default
 django.db.models.Lookup.output_field
-django.db.models.Lookup.select_format
 django.db.models.Manager.__slotnames__
 django.db.models.ManyToManyField.__get__
 django.db.models.ManyToManyField.contribute_to_class
@@ -787,7 +776,6 @@ django.db.models.expressions.BaseExpression.empty_result_set_value
 django.db.models.expressions.BaseExpression.get_refs
 django.db.models.expressions.BaseExpression.prefix_references
 django.db.models.expressions.BaseExpression.replace_expressions
-django.db.models.expressions.BaseExpression.select_format
 django.db.models.expressions.Case.as_sql
 django.db.models.expressions.Case.allowed_default
 django.db.models.expressions.CombinedExpression.allowed_default
@@ -796,10 +784,7 @@ django.db.models.expressions.Func.allowed_default
 django.db.models.expressions.When.allowed_default
 django.db.models.expressions.Col.relabeled_clone
 django.db.models.expressions.Exists.empty_result_set_value
-django.db.models.expressions.Exists.select_format
 django.db.models.expressions.Expression.identity
-django.db.models.expressions.Func.function
-django.db.models.expressions.NegatedExpression.select_format
 django.db.models.expressions.OrderBy.as_oracle
 django.db.models.expressions.OrderBy.as_sql
 django.db.models.expressions.Ref.get_refs
@@ -863,7 +848,6 @@ django.db.models.fields.Field.get_db_converters
 django.db.models.fields.Field.get_filter_kwargs_for_object
 django.db.models.fields.Field.get_pk_value_on_save
 django.db.models.fields.Field.rel_db_type
-django.db.models.fields.Field.select_format
 django.db.models.fields.Field.unique
 django.db.models.fields.FilePathField.formfield
 django.db.models.fields.FloatField.formfield
@@ -965,7 +949,6 @@ django.db.models.functions.Coalesce.as_oracle
 django.db.models.functions.Coalesce.empty_result_set_value
 django.db.models.functions.Collate.as_sql
 django.db.models.functions.Collate.collation_re
-django.db.models.functions.Concat.function
 django.db.models.functions.ConcatPair.as_postgresql
 django.db.models.functions.Cot.as_oracle
 django.db.models.functions.Degrees.as_oracle
@@ -1008,7 +991,6 @@ django.db.models.functions.math.Random.as_oracle
 django.db.models.functions.mixins.FixDecimalInputMixin.as_postgresql
 django.db.models.functions.mixins.FixDurationInputMixin.as_mysql
 django.db.models.functions.mixins.FixDurationInputMixin.as_oracle
-django.db.models.functions.text.Concat.function
 django.db.models.functions.text.ConcatPair.as_postgresql
 django.db.models.indexes.IndexExpression.wrapper_classes
 django.db.models.lookups.FieldGetDbPrepValueIterableMixin.batch_process_rhs
@@ -1018,7 +1000,6 @@ django.db.models.lookups.Lookup.get_prep_lhs
 django.db.models.lookups.Lookup.allowed_default
 django.db.models.lookups.Lookup.lookup_name
 django.db.models.lookups.Lookup.output_field
-django.db.models.lookups.Lookup.select_format
 django.db.models.lookups.PatternLookup.process_rhs
 django.db.models.manager.BaseManager.aaggregate
 django.db.models.manager.BaseManager.abulk_create
@@ -1134,7 +1115,6 @@ django.db.models.sql.where.WhereNode.get_source_expressions
 django.db.models.sql.where.WhereNode.leaves
 django.db.models.sql.where.WhereNode.output_field
 django.db.models.sql.where.WhereNode.replace_expressions
-django.db.models.sql.where.WhereNode.select_format
 django.db.models.sql.where.WhereNode.set_source_expressions
 django.db.models.sql.where.WhereNode.split_having
 django.db.models.sql.where.WhereNode.split_having_qualify
@@ -1305,7 +1285,6 @@ django.db.backends.postgresql.base.Cursor
 
 # mypy 1.14.0 new issues:
 django.apps.__all__
-django.conf.urls.__all__
 django.contrib.admin.__all__
 django.contrib.gis.admin.__all__
 django.contrib.gis.db.models.__all__

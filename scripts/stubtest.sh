@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-# Run this script as `bash ./scripts/stubtest.sh`
+# Run this script with `./scripts/stubtest.sh`
 
 set -e
 

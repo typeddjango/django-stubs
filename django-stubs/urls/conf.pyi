@@ -6,10 +6,10 @@ from django.urls import URLPattern, URLResolver, _AnyURL
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
-from ..conf.urls import _IncludedURLConf
 from ..http.response import HttpResponseBase
 
 _URLConf: TypeAlias = str | ModuleType | Sequence[_AnyURL]
+_IncludedURLConf: TypeAlias = tuple[Sequence[URLResolver | URLPattern], str | None, str | None]
 
 def include(arg: _URLConf | tuple[_URLConf, str], namespace: str | None = ...) -> _IncludedURLConf: ...
 
