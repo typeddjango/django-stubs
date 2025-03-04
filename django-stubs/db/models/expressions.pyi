@@ -181,7 +181,7 @@ class OuterRef(F):
     def relabeled_clone(self, relabels: Any) -> Self: ...
 
 class Func(SQLiteNumericMixin, Expression):
-    function: str
+    function: str | None
     name: str
     template: str
     arg_joiner: str

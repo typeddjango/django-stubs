@@ -11,6 +11,7 @@ from django.utils.functional import cached_property
 NUMERIC_TYPES: Any
 
 class GeoFuncMixin:
+    function: str | None = None
     geom_param_pos: Any
     @property
     def geo_field(self) -> Any: ...
