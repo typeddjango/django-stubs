@@ -1,6 +1,6 @@
 import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar, cast, overload, type_check_only
+from typing import Any, ClassVar, Generic, Literal, TypeVar, cast, overload, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -93,9 +93,9 @@ class BaseModelAdmin(Generic[_ModelT]):
     form: type[forms.ModelForm[_ModelT]]
     filter_vertical: _ListOrTuple[str]
     filter_horizontal: _ListOrTuple[str]
-    radio_fields: Mapping[str, _Direction]
+    radio_fields: ClassVar[Mapping[str, _Direction]]
     prepopulated_fields: dict[str, Sequence[str]]
-    formfield_overrides: Mapping[type[Field], Mapping[str, Any]]
+    formfield_overrides: ClassVar[Mapping[type[Field], Mapping[str, Any]]]
     readonly_fields: _ListOrTuple[str]
     ordering: _ListOrTuple[str] | None
     sortable_by: _ListOrTuple[str] | None
