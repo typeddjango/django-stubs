@@ -1,6 +1,6 @@
 import enum
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, TypeVar, cast, overload, type_check_only
+from typing import Any, ClassVar, Generic, Literal, TypeVar, cast, overload, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -84,23 +84,25 @@ _ListFilterT: TypeAlias = (
 _ModelT = TypeVar("_ModelT", bound=Model)
 _DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 
+# Options `form`, `list_display`, `list_display_links` and `actions` are not marked as `ClassVar` due to the
+# limitations of the current type system: `ClassVar` cannot contain type variables.
 class BaseModelAdmin(Generic[_ModelT]):
-    autocomplete_fields: _ListOrTuple[str]
-    raw_id_fields: _ListOrTuple[str]
-    fields: _FieldGroups | None
-    exclude: _ListOrTuple[str] | None
-    fieldsets: _FieldsetSpec | None
+    autocomplete_fields: ClassVar[_ListOrTuple[str]]
+    raw_id_fields: ClassVar[_ListOrTuple[str]]
+    fields: ClassVar[_FieldGroups | None]
+    exclude: ClassVar[_ListOrTuple[str] | None]
+    fieldsets: ClassVar[_FieldsetSpec | None]
     form: type[forms.ModelForm[_ModelT]]
-    filter_vertical: _ListOrTuple[str]
-    filter_horizontal: _ListOrTuple[str]
-    radio_fields: Mapping[str, _Direction]
-    prepopulated_fields: dict[str, Sequence[str]]
-    formfield_overrides: Mapping[type[Field], Mapping[str, Any]]
-    readonly_fields: _ListOrTuple[str]
-    ordering: _ListOrTuple[str] | None
-    sortable_by: _ListOrTuple[str] | None
-    show_full_result_count: bool
-    checks_class: Any
+    filter_vertical: ClassVar[_ListOrTuple[str]]
+    filter_horizontal: ClassVar[_ListOrTuple[str]]
+    radio_fields: ClassVar[Mapping[str, _Direction]]
+    prepopulated_fields: ClassVar[dict[str, Sequence[str]]]
+    formfield_overrides: ClassVar[Mapping[type[Field], Mapping[str, Any]]]
+    readonly_fields: ClassVar[_ListOrTuple[str]]
+    ordering: ClassVar[_ListOrTuple[str] | None]
+    sortable_by: ClassVar[_ListOrTuple[str] | None]
+    show_full_result_count: ClassVar[bool]
+    checks_class: ClassVar[Any]
     model: type[_ModelT]
     opts: Options[_ModelT]
     admin_site: AdminSite
@@ -150,33 +152,33 @@ _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_Model
 class ModelAdmin(BaseModelAdmin[_ModelT]):
     list_display: _DisplayT[_ModelT]
     list_display_links: _DisplayT[_ModelT] | None
-    list_filter: _ListOrTuple[_ListFilterT]
-    list_select_related: bool | _ListOrTuple[str]
-    list_per_page: int
-    list_max_show_all: int
-    list_editable: _ListOrTuple[str]
-    search_fields: _ListOrTuple[str]
-    search_help_text: _StrOrPromise | None
-    date_hierarchy: str | None
-    save_as: bool
-    save_as_continue: bool
-    save_on_top: bool
-    paginator: type
-    preserve_filters: bool
-    show_facets: ShowFacets
-    inlines: _ListOrTuple[type[InlineModelAdmin]]
-    add_form_template: _TemplateForResponseT | None
-    change_form_template: _TemplateForResponseT | None
-    change_list_template: _TemplateForResponseT | None
-    delete_confirmation_template: _TemplateForResponseT | None
-    delete_selected_confirmation_template: _TemplateForResponseT | None
-    object_history_template: _TemplateForResponseT | None
-    popup_response_template: _TemplateForResponseT | None
+    list_filter: ClassVar[_ListOrTuple[_ListFilterT]]
+    list_select_related: ClassVar[bool | _ListOrTuple[str]]
+    list_per_page: ClassVar[int]
+    list_max_show_all: ClassVar[int]
+    list_editable: ClassVar[_ListOrTuple[str]]
+    search_fields: ClassVar[_ListOrTuple[str]]
+    search_help_text: ClassVar[_StrOrPromise | None]
+    date_hierarchy: ClassVar[str | None]
+    save_as: ClassVar[bool]
+    save_as_continue: ClassVar[bool]
+    save_on_top: ClassVar[bool]
+    paginator: ClassVar[type]
+    preserve_filters: ClassVar[bool]
+    show_facets: ClassVar[ShowFacets]
+    inlines: ClassVar[_ListOrTuple[type[InlineModelAdmin]]]
+    add_form_template: ClassVar[_TemplateForResponseT | None]
+    change_form_template: ClassVar[_TemplateForResponseT | None]
+    change_list_template: ClassVar[_TemplateForResponseT | None]
+    delete_confirmation_template: ClassVar[_TemplateForResponseT | None]
+    delete_selected_confirmation_template: ClassVar[_TemplateForResponseT | None]
+    object_history_template: ClassVar[_TemplateForResponseT | None]
+    popup_response_template: ClassVar[_TemplateForResponseT | None]
     actions: Sequence[_ActionCallable[Self, _ModelT] | str] | None
-    action_form: Any
-    actions_on_top: bool
-    actions_on_bottom: bool
-    actions_selection_counter: bool
+    action_form: ClassVar[Any]
+    actions_on_top: ClassVar[bool]
+    actions_on_bottom: ClassVar[bool]
+    actions_selection_counter: ClassVar[bool]
     model: type[_ModelT]
     opts: Options[_ModelT]
     admin_site: AdminSite
