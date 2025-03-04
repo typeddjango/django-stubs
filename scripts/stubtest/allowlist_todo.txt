@@ -3,7 +3,6 @@
 
 django.__main__
 django.conf.global_settings.gettext_noop
-django.conf.urls.url
 django.contrib.admin.FieldListFilter.title
 django.contrib.admin.ModelAdmin
 django.contrib.admin.StackedInline
@@ -1293,7 +1292,6 @@ django.db.backends.postgresql.base.Cursor
 
 # mypy 1.14.0 new issues:
 django.apps.__all__
-django.conf.urls.__all__
 django.contrib.admin.__all__
 django.contrib.gis.admin.__all__
 django.contrib.gis.db.models.__all__
