@@ -1,4 +1,3 @@
-# Stubs for django.conf.urls (Python 3.5)
 from collections.abc import Callable, Sequence
 from typing import Any, overload
 
