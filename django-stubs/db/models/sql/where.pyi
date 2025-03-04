@@ -4,7 +4,7 @@ from typing import Any
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
 from django.db.models.fields import BooleanField
-from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.db.models.sql.query import Query
 from django.utils import tree
 from django.utils.functional import cached_property
@@ -33,6 +33,7 @@ class WhereNode(tree.Node):
     def contains_over_clause(self) -> bool: ...
     @property
     def is_summary(self) -> bool: ...
+    def select_format(self, compiler: SQLCompiler, sql: str, params: _ParamsT) -> _AsSqlType: ...
 
 class NothingNode:
     contains_aggregate: bool
