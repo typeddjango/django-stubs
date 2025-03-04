@@ -84,6 +84,8 @@ _ListFilterT: TypeAlias = (
 _ModelT = TypeVar("_ModelT", bound=Model)
 _DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 
+# Options `form`, `list_display`, `list_display_links` and `actions` are not marked as `ClassVar` due to the
+# limitations of the current type system: `ClassVar` cannot contain type variables.
 class BaseModelAdmin(Generic[_ModelT]):
     autocomplete_fields: ClassVar[_ListOrTuple[str]]
     raw_id_fields: ClassVar[_ListOrTuple[str]]
