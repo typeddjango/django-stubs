@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Literal, overload
+from typing import Any, ClassVar
 from uuid import UUID
 
 from django.db import models
