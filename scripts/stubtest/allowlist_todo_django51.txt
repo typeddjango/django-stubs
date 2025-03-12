@@ -14,9 +14,6 @@ django.contrib.auth.forms.SetPasswordForm.clean_new_password2
 django.contrib.auth.forms.SetPasswordMixin
 django.contrib.auth.forms.SetUnusablePasswordMixin
 django.contrib.auth.forms.AdminUserCreationForm
-django.contrib.auth.hashers.SHA1PasswordHasher
-django.contrib.auth.hashers.UnsaltedMD5PasswordHasher
-django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher
 django.contrib.auth.middleware.LoginRequiredMiddleware
 django.contrib.auth.models.BaseUserManager.make_random_password
 django.contrib.contenttypes.fields.GenericForeignKey.cache_name
