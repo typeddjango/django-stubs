@@ -186,10 +186,6 @@ django.test.RequestFactory.patch
 django.test.RequestFactory.post
 django.test.RequestFactory.put
 django.test.RequestFactory.trace
-django.test.SimpleTestCase.assertFormsetError
-django.test.SimpleTestCase.assertNotInHTML
-django.test.SimpleTestCase.ensure_connection_patch_method
-django.test.TransactionTestCase.assertQuerysetEqual
 django.test.client.AsyncClient.__init__
 django.test.client.AsyncClient.delete
 django.test.client.AsyncClient.get
@@ -232,10 +228,6 @@ django.test.selenium.SeleniumTestCase.take_screenshot
 django.test.selenium.screenshot_cases
 django.test.signals.file_storage_changed
 django.test.signals.form_renderer_changed
-django.test.testcases.SimpleTestCase.assertFormsetError
-django.test.testcases.SimpleTestCase.assertNotInHTML
-django.test.testcases.SimpleTestCase.ensure_connection_patch_method
-django.test.testcases.TransactionTestCase.assertQuerysetEqual
 django.test.utils.garbage_collect
 django.urls.converters.get_converter
 django.urls.resolvers.LocaleRegexRouteDescriptor
