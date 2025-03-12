@@ -75,13 +75,6 @@ django.contrib.postgres.fields.array.ArrayField.slice_expression
 django.contrib.postgres.fields.citext.CIText
 django.contrib.postgres.indexes.BTreeIndex.__init__
 django.contrib.postgres.indexes.OpClass.constraint_validation_compatible
-django.core.checks.templates.E001
-django.core.checks.templates.E002
-django.core.checks.templates.W003
-django.core.checks.templates.check_for_template_tags_with_the_same_name
-django.core.checks.templates.check_setting_app_dirs_loaders
-django.core.checks.templates.check_string_if_invalid_is_string
-django.core.checks.templates.check_templates
 django.core.checks.urls.check_custom_error_handlers
 django.core.files.storage.FileSystemStorage.__init__
 django.core.files.storage.FileSystemStorage.is_name_available
@@ -162,8 +155,6 @@ django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
 django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.widgets.RadioSelect.__slotnames__
-django.template.backends.base.BaseEngine.check
-django.template.backends.django.DjangoTemplates.check
 django.template.defaultfilters.length_is
 django.template.defaulttags.querystring
 django.test.AsyncClient.__init__
