@@ -349,6 +349,7 @@ django.db.models.fields.reverse_related.ForeignObjectRel.one_to_one
 django.db.models.fields.reverse_related.ForeignObjectRel.related_model
 django.db.models.lookups.Lookup.contains_aggregate
 django.db.models.lookups.Lookup.contains_over_clause
+django.db.models.options.Options.all_parents
 django.db.models.options.Options.base_manager
 django.db.models.options.Options.db_returning_fields
 django.db.models.options.Options.default_manager
@@ -356,7 +357,9 @@ django.db.models.options.Options.fields
 django.db.models.options.Options.fields_map
 django.db.models.options.Options.managers
 django.db.models.options.Options.managers_map
+django.db.models.options.Options.swapped
 django.db.models.options.Options.total_unique_constraints
+django.db.models.options.Options.verbose_name_raw
 django.db.models.query.RawQuerySet.columns
 django.db.models.query.RawQuerySet.model_fields
 django.db.models.sql.Query.base_table

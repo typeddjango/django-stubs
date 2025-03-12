@@ -134,10 +134,6 @@ django.db.models.functions.JSONObject.as_native
 django.db.models.functions.comparison.JSONObject.as_native
 django.db.models.functions.text.ConcatPair.pipes_concat_sql
 django.db.models.lookups.In.get_refs
-django.db.models.options.Options.all_parents
-django.db.models.options.Options.setting_changed
-django.db.models.options.Options.swapped
-django.db.models.options.Options.verbose_name_raw
 django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
 django.forms.models.ModelChoiceField.validate_no_null_characters
