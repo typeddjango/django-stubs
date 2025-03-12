@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from datetime import date, datetime
 from typing import Any, ClassVar, Literal, TypeVar, overload
 
 from django.db import models
@@ -19,7 +20,7 @@ class AbstractBaseUser(models.Model):
     REQUIRED_FIELDS: ClassVar[list[str]]
 
     password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
+    last_login = models.DateTimeField[str | datetime | date | Combinable, datetime | None](blank=True, null=True)
     is_active: bool | BooleanField[bool | Combinable, bool]
 
     def get_username(self) -> str: ...

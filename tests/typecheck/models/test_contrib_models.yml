@@ -112,6 +112,7 @@
         main:7: note: Revealed type is "myapp.models.MyUser"
 
         main:9: note: Revealed type is "myapp.models.MyUser"
+    monkeypatch: true
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp', 'other')
         AUTH_USER_MODEL='myapp.MyUser'
@@ -126,11 +127,15 @@
         - path: other/__init__.py
         - path: other/models.py
           content: |
+              from myapp.models import MyUser
               from django.conf import settings
               from django.db import models
 
+              class Other_users(models.Model):
+                  myuser = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
               class Other(models.Model):
-                  users = models.ManyToManyField(settings.AUTH_USER_MODEL)
+                  users = models.ManyToManyField[MyUser, Other_users](settings.AUTH_USER_MODEL, through='Other_users')
                   user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
                   unq_user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
