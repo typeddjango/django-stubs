@@ -29,8 +29,6 @@ django.contrib.gis.db.models.Field.slice_expression
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.ForeignObjectRel.cache_name
 django.contrib.gis.db.models.ForeignObjectRel.is_hidden
-django.contrib.gis.db.models.Model.asave
-django.contrib.gis.db.models.Model.save
 django.contrib.gis.db.models.OrderBy.constraint_validation_compatible
 django.contrib.gis.db.models.TextField.slice_expression
 django.contrib.gis.db.models.WindowFrame.__init__
@@ -122,15 +120,11 @@ django.db.models.Field.slice_expression
 django.db.models.ForeignObjectRel.accessor_name
 django.db.models.ForeignObjectRel.cache_name
 django.db.models.ForeignObjectRel.is_hidden
-django.db.models.Model.asave
-django.db.models.Model.save
 django.db.models.OrderBy.constraint_validation_compatible
 django.db.models.TextField.slice_expression
 django.db.models.WindowFrame.__init__
 django.db.models.WindowFrame.get_exclusion
 django.db.models.WindowFrameExclusion
-django.db.models.base.Model.asave
-django.db.models.base.Model.save
 django.db.models.constraints.CheckConstraint.__init__
 django.db.models.expressions.BaseExpression.constraint_validation_compatible
 django.db.models.expressions.BaseExpression.get_expression_for_validation
