@@ -1,5 +1,5 @@
 from collections.abc import Collection, Iterable, Sequence
-from typing import Any, ClassVar, Final, TypeVar, overload
+from typing import Any, ClassVar, Final, NoReturn, TypeVar, overload
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
@@ -71,6 +71,7 @@ class Model(metaclass=ModelBase):
     def get_constraints(self) -> list[tuple[type[Model], Sequence[BaseConstraint]]]: ...
     def save(
         self,
+        *args: NoReturn,
         force_insert: bool | tuple[ModelBase, ...] = False,
         force_update: bool = False,
         using: str | None = None,
@@ -78,6 +79,7 @@ class Model(metaclass=ModelBase):
     ) -> None: ...
     async def asave(
         self,
+        *args: NoReturn,
         force_insert: bool | tuple[ModelBase, ...] = False,
         force_update: bool = False,
         using: str | None = None,
