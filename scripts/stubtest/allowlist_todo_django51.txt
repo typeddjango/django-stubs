@@ -25,7 +25,6 @@ django.contrib.gis.db.models.CheckConstraint.__init__
 django.contrib.gis.db.models.Field.slice_expression
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.ForeignObjectRel.cache_name
-django.contrib.gis.db.models.ForeignObjectRel.is_hidden
 django.contrib.gis.db.models.OrderBy.constraint_validation_compatible
 django.contrib.gis.db.models.TextField.slice_expression
 django.contrib.gis.db.models.WindowFrame.__init__
@@ -109,7 +108,6 @@ django.db.models.CheckConstraint.__init__
 django.db.models.Field.slice_expression
 django.db.models.ForeignObjectRel.accessor_name
 django.db.models.ForeignObjectRel.cache_name
-django.db.models.ForeignObjectRel.is_hidden
 django.db.models.OrderBy.constraint_validation_compatible
 django.db.models.TextField.slice_expression
 django.db.models.WindowFrame.__init__
@@ -128,11 +126,9 @@ django.db.models.fields.TextField.slice_expression
 django.db.models.fields.mixins.FieldCacheMixin.cache_name
 django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.related.ForeignObjectRel.cache_name
-django.db.models.fields.related.ForeignObjectRel.is_hidden
 django.db.models.fields.related.RelatedField.cache_name
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.cache_name
-django.db.models.fields.reverse_related.ForeignObjectRel.is_hidden
 django.db.models.functions.ConcatPair.pipes_concat_sql
 django.db.models.functions.JSONObject.as_native
 django.db.models.functions.comparison.JSONObject.as_native
