@@ -1,5 +1,3 @@
-# Stubs for django.core.files.uploadhandler (Python 3.5)
-
 from typing import IO, Any
 
 from django.core.files.uploadedfile import TemporaryUploadedFile, UploadedFile

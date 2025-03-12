@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Literal, overload
+from typing import Any, ClassVar
 from uuid import UUID
 
 from django.contrib.auth.models import AbstractUser
@@ -25,26 +25,13 @@ class LogEntryManager(models.Manager[LogEntry]):
         action_flag: int,
         change_message: Any = ...,
     ) -> LogEntry: ...
-    @overload
     def log_actions(
         self,
         user_id: int,
         queryset: QuerySet[Model],
         action_flag: int,
         change_message: str | list[Any] = "",
-        *,
-        single_object: Literal[True],
-    ) -> LogEntry: ...
-    @overload
-    def log_actions(
-        self,
-        user_id: int,
-        queryset: QuerySet[Model],
-        action_flag: int,
-        change_message: str | list[Any] = "",
-        *,
-        single_object: Literal[False] = False,
-    ) -> list[LogEntry]: ...
+    ) -> list[LogEntry] | LogEntry: ...
 
 class LogEntry(models.Model):
     id: models.AutoField

@@ -480,3 +480,6 @@ django.contrib.auth.views.UserModel
 # Using the definitions from `dict` (from typeshed)
 django.contrib.sessions.backends.base.SessionBase.get
 django.contrib.sessions.backends.base.SessionBase.setdefault
+
+# Limited stubtest support for enums (https://github.com/python/mypy/issues/16806)
+django.db.migrations.operations.base.OperationCategory.__new__

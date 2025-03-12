@@ -95,7 +95,7 @@ jobs:
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run stubtest
-        run: bash ./scripts/stubtest.sh
+        run: ./scripts/stubtest.sh
 
   run-pyright:
     timeout-minutes: 10
