@@ -125,8 +125,6 @@ django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
 django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.widgets.RadioSelect.__slotnames__
-django.template.defaultfilters.length_is
-django.template.defaulttags.querystring
 django.test.AsyncClient.__init__
 django.test.AsyncClient.delete
 django.test.AsyncClient.get
