@@ -205,8 +205,6 @@ django.test.selenium.screenshot_cases
 django.test.signals.file_storage_changed
 django.test.signals.form_renderer_changed
 django.test.utils.garbage_collect
-django.urls.converters.get_converter
-django.urls.resolvers.LocaleRegexRouteDescriptor
 django.urls.resolvers.whitespace_set
 
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
