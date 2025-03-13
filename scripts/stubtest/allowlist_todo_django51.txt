@@ -4,7 +4,6 @@
 # Unsorted: there are real problems and things we can really ignore:
 
 django.contrib.auth.base_user.BaseUserManager.make_random_password
-django.contrib.auth.checks.check_middleware
 django.contrib.auth.forms.AdminPasswordChangeForm.clean_password2
 django.contrib.auth.forms.AdminPasswordChangeForm.usable_password_help_text
 django.contrib.auth.forms.BaseUserCreationForm.clean_password2
@@ -62,7 +61,6 @@ django.contrib.postgres.fields.CIText
 django.contrib.postgres.fields.citext.CIText
 django.contrib.postgres.indexes.BTreeIndex.__init__
 django.contrib.postgres.indexes.OpClass.constraint_validation_compatible
-django.core.checks.urls.check_custom_error_handlers
 django.core.files.storage.FileSystemStorage.__init__
 django.core.files.storage.FileSystemStorage.is_name_available
 django.core.files.storage.GET_STORAGE_CLASS_DEPRECATED_MSG
