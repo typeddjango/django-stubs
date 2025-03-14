@@ -52,6 +52,7 @@ class CheckConstraint(BaseConstraint):
         self,
         *,
         name: str,
+        condition: None = None,
         check: Q | BaseExpression,
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
@@ -62,6 +63,7 @@ class CheckConstraint(BaseConstraint):
         *,
         name: str,
         condition: Q | BaseExpression,
+        check: None = None,
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...

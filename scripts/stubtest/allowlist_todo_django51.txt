@@ -17,7 +17,6 @@ django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
-django.contrib.gis.db.models.CheckConstraint.__init__
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.ForeignObjectRel.cache_name
 django.contrib.gis.db.models.OrderBy.constraint_validation_compatible
@@ -94,14 +93,12 @@ django.db.backends.sqlite3.features.DatabaseFeatures.supports_frame_exclusion
 django.db.backends.sqlite3.operations.DatabaseOperations.force_group_by
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
-django.db.models.CheckConstraint.__init__
 django.db.models.ForeignObjectRel.accessor_name
 django.db.models.ForeignObjectRel.cache_name
 django.db.models.OrderBy.constraint_validation_compatible
 django.db.models.WindowFrame.__init__
 django.db.models.WindowFrame.get_exclusion
 django.db.models.WindowFrameExclusion
-django.db.models.constraints.CheckConstraint.__init__
 django.db.models.expressions.BaseExpression.constraint_validation_compatible
 django.db.models.expressions.BaseExpression.get_expression_for_validation
 django.db.models.expressions.OrderBy.constraint_validation_compatible
