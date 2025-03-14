@@ -488,3 +488,14 @@ django.contrib.sessions.backends.base.SessionBase.setdefault
 
 # Limited stubtest support for enums (https://github.com/python/mypy/issues/16806)
 django.db.migrations.operations.base.OperationCategory.__new__
+
+# Ignore: ...Model.[a]save is inconsistent, stub does not have *args argument "args"
+# Positional arguments were deprecated in Django 5.1, we have adopted keyword-only arguments early.
+django.contrib.auth.base_user.AbstractBaseUser.save
+django.contrib.auth.models.AbstractBaseUser.save
+django.contrib.gis.db.models.Model.asave
+django.contrib.gis.db.models.Model.save
+django.db.models.Model.asave
+django.db.models.Model.save
+django.db.models.base.Model.asave
+django.db.models.base.Model.save
