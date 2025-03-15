@@ -949,9 +949,6 @@ django.db.models.functions.Cot.as_oracle
 django.db.models.functions.Degrees.as_oracle
 django.db.models.functions.Extract.as_sql
 django.db.models.functions.Extract.lookup_name
-django.db.models.functions.JSONObject.as_oracle
-django.db.models.functions.JSONObject.as_postgresql
-django.db.models.functions.JSONObject.as_sql
 django.db.models.functions.Now.as_mysql
 django.db.models.functions.Now.as_postgresql
 django.db.models.functions.NullIf.as_oracle
@@ -967,9 +964,6 @@ django.db.models.functions.comparison.Coalesce.as_oracle
 django.db.models.functions.comparison.Coalesce.empty_result_set_value
 django.db.models.functions.comparison.Collate.as_sql
 django.db.models.functions.comparison.Collate.collation_re
-django.db.models.functions.comparison.JSONObject.as_oracle
-django.db.models.functions.comparison.JSONObject.as_postgresql
-django.db.models.functions.comparison.JSONObject.as_sql
 django.db.models.functions.comparison.NullIf.as_oracle
 django.db.models.functions.datetime.Extract.as_sql
 django.db.models.functions.datetime.Extract.lookup_name

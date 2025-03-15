@@ -80,8 +80,6 @@ django.db.models.fields.related.RelatedField.cache_name
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.cache_name
 django.db.models.functions.ConcatPair.pipes_concat_sql
-django.db.models.functions.JSONObject.as_native
-django.db.models.functions.comparison.JSONObject.as_native
 django.db.models.functions.text.ConcatPair.pipes_concat_sql
 django.db.models.lookups.In.get_refs
 django.forms.ModelChoiceField.validate_no_null_characters
