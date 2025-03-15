@@ -12,7 +12,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request: HttpRequest) -> None: ...
 
 class LoginRequiredMiddleware(MiddlewareMixin):
-    redirect_field_name: str = ...
+    redirect_field_name: ClassVar[str]
 
     def process_view(
         self,
