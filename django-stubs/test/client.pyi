@@ -78,7 +78,12 @@ class _RequestFactory(Generic[_T]):
     cookies: SimpleCookie
     errors: BytesIO
     def __init__(
-        self, *, json_encoder: type[JSONEncoder] = ..., headers: Mapping[str, Any] | None = ..., **defaults: Any
+        self,
+        *,
+        json_encoder: type[JSONEncoder] = ...,
+        headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
+        **defaults: Any,
     ) -> None: ...
     def request(self, **request: Any) -> _T: ...
     def get(
@@ -88,6 +93,7 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
     def post(
@@ -98,12 +104,28 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
     def head(
-        self, path: str, data: Any = ..., secure: bool = ..., *, headers: Mapping[str, Any] | None = ..., **extra: Any
+        self,
+        path: str,
+        data: Any = ...,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
+        **extra: Any,
     ) -> _T: ...
-    def trace(self, path: str, secure: bool = ..., *, headers: Mapping[str, Any] | None = ..., **extra: Any) -> _T: ...
+    def trace(
+        self,
+        path: str,
+        secure: bool = ...,
+        *,
+        headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
+        **extra: Any,
+    ) -> _T: ...
     def options(
         self,
         path: str,
@@ -112,6 +134,7 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
     def put(
@@ -122,6 +145,7 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
     def patch(
@@ -132,6 +156,7 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
     def delete(
@@ -142,6 +167,7 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
     def generic(
@@ -153,6 +179,7 @@ class _RequestFactory(Generic[_T]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _T: ...
 
@@ -246,6 +273,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         raise_request_exception: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **defaults: Any,
     ) -> None: ...
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
@@ -257,6 +285,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def post(  # type: ignore[override]
@@ -268,6 +297,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def head(  # type: ignore[override]
@@ -278,6 +308,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def options(  # type: ignore[override]
@@ -289,6 +320,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def put(  # type: ignore[override]
@@ -300,6 +332,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def patch(  # type: ignore[override]
@@ -311,6 +344,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def delete(  # type: ignore[override]
@@ -322,6 +356,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
     def trace(  # type: ignore[override]
@@ -332,6 +367,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedWSGIResponse: ...
 
@@ -347,6 +383,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         raise_request_exception: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **defaults: Any,
     ) -> None: ...
     async def request(self, **request: Any) -> _MonkeyPatchedASGIResponse: ...
@@ -358,6 +395,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def post(  # type: ignore[override]
@@ -369,6 +407,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def head(  # type: ignore[override]
@@ -379,6 +418,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def options(  # type: ignore[override]
@@ -390,6 +430,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def put(  # type: ignore[override]
@@ -401,6 +442,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def patch(  # type: ignore[override]
@@ -412,6 +454,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def delete(  # type: ignore[override]
@@ -423,6 +466,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
     async def trace(  # type: ignore[override]
@@ -433,5 +477,6 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
+        query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
