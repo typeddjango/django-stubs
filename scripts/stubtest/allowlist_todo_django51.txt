@@ -57,15 +57,6 @@ django.contrib.postgres.fields.CIText
 django.contrib.postgres.fields.citext.CIText
 django.contrib.postgres.indexes.BTreeIndex.__init__
 django.contrib.postgres.indexes.OpClass.constraint_validation_compatible
-django.core.files.storage.FileSystemStorage.__init__
-django.core.files.storage.FileSystemStorage.is_name_available
-django.core.files.storage.GET_STORAGE_CLASS_DEPRECATED_MSG
-django.core.files.storage.Storage.is_name_available
-django.core.files.storage.__all__
-django.core.files.storage.base.Storage.is_name_available
-django.core.files.storage.filesystem.FileSystemStorage.__init__
-django.core.files.storage.filesystem.FileSystemStorage.is_name_available
-django.core.files.storage.get_storage_class
 django.core.signing.Signer.__init__
 django.db.backends.base.operations.BaseDatabaseOperations.bulk_insert_sql
 django.db.backends.base.operations.BaseDatabaseOperations.force_group_by
@@ -118,7 +109,6 @@ django.test.selenium.SeleniumTestCase.set_emulated_media
 django.test.selenium.SeleniumTestCase.small_screen_size
 django.test.selenium.SeleniumTestCase.take_screenshot
 django.test.selenium.screenshot_cases
-django.test.signals.file_storage_changed
 django.test.signals.form_renderer_changed
 django.test.utils.garbage_collect
 django.urls.resolvers.whitespace_set
