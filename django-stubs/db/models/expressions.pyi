@@ -1,6 +1,7 @@
 import datetime
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
+from enum import Enum
 from typing import Any, ClassVar, Generic, Literal, NoReturn, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -298,13 +299,25 @@ class Window(SQLiteNumericMixin, Expression):
         output_field: Field | None = None,
     ) -> None: ...
 
+class WindowFrameExclusion(Enum):
+    CURRENT_ROW = "CURRENT ROW"
+    GROUP = "GROUP"
+    TIES = "TIES"
+    NO_OTHERS = "NO OTHERS"
+
 class WindowFrame(Expression):
     template: str
     frame_type: str
-    def __init__(self, start: int | None = None, end: int | None = None) -> None: ...
+    def __init__(
+        self,
+        start: int | None = None,
+        end: int | None = None,
+        exclusion: WindowFrameExclusion | None = None,
+    ) -> None: ...
     def window_frame_start_end(
         self, connection: BaseDatabaseWrapper, start: int | None, end: int | None
     ) -> tuple[int, int]: ...
+    def get_exclusion(self) -> str: ...
 
 class RowRange(WindowFrame): ...
 class ValueRange(WindowFrame): ...

@@ -41,6 +41,7 @@ from .expressions import ValueRange as ValueRange
 from .expressions import When as When
 from .expressions import Window as Window
 from .expressions import WindowFrame as WindowFrame
+from .expressions import WindowFrameExclusion as WindowFrameExclusion
 from .fields import NOT_PROVIDED as NOT_PROVIDED
 from .fields import AutoField as AutoField
 from .fields import BigAutoField as BigAutoField
