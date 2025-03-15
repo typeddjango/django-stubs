@@ -67,6 +67,7 @@ django.contrib.auth.backends.RemoteUserBackend.authenticate
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
 django.contrib.auth.decorators.login_required
+django.contrib.auth.forms.AdminUserCreationForm.declared_fields
 django.contrib.auth.forms.BaseUserCreationForm.declared_fields
 django.contrib.auth.forms.UserChangeForm.declared_fields
 django.contrib.auth.forms.UserCreationForm.declared_fields

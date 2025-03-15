@@ -11,6 +11,7 @@ from django.db.models.fields import _ErrorMessagesDict
 from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
+from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
 
 logger: Logger
@@ -31,12 +32,42 @@ class UsernameField(forms.CharField):
     def to_python(self, value: Any | None) -> Any | None: ...
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
+class SetPasswordMixin:
+    error_messages: dict[str, _StrOrPromise]
+
+    @staticmethod
+    def create_password_fields(
+        label1: _StrOrPromise = ..., label2: _StrOrPromise = ...
+    ) -> tuple[forms.CharField, forms.CharField]: ...
+    def validate_passwords(
+        self,
+        password1_field_name: str = ...,
+        password2_field_name: str = ...,
+    ) -> None: ...
+    def validate_password_for_user(self, user: AbstractBaseUser, password_field_name: str = "password2") -> None: ...
+    def set_password_and_save(
+        self, user: AbstractBaseUser, password_field_name: str = "password1", commit: bool = True
+    ) -> AbstractBaseUser: ...
+
+class SetUnusablePasswordMixin:
+    usable_password_help_text: _StrOrPromise
+
+    @staticmethod
+    def create_usable_password_field(help_text: _StrOrPromise = ...) -> forms.ChoiceField: ...
+    def validate_passwords(
+        self,
+        password1_field_name: str = ...,
+        password2_field_name: str = ...,
+        usable_password_field_name: str = ...,
+    ) -> None: ...
+    def validate_password_for_user(self, user: AbstractBaseUser, **kwargs: Any) -> None: ...
+    def set_password_and_save(self, user: _User, commit: bool = True, **kwargs: Any) -> _User: ...
+
 class BaseUserCreationForm(forms.ModelForm[_User]):
     error_messages: _ErrorMessagesDict
     password1: forms.Field
     password2: forms.Field
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def clean_password2(self) -> str: ...
     def save(self, commit: bool = ...) -> _User: ...
 
 class UserCreationForm(BaseUserCreationForm[_User]):
@@ -90,7 +121,6 @@ class SetPasswordForm(forms.Form):
     new_password2: forms.Field
     user: AbstractBaseUser
     def __init__(self, user: AbstractBaseUser, *args: Any, **kwargs: Any) -> None: ...
-    def clean_new_password2(self) -> str: ...
     def save(self, commit: bool = ...) -> AbstractBaseUser: ...
 
 class PasswordChangeForm(SetPasswordForm):
@@ -101,11 +131,14 @@ class PasswordChangeForm(SetPasswordForm):
 class AdminPasswordChangeForm(forms.Form):
     error_messages: _ErrorMessagesDict
     required_css_class: str
+    usable_password_help_text: str
     password1: forms.Field
     password2: forms.Field
     user: AbstractBaseUser
     def __init__(self, user: AbstractBaseUser, *args: Any, **kwargs: Any) -> None: ...
-    def clean_password2(self) -> str: ...
     def save(self, commit: bool = ...) -> AbstractBaseUser: ...
     @property
     def changed_data(self) -> list[str]: ...
+
+class AdminUserCreationForm(SetUnusablePasswordMixin, UserCreationForm):
+    usable_password: forms.ChoiceField = ...
