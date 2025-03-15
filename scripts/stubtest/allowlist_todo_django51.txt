@@ -3,16 +3,6 @@
 # Only discrepancies that appeared after Django 5.0 -> 5.1 update.
 # Unsorted: there are real problems and things we can really ignore:
 
-django.contrib.auth.base_user.BaseUserManager.make_random_password
-django.contrib.auth.forms.AdminPasswordChangeForm.clean_password2
-django.contrib.auth.forms.AdminPasswordChangeForm.usable_password_help_text
-django.contrib.auth.forms.BaseUserCreationForm.clean_password2
-django.contrib.auth.forms.SetPasswordForm.clean_new_password2
-django.contrib.auth.forms.SetPasswordMixin
-django.contrib.auth.forms.SetUnusablePasswordMixin
-django.contrib.auth.forms.AdminUserCreationForm
-django.contrib.auth.middleware.LoginRequiredMiddleware
-django.contrib.auth.models.BaseUserManager.make_random_password
 django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
