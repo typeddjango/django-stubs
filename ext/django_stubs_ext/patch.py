@@ -16,7 +16,7 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
 from django.db.models.lookups import Lookup
 from django.db.models.manager import BaseManager
-from django.db.models.query import QuerySet, RawQuerySet
+from django.db.models.query import QuerySet, RawQuerySet, ModelIterable
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField
 from django.utils.connection import BaseConnectionHandler
@@ -74,6 +74,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(BaseConnectionHandler),
     MPGeneric(ExpressionWrapper),
     MPGeneric(ReverseManyToOneDescriptor),
+    MPGeneric(ModelIterable),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
