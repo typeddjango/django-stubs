@@ -91,6 +91,7 @@ class BaseModelForm(Generic[_M], BaseForm):
 
 class ModelForm(BaseModelForm[_M], metaclass=ModelFormMetaclass):
     base_fields: ClassVar[dict[str, Field]]
+    declared_fields: ClassVar[dict[str, Field]]
 
 def modelform_factory(
     model: type[_M],
