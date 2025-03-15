@@ -15,6 +15,7 @@ class FileSystemStorage(_Deconstructible, Storage, StorageSettingsMixin):
         base_url: str | None = None,
         file_permissions_mode: int | None = None,
         directory_permissions_mode: int | None = None,
+        allow_overwrite: bool = False,
     ) -> None: ...
     @cached_property
     def base_location(self) -> _PathCompatible: ...
