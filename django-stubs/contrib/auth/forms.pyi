@@ -33,7 +33,7 @@ class UsernameField(forms.CharField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class SetPasswordMixin:
-    error_messages: dict[str, _StrOrPromise]
+    error_messages: _ErrorMessagesDict
 
     @staticmethod
     def create_password_fields(
