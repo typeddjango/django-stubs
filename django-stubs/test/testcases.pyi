@@ -1,7 +1,7 @@
 import threading
 import unittest
-from collections.abc import Callable, Collection, Generator, Iterable, Iterator, Mapping, Sequence
-from contextlib import contextmanager
+from collections.abc import Callable, Collection, Iterable, Iterator, Mapping, Sequence
+from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, overload
 
@@ -184,10 +184,9 @@ class TestCase(TransactionTestCase):
     @classmethod
     def setUpTestData(cls) -> None: ...
     @classmethod
-    @contextmanager
     def captureOnCommitCallbacks(
         cls, *, using: str = ..., execute: bool = ...
-    ) -> Generator[list[Callable[[], Any]], None, None]: ...
+    ) -> AbstractContextManager[list[Callable[[], Any]]]: ...
 
 class CheckCondition:
     conditions: Sequence[tuple[Callable, str]]

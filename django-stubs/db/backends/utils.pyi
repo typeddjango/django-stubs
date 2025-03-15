@@ -1,6 +1,6 @@
 import datetime
-from collections.abc import Generator, Iterator, Mapping, Sequence
-from contextlib import contextmanager
+from collections.abc import Iterator, Mapping, Sequence
+from contextlib import AbstractContextManager
 from decimal import Decimal
 from logging import Logger
 from types import TracebackType
@@ -62,14 +62,13 @@ class CursorWrapper:
 class CursorDebugWrapper(CursorWrapper):
     cursor: Any
     db: Any
-    @contextmanager
     def debug_sql(
         self,
         sql: str | None = None,
         params: _ExecuteParameters | Sequence[_ExecuteParameters] | None = None,
         use_last_executed_query: bool = False,
         many: bool = False,
-    ) -> Generator[None, None, None]: ...
+    ) -> AbstractContextManager[None]: ...
 
 @overload
 def typecast_date(s: None | Literal[""]) -> None: ...  # type: ignore[overload-overlap]
