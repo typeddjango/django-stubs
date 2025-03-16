@@ -3,12 +3,10 @@
 # Only discrepancies that appeared after Django 5.0 -> 5.1 update.
 # Unsorted: there are real problems and things we can really ignore:
 
-django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
-django.contrib.gis.db.models.ForeignObjectRel.cache_name
 django.contrib.gis.db.models.OrderBy.constraint_validation_compatible
 django.contrib.gis.db.models.functions.FromWKB.__init__
 django.contrib.gis.db.models.functions.FromWKB.as_oracle
@@ -68,17 +66,12 @@ django.db.backends.sqlite3.operations.DatabaseOperations.force_group_by
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
 django.db.models.ForeignObjectRel.accessor_name
-django.db.models.ForeignObjectRel.cache_name
 django.db.models.OrderBy.constraint_validation_compatible
 django.db.models.expressions.BaseExpression.constraint_validation_compatible
 django.db.models.expressions.BaseExpression.get_expression_for_validation
 django.db.models.expressions.OrderBy.constraint_validation_compatible
-django.db.models.fields.mixins.FieldCacheMixin.cache_name
 django.db.models.fields.related.ForeignObjectRel.accessor_name
-django.db.models.fields.related.ForeignObjectRel.cache_name
-django.db.models.fields.related.RelatedField.cache_name
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
-django.db.models.fields.reverse_related.ForeignObjectRel.cache_name
 django.db.models.functions.ConcatPair.pipes_concat_sql
 django.db.models.functions.text.ConcatPair.pipes_concat_sql
 django.db.models.lookups.In.get_refs
