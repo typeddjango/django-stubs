@@ -1,5 +1,4 @@
-from collections.abc import Generator
-from contextlib import contextmanager
+from contextlib import AbstractContextManager
 from typing import Any
 
 from django.test import LiveServerTestCase
@@ -14,5 +13,4 @@ class SeleniumTestCaseBase:
 class SeleniumTestCase(LiveServerTestCase):
     implicit_wait: int
     selenium: Any
-    @contextmanager
-    def disable_implicit_wait(self) -> Generator[None, None, None]: ...
+    def disable_implicit_wait(self) -> AbstractContextManager[None]: ...
