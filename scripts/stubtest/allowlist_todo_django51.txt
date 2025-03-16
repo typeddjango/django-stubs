@@ -7,11 +7,6 @@ django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
-django.contrib.gis.db.models.OrderBy.constraint_validation_compatible
-django.contrib.gis.db.models.functions.FromWKB.__init__
-django.contrib.gis.db.models.functions.FromWKB.as_oracle
-django.contrib.gis.db.models.functions.FromWKB.output_field
-django.contrib.gis.db.models.functions.FromWKT.output_field
 django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.forms.RadioSelect.__slotnames__
 django.contrib.gis.gdal.geometries.LineString.m
@@ -44,7 +39,6 @@ django.contrib.postgres.aggregates.general.JSONBAgg.__init__
 django.contrib.postgres.fields.CIText
 django.contrib.postgres.fields.citext.CIText
 django.contrib.postgres.indexes.BTreeIndex.__init__
-django.contrib.postgres.indexes.OpClass.constraint_validation_compatible
 django.core.signing.Signer.__init__
 django.db.backends.base.operations.BaseDatabaseOperations.bulk_insert_sql
 django.db.backends.base.operations.BaseDatabaseOperations.force_group_by
@@ -66,14 +60,8 @@ django.db.backends.sqlite3.operations.DatabaseOperations.force_group_by
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
 django.db.models.ForeignObjectRel.accessor_name
-django.db.models.OrderBy.constraint_validation_compatible
-django.db.models.expressions.BaseExpression.constraint_validation_compatible
-django.db.models.expressions.BaseExpression.get_expression_for_validation
-django.db.models.expressions.OrderBy.constraint_validation_compatible
 django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
-django.db.models.functions.ConcatPair.pipes_concat_sql
-django.db.models.functions.text.ConcatPair.pipes_concat_sql
 django.db.models.lookups.In.get_refs
 django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
