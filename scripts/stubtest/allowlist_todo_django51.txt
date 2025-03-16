@@ -5,7 +5,6 @@
 
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
-django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.forms.RadioSelect.__slotnames__
@@ -40,14 +39,6 @@ django.contrib.postgres.fields.CIText
 django.contrib.postgres.fields.citext.CIText
 django.contrib.postgres.indexes.BTreeIndex.__init__
 django.core.signing.Signer.__init__
-django.db.backends.base.operations.BaseDatabaseOperations.bulk_insert_sql
-django.db.backends.base.operations.BaseDatabaseOperations.force_group_by
-django.db.backends.base.operations.BaseDatabaseOperations.window_frame_end
-django.db.backends.base.operations.BaseDatabaseOperations.window_frame_start
-django.db.backends.base.operations.BaseDatabaseOperations.window_frame_value
-django.db.backends.ddl_references.Reference.references_index
-django.db.backends.ddl_references.Statement.references_index
-django.db.backends.ddl_references.Table.references_index
 django.db.backends.oracle.features.DatabaseFeatures.bare_select_suffix
 django.db.backends.oracle.features.DatabaseFeatures.supports_aggregation_over_interval_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_comparing_boolean_expr
@@ -56,7 +47,6 @@ django.db.backends.postgresql.base.DatabaseWrapper.pool
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_skips
 django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_16
 django.db.backends.sqlite3.base.DatabaseWrapper.transaction_modes
-django.db.backends.sqlite3.operations.DatabaseOperations.force_group_by
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
 django.db.models.ForeignObjectRel.accessor_name

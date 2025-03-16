@@ -20,6 +20,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def from_text(self) -> str: ...  # type: ignore[override]
     @cached_property
+    def collect(self) -> str: ...
+    @cached_property
     def gis_operators(self) -> dict[str, SpatialOperator]: ...
     disallowed_aggregates: Any
     @cached_property
