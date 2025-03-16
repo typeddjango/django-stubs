@@ -14,8 +14,7 @@ from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import Widget
-from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _ChoicesCallable
-from django.utils.choices import _ChoicesInput as _Choices
+from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
@@ -284,8 +283,8 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
-        _Choices | _ChoicesCallable | CallableChoiceIterator,
-        _Choices | CallableChoiceIterator | ModelChoiceIterator,
+        _ChoicesInput | _ChoicesCallable | CallableChoiceIterator,
+        _ChoicesInput | CallableChoiceIterator | ModelChoiceIterator,
     ]
     def prepare_value(self, value: Any) -> Any: ...
     def to_python(self, value: Any | None) -> _M | None: ...

@@ -15,8 +15,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.forms import Widget
-from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable
-from django.utils.choices import _ChoicesInput as _Choices
+from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
 from typing_extensions import Self, TypeAlias
@@ -171,7 +170,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         unique_for_date: str | None = None,
         unique_for_month: str | None = None,
         unique_for_year: str | None = None,
-        choices: _Choices | None = None,
+        choices: _ChoicesInput | None = None,
         help_text: _StrOrPromise = "",
         db_column: str | None = None,
         db_tablespace: str | None = None,
@@ -286,7 +285,7 @@ class DecimalField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -318,7 +317,7 @@ class CharField(Field[_ST, _GT]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -348,7 +347,7 @@ class SlugField(CharField[_ST, _GT]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -384,7 +383,7 @@ class URLField(CharField[_ST, _GT]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -417,7 +416,7 @@ class TextField(Field[_ST, _GT]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -465,7 +464,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -500,7 +499,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -531,7 +530,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -568,7 +567,7 @@ class UUIDField(Field[_ST, _GT]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
@@ -605,7 +604,7 @@ class FilePathField(Field[_ST, _GT]):
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,

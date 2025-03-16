@@ -11,8 +11,7 @@ from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
-from django.utils.choices import CallableChoiceIterator, _ChoicesCallable
-from django.utils.choices import _ChoicesInput as _Choices
+from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
@@ -318,14 +317,14 @@ class NullBooleanField(BooleanField):
 
 class ChoiceField(Field):
     choices: _PropertyDescriptor[
-        _Choices | _ChoicesCallable | CallableChoiceIterator,
-        _Choices | CallableChoiceIterator,
+        _ChoicesInput | _ChoicesCallable | CallableChoiceIterator,
+        _ChoicesInput | CallableChoiceIterator,
     ]
     widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
-        choices: _Choices | _ChoicesCallable = (),
+        choices: _ChoicesInput | _ChoicesCallable = (),
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -356,7 +355,7 @@ class TypedChoiceField(ChoiceField):
         *,
         coerce: _CoerceCallable = ...,
         empty_value: str | None = "",
-        choices: _Choices | _ChoicesCallable = ...,
+        choices: _ChoicesInput | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -384,7 +383,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         *,
         coerce: _CoerceCallable = ...,
         empty_value: list[Any] | None = ...,
-        choices: _Choices | _ChoicesCallable = ...,
+        choices: _ChoicesInput | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -460,7 +459,7 @@ class FilePathField(ChoiceField):
         recursive: bool = False,
         allow_files: bool = True,
         allow_folders: bool = False,
-        choices: _Choices | _ChoicesCallable = ...,
+        choices: _ChoicesInput | _ChoicesCallable = ...,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
