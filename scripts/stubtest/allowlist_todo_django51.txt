@@ -79,17 +79,6 @@ django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
 django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.widgets.RadioSelect.__slotnames__
-django.test.selenium.ChangeWindowSize
-django.test.selenium.SeleniumTestCase.dark
-django.test.selenium.SeleniumTestCase.desktop_size
-django.test.selenium.SeleniumTestCase.high_contrast
-django.test.selenium.SeleniumTestCase.mobile_size
-django.test.selenium.SeleniumTestCase.rtl
-django.test.selenium.SeleniumTestCase.screenshots
-django.test.selenium.SeleniumTestCase.set_emulated_media
-django.test.selenium.SeleniumTestCase.small_screen_size
-django.test.selenium.SeleniumTestCase.take_screenshot
-django.test.selenium.screenshot_cases
 django.test.signals.form_renderer_changed
 django.test.utils.garbage_collect
 django.urls.resolvers.whitespace_set
