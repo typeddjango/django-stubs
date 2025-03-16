@@ -11,7 +11,8 @@ from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
-from django.utils.choices import CallableChoiceIterator, _Choices, _ChoicesCallable
+from django.utils.choices import CallableChoiceIterator, _ChoicesCallable
+from django.utils.choices import _ChoicesInput as _Choices
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias

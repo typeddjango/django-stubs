@@ -14,7 +14,8 @@ from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
 from django.forms.widgets import Widget
-from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _Choices, _ChoicesCallable
+from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _ChoicesCallable
+from django.utils.choices import _ChoicesInput as _Choices
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeAlias
