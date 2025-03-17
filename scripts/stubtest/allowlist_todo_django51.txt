@@ -45,7 +45,6 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_comparing_boolean_e
 django.db.backends.postgresql.base.DatabaseWrapper.close_pool
 django.db.backends.postgresql.base.DatabaseWrapper.pool
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_skips
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_16
 django.db.backends.sqlite3.base.DatabaseWrapper.transaction_modes
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
@@ -78,7 +77,6 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_expression_defaults
 django.db.backends.oracle.features.DatabaseFeatures.supports_primitives_in_json_field
 django.db.backends.oracle.features.DatabaseFeatures.test_collations
 django.db.backends.oracle.oracledb_any
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_15
 django.db.backends.postgresql.features.DatabaseFeatures.supports_nulls_distinct_unique_constraints
 django.db.backends.postgresql.psycopg_any
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
