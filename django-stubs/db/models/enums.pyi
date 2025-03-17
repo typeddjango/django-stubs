@@ -6,8 +6,6 @@ from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, deprecated
 
-_Self = TypeVar("_Self")
-
 if sys.version_info >= (3, 11):
     _enum_property = enum.property
     EnumType = enum.EnumType
