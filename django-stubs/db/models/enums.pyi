@@ -4,7 +4,7 @@ from typing import Any, TypeVar, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
-from typing_extensions import deprecated
+from typing_extensions import Self, deprecated
 
 _Self = TypeVar("_Self")
 
@@ -26,9 +26,7 @@ class ChoicesType(EnumType):
     # disallows 'typing_extensions.Self' on metaclasses, while PYI019 try to enforce
     # 'typing_extensions.Self' for '__new__' methods.. We've chosen to ignore the
     # linter and trust mypy.
-    def __new__(
-        metacls: type[_Self], classname: str, bases: tuple[type, ...], classdict: enum._EnumDict, **kwds: Any
-    ) -> _Self: ...  # noqa: PYI019
+    def __new__(metacls, classname: str, bases: tuple[type, ...], classdict: enum._EnumDict, **kwds: Any) -> Self: ...
     def __contains__(self, member: Any) -> bool: ...
     @property
     def names(self) -> list[str]: ...
