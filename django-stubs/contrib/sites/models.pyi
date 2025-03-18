@@ -11,6 +11,7 @@ class SiteManager(models.Manager[Site]):
     def get_by_natural_key(self, domain: str) -> Site: ...
 
 class Site(models.Model):
+    # Note: do not create `class Meta` here.
     objects: ClassVar[SiteManager]
 
     domain = models.CharField(max_length=100)
