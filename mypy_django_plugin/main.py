@@ -70,15 +70,6 @@ class NewSemanalDjangoPlugin(Plugin):
         sys.path.extend(options.mypy_path)
         self.django_context = DjangoContext(self.plugin_config.django_settings_module)
 
-    def _get_current_queryset_bases(self) -> dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "queryset_bases")
-            bases[fullnames.QUERYSET_CLASS_FULLNAME] = 1
-            return bases
-        else:
-            return {}
-
     def _get_current_form_bases(self) -> dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
         if model_sym is not None and isinstance(model_sym.node, TypeInfo):
