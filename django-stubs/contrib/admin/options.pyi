@@ -56,7 +56,7 @@ class IncorrectLookupParameters(Exception): ...
 FORMFIELD_FOR_DBFIELD_DEFAULTS: Any
 csrf_protect_m: Any
 
-_FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
+_FieldGroups: TypeAlias = _ListOrTuple[str | _ListOrTuple[str]]
 
 @type_check_only
 class _OptionalFieldOpts(TypedDict, total=False):
@@ -67,9 +67,6 @@ class _OptionalFieldOpts(TypedDict, total=False):
 class _FieldOpts(_OptionalFieldOpts, total=True):
     fields: _FieldGroups
 
-# Workaround for mypy issue, a Sequence type should be preferred here.
-# https://github.com/python/mypy/issues/8921
-# _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
 _ListFilterT: TypeAlias = (
     type[ListFilter]
