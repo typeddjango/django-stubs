@@ -52,7 +52,7 @@ class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
 
 # fake, to keep simulate class properties
 @type_check_only
-class _IntegerChoicesMeta(ChoicesType):
+class _IntegerChoicesType(ChoicesType):
     @property
     def choices(self) -> list[tuple[int, str]]: ...
     @property
@@ -61,7 +61,7 @@ class _IntegerChoicesMeta(ChoicesType):
 # In reality, the `__init__` overloads provided below should also support
 # all the arguments of `int.__new__`/`str.__new__` (e.g. `base`, `encoding`).
 # They are omitted on purpose to avoid having convoluted stubs for these enums:
-class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesMeta):  # type: ignore[misc]
+class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesType):  # type: ignore[misc]
     @overload
     def __init__(self, x: ConvertibleToInt) -> None: ...
     @overload
@@ -71,13 +71,13 @@ class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesMeta):  # type: 
 
 # fake, to keep simulate class properties
 @type_check_only
-class _TextChoicesMeta(ChoicesType):
+class _TextChoicesType(ChoicesType):
     @property
     def choices(self) -> list[tuple[str, str]]: ...
     @property
     def values(self) -> list[str]: ...
 
-class TextChoices(Choices, StrEnum, metaclass=_TextChoicesMeta):  # type: ignore[misc]
+class TextChoices(Choices, StrEnum, metaclass=_TextChoicesType):  # type: ignore[misc]
     @overload
     def __init__(self, object: str) -> None: ...
     @overload
