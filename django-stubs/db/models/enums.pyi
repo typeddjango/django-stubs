@@ -26,9 +26,9 @@ class ChoicesType(EnumType):
     # disallows 'typing_extensions.Self' on metaclasses, while PYI019 try to enforce
     # 'typing_extensions.Self' for '__new__' methods.. We've chosen to ignore the
     # linter and trust mypy.
-    def __new__(
+    def __new__(  # noqa: PYI019
         metacls: type[_Self], classname: str, bases: tuple[type, ...], classdict: enum._EnumDict, **kwds: Any
-    ) -> _Self: ...  # noqa: PYI019
+    ) -> _Self: ...
     def __contains__(self, member: Any) -> bool: ...
     @property
     def names(self) -> list[str]: ...
