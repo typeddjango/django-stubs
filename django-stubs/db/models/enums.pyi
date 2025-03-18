@@ -1,6 +1,6 @@
 import enum
 import sys
-from typing import Any, TypeVar, overload, type_check_only
+from typing import Any, Literal, TypeVar, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
@@ -40,13 +40,12 @@ class ChoicesMeta(ChoicesType): ...
 
 class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
     _label_: _StrOrPromise
+    do_not_call_in_templates: Literal[True]
 
     @enum_property
     def label(self) -> _StrOrPromise: ...
     @enum_property
     def value(self) -> Any: ...
-    @property
-    def do_not_call_in_templates(self) -> bool: ...
 
 # fake, to keep simulate class properties
 @type_check_only
