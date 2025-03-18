@@ -11,8 +11,7 @@ if sys.version_info >= (3, 11):
     from enum import property as enum_property
 else:
     from enum import EnumMeta as EnumType
-
-    enum_property = property
+    from types import DynamicClassAttribute as enum_property
 
     class ReprEnum(enum.Enum): ...  # type: ignore[misc]
     class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
