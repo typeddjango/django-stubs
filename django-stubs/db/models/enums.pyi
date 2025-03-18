@@ -6,27 +6,22 @@ from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
 from typing_extensions import deprecated
 
-_Self = TypeVar("_Self")
-
 if sys.version_info >= (3, 11):
-    _enum_property = enum.property
-    EnumType = enum.EnumType
-    IntEnum = enum.IntEnum
-    StrEnum = enum.StrEnum
+    from enum import EnumType, IntEnum, StrEnum
+    from enum import property as enum_property
 else:
-    _enum_property = property
-    EnumType = enum.EnumMeta
+    from enum import EnumMeta as EnumType
+
+    enum_property = property
 
     class ReprEnum(enum.Enum): ...  # type: ignore[misc]
     class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
     class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
 
+_Self = TypeVar("_Self", bound=ChoicesType)
+
 class ChoicesType(EnumType):
-    # There's a contradiction between mypy and PYI019 regarding metaclasses. Where mypy
-    # disallows 'typing_extensions.Self' on metaclasses, while PYI019 try to enforce
-    # 'typing_extensions.Self' for '__new__' methods.. We've chosen to ignore the
-    # linter and trust mypy.
-    def __new__(  # noqa: PYI019
+    def __new__(
         metacls: type[_Self], classname: str, bases: tuple[type, ...], classdict: enum._EnumDict, **kwds: Any
     ) -> _Self: ...
     @property
@@ -46,7 +41,7 @@ class ChoicesMeta(ChoicesType): ...
 class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
     @property
     def label(self) -> str: ...
-    @_enum_property
+    @enum_property
     def value(self) -> Any: ...
     @property
     def do_not_call_in_templates(self) -> bool: ...
@@ -67,7 +62,7 @@ class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesType):  # type: 
     def __init__(self, x: ConvertibleToInt) -> None: ...
     @overload
     def __init__(self, x: ConvertibleToInt, label: _StrOrPromise) -> None: ...
-    @_enum_property
+    @enum_property
     def value(self) -> int: ...
 
 # fake, to keep simulate class properties
@@ -83,5 +78,5 @@ class TextChoices(Choices, StrEnum, metaclass=_TextChoicesType):  # type: ignore
     def __init__(self, object: str) -> None: ...
     @overload
     def __init__(self, object: str, label: _StrOrPromise) -> None: ...
-    @_enum_property
+    @enum_property
     def value(self) -> str: ...
