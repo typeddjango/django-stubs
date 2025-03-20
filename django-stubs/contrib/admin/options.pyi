@@ -56,7 +56,8 @@ class IncorrectLookupParameters(Exception): ...
 FORMFIELD_FOR_DBFIELD_DEFAULTS: Any
 csrf_protect_m: Any
 
-_FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
+_FieldT = TypeVar("_FieldT")
+_FieldGroups: TypeAlias = _ListOrTuple[_FieldT | _ListOrTuple[_FieldT]]
 
 @type_check_only
 class _OptionalFieldOpts(TypedDict, total=False):
@@ -64,13 +65,10 @@ class _OptionalFieldOpts(TypedDict, total=False):
     description: _StrOrPromise
 
 @type_check_only
-class _FieldOpts(_OptionalFieldOpts, total=True):
-    fields: _FieldGroups
+class _FieldOpts(_OptionalFieldOpts, Generic[_FieldT], total=True):
+    fields: _FieldGroups[_FieldT]
 
-# Workaround for mypy issue, a Sequence type should be preferred here.
-# https://github.com/python/mypy/issues/8921
-# _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
-_FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
+_FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts[_FieldT]]]
 _ListFilterT: TypeAlias = (
     type[ListFilter]
     | Field[Any, Any]
@@ -89,9 +87,9 @@ _DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
 class BaseModelAdmin(Generic[_ModelT]):
     autocomplete_fields: ClassVar[_ListOrTuple[str]]
     raw_id_fields: ClassVar[_ListOrTuple[str]]
-    fields: ClassVar[_FieldGroups | None]
+    fields: ClassVar[_FieldGroups[str] | None]
     exclude: ClassVar[_ListOrTuple[str] | None]
-    fieldsets: ClassVar[_FieldsetSpec | None]
+    fieldsets: ClassVar[_FieldsetSpec[str] | None]
     form: type[forms.ModelForm[_ModelT]]
     filter_vertical: ClassVar[_ListOrTuple[str]]
     filter_horizontal: ClassVar[_ListOrTuple[str]]
@@ -123,8 +121,8 @@ class BaseModelAdmin(Generic[_ModelT]):
     def get_view_on_site_url(self, obj: _ModelT | None = ...) -> str | None: ...
     def get_empty_value_display(self) -> SafeString: ...
     def get_exclude(self, request: HttpRequest, obj: _ModelT | None = ...) -> _ListOrTuple[str] | None: ...
-    def get_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldGroups: ...
-    def get_fieldsets(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldsetSpec: ...
+    def get_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldGroups[str]: ...
+    def get_fieldsets(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldsetSpec[str]: ...
     def get_inlines(self, request: HttpRequest, obj: _ModelT | None) -> list[type[InlineModelAdmin]]: ...
     def get_ordering(self, request: HttpRequest) -> _ListOrTuple[str]: ...
     def get_readonly_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _ListOrTuple[str]: ...
