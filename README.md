@@ -340,6 +340,54 @@ def assert_zero_count(model_type: type[models.Model]) -> None:
 ```
 
 
+### How to type a custom `models.Field`?
+
+Django `models.Field` (and subclasses) are generic types with two parameters:
+- `_GT`: type that will be returned when getting a value
+- `_ST`: type that can be used when setting a value
+
+When you create a subclass, you have two options depending on how strict you want
+the type to be for consumers of your custom field.
+
+1. Generic subclass
+```python
+from django.db import models
+from typing import TypeVar, reveal_type
+
+_ST = TypeVar("_ST", contravariant=True)
+_GT = TypeVar("_GT", covariant=True)
+
+class MyIntegerField(models.IntegerField[_ST, _GT]):
+    ...
+
+class User(models.Model):
+    my_field = MyIntegerField()
+
+
+reveal_type(User().my_field) # N: Revealed type is "int"
+User().my_field = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
+```
+
+2. Non-generic subclass (more strict)
+```python
+from django.db import models
+from typing import reveal_type
+
+# This is a non-generic subclass being very explicit
+# that it expects only int when setting values.
+class MyStrictIntegerField(models.IntegerField[int, int]):
+    ...
+
+class User(models.Model):
+    my_field = MyStrictIntegerField()
+
+
+reveal_type(User().my_field) # N: Revealed type is "int"
+User().my_field = "12" # E: Incompatible types in assignment (expression has type "str", variable has type "int")
+```
+
+See mypy section on [generic classes subclasses.](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes)
+
 ## Related projects
 
 - [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
