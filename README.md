@@ -342,6 +342,10 @@ def assert_zero_count(model_type: type[models.Model]) -> None:
 
 ### How to type a custom `models.Field`?
 
+> [!NOTE]
+> This require type generic support, see <a href="#i-cannot-use-queryset-or-manager-with-type-annotations">this section</a> to enable it.
+
+
 Django `models.Field` (and subclasses) are generic types with two parameters:
 - `_GT`: type that will be returned when getting a value
 - `_ST`: type that can be used when setting a value
