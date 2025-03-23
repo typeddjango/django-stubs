@@ -353,10 +353,11 @@ Django `models.Field` (and subclasses) are generic types with two parameters:
 When you create a subclass, you have two options depending on how strict you want
 the type to be for consumers of your custom field.
 
-1. Generic subclass
+1. Generic subclass:
+
 ```python
-from django.db import models
 from typing import TypeVar, reveal_type
+from django.db import models
 
 _ST = TypeVar("_ST", contravariant=True)
 _GT = TypeVar("_GT", covariant=True)
@@ -372,10 +373,11 @@ reveal_type(User().my_field) # N: Revealed type is "int"
 User().my_field = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
 ```
 
-2. Non-generic subclass (more strict)
+2. Non-generic subclass (more strict):
+
 ```python
-from django.db import models
 from typing import reveal_type
+from django.db import models
 
 # This is a non-generic subclass being very explicit
 # that it expects only int when setting values.
@@ -390,7 +392,7 @@ reveal_type(User().my_field) # N: Revealed type is "int"
 User().my_field = "12" # E: Incompatible types in assignment (expression has type "str", variable has type "int")
 ```
 
-See mypy section on [generic classes subclasses.](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes)
+See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).
 
 ## Related projects
 
