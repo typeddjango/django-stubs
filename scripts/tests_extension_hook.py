@@ -30,5 +30,8 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
         if "[mypy.plugins.django-stubs]" not in test_item.additional_mypy_config:
             test_item.additional_mypy_config += django_settings_section
 
+    # Disable caching in tests to allow parallel execution
+    test_item.disable_cache = True
+
     mysettings_file = File(path="mysettings.py", content=custom_settings)
     test_item.files.append(mysettings_file)
