@@ -347,8 +347,8 @@ def assert_zero_count(model_type: type[models.Model]) -> None:
 
 
 Django `models.Field` (and subclasses) are generic types with two parameters:
-- `_GT`: type that will be returned when getting a value
 - `_ST`: type that can be used when setting a value
+- `_GT`: type that will be returned when getting a value
 
 When you create a subclass, you have two options depending on how strict you want
 the type to be for consumers of your custom field.
