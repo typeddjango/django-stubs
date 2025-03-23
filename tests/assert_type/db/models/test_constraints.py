@@ -5,7 +5,7 @@ from django.db.models.functions import Lower
 from django.db.models.lookups import LessThan
 
 UniqueConstraint(Lower("name").desc(), "category", name="unique_lower_name_category")
-UniqueConstraint(fields=["name"], name="unqiue_name")
+UniqueConstraint(fields=["name"], name="unique_name")
 # There's no overload case for passing both expression and 'fields'
 UniqueConstraint(  # type: ignore[call-overload]
     Lower("name"),

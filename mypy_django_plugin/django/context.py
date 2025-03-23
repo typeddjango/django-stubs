@@ -180,7 +180,7 @@ class DjangoContext:
     def get_related_target_field(
         self, related_model_cls: type[Model], field: "ForeignKey[Any, Any]"
     ) -> "Optional[Field[Any, Any]]":
-        # ForeginKey only supports one `to_fields` item (ForeignObject supports many)
+        # ForeignKey only supports one `to_fields` item (ForeignObject supports many)
         assert len(field.to_fields) == 1
         to_field_name = field.to_fields[0]
         if to_field_name:

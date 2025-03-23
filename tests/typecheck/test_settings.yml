@@ -51,12 +51,12 @@
       from django.conf import settings
       if hasattr(settings, 'AUTH_USER_MODEL') and settings.AUTH_USER_MODEL:
           reveal_type(settings.AUTH_USER_MODEL)
-      if hasattr(settings, 'NON_EXISTANT_SETTING') and settings.NON_EXISTANT_SETTING:
-          reveal_type(settings.NON_EXISTANT_SETTING)
+      if hasattr(settings, 'NON_EXISTENT_SETTING') and settings.NON_EXISTENT_SETTING:
+          reveal_type(settings.NON_EXISTENT_SETTING)
     out: |
       main:3: note: Revealed type is "builtins.str"
-      main:4: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'  [misc]
-      main:5: error: 'Settings' object has no attribute 'NON_EXISTANT_SETTING'  [misc]
+      main:4: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
+      main:5: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
       main:5: note: Revealed type is "Any"
 
 
