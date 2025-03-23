@@ -14,7 +14,7 @@
                 from django.db import models
                 class MyUser(models.Model):
                     pass
--   case: request_object_user_can_be_descriminated
+-   case: request_object_user_can_be_discriminated
     main: |
         from django.http.request import HttpRequest
         request = HttpRequest()
