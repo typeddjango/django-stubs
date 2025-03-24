@@ -1,46 +1,132 @@
-from typing import Literal
+import enum
+from typing import Any, Literal
 
-from django.db.models import IntegerChoices, TextChoices
+from django.db.models import Choices, IntegerChoices, TextChoices
+from django.utils.functional import _StrPromise
 from django.utils.translation import gettext_lazy as _
 from typing_extensions import assert_type
 
 
-class MyIntegerChoices(IntegerChoices):
-    A = 1
-    B = 2, "B"
-    C = 3, "B", "..."  # pyright: ignore[reportCallIssue]
-    D = 4, _("D")
-    E = 5, 1  # pyright: ignore[reportArgumentType]
-    F = "1"
+class Suit(IntegerChoices):
+    DIAMOND = 1, _("Diamond")
+    SPADE = 2, _("Spade")
+    HEART = 3, _("Heart")
+    CLUB = 4, _("Club")
 
 
-assert_type(MyIntegerChoices.A, Literal[MyIntegerChoices.A])
-assert_type(MyIntegerChoices.A.label, str)
-
-# For standard enums, type checkers may infer the type of a member's value
-# (e.g. `MyIntegerChoices.A.value` inferred as `Literal[1]`).
-# However, Django choices metaclass is using the last value for the label.
-# Type checkers relies on the stub definition of the `value` property, typed
-# as `int`/`str` for `IntegerChoices`/`TextChoices`.
-assert_type(MyIntegerChoices.A.value, int)
+class YearInSchool(TextChoices):
+    FRESHMAN = "FR", _("Freshman")
+    SOPHOMORE = "SO", _("Sophomore")
+    JUNIOR = "JR", _("Junior")
+    SENIOR = "SR", _("Senior")
+    GRADUATE = "GR", _("Graduate")
 
 
-class MyTextChoices(TextChoices):
-    A = "a"
-    B = "b", "B"
-    C = "c", _("C")
-    D = 1  # pyright: ignore[reportArgumentType]
-    E = "e", 1  # pyright: ignore[reportArgumentType]
+class Vehicle(IntegerChoices):
+    CAR = 1, "Carriage"
+    TRUCK = 2
+    JET_SKI = 3
+
+    __empty__ = _("(Unknown)")
 
 
-assert_type(MyTextChoices.A, Literal[MyTextChoices.A])
-assert_type(MyTextChoices.A.label, str)
-assert_type(MyTextChoices.A.value, str)
+class Gender(TextChoices):
+    MALE = "M"
+    FEMALE = "F"
+    NOT_SPECIFIED = "X"
+
+    __empty__ = "(Undeclared)"
 
 
-# Assertions related to the metaclass:
+class Medal(TextChoices):
+    GOLD = enum.auto()
+    SILVER = enum.auto()
+    BRONZE = enum.auto()
 
-assert_type(MyIntegerChoices.values, list[int])
-assert_type(MyIntegerChoices.choices, list[tuple[int, str]])
-assert_type(MyTextChoices.values, list[str])
-assert_type(MyTextChoices.choices, list[tuple[str, str]])
+
+class Separator(bytes, Choices):
+    FS = b"\x1c", "File Separator"
+    GS = b"\x1d", "Group Separator"
+    RS = b"\x1e", "Record Separator"
+    US = b"\x1f", "Unit Separator"
+
+
+class Constants(float, Choices):
+    PI = 3.141592653589793, "π"
+    TAU = 6.283185307179586, "τ"
+
+    __empty__ = "NULL"
+
+
+assert_type(Suit.names, list[str])
+assert_type(Suit.labels, list[str])
+assert_type(Suit.values, list[int])
+assert_type(Suit.choices, list[tuple[int, str]])
+assert_type(Suit.CLUB, Literal[Suit.CLUB])
+assert_type(Suit.CLUB.name, Literal["CLUB"])
+assert_type(Suit.CLUB.label, str)
+assert_type(Suit.CLUB.value, int)
+assert_type(Suit.CLUB.do_not_call_in_templates, bool)
+
+assert_type(YearInSchool.names, list[str])
+assert_type(YearInSchool.labels, list[str])
+assert_type(YearInSchool.values, list[str])
+assert_type(YearInSchool.choices, list[tuple[str, str]])
+assert_type(YearInSchool.SENIOR, Literal[YearInSchool.SENIOR])
+assert_type(YearInSchool.SENIOR.name, Literal["SENIOR"])
+assert_type(YearInSchool.SENIOR.label, str)
+assert_type(YearInSchool.SENIOR.value, str)
+assert_type(YearInSchool.SENIOR.do_not_call_in_templates, bool)
+
+assert_type(Vehicle.names, list[str])
+assert_type(Vehicle.labels, list[str])
+assert_type(Vehicle.values, list[int])
+assert_type(Vehicle.choices, list[tuple[int, str]])
+assert_type(Vehicle.CAR, Literal[Vehicle.CAR])
+assert_type(Vehicle.CAR.name, Literal["CAR"])
+assert_type(Vehicle.CAR.label, str)
+assert_type(Vehicle.CAR.value, int)
+assert_type(Vehicle.CAR.do_not_call_in_templates, bool)
+assert_type(Vehicle.__empty__, _StrPromise)
+
+assert_type(Gender.names, list[str])
+assert_type(Gender.labels, list[str])
+assert_type(Gender.values, list[str])
+assert_type(Gender.choices, list[tuple[str, str]])
+assert_type(Gender.MALE, Literal[Gender.MALE])
+assert_type(Gender.MALE.name, Literal["MALE"])
+assert_type(Gender.MALE.label, str)
+assert_type(Gender.MALE.value, str)
+assert_type(Gender.MALE.do_not_call_in_templates, bool)
+assert_type(Gender.__empty__, str)
+
+assert_type(Medal.names, list[str])
+assert_type(Medal.labels, list[str])
+assert_type(Medal.values, list[str])
+assert_type(Medal.choices, list[tuple[str, str]])
+assert_type(Medal.GOLD, Literal[Medal.GOLD])
+assert_type(Medal.GOLD.name, Literal["GOLD"])
+assert_type(Medal.GOLD.label, str)
+assert_type(Medal.GOLD.value, str)
+assert_type(Medal.GOLD.do_not_call_in_templates, bool)
+
+assert_type(Separator.names, list[str])
+assert_type(Separator.labels, list[str])
+assert_type(Separator.values, list[Any])
+assert_type(Separator.choices, list[tuple[Any, str]])
+assert_type(Separator.FS, Literal[Separator.FS])
+assert_type(Separator.FS.name, Literal["FS"])
+assert_type(Separator.FS.label, str)
+assert_type(Separator.FS.value, Any)
+assert_type(Separator.FS.do_not_call_in_templates, bool)
+
+assert_type(Constants.names, list[str])
+assert_type(Constants.labels, list[str])
+assert_type(Constants.values, list[Any])
+assert_type(Constants.choices, list[tuple[Any, str]])
+assert_type(Constants.PI, Literal[Constants.PI])
+assert_type(Constants.PI.name, Literal["PI"])
+assert_type(Constants.PI.label, str)
+assert_type(Constants.PI.value, Any)
+assert_type(Constants.PI.do_not_call_in_templates, bool)
+assert_type(Constants.__empty__, str)
