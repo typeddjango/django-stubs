@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 from django.db.models import Choices, IntegerChoices, TextChoices
 from django.utils.functional import _StrOrPromise
@@ -58,6 +58,15 @@ class Constants(float, Choices):
     __empty__ = "NULL"
 
 
+class BaseEmptyChoices(Choices):
+    __empty__ = "Python's None"
+
+
+class VoidChoices(BaseEmptyChoices):
+    ABYSS = enum.auto()
+    CHASM = enum.auto()
+
+
 assert_type(Suit.names, list[str])
 assert_type(Suit.labels, list[_StrOrPromise])
 assert_type(Suit.values, list[int])
@@ -80,8 +89,8 @@ assert_type(YearInSchool.SENIOR.do_not_call_in_templates, Literal[True])
 
 assert_type(Vehicle.names, list[str])
 assert_type(Vehicle.labels, list[_StrOrPromise])
-assert_type(Vehicle.values, list[int])
-assert_type(Vehicle.choices, list[tuple[int, _StrOrPromise]])
+assert_type(Vehicle.values, list[Optional[int]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Vehicle.choices, list[tuple[Optional[int], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Vehicle.CAR, Literal[Vehicle.CAR])
 assert_type(Vehicle.CAR.name, Literal["CAR"])
 assert_type(Vehicle.CAR.label, _StrOrPromise)
@@ -91,8 +100,8 @@ assert_type(Vehicle.__empty__, _StrOrPromise)
 
 assert_type(Gender.names, list[str])
 assert_type(Gender.labels, list[_StrOrPromise])
-assert_type(Gender.values, list[str])
-assert_type(Gender.choices, list[tuple[str, _StrOrPromise]])
+assert_type(Gender.values, list[Optional[str]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Gender.choices, list[tuple[Optional[str], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Gender.MALE, Literal[Gender.MALE])
 assert_type(Gender.MALE.name, Literal["MALE"])
 assert_type(Gender.MALE.label, _StrOrPromise)
@@ -122,11 +131,22 @@ assert_type(Separator.FS.do_not_call_in_templates, Literal[True])
 
 assert_type(Constants.names, list[str])
 assert_type(Constants.labels, list[_StrOrPromise])
-assert_type(Constants.values, list[Any])
-assert_type(Constants.choices, list[tuple[Any, _StrOrPromise]])
+assert_type(Constants.values, list[Optional[Any]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Constants.choices, list[tuple[Optional[Any], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Constants.PI, Literal[Constants.PI])
 assert_type(Constants.PI.name, Literal["PI"])
 assert_type(Constants.PI.label, _StrOrPromise)
 assert_type(Constants.PI.value, Any)
 assert_type(Constants.PI.do_not_call_in_templates, Literal[True])
 assert_type(Constants.__empty__, _StrOrPromise)
+
+assert_type(VoidChoices.names, list[str])
+assert_type(VoidChoices.labels, list[_StrOrPromise])
+assert_type(VoidChoices.values, list[Optional[Any]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(VoidChoices.choices, list[tuple[Optional[Any], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(VoidChoices.ABYSS, Literal[VoidChoices.ABYSS])
+assert_type(VoidChoices.ABYSS.name, Literal["ABYSS"])
+assert_type(VoidChoices.ABYSS.label, _StrOrPromise)
+assert_type(VoidChoices.ABYSS.value, Any)
+assert_type(VoidChoices.ABYSS.do_not_call_in_templates, Literal[True])
+assert_type(VoidChoices.__empty__, _StrOrPromise)

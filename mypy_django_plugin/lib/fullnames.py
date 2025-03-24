@@ -17,6 +17,9 @@ BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
 RELATED_MANAGER_CLASS = "django.db.models.fields.related_descriptors.RelatedManager"
 
+CHOICES_CLASS_FULLNAME = "django.db.models.enums.Choices"
+CHOICES_TYPE_METACLASS_FULLNAME = "django.db.models.enums.ChoicesType"
+
 WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.WithAnnotations"
 ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.Annotations"
 

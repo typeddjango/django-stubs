@@ -24,6 +24,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
+    choices,
     fields,
     forms,
     init_create,
@@ -274,6 +275,9 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
+
+        if info and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME) and attr_name in ("choices", "values"):
+            return choices.transform_into_proper_attr_type
 
         return None
 
