@@ -31,7 +31,7 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
             test_item.additional_mypy_config += django_settings_section
 
     # Disable caching in tests to allow parallel execution
-    test_item.disable_cache = True
+    test_item.disable_cache = False
 
     mysettings_file = File(path="mysettings.py", content=custom_settings)
     test_item.files.append(mysettings_file)
