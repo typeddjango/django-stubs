@@ -507,8 +507,3 @@ django.db.models.Model.asave
 django.db.models.Model.save
 django.db.models.base.Model.asave
 django.db.models.base.Model.save
-
-# Current bug in django (https://code.djangoproject.com/ticket/36262) has an improper function signature vs the required values. Once the PR is merged it can be removed
-django.db.models.fields.generated.GeneratedField.__init__
-django.db.models.GeneratedField.__init__
-django.contrib.gis.db.models.GeneratedField.__init__
