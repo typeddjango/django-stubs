@@ -56,7 +56,7 @@ class IncorrectLookupParameters(Exception): ...
 FORMFIELD_FOR_DBFIELD_DEFAULTS: Any
 csrf_protect_m: Any
 
-_FieldGroups: TypeAlias = Sequence[str | Sequence[str]]
+_FieldGroups: TypeAlias = _ListOrTuple[str | _ListOrTuple[str]]
 
 @type_check_only
 class _OptionalFieldOpts(TypedDict, total=False):
@@ -67,9 +67,6 @@ class _OptionalFieldOpts(TypedDict, total=False):
 class _FieldOpts(_OptionalFieldOpts, total=True):
     fields: _FieldGroups
 
-# Workaround for mypy issue, a Sequence type should be preferred here.
-# https://github.com/python/mypy/issues/8921
-# _FieldsetSpec = Sequence[Tuple[Optional[str], _FieldOpts]]
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
 _ListFilterT: TypeAlias = (
     type[ListFilter]
@@ -82,7 +79,8 @@ _ListFilterT: TypeAlias = (
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
 # https://github.com/typeddjango/django-stubs/issues/482
 _ModelT = TypeVar("_ModelT", bound=Model)
-_DisplayT: TypeAlias = _ListOrTuple[str | Callable[[_ModelT], str | bool]]
+_DisplayT: TypeAlias = str | Callable[[_ModelT], str | bool]
+_ListDisplayT: TypeAlias = _ListOrTuple[_DisplayT[_ModelT]]
 
 # Options `form`, `list_display`, `list_display_links` and `actions` are not marked as `ClassVar` due to the
 # limitations of the current type system: `ClassVar` cannot contain type variables.
@@ -130,7 +128,7 @@ class BaseModelAdmin(Generic[_ModelT]):
     def get_readonly_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _ListOrTuple[str]: ...
     def get_prepopulated_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> dict[str, Sequence[str]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ModelT]: ...
-    def get_sortable_by(self, request: HttpRequest) -> _DisplayT[_ModelT]: ...
+    def get_sortable_by(self, request: HttpRequest) -> _ListDisplayT[_ModelT]: ...
     @overload
     @deprecated("None value for the request parameter will be removed in Django 6.0.")
     def lookup_allowed(self, lookup: str, value: str, request: None = None) -> bool: ...
@@ -150,8 +148,8 @@ _ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin[Any])
 _ActionCallable: TypeAlias = Callable[[_ModelAdmin, HttpRequest, QuerySet[_ModelT]], HttpResponseBase | None]
 
 class ModelAdmin(BaseModelAdmin[_ModelT]):
-    list_display: _DisplayT[_ModelT]
-    list_display_links: _DisplayT[_ModelT] | None
+    list_display: _ListDisplayT[_ModelT]
+    list_display_links: _ListDisplayT[_ModelT] | None
     list_filter: ClassVar[_ListOrTuple[_ListFilterT]]
     list_select_related: ClassVar[bool | _ListOrTuple[str]]
     list_per_page: ClassVar[int]
@@ -220,8 +218,10 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
         self, request: HttpRequest, default_choices: list[tuple[str, str]] = ...
     ) -> list[tuple[str, str]]: ...
     def get_action(self, action: Callable | str) -> tuple[Callable[..., str], str, str] | None: ...
-    def get_list_display(self, request: HttpRequest) -> _DisplayT[_ModelT]: ...
-    def get_list_display_links(self, request: HttpRequest, list_display: _DisplayT[_ModelT]) -> _DisplayT[_ModelT]: ...
+    def get_list_display(self, request: HttpRequest) -> _ListDisplayT[_ModelT]: ...
+    def get_list_display_links(
+        self, request: HttpRequest, list_display: _ListDisplayT[_ModelT]
+    ) -> _ListDisplayT[_ModelT]: ...
     def get_list_filter(self, request: HttpRequest) -> _ListOrTuple[_ListFilterT]: ...
     def get_list_select_related(self, request: HttpRequest) -> bool | _ListOrTuple[str]: ...
     def get_search_fields(self, request: HttpRequest) -> _ListOrTuple[str]: ...
