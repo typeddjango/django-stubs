@@ -279,6 +279,9 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME) and attr_name in ("choices", "values"):
             return choices.transform_into_proper_attr_type
 
+        if info and info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name == "value":
+            return choices.transform_into_proper_attr_type
+
         return None
 
     def get_type_analyze_hook(self, fullname: str) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:

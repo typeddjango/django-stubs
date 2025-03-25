@@ -121,22 +121,22 @@ assert_type(Medal.GOLD.do_not_call_in_templates, Literal[True])
 
 assert_type(Separator.names, list[str])
 assert_type(Separator.labels, list[_StrOrPromise])
-assert_type(Separator.values, list[Any])
-assert_type(Separator.choices, list[tuple[Any, _StrOrPromise]])
+assert_type(Separator.values, list[bytes])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Separator.choices, list[tuple[bytes, _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Separator.FS, Literal[Separator.FS])
 assert_type(Separator.FS.name, Literal["FS"])
 assert_type(Separator.FS.label, _StrOrPromise)
-assert_type(Separator.FS.value, Any)
+assert_type(Separator.FS.value, bytes)  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Separator.FS.do_not_call_in_templates, Literal[True])
 
 assert_type(Constants.names, list[str])
 assert_type(Constants.labels, list[_StrOrPromise])
-assert_type(Constants.values, list[Optional[Any]])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(Constants.choices, list[tuple[Optional[Any], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Constants.values, list[Optional[float]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Constants.choices, list[tuple[Optional[float], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Constants.PI, Literal[Constants.PI])
 assert_type(Constants.PI.name, Literal["PI"])
 assert_type(Constants.PI.label, _StrOrPromise)
-assert_type(Constants.PI.value, Any)
+assert_type(Constants.PI.value, float)  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Constants.PI.do_not_call_in_templates, Literal[True])
 assert_type(Constants.__empty__, _StrOrPromise)
 

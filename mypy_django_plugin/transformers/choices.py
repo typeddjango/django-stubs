@@ -22,6 +22,9 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
     expr = ctx.context.expr
 
+    if isinstance(expr, MemberExpr):
+        expr = expr.expr
+
     if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
         node = expr.node
     else:
@@ -32,6 +35,9 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
     if not node.is_enum or not node.has_base(fullnames.CHOICES_CLASS_FULLNAME):
         return default_attr_type
+
+    # Enums with more than one base will treat the first base as the mixed-in type.
+    base_type = node.bases[0] if len(node.bases) > 1 else None
 
     # When `__empty__` is defined, the `.choices` and `.values` properties will include `None` for
     # the blank choice which is labelled by the value of `__empty__`.
@@ -47,8 +53,14 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
         if isinstance(choice_arg, TupleType) and choice_arg.length() == 2:
             value_arg, label_arg = choice_arg.items
+            value_arg = get_proper_type(value_arg)
 
-            if has_blank_choice:
+            if isinstance(value_arg, AnyType) and base_type is not None:
+                new_value_arg = make_optional_type(base_type) if has_blank_choice else base_type
+                new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, label_arg])
+                return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
+
+            elif has_blank_choice:
                 new_value_arg = make_optional_type(value_arg)
                 new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, label_arg])
                 return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
@@ -59,10 +71,17 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         and default_attr_type.type.fullname == "builtins.list"
         and len(default_attr_type.args) == 1
     ):
-        value_arg = default_attr_type.args[0]
+        value_arg = get_proper_type(default_attr_type.args[0])
 
-        if has_blank_choice:
+        if isinstance(value_arg, AnyType) and base_type is not None:
+            new_value_arg = make_optional_type(base_type) if has_blank_choice else base_type
+            return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
+
+        elif has_blank_choice:
             new_value_arg = make_optional_type(value_arg)
             return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
+
+    elif method_name == "value" and isinstance(default_attr_type, AnyType) and base_type is not None:
+        return base_type
 
     return default_attr_type
