@@ -510,3 +510,10 @@ django.db.models.Model.asave
 django.db.models.Model.save
 django.db.models.base.Model.asave
 django.db.models.base.Model.save
+
+# Ignore: GeneratedField.__init__ is inconsistent, runtime argument "db_persist" has a default value but stub argument does not
+# The default value None never worked and has been dropped for Django 6.0:
+# https://code.djangoproject.com/ticket/36262
+django.contrib.gis.db.models.GeneratedField.__init__
+django.db.models.GeneratedField.__init__
+django.db.models.fields.generated.GeneratedField.__init__
