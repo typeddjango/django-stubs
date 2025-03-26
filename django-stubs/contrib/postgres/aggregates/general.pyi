@@ -34,9 +34,6 @@ class BoolOr(Aggregate):
 
 class JSONBAgg(OrderableAggMixin, Aggregate):
     output_field: ClassVar[JSONField]
-    def __init__(
-        self, *expressions: BaseExpression | Combinable | str, default: Any | None = ..., **extra: Any
-    ) -> None: ...
     def resolve_expression(
         self,
         query: Any = ...,
