@@ -32,3 +32,8 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
 
     mysettings_file = File(path="mysettings.py", content=custom_settings)
     test_item.files.append(mysettings_file)
+
+    if hasattr(test_item.config, "workerinput"):
+        # Append worker ID to cache directory to prevent race conditions during parallel mypy testing
+        # Avoids potential file corruption when multiple processes access/write cached files simultaneously
+        test_item.incremental_cache_dir += test_item.config.workerinput["workerid"]

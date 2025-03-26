@@ -51,6 +51,7 @@ class Options(Generic[_M]):
     verbose_name: _StrOrPromise | None
     verbose_name_plural: _StrOrPromise | None
     db_table: str
+    db_table_comment: str
     ordering: Sequence[str] | None
     indexes: list[Any]
     unique_together: Sequence[tuple[str, ...]]  # Are always normalized

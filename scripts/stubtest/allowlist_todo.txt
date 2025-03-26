@@ -530,10 +530,6 @@ django.db.backends.postgresql.base.psycopg_version
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_expected_failures
 django.db.backends.postgresql.features.DatabaseFeatures.has_bit_xor
 django.db.backends.postgresql.features.DatabaseFeatures.introspected_field_types
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_10
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_11
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_12
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_14
 django.db.backends.postgresql.features.DatabaseFeatures.prohibits_null_characters_in_text_exception
 django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_spgist_indexes
 django.db.backends.postgresql.features.DatabaseFeatures.uses_server_side_binding

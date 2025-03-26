@@ -64,9 +64,6 @@ class DjangoTypeMetadata(TypedDict, total=False):
     from_queryset_manager: str
     reverse_managers: dict[str, str]
     baseform_bases: dict[str, int]
-    manager_bases: dict[str, int]
-    model_bases: dict[str, int]
-    queryset_bases: dict[str, int]
     m2m_throughs: dict[str, str]
     m2m_managers: dict[str, str]
     manager_to_model: str
@@ -76,7 +73,7 @@ def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
     return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
 
 
-def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases", "queryset_bases"]) -> dict[str, int]:
+def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases"]) -> dict[str, int]:
     return get_django_metadata(model_info).setdefault(key, cast(dict[str, int], {}))
 
 
