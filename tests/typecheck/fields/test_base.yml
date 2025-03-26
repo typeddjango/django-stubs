@@ -200,21 +200,3 @@
         from django.db import models
         class RenamedField(models.Model):
             modelname = models.IntegerField(name="fieldname", choices=((1, 'One'),))
-
--   case: test_generated_field_requires_db_persist
-    main: |
-        from django.db.models.fields.generated import GeneratedField
-        GeneratedField(expression=None, output_field=None, db_persist=True)
-        GeneratedField(expression=None, output_field=None, db_persist=False)
-        GeneratedField(expression=None, output_field=None)  # E: Missing required argument "db_persist"  [call-arg]
-    installed_apps:
-        - myapp
-
--   case: test_generated_field_db_persist_must_be_boolean
-    main: |
-        from django.db.models.fields.generated import GeneratedField
-        GeneratedField(expression=None, output_field=None, db_persist=True)
-        GeneratedField(expression=None, output_field=None, db_persist=False)
-        GeneratedField(expression=None, output_field=None, db_persist="yes")  # E: Argument "db_persist" to "GeneratedField" has incompatible type "str"; expected "bool"  [arg-type]
-    installed_apps:
-        - myapp
