@@ -51,7 +51,6 @@ django.db.migrations.autodetector.OperationDependency
 django.db.models.ForeignObjectRel.accessor_name
 django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
-django.db.models.lookups.In.get_refs
 django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
 django.forms.models.ModelChoiceField.validate_no_null_characters
