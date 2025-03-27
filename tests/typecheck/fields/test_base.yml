@@ -44,6 +44,7 @@
                     some_decimal = models.DecimalField(max_digits=10, decimal_places=5)
 
 -   case: test_add_id_field_if_no_primary_key_defined
+    disable_cache: true
     main: |
         from myapp.models import User
         reveal_type(User().id)  # N: Revealed type is "builtins.int"
@@ -58,6 +59,7 @@
                     pass
 
 -   case: test_do_not_add_id_if_field_with_primary_key_True_defined
+    disable_cache: true
     main: |
         from myapp.models import User
         reveal_type(User().my_pk)  # N: Revealed type is "builtins.int"
