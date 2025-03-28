@@ -1,16 +1,21 @@
 from typing import Any
 
 c_int_p: Any
+GDAL_OF_READONLY: int = 0x00
+GDAL_OF_UPDATE: int = 0x01
+GDAL_OF_ALL: int = 0x00
+GDAL_OF_RASTER: int = 0x02
+GDAL_OF_VECTOR: int = 0x04
 register_all: Any
 cleanup_all: Any
 get_driver: Any
 get_driver_by_name: Any
 get_driver_count: Any
-get_driver_name: Any
+get_driver_description: Any
 open_ds: Any
 destroy_ds: Any
-release_ds: Any
 get_ds_name: Any
+get_dataset_driver: Any
 get_layer: Any
 get_layer_by_name: Any
 get_layer_count: Any
