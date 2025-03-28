@@ -4,9 +4,6 @@
 # Unsorted: there are real problems and things we can really ignore:
 
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
-django.contrib.contenttypes.models.ContentType.get_object_for_this_type
-django.contrib.gis.db.models.ForeignObjectRel.accessor_name
-django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.forms.RadioSelect.__slotnames__
 django.contrib.gis.gdal.geometries.LineString.m
 django.contrib.gis.gdal.geometries.Point.m
@@ -48,13 +45,8 @@ django.db.backends.postgresql.features.DatabaseFeatures.django_test_skips
 django.db.backends.sqlite3.base.DatabaseWrapper.transaction_modes
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
-django.db.models.ForeignObjectRel.accessor_name
-django.db.models.fields.related.ForeignObjectRel.accessor_name
-django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.lookups.In.get_refs
-django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.RadioSelect.__slotnames__
-django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.widgets.RadioSelect.__slotnames__
 django.test.signals.form_renderer_changed
 django.test.utils.garbage_collect

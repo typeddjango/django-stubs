@@ -182,6 +182,7 @@ django.contrib.gis.db.models.ForeignObject.foreign_related_fields
 django.contrib.gis.db.models.ForeignObject.local_related_fields
 django.contrib.gis.db.models.ForeignObject.related_fields
 django.contrib.gis.db.models.ForeignObject.reverse_related_fields
+django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.ForeignObjectRel.cache_name
 django.contrib.gis.db.models.ForeignObjectRel.hidden
 django.contrib.gis.db.models.ForeignObjectRel.many_to_many
@@ -306,6 +307,7 @@ django.db.models.ForeignObject.foreign_related_fields
 django.db.models.ForeignObject.local_related_fields
 django.db.models.ForeignObject.related_fields
 django.db.models.ForeignObject.reverse_related_fields
+django.db.models.ForeignObjectRel.accessor_name
 django.db.models.ForeignObjectRel.cache_name
 django.db.models.ForeignObjectRel.hidden
 django.db.models.ForeignObjectRel.many_to_many
@@ -334,6 +336,7 @@ django.db.models.fields.related.ForeignObject.foreign_related_fields
 django.db.models.fields.related.ForeignObject.local_related_fields
 django.db.models.fields.related.ForeignObject.related_fields
 django.db.models.fields.related.ForeignObject.reverse_related_fields
+django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.related.ForeignObjectRel.cache_name
 django.db.models.fields.related.ForeignObjectRel.hidden
 django.db.models.fields.related.ForeignObjectRel.many_to_many
@@ -352,6 +355,7 @@ django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.RelatedOb
 django.db.models.fields.related_descriptors.ManyToManyDescriptor.related_manager_cls
 django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor.related_manager_cls
 django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.RelatedObjectDoesNotExist
+django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.cache_name
 django.db.models.fields.reverse_related.ForeignObjectRel.hidden
 django.db.models.fields.reverse_related.ForeignObjectRel.many_to_many
