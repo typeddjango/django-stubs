@@ -7,7 +7,6 @@ django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
-django.contrib.gis.forms.RadioSelect.__slotnames__
 django.contrib.gis.gdal.geometries.LineString.m
 django.contrib.gis.gdal.geometries.Point.m
 django.contrib.gis.gdal.prototypes.ds.GDAL_OF_ALL
@@ -48,9 +47,7 @@ django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.lookups.In.get_refs
 django.forms.ModelChoiceField.validate_no_null_characters
-django.forms.RadioSelect.__slotnames__
 django.forms.models.ModelChoiceField.validate_no_null_characters
-django.forms.widgets.RadioSelect.__slotnames__
 
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore:
