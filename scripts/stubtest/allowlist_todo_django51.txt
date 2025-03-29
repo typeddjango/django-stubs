@@ -32,12 +32,7 @@ django.contrib.gis.gdal.prototypes.raster.get_driver_description
 django.contrib.gis.gdal.prototypes.raster.register_all
 django.contrib.gis.geoip2.GeoIP2.info
 django.contrib.gis.geoip2.resources
-django.contrib.postgres.aggregates.JSONBAgg.__init__
-django.contrib.postgres.aggregates.general.JSONBAgg.__init__
-django.contrib.postgres.fields.CIText
-django.contrib.postgres.fields.citext.CIText
 django.contrib.postgres.indexes.BTreeIndex.__init__
-django.core.signing.Signer.__init__
 django.db.backends.oracle.features.DatabaseFeatures.bare_select_suffix
 django.db.backends.oracle.features.DatabaseFeatures.supports_aggregation_over_interval_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_comparing_boolean_expr
@@ -53,9 +48,6 @@ django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.lookups.In.get_refs
 django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.models.ModelChoiceField.validate_no_null_characters
-django.test.signals.form_renderer_changed
-django.test.utils.garbage_collect
-django.urls.resolvers.whitespace_set
 
 # Only discrepancies that appeared after Django 4.2 -> 5.0 update.
 # Unsorted: there are real problems and things we can really ignore:
