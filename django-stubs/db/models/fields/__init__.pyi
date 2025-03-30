@@ -230,7 +230,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = (),
         error_messages: _ErrorMessagesMapping | None = None,
         db_comment: str | None = None,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access

@@ -27,13 +27,6 @@ django.core.files.storage.default_storage
 django.contrib.admin.models.LogEntry_RelatedManager
 django.contrib.auth.models.Permission_RelatedManager
 
-# '<Model>_ManyRelatedManager' entries are plugin generated and these subclasses only exist
-# _locally/dynamically_ runtime -- Created via
-# 'django.db.models.fields.related_descriptors.create_forward_many_to_many_manager'
-django.contrib.auth.models.Group_ManyRelatedManager
-django.contrib.auth.models.Permission_ManyRelatedManager
-django.contrib.auth.models.User_ManyRelatedManager
-
 # BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
 django.utils.archive.BaseArchive.list
 django.utils.archive.BaseArchive.extract
@@ -458,8 +451,12 @@ django.contrib.auth.models.Group@AnnotatedWith
 django.contrib.auth.models.Permission@AnnotatedWith
 django.contrib.auth.models.PermissionsMixin@AnnotatedWith
 django.contrib.auth.models.User@AnnotatedWith
+django.contrib.auth.models.Group_permissions@AnnotatedWith
+django.contrib.auth.models.User_groups@AnnotatedWith
+django.contrib.auth.models.User_permissions@AnnotatedWith
 django.contrib.contenttypes.models.ContentType@AnnotatedWith
 django.contrib.flatpages.models.FlatPage@AnnotatedWith
+django.contrib.flatpages.models.FlatPage_sites@AnnotatedWith
 django.contrib.gis.db.backends.oracle.models.OracleGeometryColumns@AnnotatedWith
 django.contrib.gis.db.backends.oracle.models.OracleSpatialRefSys@AnnotatedWith
 django.contrib.gis.db.backends.postgis.models.PostGISGeometryColumns@AnnotatedWith
