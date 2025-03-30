@@ -1,12 +1,14 @@
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from typing import Any, Protocol, TypeVar, type_check_only
 
+from django.db.models import Choices
 from typing_extensions import TypeAlias
 
 _Choice: TypeAlias = tuple[Any, Any]
 _ChoiceNamedGroup: TypeAlias = tuple[str, Iterable[_Choice]]
 _Choices: TypeAlias = Iterable[_Choice | _ChoiceNamedGroup]
-_ChoicesMapping: TypeAlias = Mapping[Any, Any]  # noqa: PYI047
+_ChoicesMapping: TypeAlias = Mapping[Any, Any]
+_ChoicesInput: TypeAlias = _Choices | _ChoicesMapping | type[Choices] | Callable[[], _Choices | _ChoicesMapping]  # noqa: PYI047
 
 @type_check_only
 class _ChoicesCallable(Protocol):

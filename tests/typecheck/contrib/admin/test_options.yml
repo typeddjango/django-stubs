@@ -56,7 +56,7 @@
           list_max_show_all = 2
           list_editable = ("a", "b")
           search_fields = ("c", "d")
-          date_hirearchy = "f"
+          date_hierarchy = "f"
           save_as = False
           save_as_continue = True
           save_on_top = False

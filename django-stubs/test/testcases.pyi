@@ -1,7 +1,7 @@
 import threading
 import unittest
-from collections.abc import Callable, Collection, Generator, Iterable, Iterator, Mapping, Sequence
-from contextlib import contextmanager
+from collections.abc import Callable, Collection, Iterable, Iterator, Mapping, Sequence
+from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, overload
 
@@ -63,6 +63,8 @@ class SimpleTestCase(unittest.TestCase):
     async_client: AsyncClient
     # TODO: str -> Literal['__all__']
     databases: set[str] | str
+    @classmethod
+    def ensure_connection_patch_method(cls) -> None: ...
     def __call__(self, result: unittest.TestResult | None = ...) -> None: ...
     def settings(self, **kwargs: Any) -> Any: ...
     def modify_settings(self, **kwargs: Any) -> Any: ...
@@ -105,15 +107,6 @@ class SimpleTestCase(unittest.TestCase):
         errors: list[str] | str,
         msg_prefix: str = ...,
     ) -> None: ...
-    # assertFormsetError (lowercase "set") deprecated in Django 4.2
-    def assertFormsetError(
-        self,
-        formset: BaseFormSet,
-        form_index: int | None,
-        field: str | None,
-        errors: list[str] | str,
-        msg_prefix: str = ...,
-    ) -> None: ...
     def assertFormSetError(
         self,
         formset: BaseFormSet,
@@ -150,6 +143,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertHTMLEqual(self, html1: str, html2: str, msg: str | None = ...) -> None: ...
     def assertHTMLNotEqual(self, html1: str, html2: str, msg: str | None = ...) -> None: ...
     def assertInHTML(self, needle: str, haystack: str, count: int | None = ..., msg_prefix: str = ...) -> None: ...
+    def assertNotInHTML(self, needle: str, haystack: str, msg_prefix: str = ...) -> None: ...
     def assertJSONEqual(
         self,
         raw: str | bytes | bytearray,
@@ -171,15 +165,6 @@ class TransactionTestCase(SimpleTestCase):
     fixtures: Any
     multi_db: bool
     serialized_rollback: bool
-    # assertQuerysetEqual (lowercase "set") deprecated in Django 4.2
-    def assertQuerysetEqual(
-        self,
-        qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
-        values: Collection[Any],
-        transform: Callable[[Model], Any] | type[str] = ...,
-        ordered: bool = ...,
-        msg: str | None = ...,
-    ) -> None: ...
     def assertQuerySetEqual(
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
@@ -199,10 +184,9 @@ class TestCase(TransactionTestCase):
     @classmethod
     def setUpTestData(cls) -> None: ...
     @classmethod
-    @contextmanager
     def captureOnCommitCallbacks(
         cls, *, using: str = ..., execute: bool = ...
-    ) -> Generator[list[Callable[[], Any]], None, None]: ...
+    ) -> AbstractContextManager[list[Callable[[], Any]]]: ...
 
 class CheckCondition:
     conditions: Sequence[tuple[Callable, str]]

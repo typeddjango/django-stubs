@@ -149,10 +149,14 @@ django.utils.functional.cached_property.__set__
 django.utils.functional.cached_property.name
 
 # Ignore @cached_property error "cannot reconcile @property on stub with runtime object"
+django.contrib.admin.helpers.Fieldset.is_collapsible
+django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
+django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor.related_manager_cls
 django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_extent
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.supports_geometry_field_unique_index
+django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.geoip2.GeoIP2.is_country
 django.contrib.gis.geoip2.GeoIP2.is_city
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.from_text
@@ -171,6 +175,7 @@ django.contrib.gis.db.models.ForeignObject.foreign_related_fields
 django.contrib.gis.db.models.ForeignObject.local_related_fields
 django.contrib.gis.db.models.ForeignObject.related_fields
 django.contrib.gis.db.models.ForeignObject.reverse_related_fields
+django.contrib.gis.db.models.ForeignObjectRel.cache_name
 django.contrib.gis.db.models.ForeignObjectRel.hidden
 django.contrib.gis.db.models.ForeignObjectRel.many_to_many
 django.contrib.gis.db.models.ForeignObjectRel.many_to_one
@@ -257,8 +262,11 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_index_column_orderin
 django.db.backends.mysql.features.DatabaseFeatures.supports_transactions
 django.db.backends.mysql.features.DatabaseFeatures.update_can_self_select
 django.db.backends.oracle.features.DatabaseFeatures.supports_boolean_expr_in_select_clause
+django.db.backends.oracle.features.DatabaseFeatures.supports_frame_exclusion
 django.db.backends.postgresql.base.DatabaseWrapper.pg_version
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_13
+django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_14
+django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_15
+django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_16
 django.db.migrations.RenameField.new_name_lower
 django.db.migrations.RenameField.old_name_lower
 django.db.migrations.RenameIndex.new_name_lower
@@ -291,6 +299,7 @@ django.db.models.ForeignObject.foreign_related_fields
 django.db.models.ForeignObject.local_related_fields
 django.db.models.ForeignObject.related_fields
 django.db.models.ForeignObject.reverse_related_fields
+django.db.models.ForeignObjectRel.cache_name
 django.db.models.ForeignObjectRel.hidden
 django.db.models.ForeignObjectRel.many_to_many
 django.db.models.ForeignObjectRel.many_to_one
@@ -313,10 +322,12 @@ django.db.models.fields.Field.cached_col
 django.db.models.fields.Field.validators
 django.db.models.fields.IntegerField.validators
 django.db.models.fields.generated.GeneratedField.cached_col
+django.db.models.fields.mixins.FieldCacheMixin.cache_name
 django.db.models.fields.related.ForeignObject.foreign_related_fields
 django.db.models.fields.related.ForeignObject.local_related_fields
 django.db.models.fields.related.ForeignObject.related_fields
 django.db.models.fields.related.ForeignObject.reverse_related_fields
+django.db.models.fields.related.ForeignObjectRel.cache_name
 django.db.models.fields.related.ForeignObjectRel.hidden
 django.db.models.fields.related.ForeignObjectRel.many_to_many
 django.db.models.fields.related.ForeignObjectRel.many_to_one
@@ -326,6 +337,7 @@ django.db.models.fields.related.ForeignObjectRel.one_to_one
 django.db.models.fields.related.ForeignObjectRel.related_model
 django.db.models.fields.related.ForwardManyToOneDescriptor.RelatedObjectDoesNotExist
 django.db.models.fields.related.ManyToManyDescriptor.related_manager_cls
+django.db.models.fields.related.RelatedField.cache_name
 django.db.models.fields.related.RelatedField.related_model
 django.db.models.fields.related.ReverseManyToOneDescriptor.related_manager_cls
 django.db.models.fields.related.ReverseOneToOneDescriptor.RelatedObjectDoesNotExist
@@ -333,6 +345,7 @@ django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.RelatedOb
 django.db.models.fields.related_descriptors.ManyToManyDescriptor.related_manager_cls
 django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor.related_manager_cls
 django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.RelatedObjectDoesNotExist
+django.db.models.fields.reverse_related.ForeignObjectRel.cache_name
 django.db.models.fields.reverse_related.ForeignObjectRel.hidden
 django.db.models.fields.reverse_related.ForeignObjectRel.many_to_many
 django.db.models.fields.reverse_related.ForeignObjectRel.many_to_one
@@ -342,6 +355,7 @@ django.db.models.fields.reverse_related.ForeignObjectRel.one_to_one
 django.db.models.fields.reverse_related.ForeignObjectRel.related_model
 django.db.models.lookups.Lookup.contains_aggregate
 django.db.models.lookups.Lookup.contains_over_clause
+django.db.models.options.Options.all_parents
 django.db.models.options.Options.base_manager
 django.db.models.options.Options.db_returning_fields
 django.db.models.options.Options.default_manager
@@ -349,7 +363,9 @@ django.db.models.options.Options.fields
 django.db.models.options.Options.fields_map
 django.db.models.options.Options.managers
 django.db.models.options.Options.managers_map
+django.db.models.options.Options.swapped
 django.db.models.options.Options.total_unique_constraints
+django.db.models.options.Options.verbose_name_raw
 django.db.models.query.RawQuerySet.columns
 django.db.models.query.RawQuerySet.model_fields
 django.db.models.sql.Query.base_table
@@ -476,3 +492,26 @@ django.contrib.sessions.backends.base.SessionBase.setdefault
 
 # Limited stubtest support for enums (https://github.com/python/mypy/issues/16806)
 django.db.migrations.operations.base.OperationCategory.__new__
+
+# Ignore: ...Model.[a]save is inconsistent, stub does not have *args argument "args"
+# Positional arguments were deprecated in Django 5.1, we have adopted keyword-only arguments early.
+django.contrib.auth.base_user.AbstractBaseUser.save
+django.contrib.auth.models.AbstractBaseUser.save
+django.contrib.gis.db.models.Model.asave
+django.contrib.gis.db.models.Model.save
+django.db.models.Model.asave
+django.db.models.Model.save
+django.db.models.base.Model.asave
+django.db.models.base.Model.save
+
+# Ignore: GeneratedField.__init__ is inconsistent, runtime argument "db_persist" has a default value but stub argument does not
+# The default value None never worked and has been dropped for Django 6.0:
+# https://code.djangoproject.com/ticket/36262
+django.contrib.gis.db.models.GeneratedField.__init__
+django.db.models.GeneratedField.__init__
+django.db.models.fields.generated.GeneratedField.__init__
+
+# cls.__slotnames__ gets added by Python’s pickling internals:
+# https://github.com/python/cpython/blob/5abff6960b4aecb0d5c81c7482cf3faa74e1983d/Lib/copyreg.py#L112-L161
+# Some Django classes get copied at import time, which leads stubtest to detect it.
+.*\.__slotnames__

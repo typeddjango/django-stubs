@@ -68,7 +68,7 @@ You can also run pre-commit per file or for a specific path, simply replace "--a
 To execute the unit tests, simply run:
 
 ```bash
-pytest
+pytest -n auto
 ```
 
 If you get some unexpected results or want to be sure that tests run is not affected by previous one, remove `mypy` cache:

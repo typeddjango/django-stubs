@@ -77,7 +77,6 @@ class ForeignObjectRel(FieldCacheMixin):
         limit_choices_to: _LimitChoicesTo | None = None,
         ordering: Sequence[str] = (),
     ) -> _ChoicesList: ...
-    def is_hidden(self) -> bool: ...
     @deprecated(
         "get_joining_columns() is deprecated and will be removed in Django 6.0. Use get_joining_fields() instead."
     )

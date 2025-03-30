@@ -24,6 +24,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
+    choices,
     fields,
     forms,
     init_create,
@@ -69,15 +70,6 @@ class NewSemanalDjangoPlugin(Plugin):
         # Add paths from mypy_path config option
         sys.path.extend(options.mypy_path)
         self.django_context = DjangoContext(self.plugin_config.django_settings_module)
-
-    def _get_current_queryset_bases(self) -> dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.QUERYSET_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "queryset_bases")
-            bases[fullnames.QUERYSET_CLASS_FULLNAME] = 1
-            return bases
-        else:
-            return {}
 
     def _get_current_form_bases(self) -> dict[str, int]:
         model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
@@ -283,6 +275,12 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
+
+        if info and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME) and attr_name in ("choices", "values"):
+            return choices.transform_into_proper_attr_type
+
+        if info and info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name == "value":
+            return choices.transform_into_proper_attr_type
 
         return None
 

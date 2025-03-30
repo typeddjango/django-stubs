@@ -64,8 +64,13 @@ class RegexPattern(CheckURLMixin):
     def match(self, path: str) -> tuple[str, tuple, dict[str, str]] | None: ...
     def check(self) -> list[CheckMessage]: ...
 
+whitespace_set: frozenset[str]
+
+class LocaleRegexRouteDescriptor:
+    def __get__(self, instance: RoutePattern | None, cls: type | None = None) -> Pattern[str]: ...
+
 class RoutePattern(CheckURLMixin):
-    regex: LocaleRegexDescriptor
+    regex: LocaleRegexRouteDescriptor
     name: str | None
     converters: dict[str, Any]
     def __init__(self, route: str, name: str | None = ..., is_endpoint: bool = ...) -> None: ...
