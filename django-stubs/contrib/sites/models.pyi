@@ -1,6 +1,6 @@
 from typing import Any, ClassVar
 
-from django.contrib.flatpages.models import FlatPage, FlatPage_sites
+from django.contrib.flatpages.models import FlatPage, _FlatPage_sites
 from django.contrib.redirects.models import Redirect
 from django.db import models
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
@@ -20,7 +20,7 @@ class Site(models.Model):
     pk: models.AutoField
     domain = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
-    flatpage_set: ManyToManyDescriptor[FlatPage, FlatPage_sites]
+    flatpage_set: ManyToManyDescriptor[FlatPage, _FlatPage_sites]
     redirect_set: ReverseManyToOneDescriptor[Redirect]
     def natural_key(self) -> tuple[str]: ...
 

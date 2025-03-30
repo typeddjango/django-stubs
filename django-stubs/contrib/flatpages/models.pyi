@@ -8,7 +8,7 @@ from typing_extensions import Self
 # This is a model that only exists in Django's model registry and doesn't have any
 # class statement form. It's the through model between 'FlatPage' and 'Site'.
 @type_check_only
-class FlatPage_sites(models.Model):
+class _FlatPage_sites(models.Model):
     objects: ClassVar[models.Manager[Self]]
 
     id: models.AutoField
@@ -27,5 +27,5 @@ class FlatPage(models.Model):
     enable_comments: models.BooleanField
     template_name: models.CharField
     registration_required: models.BooleanField
-    sites: models.ManyToManyField[Site, FlatPage_sites]
+    sites: models.ManyToManyField[Site, _FlatPage_sites]
     def get_absolute_url(self) -> str: ...

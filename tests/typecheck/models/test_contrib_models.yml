@@ -28,8 +28,8 @@
         reveal_type(User().is_anonymous)  # N: Revealed type is "Literal[False]"
         reveal_type(User().groups.get())  # N: Revealed type is "django.contrib.auth.models.Group"
         reveal_type(User().user_permissions.get())  # N: Revealed type is "django.contrib.auth.models.Permission"
-        reveal_type(User.groups)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Group, django.contrib.auth.models.User_groups]"
-        reveal_type(User.user_permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.contrib.auth.models.User_permissions]"
+        reveal_type(User.groups)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Group, django.contrib.auth.models._User_groups]"
+        reveal_type(User.user_permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.contrib.auth.models._User_permissions]"
 
         from django.contrib.auth.models import AnonymousUser
         reveal_type(AnonymousUser().is_authenticated)  # N: Revealed type is "Literal[False]"
@@ -46,7 +46,7 @@
         from django.contrib.auth.models import Group
         reveal_type(Group().name)  # N: Revealed type is "builtins.str"
         reveal_type(Group().permissions.get())  # N: Revealed type is "django.contrib.auth.models.Permission"
-        reveal_type(Group.permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.contrib.auth.models.Group_permissions]"
+        reveal_type(Group.permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.contrib.auth.models._Group_permissions]"
 
 -   case: can_override_abstract_user_manager
     main: |
@@ -182,8 +182,8 @@
     main: |
         from django.contrib.auth.models import Group, Permission
         from django.contrib.contenttypes.models import ContentType
-        reveal_type(Permission().user_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[django.contrib.auth.models.User, django.contrib.auth.models.User_permissions]"
-        reveal_type(Group().user_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[django.contrib.auth.models.User, django.contrib.auth.models.User_groups]"
+        reveal_type(Permission().user_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[django.contrib.auth.models.User, django.contrib.auth.models._User_permissions]"
+        reveal_type(Group().user_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[django.contrib.auth.models.User, django.contrib.auth.models._User_groups]"
         reveal_type(ContentType.permission_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[django.contrib.auth.models.Permission]"
         reveal_type(ContentType().permission_set)  # N: Revealed type is "django.contrib.auth.models.Permission_RelatedManager"
     custom_settings: |

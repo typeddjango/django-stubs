@@ -32,6 +32,7 @@ class LogEntryManager(models.Manager[LogEntry]):
         action_flag: int,
         change_message: str | list[Any] = "",
         *,
+        # Commit 27b68bc, django https://github.com/django/django/pull/19233
         single_object: bool = False,
     ) -> list[LogEntry] | LogEntry: ...
 

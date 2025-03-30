@@ -30,8 +30,8 @@ class Permission(models.Model):
     content_type = models.ForeignKey[ContentType | Combinable, ContentType](ContentType, on_delete=models.CASCADE)
     content_type_id: int
     codename = models.CharField(max_length=100)
-    group_set: ManyToManyDescriptor[Group, Group_permissions]
-    user_set: ManyToManyDescriptor[User, User_permissions]
+    group_set: ManyToManyDescriptor[Group, _Group_permissions]
+    user_set: ManyToManyDescriptor[User, _User_permissions]
     def natural_key(self) -> tuple[str, str, str]: ...
 
 class GroupManager(models.Manager[Group]):
@@ -40,7 +40,7 @@ class GroupManager(models.Manager[Group]):
 # This is a model that only exists in Django's model registry and doesn't have any
 # class statement form. It's the through model between 'Group' and 'Permission'.
 @type_check_only
-class Group_permissions(models.Model):
+class _Group_permissions(models.Model):
     objects: ClassVar[models.Manager[Self]]
 
     id: models.AutoField
@@ -53,7 +53,7 @@ class Group_permissions(models.Model):
 # This is a model that only exists in Django's model registry and doesn't have any
 # class statement form. It's the through model between 'User' and 'Group'.
 @type_check_only
-class User_groups(models.Model):
+class _User_groups(models.Model):
     objects: ClassVar[models.Manager[Self]]
 
     id: models.AutoField
@@ -66,7 +66,7 @@ class User_groups(models.Model):
 # This is a model that only exists in Django's model registry and doesn't have any
 # class statement form. It's the through model between 'User' and 'Permission'.
 @type_check_only
-class User_permissions(models.Model):
+class _User_permissions(models.Model):
     objects: ClassVar[models.Manager[Self]]
 
     id: models.AutoField
@@ -82,8 +82,8 @@ class Group(models.Model):
     id: models.AutoField
     pk: models.AutoField
     name = models.CharField(max_length=150)
-    permissions = models.ManyToManyField[Permission, Group_permissions](Permission)
-    user_set: ManyToManyDescriptor[User, User_groups]
+    permissions = models.ManyToManyField[Permission, _Group_permissions](Permission)
+    user_set: ManyToManyDescriptor[User, _User_groups]
     def natural_key(self) -> tuple[str]: ...
 
 _T = TypeVar("_T", bound=Model)
@@ -106,8 +106,8 @@ class UserManager(BaseUserManager[_T]):
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
-    groups = models.ManyToManyField[Group, User_groups](Group)
-    user_permissions = models.ManyToManyField[Permission, User_permissions](Permission)
+    groups = models.ManyToManyField[Group, _User_groups](Group)
+    user_permissions = models.ManyToManyField[Permission, _User_permissions](Permission)
 
     def get_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...

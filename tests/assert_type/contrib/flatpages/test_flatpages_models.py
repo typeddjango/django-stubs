@@ -1,4 +1,4 @@
-from django.contrib.flatpages.models import FlatPage, FlatPage_sites
+from django.contrib.flatpages.models import FlatPage, _FlatPage_sites
 from django.contrib.sites.models import Site
 from django.db.models import Manager
 from typing_extensions import assert_type
@@ -14,7 +14,7 @@ assert_type(flat_page.template_name, str)
 assert_type(flat_page.registration_required, bool)
 assert_type(flat_page.sites.get(), Site)
 
-assert_type(FlatPage.sites.through.objects, Manager[FlatPage_sites])
+assert_type(FlatPage.sites.through.objects, Manager[_FlatPage_sites])
 flat_page_sites = FlatPage.sites.through.objects.get()
 assert_type(flat_page_sites.id, int)
 assert_type(flat_page_sites.pk, int)

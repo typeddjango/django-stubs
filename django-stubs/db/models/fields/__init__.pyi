@@ -54,54 +54,6 @@ _ST = TypeVar("_ST", contravariant=True)
 # __get__ return type
 _GT = TypeVar("_GT", covariant=True)
 
-# Generic field types
-_ST_IntegerField = TypeVar("_ST_IntegerField", default=float | int | str | Combinable)
-_GT_IntegerField = TypeVar("_GT_IntegerField", default=int)
-
-_ST_FloatField = TypeVar("_ST_FloatField", default=float | int | str | Combinable)
-_GT_FloatField = TypeVar("_GT_FloatField", default=float)
-
-_ST_DecimalField = TypeVar("_ST_DecimalField", default=str | float | decimal.Decimal | Combinable)
-_GT_DecimalField = TypeVar("_GT_DecimalField", default=decimal.Decimal)
-
-_ST_CharField = TypeVar("_ST_CharField", default=str | int | Combinable)
-_GT_CharField = TypeVar("_GT_CharField", default=str)
-_ST_EmailField = TypeVar("_ST_EmailField", default=str | Combinable)
-_GT_EmailField = TypeVar("_GT_EmailField", default=str)
-
-_ST_TextField = TypeVar("_ST_TextField", default=str | Combinable)
-_GT_TextField = TypeVar("_GT_TextField", default=str)
-
-_ST_BooleanField = TypeVar("_ST_BooleanField", default=bool | Combinable)
-_GT_BooleanField = TypeVar("_GT_BooleanField", default=bool)
-
-_ST_IPAddressField = TypeVar("_ST_IPAddressField", default=str | Combinable)
-_GT_IPAddressField = TypeVar("_GT_IPAddressField", default=str)
-_ST_GenericIPAddressField = TypeVar("_ST_GenericIPAddressField", default=str | int | Callable[..., Any] | Combinable)
-_GT_GenericIPAddressField = TypeVar("_GT_GenericIPAddressField", default=str)
-
-_ST_DateField = TypeVar("_ST_DateField", default=str | date | Combinable)
-_GT_DateField = TypeVar("_GT_DateField", default=date)
-_ST_TimeField = TypeVar("_ST_TimeField", default=str | time | real_datetime | Combinable)
-_GT_TimeField = TypeVar("_GT_TimeField", default=time)
-_ST_DateTimeField = TypeVar("_ST_DateTimeField", default=str | real_datetime | date | Combinable)
-_GT_DateTimeField = TypeVar("_GT_DateTimeField", default=real_datetime)
-
-_ST_UUIDField = TypeVar("_ST_UUIDField", default=str | uuid.UUID)
-_GT_UUIDField = TypeVar("_GT_UUIDField", default=uuid.UUID)
-
-_ST_BinaryField = TypeVar("_ST_BinaryField", default=bytes | memoryview)
-_GT_BinaryField = TypeVar("_GT_BinaryField", default=bytes | memoryview)
-
-_ST_FileField = TypeVar("_ST_FileField", default=str | bytes | memoryview)
-_GT_FileField = TypeVar("_GT_FileField", default=str)
-
-_ST_DurationField = TypeVar("_ST_DurationField", default=timedelta)
-_GT_DurationField = TypeVar("_GT_DurationField", default=timedelta)
-
-_ST_AutoField = TypeVar("_ST_AutoField", default=Combinable | int | str | None)
-_GT_AutoField = TypeVar("_GT_AutoField", default=int)
-
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     """
     Typing model fields.
@@ -291,6 +243,9 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_to_string(self, obj: Model) -> str: ...
     def slice_expression(self, expression: Expression, start: int, end: int | None) -> Func: ...
 
+_ST_IntegerField = TypeVar("_ST_IntegerField", default=float | int | str | Combinable)
+_GT_IntegerField = TypeVar("_GT_IntegerField", default=int)
+
 class IntegerField(Field[_ST_IntegerField, _GT_IntegerField]):
     _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: int
@@ -310,10 +265,16 @@ class PositiveSmallIntegerField(
 ): ...
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_IntegerField, _GT_IntegerField]): ...
 
+_ST_FloatField = TypeVar("_ST_FloatField", default=float | int | str | Combinable)
+_GT_FloatField = TypeVar("_GT_FloatField", default=float)
+
 class FloatField(Field[_ST_FloatField, _GT_FloatField]):
     _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
+
+_ST_DecimalField = TypeVar("_ST_DecimalField", default=str | float | decimal.Decimal | Combinable)
+_GT_DecimalField = TypeVar("_GT_DecimalField", default=decimal.Decimal)
 
 class DecimalField(Field[_ST_DecimalField, _GT_DecimalField]):
     _pyi_private_set_type: str | float | decimal.Decimal | Combinable
@@ -347,6 +308,9 @@ class DecimalField(Field[_ST_DecimalField, _GT_DecimalField]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+
+_ST_CharField = TypeVar("_ST_CharField", default=str | int | Combinable)
+_GT_CharField = TypeVar("_GT_CharField", default=str)
 
 class CharField(Field[_ST_CharField, _GT_CharField]):
     _pyi_private_set_type: str | int | Combinable
@@ -414,6 +378,9 @@ class SlugField(CharField[_ST_CharField, _GT_CharField]):
         allow_unicode: bool = False,
     ) -> None: ...
 
+_ST_EmailField = TypeVar("_ST_EmailField", default=str | Combinable)
+_GT_EmailField = TypeVar("_GT_EmailField", default=str)
+
 class EmailField(CharField[_ST_EmailField, _GT_EmailField]):
     _pyi_private_set_type: str | Combinable
 
@@ -446,6 +413,9 @@ class URLField(CharField[_ST_CharField, _GT_CharField]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+
+_ST_TextField = TypeVar("_ST_TextField", default=str | Combinable)
+_GT_TextField = TypeVar("_GT_TextField", default=str)
 
 class TextField(Field[_ST_TextField, _GT_TextField]):
     _pyi_private_set_type: str | Combinable
@@ -481,6 +451,9 @@ class TextField(Field[_ST_TextField, _GT_TextField]):
         db_collation: str | None = None,
     ) -> None: ...
 
+_ST_BooleanField = TypeVar("_ST_BooleanField", default=bool | Combinable)
+_GT_BooleanField = TypeVar("_GT_BooleanField", default=bool)
+
 class BooleanField(Field[_ST_BooleanField, _GT_BooleanField]):
     _pyi_private_set_type: bool | Combinable
     _pyi_private_get_type: bool
@@ -491,9 +464,15 @@ class NullBooleanField(BooleanField[_ST_BooleanField, _GT_BooleanField]):
     _pyi_private_get_type: bool | None  # type: ignore[assignment]
     _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
+_ST_IPAddressField = TypeVar("_ST_IPAddressField", default=str | Combinable)
+_GT_IPAddressField = TypeVar("_GT_IPAddressField", default=str)
+
 class IPAddressField(Field[_ST_IPAddressField, _GT_IPAddressField]):
     _pyi_private_set_type: str | Combinable
     _pyi_private_get_type: str
+
+_ST_GenericIPAddressField = TypeVar("_ST_GenericIPAddressField", default=str | int | Callable[..., Any] | Combinable)
+_GT_GenericIPAddressField = TypeVar("_GT_GenericIPAddressField", default=str)
 
 class GenericIPAddressField(Field[_ST_GenericIPAddressField, _GT_GenericIPAddressField]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
@@ -529,6 +508,9 @@ class GenericIPAddressField(Field[_ST_GenericIPAddressField, _GT_GenericIPAddres
 
 class DateTimeCheckMixin: ...
 
+_ST_DateField = TypeVar("_ST_DateField", default=str | date | Combinable)
+_GT_DateField = TypeVar("_GT_DateField", default=date)
+
 class DateField(DateTimeCheckMixin, Field[_ST_DateField, _GT_DateField]):
     _pyi_private_set_type: str | date | Combinable
     _pyi_private_get_type: date
@@ -562,6 +544,9 @@ class DateField(DateTimeCheckMixin, Field[_ST_DateField, _GT_DateField]):
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
+_ST_TimeField = TypeVar("_ST_TimeField", default=str | time | real_datetime | Combinable)
+_GT_TimeField = TypeVar("_GT_TimeField", default=time)
+
 class TimeField(DateTimeCheckMixin, Field[_ST_TimeField, _GT_TimeField]):
     _pyi_private_set_type: str | time | real_datetime | Combinable
     _pyi_private_get_type: time
@@ -593,10 +578,16 @@ class TimeField(DateTimeCheckMixin, Field[_ST_TimeField, _GT_TimeField]):
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
+_ST_DateTimeField = TypeVar("_ST_DateTimeField", default=str | real_datetime | date | Combinable)
+_GT_DateTimeField = TypeVar("_GT_DateTimeField", default=real_datetime)
+
 class DateTimeField(DateField[_ST_DateTimeField, _GT_DateTimeField]):
     _pyi_private_set_type: str | real_datetime | date | Combinable
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
+
+_ST_UUIDField = TypeVar("_ST_UUIDField", default=str | uuid.UUID)
+_GT_UUIDField = TypeVar("_GT_UUIDField", default=uuid.UUID)
 
 class UUIDField(Field[_ST_UUIDField, _GT_UUIDField]):
     _pyi_private_set_type: str | uuid.UUID
@@ -630,6 +621,9 @@ class UUIDField(Field[_ST_UUIDField, _GT_UUIDField]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+
+_ST_FileField = TypeVar("_ST_FileField", default=str | bytes | memoryview)
+_GT_FileField = TypeVar("_GT_FileField", default=str)
 
 class FilePathField(Field[_ST_FileField, _GT_FileField]):
     path: Any
@@ -667,8 +661,14 @@ class FilePathField(Field[_ST_FileField, _GT_FileField]):
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
 
+_ST_BinaryField = TypeVar("_ST_BinaryField", default=bytes | memoryview)
+_GT_BinaryField = TypeVar("_GT_BinaryField", default=bytes | memoryview)
+
 class BinaryField(Field[_ST_BinaryField, _GT_BinaryField]):
     _pyi_private_get_type: bytes | memoryview
+
+_ST_DurationField = TypeVar("_ST_DurationField", default=timedelta)
+_GT_DurationField = TypeVar("_GT_DurationField", default=timedelta)
 
 class DurationField(Field[_ST_DurationField, _GT_DurationField]):
     _pyi_private_get_type: timedelta
@@ -678,6 +678,9 @@ class AutoFieldMixin:
     def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
 
 class AutoFieldMeta(type): ...
+
+_ST_AutoField = TypeVar("_ST_AutoField", default=Combinable | int | str | None)
+_GT_AutoField = TypeVar("_GT_AutoField", default=int)
 
 class AutoField(AutoFieldMixin, IntegerField[_ST_AutoField, _GT_AutoField], metaclass=AutoFieldMeta):
     _pyi_private_set_type: Combinable | int | str
