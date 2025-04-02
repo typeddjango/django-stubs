@@ -401,7 +401,6 @@ django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_PREFIX
 django.contrib.gis.gdal.raster.const.VSI_MEM_FILESYSTEM_BASE_PATH
 django.contrib.gis.gdal.srs.SpatialReference.pretty_wkt
 django.contrib.gis.gdal.srs.SpatialReference.xml
-django.contrib.gis.geoip2.base
 django.contrib.gis.geos.Point.tuple
 django.contrib.gis.geos.geometry.GEOSGeometryBase.geojson
 django.contrib.gis.geos.geometry.GEOSGeometryBase.make_valid

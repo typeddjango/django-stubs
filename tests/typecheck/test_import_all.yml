@@ -177,8 +177,6 @@
         import django.contrib.gis.gdal.raster.source
         import django.contrib.gis.gdal.srs
         import django.contrib.gis.geoip2
-        import django.contrib.gis.geoip2.base
-        import django.contrib.gis.geoip2.resources
         import django.contrib.gis.geometry
         import django.contrib.gis.geos
         import django.contrib.gis.geos.base

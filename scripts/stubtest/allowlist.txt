@@ -164,8 +164,6 @@ django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_exte
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.supports_geometry_field_unique_index
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
-django.contrib.gis.geoip2.GeoIP2.is_country
-django.contrib.gis.geoip2.GeoIP2.is_city
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.from_text
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.gis_operators
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.mariadb
@@ -206,6 +204,8 @@ django.contrib.gis.gdal.GDALRaster.driver
 django.contrib.gis.gdal.GDALRaster.is_vsi_based
 django.contrib.gis.gdal.raster.source.GDALRaster.driver
 django.contrib.gis.gdal.raster.source.GDALRaster.is_vsi_based
+django.contrib.gis.geoip2.GeoIP2.is_city
+django.contrib.gis.geoip2.GeoIP2.is_country
 django.contrib.postgres.expressions.ArraySubquery.output_field
 django.contrib.postgres.indexes.PostgresIndex.max_name_length
 django.contrib.sessions.backends.db.SessionStore.model
