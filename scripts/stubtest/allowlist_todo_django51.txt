@@ -30,8 +30,6 @@ django.contrib.gis.gdal.prototypes.raster.get_driver_by_name
 django.contrib.gis.gdal.prototypes.raster.get_driver_count
 django.contrib.gis.gdal.prototypes.raster.get_driver_description
 django.contrib.gis.gdal.prototypes.raster.register_all
-django.contrib.gis.geoip2.GeoIP2.info
-django.contrib.gis.geoip2.resources
 django.contrib.postgres.indexes.BTreeIndex.__init__
 django.db.backends.oracle.features.DatabaseFeatures.bare_select_suffix
 django.db.backends.oracle.features.DatabaseFeatures.supports_aggregation_over_interval_types
