@@ -3,6 +3,7 @@
 # Only discrepancies that appeared after Django 5.0 -> 5.1 update.
 # Unsorted: there are real problems and things we can really ignore:
 
+django.contrib.admin.models.LogEntryManager.log_actions
 django.contrib.contenttypes.fields.GenericForeignKey.get_attname_column
 django.contrib.contenttypes.models.ContentType.get_object_for_this_type
 django.contrib.gis.db.models.ForeignObjectRel.accessor_name

@@ -64,6 +64,8 @@
     main: |
         from myapp.models import Child
         Child.objects.create(dct={"hello": "world"})  # no errors
+        reveal_type(Child().dct)  # N: Revealed type is "builtins.dict[builtins.str, builtins.str]"
+    monkeypatch: true
     installed_apps:
         - myapp
     files:
@@ -74,10 +76,10 @@
 
                 from django.db import models
 
-                class JSONField(models.TextField): pass  # incomplete
+                class JSONField(models.TextField[dict[str, str], dict[str, str]]): pass  # incomplete
 
                 class Base(models.Model):
-                    dct: models.Field[dict[str, str], dict[str, str]] = JSONField()
+                    dct = JSONField()
 
                 class Child(Base): pass
 
@@ -140,17 +142,21 @@
         third = MyModel3()
         third.default = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[float, int, str, Combinable]")  [assignment]
         reveal_type(third.default)  # N: Revealed type is "builtins.int"
+    monkeypatch: true
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import Optional, Union
                 from django.db import models
+                from django.db.models.expressions import Combinable
+
                 def return_int() -> int:
                     return 0
                 class MyModel(models.Model):
-                    id = models.IntegerField(primary_key=True, default=return_int)
+                    id = models.IntegerField[Optional[Union[float, int, str, Combinable]], int](default=return_int, primary_key=True)
                 class MyModel2(models.Model):
                     id = models.IntegerField(primary_key=True)
                 class MyModel3(models.Model):

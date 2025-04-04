@@ -52,6 +52,7 @@
         from myapp.models import Concrete
         ret = list(Concrete.objects.values_list('id', 'data'))
         reveal_type(ret)  # N: Revealed type is "builtins.list[Tuple[builtins.int, builtins.dict[builtins.str, builtins.str]]]"
+    monkeypatch: true
     installed_apps:
         - myapp
     files:
@@ -61,7 +62,7 @@
                 from __future__ import annotations
                 from django.db import models
 
-                class JSONField(models.TextField): pass  # incomplete
+                class JSONField(models.TextField[dict[str, str], dict[str, str]]): pass  # incomplete
 
                 class Concrete(models.Model):
                     id = models.IntegerField()
