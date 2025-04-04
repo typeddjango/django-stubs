@@ -37,7 +37,11 @@
 
         from django.contrib.auth.models import Permission
         reveal_type(Permission().name)  # N: Revealed type is "builtins.str"
+        reveal_type(Permission().content_type)  # N: Revealed type is "django.contrib.contenttypes.models.ContentType"
+        reveal_type(Permission().content_type_id)  # N: Revealed type is "builtins.int"
         reveal_type(Permission().codename)  # N: Revealed type is "builtins.str"
+        reveal_type(Permission.user_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.User, django.contrib.auth.models._User_permissions]"
+        reveal_type(Permission.group_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Group, django.contrib.auth.models._Group_permissions]"
 
         from django.contrib.auth.models import PermissionsMixin
         p: Type[PermissionsMixin]
@@ -47,6 +51,113 @@
         reveal_type(Group().name)  # N: Revealed type is "builtins.str"
         reveal_type(Group().permissions.get())  # N: Revealed type is "django.contrib.auth.models.Permission"
         reveal_type(Group.permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.contrib.auth.models._Group_permissions]"
+
+-   case: contrib_contenttype_model_fields
+    main: |
+        from django.contrib.contenttypes.models import ContentType
+        from django.contrib.auth.models import User
+        reveal_type(ContentType().app_label)  # N: Revealed type is "builtins.str"
+        reveal_type(ContentType().model)  # N: Revealed type is "builtins.str"
+        reveal_type(ContentType.logentry_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[django.contrib.admin.models.LogEntry]"
+        reveal_type(ContentType.permission_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[django.contrib.auth.models.Permission]"
+        reveal_type(ContentType.objects)  # N: Revealed type is "django.contrib.contenttypes.models.ContentTypeManager"
+        reveal_type(ContentType.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[django.contrib.contenttypes.models.ContentType, django.contrib.contenttypes.models.ContentType]"
+
+-   case: contrib_flatpages_model_fields
+    main: |
+        from django.contrib.flatpages.models import FlatPage
+        from django.contrib.auth.models import User
+        reveal_type(FlatPage().url)  # N: Revealed type is "builtins.str"
+        reveal_type(FlatPage().title)  # N: Revealed type is "builtins.str"
+        reveal_type(FlatPage().content)  # N: Revealed type is "builtins.str"
+        reveal_type(FlatPage().enable_comments)  # N: Revealed type is "builtins.bool"
+        reveal_type(FlatPage().template_name)  # N: Revealed type is "builtins.str"
+        reveal_type(FlatPage().registration_required)  # N: Revealed type is "builtins.bool"
+        reveal_type(FlatPage.sites)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.sites.models.Site, django.contrib.flatpages.models._FlatPage_sites]"
+
+-   case: contrib_redirects_model_fields
+    main: |
+        from django.contrib.redirects.models import Redirect
+        from django.contrib.auth.models import User
+        reveal_type(Redirect().site)  # N: Revealed type is "django.contrib.sites.models.Site"
+        reveal_type(Redirect().old_path)  # N: Revealed type is "builtins.str"
+        reveal_type(Redirect().new_path)  # N: Revealed type is "builtins.str"
+        reveal_type(Redirect().site_id)  # N: Revealed type is "builtins.int"
+
+-   case: contrib_sessions_model_fields
+    main: |
+        from django.contrib.sessions.models import Session
+        from django.contrib.auth.models import User
+        reveal_type(Session().session_key)  # N: Revealed type is "builtins.str"
+        reveal_type(Session().session_data)  # N: Revealed type is "builtins.str"
+        reveal_type(Session().expire_date)  # N: Revealed type is "datetime.datetime"
+        reveal_type(Session.objects)  # N: Revealed type is "django.contrib.sessions.models.SessionManager[django.contrib.sessions.models.Session]"
+
+-   case: contrib_sites_model_fields
+    main: |
+        from django.contrib.sites.models import Site
+        reveal_type(Site().domain)  # N: Revealed type is "builtins.str"
+        reveal_type(Site().name)  # N: Revealed type is "builtins.str"
+        reveal_type(Site.flatpage_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.flatpages.models.FlatPage, django.contrib.flatpages.models._FlatPage_sites]"
+        reveal_type(Site.redirect_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[django.contrib.redirects.models.Redirect]"
+        reveal_type(Site.objects)  # N: Revealed type is "django.contrib.sites.models.SiteManager"
+
+-   case: contrib_gis_db_backends_model_fields
+    main: |
+        from django.contrib.gis.db.backends.oracle.models import (
+            OracleGeometryColumns,
+            OracleSpatialRefSys,
+        )
+        from django.contrib.gis.db.backends.postgis.models import (
+            PostGISGeometryColumns,
+            PostGISSpatialRefSys,
+        )
+        from django.contrib.gis.db.backends.spatialite.models import (
+            SpatialiteGeometryColumns,
+            SpatialiteSpatialRefSys,
+        )
+
+        reveal_type(OracleGeometryColumns().table_name)  # N: Revealed type is "builtins.str"
+        reveal_type(OracleGeometryColumns().column_name)  # N: Revealed type is "builtins.str"
+        reveal_type(OracleGeometryColumns().srid)  # N: Revealed type is "builtins.int"
+        reveal_type(OracleGeometryColumns.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.gis.db.backends.oracle.models.OracleGeometryColumns]"
+        reveal_type(OracleSpatialRefSys().cs_name)  # N: Revealed type is "builtins.str"
+        reveal_type(OracleSpatialRefSys().srid)  # N: Revealed type is "builtins.int"
+        reveal_type(OracleSpatialRefSys().auth_name)  # N: Revealed type is "builtins.str"
+        reveal_type(OracleSpatialRefSys().auth_srid)  # N: Revealed type is "builtins.int"
+        reveal_type(OracleSpatialRefSys().wktext)  # N: Revealed type is "builtins.str"
+        reveal_type(OracleSpatialRefSys().cs_bounds)  # N: Revealed type is "django.contrib.gis.geos.polygon.Polygon"
+        reveal_type(OracleSpatialRefSys.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.gis.db.backends.oracle.models.OracleSpatialRefSys]"
+
+        reveal_type(PostGISGeometryColumns().f_table_catalog)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISGeometryColumns().f_table_schema)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISGeometryColumns().f_table_name)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISGeometryColumns().f_geometry_column)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISGeometryColumns().coord_dimension)  # N: Revealed type is "builtins.int"
+        reveal_type(PostGISGeometryColumns().srid)  # N: Revealed type is "builtins.int"
+        reveal_type(PostGISGeometryColumns().type)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISGeometryColumns.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.gis.db.backends.postgis.models.PostGISGeometryColumns]"
+        reveal_type(PostGISSpatialRefSys().srid)  # N: Revealed type is "builtins.int"
+        reveal_type(PostGISSpatialRefSys().auth_name)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISSpatialRefSys().auth_srid)  # N: Revealed type is "builtins.int"
+        reveal_type(PostGISSpatialRefSys().srtext)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISSpatialRefSys().proj4text)  # N: Revealed type is "builtins.str"
+        reveal_type(PostGISSpatialRefSys.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.gis.db.backends.postgis.models.PostGISSpatialRefSys]"
+
+        reveal_type(SpatialiteGeometryColumns().f_table_name)  # N: Revealed type is "builtins.str"
+        reveal_type(SpatialiteGeometryColumns().f_geometry_column)  # N: Revealed type is "builtins.str"
+        reveal_type(SpatialiteGeometryColumns().coord_dimension)  # N: Revealed type is "builtins.int"
+        reveal_type(SpatialiteGeometryColumns().srid)  # N: Revealed type is "builtins.int"
+        reveal_type(SpatialiteGeometryColumns().spatial_index_enabled)  # N: Revealed type is "builtins.int"
+        reveal_type(SpatialiteGeometryColumns().type)  # N: Revealed type is "builtins.int"
+        reveal_type(SpatialiteGeometryColumns.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.gis.db.backends.spatialite.models.SpatialiteGeometryColumns]"
+        reveal_type(SpatialiteSpatialRefSys().srid)  # N: Revealed type is "builtins.int"
+        reveal_type(SpatialiteSpatialRefSys().auth_name)  # N: Revealed type is "builtins.str"
+        reveal_type(SpatialiteSpatialRefSys().auth_srid)  # N: Revealed type is "builtins.int"
+        reveal_type(SpatialiteSpatialRefSys().ref_sys_name)  # N: Revealed type is "builtins.str"
+        reveal_type(SpatialiteSpatialRefSys().proj4text)  # N: Revealed type is "builtins.str"
+        reveal_type(SpatialiteSpatialRefSys().srtext)  # N: Revealed type is "builtins.str"
+        reveal_type(SpatialiteSpatialRefSys.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.gis.db.backends.spatialite.models.SpatialiteSpatialRefSys]"
 
 -   case: can_override_abstract_user_manager
     main: |

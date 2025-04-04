@@ -27,7 +27,7 @@ class Permission(models.Model):
     id: models.AutoField
     pk: models.AutoField
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey[ContentType | Combinable, ContentType](ContentType, on_delete=models.CASCADE)
+    content_type: models.ForeignKey[ContentType | Combinable, ContentType]
     content_type_id: int
     codename = models.CharField(max_length=100)
     group_set: ManyToManyDescriptor[Group, _Group_permissions]

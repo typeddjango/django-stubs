@@ -13,8 +13,8 @@ assert_type(flat_page.enable_comments, bool)
 assert_type(flat_page.template_name, str)
 assert_type(flat_page.registration_required, bool)
 assert_type(flat_page.sites.get(), Site)
-
 assert_type(FlatPage.sites.through.objects, Manager[_FlatPage_sites])
+
 flat_page_sites = FlatPage.sites.through.objects.get()
 assert_type(flat_page_sites.id, int)
 assert_type(flat_page_sites.pk, int)

@@ -6,9 +6,9 @@ from django.db.models.manager import Manager
 from typing_extensions import Self
 
 class OracleGeometryColumns(models.Model):
-    table_name: Any
-    column_name: Any
-    srid: Any
+    table_name: models.CharField
+    column_name: models.CharField
+    srid: models.IntegerField
     objects: ClassVar[Manager[Self]]
 
     @classmethod
@@ -17,12 +17,12 @@ class OracleGeometryColumns(models.Model):
     def geom_col_name(cls) -> Any: ...
 
 class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
-    cs_name: Any
-    srid: Any
-    auth_srid: Any
-    auth_name: Any
-    wktext: Any
-    cs_bounds: Any
+    cs_name: models.CharField
+    srid: models.IntegerField
+    auth_srid: models.IntegerField
+    auth_name: models.CharField
+    wktext: models.TextField
+    cs_bounds: models.PolygonField
     objects: ClassVar[Manager[Self]]
 
     @property
