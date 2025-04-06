@@ -13,4 +13,4 @@ stubtest django \
     --mypy-config-file mypy.ini \
     --allowlist scripts/stubtest/allowlist.txt \
     --allowlist scripts/stubtest/allowlist_todo.txt \
-    --generate-allowlist
+    --allowlist scripts/stubtest/allowlist_django52.txt

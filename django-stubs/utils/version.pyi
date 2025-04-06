@@ -8,6 +8,7 @@ PY310: bool
 PY311: bool
 PY312: bool
 PY313: bool
+PY314: bool
 
 _VT: TypeAlias = tuple[int, int, int, str, int]
 
