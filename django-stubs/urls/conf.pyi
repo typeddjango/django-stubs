@@ -1,10 +1,9 @@
 from collections.abc import Callable, Coroutine, Sequence
 from types import ModuleType
-from typing import Any, overload
+from typing import Any, TypeAlias, overload
 
 from django.urls import URLPattern, URLResolver, _AnyURL
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
 
 from ..http.response import HttpResponseBase
 

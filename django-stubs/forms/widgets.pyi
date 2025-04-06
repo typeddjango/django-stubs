@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, Literal, Protocol, type_check_only
+from typing import Any, Literal, Protocol, TypeAlias, type_check_only
 
 from django.core.files.base import File
 from django.forms.renderers import BaseRenderer
@@ -8,7 +8,7 @@ from django.forms.utils import _DataT, _FilesT
 from django.utils.choices import _Choices
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 _OptAttrs: TypeAlias = dict[str, Any]
 

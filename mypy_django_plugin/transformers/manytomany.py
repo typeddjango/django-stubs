@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
 from mypy.plugin import FunctionContext, MethodContext
@@ -10,7 +10,7 @@ from mypy_django_plugin.lib import fullnames, helpers
 
 
 class M2MThrough(NamedTuple):
-    arg: Optional[Node]
+    arg: Node | None
     model: ProperType
 
 
@@ -22,7 +22,7 @@ class M2MTo(NamedTuple):
 
 class M2MArguments(NamedTuple):
     to: M2MTo
-    through: Optional[M2MThrough]
+    through: M2MThrough | None
 
 
 def fill_model_args_for_many_to_many_field(
@@ -74,7 +74,7 @@ def get_m2m_arguments(
     ctx: FunctionContext,
     model_info: TypeInfo,
     django_context: DjangoContext,
-) -> Optional[M2MArguments]:
+) -> M2MArguments | None:
     checker = helpers.get_typechecker_api(ctx)
     to_arg = ctx.args[0][0]
     to_model = helpers.get_model_from_expression(
@@ -121,7 +121,7 @@ def get_m2m_arguments(
     return M2MArguments(to=to, through=through)
 
 
-def get_related_manager_and_model(ctx: MethodContext) -> Optional[tuple[Instance, Instance, Instance]]:
+def get_related_manager_and_model(ctx: MethodContext) -> tuple[Instance, Instance, Instance] | None:
     """
     Returns a 3-tuple consisting of:
       1. A `ManyRelatedManager` instance

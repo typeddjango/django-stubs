@@ -25,10 +25,10 @@ if TYPE_CHECKING:
         db_tablespace: ClassVar[str]
         default_manager_name: ClassVar[str]
         default_related_name: ClassVar[str]
-        get_latest_by: ClassVar[Union[str, Sequence[str]]]
+        get_latest_by: ClassVar[str | Sequence[str]]
         managed: ClassVar[bool]  # default: True
         order_with_respect_to: ClassVar[str]
-        ordering: ClassVar[Sequence[Union[str, OrderBy]]]
+        ordering: ClassVar[Sequence[str | OrderBy]]
         permissions: ClassVar[_ListOrTuple[tuple[str, str]]]
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False
@@ -36,8 +36,8 @@ if TYPE_CHECKING:
         required_db_vendor: ClassVar[Literal["sqlite", "postgresql", "mysql", "oracle"]]
         select_on_save: ClassVar[bool]  # default: False
         indexes: ClassVar[_ListOrTuple[Index]]
-        unique_together: ClassVar[Union[Sequence[Sequence[str]], Sequence[str]]]
-        index_together: ClassVar[Union[Sequence[Sequence[str]], Sequence[str]]]  # Deprecated in Django 4.2
+        unique_together: ClassVar[Sequence[Sequence[str]] | Sequence[str]]
+        index_together: ClassVar[Sequence[Sequence[str]] | Sequence[str]]  # Deprecated in Django 4.2
         constraints: ClassVar[_ListOrTuple[BaseConstraint]]
         verbose_name: ClassVar[StrOrPromise]
         verbose_name_plural: ClassVar[StrOrPromise]

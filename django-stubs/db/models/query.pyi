@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
-from typing import Any, Generic, NamedTuple, overload
+from typing import Any, Generic, NamedTuple, TypeAlias, overload
 
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
@@ -8,7 +8,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import Combinable, OrderBy
 from django.db.models.sql.query import Query, RawQuery
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeAlias, TypeVar, deprecated
+from typing_extensions import Self, TypeVar, deprecated
 
 _T = TypeVar("_T", covariant=True)
 _Model = TypeVar("_Model", bound=Model, covariant=True)

@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Union
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -78,7 +78,7 @@ class LookupsAreUnsupported(Exception):
     pass
 
 
-def _get_field_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[Instance]:
+def _get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> Instance | None:
     if info is None:
         return None
     field_node = info.get(field_name)
@@ -94,7 +94,7 @@ def _get_field_type_from_model_type_info(info: Optional[TypeInfo], field_name: s
         return field_type
 
 
-def _get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
+def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
     field_type = _get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[0]
@@ -102,7 +102,7 @@ def _get_field_set_type_from_model_type_info(info: Optional[TypeInfo], field_nam
         return None
 
 
-def _get_field_get_type_from_model_type_info(info: Optional[TypeInfo], field_name: str) -> Optional[MypyType]:
+def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
     field_type = _get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[1]
@@ -130,7 +130,7 @@ class DjangoContext:
                     modules[model_cls.__module__][model_cls.__name__] = model_cls
         return modules
 
-    def get_model_class_by_fullname(self, fullname: str) -> Optional[type[Model]]:
+    def get_model_class_by_fullname(self, fullname: str) -> type[Model] | None:
         """Returns None if Model is abstract"""
         module, _, model_cls_name = fullname.rpartition(".")
         return self.model_modules.get(module, {}).get(model_cls_name)
@@ -179,7 +179,7 @@ class DjangoContext:
 
     def get_related_target_field(
         self, related_model_cls: type[Model], field: "ForeignKey[Any, Any]"
-    ) -> "Optional[Field[Any, Any]]":
+    ) -> "Field[Any, Any] | None":
         # ForeignKey only supports one `to_fields` item (ForeignObject supports many)
         assert len(field.to_fields) == 1
         to_field_name = field.to_fields[0]
@@ -290,7 +290,7 @@ class DjangoContext:
             if klass is not models.Model
         }
 
-    def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: Optional[str]) -> bool:
+    def get_field_nullability(self, field: Union["Field[Any, Any]", ForeignObjectRel], method: str | None) -> bool:
         if method in ("values", "values_list"):
             return field.null
 
@@ -335,7 +335,7 @@ class DjangoContext:
     def get_field_get_type(
         self,
         api: TypeChecker,
-        model_info: Optional[TypeInfo],
+        model_info: TypeInfo | None,
         field: Union["Field[Any, Any]", ForeignObjectRel],
         *,
         method: str,
@@ -398,7 +398,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: type[Model]
     ) -> tuple[Union["Field[Any, Any]", ForeignObjectRel], type[Model]]:
         currently_observed_model = model_cls
-        field: Union[Field[Any, Any], ForeignObjectRel, GenericForeignKey, None] = None
+        field: Field[Any, Any] | ForeignObjectRel | GenericForeignKey | None = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
@@ -420,7 +420,7 @@ class DjangoContext:
 
     def solve_lookup_type(
         self, model_cls: type[Model], lookup: str
-    ) -> Optional[tuple[Sequence[str], Sequence[str], Union[Expression, Literal[False]]]]:
+    ) -> tuple[Sequence[str], Sequence[str], Expression | Literal[False]] | None:
         query = Query(model_cls)
         if (lookup == "pk" or lookup.startswith("pk__")) and query.get_meta().pk is None:
             # Primary key lookup when no primary key field is found, model is presumably

@@ -1,4 +1,4 @@
-from typing import Final, Optional, Union
+from typing import Final
 
 from mypy.checker import TypeChecker
 from mypy.copytype import copy_type
@@ -68,7 +68,7 @@ MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
 
 def get_method_type_from_dynamic_manager(
     api: TypeChecker, method_name: str, manager_instance: Instance
-) -> Optional[ProperType]:
+) -> ProperType | None:
     """
     Attempt to resolve a method on a manager that was built from '.from_queryset'
     """
@@ -164,7 +164,7 @@ def _process_dynamic_method(
     )
 
 
-def _get_funcdef_type(definition: Union[Node, None]) -> Optional[ProperType]:
+def _get_funcdef_type(definition: Node | None) -> ProperType | None:
     if isinstance(definition, FuncBase):
         return definition.type
     elif isinstance(definition, Decorator):
@@ -201,7 +201,7 @@ def _has_compatible_type_vars(type_info: TypeInfo) -> bool:
     if not args or len(args) > 1 or not isinstance(args[0], TypeVarType):
         # No type var to manage, or too many
         return False
-    type_var: Optional[MypyType] = None
+    type_var: MypyType | None = None
     # check that for all the bases it has only one type vars
     for sub_base in type_info.bases:
         unic_args = list(set(sub_base.args))
@@ -343,8 +343,8 @@ def register_dynamically_created_manager(fullname: str, manager_name: str, manag
 
 
 def create_manager_info_from_from_queryset_call(
-    api: SemanticAnalyzer, call_expr: CallExpr, name: Optional[str] = None
-) -> Optional[TypeInfo]:
+    api: SemanticAnalyzer, call_expr: CallExpr, name: str | None = None
+) -> TypeInfo | None:
     """
     Extract manager and queryset TypeInfo from a from_queryset call.
     """

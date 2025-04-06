@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
@@ -78,8 +78,8 @@ def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases
 
 
 def get_reverse_manager_info(
-    api: Union[TypeChecker, SemanticAnalyzer], model_info: TypeInfo, derived_from: str
-) -> Optional[TypeInfo]:
+    api: TypeChecker | SemanticAnalyzer, model_info: TypeInfo, derived_from: str
+) -> TypeInfo | None:
     manager_fullname = get_django_metadata(model_info).get("reverse_managers", {}).get(derived_from)
     if not manager_fullname:
         return None
@@ -92,8 +92,8 @@ def set_reverse_manager_info(model_info: TypeInfo, derived_from: str, fullname: 
 
 
 def get_many_to_many_manager_info(
-    api: Union[TypeChecker, SemanticAnalyzer], *, to: TypeInfo, derived_from: str
-) -> Optional[TypeInfo]:
+    api: TypeChecker | SemanticAnalyzer, *, to: TypeInfo, derived_from: str
+) -> TypeInfo | None:
     manager_fullname = get_django_metadata(to).get("m2m_managers", {}).get(derived_from)
     if not manager_fullname:
         return None
@@ -109,7 +109,7 @@ def set_manager_to_model(manager: TypeInfo, to_model: TypeInfo) -> None:
     get_django_metadata(manager)["manager_to_model"] = to_model.fullname
 
 
-def get_manager_to_model(manager: TypeInfo) -> Optional[str]:
+def get_manager_to_model(manager: TypeInfo) -> str | None:
     return get_django_metadata(manager).get("manager_to_model")
 
 
@@ -125,7 +125,7 @@ class IncompleteDefnException(Exception):
     pass
 
 
-def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) -> Optional[SymbolTableNode]:
+def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) -> SymbolTableNode | None:
     if "." not in fullname:
         return None
     if "[" in fullname and "]" in fullname:
@@ -148,7 +148,7 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) 
         module, parent_cls = module.rsplit(".", 1)
         parent_classes.insert(0, parent_cls)
 
-    scope: Union[MypyFile, TypeInfo] = module_file
+    scope: MypyFile | TypeInfo = module_file
     for parent_cls in parent_classes:
         sym = scope.names.get(parent_cls)
         if sym is None:
@@ -164,21 +164,21 @@ def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) 
     return sym
 
 
-def lookup_fully_qualified_generic(name: str, all_modules: dict[str, MypyFile]) -> Optional[SymbolNode]:
+def lookup_fully_qualified_generic(name: str, all_modules: dict[str, MypyFile]) -> SymbolNode | None:
     sym = lookup_fully_qualified_sym(name, all_modules)
     if sym is None:
         return None
     return sym.node
 
 
-def lookup_fully_qualified_typeinfo(api: Union[TypeChecker, SemanticAnalyzer], fullname: str) -> Optional[TypeInfo]:
+def lookup_fully_qualified_typeinfo(api: TypeChecker | SemanticAnalyzer, fullname: str) -> TypeInfo | None:
     node = lookup_fully_qualified_generic(fullname, api.modules)
     if not isinstance(node, TypeInfo):
         return None
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: Optional[type]) -> Optional[TypeInfo]:
+def lookup_class_typeinfo(api: TypeChecker, klass: type | None) -> TypeInfo | None:
     if klass is None:
         return None
 
@@ -195,14 +195,14 @@ def get_class_fullname(klass: type) -> str:
     return klass.__module__ + "." + klass.__qualname__
 
 
-def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[Expression]:
+def get_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str) -> Expression | None:
     """
     Return the expression for the specific argument.
     This helper should only be used with non-star arguments.
     """
     # try and pull the named argument from the caller first
-    for kinds, argnames, args in zip(ctx.arg_kinds, ctx.arg_names, ctx.args):
-        for kind, argname, arg in zip(kinds, argnames, args):
+    for kinds, argnames, args in zip(ctx.arg_kinds, ctx.arg_names, ctx.args, strict=False):
+        for kind, argname, arg in zip(kinds, argnames, args, strict=False):
             if kind == ArgKind.ARG_NAMED and argname == name:
                 return arg
 
@@ -216,7 +216,7 @@ def get_call_argument_by_name(ctx: Union[FunctionContext, MethodContext], name: 
     return args[0]
 
 
-def get_call_argument_type_by_name(ctx: Union[FunctionContext, MethodContext], name: str) -> Optional[MypyType]:
+def get_call_argument_type_by_name(ctx: FunctionContext | MethodContext, name: str) -> MypyType | None:
     """Return the type for the specific argument.
 
     This helper should only be used with non-star arguments.
@@ -237,7 +237,7 @@ def is_optional(typ: MypyType) -> bool:
 
 
 # Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
-def parse_bool(expr: Expression) -> Optional[bool]:
+def parse_bool(expr: Expression) -> bool | None:
     if isinstance(expr, NameExpr):
         if expr.fullname == "builtins.True":
             return True
@@ -292,7 +292,7 @@ def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> M
     return get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
 
-def get_nested_meta_node_for_current_class(info: TypeInfo) -> Optional[TypeInfo]:
+def get_nested_meta_node_for_current_class(info: TypeInfo) -> TypeInfo | None:
     metaclass_sym = info.names.get("Meta")
     if metaclass_sym is not None and isinstance(metaclass_sym.node, TypeInfo):
         return metaclass_sym.node
@@ -319,7 +319,7 @@ def add_new_class_for_module(
     module: MypyFile,
     name: str,
     bases: list[Instance],
-    fields: Optional[dict[str, MypyType]] = None,
+    fields: dict[str, MypyType] | None = None,
     no_serialize: bool = False,
 ) -> TypeInfo:
     new_class_unique_name = checker.gen_unique_name(name, module.names)
@@ -353,7 +353,7 @@ def get_current_module(api: TypeChecker) -> MypyFile:
 
 
 def make_oneoff_named_tuple(
-    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: Optional[list[Instance]] = None
+    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: list[Instance] | None = None
 ) -> TupleType:
     current_module = get_current_module(api)
     if extra_bases is None:
@@ -394,7 +394,7 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
 
 
 def make_typeddict(
-    api: Union[SemanticAnalyzer, CheckerPluginInterface],
+    api: SemanticAnalyzer | CheckerPluginInterface,
     fields: dict[str, MypyType],
     required_keys: set[str],
     readonly_keys: set[str],
@@ -412,7 +412,7 @@ def make_typeddict(
     return typed_dict_type
 
 
-def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> Optional[str]:
+def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> str | None:
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
@@ -425,20 +425,20 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
     return None
 
 
-def get_semanal_api(ctx: Union[ClassDefContext, DynamicClassDefContext]) -> SemanticAnalyzer:
+def get_semanal_api(ctx: ClassDefContext | DynamicClassDefContext) -> SemanticAnalyzer:
     if not isinstance(ctx.api, SemanticAnalyzer):
         raise ValueError("Not a SemanticAnalyzer")
     return ctx.api
 
 
-def get_typechecker_api(ctx: Union[AttributeContext, MethodContext, FunctionContext]) -> TypeChecker:
+def get_typechecker_api(ctx: AttributeContext | MethodContext | FunctionContext) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
         raise ValueError("Not a TypeChecker")
     return ctx.api
 
 
 def check_types_compatible(
-    ctx: Union[FunctionContext, MethodContext], *, expected_type: MypyType, actual_type: MypyType, error_message: str
+    ctx: FunctionContext | MethodContext, *, expected_type: MypyType, actual_type: MypyType, error_message: str
 ) -> None:
     api = get_typechecker_api(ctx)
     api.check_subtype(actual_type, expected_type, ctx.context, error_message, "got", "expected")
@@ -494,8 +494,8 @@ def is_abstract_model(model: TypeInfo) -> bool:
 
 
 def resolve_lazy_reference(
-    reference: str, *, api: Union[TypeChecker, SemanticAnalyzer], django_context: "DjangoContext", ctx: Context
-) -> Optional[TypeInfo]:
+    reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: "DjangoContext", ctx: Context
+) -> TypeInfo | None:
     """
     Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
     'TypeInfo' instance.
@@ -528,9 +528,9 @@ def get_model_from_expression(
     expr: Expression,
     *,
     self_model: TypeInfo,
-    api: Union[TypeChecker, SemanticAnalyzer],
+    api: TypeChecker | SemanticAnalyzer,
     django_context: "DjangoContext",
-) -> Optional[Instance]:
+) -> Instance | None:
     """
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
