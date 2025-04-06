@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView
