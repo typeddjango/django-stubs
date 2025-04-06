@@ -160,7 +160,7 @@ class DjangoContext:
     def get_field_lookup_exact_type(
         self, api: TypeChecker, field: Union["Field[Any, Any]", ForeignObjectRel]
     ) -> MypyType:
-        if isinstance(field, (RelatedField, ForeignObjectRel)):
+        if isinstance(field, RelatedField | ForeignObjectRel):
             related_model_cls = self.get_field_related_model_cls(field)
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
             if rel_model_info is None:
@@ -415,7 +415,7 @@ class DjangoContext:
                 currently_observed_model = self.get_field_related_model_cls(field)
 
         # Guaranteed by `query.solve_lookup_type` before.
-        assert isinstance(field, (Field, ForeignObjectRel))
+        assert isinstance(field, Field | ForeignObjectRel)
         return field, currently_observed_model
 
     def solve_lookup_type(
@@ -444,7 +444,7 @@ class DjangoContext:
         if len(query_parts) == 1:
             return [], [query_parts[0]], False
 
-        if not isinstance(field, (RelatedField, ForeignObjectRel)):
+        if not isinstance(field, RelatedField | ForeignObjectRel):
             return None
 
         related_model = self.get_field_related_model_cls(field)

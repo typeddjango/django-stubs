@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import ClassVar, Literal, Union
+    from typing import ClassVar, Literal
 
     from django.db.models import BaseConstraint, Index, OrderBy
     from django.utils.datastructures import _ListOrTuple
