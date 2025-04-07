@@ -1,8 +1,8 @@
 import datetime
-from collections.abc import Awaitable, Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping
 from io import BytesIO
 from re import Pattern
-from typing import Any, BinaryIO, Callable, Literal, NoReturn, TypeVar, overload, type_check_only
+from typing import Any, BinaryIO, Literal, NoReturn, TypeAlias, TypeVar, overload, type_check_only
 
 from django.contrib.auth.base_user import _UserModel
 from django.contrib.auth.models import AnonymousUser
@@ -12,7 +12,7 @@ from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
@@ -173,9 +173,6 @@ class QueryDict(MultiValueDict[str, str]):
 @type_check_only
 class _ImmutableQueryDict(QueryDict):
     _mutable: Literal[False]
-    # def __init__(
-    #     self, query_string: Optional[Union[str, bytes]] = ..., mutable: bool = ..., encoding: Optional[str] = ...
-    # ) -> None: ...
     def __setitem__(self, key: str | bytes, value: str | bytes) -> NoReturn: ...
     def __delitem__(self, key: str | bytes) -> NoReturn: ...
     def setlist(self, key: str | bytes, list_: Iterable[str | bytes]) -> NoReturn: ...

@@ -12,7 +12,7 @@ else:
     from django.db.models.query import QuerySet
     from django.utils.functional import Promise as StrPromise
 
-    StrOrPromise = typing.Union[str, StrPromise]
+    StrOrPromise = str | StrPromise
     # Deprecated type aliases. Use the QuerySet class directly instead.
     QuerySetAny = QuerySet
     ValuesQuerySet = QuerySet

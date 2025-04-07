@@ -2,9 +2,10 @@ import configparser
 import os
 import sys
 import textwrap
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, NoReturn, Optional
+from typing import Any, NoReturn
 
 if sys.version_info[:2] >= (3, 11):
     import tomllib
@@ -57,7 +58,7 @@ class DjangoPluginConfig:
     django_settings_module: str
     strict_settings: bool
 
-    def __init__(self, config_file: Optional[str]) -> None:
+    def __init__(self, config_file: str | None) -> None:
         if not config_file:
             exit_with_error(INVALID_FILE)
 

@@ -36,7 +36,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     if model_cls is None:
         return ctx.default_return_type
 
-    for lookup_kwarg, provided_type in zip(lookup_kwargs, provided_lookup_types):
+    for lookup_kwarg, provided_type in zip(lookup_kwargs, provided_lookup_types, strict=False):
         if lookup_kwarg is None:
             continue
         provided_type = get_proper_type(provided_type)

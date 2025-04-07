@@ -1,14 +1,13 @@
 from collections.abc import Callable, Iterator, Sequence
 from re import Pattern
 from types import ModuleType
-from typing import Any, overload
+from typing import Any, TypeAlias, overload
 
 from django.core.checks.messages import CheckMessage
 from django.http import HttpRequest, HttpResponse
 from django.urls import _AnyURL
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
-from typing_extensions import TypeAlias
 
 class ResolverMatch:
     func: Callable

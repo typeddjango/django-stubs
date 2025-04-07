@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, ClassVar, Literal, TypeVar
+from typing import Any, ClassVar, Literal, TypeAlias, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
@@ -10,7 +10,7 @@ from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 _AnyUser: TypeAlias = Model | AnonymousUser
 

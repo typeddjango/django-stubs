@@ -1,12 +1,11 @@
 from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
-from typing import Any
+from typing import Any, TypeAlias
 
 from django.core.files.base import File
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
 
 EMPTY_VALUES: Any
 
