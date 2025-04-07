@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from collections.abc import Sequence
-from typing import Optional
 
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
@@ -19,7 +18,7 @@ from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers.models import get_annotated_type
 
 
-def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Optional[Instance]:
+def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
     if queryset_type.type.has_base(fullnames.MANAGER_CLASS_FULLNAME):
         to_model_fullname = helpers.get_manager_to_model(queryset_type.type)
         if to_model_fullname is not None:
@@ -62,7 +61,7 @@ def get_field_type_from_lookup(
     method: str,
     lookup: str,
     silent_on_error: bool = False,
-) -> Optional[MypyType]:
+) -> MypyType | None:
     try:
         lookup_field, model_cls = django_context.resolve_lookup_into_field(model_cls, lookup)
     except FieldError as exc:
@@ -211,7 +210,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
 
 
-def gather_kwargs(ctx: MethodContext) -> Optional[dict[str, MypyType]]:
+def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
     num_args = len(ctx.arg_kinds)
     kwargs = {}
     named = (ARG_NAMED, ARG_NAMED_OPT)
@@ -242,7 +241,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     api = helpers.get_typechecker_api(ctx)
 
-    field_types: Optional[dict[str, MypyType]] = None
+    field_types: dict[str, MypyType] | None = None
     kwargs = gather_kwargs(ctx)
     if kwargs:
         # For now, we don't try to resolve the output_field of the field would be, but use Any.
@@ -311,7 +310,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     return helpers.reparametrize_instance(default_return_type, [annotated_type, row_type])
 
 
-def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> Optional[list[str]]:
+def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:
     field_lookups = []
     for field_lookup_expr in lookup_exprs:
         field_lookup = helpers.resolve_string_attribute_value(field_lookup_expr, django_context)

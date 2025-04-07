@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import Any, TypeVar
+from typing import Any, TypeAlias, TypeVar
 from weakref import WeakSet
 
 from django.apps.config import AppConfig
@@ -14,7 +14,6 @@ from django.http.response import HttpResponse, HttpResponseBase
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject, _StrOrPromise
-from typing_extensions import TypeAlias
 
 all_sites: WeakSet[AdminSite]
 

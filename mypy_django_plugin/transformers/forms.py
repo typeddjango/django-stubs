@@ -1,5 +1,3 @@
-from typing import Optional
-
 from mypy.plugin import ClassDefContext, MethodContext
 from mypy.types import CallableType, Instance, NoneTyp, TypeType, get_proper_type
 from mypy.types import Type as MypyType
@@ -16,7 +14,7 @@ def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:
         meta_node.fallback_to_any = True
 
 
-def get_specified_form_class(object_type: Instance) -> Optional[TypeType]:
+def get_specified_form_class(object_type: Instance) -> TypeType | None:
     form_class_sym = object_type.type.get("form_class")
     if form_class_sym:
         form_class_type = get_proper_type(form_class_sym.type)

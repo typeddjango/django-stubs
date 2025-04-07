@@ -1,11 +1,10 @@
-from typing import Any, TypeVar
+from typing import Any, TypeAlias, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser, _UserModel
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.http.request import HttpRequest
-from typing_extensions import TypeAlias
 
 UserModel: TypeAlias = type[_UserModel]
 _AnyUser: TypeAlias = _UserModel | AnonymousUser
