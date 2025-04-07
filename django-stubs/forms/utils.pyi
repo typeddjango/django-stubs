@@ -1,7 +1,7 @@
 from collections import UserList
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import Any
+from typing import Any, TypeAlias
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
@@ -9,7 +9,6 @@ from django.forms.renderers import BaseRenderer
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import TypeAlias
 
 _DataT: TypeAlias = Mapping[str, Any]  # noqa: PYI047
 

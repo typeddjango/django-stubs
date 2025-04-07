@@ -1,9 +1,8 @@
 from collections.abc import Awaitable, Callable
-from typing import Any, Protocol, type_check_only
+from typing import Any, Protocol, TypeAlias, type_check_only
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
-from typing_extensions import TypeAlias
 
 class RemovedInNextVersionWarning(DeprecationWarning): ...
 class RemovedInDjango60Warning(PendingDeprecationWarning): ...

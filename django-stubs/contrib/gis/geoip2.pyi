@@ -1,11 +1,11 @@
 from collections.abc import Sequence
 from ipaddress import IPv4Address, IPv6Address
-from typing import Final, TypedDict
+from typing import Final, TypeAlias, TypedDict
 
 from _typeshed import StrPath
 from django.contrib.gis.geos import Point
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeAlias, deprecated
+from typing_extensions import Self, deprecated
 
 HAS_GEOIP2: bool
 SUPPORTED_DATABASE_TYPES: set[str]

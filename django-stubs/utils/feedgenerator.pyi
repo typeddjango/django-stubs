@@ -1,9 +1,8 @@
 import datetime
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, TypeAlias
 
 from django.utils.xmlutils import SimplerXMLGenerator
-from typing_extensions import TypeAlias
 
 def rfc2822_date(date: datetime.date) -> str: ...
 def rfc3339_date(date: datetime.date) -> str: ...

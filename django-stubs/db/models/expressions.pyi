@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from enum import Enum
-from typing import Any, ClassVar, Generic, Literal, NoReturn, TypeVar
+from typing import Any, ClassVar, Generic, Literal, NoReturn, TypeAlias, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q, fields
@@ -13,7 +13,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.db.models.sql.query import Query
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 class SQLiteNumericMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...

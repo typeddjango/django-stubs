@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, ClassVar, Protocol, type_check_only
+from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -14,7 +14,6 @@ from django.forms.widgets import Widget
 from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
 # However, on class level it can be set to `Type[Widget]` too.

@@ -1,7 +1,7 @@
 from collections import deque
 from collections.abc import Iterable
 from functools import cached_property
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 from django.db.models import Manager, Model
 from django.db.models.fields import DateField, DateTimeField, Field
@@ -67,7 +67,7 @@ class ModelClassInitializer:
     def is_model_abstract(self) -> bool:
         return helpers.is_abstract_model(self.model_classdef.info)
 
-    def lookup_typeinfo(self, fullname: str) -> Optional[TypeInfo]:
+    def lookup_typeinfo(self, fullname: str) -> TypeInfo | None:
         return helpers.lookup_fully_qualified_typeinfo(self.api, fullname)
 
     def lookup_typeinfo_or_incomplete_defn_error(self, fullname: str) -> TypeInfo:
@@ -116,7 +116,7 @@ class ModelClassInitializer:
             return {}
         return base_manager_info.metadata["from_queryset_managers"]
 
-    def get_generated_manager_info(self, manager_fullname: str, base_manager_fullname: str) -> Optional[TypeInfo]:
+    def get_generated_manager_info(self, manager_fullname: str, base_manager_fullname: str) -> TypeInfo | None:
         generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
         real_manager_fullname = generated_managers.get(manager_fullname)
         if real_manager_fullname:
@@ -124,7 +124,7 @@ class ModelClassInitializer:
         # Not a generated manager
         return None
 
-    def get_or_create_manager_with_any_fallback(self) -> Optional[TypeInfo]:
+    def get_or_create_manager_with_any_fallback(self) -> TypeInfo | None:
         """
         Create a Manager subclass with fallback to Any for unknown attributes
         and methods. This is used for unresolved managers, where we don't know
@@ -175,7 +175,7 @@ class ModelClassInitializer:
 
         return manager_info
 
-    def get_or_create_queryset_with_any_fallback(self) -> Optional[TypeInfo]:
+    def get_or_create_queryset_with_any_fallback(self) -> TypeInfo | None:
         """
         Create a QuerySet subclass with fallback to Any for unknown attributes
         and methods. This is used for the manager returned by the method above.
@@ -356,18 +356,18 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 
 class AddManagers(ModelClassInitializer):
-    def lookup_manager(self, fullname: str, manager: "Manager[Any]") -> Optional[TypeInfo]:
+    def lookup_manager(self, fullname: str, manager: "Manager[Any]") -> TypeInfo | None:
         manager_info = self.lookup_typeinfo(fullname)
         if manager_info is None:
             manager_info = self.get_dynamic_manager(fullname, manager)
         return manager_info
 
-    def is_manager_dynamically_generated(self, manager_info: Optional[TypeInfo]) -> bool:
+    def is_manager_dynamically_generated(self, manager_info: TypeInfo | None) -> bool:
         if manager_info is None:
             return False
         return manager_info.metadata.get("django", {}).get("from_queryset_manager") is not None
 
-    def reparametrize_dynamically_created_manager(self, manager_name: str, manager_info: Optional[TypeInfo]) -> None:
+    def reparametrize_dynamically_created_manager(self, manager_name: str, manager_info: TypeInfo | None) -> None:
         if not self.is_manager_dynamically_generated(manager_info):
             return
 
@@ -377,7 +377,7 @@ class AddManagers(ModelClassInitializer):
         self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
-        manager_info: Optional[TypeInfo]
+        manager_info: TypeInfo | None
 
         incomplete_manager_defs = set()
         for manager_name, manager in model_cls._meta.managers_map.items():
@@ -428,7 +428,7 @@ class AddManagers(ModelClassInitializer):
                     code=MANAGER_MISSING,
                 )
 
-    def get_manager_expression(self, name: str) -> Optional[AssignmentStmt]:
+    def get_manager_expression(self, name: str) -> AssignmentStmt | None:
         # TODO: What happens if the manager is defined multiple times?
         for expr in self.ctx.cls.defs.body:
             if (
@@ -440,7 +440,7 @@ class AddManagers(ModelClassInitializer):
 
         return None
 
-    def get_dynamic_manager(self, fullname: str, manager: "Manager[Any]") -> Optional[TypeInfo]:
+    def get_dynamic_manager(self, fullname: str, manager: "Manager[Any]") -> TypeInfo | None:
         """
         Try to get a dynamically defined manager
         """
@@ -449,13 +449,13 @@ class AddManagers(ModelClassInitializer):
         base_manager_fullname = helpers.get_class_fullname(manager.__class__.__bases__[0])
         generated_managers = self.get_generated_manager_mappings(base_manager_fullname)
 
-        generated_manager_name: Optional[str] = generated_managers.get(fullname, None)
+        generated_manager_name: str | None = generated_managers.get(fullname, None)
         if generated_manager_name is None:
             return None
 
         return self.lookup_typeinfo(generated_manager_name)
 
-    def create_manager_from_from_queryset(self, name: str) -> Optional[TypeInfo]:
+    def create_manager_from_from_queryset(self, name: str) -> TypeInfo | None:
         """
         Try to create a manager from a .from_queryset call:
 
@@ -633,7 +633,7 @@ class AddExtraFieldMethods(ModelClassInitializer):
 
         # get_next_by, get_previous_by for Date, DateTime
         for field in self.django_context.get_model_fields(model_cls):
-            if isinstance(field, (DateField, DateTimeField)) and not field.null:
+            if isinstance(field, DateField | DateTimeField) and not field.null:
                 return_type = Instance(self.model_classdef.info, [])
                 common.add_method(
                     self.ctx,
@@ -825,7 +825,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
     def create_through_table_class(
         self, field_name: str, model_name: str, model_fullname: str, m2m_args: M2MArguments
-    ) -> Optional[TypeInfo]:
+    ) -> TypeInfo | None:
         if not isinstance(m2m_args.to.model, Instance):
             return None
         elif m2m_args.through is not None:
@@ -903,12 +903,12 @@ class ProcessManyToManyFields(ModelClassInitializer):
         )
         return through_model
 
-    def resolve_many_to_many_arguments(self, call: CallExpr, /, context: Context) -> Optional[M2MArguments]:
+    def resolve_many_to_many_arguments(self, call: CallExpr, /, context: Context) -> M2MArguments | None:
         """
         Inspect a 'ManyToManyField(...)' call to collect argument data on any 'to' and
         'through' arguments.
         """
-        look_for: dict[str, Optional[Expression]] = {"to": None, "through": None}
+        look_for: dict[str, Expression | None] = {"to": None, "through": None}
         # Look for 'to', being declared as the first positional argument
         if call.arg_kinds[0].is_positional():
             look_for["to"] = call.args[0]
@@ -917,7 +917,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
             look_for["through"] = call.args[5]
 
         # Sort out if any of the expected arguments was provided as keyword arguments
-        for arg_expr, _arg_kind, arg_name in zip(call.args, call.arg_kinds, call.arg_names):
+        for arg_expr, _arg_kind, arg_name in zip(call.args, call.arg_kinds, call.arg_names, strict=False):
             if arg_name in look_for and look_for[arg_name] is None:
                 look_for[arg_name] = arg_expr
 
@@ -1051,7 +1051,7 @@ class MetaclassAdjustments(ModelClassInitializer):
         """
         if "DoesNotExist" not in self.model_classdef.info.names:
             object_does_not_exist = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OBJECT_DOES_NOT_EXIST)
-            does_not_exist: Union[Var, TypeInfo]
+            does_not_exist: Var | TypeInfo
             if self.is_model_abstract:
                 does_not_exist = self.create_new_var("DoesNotExist", TypeType(Instance(object_does_not_exist, [])))
                 does_not_exist.is_abstract_var = True
@@ -1069,7 +1069,7 @@ class MetaclassAdjustments(ModelClassInitializer):
             django_multiple_objects_returned = self.lookup_typeinfo_or_incomplete_defn_error(
                 fullnames.MULTIPLE_OBJECTS_RETURNED
             )
-            multiple_objects_returned: Union[Var, TypeInfo]
+            multiple_objects_returned: Var | TypeInfo
             if self.is_model_abstract:
                 multiple_objects_returned = self.create_new_var(
                     "MultipleObjectsReturned", TypeType(Instance(django_multiple_objects_returned, []))
@@ -1156,7 +1156,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
 
 
 def get_annotated_type(
-    api: Union[SemanticAnalyzer, TypeChecker], model_type: Instance, fields_dict: TypedDictType
+    api: SemanticAnalyzer | TypeChecker, model_type: Instance, fields_dict: TypedDictType
 ) -> ProperType:
     """
     Get a model type that can be used to represent an annotated model
@@ -1174,7 +1174,7 @@ def get_annotated_type(
             mod_name=None,
         )
 
-    annotated_model: Optional[TypeInfo]
+    annotated_model: TypeInfo | None
     if helpers.is_annotated_model(model_type.type):
         annotated_model = model_type.type
         if model_type.args:
