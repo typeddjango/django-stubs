@@ -282,8 +282,6 @@ django.template.loader_tags.construct_relative_path
 django.test.client.FakePayload.read
 django.test.client.FakePayload.write
 django.test.runner.ParallelTestSuite.handle_event
-django.urls.base.reverse
-django.urls.reverse
 django.utils.deprecation.DeprecationInstanceCheck
 django.utils.deprecation.RemovedInDjango61Warning
 django.utils.feedgenerator.RssFeed.add_stylesheets
