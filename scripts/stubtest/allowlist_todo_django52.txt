@@ -146,10 +146,6 @@ django.core.serializers.json.Deserializer
 django.core.serializers.jsonl.Deserializer
 django.core.serializers.python.Deserializer
 django.core.serializers.pyyaml.Deserializer
-django.core.validators.DomainNameValidator.tld_no_fqdn_re
-django.core.validators.EmailValidator.domain_re
-django.core.validators.EmailValidator.hostname_re
-django.core.validators.EmailValidator.tld_no_fqdn_re
 django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_lookups
 django.db.backends.base.schema.BaseDatabaseSchemaEditor.sql_pk_constraint
