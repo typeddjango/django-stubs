@@ -280,11 +280,3 @@ django.template.library.Library.simple_block_tag
 django.template.library.SimpleBlockNode
 django.template.loader_tags.construct_relative_path
 django.test.runner.ParallelTestSuite.handle_event
-django.utils.deprecation.DeprecationInstanceCheck
-django.utils.deprecation.RemovedInDjango61Warning
-django.utils.feedgenerator.RssFeed.add_stylesheets
-django.utils.feedgenerator.Stylesheet
-django.utils.feedgenerator.SyndicationFeed.__init__
-django.utils.feedgenerator.SyndicationFeed.add_stylesheets
-django.utils.http.MAX_URL_LENGTH
-django.utils.jslex
