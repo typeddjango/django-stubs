@@ -279,8 +279,6 @@ django.template.autoreload
 django.template.library.Library.simple_block_tag
 django.template.library.SimpleBlockNode
 django.template.loader_tags.construct_relative_path
-django.test.client.FakePayload.read
-django.test.client.FakePayload.write
 django.test.runner.ParallelTestSuite.handle_event
 django.utils.deprecation.DeprecationInstanceCheck
 django.utils.deprecation.RemovedInDjango61Warning
