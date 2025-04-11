@@ -8,6 +8,7 @@ from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, OneToOneRel
 from mypy.checker import TypeChecker
 from mypy.nodes import (
+    ARG_NAMED_OPT,
     ARG_STAR2,
     MDEF,
     Argument,
@@ -629,22 +630,55 @@ class AddExtraFieldMethods(ModelClassInitializer):
             if field.choices:
                 info = self.lookup_typeinfo_or_incomplete_defn_error("builtins.str")
                 return_type = Instance(info, [])
-                common.add_method(self.ctx, name=f"get_{field.attname}_display", args=[], return_type=return_type)
+                field_type = self.lookup_typeinfo(f"django.db.models.fields.{field.__class__.__name__}")
+                args = []
+                if field_type is not None:
+                    field_type = fill_typevars(field_type)
+                    args = [
+                        Argument(
+                            Var("field", field_type),
+                            field_type,
+                            initializer=None,
+                            kind=ARG_NAMED_OPT,
+                        ),
+                    ]
+                common.add_method(self.ctx, name=f"get_{field.attname}_display", args=args, return_type=return_type)
 
         # get_next_by, get_previous_by for Date, DateTime
+        # def get_next_by_<attname>(self, *, field=<DateTimeField | DateField>, is_next=True, **kwargs)
+        # def get_previous_by_<attname>(self, *, field=<DateTimeField | DateField>, is_next=False, **kwargs)
         for field in self.django_context.get_model_fields(model_cls):
             if isinstance(field, DateField | DateTimeField) and not field.null:
                 return_type = Instance(self.model_classdef.info, [])
+                date_or_datetime_field = self.lookup_typeinfo_or_incomplete_defn_error(
+                    fullname=fullnames.DATETIME_FIELD_FULLNAME
+                    if isinstance(field, DateTimeField)
+                    else fullnames.DATE_FIELD_FULLNAME
+                )
+                datetime_field_type = fill_typevars(date_or_datetime_field)
+                bool_type = self.ctx.api.named_type("builtins.bool")
                 common.add_method(
                     self.ctx,
                     name=f"get_next_by_{field.attname}",
                     args=[
                         Argument(
+                            Var("field", datetime_field_type),
+                            datetime_field_type,
+                            initializer=None,
+                            kind=ARG_NAMED_OPT,
+                        ),
+                        Argument(
+                            Var("is_next", bool_type),
+                            bool_type,
+                            initializer=None,
+                            kind=ARG_NAMED_OPT,
+                        ),
+                        Argument(
                             Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
                             AnyType(TypeOfAny.implementation_artifact),
                             initializer=None,
                             kind=ARG_STAR2,
-                        )
+                        ),
                     ],
                     return_type=return_type,
                 )
@@ -653,11 +687,23 @@ class AddExtraFieldMethods(ModelClassInitializer):
                     name=f"get_previous_by_{field.attname}",
                     args=[
                         Argument(
+                            Var("field", datetime_field_type),
+                            datetime_field_type,
+                            initializer=None,
+                            kind=ARG_NAMED_OPT,
+                        ),
+                        Argument(
+                            Var("is_next", bool_type),
+                            bool_type,
+                            initializer=None,
+                            kind=ARG_NAMED_OPT,
+                        ),
+                        Argument(
                             Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
                             AnyType(TypeOfAny.implementation_artifact),
                             initializer=None,
                             kind=ARG_STAR2,
-                        )
+                        ),
                     ],
                     return_type=return_type,
                 )

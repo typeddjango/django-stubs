@@ -32,7 +32,6 @@ class LogEntryManager(models.Manager[LogEntry]):
         action_flag: int,
         change_message: str | list[Any] = "",
         *,
-        # Commit 27b68bc, django https://github.com/django/django/pull/19233
         single_object: bool = False,
     ) -> list[LogEntry] | LogEntry: ...
 
@@ -41,7 +40,7 @@ class LogEntry(models.Model):
     pk: models.AutoField
     action_time: models.DateTimeField
     user: models.ForeignKey[AbstractUser | Combinable, AbstractUser]
-    user_id: Any
+    user_id: int
     content_type: models.ForeignKey[ContentType | Combinable | None, ContentType | None]
     content_type_id: int | None
     object_id: models.TextField[str | int | Combinable | None, str | None]

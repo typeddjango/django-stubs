@@ -1,7 +1,14 @@
 from datetime import datetime
-from typing import Optional
 
-from django.contrib.auth.models import Group, Permission, User, _Group_permissions, _User_groups, _User_permissions
+from django.contrib.auth.models import (
+    Group,
+    Permission,
+    User,
+    UserManager,
+    _Group_permissions,
+    _User_groups,
+    _User_permissions,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Manager
 from typing_extensions import assert_type
@@ -10,7 +17,7 @@ user = User()
 assert_type(user.id, int)
 assert_type(user.pk, int)
 assert_type(user.password, str)
-assert_type(user.last_login, Optional[datetime])
+assert_type(user.last_login, datetime | None)
 assert_type(user.is_active, bool)
 assert_type(user.username, str)
 assert_type(user.first_name, str)
@@ -19,6 +26,7 @@ assert_type(user.email, str)
 assert_type(user.is_staff, bool)
 assert_type(user.is_active, bool)
 assert_type(user.date_joined, datetime)
+assert_type(User.objects, UserManager[User])
 assert_type(user.groups.get(), Group)
 assert_type(user.groups.through, type[_User_groups])
 assert_type(user.user_permissions.get(), Permission)
