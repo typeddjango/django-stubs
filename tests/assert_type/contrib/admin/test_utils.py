@@ -10,13 +10,13 @@ from typing_extensions import assert_type
 
 @admin.display(description="Name")
 def upper_case_name(obj: Person) -> str:
-    return f"{obj.first_name} {obj.last_name}".upper()  # pyright: ignore[reportUnknownMemberType]
+    return f"{obj.first_name} {obj.last_name}".upper()
 
 
 class Person(models.Model):
-    first_name = models.CharField(max_length=None)  # pyright: ignore[reportUnknownVariableType]
-    last_name = models.CharField(max_length=None)  # pyright: ignore[reportUnknownVariableType]
-    birthday = models.DateField()  # pyright: ignore[reportUnknownVariableType]
+    first_name = models.CharField(max_length=None)
+    last_name = models.CharField(max_length=None)
+    birthday = models.DateField()
 
 
 class PersonListAdmin(admin.ModelAdmin[Person]):

@@ -62,3 +62,6 @@ DJANGO_ABSTRACT_MODELS = frozenset(
         "django.contrib.sessions.base_session.AbstractBaseSession",
     )
 )
+
+DATETIME_FIELD_FULLNAME = "django.db.models.fields.DateTimeField"
+DATE_FIELD_FULLNAME = "django.db.models.fields.DateField"
