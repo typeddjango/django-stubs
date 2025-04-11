@@ -1,4 +1,4 @@
-from collections.abc import Callable, Collection, Container, Iterator, Mapping, Sequence
+from collections.abc import Callable, Collection, Container, Iterator, Mapping, MutableMapping, Sequence
 from typing import Any, ClassVar, Generic, Literal, TypeAlias, TypeVar, overload
 from uuid import UUID
 
@@ -76,7 +76,7 @@ class BaseModelForm(Generic[_M], BaseForm):
         files: _FilesT | None = None,
         auto_id: bool | str = "id_%s",
         prefix: str | None = None,
-        initial: Mapping[str, Any] | None = None,
+        initial: MutableMapping[str, Any] | None = None,
         error_class: type[ErrorList] = ...,
         label_suffix: str | None = None,
         empty_permitted: bool = False,
