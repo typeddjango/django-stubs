@@ -630,10 +630,10 @@ class AddExtraFieldMethods(ModelClassInitializer):
             if field.choices:
                 info = self.lookup_typeinfo_or_incomplete_defn_error("builtins.str")
                 return_type = Instance(info, [])
-                field_type = self.lookup_typeinfo(f"django.db.models.fields.{field.__class__.__name__}")
+                field_t = self.lookup_typeinfo(f"django.db.models.fields.{field.__class__.__name__}")
                 args = []
-                if field_type is not None:
-                    field_type = fill_typevars(field_type)
+                if field_t is not None:
+                    field_type = fill_typevars(field_t)
                     args = [
                         Argument(
                             Var("field", field_type),
