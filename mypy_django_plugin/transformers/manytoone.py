@@ -1,5 +1,3 @@
-from typing import Optional
-
 from mypy.plugin import MethodContext
 from mypy.types import Instance, get_proper_type
 from mypy.types import Type as MypyType
@@ -7,7 +5,7 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.lib import fullnames, helpers
 
 
-def get_model_of_related_manager(ctx: MethodContext) -> Optional[Instance]:
+def get_model_of_related_manager(ctx: MethodContext) -> Instance | None:
     """
     Returns the type parameter (_To) instance of a `RelatedManager` instance when it's a
     model. Otherwise `None` is returned.

@@ -4,10 +4,9 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, overload
+from typing import Any, TypeAlias, overload
 
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
 
 utf8_charset: Any
 utf8_charset_qp: Any

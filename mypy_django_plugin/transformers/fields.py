@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, NamedTuple, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, Union, cast
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 def _get_current_field_from_assignment(
     ctx: FunctionContext, django_context: DjangoContext
-) -> Optional[Union["Field[Any, Any]", ForeignObjectRel, "GenericForeignKey"]]:
+) -> Union["Field[Any, Any]", ForeignObjectRel, "GenericForeignKey"] | None:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
         return None
@@ -187,7 +187,7 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
     if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
         return default_return_type
 
-    def drop_combinable(_type: MypyType) -> Optional[MypyType]:
+    def drop_combinable(_type: MypyType) -> MypyType | None:
         _type = get_proper_type(_type)
         if isinstance(_type, Instance) and _type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
             return None
@@ -216,7 +216,7 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
     # Both base_field and return type should derive from Field and thus expect 2 arguments
     assert len(base_field_arg_type.args) == len(default_return_type.args) == 2
     args = []
-    for new_type, default_arg in zip(base_field_arg_type.args, default_return_type.args):
+    for new_type, default_arg in zip(base_field_arg_type.args, default_return_type.args, strict=False):
         # Drop any base_field Combinable type
         reduced = drop_combinable(new_type)
         if reduced is None:

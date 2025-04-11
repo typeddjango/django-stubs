@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from django.db.models import Choices, IntegerChoices, TextChoices
 from django.utils.functional import _StrOrPromise
@@ -89,8 +89,8 @@ assert_type(YearInSchool.SENIOR.do_not_call_in_templates, Literal[True])
 
 assert_type(Vehicle.names, list[str])
 assert_type(Vehicle.labels, list[_StrOrPromise])
-assert_type(Vehicle.values, list[Optional[int]])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(Vehicle.choices, list[tuple[Optional[int], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Vehicle.values, list[int | None])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Vehicle.choices, list[tuple[int | None, _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Vehicle.CAR, Literal[Vehicle.CAR])
 assert_type(Vehicle.CAR.name, Literal["CAR"])
 assert_type(Vehicle.CAR.label, _StrOrPromise)
@@ -100,8 +100,8 @@ assert_type(Vehicle.__empty__, _StrOrPromise)
 
 assert_type(Gender.names, list[str])
 assert_type(Gender.labels, list[_StrOrPromise])
-assert_type(Gender.values, list[Optional[str]])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(Gender.choices, list[tuple[Optional[str], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Gender.values, list[str | None])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Gender.choices, list[tuple[str | None, _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Gender.MALE, Literal[Gender.MALE])
 assert_type(Gender.MALE.name, Literal["MALE"])
 assert_type(Gender.MALE.label, _StrOrPromise)
@@ -131,8 +131,8 @@ assert_type(Separator.FS.do_not_call_in_templates, Literal[True])
 
 assert_type(Constants.names, list[str])
 assert_type(Constants.labels, list[_StrOrPromise])
-assert_type(Constants.values, list[Optional[float]])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(Constants.choices, list[tuple[Optional[float], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Constants.values, list[float | None])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(Constants.choices, list[tuple[float | None, _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Constants.PI, Literal[Constants.PI])
 assert_type(Constants.PI.name, Literal["PI"])
 assert_type(Constants.PI.label, _StrOrPromise)
@@ -142,8 +142,8 @@ assert_type(Constants.__empty__, _StrOrPromise)
 
 assert_type(VoidChoices.names, list[str])
 assert_type(VoidChoices.labels, list[_StrOrPromise])
-assert_type(VoidChoices.values, list[Optional[Any]])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(VoidChoices.choices, list[tuple[Optional[Any], _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(VoidChoices.values, list[Any | None])  # pyright: ignore[reportAssertTypeFailure]
+assert_type(VoidChoices.choices, list[tuple[Any | None, _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(VoidChoices.ABYSS, Literal[VoidChoices.ABYSS])
 assert_type(VoidChoices.ABYSS.name, Literal["ABYSS"])
 assert_type(VoidChoices.ABYSS.label, _StrOrPromise)

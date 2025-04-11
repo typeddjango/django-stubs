@@ -434,7 +434,6 @@ django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_PREFIX
 django.contrib.gis.gdal.raster.const.VSI_MEM_FILESYSTEM_BASE_PATH
 django.contrib.gis.gdal.srs.SpatialReference.pretty_wkt
 django.contrib.gis.gdal.srs.SpatialReference.xml
-django.contrib.gis.geoip2.base
 django.contrib.gis.geos.Point.tuple
 django.contrib.gis.geos.geometry.GEOSGeometryBase.geojson
 django.contrib.gis.geos.geometry.GEOSGeometryBase.make_valid
@@ -547,10 +546,8 @@ django.db.backends.postgresql.base.PSYCOPG2_VERSION
 django.db.backends.postgresql.base.psycopg2_version
 django.db.backends.postgresql.base.psycopg_version
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_expected_failures
-django.db.backends.postgresql.features.DatabaseFeatures.has_bit_xor
 django.db.backends.postgresql.features.DatabaseFeatures.introspected_field_types
 django.db.backends.postgresql.features.DatabaseFeatures.prohibits_null_characters_in_text_exception
-django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_spgist_indexes
 django.db.backends.postgresql.features.DatabaseFeatures.uses_server_side_binding
 django.db.backends.postgresql.introspection.DatabaseIntrospection.index_default_access_method
 django.db.backends.postgresql.introspection.FieldInfo
@@ -932,8 +929,6 @@ django.db.models.fields.related.OneToOneField.related_accessor_class
 django.db.models.fields.related.RelatedField.formfield
 django.db.models.fields.related.lazy_related_operation
 django.db.models.fields.related_descriptors.ForeignKeyDeferredAttribute.__set__
-django.db.models.fields.related_lookups.MultiColSource.contains_over_clause
-django.db.models.fields.related_lookups.MultiColSource.resolve_expression
 django.db.models.fields.related_lookups.RelatedLookupMixin.as_sql
 django.db.models.fields.reverse_related.ForeignObjectRel.empty_strings_allowed
 django.db.models.fields.reverse_related.ForeignObjectRel.get_extra_restriction
@@ -1100,7 +1095,6 @@ django.db.models.sql.subqueries.AggregateQuery.__init__
 django.db.models.sql.subqueries.InsertQuery.__init__
 django.db.models.sql.where.ExtraWhere.contains_over_clause
 django.db.models.sql.where.NothingNode.contains_over_clause
-django.db.models.sql.where.SubqueryConstraint.contains_over_clause
 django.db.models.sql.where.WhereNode.get_db_converters
 django.db.models.sql.where.WhereNode.get_group_by_cols
 django.db.models.sql.where.WhereNode.get_lookup

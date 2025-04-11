@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import Any
+from typing import Any, TypeAlias
 
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 _NUMERIC_TYPES: TypeAlias = int | float | Decimal
 

@@ -1,6 +1,7 @@
 import socketserver
+from collections.abc import Callable
 from io import BytesIO
-from typing import Any, Callable
+from typing import Any
 from wsgiref import simple_server
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest

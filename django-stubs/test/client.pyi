@@ -5,7 +5,7 @@ from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
 from types import TracebackType
-from typing import Any, Generic, Literal, NoReturn, TypedDict, TypeVar, type_check_only
+from typing import Any, Generic, Literal, NoReturn, TypeAlias, TypedDict, TypeVar, type_check_only
 
 from asgiref.typing import ASGIVersions
 from django.contrib.auth.base_user import _UserModel
@@ -18,7 +18,6 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
-from typing_extensions import TypeAlias
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
@@ -35,9 +34,9 @@ class FakePayload(IOBase):
     read_started: bool
     def __init__(self, initial_bytes: bytes | str | None = ...) -> None: ...
     def __len__(self) -> int: ...
-    def read(self, size: int = ...) -> bytes: ...
+    def read(self, size: int = ..., /) -> bytes: ...
     def readline(self, size: int | None = ..., /) -> bytes: ...
-    def write(self, content: bytes | str) -> None: ...
+    def write(self, content: bytes | str, /) -> None: ...
 
 _T = TypeVar("_T")
 

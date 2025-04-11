@@ -1,7 +1,7 @@
 import builtins
 from collections.abc import Iterable
 from contextlib import suppress
-from typing import Optional, Protocol
+from typing import Protocol
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -19,8 +19,8 @@ class _MakeGenericClasses(Protocol):
 
     def __call__(
         self,
-        django_version: Optional[_VersionSpec] = None,
-        extra_classes: Optional[Iterable[type]] = None,
+        django_version: _VersionSpec | None = None,
+        extra_classes: Iterable[type] | None = None,
         include_builtins: bool = True,
     ) -> None: ...
 
@@ -46,8 +46,8 @@ def make_generic_classes(
             del builtins.reveal_locals
 
     def factory(
-        django_version: Optional[_VersionSpec] = None,
-        extra_classes: Optional[Iterable[type]] = None,
+        django_version: _VersionSpec | None = None,
+        extra_classes: Iterable[type] | None = None,
         include_builtins: bool = True,
     ) -> None:
         if extra_classes:

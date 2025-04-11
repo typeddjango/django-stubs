@@ -4,7 +4,7 @@ ignore-words-list = "aadd,acount,nam,asend"
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 line-length = 120
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/

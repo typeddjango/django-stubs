@@ -1,4 +1,4 @@
-from typing_extensions import TypeAlias
+from typing import TypeAlias
 
 # noinspection PyUnresolvedReferences
 from .base import clear_script_prefix as clear_script_prefix
