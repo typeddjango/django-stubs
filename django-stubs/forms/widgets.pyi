@@ -14,6 +14,21 @@ _OptAttrs: TypeAlias = dict[str, Any]
 
 class MediaOrderConflictWarning(RuntimeWarning): ...
 
+class MediaAsset:
+    element_template: str
+
+    def __init__(self, path: str, **attributes: _OptAttrs) -> None: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __html__(self) -> SafeString: ...
+    @property
+    def path(self) -> str: ...
+
+class Script(MediaAsset):
+    element_template: str
+
+    def __init__(self, src: str, **attributes: _OptAttrs) -> None: ...
+
 class Media:
     def __init__(
         self,
@@ -74,6 +89,18 @@ class EmailInput(Input):
     template_name: str
 
 class URLInput(Input):
+    input_type: str
+    template_name: str
+
+class ColorInput(Input):
+    input_type: str
+    template_name: str
+
+class SearchInput(Input):
+    input_type: str
+    template_name: str
+
+class TelInput(Input):
     input_type: str
     template_name: str
 
