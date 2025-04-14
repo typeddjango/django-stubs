@@ -207,10 +207,6 @@ django.forms.forms.BaseForm.bound_field_class
 django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.renderers.BaseRenderer.bound_field_class
 django.forms.utils.ErrorList.__init__
-django.forms.widgets.ColorInput
-django.forms.widgets.Script
-django.forms.widgets.SearchInput
-django.forms.widgets.TelInput
 django.http.HttpRequest.accepted_type
 django.http.HttpRequest.get_preferred_type
 django.http.HttpResponse.text
