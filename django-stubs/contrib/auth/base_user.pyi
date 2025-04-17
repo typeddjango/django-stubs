@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, ClassVar, Literal, TypeAlias, TypeVar, overload
+from typing import Any, ClassVar, Literal, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model
@@ -41,8 +41,3 @@ class AbstractBaseUser(models.Model):
     @classmethod
     @overload
     def normalize_username(cls, username: Any) -> Any: ...
-
-# This is our "placeholder" type the mypy plugin refines to configured 'AUTH_USER_MODEL'
-# wherever it is used as a type. The most recognised example of this is (probably)
-# `HttpRequest.user`
-_UserModel: TypeAlias = AbstractBaseUser  # noqa: PYI047

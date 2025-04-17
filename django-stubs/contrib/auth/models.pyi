@@ -12,9 +12,22 @@ from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self
 
-_AnyUser: TypeAlias = Model | AnonymousUser
+# This is our "placeholder" type the mypy plugin refines to configured 'AUTH_USER_MODEL'
+# wherever it is used as a type. The most recognised example of this is (probably)
+# `HttpRequest.user`
+_User: TypeAlias = AbstractBaseUser
 
-def update_last_login(sender: type[AbstractBaseUser], user: AbstractBaseUser, **kwargs: Any) -> None: ...
+_UserModel: TypeAlias = type[_User]
+
+_AnyUser: TypeAlias = _User | AnonymousUser
+
+# These are only needed for generic classes in order to bind to a specific implementation
+_AnyUserType = TypeVar("_AnyUserType", bound=_AnyUser)  # noqa: PYI018
+
+# do not use the alias `_User` so the bound remains at `AbstractUser`
+_UserType = TypeVar("_UserType", bound=AbstractUser)
+
+def update_last_login(sender: _UserModel, user: _User, **kwargs: Any) -> None: ...
 
 class PermissionManager(models.Manager[Permission]):
     def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...
@@ -38,15 +51,13 @@ class Group(models.Model):
     permissions = models.ManyToManyField(Permission)
     def natural_key(self) -> tuple[str]: ...
 
-_T = TypeVar("_T", bound=Model)
-
-class UserManager(BaseUserManager[_T]):
+class UserManager(BaseUserManager[_UserType]):
     def create_user(
         self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any
-    ) -> _T: ...
+    ) -> _UserType: ...
     def create_superuser(
         self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any
-    ) -> _T: ...
+    ) -> _UserType: ...
     def with_perm(
         self,
         perm: str | Permission,
@@ -54,7 +65,7 @@ class UserManager(BaseUserManager[_T]):
         include_superusers: bool = ...,
         backend: str | None = ...,
         obj: Model | None = ...,
-    ) -> QuerySet[_T]: ...
+    ) -> QuerySet[_UserType]: ...
 
 class PermissionsMixin(models.Model):
     is_superuser = models.BooleanField()
