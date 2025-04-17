@@ -43,6 +43,7 @@ class Permission(models.Model):
 
 class GroupManager(models.Manager[Group]):
     def get_by_natural_key(self, name: str) -> Group: ...
+    async def aget_by_natural_key(self, name: str) -> Group: ...
 
 class Group(models.Model):
     objects: ClassVar[GroupManager]
@@ -55,7 +56,13 @@ class UserManager(BaseUserManager[_UserType]):
     def create_user(
         self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any
     ) -> _UserType: ...
+    async def acreate_user(
+        self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any
+    ) -> _UserType: ...
     def create_superuser(
+        self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any
+    ) -> _UserType: ...
+    async def acreate_superuser(
         self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any
     ) -> _UserType: ...
     def with_perm(

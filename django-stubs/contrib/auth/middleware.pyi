@@ -30,7 +30,6 @@ class LoginRequiredMiddleware(MiddlewareMixin):
 class RemoteUserMiddleware(MiddlewareMixin):
     header: str
     force_logout_if_no_header: bool
-    def process_request(self, request: HttpRequest) -> None: ...
     def clean_username(self, username: str, request: HttpRequest) -> str: ...
 
 class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
