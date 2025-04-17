@@ -17,6 +17,8 @@ from typing_extensions import Self
 # `HttpRequest.user`
 _User: TypeAlias = AbstractBaseUser
 
+_UserModel: TypeAlias = type[_User]
+
 _AnyUser: TypeAlias = _User | AnonymousUser
 
 # These are only needed for generic classes in order to bind to a specific implementation
@@ -25,7 +27,7 @@ _AnyUserType = TypeVar("_AnyUserType", bound=_AnyUser)  # noqa: PYI018
 # do not use the alias `_User` so the bound remains at `AbstractUser`
 _UserType = TypeVar("_UserType", bound=AbstractUser)
 
-def update_last_login(sender: type[_User], user: _User, **kwargs: Any) -> None: ...
+def update_last_login(sender: _UserModel, user: _User, **kwargs: Any) -> None: ...
 
 class PermissionManager(models.Manager[Permission]):
     def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...

@@ -1,11 +1,11 @@
-from typing import Any, TypeAlias
+from typing import Any
 
-from django.contrib.auth.models import Permission, _AnyUser, _User, _UserType
+from django.contrib.auth.models import Permission, _AnyUser, _User, _UserModel, _UserType
 from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.http.request import HttpRequest
 
-UserModel: TypeAlias = type[_User]
+UserModel = _UserModel
 
 class BaseBackend:
     def authenticate(self, request: HttpRequest | None, **kwargs: Any) -> _User | None: ...

@@ -1,13 +1,13 @@
-from typing import Any, TypeAlias
+from typing import Any
 
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import _User
+from django.contrib.auth.models import _User, _UserModel
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
-UserModel: TypeAlias = type[_User]
+UserModel = _UserModel
 
 class RedirectURLMixin:
     next_page: str | None

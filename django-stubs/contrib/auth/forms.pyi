@@ -1,9 +1,9 @@
 from collections.abc import Iterable
 from logging import Logger
-from typing import Any, Generic, TypeAlias
+from typing import Any, Generic
 
 from django import forms
-from django.contrib.auth.models import _User, _UserType
+from django.contrib.auth.models import _User, _UserModel, _UserType
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -14,8 +14,7 @@ from django.http.request import HttpRequest
 from django.utils.functional import _StrOrPromise
 
 logger: Logger
-
-UserModel: TypeAlias = type[_User]
+UserModel = _UserModel
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name: str
