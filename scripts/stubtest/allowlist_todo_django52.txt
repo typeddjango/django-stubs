@@ -86,14 +86,6 @@ django.core.mail.EmailMultiAlternatives.body_contains
 django.core.mail.message.EmailAlternative
 django.core.mail.message.EmailAttachment
 django.core.mail.message.EmailMultiAlternatives.body_contains
-django.core.management.BaseCommand.get_check_kwargs
-django.core.management.base.BaseCommand.get_check_kwargs
-django.core.management.commands.compilemessages.is_dir_writable
-django.core.management.commands.compilemessages.is_writable
-django.core.management.commands.makemigrations.Command.autodetector
-django.core.management.commands.migrate.Command.autodetector
-django.core.management.commands.migrate.Command.get_check_kwargs
-django.core.management.commands.runserver.Command.get_check_kwargs
 django.core.management.commands.shell.Command.get_auto_imports
 django.core.management.commands.shell.Command.get_namespace
 django.core.management.utils.run_formatters
