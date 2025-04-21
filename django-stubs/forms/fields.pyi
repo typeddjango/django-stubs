@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
+from typing import Any, ClassVar, Protocol, overload, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -15,20 +15,22 @@ from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _Choi
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 
-# Problem: attribute `widget` is always of type `Widget` after field instantiation.
-# However, on class level it can be set to `Type[Widget]` too.
-# If we annotate it as `Union[Widget, Type[Widget]]`, every code that uses field
-# instances will not typecheck.
-# If we annotate it as `Widget`, any widget subclasses that do e.g.
-# `widget = Select` will not typecheck.
-# `Any` gives too much freedom, but does not create false positives.
-_ClassLevelWidgetT: TypeAlias = Any
+@type_check_only
+class _WidgetTypeOrInstance:
+    @overload
+    def __get__(self, instance: None, owner: type[Field]) -> type[Widget] | Widget: ...
+    @overload
+    def __get__(self, instance: Field, owner: type[Field]) -> Widget: ...
+    @overload
+    def __set__(self, instance: None, value: type[Widget] | Widget) -> None: ...
+    @overload
+    def __set__(self, instance: Field, value: Widget) -> None: ...
 
 class Field:
     initial: Any
     label: _StrOrPromise | None
     required: bool
-    widget: _ClassLevelWidgetT
+    widget: _WidgetTypeOrInstance
     hidden_widget: type[Widget]
     default_validators: list[_ValidatorCallable]
     default_error_messages: ClassVar[_ErrorMessagesDict]
