@@ -321,7 +321,6 @@ class ChoiceField(Field):
         _ChoicesInput | _ChoicesCallable | CallableChoiceIterator,
         _ChoicesInput | CallableChoiceIterator,
     ]
-    widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
@@ -549,7 +548,6 @@ class JSONString(str): ...
 
 class JSONField(CharField):
     default_error_messages: ClassVar[_ErrorMessagesDict]
-    widget: _ClassLevelWidgetT
     encoder: Any
     decoder: Any
     def __init__(self, encoder: Any | None = None, decoder: Any | None = None, **kwargs: Any) -> None: ...

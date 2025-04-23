@@ -3,7 +3,6 @@ from typing import Any
 from django import forms
 
 class GeometryField(forms.Field):
-    widget: Any
     geom_type: str
     srid: Any
     def __init__(self, *, srid: Any | None = ..., geom_type: Any | None = ..., **kwargs: Any) -> None: ...
