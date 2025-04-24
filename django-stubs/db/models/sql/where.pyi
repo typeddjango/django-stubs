@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Final
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
@@ -8,8 +8,9 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.utils import tree
 from django.utils.functional import cached_property
 
-AND: str
-OR: str
+AND: Final = "AND"
+OR: Final = "OR"
+XOR: Final = "XOR"
 
 class WhereNode(tree.Node):
     connector: str

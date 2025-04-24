@@ -482,3 +482,13 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
+
+__all__ = (
+    "AsyncClient",
+    "AsyncRequestFactory",
+    "Client",
+    "RedirectCycleError",
+    "RequestFactory",
+    "encode_file",
+    "encode_multipart",
+)

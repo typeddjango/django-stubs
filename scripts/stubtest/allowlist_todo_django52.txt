@@ -102,7 +102,6 @@ django.db.backends.mysql.compiler.SQLCompiler.get_qualify_sql
 django.db.backends.mysql.compiler.SQLCompiler.get_related_selections
 django.db.backends.mysql.compiler.SQLCompiler.has_composite_fields
 django.db.backends.mysql.compiler.SQLInsertCompiler.field_as_sql
-django.db.backends.mysql.compiler.__all__
 django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
 django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field
 django.db.backends.mysql.features.DatabaseFeatures.supports_expression_defaults

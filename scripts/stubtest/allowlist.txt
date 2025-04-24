@@ -524,3 +524,6 @@ django.db.models.fields.generated.GeneratedField.__init__
 # https://github.com/python/cpython/blob/5abff6960b4aecb0d5c81c7482cf3faa74e1983d/Lib/copyreg.py#L112-L161
 # Some Django classes get copied at import time, which leads stubtest to detect it.
 .*\.__slotnames__
+
+# Depends on availability of geoip2.database
+django.contrib.gis.geoip2.__all__

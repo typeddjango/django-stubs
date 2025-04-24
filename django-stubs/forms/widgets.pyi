@@ -311,3 +311,36 @@ class SelectDateWidget(Widget):
     def id_for_label(self, id_: str) -> str: ...
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> str | None | Any: ...
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
+
+__all__ = (
+    "Script",
+    "Media",
+    "MediaDefiningClass",
+    "Widget",
+    "TextInput",
+    "NumberInput",
+    "EmailInput",
+    "URLInput",
+    "ColorInput",
+    "SearchInput",
+    "TelInput",
+    "PasswordInput",
+    "HiddenInput",
+    "MultipleHiddenInput",
+    "FileInput",
+    "ClearableFileInput",
+    "Textarea",
+    "DateInput",
+    "DateTimeInput",
+    "TimeInput",
+    "CheckboxInput",
+    "Select",
+    "NullBooleanSelect",
+    "SelectMultiple",
+    "RadioSelect",
+    "CheckboxSelectMultiple",
+    "MultiWidget",
+    "SplitDateTimeWidget",
+    "SplitHiddenDateTimeWidget",
+    "SelectDateWidget",
+)

@@ -11,6 +11,10 @@ from typing_extensions import Self
 
 _Self = TypeVar("_Self", bound=Model)
 
+class Deferred: ...
+
+DEFERRED: Deferred
+
 class ModelStateFieldsCacheDescriptor:
     @overload
     def __get__(self, inst: None, owner: object) -> Self: ...
