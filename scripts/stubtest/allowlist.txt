@@ -395,8 +395,10 @@ django.forms.renderers.Jinja2.backend
 django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.http.HttpRequest.accepted_types
 django.http.HttpRequest.headers
+django.http.HttpResponse.text
 django.http.request.HttpRequest.accepted_types
 django.http.request.HttpRequest.headers
+django.http.response.HttpResponse.text
 django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
 django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
 django.middleware.csrf.CsrfViewMiddleware.csrf_trusted_origins_hosts
