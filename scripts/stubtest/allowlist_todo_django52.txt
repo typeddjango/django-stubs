@@ -80,10 +80,6 @@ django.core.checks.commands
 django.core.checks.registry.Tags.commands
 django.core.handlers.wsgi.LimitedStream.read
 django.core.handlers.wsgi.LimitedStream.readline
-django.core.mail.EmailAlternative
-django.core.mail.EmailAttachment
-django.core.mail.message.EmailAlternative
-django.core.mail.message.EmailAttachment
 django.core.management.commands.shell.Command.get_auto_imports
 django.core.management.commands.shell.Command.get_namespace
 django.core.management.utils.run_formatters
@@ -134,8 +130,6 @@ django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_constraints
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
-django.db.migrations.operations.AlterConstraint
-django.db.migrations.operations.models.AlterConstraint
 django.db.migrations.state.ProjectState.alter_constraint
 django.db.models.BaseConstraint.non_db_attrs
 django.db.models.CompositePrimaryKey
