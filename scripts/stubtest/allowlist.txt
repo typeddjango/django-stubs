@@ -527,3 +527,5 @@ django.db.models.fields.generated.GeneratedField.__init__
 
 # Depends on availability of geoip2.database
 django.contrib.gis.geoip2.__all__
+# Depends on whether DJANGO_SETTINGS_MODULE set
+django.contrib.gis.utils.__all__
