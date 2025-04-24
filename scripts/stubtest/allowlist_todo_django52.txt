@@ -186,7 +186,6 @@ django.forms.renderers.BaseRenderer.bound_field_class
 django.forms.utils.ErrorList.__init__
 django.http.HttpRequest.accepted_type
 django.http.HttpRequest.get_preferred_type
-django.http.HttpResponse.text
 django.http.HttpResponsePermanentRedirect.status_code_preserve_request
 django.http.HttpResponseRedirect.status_code_preserve_request
 django.http.QueryDict.pop
@@ -197,7 +196,6 @@ django.http.request.MediaType.quality
 django.http.request.MediaType.specificity
 django.http.request.QueryDict.pop
 django.http.request.parse_accept_header
-django.http.response.HttpResponse.text
 django.http.response.HttpResponsePermanentRedirect.status_code_preserve_request
 django.http.response.HttpResponseRedirect.status_code_preserve_request
 django.http.response.HttpResponseRedirectBase.__init__

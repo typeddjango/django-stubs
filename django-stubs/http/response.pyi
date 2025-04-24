@@ -6,6 +6,7 @@ from json import JSONEncoder
 from typing import Any, Literal, TypeVar, overload, type_check_only
 
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
+from django.utils.functional import cached_property
 
 class BadHeaderError(ValueError): ...
 
@@ -102,6 +103,8 @@ class HttpResponse(HttpResponseBase, Iterable[bytes]):
     __bytes__ = serialize
     def __iter__(self) -> Iterator[bytes]: ...
     def getvalue(self) -> bytes: ...
+    @cached_property
+    def text(self) -> str: ...
 
 class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[bytes]):
     is_async: bool
