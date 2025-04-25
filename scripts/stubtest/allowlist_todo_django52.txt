@@ -18,8 +18,6 @@ django.contrib.gis.db.models.OrderBy.allows_composite_expressions
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.forms.BaseForm.bound_field_class
 django.contrib.gis.forms.BoundField.aria_describedby
-django.contrib.gis.forms.Field.__init__
-django.contrib.gis.forms.Field.bound_field_class
 django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.gdal.OGRGeometry.geos_support
 django.contrib.gis.gdal.OGRGeometry.get_curve_geometry
@@ -163,10 +161,8 @@ django.db.models.sql.compiler.SQLCompiler.has_composite_fields
 django.db.models.sql.compiler.SQLInsertCompiler.field_as_sql
 django.forms.BaseForm.bound_field_class
 django.forms.BoundField.aria_describedby
-django.forms.Field.bound_field_class
 django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.boundfield.BoundField.aria_describedby
-django.forms.fields.Field.bound_field_class
 django.forms.forms.BaseForm.bound_field_class
 django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.renderers.BaseRenderer.bound_field_class
