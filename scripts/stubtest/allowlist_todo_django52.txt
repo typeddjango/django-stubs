@@ -147,7 +147,7 @@ django.db.models.expressions.OrderBy.allows_composite_expressions
 django.db.models.expressions.OutputFieldIsNoneError
 django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.has_db_default
-django.db.models.fields.composite
+django.db.models.fields.composite.unnest
 django.db.models.fields.related.ForeignKey.cast_db_type
 django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.related_lookups.MultiColSource
