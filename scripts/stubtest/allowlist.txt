@@ -398,6 +398,7 @@ django.http.HttpRequest.headers
 django.http.HttpResponse.text
 django.http.request.HttpRequest.accepted_types
 django.http.request.HttpRequest.headers
+django.http.request.MediaType.quality
 django.http.response.HttpResponse.text
 django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
 django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
