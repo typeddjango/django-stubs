@@ -3,7 +3,7 @@ from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator
 from http.cookies import SimpleCookie
 from io import BytesIO
 from json import JSONEncoder
-from typing import Any, Literal, TypeVar, overload, type_check_only
+from typing import Any, Literal, TypeVar, Never, overload, type_check_only
 
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
 from django.utils.functional import cached_property
@@ -117,6 +117,8 @@ class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[byt
     def __iter__(self) -> Iterator[bytes]: ...
     def __aiter__(self) -> AsyncIterator[bytes]: ...
     def getvalue(self) -> bytes: ...
+    @property
+    def text(self) -> Never: ...
 
 class FileResponse(StreamingHttpResponse):
     file_to_stream: BytesIO | None
