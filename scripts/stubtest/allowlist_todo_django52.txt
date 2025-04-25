@@ -9,7 +9,6 @@ django.contrib.gis.db.backends.mysql.schema.MySQLGISSchemaEditor.create_spatial_
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.from_text
 django.contrib.gis.db.models.BaseConstraint.non_db_attrs
-django.contrib.gis.db.models.CompositePrimaryKey
 django.contrib.gis.db.models.Count.allows_composite_expressions
 django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.has_db_default
@@ -132,7 +131,6 @@ django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_t
 django.db.migrations.autodetector.OperationDependency
 django.db.migrations.state.ProjectState.alter_constraint
 django.db.models.BaseConstraint.non_db_attrs
-django.db.models.CompositePrimaryKey
 django.db.models.Count.allows_composite_expressions
 django.db.models.Field._get_flatchoices
 django.db.models.Field.has_db_default
