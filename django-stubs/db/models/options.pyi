@@ -36,7 +36,7 @@ def make_immutable_fields_list(name: str, data: Iterable[_T]) -> ImmutableList[_
 _M = TypeVar("_M", bound=Model)
 
 class Options(Generic[_M]):
-    constraints: list[BaseConstraint]
+    constraints: _ListOrTuple[BaseConstraint]
     FORWARD_PROPERTIES: set[str]
     REVERSE_PROPERTIES: set[str]
     default_apps: Any
@@ -52,18 +52,18 @@ class Options(Generic[_M]):
     db_table: str
     db_table_comment: str
     ordering: Sequence[str] | None
-    indexes: list[Any]
+    indexes: _ListOrTuple[Any]
     unique_together: Sequence[tuple[str, ...]]  # Are always normalized
     index_together: Sequence[tuple[str, ...]]  # Are always normalized
     select_on_save: bool
     default_permissions: Sequence[str]
-    permissions: list[Any]
+    permissions: _ListOrTuple[Any]
     object_name: str | None
     app_label: str
     get_latest_by: Sequence[str] | None
     order_with_respect_to: str | None
     db_tablespace: str
-    required_db_features: list[str]
+    required_db_features: _ListOrTuple[str]
     required_db_vendor: Literal["sqlite", "postgresql", "mysql", "oracle"] | None
     meta: type | None
     pk: Field
