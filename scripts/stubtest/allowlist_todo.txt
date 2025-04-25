@@ -1203,6 +1203,9 @@ django.urls.path
 django.urls.re_path
 django.urls.resolvers.LocaleRegexDescriptor.__get__
 django.urls.resolvers.ResolverMatch.__iter__
+django.contrib.gis.db.models.CompositePrimaryKey.descriptor_class
+django.db.models.CompositePrimaryKey.descriptor_class
+django.db.models.fields.composite.CompositePrimaryKey.descriptor_class
 
 # mypy 1.9.0 new issues:
 django.db.models.expressions.rhs

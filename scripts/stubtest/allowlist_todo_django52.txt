@@ -154,6 +154,7 @@ django.db.models.fields.related_lookups.MultiColSource
 django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.fields.tuple_lookups
 django.db.models.functions.JSONObject.join
+django.db.models.functions.json.JSONObject.join
 django.db.models.options.Options.is_composite_pk
 django.db.models.options.Options.pk_fields
 django.db.models.sql.compiler.SQLCompiler.as_subquery_condition

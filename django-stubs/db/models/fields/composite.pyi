@@ -21,7 +21,6 @@ class CompositeAttribute:
     def __set__(self, instance: Model, values: list[Any] | tuple[Any] | None) -> None: ...
 
 class CompositePrimaryKey(Field):
-    descriptor_class = CompositeAttribute
     field_names: tuple[str]
     def __init__(
         self,
