@@ -172,8 +172,6 @@ django.http.QueryDict.pop
 django.http.StreamingHttpResponse.text
 django.http.request.HttpRequest.accepted_type
 django.http.request.HttpRequest.get_preferred_type
-django.http.request.MediaType.quality
-django.http.request.MediaType.specificity
 django.http.request.QueryDict.pop
 django.http.response.StreamingHttpResponse.text
 django.template.Library.simple_block_tag
