@@ -77,6 +77,7 @@ from .fields import TextField as TextField
 from .fields import TimeField as TimeField
 from .fields import URLField as URLField
 from .fields import UUIDField as UUIDField
+from .fields.composite import CompositePrimaryKey
 from .fields.files import FileField as FileField
 from .fields.files import ImageField as ImageField
 from .fields.generated import GeneratedField as GeneratedField
