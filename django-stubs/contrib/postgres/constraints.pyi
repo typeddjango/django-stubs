@@ -32,3 +32,5 @@ class ExclusionConstraint(BaseConstraint):
     def validate(
         self, model: type[Model], instance: Model, exclude: Iterable[str] | None = None, using: str = "default"
     ) -> None: ...
+
+__all__ = ["ExclusionConstraint"]

@@ -31,3 +31,11 @@ _L = TypeVar("_L")
 
 def flatten_choices(choices: Iterable[tuple[_V, _L | Iterable[tuple[_V, _L]]]]) -> Iterator[tuple[_V, _L]]: ...
 def normalize_choices(value: Any, *, depth: int = 0) -> Any: ...
+
+__all__ = [
+    "BaseChoiceIterator",
+    "BlankChoiceIterator",
+    "CallableChoiceIterator",
+    "flatten_choices",
+    "normalize_choices",
+]
