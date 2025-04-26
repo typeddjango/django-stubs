@@ -29,9 +29,9 @@ class Library:
     @overload
     def filter(self, name: str | None = None, filter_func: None = None, **flags: Any) -> Callable[[_C], _C]: ...
     @overload
-    def simple_tag(self, func: _C, takes_context: bool | None = None, name: str | None = None) -> _C: ...
+    def simple_tag(self, func: _C) -> _C: ...
     @overload
-    def simple_tag(self, *, takes_context: bool | None = None, name: str | None = None) -> Callable[[_C], _C]: ...
+    def simple_tag(self, *, func: None = None, takes_context: bool | None = None, name: str | None = None) -> Callable[[_C], _C]: ...
     def inclusion_tag(
         self,
         filename: Template | str,
@@ -40,17 +40,12 @@ class Library:
         name: str | None = None,
     ) -> Callable[[_C], _C]: ...
     @overload
-    def simple_block_tag(
-        self,
-        func: _C,
-        takes_context: bool | None = None,
-        name: str | None = None,
-        end_name: str | None = None,
-    ) -> _C: ...
+    def simple_block_tag(self, func: _C) -> _C: ...
     @overload
     def simple_block_tag(
         self,
         *,
+        func: None = None,
         takes_context: bool | None = None,
         name: str | None = None,
         end_name: str | None = None,
