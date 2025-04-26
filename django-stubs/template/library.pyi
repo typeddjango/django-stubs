@@ -54,7 +54,7 @@ class Library:
         takes_context: bool | None = None,
         name: str | None = None,
         end_name: str | None = None,
-    ) -> _C: ...
+    ) -> Callable[[_C], _C]: ...
 
 class TagHelperNode(Node):
     func: Any
