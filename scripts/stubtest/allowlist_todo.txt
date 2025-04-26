@@ -1143,6 +1143,8 @@ django.template.defaulttags.IfEqualNode
 django.template.defaulttags.do_ifequal
 django.template.defaulttags.ifequal
 django.template.defaulttags.ifnotequal
+django.template.library.InclusionNode.token
+django.template.library.SimpleNode.token
 django.template.loader_tags.BlockNode.token
 django.template.loader_tags.ExtendsNode.token
 django.template.loader_tags.IncludeNode.token
