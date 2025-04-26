@@ -5,7 +5,7 @@ from django.template.base import FilterExpression, Origin, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeString
 
-from .base import Node, Template, NodeList
+from .base import Node, NodeList, Template
 
 class InvalidTemplateLibrary(Exception): ...
 
