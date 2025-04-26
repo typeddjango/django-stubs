@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any
 
 from django.core.serializers import base
@@ -9,5 +10,5 @@ class Serializer(base.Serializer):
 
 class Deserializer(base.Deserializer):
     def __init__(
-        self, object_list: list[dict[str, Any]], *, using: str = ..., ignorenonexistent: bool = False, **options: Any
+        self, object_list: Iterable[dict[str, Any]], *, using: str = ..., ignorenonexistent: bool = False, **options: Any
     ) -> None: ...
