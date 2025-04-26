@@ -28,6 +28,8 @@ class LogEntryManager(models.Manager[LogEntry]):
         queryset: QuerySet[Model],
         action_flag: int,
         change_message: str | list[Any] = "",
+        *,
+        single_object: bool = False,
     ) -> list[LogEntry] | LogEntry: ...
 
 class LogEntry(models.Model):

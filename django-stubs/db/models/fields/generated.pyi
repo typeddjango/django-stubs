@@ -22,7 +22,7 @@ class GeneratedField(models.Field):
         *,
         expression: Expression,
         output_field: models.Field,
-        db_persist: bool | None = None,
+        db_persist: bool,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
         primary_key: bool = ...,
@@ -47,3 +47,5 @@ class GeneratedField(models.Field):
     ) -> None: ...
     def generated_sql(self, connection: BaseDatabaseWrapper) -> tuple[str, Any]: ...
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper: ...
+
+__all__ = ["GeneratedField"]

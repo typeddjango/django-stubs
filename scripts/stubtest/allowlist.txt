@@ -164,8 +164,6 @@ django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_exte
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.supports_geometry_field_unique_index
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
-django.contrib.gis.geoip2.GeoIP2.is_country
-django.contrib.gis.geoip2.GeoIP2.is_city
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.from_text
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.gis_operators
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.mariadb
@@ -207,6 +205,8 @@ django.contrib.gis.gdal.GDALRaster.driver
 django.contrib.gis.gdal.GDALRaster.is_vsi_based
 django.contrib.gis.gdal.raster.source.GDALRaster.driver
 django.contrib.gis.gdal.raster.source.GDALRaster.is_vsi_based
+django.contrib.gis.geoip2.GeoIP2.is_city
+django.contrib.gis.geoip2.GeoIP2.is_country
 django.contrib.postgres.expressions.ArraySubquery.output_field
 django.contrib.postgres.indexes.PostgresIndex.max_name_length
 django.contrib.sessions.backends.db.SessionStore.model
@@ -399,8 +399,11 @@ django.forms.renderers.Jinja2.backend
 django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.http.HttpRequest.accepted_types
 django.http.HttpRequest.headers
+django.http.HttpResponse.text
 django.http.request.HttpRequest.accepted_types
 django.http.request.HttpRequest.headers
+django.http.request.MediaType.quality
+django.http.response.HttpResponse.text
 django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
 django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
 django.middleware.csrf.CsrfViewMiddleware.csrf_trusted_origins_hosts
@@ -427,6 +430,15 @@ django.db.models.Q.referenced_base_fields
 django.db.models.query_utils.Q.referenced_base_fields
 django.contrib.gis.db.models.Q.referenced_base_fields
 django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
+django.contrib.gis.db.models.CompositePrimaryKey.cached_col
+django.contrib.gis.db.models.CompositePrimaryKey.columns
+django.contrib.gis.db.models.CompositePrimaryKey.fields
+django.db.models.CompositePrimaryKey.cached_col
+django.db.models.CompositePrimaryKey.columns
+django.db.models.CompositePrimaryKey.fields
+django.db.models.fields.composite.CompositePrimaryKey.cached_col
+django.db.models.fields.composite.CompositePrimaryKey.columns
+django.db.models.fields.composite.CompositePrimaryKey.fields
 
 # Ignore missing inner `Meta` class, see PR #2000 for the related discussion
 django.contrib.auth.base_user.AbstractBaseUser.Meta
@@ -514,3 +526,15 @@ django.db.models.Model.asave
 django.db.models.Model.save
 django.db.models.base.Model.asave
 django.db.models.base.Model.save
+
+# Ignore: GeneratedField.__init__ is inconsistent, runtime argument "db_persist" has a default value but stub argument does not
+# The default value None never worked and has been dropped for Django 6.0:
+# https://code.djangoproject.com/ticket/36262
+django.contrib.gis.db.models.GeneratedField.__init__
+django.db.models.GeneratedField.__init__
+django.db.models.fields.generated.GeneratedField.__init__
+
+# cls.__slotnames__ gets added by Python’s pickling internals:
+# https://github.com/python/cpython/blob/5abff6960b4aecb0d5c81c7482cf3faa74e1983d/Lib/copyreg.py#L112-L161
+# Some Django classes get copied at import time, which leads stubtest to detect it.
+.*\.__slotnames__

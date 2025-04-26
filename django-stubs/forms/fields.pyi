@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, ClassVar, Protocol, type_check_only
+from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -14,7 +14,6 @@ from django.forms.widgets import Widget
 from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
 # However, on class level it can be set to `Type[Widget]` too.
@@ -41,6 +40,7 @@ class Field:
     localize: bool
     error_messages: _ErrorMessagesDict
     validators: list[_ValidatorCallable]
+    bound_field_class: type[BoundField] | None
     def __init__(
         self,
         *,
@@ -56,6 +56,7 @@ class Field:
         disabled: bool = False,
         label_suffix: str | None = None,
         template_name: str | None = None,
+        bound_field_class: type[BoundField] | None = None,
     ) -> None: ...
     def prepare_value(self, value: Any) -> Any: ...
     def to_python(self, value: Any | None) -> Any | None: ...
@@ -556,3 +557,34 @@ class JSONField(CharField):
     def bound_data(self, data: Any, initial: Any) -> Any: ...
     def prepare_value(self, value: Any) -> str: ...
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
+
+__all__ = (
+    "Field",
+    "CharField",
+    "IntegerField",
+    "DateField",
+    "TimeField",
+    "DateTimeField",
+    "DurationField",
+    "RegexField",
+    "EmailField",
+    "FileField",
+    "ImageField",
+    "URLField",
+    "BooleanField",
+    "NullBooleanField",
+    "ChoiceField",
+    "MultipleChoiceField",
+    "ComboField",
+    "MultiValueField",
+    "FloatField",
+    "DecimalField",
+    "SplitDateTimeField",
+    "GenericIPAddressField",
+    "FilePathField",
+    "JSONField",
+    "SlugField",
+    "TypedChoiceField",
+    "TypedMultipleChoiceField",
+    "UUIDField",
+)

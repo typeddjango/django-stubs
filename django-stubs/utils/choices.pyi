@@ -1,8 +1,7 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping
-from typing import Any, Protocol, TypeVar, type_check_only
+from typing import Any, Protocol, TypeAlias, TypeVar, type_check_only
 
 from django.db.models import Choices
-from typing_extensions import TypeAlias
 
 _Choice: TypeAlias = tuple[Any, Any]
 _ChoiceNamedGroup: TypeAlias = tuple[str, Iterable[_Choice]]
@@ -32,3 +31,11 @@ _L = TypeVar("_L")
 
 def flatten_choices(choices: Iterable[tuple[_V, _L | Iterable[tuple[_V, _L]]]]) -> Iterator[tuple[_V, _L]]: ...
 def normalize_choices(value: Any, *, depth: int = 0) -> Any: ...
+
+__all__ = [
+    "BaseChoiceIterator",
+    "BlankChoiceIterator",
+    "CallableChoiceIterator",
+    "flatten_choices",
+    "normalize_choices",
+]

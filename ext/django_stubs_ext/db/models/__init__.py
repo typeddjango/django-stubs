@@ -2,9 +2,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import ClassVar, Literal, Union
+    from typing import ClassVar, Literal
 
     from django.db.models import BaseConstraint, Index, OrderBy
+    from django.utils.datastructures import _ListOrTuple
 
     from django_stubs_ext import StrOrPromise
 
@@ -24,20 +25,20 @@ if TYPE_CHECKING:
         db_tablespace: ClassVar[str]
         default_manager_name: ClassVar[str]
         default_related_name: ClassVar[str]
-        get_latest_by: ClassVar[Union[str, Sequence[str]]]
+        get_latest_by: ClassVar[str | Sequence[str]]
         managed: ClassVar[bool]  # default: True
         order_with_respect_to: ClassVar[str]
-        ordering: ClassVar[Sequence[Union[str, OrderBy]]]
-        permissions: ClassVar[list[tuple[str, str]]]
+        ordering: ClassVar[Sequence[str | OrderBy]]
+        permissions: ClassVar[_ListOrTuple[tuple[str, str]]]
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False
-        required_db_features: ClassVar[list[str]]
+        required_db_features: ClassVar[_ListOrTuple[str]]
         required_db_vendor: ClassVar[Literal["sqlite", "postgresql", "mysql", "oracle"]]
         select_on_save: ClassVar[bool]  # default: False
-        indexes: ClassVar[list[Index]]
-        unique_together: ClassVar[Union[Sequence[Sequence[str]], Sequence[str]]]
-        index_together: ClassVar[Union[Sequence[Sequence[str]], Sequence[str]]]  # Deprecated in Django 4.2
-        constraints: ClassVar[list[BaseConstraint]]
+        indexes: ClassVar[_ListOrTuple[Index]]
+        unique_together: ClassVar[Sequence[Sequence[str]] | Sequence[str]]
+        index_together: ClassVar[Sequence[Sequence[str]] | Sequence[str]]  # Deprecated in Django 4.2
+        constraints: ClassVar[_ListOrTuple[BaseConstraint]]
         verbose_name: ClassVar[StrOrPromise]
         verbose_name_plural: ClassVar[StrOrPromise]
 
