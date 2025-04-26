@@ -32,7 +32,9 @@ class Library:
     @overload
     def simple_tag(self, func: _C, takes_context: bool | None = None, name: str | None = None) -> _C: ...
     @overload
-    def simple_tag(self, func: None = None, takes_context: bool | None = None, name: str | None = None) -> Callable[[_C], _C]: ...
+    def simple_tag(
+        self, func: None = None, takes_context: bool | None = None, name: str | None = None
+    ) -> Callable[[_C], _C]: ...
     def inclusion_tag(
         self,
         filename: Template | str,
@@ -41,9 +43,13 @@ class Library:
         name: str | None = None,
     ) -> Callable[[_C], _C]: ...
     @overload
-    def simple_block_tag(self, func: _C, takes_context: bool | None = None,
+    def simple_block_tag(
+        self,
+        func: _C,
+        takes_context: bool | None = None,
         name: str | None = None,
-        end_name: str | None = None,) -> _C: ...
+        end_name: str | None = None,
+    ) -> _C: ...
     @overload
     def simple_block_tag(
         self,
