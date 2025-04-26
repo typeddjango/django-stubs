@@ -168,8 +168,5 @@ django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.renderers.BaseRenderer.bound_field_class
 django.http.QueryDict.pop
 django.http.request.QueryDict.pop
-django.template.Library.simple_block_tag
 django.template.autoreload
-django.template.library.Library.simple_block_tag
-django.template.library.SimpleBlockNode
 django.test.runner.ParallelTestSuite.handle_event

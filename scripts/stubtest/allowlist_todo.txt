@@ -1132,8 +1132,6 @@ django.http.HttpRequest.__init__
 django.http.StreamingHttpResponse.content
 django.http.request.HttpRequest.__init__
 django.http.response.StreamingHttpResponse.content
-django.template.Library.filter_function
-django.template.Library.simple_tag
 django.template.Node.__iter__
 django.template.VariableDoesNotExist.__init__
 django.template.base.Context
@@ -1146,8 +1144,6 @@ django.template.defaulttags.do_ifequal
 django.template.defaulttags.ifequal
 django.template.defaulttags.ifnotequal
 django.template.library.InclusionNode.token
-django.template.library.Library.filter_function
-django.template.library.Library.simple_tag
 django.template.library.SimpleNode.token
 django.template.loader_tags.BlockNode.token
 django.template.loader_tags.ExtendsNode.token
