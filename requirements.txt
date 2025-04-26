@@ -1,5 +1,4 @@
 # Dev tools:
-pre-commit==4.2.0
 pytest==8.3.5
 pytest-mypy-plugins==3.2.0
 pytest-shard==0.1.2
