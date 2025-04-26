@@ -69,6 +69,7 @@
 
 -   case: register_simple_block_tag
     main: |
+        import datetime
         from django import template
         register = template.Library()
 
