@@ -3,7 +3,6 @@
 # Created for 5.2 update:
 django.contrib.contenttypes.fields.GenericRelation.get_foreign_related_value
 django.contrib.contenttypes.fields.GenericRelation.get_local_related_value
-django.contrib.contenttypes.models.ContentType.get_object_for_this_type
 django.contrib.gis.db.backends.mysql.schema.MySQLGISSchemaEditor.__init__
 django.contrib.gis.db.backends.mysql.schema.MySQLGISSchemaEditor.create_spatial_indexes
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent
@@ -13,12 +12,10 @@ django.contrib.gis.db.models.Count.allows_composite_expressions
 django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.has_db_default
 django.contrib.gis.db.models.ForeignKey.cast_db_type
-django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.OrderBy.allows_composite_expressions
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.forms.BaseForm.bound_field_class
 django.contrib.gis.forms.BoundField.aria_describedby
-django.contrib.gis.forms.ModelChoiceField.validate_no_null_characters
 django.contrib.gis.gdal.OGRGeometry.geos_support
 django.contrib.gis.gdal.OGRGeometry.get_curve_geometry
 django.contrib.gis.gdal.OGRGeometry.get_linear_geometry
@@ -106,7 +103,6 @@ django.db.models.Count.allows_composite_expressions
 django.db.models.Field._get_flatchoices
 django.db.models.Field.has_db_default
 django.db.models.ForeignKey.cast_db_type
-django.db.models.ForeignObjectRel.accessor_name
 django.db.models.OrderBy.allows_composite_expressions
 django.db.models.Q.identity
 django.db.models.aggregates.Count.allows_composite_expressions
@@ -120,9 +116,7 @@ django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.has_db_default
 django.db.models.fields.composite.unnest
 django.db.models.fields.related.ForeignKey.cast_db_type
-django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.related_lookups.MultiColSource
-django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.fields.tuple_lookups
 django.db.models.functions.JSONObject.join
 django.db.models.functions.json.JSONObject.join
@@ -134,10 +128,8 @@ django.db.models.sql.compiler.SQLCompiler.has_composite_fields
 django.db.models.sql.compiler.SQLInsertCompiler.field_as_sql
 django.forms.BaseForm.bound_field_class
 django.forms.BoundField.aria_describedby
-django.forms.ModelChoiceField.validate_no_null_characters
 django.forms.boundfield.BoundField.aria_describedby
 django.forms.forms.BaseForm.bound_field_class
-django.forms.models.ModelChoiceField.validate_no_null_characters
 django.forms.renderers.BaseRenderer.bound_field_class
 django.http.QueryDict.pop
 django.http.request.QueryDict.pop
