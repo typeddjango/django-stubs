@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Final
 
 c_int_p: Any
-GDAL_OF_READONLY: int = 0x00
-GDAL_OF_UPDATE: int = 0x01
-GDAL_OF_ALL: int = 0x00
-GDAL_OF_RASTER: int = 0x02
-GDAL_OF_VECTOR: int = 0x04
+GDAL_OF_READONLY: Final = 0x00
+GDAL_OF_UPDATE: Final = 0x01
+GDAL_OF_ALL: Final = 0x00
+GDAL_OF_RASTER: Final = 0x02
+GDAL_OF_VECTOR: Final = 0x04
 register_all: Any
 cleanup_all: Any
 get_driver: Any
