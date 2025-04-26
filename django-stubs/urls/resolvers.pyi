@@ -1,14 +1,13 @@
 from collections.abc import Callable, Iterator, Sequence
 from re import Pattern
 from types import ModuleType
-from typing import Any, overload
+from typing import Any, TypeAlias, overload
 
 from django.core.checks.messages import CheckMessage
 from django.http import HttpRequest, HttpResponse
 from django.urls import _AnyURL
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
-from typing_extensions import TypeAlias
 
 class ResolverMatch:
     func: Callable
@@ -63,6 +62,8 @@ class RegexPattern(CheckURLMixin):
     def __init__(self, regex: str, name: str | None = ..., is_endpoint: bool = ...) -> None: ...
     def match(self, path: str) -> tuple[str, tuple, dict[str, str]] | None: ...
     def check(self) -> list[CheckMessage]: ...
+
+whitespace_set: frozenset[str]
 
 class LocaleRegexRouteDescriptor:
     def __get__(self, instance: RoutePattern | None, cls: type | None = None) -> Pattern[str]: ...

@@ -2,7 +2,7 @@ from collections.abc import Callable, MutableMapping
 from contextlib import AbstractContextManager
 from datetime import tzinfo
 from logging import Logger
-from typing import Any
+from typing import Any, TypeAlias
 
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
@@ -14,7 +14,7 @@ from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.utils import CursorDebugWrapper, CursorWrapper
 from django.db.transaction import Atomic
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 NO_DB_ALIAS: str
 RAN_DB_VERSION_CHECK: set[str]

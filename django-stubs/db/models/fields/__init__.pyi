@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Literal, Protocol, TypeVar, overload, type_check_only
+from typing import Any, ClassVar, Generic, Literal, Protocol, TypeAlias, TypeVar, overload, type_check_only
 
 from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
@@ -18,7 +18,7 @@ from django.forms import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 class Empty: ...
 class NOT_PROVIDED: ...
@@ -632,3 +632,38 @@ class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta)
 
 class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...
 class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...
+
+__all__ = [
+    "AutoField",
+    "BLANK_CHOICE_DASH",
+    "BigAutoField",
+    "BigIntegerField",
+    "BinaryField",
+    "BooleanField",
+    "CharField",
+    "CommaSeparatedIntegerField",
+    "DateField",
+    "DateTimeField",
+    "DecimalField",
+    "DurationField",
+    "EmailField",
+    "Empty",
+    "Field",
+    "FilePathField",
+    "FloatField",
+    "GenericIPAddressField",
+    "IPAddressField",
+    "IntegerField",
+    "NOT_PROVIDED",
+    "NullBooleanField",
+    "PositiveBigIntegerField",
+    "PositiveIntegerField",
+    "PositiveSmallIntegerField",
+    "SlugField",
+    "SmallAutoField",
+    "SmallIntegerField",
+    "TextField",
+    "TimeField",
+    "URLField",
+    "UUIDField",
+]

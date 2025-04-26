@@ -10,3 +10,18 @@ from django.contrib.admin import display as display
 from django.contrib.admin import register as register
 from django.contrib.admin import site as site
 from django.contrib.gis.admin.options import GISModelAdmin as GISModelAdmin
+
+__all__ = [
+    "HORIZONTAL",
+    "VERTICAL",
+    "AdminSite",
+    "ModelAdmin",
+    "StackedInline",
+    "TabularInline",
+    "action",
+    "autodiscover",
+    "display",
+    "register",
+    "site",
+    "GISModelAdmin",
+]

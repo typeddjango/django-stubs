@@ -4,7 +4,7 @@ ignore-words-list = "aadd,acount,nam,asend"
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 line-length = 120
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
@@ -56,4 +56,4 @@ known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools<79.0.0", "wheel"]

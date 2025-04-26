@@ -3,7 +3,7 @@ import tempfile
 import uuid
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -32,7 +32,7 @@ strict_settings = bool (default: true)
 
 
 @contextmanager
-def write_to_file(file_contents: str, suffix: Optional[str] = None) -> Generator[str, None, None]:
+def write_to_file(file_contents: str, suffix: str | None = None) -> Generator[str, None, None]:
     with tempfile.NamedTemporaryFile(mode="w+", suffix=suffix) as config_file:
         config_file.write(file_contents)
         config_file.seek(0)

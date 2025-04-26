@@ -1,14 +1,13 @@
 from typing import Any
 
-from django.contrib.auth.base_user import _UserModel
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import _User, _UserModel
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from typing_extensions import TypeAlias
 
-UserModel: TypeAlias = type[_UserModel]
+UserModel = _UserModel
 
 class RedirectURLMixin:
     next_page: str | None
@@ -66,7 +65,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     token_generator: Any
     validlink: bool
     user: Any
-    def get_user(self, uidb64: str) -> _UserModel | None: ...
+    def get_user(self, uidb64: str) -> _User | None: ...
 
 class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
     title: Any

@@ -5,7 +5,7 @@ from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, SupportsIndex, TypeVar, type_check_only
+from typing import Any, Protocol, SupportsIndex, TypeAlias, TypeVar, type_check_only
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
@@ -15,7 +15,7 @@ from django.db.models.lookups import Lookup, Transform
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 _TestClass: TypeAlias = type[SimpleTestCase]
 
@@ -169,3 +169,23 @@ def require_jinja2(test_func: _C) -> _C: ...
 def register_lookup(
     field: type[RegisterLookupMixin], *lookups: type[Lookup | Transform], lookup_name: str | None = ...
 ) -> AbstractContextManager[None]: ...
+def garbage_collect() -> None: ...
+
+__all__ = (
+    "Approximate",
+    "ContextList",
+    "isolate_lru_cache",
+    "garbage_collect",
+    "get_runner",
+    "CaptureQueriesContext",
+    "ignore_warnings",
+    "isolate_apps",
+    "modify_settings",
+    "override_settings",
+    "override_system_checks",
+    "tag",
+    "requires_tz_support",
+    "setup_databases",
+    "setup_test_environment",
+    "teardown_test_environment",
+)

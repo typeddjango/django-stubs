@@ -1,7 +1,8 @@
 import itertools
 import sys
+from collections.abc import Callable
 from functools import cached_property, partial
-from typing import Any, Callable, Optional
+from typing import Any
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
@@ -82,7 +83,7 @@ class NewSemanalDjangoPlugin(Plugin):
         else:
             return {}
 
-    def _get_typeinfo_or_none(self, class_name: str) -> Optional[TypeInfo]:
+    def _get_typeinfo_or_none(self, class_name: str) -> TypeInfo | None:
         sym = self.lookup_fully_qualified(class_name)
         if sym is not None and isinstance(sym.node, TypeInfo):
             return sym.node
@@ -139,7 +140,7 @@ class NewSemanalDjangoPlugin(Plugin):
             self._new_dependency("django.db.models.query"),
         ]
 
-    def get_function_hook(self, fullname: str) -> Optional[Callable[[FunctionContext], MypyType]]:
+    def get_function_hook(self, fullname: str) -> Callable[[FunctionContext], MypyType] | None:
         info = self._get_typeinfo_or_none(fullname)
         if info:
             if info.has_base(fullnames.FIELD_FULLNAME):
@@ -170,7 +171,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "exclude": typecheck_filtering_method,
         }
 
-    def get_method_hook(self, fullname: str) -> Optional[Callable[[MethodContext], MypyType]]:
+    def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
         class_fullname, _, method_name = fullname.rpartition(".")
         # Methods called very often -- short circuit for minor speed up
         if method_name == "__init_subclass__" or fullname.startswith("builtins."):
@@ -212,7 +213,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
-    def get_customize_class_mro_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+    def get_customize_class_mro_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         sym = self.lookup_fully_qualified(fullname)
         if (
             sym is not None
@@ -223,12 +224,12 @@ class NewSemanalDjangoPlugin(Plugin):
         else:
             return None
 
-    def get_metaclass_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+    def get_metaclass_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         if fullname == fullnames.MODEL_METACLASS_FULLNAME:
             return MetaclassAdjustments.adjust_model_class
         return None
 
-    def get_base_class_hook(self, fullname: str) -> Optional[Callable[[ClassDefContext], None]]:
+    def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         # Base class is a Model class definition
         sym = self.lookup_fully_qualified(fullname)
         if sym is not None and isinstance(sym.node, TypeInfo) and helpers.is_model_type(sym.node):
@@ -243,7 +244,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return add_as_manager_to_queryset_class
         return None
 
-    def get_attribute_hook(self, fullname: str) -> Optional[Callable[[AttributeContext], MypyType]]:
+    def get_attribute_hook(self, fullname: str) -> Callable[[AttributeContext], MypyType] | None:
         class_name, _, attr_name = fullname.rpartition(".")
 
         # Lookup of a settings variable
@@ -284,18 +285,18 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
-    def get_type_analyze_hook(self, fullname: str) -> Optional[Callable[[AnalyzeTypeContext], MypyType]]:
+    def get_type_analyze_hook(self, fullname: str) -> Callable[[AnalyzeTypeContext], MypyType] | None:
         if fullname in (
             "typing.Annotated",
             "typing_extensions.Annotated",
             "django_stubs_ext.annotations.WithAnnotations",
         ):
             return partial(handle_annotated_type, fullname=fullname)
-        elif fullname == "django.contrib.auth.base_user._UserModel":
+        elif fullname == "django.contrib.auth.models._User":
             return partial(get_user_model, django_context=self.django_context)
         return None
 
-    def get_dynamic_class_hook(self, fullname: str) -> Optional[Callable[[DynamicClassDefContext], None]]:
+    def get_dynamic_class_hook(self, fullname: str) -> Callable[[DynamicClassDefContext], None] | None:
         # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
         class_name, _, method_name = fullname.rpartition(".")
         if method_name == "from_queryset":
@@ -307,7 +308,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {}
-        # In all places we use '_UserModel' alias as a type we want to clear cache if
+        # In all places we use '_User' alias as a type we want to clear cache if
         # AUTH_USER_MODEL setting changes
         if ctx.id.startswith("django.contrib.auth") or ctx.id in {"django.http.request", "django.test.client"}:
             extra_data["AUTH_USER_MODEL"] = self.django_context.settings.AUTH_USER_MODEL

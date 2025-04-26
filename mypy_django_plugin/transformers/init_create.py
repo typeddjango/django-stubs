@@ -1,5 +1,3 @@
-from typing import Union
-
 from django.db.models.base import Model
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import Instance, get_proper_type
@@ -9,12 +7,10 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
 
 
-def get_actual_types(
-    ctx: Union[MethodContext, FunctionContext], expected_keys: list[str]
-) -> list[tuple[str, MypyType]]:
+def get_actual_types(ctx: MethodContext | FunctionContext, expected_keys: list[str]) -> list[tuple[str, MypyType]]:
     actual_types = []
     # positionals
-    for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0])):
+    for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0], strict=False)):
         if actual_name is None:
             if ctx.callee_arg_names[0] == "kwargs":
                 # unpacked dict as kwargs is not supported
@@ -23,7 +19,7 @@ def get_actual_types(
         actual_types.append((actual_name, actual_type))
     # kwargs
     if len(ctx.callee_arg_names) > 1:
-        for actual_name, actual_type in zip(ctx.arg_names[1], ctx.arg_types[1]):
+        for actual_name, actual_type in zip(ctx.arg_names[1], ctx.arg_types[1], strict=False):
             if actual_name is None:
                 # unpacked dict as kwargs is not supported
                 continue
@@ -32,7 +28,7 @@ def get_actual_types(
 
 
 def typecheck_model_method(
-    ctx: Union[FunctionContext, MethodContext], django_context: DjangoContext, model_cls: type[Model], method: str
+    ctx: FunctionContext | MethodContext, django_context: DjangoContext, model_cls: type[Model], method: str
 ) -> MypyType:
     typechecker_api = helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)

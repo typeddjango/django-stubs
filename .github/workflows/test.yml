@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
         shard: [0, 1, 2, 3]
       fail-fast: false
     steps:
@@ -63,7 +63,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       # Must match `shard` definition in the test matrix:
@@ -91,7 +91,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run stubtest
@@ -112,7 +112,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
       - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
@@ -132,13 +132,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11', '3.12', '3.13']
-        django-version: ['4.2', '5.0', '5.1']
-        include:
-          - python-version: '3.9'
-            django-version: '4.2'
-          - python-version: '3.10'
-            django-version: '4.2'
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        django-version: ['5.0', '5.1', '5.2']
     steps:
       - uses: actions/checkout@v4
       - name: Setup system dependencies
@@ -151,7 +146,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
           pip install "Django==${{ matrix.django-version }}"
           pip check

@@ -1,12 +1,11 @@
 from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
-from typing import Any
+from typing import Any, TypeAlias
 
 from django.core.files.base import File
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeAlias
 
 EMPTY_VALUES: Any
 
@@ -34,6 +33,7 @@ class DomainNameValidator(RegexValidator):
     ul: str
     hostname_re: str
     domain_re: str
+    tld_no_fqdn_re: str
     tld_re: str
     ascii_only_hostname_re: str
     ascii_only_domain_re: str
@@ -66,6 +66,9 @@ def validate_integer(value: float | str | None) -> None: ...
 class EmailValidator(_Deconstructible):
     message: _StrOrPromise
     code: str
+    domain_re: str
+    hostname_re: str
+    tld_no_fqdn_re: str
     user_regex: Pattern[str]
     domain_regex: Pattern[str]
     literal_regex: Pattern[str]
