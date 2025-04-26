@@ -1,7 +1,7 @@
 import json
-from typing import IO, Any, TypeAlias
-import _typeshed
+from typing import Any, TypeAlias
 
+import _typeshed
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.python import Serializer as PythonSerializer
 

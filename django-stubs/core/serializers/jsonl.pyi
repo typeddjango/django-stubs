@@ -1,4 +1,4 @@
-from typing import IO, Any
+from typing import Any
 
 from django.core.serializers.json import _DeserializerInput
 from django.core.serializers.python import Deserializer as PythonDeserializer
