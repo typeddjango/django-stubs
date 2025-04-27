@@ -1108,10 +1108,6 @@ django.template.base.FilterExpression.is_var
 django.template.base.Node.__iter__
 django.template.base.VariableDoesNotExist.__init__
 django.template.defaultfilters.json_script
-django.template.defaulttags.IfEqualNode
-django.template.defaulttags.do_ifequal
-django.template.defaulttags.ifequal
-django.template.defaulttags.ifnotequal
 django.template.library.InclusionNode.token
 django.template.library.SimpleNode.token
 django.template.loader_tags.BlockNode.token
