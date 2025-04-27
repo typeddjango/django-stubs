@@ -440,15 +440,10 @@ django.db.models.fields.composite.CompositePrimaryKey.cached_col
 django.db.models.fields.composite.CompositePrimaryKey.columns
 django.db.models.fields.composite.CompositePrimaryKey.fields
 
-# Ignore missing inner `Meta` class, see PR #2000 for the related discussion
-django.contrib.auth.base_user.AbstractBaseUser.Meta
+# Ignore missing inner `Meta` class, see PR #2000 and #2168
 django.contrib.auth.forms.BaseUserCreationForm.Meta
 django.contrib.auth.forms.UserChangeForm.Meta
-django.contrib.auth.models.AbstractBaseUser.Meta
-django.contrib.auth.models.AbstractUser.Meta
-django.contrib.auth.models.PermissionsMixin.Meta
 django.contrib.flatpages.forms.FlatpageForm.Meta
-django.contrib.sessions.base_session.AbstractBaseSession.Meta
 
 # Custom __str__ that we don't want to overcomplicate:
 django.forms.utils.RenderableMixin.__str__

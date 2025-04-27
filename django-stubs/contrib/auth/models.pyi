@@ -33,6 +33,7 @@ class PermissionManager(models.Manager[Permission]):
     def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...
 
 class Permission(models.Model):
+    # Note: do not create `class Meta` here.
     content_type_id: int
     objects: ClassVar[PermissionManager]
 
@@ -46,6 +47,7 @@ class GroupManager(models.Manager[Group]):
     async def aget_by_natural_key(self, name: str) -> Group: ...
 
 class Group(models.Model):
+    # Note: do not create `class Meta` here.
     objects: ClassVar[GroupManager]
 
     name = models.CharField(max_length=150)
@@ -79,6 +81,9 @@ class PermissionsMixin(models.Model):
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
 
+    class Meta:
+        abstract: bool
+
     def get_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     async def aget_user_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: _AnyUser | None = ...) -> set[str]: ...
@@ -107,6 +112,11 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     EMAIL_FIELD: str
     USERNAME_FIELD: str
+
+    class Meta:
+        verbose_name: str
+        verbose_name_plural: str
+        abstract: bool
 
     def get_full_name(self) -> str: ...
     def get_short_name(self) -> str: ...
