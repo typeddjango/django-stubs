@@ -37,7 +37,6 @@ django.contrib.admin.options.StackedInline
 django.contrib.admin.options.TabularInline
 django.contrib.admin.site
 django.contrib.admin.sites.site
-django.contrib.admin.templatetags.admin_list.DOT
 django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
 django.contrib.admin.tests.CSPMiddleware.process_response
@@ -121,9 +120,7 @@ django.contrib.auth.password_validation.CommonPasswordValidator.__init__
 django.contrib.auth.password_validation.exceeds_maximum_length_ratio
 django.contrib.auth.tokens.PasswordResetTokenGenerator._make_token_with_timestamp
 django.contrib.auth.tokens.PasswordResetTokenGenerator.algorithm
-django.contrib.auth.views.INTERNAL_RESET_URL_TOKEN
 django.contrib.auth.views.LoginView.form_class
-django.contrib.auth.views.LogoutView.get_next_page
 django.contrib.auth.views.PasswordChangeView.form_class
 django.contrib.auth.views.PasswordResetConfirmView.form_class
 django.contrib.auth.views.PasswordResetView.form_class
@@ -172,7 +169,6 @@ django.contrib.gis.db.backends.mysql.introspection
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.supports_tolerance_parameter
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.unsupported_geojson_options
-django.contrib.gis.db.backends.postgis.adapter.PostGISAdapter.prepare
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersection_returns_none
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
@@ -309,7 +305,6 @@ django.contrib.gis.db.models.PositiveSmallIntegerField.formfield
 django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
 django.contrib.gis.db.models.Q.XOR
 django.contrib.gis.db.models.QuerySet.__deepcopy__
-django.contrib.gis.db.models.QuerySet.__reversed__
 django.contrib.gis.db.models.QuerySet.__xor__
 django.contrib.gis.db.models.RasterField.contribute_to_class
 django.contrib.gis.db.models.SlugField.formfield
@@ -348,9 +343,7 @@ django.contrib.gis.forms.ALL_FIELDS
 django.contrib.gis.forms.BaseForm.__init__
 django.contrib.gis.forms.BaseFormSet.__init__
 django.contrib.gis.forms.BaseModelForm.__init__
-django.contrib.gis.forms.BaseModelForm.save_m2m
 django.contrib.gis.forms.BaseModelFormSet.model
-django.contrib.gis.forms.BaseModelFormSet.save_m2m
 django.contrib.gis.forms.ChoiceField.__deepcopy__
 django.contrib.gis.forms.Field.__deepcopy__
 django.contrib.gis.forms.Field.hidden_widget
@@ -495,9 +488,6 @@ django.db.backends.postgresql.base.DatabaseWrapper.ops
 django.db.backends.postgresql.base.DatabaseWrapper.tzinfo_factory
 django.db.backends.postgresql.base.INETARRAY
 django.db.backends.postgresql.base.INETARRAY_OID
-django.db.backends.postgresql.base.PSYCOPG2_VERSION
-django.db.backends.postgresql.base.psycopg2_version
-django.db.backends.postgresql.base.psycopg_version
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_expected_failures
 django.db.backends.postgresql.features.DatabaseFeatures.introspected_field_types
 django.db.backends.postgresql.features.DatabaseFeatures.prohibits_null_characters_in_text_exception
@@ -677,7 +667,6 @@ django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
 django.db.models.Q.XOR
 django.db.models.QuerySet.__deepcopy__
-django.db.models.QuerySet.__reversed__
 django.db.models.QuerySet.__xor__
 django.db.models.SlugField.formfield
 django.db.models.SmallAutoField.rel_db_type
@@ -1006,14 +995,12 @@ django.db.models.options.Options.many_to_many
 django.db.models.options.Options.related_objects
 django.db.models.query.EmptyQuerySet.__init__
 django.db.models.query.QuerySet.__deepcopy__
-django.db.models.query.QuerySet.__reversed__
 django.db.models.query.QuerySet.__xor__
 django.db.models.query.RawQuerySet.__aiter__
 django.db.models.query.RelatedPopulator
 django.db.models.query.get_related_populators
 django.db.models.query.normalize_prefetch_lookups
 django.db.models.query.prefetch_one_level
-django.db.models.query_utils.InvalidQuery
 django.db.models.query_utils.Q.XOR
 django.db.models.query_utils.Q.identity
 django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
@@ -1057,9 +1044,7 @@ django.forms.ALL_FIELDS
 django.forms.BaseForm.__init__
 django.forms.BaseFormSet.__init__
 django.forms.BaseModelForm.__init__
-django.forms.BaseModelForm.save_m2m
 django.forms.BaseModelFormSet.model
-django.forms.BaseModelFormSet.save_m2m
 django.forms.ChoiceField.__deepcopy__
 django.forms.Field.__deepcopy__
 django.forms.Field.hidden_widget
@@ -1094,9 +1079,7 @@ django.forms.inlineformset_factory
 django.forms.modelform_factory
 django.forms.modelformset_factory
 django.forms.models.BaseModelForm.__init__
-django.forms.models.BaseModelForm.save_m2m
 django.forms.models.BaseModelFormSet.model
-django.forms.models.BaseModelFormSet.save_m2m
 django.forms.models.ModelChoiceField.__deepcopy__
 django.forms.models.ModelFormMetaclass.__new__
 django.forms.models.ModelMultipleChoiceField.hidden_widget
@@ -1125,10 +1108,6 @@ django.template.base.FilterExpression.is_var
 django.template.base.Node.__iter__
 django.template.base.VariableDoesNotExist.__init__
 django.template.defaultfilters.json_script
-django.template.defaulttags.IfEqualNode
-django.template.defaulttags.do_ifequal
-django.template.defaulttags.ifequal
-django.template.defaulttags.ifnotequal
 django.template.library.InclusionNode.token
 django.template.library.SimpleNode.token
 django.template.loader_tags.BlockNode.token
