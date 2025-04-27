@@ -50,7 +50,6 @@ class PasswordResetView(PasswordContextMixin, FormView):
     title: Any
     token_generator: Any
 
-INTERNAL_RESET_URL_TOKEN: str
 INTERNAL_RESET_SESSION_TOKEN: str
 
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):

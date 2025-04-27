@@ -120,7 +120,6 @@ django.contrib.auth.password_validation.CommonPasswordValidator.__init__
 django.contrib.auth.password_validation.exceeds_maximum_length_ratio
 django.contrib.auth.tokens.PasswordResetTokenGenerator._make_token_with_timestamp
 django.contrib.auth.tokens.PasswordResetTokenGenerator.algorithm
-django.contrib.auth.views.INTERNAL_RESET_URL_TOKEN
 django.contrib.auth.views.LoginView.form_class
 django.contrib.auth.views.PasswordChangeView.form_class
 django.contrib.auth.views.PasswordResetConfirmView.form_class
