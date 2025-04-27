@@ -37,7 +37,6 @@ django.contrib.admin.options.StackedInline
 django.contrib.admin.options.TabularInline
 django.contrib.admin.site
 django.contrib.admin.sites.site
-django.contrib.admin.templatetags.admin_list.DOT
 django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
 django.contrib.admin.tests.CSPMiddleware.process_response
