@@ -19,8 +19,6 @@ PathInfo = namedtuple(
     "PathInfo", ["from_opts", "to_opts", "target_fields", "join_field", "m2m", "direct", "filtered_relation"]
 )
 
-class InvalidQuery(Exception): ...
-
 def subclasses(cls: type[RegisterLookupMixin]) -> Iterator[type[RegisterLookupMixin]]: ...
 
 class Q(tree.Node):
