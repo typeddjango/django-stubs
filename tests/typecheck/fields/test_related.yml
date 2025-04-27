@@ -771,10 +771,9 @@
                 class TransactionLog(models.Model):
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
-        myapp/models:11: error: Could not resolve manager type for "myapp.models.Transaction.objects"  [django-manager-missing]
         myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
-        myapp/models:15: note: Revealed type is "myapp.models.UnknownManager[myapp.models.Transaction]"
-        myapp/models:16: note: Revealed type is "Any"
+        myapp/models:15: note: Revealed type is "myapp.models.ManagerFromTransactionQuerySet[myapp.models.Transaction]"
+        myapp/models:16: note: Revealed type is "None"
 
 
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
