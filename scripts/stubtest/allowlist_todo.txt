@@ -351,19 +351,12 @@ django.contrib.gis.forms.BaseModelForm.__init__
 django.contrib.gis.forms.BaseModelForm.save_m2m
 django.contrib.gis.forms.BaseModelFormSet.model
 django.contrib.gis.forms.BaseModelFormSet.save_m2m
-django.contrib.gis.forms.BoundWidget
 django.contrib.gis.forms.ChoiceField.__deepcopy__
-django.contrib.gis.forms.DateTimeBaseInput
 django.contrib.gis.forms.Field.__deepcopy__
 django.contrib.gis.forms.Field.hidden_widget
 django.contrib.gis.forms.FileField.bound_data
-django.contrib.gis.forms.InlineForeignKeyField
-django.contrib.gis.forms.Input
 django.contrib.gis.forms.Media.__html__
 django.contrib.gis.forms.ModelChoiceField.__deepcopy__
-django.contrib.gis.forms.ModelChoiceIterator
-django.contrib.gis.forms.ModelFormMetaclass
-django.contrib.gis.forms.ModelFormOptions
 django.contrib.gis.forms.ModelMultipleChoiceField.hidden_widget
 django.contrib.gis.forms.MultiValueField.__deepcopy__
 django.contrib.gis.forms.MultiWidget.use_fieldset
@@ -1067,19 +1060,12 @@ django.forms.BaseModelForm.__init__
 django.forms.BaseModelForm.save_m2m
 django.forms.BaseModelFormSet.model
 django.forms.BaseModelFormSet.save_m2m
-django.forms.BoundWidget
 django.forms.ChoiceField.__deepcopy__
-django.forms.DateTimeBaseInput
 django.forms.Field.__deepcopy__
 django.forms.Field.hidden_widget
 django.forms.FileField.bound_data
-django.forms.InlineForeignKeyField
-django.forms.Input
 django.forms.Media.__html__
 django.forms.ModelChoiceField.__deepcopy__
-django.forms.ModelChoiceIterator
-django.forms.ModelFormMetaclass
-django.forms.ModelFormOptions
 django.forms.ModelMultipleChoiceField.hidden_widget
 django.forms.MultiValueField.__deepcopy__
 django.forms.MultiWidget.use_fieldset
@@ -1192,16 +1178,11 @@ django.test.testcases.LiveServerThread.server_class
 django.test.testcases.SerializeMixin.tearDownClass
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
-django.urls.ResolverMatch.__iter__
 django.urls.conf.path
 django.urls.conf.re_path
 django.urls.path
 django.urls.re_path
 django.urls.resolvers.LocaleRegexDescriptor.__get__
-django.urls.resolvers.ResolverMatch.__iter__
-django.contrib.gis.db.models.CompositePrimaryKey.descriptor_class
-django.db.models.CompositePrimaryKey.descriptor_class
-django.db.models.fields.composite.CompositePrimaryKey.descriptor_class
 
 # mypy 1.9.0 new issues:
 django.db.models.expressions.rhs
