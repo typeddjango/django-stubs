@@ -434,9 +434,6 @@ django.contrib.staticfiles.finders.BaseStorageFinder.storage
 django.contrib.staticfiles.finders.DefaultStorageFinder.storage
 django.contrib.staticfiles.storage.staticfiles_storage
 django.core.cache.cache
-django.core.files.locks.OVERLAPPED
-django.core.files.locks.PVOID
-django.core.files.locks.ULONG_PTR
 django.core.files.uploadedfile.UploadedFile.size
 django.core.files.utils.FileProxyMixin.encoding
 django.core.files.utils.FileProxyMixin.fileno
