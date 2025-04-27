@@ -305,7 +305,6 @@ django.contrib.gis.db.models.PositiveSmallIntegerField.formfield
 django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
 django.contrib.gis.db.models.Q.XOR
 django.contrib.gis.db.models.QuerySet.__deepcopy__
-django.contrib.gis.db.models.QuerySet.__reversed__
 django.contrib.gis.db.models.QuerySet.__xor__
 django.contrib.gis.db.models.RasterField.contribute_to_class
 django.contrib.gis.db.models.SlugField.formfield
@@ -673,7 +672,6 @@ django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
 django.db.models.Q.XOR
 django.db.models.QuerySet.__deepcopy__
-django.db.models.QuerySet.__reversed__
 django.db.models.QuerySet.__xor__
 django.db.models.SlugField.formfield
 django.db.models.SmallAutoField.rel_db_type
@@ -1002,7 +1000,6 @@ django.db.models.options.Options.many_to_many
 django.db.models.options.Options.related_objects
 django.db.models.query.EmptyQuerySet.__init__
 django.db.models.query.QuerySet.__deepcopy__
-django.db.models.query.QuerySet.__reversed__
 django.db.models.query.QuerySet.__xor__
 django.db.models.query.RawQuerySet.__aiter__
 django.db.models.query.RelatedPopulator
