@@ -4,7 +4,6 @@
 django.contrib.contenttypes.fields.GenericRelation.get_foreign_related_value
 django.contrib.contenttypes.fields.GenericRelation.get_local_related_value
 django.contrib.gis.db.backends.mysql.schema.MySQLGISSchemaEditor.__init__
-django.contrib.gis.db.backends.mysql.schema.MySQLGISSchemaEditor.create_spatial_indexes
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.from_text
 django.contrib.gis.db.models.BaseConstraint.non_db_attrs
