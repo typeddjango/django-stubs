@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist as ObjectDoesNotExist
 
 from . import lookups as lookups
 from . import signals as signals

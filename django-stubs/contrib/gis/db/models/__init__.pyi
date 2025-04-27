@@ -1,4 +1,8 @@
-from django.contrib.gis.db.models.aggregates import *
+from django.contrib.gis.db.models.aggregates import Collect as Collect
+from django.contrib.gis.db.models.aggregates import Extent as Extent
+from django.contrib.gis.db.models.aggregates import Extent3D as Extent3D
+from django.contrib.gis.db.models.aggregates import MakeLine as MakeLine
+from django.contrib.gis.db.models.aggregates import Union as Union
 from django.contrib.gis.db.models.fields import GeometryCollectionField as GeometryCollectionField
 from django.contrib.gis.db.models.fields import GeometryField as GeometryField
 from django.contrib.gis.db.models.fields import LineStringField as LineStringField

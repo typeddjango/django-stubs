@@ -22,6 +22,7 @@ class CompositeAttribute:
 
 class CompositePrimaryKey(Field):
     field_names: tuple[str]
+    descriptor_class: type[CompositeAttribute]
     def __init__(
         self,
         *args: str,
