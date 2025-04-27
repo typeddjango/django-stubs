@@ -169,7 +169,6 @@ django.contrib.gis.db.backends.mysql.introspection
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.supports_tolerance_parameter
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.unsupported_geojson_options
-django.contrib.gis.db.backends.postgis.adapter.PostGISAdapter.prepare
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.empty_intersection_returns_none
 django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
