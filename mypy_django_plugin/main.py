@@ -136,7 +136,7 @@ class NewSemanalDjangoPlugin(Plugin):
         return list(deps) + [
             # for QuerySet.annotate
             self._new_dependency("django_stubs_ext"),
-            # For BaseManager.from_queryset
+            # For Manager.from_queryset
             self._new_dependency("django.db.models.query"),
         ]
 
