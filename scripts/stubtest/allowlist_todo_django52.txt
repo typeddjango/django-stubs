@@ -8,7 +8,6 @@ django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.from_text
 django.contrib.gis.db.models.BaseConstraint.non_db_attrs
 django.contrib.gis.db.models.Count.allows_composite_expressions
-django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.has_db_default
 django.contrib.gis.db.models.ForeignKey.cast_db_type
 django.contrib.gis.db.models.OrderBy.allows_composite_expressions
@@ -98,7 +97,6 @@ django.db.migrations.autodetector.OperationDependency
 django.db.migrations.state.ProjectState.alter_constraint
 django.db.models.BaseConstraint.non_db_attrs
 django.db.models.Count.allows_composite_expressions
-django.db.models.Field._get_flatchoices
 django.db.models.Field.has_db_default
 django.db.models.ForeignKey.cast_db_type
 django.db.models.OrderBy.allows_composite_expressions
@@ -110,7 +108,6 @@ django.db.models.expressions.BaseExpression.set_returning
 django.db.models.expressions.ColPairs
 django.db.models.expressions.OrderBy.allows_composite_expressions
 django.db.models.expressions.OutputFieldIsNoneError
-django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.has_db_default
 django.db.models.fields.composite.unnest
 django.db.models.fields.related.ForeignKey.cast_db_type
