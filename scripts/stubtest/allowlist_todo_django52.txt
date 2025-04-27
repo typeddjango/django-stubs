@@ -57,7 +57,6 @@ django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_lookups
 django.db.backends.base.schema.BaseDatabaseSchemaEditor.sql_pk_constraint
 django.db.backends.mysql.compiler.SQLCompiler.__init__
-django.db.backends.mysql.compiler.SQLCompiler.as_subquery_condition
 django.db.backends.mysql.compiler.SQLCompiler.composite_fields_to_tuples
 django.db.backends.mysql.compiler.SQLCompiler.get_default_columns
 django.db.backends.mysql.compiler.SQLCompiler.get_qualify_sql
@@ -120,7 +119,6 @@ django.db.models.functions.JSONObject.join
 django.db.models.functions.json.JSONObject.join
 django.db.models.options.Options.is_composite_pk
 django.db.models.options.Options.pk_fields
-django.db.models.sql.compiler.SQLCompiler.as_subquery_condition
 django.db.models.sql.compiler.SQLCompiler.composite_fields_to_tuples
 django.db.models.sql.compiler.SQLCompiler.has_composite_fields
 django.db.models.sql.compiler.SQLInsertCompiler.field_as_sql
