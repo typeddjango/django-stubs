@@ -374,10 +374,6 @@ django.contrib.gis.gdal.envelope.OGREnvelope.MinY
 django.contrib.gis.gdal.geometries.LineString.coords
 django.contrib.gis.gdal.geometries.OGRGeometry.geojson
 django.contrib.gis.gdal.geometries.Polygon.exterior_ring
-django.contrib.gis.gdal.raster.const.GDAL_TO_CTYPES
-django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_BASE_PATH
-django.contrib.gis.gdal.raster.const.VSI_FILESYSTEM_PREFIX
-django.contrib.gis.gdal.raster.const.VSI_MEM_FILESYSTEM_BASE_PATH
 django.contrib.gis.gdal.srs.SpatialReference.pretty_wkt
 django.contrib.gis.gdal.srs.SpatialReference.xml
 django.contrib.gis.geos.Point.tuple
@@ -434,9 +430,6 @@ django.contrib.staticfiles.finders.BaseStorageFinder.storage
 django.contrib.staticfiles.finders.DefaultStorageFinder.storage
 django.contrib.staticfiles.storage.staticfiles_storage
 django.core.cache.cache
-django.core.files.locks.OVERLAPPED
-django.core.files.locks.PVOID
-django.core.files.locks.ULONG_PTR
 django.core.files.uploadedfile.UploadedFile.size
 django.core.files.utils.FileProxyMixin.encoding
 django.core.files.utils.FileProxyMixin.fileno
@@ -461,7 +454,6 @@ django.core.mail.backends.locmem.EmailBackend.send_messages
 django.core.mail.backends.smtp.EmailBackend.__init__
 django.core.mail.backends.smtp.EmailBackend.connection_class
 django.core.mail.backends.smtp.EmailBackend.ssl_context
-django.core.mail.outbox
 django.core.management.commands.makemessages.TranslatableFile.__ge__
 django.core.management.commands.makemessages.TranslatableFile.__gt__
 django.core.management.commands.makemessages.TranslatableFile.__le__
@@ -528,7 +520,6 @@ django.db.migrations.Migration.suggest_name
 django.db.migrations.graph.Node.__ge__
 django.db.migrations.graph.Node.__gt__
 django.db.migrations.graph.Node.__le__
-django.db.migrations.graph.RECURSION_DEPTH_WARNING
 django.db.migrations.loader.MigrationLoader.collect_sql
 django.db.migrations.migration.Migration.suggest_name
 django.db.migrations.operations.utils
@@ -955,7 +946,6 @@ django.db.models.query_utils.select_related_descend
 django.db.models.sql.AggregateQuery.__init__
 django.db.models.sql.InsertQuery.__init__
 django.db.models.sql.compiler.SQLCompiler.__init__
-django.db.models.sql.compiler.SQLCompiler.deferred_to_columns
 django.db.models.sql.compiler.SQLCompiler.get_default_columns
 django.db.models.sql.compiler.SQLCompiler.get_qualify_sql
 django.db.models.sql.compiler.SQLCompiler.get_related_selections
@@ -975,9 +965,6 @@ django.db.models.sql.where.WhereNode.replace_expressions
 django.db.models.sql.where.WhereNode.set_source_expressions
 django.db.models.sql.where.WhereNode.split_having
 django.db.models.sql.where.WhereNode.split_having_qualify
-django.db.utils.ConnectionHandler.configure_settings
-django.db.utils.ConnectionHandler.ensure_defaults
-django.db.utils.ConnectionHandler.prepare_test_settings
 django.db.utils.DatabaseErrorWrapper.__call__
 django.forms.ALL_FIELDS
 django.forms.BaseForm.__init__

@@ -8,7 +8,6 @@ django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.from_text
 django.contrib.gis.db.models.BaseConstraint.non_db_attrs
 django.contrib.gis.db.models.Count.allows_composite_expressions
-django.contrib.gis.db.models.Field._get_flatchoices
 django.contrib.gis.db.models.Field.has_db_default
 django.contrib.gis.db.models.ForeignKey.cast_db_type
 django.contrib.gis.db.models.OrderBy.allows_composite_expressions
@@ -37,7 +36,6 @@ django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
 django.contrib.gis.management.commands.ogrinspect
 django.contrib.postgres.aggregates.mixins.OrderableAggMixin.__init__
-django.contrib.postgres.constraints.ExclusionConstraint.check_supported
 django.contrib.postgres.indexes.BTreeIndex.__init__
 django.contrib.sessions.backends.base.SessionBase.pop
 django.contrib.staticfiles.finders.AppDirectoriesFinder.find
@@ -57,7 +55,6 @@ django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_lookups
 django.db.backends.base.schema.BaseDatabaseSchemaEditor.sql_pk_constraint
 django.db.backends.mysql.compiler.SQLCompiler.__init__
-django.db.backends.mysql.compiler.SQLCompiler.as_subquery_condition
 django.db.backends.mysql.compiler.SQLCompiler.composite_fields_to_tuples
 django.db.backends.mysql.compiler.SQLCompiler.get_default_columns
 django.db.backends.mysql.compiler.SQLCompiler.get_qualify_sql
@@ -99,7 +96,6 @@ django.db.migrations.autodetector.OperationDependency
 django.db.migrations.state.ProjectState.alter_constraint
 django.db.models.BaseConstraint.non_db_attrs
 django.db.models.Count.allows_composite_expressions
-django.db.models.Field._get_flatchoices
 django.db.models.Field.has_db_default
 django.db.models.ForeignKey.cast_db_type
 django.db.models.OrderBy.allows_composite_expressions
@@ -111,7 +107,6 @@ django.db.models.expressions.BaseExpression.set_returning
 django.db.models.expressions.ColPairs
 django.db.models.expressions.OrderBy.allows_composite_expressions
 django.db.models.expressions.OutputFieldIsNoneError
-django.db.models.fields.Field._get_flatchoices
 django.db.models.fields.Field.has_db_default
 django.db.models.fields.composite.unnest
 django.db.models.fields.related.ForeignKey.cast_db_type
@@ -120,7 +115,6 @@ django.db.models.functions.JSONObject.join
 django.db.models.functions.json.JSONObject.join
 django.db.models.options.Options.is_composite_pk
 django.db.models.options.Options.pk_fields
-django.db.models.sql.compiler.SQLCompiler.as_subquery_condition
 django.db.models.sql.compiler.SQLCompiler.composite_fields_to_tuples
 django.db.models.sql.compiler.SQLCompiler.has_composite_fields
 django.db.models.sql.compiler.SQLInsertCompiler.field_as_sql
