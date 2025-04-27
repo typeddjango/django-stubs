@@ -538,3 +538,12 @@ django.db.models.fields.generated.GeneratedField.__init__
 # https://github.com/python/cpython/blob/5abff6960b4aecb0d5c81c7482cf3faa74e1983d/Lib/copyreg.py#L112-L161
 # Some Django classes get copied at import time, which leads stubtest to detect it.
 .*\.__slotnames__
+
+# These are dynamically added when using `save(commit=False)`
+# See https://docs.djangoproject.com/en/5.2/topics/forms/modelforms/#the-save-method
+django.forms.BaseModelForm.save_m2m
+django.forms.BaseModelFormSet.save_m2m
+django.forms.models.BaseModelForm.save_m2m
+django.forms.models.BaseModelFormSet.save_m2m
+django.contrib.gis.forms.BaseModelForm.save_m2m
+django.contrib.gis.forms.BaseModelFormSet.save_m2m

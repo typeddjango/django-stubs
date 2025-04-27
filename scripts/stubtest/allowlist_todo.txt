@@ -343,9 +343,7 @@ django.contrib.gis.forms.ALL_FIELDS
 django.contrib.gis.forms.BaseForm.__init__
 django.contrib.gis.forms.BaseFormSet.__init__
 django.contrib.gis.forms.BaseModelForm.__init__
-django.contrib.gis.forms.BaseModelForm.save_m2m
 django.contrib.gis.forms.BaseModelFormSet.model
-django.contrib.gis.forms.BaseModelFormSet.save_m2m
 django.contrib.gis.forms.ChoiceField.__deepcopy__
 django.contrib.gis.forms.Field.__deepcopy__
 django.contrib.gis.forms.Field.hidden_widget
@@ -1046,9 +1044,7 @@ django.forms.ALL_FIELDS
 django.forms.BaseForm.__init__
 django.forms.BaseFormSet.__init__
 django.forms.BaseModelForm.__init__
-django.forms.BaseModelForm.save_m2m
 django.forms.BaseModelFormSet.model
-django.forms.BaseModelFormSet.save_m2m
 django.forms.ChoiceField.__deepcopy__
 django.forms.Field.__deepcopy__
 django.forms.Field.hidden_widget
@@ -1083,9 +1079,7 @@ django.forms.inlineformset_factory
 django.forms.modelform_factory
 django.forms.modelformset_factory
 django.forms.models.BaseModelForm.__init__
-django.forms.models.BaseModelForm.save_m2m
 django.forms.models.BaseModelFormSet.model
-django.forms.models.BaseModelFormSet.save_m2m
 django.forms.models.ModelChoiceField.__deepcopy__
 django.forms.models.ModelFormMetaclass.__new__
 django.forms.models.ModelMultipleChoiceField.hidden_widget
