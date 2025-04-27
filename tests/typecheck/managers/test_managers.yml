@@ -440,7 +440,7 @@
     installed_apps:
         - myapp
     out: |
-        myapp/models:5: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "BaseManager"  [override]
+        myapp/models:5: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "Manager"  [override]
         myapp/models:6: error: Incompatible return value type (got "_T", expected "MyModel")  [return-value]
     files:
         -   path: myapp/__init__.py
