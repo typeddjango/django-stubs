@@ -767,8 +767,8 @@
     main: |
         from myapp.models import MyModel, Generated, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
-        reveal_type(Generated())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Never]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(Generated())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[Never]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
