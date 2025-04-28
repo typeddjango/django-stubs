@@ -1,4 +1,4 @@
-from mypy.nodes import MemberExpr, NameExpr, TypeInfo
+from mypy.nodes import MemberExpr, NameExpr, TypeInfo, Var
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
 from mypy.types import AnyType, Instance, TupleType, TypeOfAny, get_proper_type
@@ -27,6 +27,12 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
     if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
         node = expr.node
+    elif (
+        isinstance(expr, NameExpr)
+        and isinstance(expr.node, Var)
+        and isinstance(var_node_type := get_proper_type(expr.node.type), Instance)
+    ):
+        node = var_node_type.type
     else:
         ctx.api.fail("Unable to resolve type of choices property", ctx.context)
         return AnyType(TypeOfAny.from_error)
