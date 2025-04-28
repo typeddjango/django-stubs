@@ -74,6 +74,10 @@ class VoidChoices(BaseEmptyChoices):
 CompassPoint = imported.Direction
 
 
+# Choice type that has been aliased by type to test that the plugin resolves types correctly.
+Award: type[TextChoices] = Medal
+
+
 # Assertions for an integer choices type that uses a lazy translatable string for all labels.
 assert_type(Suit.names, list[str])
 assert_type(Suit.labels, list[_StrOrPromise])
@@ -193,3 +197,9 @@ assert_type(CompassPoint.NORTH.name, Literal["NORTH"])
 assert_type(CompassPoint.NORTH.label, _StrOrPromise)
 assert_type(CompassPoint.NORTH.value, str)
 assert_type(CompassPoint.NORTH.do_not_call_in_templates, Literal[True])
+
+# Assertions for a choices type aliased by type to test the plugin resolves correctly.
+assert_type(Award.names, list[str])
+assert_type(Award.labels, list[_StrOrPromise])
+assert_type(Award.values, list[str])
+assert_type(Award.choices, list[tuple[str, _StrOrPromise]])
