@@ -18,6 +18,65 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.lib import fullnames, helpers
 
 
+def _has_lazy_label(node: TypeInfo) -> bool:
+    """
+    Check whether a choices type has any lazy strings for labels.
+
+    This is used to determine choices types that do not use lazy strings for labels such that a
+    more simple type can be used instead of the default in the stubs.
+    """
+    assert node.is_enum
+
+    if (sym := node.get("__empty__")) is not None:
+        _empty_type = get_proper_type(sym.type)
+        if isinstance(_empty_type, Instance) and _empty_type.type.has_base(fullnames.STR_PROMISE_FULLNAME):
+            # If the empty label is lazy, then we don't need to check all the members.
+            return True
+
+    for member_name in node.enum_members:
+        if (sym := node.get(member_name)) is None:
+            continue
+
+        _member_type = get_proper_type(sym.type)
+        if not isinstance(_member_type, TupleType):
+            # Member has auto-generated plain string label - enum.auto() or no explicit label.
+            continue
+
+        if _member_type.length() < 2:
+            # There need to be at least two items in the tuple.
+            continue
+
+        _label_type = get_proper_type(_member_type.items[-1])
+        if isinstance(_label_type, Instance) and _label_type.type.has_base(fullnames.STR_PROMISE_FULLNAME):
+            # If any member label is lazy, then we don't need to check the remaining members.
+            return True
+
+    return False
+
+
+def _try_replace_label(typ: ProperType, has_lazy_label: bool) -> MypyType:
+    """
+    Attempt to replace a label with a modified version.
+
+    If there are no lazy strings for labels, remove the lazy string type.
+    """
+    if has_lazy_label:
+        return typ
+
+    if not isinstance(typ, UnionType):
+        # If it's not a union, then it already is likely just `str` and not lazy.
+        return typ
+
+    items = [
+        t
+        for t in map(get_proper_type, typ.items)
+        if isinstance(t, Instance) and not t.type.has_base(fullnames.STR_PROMISE_FULLNAME)
+    ]
+
+    # If we only have one item use that, otherwise make a new union.
+    return UnionType.make_union(items) if len(items) > 1 else items[0]
+
+
 def _try_replace_value(typ: ProperType, base_type: Instance | None, has_empty_label: bool) -> MypyType:
     """
     Attempt to replace a label with a modified version.
@@ -120,6 +179,12 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     # the blank choice which is labelled by the value of `__empty__`.
     has_empty_label = node.get("__empty__") is not None
 
+    # When `__empty__` is not a lazy string and the labels on all members are not lazy strings, the
+    # label can be simplified to only be a simple string type. This keeps the benefits of accurate
+    # typing when the lazy labels are being used, but reduces the pain of having to manage a union
+    # of a simple and lazy string type where it's not necessary.
+    has_lazy_label = _has_lazy_label(node)
+
     if (
         name == "choices"
         and isinstance(default_attr_type, Instance)
@@ -130,11 +195,24 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
         if isinstance(choice_arg, TupleType) and choice_arg.length() == 2:
             value_arg, label_arg = choice_arg.items
+            label_arg = get_proper_type(label_arg)
             value_arg = get_proper_type(value_arg)
+            new_label_arg = _try_replace_label(label_arg, has_lazy_label)
             new_value_arg = _try_replace_value(value_arg, base_type, has_empty_label)
-            if new_value_arg is not value_arg:
-                new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, label_arg])
+            if new_label_arg is not label_arg or new_value_arg is not value_arg:
+                new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, new_label_arg])
                 return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
+
+    elif (
+        name == "labels"
+        and isinstance(default_attr_type, Instance)
+        and default_attr_type.type.fullname == "builtins.list"
+        and len(default_attr_type.args) == 1
+    ):
+        label_arg = get_proper_type(default_attr_type.args[0])
+        new_label_arg = _try_replace_label(label_arg, has_lazy_label)
+        if new_label_arg is not label_arg:
+            return helpers.reparametrize_instance(default_attr_type, [new_label_arg])
 
     elif (
         name == "values"
@@ -146,6 +224,9 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         new_value_arg = _try_replace_value(value_arg, base_type, has_empty_label)
         if new_value_arg is not value_arg:
             return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
+
+    elif name in ("__empty__", "label"):
+        return _try_replace_label(default_attr_type, has_lazy_label)
 
     elif name == "value":
         # Pass in `False` because `.value` will never return `None`.
