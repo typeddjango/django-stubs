@@ -24,8 +24,8 @@ _AnyUser: TypeAlias = _User | AnonymousUser
 # These are only needed for generic classes in order to bind to a specific implementation
 _AnyUserType = TypeVar("_AnyUserType", bound=_AnyUser)  # noqa: PYI018
 
-# do not use the alias `_User` so the bound remains at `AbstractUser`
-_UserType = TypeVar("_UserType", bound=AbstractUser)
+# do not use the alias `_User` so the bound remains at `AbstractBaseUser`
+_UserType = TypeVar("_UserType", bound=AbstractBaseUser)
 
 def update_last_login(sender: _UserModel, user: _User, **kwargs: Any) -> None: ...
 
