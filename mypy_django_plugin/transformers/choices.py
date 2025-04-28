@@ -1,7 +1,7 @@
 from mypy.nodes import MemberExpr, NameExpr, TypeAlias, TypeInfo
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
-from mypy.types import AnyType, Instance, TupleType, TypeOfAny, TypeType, get_proper_type
+from mypy.types import AnyType, Instance, TupleType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
@@ -35,6 +35,8 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         _node_type = get_proper_type(ctx.api.get_expression_type(expr))
         if isinstance(_node_type, TypeType):
             _node_type = _node_type.item
+        if isinstance(_node_type, TypeVarType):
+            _node_type = get_proper_type(_node_type.upper_bound)
         if isinstance(_node_type, Instance):
             node = _node_type.type
 

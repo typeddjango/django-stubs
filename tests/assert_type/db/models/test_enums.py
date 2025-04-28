@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 from django.db.models import Choices, IntegerChoices, TextChoices
 from django.utils.functional import _StrOrPromise
@@ -8,6 +8,28 @@ from typing_extensions import assert_type
 
 # Choices in a separate model to test that the plugin resolves types correctly.
 from tests.assert_type.db.models import _enums as imported
+
+T_Choices = TypeVar("T_Choices", bound=IntegerChoices)
+
+
+def get_choices_using_property(choices: type[T_Choices]) -> list[tuple[int, _StrOrPromise]]:
+    return choices.choices
+
+
+def get_labels_using_property(choices: type[T_Choices]) -> list[_StrOrPromise]:
+    return choices.labels
+
+
+def get_values_using_property(choices: type[T_Choices]) -> list[int]:
+    return choices.values
+
+
+def get_labels_using_comprehension(choices: type[T_Choices]) -> list[_StrOrPromise]:
+    return [choice.label for choice in choices]
+
+
+def get_values_using_comprehension(choices: type[T_Choices]) -> list[int]:
+    return [choice.value for choice in choices]
 
 
 class Suit(IntegerChoices):
