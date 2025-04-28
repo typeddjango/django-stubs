@@ -70,6 +70,10 @@ class VoidChoices(BaseEmptyChoices):
     CHASM = enum.auto()
 
 
+# Choice type that has been aliased to test that the plugin resolves types correctly.
+CompassPoint = imported.Direction
+
+
 # Assertions for an integer choices type that uses a lazy translatable string for all labels.
 assert_type(Suit.names, list[str])
 assert_type(Suit.labels, list[_StrOrPromise])
@@ -178,3 +182,14 @@ assert_type(imported.Direction.NORTH.name, Literal["NORTH"])
 assert_type(imported.Direction.NORTH.label, _StrOrPromise)
 assert_type(imported.Direction.NORTH.value, str)
 assert_type(imported.Direction.NORTH.do_not_call_in_templates, Literal[True])
+
+# Assertions for a choices type aliased from another to test the plugin resolves correctly.
+assert_type(CompassPoint.names, list[str])
+assert_type(CompassPoint.labels, list[_StrOrPromise])
+assert_type(CompassPoint.values, list[str])
+assert_type(CompassPoint.choices, list[tuple[str, _StrOrPromise]])
+assert_type(CompassPoint.NORTH, Literal[imported.Direction.NORTH])
+assert_type(CompassPoint.NORTH.name, Literal["NORTH"])
+assert_type(CompassPoint.NORTH.label, _StrOrPromise)
+assert_type(CompassPoint.NORTH.value, str)
+assert_type(CompassPoint.NORTH.do_not_call_in_templates, Literal[True])

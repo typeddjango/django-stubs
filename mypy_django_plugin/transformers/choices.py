@@ -1,4 +1,4 @@
-from mypy.nodes import MemberExpr, NameExpr, TypeInfo
+from mypy.nodes import MemberExpr, NameExpr, TypeAlias, TypeInfo
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
 from mypy.types import AnyType, Instance, TupleType, TypeOfAny, get_proper_type
@@ -26,6 +26,10 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     if isinstance(expr, MemberExpr | NameExpr):
         if isinstance(expr.node, TypeInfo):
             node = expr.node
+        elif isinstance(expr.node, TypeAlias):
+            alias = get_proper_type(expr.node.target)
+            if isinstance(alias, Instance):
+                node = alias.type
 
     if node is None:
         _node_type = get_proper_type(ctx.api.get_expression_type(expr))
