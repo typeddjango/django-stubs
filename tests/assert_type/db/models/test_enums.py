@@ -67,6 +67,7 @@ class VoidChoices(BaseEmptyChoices):
     CHASM = enum.auto()
 
 
+# Assertions for an integer choices type that uses a lazy translatable string for all labels.
 assert_type(Suit.names, list[str])
 assert_type(Suit.labels, list[_StrOrPromise])
 assert_type(Suit.values, list[int])
@@ -77,6 +78,7 @@ assert_type(Suit.CLUB.label, _StrOrPromise)
 assert_type(Suit.CLUB.value, int)
 assert_type(Suit.CLUB.do_not_call_in_templates, Literal[True])
 
+# Assertions for a text choices type that uses a lazy translatable string for all labels.
 assert_type(YearInSchool.names, list[str])
 assert_type(YearInSchool.labels, list[_StrOrPromise])
 assert_type(YearInSchool.values, list[str])
@@ -87,6 +89,8 @@ assert_type(YearInSchool.SENIOR.label, _StrOrPromise)
 assert_type(YearInSchool.SENIOR.value, str)
 assert_type(YearInSchool.SENIOR.do_not_call_in_templates, Literal[True])
 
+# Assertions for an integer choices type that defines `__empty__`, generates most labels, etc.
+# Note: Suppress errors from pyright as the mypy plugin handles making types optional.
 assert_type(Vehicle.names, list[str])
 assert_type(Vehicle.labels, list[_StrOrPromise])
 assert_type(Vehicle.values, list[int | None])  # pyright: ignore[reportAssertTypeFailure]
@@ -98,6 +102,8 @@ assert_type(Vehicle.CAR.value, int)
 assert_type(Vehicle.CAR.do_not_call_in_templates, Literal[True])
 assert_type(Vehicle.__empty__, _StrOrPromise)
 
+# Assertions for an text choices type that defines `__empty__` and uses plain strings for all labels.
+# Note: Suppress errors from pyright as the mypy plugin handles making types optional.
 assert_type(Gender.names, list[str])
 assert_type(Gender.labels, list[_StrOrPromise])
 assert_type(Gender.values, list[str | None])  # pyright: ignore[reportAssertTypeFailure]
@@ -109,6 +115,7 @@ assert_type(Gender.MALE.value, str)
 assert_type(Gender.MALE.do_not_call_in_templates, Literal[True])
 assert_type(Gender.__empty__, _StrOrPromise)
 
+# Assertions for a text choices type that uses `enum.auto()`.
 assert_type(Medal.names, list[str])
 assert_type(Medal.labels, list[_StrOrPromise])
 assert_type(Medal.values, list[str])
@@ -119,6 +126,8 @@ assert_type(Medal.GOLD.label, _StrOrPromise)
 assert_type(Medal.GOLD.value, str)
 assert_type(Medal.GOLD.do_not_call_in_templates, Literal[True])
 
+# Assertions for a choices type that uses a custom base type.
+# Note: Suppress errors from pyright as the mypy plugin handles propagating custom base types.
 assert_type(Separator.names, list[str])
 assert_type(Separator.labels, list[_StrOrPromise])
 assert_type(Separator.values, list[bytes])  # pyright: ignore[reportAssertTypeFailure]
@@ -129,6 +138,9 @@ assert_type(Separator.FS.label, _StrOrPromise)
 assert_type(Separator.FS.value, bytes)  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Separator.FS.do_not_call_in_templates, Literal[True])
 
+# Assertions for a choices type uses a custom base type and defines `__empty__`.
+# Note: Suppress errors from pyright as the mypy plugin handles making types optional.
+# Note: Suppress errors from pyright as the mypy plugin handles propagating custom base types.
 assert_type(Constants.names, list[str])
 assert_type(Constants.labels, list[_StrOrPromise])
 assert_type(Constants.values, list[float | None])  # pyright: ignore[reportAssertTypeFailure]
@@ -140,6 +152,8 @@ assert_type(Constants.PI.value, float)  # pyright: ignore[reportAssertTypeFailur
 assert_type(Constants.PI.do_not_call_in_templates, Literal[True])
 assert_type(Constants.__empty__, _StrOrPromise)
 
+# Assertions for a choices type where `__empty__` is defined on a base class.
+# Note: Suppress errors from pyright as the mypy plugin handles making types optional.
 assert_type(VoidChoices.names, list[str])
 assert_type(VoidChoices.labels, list[_StrOrPromise])
 assert_type(VoidChoices.values, list[Any | None])  # pyright: ignore[reportAssertTypeFailure]
