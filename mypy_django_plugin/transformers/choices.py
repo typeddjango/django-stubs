@@ -5,6 +5,7 @@ from mypy.types import (
     AnyType,
     Instance,
     LiteralType,
+    ProperType,
     TupleType,
     TypeOfAny,
     TypeType,
@@ -15,6 +16,28 @@ from mypy.types import (
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+
+def _try_replace_value(typ: ProperType, base_type: Instance | None, has_empty_label: bool) -> MypyType:
+    """
+    Attempt to replace a label with a modified version.
+
+    If the value is of any type, then attempt to use the base type of the choices type.
+
+    If the choices type has `__empty__` defined, then make the value type optional.
+    """
+    has_unknown_base = isinstance(typ, AnyType)
+
+    if has_empty_label and has_unknown_base and base_type is not None:
+        return make_optional_type(base_type)
+
+    if has_empty_label:
+        return make_optional_type(typ)
+
+    if has_unknown_base and base_type is not None:
+        return base_type
+
+    return typ
 
 
 def _get_enum_type_from_union_of_literals(typ: UnionType) -> MypyType:
@@ -95,7 +118,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
     # When `__empty__` is defined, the `.choices` and `.values` properties will include `None` for
     # the blank choice which is labelled by the value of `__empty__`.
-    has_blank_choice = node.get("__empty__") is not None
+    has_empty_label = node.get("__empty__") is not None
 
     if (
         name == "choices"
@@ -108,14 +131,8 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         if isinstance(choice_arg, TupleType) and choice_arg.length() == 2:
             value_arg, label_arg = choice_arg.items
             value_arg = get_proper_type(value_arg)
-
-            if isinstance(value_arg, AnyType) and base_type is not None:
-                new_value_arg = make_optional_type(base_type) if has_blank_choice else base_type
-                new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, label_arg])
-                return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
-
-            elif has_blank_choice:
-                new_value_arg = make_optional_type(value_arg)
+            new_value_arg = _try_replace_value(value_arg, base_type, has_empty_label)
+            if new_value_arg is not value_arg:
                 new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, label_arg])
                 return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
 
@@ -126,16 +143,12 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         and len(default_attr_type.args) == 1
     ):
         value_arg = get_proper_type(default_attr_type.args[0])
-
-        if isinstance(value_arg, AnyType) and base_type is not None:
-            new_value_arg = make_optional_type(base_type) if has_blank_choice else base_type
+        new_value_arg = _try_replace_value(value_arg, base_type, has_empty_label)
+        if new_value_arg is not value_arg:
             return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
 
-        elif has_blank_choice:
-            new_value_arg = make_optional_type(value_arg)
-            return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
-
-    elif name == "value" and isinstance(default_attr_type, AnyType) and base_type is not None:
-        return base_type
+    elif name == "value":
+        # Pass in `False` because `.value` will never return `None`.
+        return _try_replace_value(default_attr_type, base_type, False)
 
     return default_attr_type
