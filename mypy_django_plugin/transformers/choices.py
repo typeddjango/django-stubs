@@ -15,20 +15,25 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     blank choice/value. This hook will amend the type returned by those properties.
     """
     if isinstance(ctx.context, MemberExpr):
-        method_name = ctx.context.name
+        expr = ctx.context.expr
+        name = ctx.context.name
     else:
-        ctx.api.fail("Unable to resolve type of choices property", ctx.context)
+        ctx.api.fail("Unable to resolve type of property", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
-    expr = ctx.context.expr
+    node: TypeInfo | None = None
 
-    if isinstance(expr, MemberExpr):
-        expr = expr.expr
+    if isinstance(expr, MemberExpr | NameExpr):
+        if isinstance(expr.node, TypeInfo):
+            node = expr.node
 
-    if isinstance(expr, NameExpr) and isinstance(expr.node, TypeInfo):
-        node = expr.node
-    else:
-        ctx.api.fail("Unable to resolve type of choices property", ctx.context)
+    if node is None:
+        _node_type = get_proper_type(ctx.api.get_expression_type(expr))
+        if isinstance(_node_type, Instance):
+            node = _node_type.type
+
+    if node is None:
+        ctx.api.fail(f"Unable to resolve type of {name} property", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
     default_attr_type = get_proper_type(ctx.default_attr_type)
@@ -44,7 +49,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     has_blank_choice = node.get("__empty__") is not None
 
     if (
-        method_name == "choices"
+        name == "choices"
         and isinstance(default_attr_type, Instance)
         and default_attr_type.type.fullname == "builtins.list"
         and len(default_attr_type.args) == 1
@@ -66,7 +71,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
                 return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
 
     elif (
-        method_name == "values"
+        name == "values"
         and isinstance(default_attr_type, Instance)
         and default_attr_type.type.fullname == "builtins.list"
         and len(default_attr_type.args) == 1
@@ -81,7 +86,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
             new_value_arg = make_optional_type(value_arg)
             return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
 
-    elif method_name == "value" and isinstance(default_attr_type, AnyType) and base_type is not None:
+    elif name == "value" and isinstance(default_attr_type, AnyType) and base_type is not None:
         return base_type
 
     return default_attr_type

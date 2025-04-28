@@ -6,6 +6,9 @@ from django.utils.functional import _StrOrPromise
 from django.utils.translation import gettext_lazy as _
 from typing_extensions import assert_type
 
+# Choices in a separate model to test that the plugin resolves types correctly.
+from tests.assert_type.db.models import _enums as imported
+
 
 class Suit(IntegerChoices):
     DIAMOND = 1, _("Diamond")
@@ -164,3 +167,14 @@ assert_type(VoidChoices.ABYSS.label, _StrOrPromise)
 assert_type(VoidChoices.ABYSS.value, Any)
 assert_type(VoidChoices.ABYSS.do_not_call_in_templates, Literal[True])
 assert_type(VoidChoices.__empty__, _StrOrPromise)
+
+# Assertions for a choices type imported from another module to test the plugin resolves correctly.
+assert_type(imported.Direction.names, list[str])
+assert_type(imported.Direction.labels, list[_StrOrPromise])
+assert_type(imported.Direction.values, list[str])
+assert_type(imported.Direction.choices, list[tuple[str, _StrOrPromise]])
+assert_type(imported.Direction.NORTH, Literal[imported.Direction.NORTH])
+assert_type(imported.Direction.NORTH.name, Literal["NORTH"])
+assert_type(imported.Direction.NORTH.label, _StrOrPromise)
+assert_type(imported.Direction.NORTH.value, str)
+assert_type(imported.Direction.NORTH.do_not_call_in_templates, Literal[True])
