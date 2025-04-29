@@ -72,6 +72,8 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
             # use that type instead. This situation often occurs where there is comparison to an
             # enum member in a branch.
             _node_type = get_proper_type(_get_enum_type_from_union_of_literals(_node_type))
+        if isinstance(_node_type, LiteralType) and _node_type.is_enum_literal():
+            _node_type = _node_type.fallback
         if isinstance(_node_type, TypeType):
             _node_type = _node_type.item
         if isinstance(_node_type, TypeVarType):
