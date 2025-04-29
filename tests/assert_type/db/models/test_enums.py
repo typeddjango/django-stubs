@@ -100,6 +100,14 @@ CompassPoint = imported.Direction
 Award: type[TextChoices] = Medal
 
 
+# Checks unions of enum literals to test that the plugin resolves types correctly.
+def get_suit_with_color(suit: Suit) -> str:
+    if suit == Suit.DIAMOND or suit == Suit.HEART:
+        return f"{suit.label} is red."
+    else:
+        return f"{suit.label} is black."
+
+
 # Assertions for an integer choices type that uses a lazy translatable string for all labels.
 assert_type(Suit.names, list[str])
 assert_type(Suit.labels, list[_StrOrPromise])

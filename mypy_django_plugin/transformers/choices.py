@@ -1,10 +1,39 @@
 from mypy.nodes import MemberExpr, NameExpr, TypeAlias, TypeInfo
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
-from mypy.types import AnyType, Instance, TupleType, TypeOfAny, TypeType, TypeVarType, get_proper_type
+from mypy.types import (
+    AnyType,
+    Instance,
+    LiteralType,
+    TupleType,
+    TypeOfAny,
+    TypeType,
+    TypeVarType,
+    UnionType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+
+def _get_enum_type_from_union_of_literals(typ: UnionType) -> MypyType:
+    """
+    Attempts to resolve a single enum type from a union of enum literals.
+
+    If this cannot be resolved, the original is returned.
+    """
+    types = set()
+
+    for item in typ.items:
+        item = get_proper_type(item)
+        if not isinstance(item, LiteralType) or not item.fallback.type.is_enum:
+            # If anything that isn't a literal of an enum type is encountered, return the original.
+            return typ
+        types.add(item.fallback)
+
+    # If there is only one enum type seen, return that otherwise return the original.
+    return types.pop() if len(types) == 1 else typ
 
 
 def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
@@ -33,6 +62,11 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
 
     if node is None:
         _node_type = get_proper_type(ctx.api.get_expression_type(expr))
+        if isinstance(_node_type, UnionType):
+            # If this is a union of enum literals, check if they're all of the same enum type and
+            # use that type instead. This situation often occurs where there is comparison to an
+            # enum member in a branch.
+            _node_type = get_proper_type(_get_enum_type_from_union_of_literals(_node_type))
         if isinstance(_node_type, TypeType):
             _node_type = _node_type.item
         if isinstance(_node_type, TypeVarType):
