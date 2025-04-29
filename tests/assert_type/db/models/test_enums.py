@@ -256,3 +256,23 @@ assert_type(Award.names, list[str])
 assert_type(Award.labels, list[str])  # pyright: ignore[reportAssertTypeFailure]
 assert_type(Award.values, list[str])
 assert_type(Award.choices, list[tuple[str, str]])  # pyright: ignore[reportAssertTypeFailure]
+
+# Assertions for mixing multiple choices types with consistent base types - only `IntegerChoices`.
+x = (Suit, Vehicle)
+assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x for member in choices], list[int])
+
+# Assertions for mixing multiple choices types with consistent base types - only `TextChoices`.
+x = (Medal, Gender)
+assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x for member in choices], list[str])
+
+# Assertions for mixing multiple choices types with different base types - `IntegerChoices` and `TextChoices`.
+x = (Medal, Suit)
+assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x for member in choices], list[int | str])
+
+# Assertions for mixing multiple choices types with consistent base types - custom types.
+x = (Constants, Separator)
+assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x for member in choices], list[Any])

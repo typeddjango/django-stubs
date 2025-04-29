@@ -147,6 +147,8 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     elif isinstance(expr, SuperExpr):
         node = expr.info
 
+    _node_type: ProperType | None = None
+
     if node is None:
         _node_type = get_proper_type(ctx.api.get_expression_type(expr))
         if isinstance(_node_type, UnionType):
@@ -164,6 +166,12 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
             node = _node_type.type
 
     if node is None:
+        if isinstance(_node_type, UnionType):
+            # Suppress the error for a known case where there are multiple base choices types in a
+            # union. In theory this is something that could be handled by extracting all of the
+            # base types and making the following code consider all of these types, but that's
+            # quite a bit of effort.
+            return ctx.default_attr_type
         ctx.api.fail(f"Unable to resolve type of {name} property", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
