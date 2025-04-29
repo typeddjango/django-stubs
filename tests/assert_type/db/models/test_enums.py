@@ -108,6 +108,13 @@ def get_suit_with_color(suit: Suit) -> str:
         return f"{suit.label} is black."
 
 
+# Choice type that overrides a property and uses `super()` to test the plugin resolve types correctly.
+class ShoutyTextChoices(TextChoices):
+    @property
+    def label(self) -> str:
+        return super().label.upper()
+
+
 # Assertions for an integer choices type that uses a lazy translatable string for all labels.
 assert_type(Suit.names, list[str])
 assert_type(Suit.labels, list[_StrOrPromise])

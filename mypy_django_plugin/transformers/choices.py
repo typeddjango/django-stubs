@@ -1,4 +1,4 @@
-from mypy.nodes import MemberExpr, NameExpr, TypeAlias, TypeInfo
+from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
 from mypy.types import (
@@ -46,6 +46,9 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     if isinstance(ctx.context, MemberExpr):
         expr = ctx.context.expr
         name = ctx.context.name
+    elif isinstance(ctx.context, SuperExpr):
+        expr = ctx.context
+        name = ctx.context.name
     else:
         ctx.api.fail("Unable to resolve type of property", ctx.context)
         return AnyType(TypeOfAny.from_error)
@@ -59,6 +62,8 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
             alias = get_proper_type(expr.node.target)
             if isinstance(alias, Instance):
                 node = alias.type
+    elif isinstance(expr, SuperExpr):
+        node = expr.info
 
     if node is None:
         _node_type = get_proper_type(ctx.api.get_expression_type(expr))
