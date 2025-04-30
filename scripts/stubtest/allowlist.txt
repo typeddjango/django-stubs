@@ -548,5 +548,5 @@ django.forms.models.BaseModelFormSet.save_m2m
 django.contrib.gis.forms.BaseModelForm.save_m2m
 django.contrib.gis.forms.BaseModelFormSet.save_m2m
 
-# Dynamically generated in https://github.com/django/django/blame/0ee06c04e0256094270db3ffe8b5dafa6a8457a3/django/core/mail/backends/locmem.py#L24
+# Dynamically generated in https://github.com/django/django/blob/0ee06c04e0256094270db3ffe8b5dafa6a8457a3/django/core/mail/backends/locmem.py#L24
 django.core.mail.outbox
