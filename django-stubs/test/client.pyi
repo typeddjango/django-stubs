@@ -8,7 +8,7 @@ from types import TracebackType
 from typing import Any, Generic, Literal, NoReturn, TypeAlias, TypedDict, TypeVar, type_check_only
 
 from asgiref.typing import ASGIVersions
-from django.contrib.auth.base_user import _UserModel
+from django.contrib.auth.models import _User
 from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
@@ -18,6 +18,7 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
+from django.utils.functional import cached_property
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
@@ -227,6 +228,8 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     content: bytes
     resolver_match: ResolverMatch
     redirect_chain: list[tuple[str, int]]
+    @cached_property
+    def text(self) -> str: ...
 
 @type_check_only
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
@@ -255,8 +258,8 @@ class ClientMixin:
     async def asession(self) -> SessionBase: ...
     def login(self, **credentials: Any) -> bool: ...
     async def alogin(self, **credentials: Any) -> bool: ...
-    def force_login(self, user: _UserModel, backend: str | None = ...) -> None: ...
-    async def aforce_login(self, user: _UserModel, backend: str | None = ...) -> None: ...
+    def force_login(self, user: _User, backend: str | None = ...) -> None: ...
+    async def aforce_login(self, user: _User, backend: str | None = ...) -> None: ...
     def logout(self) -> None: ...
     async def alogout(self) -> None: ...
 
@@ -479,3 +482,13 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
+
+__all__ = (
+    "AsyncClient",
+    "AsyncRequestFactory",
+    "Client",
+    "RedirectCycleError",
+    "RequestFactory",
+    "encode_file",
+    "encode_multipart",
+)

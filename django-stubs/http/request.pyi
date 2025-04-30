@@ -1,11 +1,10 @@
 import datetime
-from collections.abc import Awaitable, Callable, Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from io import BytesIO
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeAlias, TypeVar, overload, type_check_only
 
-from django.contrib.auth.base_user import _UserModel
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import _AnyUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
@@ -55,9 +54,9 @@ class HttpRequest(BytesIO):
     # django.contrib.admin views:
     current_app: str
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    user: _UserModel | AnonymousUser
+    user: _AnyUser
     # django.contrib.auth.middleware.AuthenticationMiddleware:
-    auser: Callable[[], Awaitable[_UserModel | AnonymousUser]]
+    auser: Callable[[], Awaitable[_AnyUser]]
     # django.middleware.locale.LocaleMiddleware:
     LANGUAGE_CODE: str
     # django.contrib.sites.middleware.CurrentSiteMiddleware
@@ -94,6 +93,8 @@ class HttpRequest(BytesIO):
     def upload_handlers(self, upload_handlers: _UploadHandlerList) -> None: ...
     @cached_property
     def accepted_types(self) -> list[MediaType]: ...
+    def accepted_type(self, media_type: str) -> MediaType | None: ...
+    def get_preferred_type(self, media_types: Sequence[str]) -> str | None: ...
     def parse_file_upload(
         self, META: Mapping[str, Any], post_data: BinaryIO
     ) -> tuple[QueryDict, MultiValueDict[str, uploadedfile.UploadedFile]]: ...
@@ -202,6 +203,10 @@ class MediaType:
     @property
     def is_all_types(self) -> bool: ...
     def match(self, other: str) -> bool: ...
+    @cached_property
+    def quality(self) -> float: ...
+    @property
+    def specificity(self) -> int: ...
 
 @overload
 def bytes_to_text(s: None, encoding: str) -> None: ...
@@ -209,4 +214,3 @@ def bytes_to_text(s: None, encoding: str) -> None: ...
 def bytes_to_text(s: bytes | str, encoding: str) -> str: ...
 def split_domain_port(host: str) -> tuple[str, str]: ...
 def validate_host(host: str, allowed_hosts: Iterable[str]) -> bool: ...
-def parse_accept_header(header: str) -> list[MediaType]: ...

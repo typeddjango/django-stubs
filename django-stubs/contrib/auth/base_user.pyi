@@ -13,6 +13,7 @@ class BaseUserManager(models.Manager[_T]):
     @classmethod
     def normalize_email(cls, email: str | None) -> str: ...
     def get_by_natural_key(self, username: str | None) -> _T: ...
+    async def aget_by_natural_key(self, username: str | None) -> _T: ...
 
 class AbstractBaseUser(models.Model):
     REQUIRED_FIELDS: ClassVar[list[str]]
@@ -42,8 +43,3 @@ class AbstractBaseUser(models.Model):
     @classmethod
     @overload
     def normalize_username(cls, username: Any) -> Any: ...
-
-# This is our "placeholder" type the mypy plugin refines to configured 'AUTH_USER_MODEL'
-# wherever it is used as a type. The most recognised example of this is (probably)
-# `HttpRequest.user`
-_UserModel: TypeAlias = AbstractBaseUser  # noqa: PYI047

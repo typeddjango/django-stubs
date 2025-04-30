@@ -74,3 +74,5 @@ class BaseForm(RenderableFormMixin):
 class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     base_fields: ClassVar[dict[str, Field]]
     declared_fields: ClassVar[dict[str, Field]]
+
+__all__ = ("BaseForm", "Form")

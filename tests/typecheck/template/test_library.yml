@@ -67,6 +67,29 @@
 
         reveal_type(register.simple_tag(f, name='double')) # N: Revealed type is "def (s: builtins.str) -> builtins.str"
 
+-   case: register_simple_block_tag
+    main: |
+        import datetime
+        from django import template
+        register = template.Library()
+
+        def f(s: str) -> str:
+            return s * 2
+
+        reveal_type(register.simple_block_tag(f, name='double')) # N: Revealed type is "def (s: builtins.str) -> builtins.str"
+
+        @register.simple_block_tag
+        def current_time(format_string: str) -> str:
+            return datetime.datetime.now().strftime(format_string)
+
+        reveal_type(current_time) # N: Revealed type is "def (format_string: builtins.str) -> builtins.str"
+
+        @register.simple_block_tag(name='minustwo')
+        def some_function(value: int) -> int:
+            return value - 2
+
+        reveal_type(some_function) # N: Revealed type is "def (value: builtins.int) -> builtins.int"
+
 -   case: register_tag_no_args
     main: |
         from django import template

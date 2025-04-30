@@ -119,3 +119,5 @@ class OpClass(Func):
         expression: BaseExpression | Combinable | str,
         name: str,
     ) -> None: ...
+
+__all__ = ["BloomIndex", "BrinIndex", "BTreeIndex", "GinIndex", "GistIndex", "HashIndex", "SpGistIndex"]

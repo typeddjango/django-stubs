@@ -1,16 +1,16 @@
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Final
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
 from django.db.models.fields import BooleanField
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
-from django.db.models.sql.query import Query
 from django.utils import tree
 from django.utils.functional import cached_property
 
-AND: str
-OR: str
+AND: Final = "AND"
+OR: Final = "OR"
+XOR: Final = "XOR"
 
 class WhereNode(tree.Node):
     connector: str
@@ -50,12 +50,3 @@ class ExtraWhere:
     def as_sql(
         self, compiler: SQLCompiler | None = None, connection: BaseDatabaseWrapper | None = None
     ) -> _AsSqlType: ...
-
-class SubqueryConstraint:
-    contains_aggregate: bool
-    alias: str
-    columns: list[str]
-    targets: list[str]
-    query_object: Query
-    def __init__(self, alias: str, columns: list[str], targets: list[str], query_object: Query) -> None: ...
-    def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...

@@ -30,7 +30,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
@@ -63,7 +63,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       # Must match `shard` definition in the test matrix:
@@ -91,7 +91,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
 
       - name: Run stubtest
@@ -112,7 +112,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
       - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
@@ -146,7 +146,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
+          pip install -U pip "setuptools<79.0.0" wheel
           SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
           pip install "Django==${{ matrix.django-version }}"
           pip check

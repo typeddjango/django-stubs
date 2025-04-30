@@ -224,7 +224,6 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         limit_choices_to: _LimitChoicesTo | None = None,
         ordering: Sequence[str] = (),
     ) -> BlankChoiceIterator | _ChoicesList: ...
-    def _get_flatchoices(self) -> list[_Choice]: ...
     @property
     def flatchoices(self) -> list[_Choice]: ...
     def has_default(self) -> bool: ...
@@ -683,3 +682,38 @@ class AutoField(AutoFieldMixin, IntegerField[_ST_AutoField, _GT_AutoField], meta
 
 class BigAutoField(AutoFieldMixin, BigIntegerField[_ST_AutoField, _GT_AutoField]): ...
 class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST_AutoField, _GT_AutoField]): ...
+
+__all__ = [
+    "AutoField",
+    "BLANK_CHOICE_DASH",
+    "BigAutoField",
+    "BigIntegerField",
+    "BinaryField",
+    "BooleanField",
+    "CharField",
+    "CommaSeparatedIntegerField",
+    "DateField",
+    "DateTimeField",
+    "DecimalField",
+    "DurationField",
+    "EmailField",
+    "Empty",
+    "Field",
+    "FilePathField",
+    "FloatField",
+    "GenericIPAddressField",
+    "IPAddressField",
+    "IntegerField",
+    "NOT_PROVIDED",
+    "NullBooleanField",
+    "PositiveBigIntegerField",
+    "PositiveIntegerField",
+    "PositiveSmallIntegerField",
+    "SlugField",
+    "SmallAutoField",
+    "SmallIntegerField",
+    "TextField",
+    "TimeField",
+    "URLField",
+    "UUIDField",
+]

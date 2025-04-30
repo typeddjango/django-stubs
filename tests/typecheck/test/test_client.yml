@@ -1,5 +1,5 @@
--   case: client_methods
-    main: |
+- case: client_methods
+  main: |
       from django.test.client import Client
       client = Client()
       response = client.get('foo')
@@ -11,9 +11,10 @@
       reveal_type(response.context_data)  # N: Revealed type is "Union[django.test.utils.ContextList, builtins.dict[builtins.str, Any]]"
       reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
       reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
+      reveal_type(response.text)  # N: Revealed type is "builtins.str"
       response.json()
--   case: async_client_methods
-    main: |
+- case: async_client_methods
+  main: |
       from django.test.client import AsyncClient
       async def main() -> None:
         client = AsyncClient()
@@ -27,8 +28,8 @@
         reveal_type(response.content)  # N: Revealed type is "builtins.bytes"
         reveal_type(response.redirect_chain)  # N: Revealed type is "builtins.list[Tuple[builtins.str, builtins.int]]"
         response.json()
--   case: request_factories
-    main: |
+- case: request_factories
+  main: |
       from django.test.client import RequestFactory, AsyncRequestFactory
       factory = RequestFactory()
       request = factory.get('foo')

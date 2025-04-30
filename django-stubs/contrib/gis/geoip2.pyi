@@ -73,3 +73,5 @@ class GeoIP2:
     @classmethod
     @deprecated("open() is deprecated and will be removed in Django 6.0. Use GeoIP2() instead.")
     def open(cls, full_path: StrPath | None, cache: int) -> Self: ...
+
+__all__ = ["HAS_GEOIP2"]
