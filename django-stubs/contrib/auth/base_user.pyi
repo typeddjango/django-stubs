@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from datetime import date, datetime
-from typing import Any, ClassVar, Literal, TypeAlias, TypeVar, overload
+from typing import Any, ClassVar, Literal, TypeVar, overload
 
 from django.db import models
 from django.db.models.base import Model
