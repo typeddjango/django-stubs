@@ -272,6 +272,7 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
         max_length: int | None = ...,
         unique: bool = ...,
         blank: bool = ...,
+        null: bool = ...,
         db_index: bool = ...,
         default: Any = ...,
         editable: bool = ...,
