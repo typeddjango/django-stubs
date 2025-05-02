@@ -17,15 +17,15 @@ _ClassT = TypeVar("_ClassT")
 _InstanceT = TypeVar("_InstanceT")
 
 @type_check_only
-class ClassOrInstanceAttribute(Generic[_ClassT, _InstanceT]):
+class _ClassOrInstanceAttribute(Generic[_ClassT, _InstanceT]):
     @overload
-    def __get__(self, obj: None, owner: type[object]) -> _ClassT: ...
+    def __get__(self, instance: None, owner: type[object]) -> _ClassT: ...
     @overload
-    def __get__(self, obj: object, owner: type[object]) -> _InstanceT: ...
-    def __set__(self, obj: object, value: _InstanceT) -> None: ...
+    def __get__(self, instance: object, owner: type[object]) -> _InstanceT: ...
+    def __set__(self, instance: object, value: _InstanceT) -> None: ...
 
 class RegexValidator(_Deconstructible):
-    regex: ClassOrInstanceAttribute[_Regex, Pattern[str]]
+    regex: _ClassOrInstanceAttribute[_Regex, Pattern[str]]
     message: _StrOrPromise
     code: str
     inverse_match: bool
