@@ -550,3 +550,9 @@ django.contrib.gis.forms.BaseModelFormSet.save_m2m
 
 # Dynamically generated in https://github.com/django/django/blob/0ee06c04e0256094270db3ffe8b5dafa6a8457a3/django/core/mail/backends/locmem.py#L24
 django.core.mail.outbox
+
+# We use a trick using a descriptor class to represent an attribute with different type at the class and instance level.
+# Here to narrow `str | Pattern[str]` at the class level to `Pattern[str]` at the instance level.
+django.core.validators.RegexValidator.regex
+django.contrib.auth.validators.ASCIIUsernameValidator.regex
+django.contrib.auth.validators.UnicodeUsernameValidator.regex
