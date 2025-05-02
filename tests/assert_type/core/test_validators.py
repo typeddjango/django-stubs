@@ -18,5 +18,5 @@ RegexValidator().regex = ""  # type: ignore[assignment] # pyright: ignore[report
 UnicodeUsernameValidator().regex = ""  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
 
 # expect "_ClassOrInstanceAttribute[Union[str, Pattern[str]], Pattern[str]]"
-RegexValidator.regex = "anything fails here"  # type: ignore[assignment]
-UnicodeUsernameValidator.regex = "anything fails here"  # type: ignore[assignment]
+RegexValidator.regex = "anything fails here"  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
+UnicodeUsernameValidator.regex = "anything fails here"  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
