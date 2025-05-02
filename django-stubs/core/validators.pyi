@@ -14,7 +14,7 @@ _Regex: TypeAlias = str | Pattern[str]
 _ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: PYI047
 
 class RegexValidator(_Deconstructible):
-    regex: _Regex  # Pattern[str] on instance, but may be str on class definition
+    regex: Pattern[str]
     message: _StrOrPromise
     code: str
     inverse_match: bool
