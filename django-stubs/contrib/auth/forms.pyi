@@ -8,7 +8,6 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import _ErrorMessagesDict
-from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
 from django.utils.functional import _StrOrPromise
@@ -22,7 +21,6 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
     def get_context(self, name: str, value: Any, attrs: dict[str, Any] | None) -> dict[str, Any]: ...
 
 class ReadOnlyPasswordHashField(forms.Field):
-    widget: _ClassLevelWidgetT
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class UsernameField(forms.CharField):
