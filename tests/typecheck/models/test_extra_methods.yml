@@ -66,4 +66,4 @@
                 from django.db.models.expressions import Combinable
 
                 class MyUser(models.Model):
-                    date = models.DateField[Optional[Union[str, date, Combinable]], Optional[date]](null=True)
+                    date = models.DateField(null=True)

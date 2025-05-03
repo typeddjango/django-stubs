@@ -43,7 +43,7 @@ class LogEntry(models.Model):
     user_id: int
     content_type: models.ForeignKey[ContentType | Combinable | None, ContentType | None]
     content_type_id: int | None
-    object_id: models.TextField[str | int | Combinable | None, str | None]
+    object_id = models.TextField(null=True)
     object_repr: models.CharField
     action_flag: models.PositiveSmallIntegerField
     change_message: models.TextField

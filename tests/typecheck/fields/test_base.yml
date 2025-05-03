@@ -93,7 +93,7 @@
                 from django.db.models.expressions import Combinable
 
                 class MyModel(models.Model):
-                    nulltext = models.CharField[Optional[Union[str, int, Combinable]], Optional[str]](max_length=1, blank=True, null=True)
+                    nulltext = models.CharField(max_length=1, blank=True, null=True)
 
 -   case: blank_and_not_null_charfield_does_not_allow_none
     main: |
