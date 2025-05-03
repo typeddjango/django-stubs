@@ -917,11 +917,6 @@ django.db.models.lookups.Lookup.allowed_default
 django.db.models.lookups.Lookup.lookup_name
 django.db.models.lookups.Lookup.output_field
 django.db.models.lookups.PatternLookup.process_rhs
-django.db.models.options.Options.concrete_fields
-django.db.models.options.Options.installed
-django.db.models.options.Options.local_concrete_fields
-django.db.models.options.Options.many_to_many
-django.db.models.options.Options.related_objects
 django.db.models.query.EmptyQuerySet.__init__
 django.db.models.query.QuerySet.__deepcopy__
 django.db.models.query.QuerySet.__xor__
