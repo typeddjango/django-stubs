@@ -29,4 +29,4 @@ UnicodeUsernameValidator.regex = ""  # type: ignore[assignment] # pyright: ignor
 
 
 class StrSubtype(RegexValidator):
-    regex = "abc"  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
+    regex = "abc"  # type: ignore[assignment] # pyright: ignore[reportAssignmentType]
