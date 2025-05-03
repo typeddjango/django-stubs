@@ -1071,7 +1071,6 @@ django.test.selenium.SeleniumTestCaseBase.import_options
 django.test.selenium.SeleniumTestCaseBase.selenium_hub
 django.test.testcases.LiveServerThread.__init__
 django.test.testcases.LiveServerThread.server_class
-django.test.testcases.SerializeMixin.tearDownClass
 django.test.testcases._AssertTemplateUsedContext.__init__
 django.test.testcases._AssertTemplateUsedContext.message
 django.urls.conf.path
