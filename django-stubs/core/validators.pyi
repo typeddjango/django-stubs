@@ -1,7 +1,7 @@
 from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
-from typing import Any, Generic, TypeAlias, TypeVar, overload, type_check_only
+from typing import Any, TypeAlias
 
 from django.core.files.base import File
 from django.utils.deconstruct import _Deconstructible
@@ -13,19 +13,8 @@ _Regex: TypeAlias = str | Pattern[str]
 
 _ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: PYI047
 
-_ClassT = TypeVar("_ClassT")
-_InstanceT = TypeVar("_InstanceT")
-
-@type_check_only
-class _ClassOrInstanceAttribute(Generic[_ClassT, _InstanceT]):
-    @overload
-    def __get__(self, instance: None, owner: type[object]) -> _ClassT: ...
-    @overload
-    def __get__(self, instance: object, owner: type[object]) -> _InstanceT: ...
-    def __set__(self, instance: object, value: _InstanceT) -> None: ...
-
 class RegexValidator(_Deconstructible):
-    regex: _ClassOrInstanceAttribute[_Regex, Pattern[str]]
+    regex: Pattern[str]
     message: _StrOrPromise
     code: str
     inverse_match: bool
