@@ -153,33 +153,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
     non_db_attrs: tuple[str, ...]
-    def __init__(
-        self,
-        verbose_name: _StrOrPromise | None = None,
-        name: str | None = None,
-        primary_key: bool = False,
-        max_length: int | None = None,
-        unique: bool = False,
-        blank: bool = False,
-        null: bool = False,
-        db_index: bool = False,
-        rel: ForeignObjectRel | None = None,
-        default: Any = ...,
-        editable: bool = True,
-        serialize: bool = True,
-        unique_for_date: str | None = None,
-        unique_for_month: str | None = None,
-        unique_for_year: str | None = None,
-        choices: _ChoicesInput | None = None,
-        help_text: _StrOrPromise = "",
-        db_column: str | None = None,
-        db_tablespace: str | None = None,
-        auto_created: bool = False,
-        validators: Iterable[validators._ValidatorCallable] = (),
-        error_messages: _ErrorMessagesMapping | None = None,
-        db_comment: str | None = None,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,  # pyright: ignore[reportInvalidTypeVarUse]
-    ) -> None: ...
+    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
