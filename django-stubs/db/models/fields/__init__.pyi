@@ -153,7 +153,33 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
     non_db_attrs: tuple[str, ...]
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
@@ -704,6 +730,15 @@ class DecimalField(Field[_ST_DecimalField, _GT_DecimalField]):
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST_DecimalField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> DecimalField[_ST_DecimalField | None, _GT_DecimalField | None]: ...
+    def __init__(
+        self,
+        *args: Any,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
+        **kwargs: Any,
+    ) -> None: ...
 
 _ST_CharField = TypeVar("_ST_CharField", default=str | int | Combinable)
 _GT_CharField = TypeVar("_GT_CharField", default=str)
@@ -771,6 +806,7 @@ class CharField(Field[_ST_CharField, _GT_CharField]):
         db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
         db_collation: str | None = None,
     ) -> CharField[_ST_CharField | None, _GT_CharField | None]: ...
+    def __init__(self, *args: Any, db_collation: str | None = None, **kwargs: Any) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST_CharField, _GT_CharField]):
     @overload
@@ -893,6 +929,14 @@ class SlugField(CharField[_ST_CharField, _GT_CharField]):
         db_collation: str | None = None,
         allow_unicode: bool = False,
     ) -> SlugField[_ST_CharField | None, _GT_CharField | None]: ...
+    def __init__(
+        self,
+        *args: Any,
+        max_length: int | None = 50,
+        allow_unicode: bool = False,
+        db_index: bool = True,
+        **kwargs: Any,
+    ) -> None: ...
 
 _ST_EmailField = TypeVar("_ST_EmailField", default=str | Combinable)
 _GT_EmailField = TypeVar("_GT_EmailField", default=str)
@@ -1017,6 +1061,9 @@ class URLField(CharField[_ST_CharField, _GT_CharField]):
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> URLField[_ST_CharField | None, _GT_CharField | None]: ...
+    def __init__(
+        self, *args: Any, verbose_name: _StrOrPromise | None = None, name: str | None = None, **kwargs: Any
+    ) -> None: ...
 
 _ST_TextField = TypeVar("_ST_TextField", default=str | Combinable)
 _GT_TextField = TypeVar("_GT_TextField", default=str)
@@ -1084,6 +1131,7 @@ class TextField(Field[_ST_TextField, _GT_TextField]):
         db_default: type[NOT_PROVIDED] | Expression | _ST_TextField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
         db_collation: str | None = None,
     ) -> TextField[_ST_TextField | None, _GT_TextField | None]: ...
+    def __init__(self, *args: Any, db_collation: str | None = None, **kwargs: Any) -> None: ...
 
 _ST_BooleanField = TypeVar("_ST_BooleanField", default=bool | Combinable)
 _GT_BooleanField = TypeVar("_GT_BooleanField", default=bool)
@@ -1343,6 +1391,15 @@ class GenericIPAddressField(Field[_ST_GenericIPAddressField, _GT_GenericIPAddres
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST_GenericIPAddressField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> GenericIPAddressField[_ST_GenericIPAddressField | None, _GT_GenericIPAddressField | None]: ...
+    def __init__(
+        self,
+        *args: Any,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        **kwargs: Any,
+    ) -> None: ...
 
 class DateTimeCheckMixin: ...
 
@@ -1415,6 +1472,15 @@ class DateField(DateTimeCheckMixin, Field[_ST_DateField, _GT_DateField]):
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST_DateField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> DateField[_ST_DateField | None, _GT_DateField | None]: ...
+    def __init__(
+        self,
+        *args: Any,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        **kwargs: Any,
+    ) -> None: ...
 
 _ST_TimeField = TypeVar("_ST_TimeField", default=str | time | real_datetime | Combinable)
 _GT_TimeField = TypeVar("_GT_TimeField", default=time)
@@ -1484,6 +1550,15 @@ class TimeField(DateTimeCheckMixin, Field[_ST_TimeField, _GT_TimeField]):
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST_TimeField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> TimeField[_ST_TimeField | None, _ST_TimeField | None]: ...
+    def __init__(
+        self,
+        *args: Any,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        **kwargs: Any,
+    ) -> None: ...
 
 _ST_DateTimeField = TypeVar("_ST_DateTimeField", default=str | real_datetime | date | Combinable)
 _GT_DateTimeField = TypeVar("_GT_DateTimeField", default=real_datetime)
@@ -1692,6 +1767,18 @@ class FilePathField(Field[_ST_FileField, _GT_FileField]):
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST_FileField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
     ) -> FilePathField[_ST_FileField | None, _GT_FileField | None]: ...
+    def __init__(
+        self,
+        *args: Any,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        path: str | Callable[..., str] = "",
+        match: str | None = None,
+        recursive: bool = False,
+        allow_files: bool = True,
+        allow_folders: bool = False,
+        **kwargs: Any,
+    ) -> None: ...
 
 _ST_BinaryField = TypeVar("_ST_BinaryField", default=bytes | memoryview)
 _GT_BinaryField = TypeVar("_GT_BinaryField", default=bytes | memoryview)
