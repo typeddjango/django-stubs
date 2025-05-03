@@ -500,7 +500,6 @@ django.db.backends.sqlite3.base.SQLiteCursorWrapper.execute
 django.db.backends.sqlite3.base.SQLiteCursorWrapper.executemany
 django.db.backends.sqlite3.base.adapt_date
 django.db.backends.sqlite3.base.adapt_datetime
-django.db.backends.sqlite3.base.check_sqlite_version
 django.db.backends.sqlite3.features.DatabaseFeatures.can_alter_table_drop_column
 django.db.backends.sqlite3.features.DatabaseFeatures.can_introspect_json_field
 django.db.backends.sqlite3.features.DatabaseFeatures.can_return_columns_from_insert
