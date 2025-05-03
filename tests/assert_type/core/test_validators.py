@@ -13,6 +13,7 @@ assert_type(UnicodeUsernameValidator.regex, str | Pattern[str])
 assert_type(UnicodeUsernameValidator().regex, Pattern[str])
 UnicodeUsernameValidator().regex = re.compile("")
 
+
 # expect "Pattern[str]"
 RegexValidator().regex = ""  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
 UnicodeUsernameValidator().regex = ""  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
@@ -20,3 +21,11 @@ UnicodeUsernameValidator().regex = ""  # type: ignore[assignment] # pyright: ign
 # expect "_ClassOrInstanceAttribute[Union[str, Pattern[str]], Pattern[str]]"
 RegexValidator.regex = "anything fails here"  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
 UnicodeUsernameValidator.regex = "anything fails here"  # type: ignore[assignment] # pyright: ignore[reportAttributeAccessIssue]
+
+
+class RegexSubtype(RegexValidator):
+    regex = re.compile("abc")
+
+
+class StrSubtype(RegexValidator):
+    regex = "abc"
