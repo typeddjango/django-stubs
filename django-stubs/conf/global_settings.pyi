@@ -404,11 +404,11 @@ PASSWORD_RESET_TIMEOUT: int
 PASSWORD_HASHERS: list[str]
 
 @type_check_only
-class AuthPasswordValidatorsDict(TypedDict):
+class _AuthPasswordValidatorsDict(TypedDict):
     NAME: str
     OPTIONS: NotRequired[dict[str, Any]]
 
-AUTH_PASSWORD_VALIDATORS: list[AuthPasswordValidatorsDict]
+AUTH_PASSWORD_VALIDATORS: list[_AuthPasswordValidatorsDict]
 
 ###########
 # SIGNING #
