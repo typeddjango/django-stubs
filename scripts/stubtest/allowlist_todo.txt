@@ -1045,9 +1045,6 @@ django.test.runner.ParallelTestSuite.__init__
 django.test.runner.ParallelTestSuite.initialize_suite
 django.test.runner.ParallelTestSuite.process_setup
 django.test.runner.ParallelTestSuite.process_setup_args
-django.test.runner.RemoteTestResult.__init__
-django.test.runner.RemoteTestResult.stop_if_failfast
-django.test.runner.RemoteTestResult.wasSuccessful
 django.test.runner.Shuffler
 django.test.runner.default_test_processes
 django.test.runner.filter_tests_by_tags
