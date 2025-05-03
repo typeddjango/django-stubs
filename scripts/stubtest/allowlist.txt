@@ -639,6 +639,44 @@ django.contrib.sites.models.Site.domain
 django.contrib.sites.models.Site.id
 django.contrib.sites.models.Site.name
 
+# Model field __init__ methods, mypy is unable to infer attributes from __new__
+# https://github.com/python/mypy/issues/1021, No actual effect in practice, just on mypy run on stub
+# TODO: __init__ methods cannot be redefined per class again (as of yet) because of mypy's return type resolution
+# https://github.com/python/mypy/issues/1020#issuecomment-1825771327
+django.db.models.fields.UUIDField.__init__
+django.db.models.fields.URLField.__init__
+django.db.models.fields.TimeField.__init__
+django.db.models.fields.SlugField.__init__
+django.db.models.fields.GenericIPAddressField.__init__
+django.db.models.fields.FilePathField.__init__
+django.db.models.fields.TextField.__init__
+django.db.models.fields.Field.__init__
+django.db.models.fields.DateField.__init__
+django.db.models.fields.DecimalField.__init__
+django.db.models.fields.CharField.__init__
+django.db.models.UUIDField.__init__
+django.db.models.URLField.__init__
+django.db.models.TimeField.__init__
+django.db.models.SlugField.__init__
+django.db.models.GenericIPAddressField.__init__
+django.db.models.FilePathField.__init__
+django.db.models.TextField.__init__
+django.db.models.Field.__init__
+django.db.models.DateField.__init__
+django.db.models.DecimalField.__init__
+django.db.models.CharField.__init__
+django.contrib.gis.db.models.UUIDField.__init__
+django.contrib.gis.db.models.URLField.__init__
+django.contrib.gis.db.models.TimeField.__init__
+django.contrib.gis.db.models.SlugField.__init__
+django.contrib.gis.db.models.GenericIPAddressField.__init__
+django.contrib.gis.db.models.FilePathField.__init__
+django.contrib.gis.db.models.TextField.__init__
+django.contrib.gis.db.models.Field.__init__
+django.contrib.gis.db.models.DateField.__init__
+django.contrib.gis.db.models.DecimalField.__init__
+django.contrib.gis.db.models.CharField.__init__
+
 # These are dynamically added when using `save(commit=False)`
 # See https://docs.djangoproject.com/en/5.2/topics/forms/modelforms/#the-save-method
 django.forms.BaseModelForm.save_m2m
