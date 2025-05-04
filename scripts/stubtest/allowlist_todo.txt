@@ -500,7 +500,6 @@ django.db.backends.sqlite3.base.SQLiteCursorWrapper.execute
 django.db.backends.sqlite3.base.SQLiteCursorWrapper.executemany
 django.db.backends.sqlite3.base.adapt_date
 django.db.backends.sqlite3.base.adapt_datetime
-django.db.backends.sqlite3.base.check_sqlite_version
 django.db.backends.sqlite3.features.DatabaseFeatures.can_alter_table_drop_column
 django.db.backends.sqlite3.features.DatabaseFeatures.can_introspect_json_field
 django.db.backends.sqlite3.features.DatabaseFeatures.can_return_columns_from_insert
@@ -918,11 +917,6 @@ django.db.models.lookups.Lookup.allowed_default
 django.db.models.lookups.Lookup.lookup_name
 django.db.models.lookups.Lookup.output_field
 django.db.models.lookups.PatternLookup.process_rhs
-django.db.models.options.Options.concrete_fields
-django.db.models.options.Options.installed
-django.db.models.options.Options.local_concrete_fields
-django.db.models.options.Options.many_to_many
-django.db.models.options.Options.related_objects
 django.db.models.query.EmptyQuerySet.__init__
 django.db.models.query.QuerySet.__deepcopy__
 django.db.models.query.QuerySet.__xor__
@@ -1027,11 +1021,8 @@ django.http.HttpRequest.__init__
 django.http.StreamingHttpResponse.content
 django.http.request.HttpRequest.__init__
 django.http.response.StreamingHttpResponse.content
-django.template.Node.__iter__
 django.template.VariableDoesNotExist.__init__
-django.template.base.Context
 django.template.base.FilterExpression.is_var
-django.template.base.Node.__iter__
 django.template.base.VariableDoesNotExist.__init__
 django.template.defaultfilters.json_script
 django.template.library.InclusionNode.token
@@ -1051,9 +1042,6 @@ django.test.runner.ParallelTestSuite.__init__
 django.test.runner.ParallelTestSuite.initialize_suite
 django.test.runner.ParallelTestSuite.process_setup
 django.test.runner.ParallelTestSuite.process_setup_args
-django.test.runner.RemoteTestResult.__init__
-django.test.runner.RemoteTestResult.stop_if_failfast
-django.test.runner.RemoteTestResult.wasSuccessful
 django.test.runner.Shuffler
 django.test.runner.default_test_processes
 django.test.runner.filter_tests_by_tags
@@ -1080,9 +1068,7 @@ django.test.selenium.SeleniumTestCaseBase.import_options
 django.test.selenium.SeleniumTestCaseBase.selenium_hub
 django.test.testcases.LiveServerThread.__init__
 django.test.testcases.LiveServerThread.server_class
-django.test.testcases.SerializeMixin.tearDownClass
 django.test.testcases._AssertTemplateUsedContext.__init__
-django.test.testcases._AssertTemplateUsedContext.message
 django.urls.conf.path
 django.urls.conf.re_path
 django.urls.path

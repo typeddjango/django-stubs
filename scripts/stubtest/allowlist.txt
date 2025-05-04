@@ -373,6 +373,10 @@ django.db.models.options.Options.default_manager
 django.db.models.options.Options.fields
 django.db.models.options.Options.fields_map
 django.db.models.options.Options.managers
+django.db.models.options.Options.concrete_fields
+django.db.models.options.Options.local_concrete_fields
+django.db.models.options.Options.many_to_many
+django.db.models.options.Options.related_objects
 django.db.models.options.Options.managers_map
 django.db.models.options.Options.swapped
 django.db.models.options.Options.total_unique_constraints

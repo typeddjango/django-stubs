@@ -4,7 +4,7 @@ from logging import Logger
 from re import Pattern
 from typing import Any, cast
 
-from django.template.context import Context as Context  # Django: imported for backwards compatibility
+from django.template.context import Context
 from django.template.engine import Engine
 from django.template.library import Library
 from django.template.loaders.base import Loader
@@ -145,7 +145,6 @@ class Node:
     token: Token | None
     def render(self, context: Context) -> str: ...
     def render_annotated(self, context: Context) -> int | str: ...
-    def __iter__(self) -> Iterator[Node]: ...
     def get_nodes_by_type(self, nodetype: type[Node]) -> list[Node]: ...
 
 class NodeList(list[Node]):

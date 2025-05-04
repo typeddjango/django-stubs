@@ -91,7 +91,6 @@ django.db.backends.sqlite3.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_constraints
-django.db.migrations.autodetector.MigrationAutodetector.generate_altered_index_together
 django.db.migrations.autodetector.OperationDependency
 django.db.migrations.state.ProjectState.alter_constraint
 django.db.models.BaseConstraint.non_db_attrs

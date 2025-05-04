@@ -123,10 +123,10 @@ class NewSemanalDjangoPlugin(Plugin):
                 # forward relations
                 self.django_context.get_model_related_fields(model_class),
                 # reverse relations - `related_objects` is private API (according to docstring)
-                model_class._meta.related_objects,  # type: ignore[attr-defined]
+                model_class._meta.related_objects,
             ):
                 try:
-                    related_model_cls = self.django_context.get_field_related_model_cls(field)
+                    related_model_cls = self.django_context.get_field_related_model_cls(field)  # type: ignore[arg-type]
                 except UnregisteredModelError:
                     continue
                 related_model_module = related_model_cls.__module__
