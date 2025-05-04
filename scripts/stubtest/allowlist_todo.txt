@@ -157,12 +157,9 @@ django.contrib.gis.admin.options.GISModelAdmin
 django.contrib.gis.admin.options.GISModelAdmin.gis_widget
 django.contrib.gis.admin.options.GeoModelAdminMixin
 django.contrib.gis.admin.site
-django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.supports_geography
-django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geojson_options
 django.contrib.gis.db.backends.mysql.base
 django.contrib.gis.db.backends.mysql.introspection
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
-django.contrib.gis.db.backends.postgis.features.DatabaseFeatures.supports_geography
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
 django.contrib.gis.db.backends.postgis.schema.PostGISSchemaEditor.rast_index_template

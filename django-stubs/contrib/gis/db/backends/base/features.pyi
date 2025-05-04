@@ -5,6 +5,7 @@ class BaseSpatialFeatures:
     has_spatialrefsys_table: bool
     supports_add_srs_entry: bool
     supports_geometry_field_introspection: bool
+    supports_geography: bool
     supports_3d_storage: bool
     supports_3d_functions: bool
     supports_transform: bool
