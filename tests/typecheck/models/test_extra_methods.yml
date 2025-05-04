@@ -53,17 +53,12 @@
         from myapp.models import MyUser
         MyUser().get_next_by_date()  # E: "MyUser" has no attribute "get_next_by_date"  [attr-defined]
         MyUser().get_previous_by_date()  # E: "MyUser" has no attribute "get_previous_by_date"  [attr-defined]
-    monkeypatch: true
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from datetime import date
-                from typing import Optional, Union
                 from django.db import models
-                from django.db.models.expressions import Combinable
-
                 class MyUser(models.Model):
                     date = models.DateField(null=True)

@@ -81,17 +81,13 @@
         MyModel(nulltext=None)
         MyModel().nulltext=None
         reveal_type(MyModel().nulltext)  # N: Revealed type is "Union[builtins.str, None]"
-    monkeypatch: true
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Optional, Union
                 from django.db import models
-                from django.db.models.expressions import Combinable
-
                 class MyModel(models.Model):
                     nulltext = models.CharField(max_length=1, blank=True, null=True)
 

@@ -38,17 +38,13 @@
         reveal_type(MyModel().text_nullable)  # N: Revealed type is "Union[builtins.str, None]"
         MyModel().text = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")  [assignment]
         MyModel().text_nullable = None
-    monkeypatch: true
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Optional, Union
                 from django.db import models
-                from django.db.models.expressions import Combinable
-
                 class MyModel(models.Model):
                     text_nullable = models.CharField(max_length=100, null=True)
                     text = models.CharField(max_length=100)
