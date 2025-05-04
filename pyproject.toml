@@ -23,14 +23,9 @@ select = [
     "PGH003",   # Disallowed blanket `type: ignore` annotations.
 ]
 ignore = [
-    "PYI021",
-    "PYI024",
-    "PYI041",
+    "PYI021", # We have a few meaningful docstrings for stubs only constructs/utilities.
+    "PYI041", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
     "PYI043",
-    # no-return-argument-annotation-in-stub
-    # Prefers typing.Never to typing.NoReturn, but Never only available on
-    # Python 3.11+
-    "PYI050",
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -50,6 +45,7 @@ ignore = [
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."
+"typing.assert_type".msg = "Use typing_extensions.assert_type instead."
 
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
