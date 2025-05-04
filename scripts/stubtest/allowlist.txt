@@ -556,3 +556,8 @@ django.core.mail.outbox
 
 # Variable is supposed to be a set but is initialised to an empty dict
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geojson_options
+
+# We declare more strict types for this in stubs to avoid RuntimeErrors.
+# Django uses a `*args` parameter but crash if it contains more than 1 element.
+django.http.QueryDict.pop
+django.http.request.QueryDict.pop
