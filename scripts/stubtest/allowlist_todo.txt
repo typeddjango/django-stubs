@@ -1005,10 +1005,6 @@ django.forms.widgets.RadioSelect.use_fieldset
 django.forms.widgets.SelectDateWidget.select_widget
 django.forms.widgets.SelectDateWidget.use_fieldset
 django.forms.widgets.Widget.use_fieldset
-django.http.HttpRequest.__init__
-django.http.StreamingHttpResponse.content
-django.http.request.HttpRequest.__init__
-django.http.response.StreamingHttpResponse.content
 django.template.VariableDoesNotExist.__init__
 django.template.base.FilterExpression.is_var
 django.template.base.VariableDoesNotExist.__init__

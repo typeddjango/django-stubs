@@ -1,6 +1,5 @@
 import datetime
-from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
-from io import BytesIO
+from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeAlias, TypeVar, overload, type_check_only
 
@@ -36,7 +35,7 @@ class HttpHeaders(CaseInsensitiveMapping[str]):
     @classmethod
     def to_asgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
 
-class HttpRequest(BytesIO):
+class HttpRequest:
     GET: _ImmutableQueryDict
     POST: _ImmutableQueryDict
     COOKIES: dict[str, str]
@@ -104,7 +103,12 @@ class HttpRequest(BytesIO):
     def body(self) -> bytes: ...
     def _load_post_and_files(self) -> None: ...
     def accepts(self, media_type: str) -> bool: ...
-    def readlines(self) -> list[bytes]: ...  # type: ignore[override]
+    def close(self) -> None: ...
+    # File-like and iterator interface, a minimal subset of BytesIO.
+    def read(self, n: int = -1, /) -> bytes: ...
+    def readline(self, limit: int = -1, /) -> bytes: ...
+    def __iter__(self) -> Iterator[bytes]: ...
+    def readlines(self) -> list[bytes]: ...
 
 @type_check_only
 class _MutableHttpRequest(HttpRequest):
@@ -113,36 +117,49 @@ class _MutableHttpRequest(HttpRequest):
 
 _Z = TypeVar("_Z")
 
-class QueryDict(MultiValueDict[str, str]):
+# mypy uses mro to pick between `__init__` and `__new__` for return types and will prefers `__init__` over `__new__`
+# in case of a tie. So to be able to specialize type via `__new__` (which is required for pyright to work),
+# we need to use an intermediary class for the `__init__` method.
+# See https://github.com/python/mypy/issues/17251
+# https://github.com/python/mypy/blob/c724a6a806655f94d0c705a7121e3d671eced96d/mypy/typeops.py#L148-L149
+class _QueryDictMixin:
+    def __init__(
+        self,
+        query_string: str | bytes | None = ...,
+        mutable: bool = ...,
+        encoding: str | None = ...,
+    ) -> None: ...
+
+class QueryDict(_QueryDictMixin, MultiValueDict[str, str]):
     _mutable: bool
     # We can make it mutable only by specifying `mutable=True`.
     # It can be done a) with kwarg and b) with pos. arg. `overload` has
     # some problems with args/kwargs + Literal, so two signatures are required.
     # ('querystring', True, [...])
     @overload
-    def __init__(
-        self: QueryDict,
+    def __new__(
+        cls,
         query_string: str | bytes | None,
         mutable: Literal[True],
         encoding: str | None = ...,
-    ) -> None: ...
+    ) -> QueryDict: ...
     # ([querystring='string',] mutable=True, [...])
     @overload
-    def __init__(
-        self: QueryDict,
+    def __new__(
+        cls,
         *,
-        mutable: Literal[True],
         query_string: str | bytes | None = ...,
+        mutable: Literal[True],
         encoding: str | None = ...,
-    ) -> None: ...
+    ) -> QueryDict: ...
     # Otherwise it's immutable
     @overload
-    def __init__(  # type: ignore[misc]
-        self: _ImmutableQueryDict,
+    def __new__(
+        cls,
         query_string: str | bytes | None = ...,
-        mutable: bool = ...,
+        mutable: Literal[False] = ...,
         encoding: str | None = ...,
-    ) -> None: ...
+    ) -> _ImmutableQueryDict: ...
     @classmethod
     def fromkeys(  # type: ignore[override]
         cls,
@@ -161,11 +178,11 @@ class QueryDict(MultiValueDict[str, str]):
     def setlistdefault(self, key: str | bytes, default_list: list[str] | None = ...) -> list[str]: ...
     def appendlist(self, key: str | bytes, value: str | bytes) -> None: ...
     # Fake signature (because *args is used in source, but it fails with more that 1 argument)
+    @overload  # type:ignore[override]
+    def pop(self, key: str | bytes, /) -> list[str]: ...
     @overload
-    def pop(self, key: str | bytes, /) -> str: ...
-    @overload
-    def pop(self, key: str | bytes, default: str | _Z = ..., /) -> str | _Z: ...
-    def popitem(self) -> tuple[str, str]: ...
+    def pop(self, key: str | bytes, default: str | _Z = ..., /) -> list[str] | _Z: ...
+    def popitem(self) -> tuple[str, list[str]]: ...  # type:ignore[override]
     def clear(self) -> None: ...
     def setdefault(self, key: str | bytes, default: str | bytes | None = ...) -> str: ...
     def copy(self) -> QueryDict: ...
