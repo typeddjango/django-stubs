@@ -19,6 +19,10 @@ class BaseSpatialFeatures:
     supports_dwithin_distance_expr: bool
     supports_raster: bool
     supports_geometry_field_unique_index: bool
+    can_alter_geometry_field: bool
+    supports_tolerance_parameter: bool
+    unsupported_geojson_options: set[str]
+    empty_intersection_returns_none: bool
     @property
     def supports_bbcontains_lookup(self) -> bool: ...
     @property

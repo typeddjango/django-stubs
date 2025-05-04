@@ -161,7 +161,6 @@ django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
 django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor.related_manager_cls
 django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_extent
-django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.supports_geometry_field_unique_index
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.from_text
