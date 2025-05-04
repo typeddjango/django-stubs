@@ -117,36 +117,49 @@ class _MutableHttpRequest(HttpRequest):
 
 _Z = TypeVar("_Z")
 
-class QueryDict(MultiValueDict[str, str]):
+# mypy uses mro to pick between `__init__` and `__new__` for return types and will prefers `__init__` over `__new__`
+# in case of a tie. So to be able to specialize type via `__new__` (which is required for pyright to work),
+# we need to use an intermediary class for the `__init__` method.
+# See https://github.com/python/mypy/issues/17251
+# https://github.com/python/mypy/blob/c724a6a806655f94d0c705a7121e3d671eced96d/mypy/typeops.py#L148-L149
+class _QueryDictMixin:
+    def __init__(
+        self,
+        query_string: str | bytes | None = ...,
+        mutable: bool = ...,
+        encoding: str | None = ...,
+    ) -> None: ...
+
+class QueryDict(_QueryDictMixin, MultiValueDict[str, str]):
     _mutable: bool
     # We can make it mutable only by specifying `mutable=True`.
     # It can be done a) with kwarg and b) with pos. arg. `overload` has
     # some problems with args/kwargs + Literal, so two signatures are required.
     # ('querystring', True, [...])
     @overload
-    def __init__(
-        self: QueryDict,
+    def __new__(
+        cls,
         query_string: str | bytes | None,
         mutable: Literal[True],
         encoding: str | None = ...,
-    ) -> None: ...
+    ) -> QueryDict: ...
     # ([querystring='string',] mutable=True, [...])
     @overload
-    def __init__(
-        self: QueryDict,
+    def __new__(
+        cls,
         *,
-        mutable: Literal[True],
         query_string: str | bytes | None = ...,
+        mutable: Literal[True],
         encoding: str | None = ...,
-    ) -> None: ...
+    ) -> QueryDict: ...
     # Otherwise it's immutable
     @overload
-    def __init__(  # type: ignore[misc]
-        self: _ImmutableQueryDict,
+    def __new__(
+        cls,
         query_string: str | bytes | None = ...,
-        mutable: bool = ...,
+        mutable: Literal[False] = ...,
         encoding: str | None = ...,
-    ) -> None: ...
+    ) -> _ImmutableQueryDict: ...
     @classmethod
     def fromkeys(  # type: ignore[override]
         cls,

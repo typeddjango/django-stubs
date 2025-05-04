@@ -1,7 +1,20 @@
 from collections.abc import Iterable, Iterator
 
 from django.http import QueryDict
+from django.http.request import _ImmutableQueryDict
 from typing_extensions import assert_type
+
+q = QueryDict("", False)
+# Test constructor overloads -- Mutable
+assert_type(QueryDict("querystring", True), QueryDict)
+assert_type(QueryDict("querystring", mutable=True), QueryDict)
+
+# Test constructor overloads -- Immutable
+assert_type(QueryDict(), _ImmutableQueryDict)
+assert_type(QueryDict("querystring"), _ImmutableQueryDict)
+assert_type(QueryDict("querystring", False), _ImmutableQueryDict)
+assert_type(QueryDict("querystring", mutable=False), _ImmutableQueryDict)
+
 
 # Test ImmutableQueryDict
 q = QueryDict()
