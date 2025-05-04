@@ -1,6 +1,5 @@
 import datetime
-from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
-from io import BytesIO
+from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, TypeAlias, TypeVar, overload, type_check_only
 
@@ -36,7 +35,7 @@ class HttpHeaders(CaseInsensitiveMapping[str]):
     @classmethod
     def to_asgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
 
-class HttpRequest(BytesIO):
+class HttpRequest:
     GET: _ImmutableQueryDict
     POST: _ImmutableQueryDict
     COOKIES: dict[str, str]
@@ -104,7 +103,12 @@ class HttpRequest(BytesIO):
     def body(self) -> bytes: ...
     def _load_post_and_files(self) -> None: ...
     def accepts(self, media_type: str) -> bool: ...
-    def readlines(self) -> list[bytes]: ...  # type: ignore[override]
+    def close(self) -> None: ...
+    # File-like and iterator interface, a minimal subset of BytesIO.
+    def read(self, n: int = -1, /) -> bytes: ...
+    def readline(self, limit: int = -1, /) -> bytes: ...
+    def __iter__(self) -> Iterator[bytes]: ...
+    def readlines(self) -> list[bytes]: ...
 
 @type_check_only
 class _MutableHttpRequest(HttpRequest):
