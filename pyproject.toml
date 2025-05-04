@@ -27,10 +27,6 @@ ignore = [
     "PYI024",
     "PYI041",
     "PYI043",
-    # no-return-argument-annotation-in-stub
-    # Prefers typing.Never to typing.NoReturn, but Never only available on
-    # Python 3.11+
-    "PYI050",
 ]
 
 [tool.ruff.lint.per-file-ignores]
