@@ -25,7 +25,7 @@ select = [
 ignore = [
     "PYI021",
     "PYI024",
-    "PYI041",
+    "PYI041", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
     "PYI043",
 ]
 
