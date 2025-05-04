@@ -23,7 +23,7 @@ select = [
     "PGH003",   # Disallowed blanket `type: ignore` annotations.
 ]
 ignore = [
-    "PYI021",
+    "PYI021", # We have a few meaningful docstrings for stubs only constructs/utilities.
     "PYI041", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
     "PYI043",
 ]
