@@ -1,9 +1,12 @@
 from typing import Any, ClassVar
 from uuid import UUID
 
+from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
 from typing_extensions import deprecated
 
 ADDITION: int
@@ -33,10 +36,14 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> list[LogEntry] | LogEntry: ...
 
 class LogEntry(models.Model):
+    id: models.AutoField
+    pk: models.AutoField
     action_time: models.DateTimeField
-    user: models.ForeignKey
-    content_type: models.ForeignKey
-    object_id: models.TextField
+    user: models.ForeignKey[AbstractUser | Combinable, AbstractUser]
+    user_id: int
+    content_type: models.ForeignKey[ContentType | Combinable | None, ContentType | None]
+    content_type_id: int | None
+    object_id = models.TextField(null=True)
     object_repr: models.CharField
     action_flag: models.PositiveSmallIntegerField
     change_message: models.TextField

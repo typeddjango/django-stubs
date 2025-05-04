@@ -1,10 +1,14 @@
 from typing import Any, ClassVar
 
+from django.contrib.admin.models import LogEntry
+from django.contrib.auth.models import Permission
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
 from django.db.models.query import QuerySet
 
 class ContentTypeManager(models.Manager[ContentType]):
+    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def get_by_natural_key(self, app_label: str, model: str) -> ContentType: ...
     def get_for_model(self, model: type[Model] | Model, for_concrete_model: bool = ...) -> ContentType: ...
     def get_for_models(self, *models: Any, for_concrete_models: bool = ...) -> dict[type[Model], ContentType]: ...
@@ -12,12 +16,17 @@ class ContentTypeManager(models.Manager[ContentType]):
     def clear_cache(self) -> None: ...
 
 class ContentType(models.Model):
-    id: int
+    id: models.AutoField
+    pk: models.AutoField
     app_label = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
+    logentry_set: ReverseManyToOneDescriptor[LogEntry]
+    permission_set: ReverseManyToOneDescriptor[Permission]
     objects: ClassVar[ContentTypeManager]
     @property
     def name(self) -> str: ...
+    @property
+    def app_labeled_name(self) -> str: ...
     def model_class(self) -> type[Model] | None: ...
     def get_object_for_this_type(self, using: str | None = None, **kwargs: Any) -> Model: ...
     def get_all_objects_for_this_type(self, **kwargs: Any) -> QuerySet: ...

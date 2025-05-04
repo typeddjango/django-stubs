@@ -5,13 +5,13 @@ from django.db import models
 from typing_extensions import Self
 
 class PostGISGeometryColumns(models.Model):
-    f_table_catalog: Any
-    f_table_schema: Any
-    f_table_name: Any
-    f_geometry_column: Any
-    coord_dimension: Any
-    srid: Any
-    type: Any
+    f_table_catalog: models.CharField
+    f_table_schema: models.CharField
+    f_table_name: models.CharField
+    f_geometry_column: models.CharField
+    coord_dimension: models.IntegerField
+    srid: models.IntegerField
+    type: models.CharField
     objects: ClassVar[models.Manager[Self]]
 
     @classmethod
@@ -20,11 +20,11 @@ class PostGISGeometryColumns(models.Model):
     def geom_col_name(cls) -> Any: ...
 
 class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
-    srid: Any
-    auth_name: Any
-    auth_srid: Any
-    srtext: Any
-    proj4text: Any
+    srid: models.IntegerField
+    auth_name: models.CharField
+    auth_srid: models.IntegerField
+    srtext: models.CharField
+    proj4text: models.CharField
     objects: ClassVar[models.Manager[Self]]
 
     @property

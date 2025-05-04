@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Literal, Protocol, TypeAlias, TypeVar, overload, type_check_only
+from typing import Any, ClassVar, Generic, Literal, Protocol, TypeAlias, overload, type_check_only
 
 from django import forms
 from django.core import validators  # due to weird mypy.stubtest error
@@ -18,7 +18,7 @@ from django.forms import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
-from typing_extensions import Self
+from typing_extensions import Self, TypeVar
 
 class Empty: ...
 class NOT_PROVIDED: ...
@@ -153,33 +153,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     system_check_removed_details: Any | None
     system_check_deprecated_details: Any | None
     non_db_attrs: tuple[str, ...]
-    def __init__(
-        self,
-        verbose_name: _StrOrPromise | None = None,
-        name: str | None = None,
-        primary_key: bool = False,
-        max_length: int | None = None,
-        unique: bool = False,
-        blank: bool = False,
-        null: bool = False,
-        db_index: bool = False,
-        rel: ForeignObjectRel | None = None,
-        default: Any = ...,
-        editable: bool = True,
-        serialize: bool = True,
-        unique_for_date: str | None = None,
-        unique_for_month: str | None = None,
-        unique_for_year: str | None = None,
-        choices: _ChoicesInput | None = None,
-        help_text: _StrOrPromise = "",
-        db_column: str | None = None,
-        db_tablespace: str | None = None,
-        auto_created: bool = False,
-        validators: Iterable[validators._ValidatorCallable] = (),
-        error_messages: _ErrorMessagesMapping | None = None,
-        db_comment: str | None = None,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-    ) -> None: ...
+    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def __set__(self, instance: Any, value: _ST) -> None: ...
     # class access
     @overload
@@ -229,7 +203,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def has_default(self) -> bool: ...
     def get_default(self) -> Any: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
-    def get_col(self, alias: str, output_field: Field | None = None) -> Col: ...
+    def get_col(self, alias: str, output_field: Field[Any, Any] | None = None) -> Col: ...
     @cached_property
     def cached_col(self) -> Col: ...
     def value_from_object(self, obj: Model) -> _GT: ...
@@ -238,352 +212,1423 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_to_string(self, obj: Model) -> str: ...
     def slice_expression(self, expression: Expression, start: int, length: int | None) -> Func: ...
 
-class IntegerField(Field[_ST, _GT]):
+_ST_IntegerField = TypeVar("_ST_IntegerField", default=float | int | str | Combinable)
+_GT_IntegerField = TypeVar("_GT_IntegerField", default=int)
+
+class IntegerField(Field[_ST_IntegerField, _GT_IntegerField]):
     _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> IntegerField[_ST_IntegerField | None, _GT_IntegerField | None]: ...
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
-class SmallIntegerField(IntegerField[_ST, _GT]): ...
+class SmallIntegerField(IntegerField[_ST_IntegerField, _GT_IntegerField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> SmallIntegerField[_ST_IntegerField | None, _GT_IntegerField | None]: ...
 
-class BigIntegerField(IntegerField[_ST, _GT]):
+class BigIntegerField(IntegerField[_ST_IntegerField, _GT_IntegerField]):
     MAX_BIGINT: ClassVar[int]
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> BigIntegerField[_ST_IntegerField | None, _GT_IntegerField | None]: ...
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]): ...
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]): ...
-class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]): ...
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_IntegerField, _GT_IntegerField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> PositiveIntegerField[_ST_IntegerField | None, _GT_IntegerField | None]: ...
 
-class FloatField(Field[_ST, _GT]):
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST_IntegerField, _GT_IntegerField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> PositiveSmallIntegerField[_ST_IntegerField | None, _GT_IntegerField | None]: ...
+
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_IntegerField, _GT_IntegerField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IntegerField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> PositiveBigIntegerField[_ST_IntegerField | None, _GT_IntegerField | None]: ...
+
+_ST_FloatField = TypeVar("_ST_FloatField", default=float | int | str | Combinable)
+_GT_FloatField = TypeVar("_GT_FloatField", default=float)
+
+class FloatField(Field[_ST_FloatField, _GT_FloatField]):
     _pyi_private_set_type: float | int | str | Combinable
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_FloatField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_FloatField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> FloatField[_ST_FloatField | None, _GT_FloatField | None]: ...
 
-class DecimalField(Field[_ST, _GT]):
+_ST_DecimalField = TypeVar("_ST_DecimalField", default=str | float | decimal.Decimal | Combinable)
+_GT_DecimalField = TypeVar("_GT_DecimalField", default=decimal.Decimal)
+
+class DecimalField(Field[_ST_DecimalField, _GT_DecimalField]):
     _pyi_private_set_type: str | float | decimal.Decimal | Combinable
     _pyi_private_get_type: decimal.Decimal
     _pyi_lookup_exact_type: str | decimal.Decimal
     # attributes
     max_digits: int
     decimal_places: int
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         max_digits: int | None = None,
         decimal_places: int | None = None,
-        *,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DecimalField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DecimalField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> DecimalField[_ST_DecimalField | None, _GT_DecimalField | None]: ...
 
-class CharField(Field[_ST, _GT]):
+_ST_CharField = TypeVar("_ST_CharField", default=str | int | Combinable)
+_GT_CharField = TypeVar("_GT_CharField", default=str)
+
+class CharField(Field[_ST_CharField, _GT_CharField]):
     _pyi_private_set_type: str | int | Combinable
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
-    def __init__(
-        self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        *,
-        db_collation: str | None = None,
-    ) -> None: ...
-
-class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
-
-class SlugField(CharField[_ST, _GT]):
-    def __init__(
-        self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        *,
-        max_length: int | None = 50,
-        db_index: bool = True,
-        allow_unicode: bool = False,
-    ) -> None: ...
-
-class EmailField(CharField[_ST, _GT]):
-    _pyi_private_set_type: str | Combinable
-
-class URLField(CharField[_ST, _GT]):
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        *,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+    ) -> CharField[_ST_CharField | None, _GT_CharField | None]: ...
 
-class TextField(Field[_ST, _GT]):
+class CommaSeparatedIntegerField(CharField[_ST_CharField, _GT_CharField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+    ) -> CommaSeparatedIntegerField[_ST_CharField | None, _GT_CharField | None]: ...
+
+class SlugField(CharField[_ST_CharField, _GT_CharField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+        allow_unicode: bool = False,
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+        allow_unicode: bool = False,
+    ) -> SlugField[_ST_CharField | None, _GT_CharField | None]: ...
+
+_ST_EmailField = TypeVar("_ST_EmailField", default=str | Combinable)
+_GT_EmailField = TypeVar("_GT_EmailField", default=str)
+
+class EmailField(CharField[_ST_EmailField, _GT_EmailField]):
+    _pyi_private_set_type: str | Combinable
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+        allow_unicode: bool = False,
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+        allow_unicode: bool = False,
+    ) -> EmailField[_ST_CharField | None, _GT_CharField | None]: ...
+
+class URLField(CharField[_ST_CharField, _GT_CharField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_CharField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> URLField[_ST_CharField | None, _GT_CharField | None]: ...
+
+_ST_TextField = TypeVar("_ST_TextField", default=str | Combinable)
+_GT_TextField = TypeVar("_GT_TextField", default=str)
+
+class TextField(Field[_ST_TextField, _GT_TextField]):
     _pyi_private_set_type: str | Combinable
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
-    def __init__(
-        self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        *,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_TextField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
         db_collation: str | None = None,
-    ) -> None: ...
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_TextField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+        db_collation: str | None = None,
+    ) -> TextField[_ST_TextField | None, _GT_TextField | None]: ...
 
-class BooleanField(Field[_ST, _GT]):
+_ST_BooleanField = TypeVar("_ST_BooleanField", default=bool | Combinable)
+_GT_BooleanField = TypeVar("_GT_BooleanField", default=bool)
+
+class BooleanField(Field[_ST_BooleanField, _GT_BooleanField]):
     _pyi_private_set_type: bool | Combinable
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_BooleanField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_BooleanField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> BooleanField[_ST_BooleanField | None, _GT_BooleanField | None]: ...
 
-class NullBooleanField(BooleanField[_ST, _GT]):
+class NullBooleanField(BooleanField[_ST_BooleanField, _GT_BooleanField]):
     _pyi_private_set_type: bool | Combinable | None  # type: ignore[assignment]
     _pyi_private_get_type: bool | None  # type: ignore[assignment]
     _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_BooleanField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_BooleanField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> NullBooleanField[_ST_BooleanField | None, _GT_BooleanField | None]: ...
 
-class IPAddressField(Field[_ST, _GT]):
+_ST_IPAddressField = TypeVar("_ST_IPAddressField", default=str | Combinable)
+_GT_IPAddressField = TypeVar("_GT_IPAddressField", default=str)
+
+class IPAddressField(Field[_ST_IPAddressField, _GT_IPAddressField]):
     _pyi_private_set_type: str | Combinable
     _pyi_private_get_type: str
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IPAddressField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_IPAddressField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> IPAddressField[_ST_IPAddressField | None, _GT_IPAddressField | None]: ...
 
-class GenericIPAddressField(Field[_ST, _GT]):
+_ST_GenericIPAddressField = TypeVar("_ST_GenericIPAddressField", default=str | int | Callable[..., Any] | Combinable)
+_GT_GenericIPAddressField = TypeVar("_GT_GenericIPAddressField", default=str)
+
+class GenericIPAddressField(Field[_ST_GenericIPAddressField, _GT_GenericIPAddressField]):
     _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
     _pyi_private_get_type: str
 
     default_error_messages: ClassVar[_ErrorMessagesDict]
     unpack_ipv4: bool
     protocol: str
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
-        name: Any | None = None,
+        name: str | None = None,
         protocol: str = "both",
         unpack_ipv4: bool = False,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_GenericIPAddressField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_GenericIPAddressField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> GenericIPAddressField[_ST_GenericIPAddressField | None, _GT_GenericIPAddressField | None]: ...
 
 class DateTimeCheckMixin: ...
 
-class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
+_ST_DateField = TypeVar("_ST_DateField", default=str | date | Combinable)
+_GT_DateField = TypeVar("_GT_DateField", default=date)
+
+class DateField(DateTimeCheckMixin, Field[_ST_DateField, _GT_DateField]):
     _pyi_private_set_type: str | date | Combinable
     _pyi_private_get_type: date
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         auto_now: bool = False,
         auto_now_add: bool = False,
-        *,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DateField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DateField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> DateField[_ST_DateField | None, _GT_DateField | None]: ...
 
-class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
+_ST_TimeField = TypeVar("_ST_TimeField", default=str | time | real_datetime | Combinable)
+_GT_TimeField = TypeVar("_GT_TimeField", default=time)
+
+class TimeField(DateTimeCheckMixin, Field[_ST_TimeField, _GT_TimeField]):
     _pyi_private_set_type: str | time | real_datetime | Combinable
     _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         auto_now: bool = False,
         auto_now_add: bool = False,
-        *,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_TimeField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_TimeField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> TimeField[_ST_TimeField | None, _ST_TimeField | None]: ...
 
-class DateTimeField(DateField[_ST, _GT]):
+_ST_DateTimeField = TypeVar("_ST_DateTimeField", default=str | real_datetime | date | Combinable)
+_GT_DateTimeField = TypeVar("_GT_DateTimeField", default=real_datetime)
+
+class DateTimeField(DateField[_ST_DateTimeField, _GT_DateTimeField]):
     _pyi_private_set_type: str | real_datetime | date | Combinable
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DateTimeField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DateTimeField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> DateTimeField[_ST_DateTimeField | None, _GT_DateTimeField | None]: ...
 
-class UUIDField(Field[_ST, _GT]):
+_ST_UUIDField = TypeVar("_ST_UUIDField", default=str | uuid.UUID)
+_GT_UUIDField = TypeVar("_GT_UUIDField", default=uuid.UUID)
+
+class UUIDField(Field[_ST_UUIDField, _GT_UUIDField]):
     _pyi_private_set_type: str | uuid.UUID
     _pyi_private_get_type: uuid.UUID
     _pyi_lookup_exact_type: uuid.UUID | str
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
-        *,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_UUIDField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_UUIDField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> UUIDField[_ST_UUIDField | None, _GT_UUIDField | None]: ...
 
-class FilePathField(Field[_ST, _GT]):
+_ST_FileField = TypeVar("_ST_FileField", default=str | bytes | memoryview)
+_GT_FileField = TypeVar("_GT_FileField", default=str)
+
+class FilePathField(Field[_ST_FileField, _GT_FileField]):
     path: Any
     match: str | None
     recursive: bool
     allow_files: bool
     allow_folders: bool
-    def __init__(
-        self,
+    @overload
+    def __new__(
+        cls,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         path: str | Callable[..., str] = "",
@@ -591,32 +1636,186 @@ class FilePathField(Field[_ST, _GT]):
         recursive: bool = False,
         allow_files: bool = True,
         allow_folders: bool = False,
-        *,
-        primary_key: bool = ...,
-        max_length: int = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-    ) -> None: ...
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_FileField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        path: str | Callable[..., str] = "",
+        match: str | None = None,
+        recursive: bool = False,
+        allow_files: bool = True,
+        allow_folders: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_FileField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> FilePathField[_ST_FileField | None, _GT_FileField | None]: ...
 
-class BinaryField(Field[_ST, _GT]):
+_ST_BinaryField = TypeVar("_ST_BinaryField", default=bytes | memoryview)
+_GT_BinaryField = TypeVar("_GT_BinaryField", default=bytes | memoryview)
+
+class BinaryField(Field[_ST_BinaryField, _GT_BinaryField]):
     _pyi_private_get_type: bytes | memoryview
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_BinaryField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_BinaryField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> BinaryField[_ST_BinaryField | None, _GT_BinaryField | None]: ...
 
-class DurationField(Field[_ST, _GT]):
+_ST_DurationField = TypeVar("_ST_DurationField", default=timedelta)
+_GT_DurationField = TypeVar("_GT_DurationField", default=timedelta)
+
+class DurationField(Field[_ST_DurationField, _GT_DurationField]):
     _pyi_private_get_type: timedelta
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DurationField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_DurationField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> DurationField[_ST_DurationField | None, _GT_DurationField | None]: ...
 
 class AutoFieldMixin:
     db_returning: bool
@@ -624,13 +1823,183 @@ class AutoFieldMixin:
 
 class AutoFieldMeta(type): ...
 
-class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):
-    _pyi_private_set_type: Combinable | int | str
-    _pyi_private_get_type: int
-    _pyi_lookup_exact_type: str | int
+_ST_AutoField = TypeVar("_ST_AutoField", default=Combinable | int | str | None)
+_GT_AutoField = TypeVar("_GT_AutoField", default=int)
 
-class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...
-class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...
+class AutoField(AutoFieldMixin, IntegerField[_ST_AutoField, _GT_AutoField], metaclass=AutoFieldMeta):
+    _pyi_private_set_type: Combinable | int | str
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_AutoField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_AutoField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> AutoField[_ST_AutoField | None, _GT_AutoField | None]: ...
+
+class BigAutoField(AutoFieldMixin, BigIntegerField[_ST_AutoField, _GT_AutoField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_AutoField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_AutoField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> BigAutoField[_ST_AutoField | None, _GT_AutoField | None]: ...
+
+class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST_AutoField, _GT_AutoField]):
+    @overload
+    def __new__(
+        cls,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        null: Literal[False] = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_AutoField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> Self: ...
+    @overload
+    def __new__(
+        cls,
+        null: Literal[True],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        unique: bool = False,
+        blank: bool = False,
+        db_index: bool = False,
+        rel: ForeignObjectRel | None = None,
+        default: Any = ...,
+        editable: bool = True,
+        serialize: bool = True,
+        unique_for_date: str | None = None,
+        unique_for_month: str | None = None,
+        unique_for_year: str | None = None,
+        choices: _ChoicesInput | None = None,
+        help_text: _StrOrPromise = "",
+        db_column: str | None = None,
+        db_tablespace: str | None = None,
+        auto_created: bool = False,
+        validators: Iterable[validators._ValidatorCallable] = (),
+        error_messages: _ErrorMessagesMapping | None = None,
+        db_comment: str | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_AutoField = ...,  # pyright: ignore[reportInvalidTypeVarUse]
+    ) -> SmallAutoField[_ST_AutoField | None, _GT_AutoField | None]: ...
 
 __all__ = [
     "AutoField",
