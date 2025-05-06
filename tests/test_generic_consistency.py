@@ -71,7 +71,7 @@ def test_find_classes_inheriting_from_generic():
     # Class patched in `ext/django_stubs_ext/patch.py`
     import django_stubs_ext
 
-    patched_classes = {mp_generic.cls.__name__ for mp_generic in django_stubs_ext.patch._need_generic}
+    patched_classes = {mp_generic.cls.__name__ for mp_generic in django_stubs_ext.patch._get_need_generic()}
 
     # Pretty-print missing patch in `ext/django_stubs_ext/patch.py`
     errors = []
