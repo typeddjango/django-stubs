@@ -6,8 +6,6 @@ from unittest import mock
 
 import django
 
-import django_stubs_ext
-
 # The root directory of the django-stubs package
 STUBS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "django-stubs"))
 
@@ -71,6 +69,8 @@ def test_find_classes_inheriting_from_generic():
     print(f"Found {len(all_generic_classes)} unique classes inheriting from Generic in stubs")
 
     # Class patched in `ext/django_stubs_ext/patch.py`
+    import django_stubs_ext
+
     patched_classes = {mp_generic.cls.__name__ for mp_generic in django_stubs_ext.patch._need_generic}
 
     # Pretty-print missing patch in `ext/django_stubs_ext/patch.py`
