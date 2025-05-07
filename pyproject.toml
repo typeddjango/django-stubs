@@ -44,7 +44,7 @@ ignore = [
 "setup.py" = ["INP001"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead."
+"_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a noqa"
 "typing.assert_type".msg = "Use typing_extensions.assert_type instead."
 
 [tool.ruff.lint.isort]

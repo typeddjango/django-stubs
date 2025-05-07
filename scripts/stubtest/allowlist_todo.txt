@@ -4,9 +4,6 @@
 django.__main__
 django.conf.global_settings.gettext_noop
 django.contrib.admin.FieldListFilter.title
-django.contrib.admin.ModelAdmin
-django.contrib.admin.StackedInline
-django.contrib.admin.TabularInline
 django.contrib.admin.filters.FieldListFilter.title
 django.contrib.admin.helpers.AdminForm.fields
 django.contrib.admin.helpers.AdminForm.is_bound
@@ -26,15 +23,10 @@ django.contrib.admin.models.LogEntry.object_id
 django.contrib.admin.models.LogEntry.object_repr
 django.contrib.admin.models.LogEntry.user
 django.contrib.admin.models.LogEntry.user_id
-django.contrib.admin.options.BaseModelAdmin
 django.contrib.admin.options.BaseModelAdmin.form
 django.contrib.admin.options.BaseModelAdmin.media
-django.contrib.admin.options.InlineModelAdmin
 django.contrib.admin.options.InlineModelAdmin.model
 django.contrib.admin.options.InlineModelAdmin.template
-django.contrib.admin.options.ModelAdmin
-django.contrib.admin.options.StackedInline
-django.contrib.admin.options.TabularInline
 django.contrib.admin.site
 django.contrib.admin.sites.site
 django.contrib.admin.tests.AdminSeleniumTestCase
@@ -54,9 +46,7 @@ django.contrib.admin.widgets.BaseAdminDateWidget.Media
 django.contrib.admindocs.utils.non_capturing_group_matcher
 django.contrib.admindocs.utils.remove_non_capturing_groups
 django.contrib.admindocs.utils.replace_metacharacters
-django.contrib.auth.admin.GroupAdmin
 django.contrib.auth.admin.GroupAdmin.formfield_for_manytomany
-django.contrib.auth.admin.UserAdmin
 django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.admin.UserAdmin.form
 django.contrib.auth.admin.UserAdmin.get_form
@@ -124,12 +114,9 @@ django.contrib.auth.views.LoginView.form_class
 django.contrib.auth.views.PasswordChangeView.form_class
 django.contrib.auth.views.PasswordResetConfirmView.form_class
 django.contrib.auth.views.PasswordResetView.form_class
-django.contrib.contenttypes.admin.GenericInlineModelAdmin
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_field
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_fk_field
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.template
-django.contrib.contenttypes.admin.GenericStackedInline
-django.contrib.contenttypes.admin.GenericTabularInline
 django.contrib.contenttypes.fields.GenericRelation.contribute_to_class
 django.contrib.contenttypes.fields.GenericRelation.get_extra_restriction
 django.contrib.contenttypes.forms.generic_inlineformset_factory
@@ -139,7 +126,6 @@ django.contrib.contenttypes.models.ContentType.app_labeled_name
 django.contrib.contenttypes.models.ContentType.id
 django.contrib.contenttypes.models.ContentType.model
 django.contrib.contenttypes.models.ContentTypeManager.__init__
-django.contrib.flatpages.admin.FlatPageAdmin
 django.contrib.flatpages.models.FlatPage.content
 django.contrib.flatpages.models.FlatPage.enable_comments
 django.contrib.flatpages.models.FlatPage.id
@@ -148,12 +134,7 @@ django.contrib.flatpages.models.FlatPage.sites
 django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
-django.contrib.gis.admin.GISModelAdmin
 django.contrib.gis.admin.GISModelAdmin.gis_widget
-django.contrib.gis.admin.ModelAdmin
-django.contrib.gis.admin.StackedInline
-django.contrib.gis.admin.TabularInline
-django.contrib.gis.admin.options.GISModelAdmin
 django.contrib.gis.admin.options.GISModelAdmin.gis_widget
 django.contrib.gis.admin.options.GeoModelAdminMixin
 django.contrib.gis.admin.site
@@ -388,7 +369,6 @@ django.contrib.postgres.fields.hstore.HStoreField.formfield
 django.contrib.postgres.fields.ranges.RangeField.formfield
 django.contrib.postgres.forms.BaseRangeField.hidden_widget
 django.contrib.postgres.forms.ranges.BaseRangeField.hidden_widget
-django.contrib.redirects.admin.RedirectAdmin
 django.contrib.redirects.models.Redirect.id
 django.contrib.redirects.models.Redirect.new_path
 django.contrib.redirects.models.Redirect.old_path
@@ -407,7 +387,6 @@ django.contrib.sessions.models.Session.get_previous_by_expire_date
 django.contrib.sessions.models.Session.session_data
 django.contrib.sessions.models.Session.session_key
 django.contrib.sitemaps.views.SitemapIndexItem
-django.contrib.sites.admin.SiteAdmin
 django.contrib.sites.models.Site.domain
 django.contrib.sites.models.Site.flatpage_set
 django.contrib.sites.models.Site.id
@@ -984,7 +963,6 @@ django.forms.fields.MultiValueField.__deepcopy__
 django.forms.fields.MultipleChoiceField.hidden_widget
 django.forms.fields.SplitDateTimeField.hidden_widget
 django.forms.forms.BaseForm.__init__
-django.forms.forms.DeclarativeFieldsMetaclass.__new__
 django.forms.formset_factory
 django.forms.formsets.BaseFormSet.__init__
 django.forms.formsets.ManagementForm.__init__
@@ -995,7 +973,6 @@ django.forms.modelformset_factory
 django.forms.models.BaseModelForm.__init__
 django.forms.models.BaseModelFormSet.model
 django.forms.models.ModelChoiceField.__deepcopy__
-django.forms.models.ModelFormMetaclass.__new__
 django.forms.models.ModelMultipleChoiceField.hidden_widget
 django.forms.models.inlineformset_factory
 django.forms.models.modelform_factory
@@ -1004,7 +981,6 @@ django.forms.renderers.DjangoDivFormRenderer
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__
-django.forms.widgets.MediaDefiningClass.__new__
 django.forms.widgets.MultiWidget.use_fieldset
 django.forms.widgets.RadioSelect.id_for_label
 django.forms.widgets.RadioSelect.use_fieldset
