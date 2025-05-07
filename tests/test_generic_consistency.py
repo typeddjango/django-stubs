@@ -2,6 +2,7 @@ import ast
 import glob
 import importlib
 import os
+from typing import final
 from unittest import mock
 
 import django
@@ -10,6 +11,7 @@ import django
 STUBS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "django-stubs"))
 
 
+@final
 class GenericInheritanceVisitor(ast.NodeVisitor):
     """AST visitor to find classes inheriting from `typing.Generic` in stubs."""
 
@@ -29,7 +31,7 @@ class GenericInheritanceVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def test_find_classes_inheriting_from_generic():
+def test_find_classes_inheriting_from_generic() -> None:
     """
     This test ensures that the `ext/django_stubs_ext/patch.py` stays up-to-date with the stubs.
     It works as follows:
