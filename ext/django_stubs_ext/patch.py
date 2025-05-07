@@ -103,15 +103,20 @@ _need_generic: list[MPGeneric[Any]] = [
 
 def _get_need_generic() -> list[MPGeneric[Any]]:
     try:
-        from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
+        if VERSION >= (5, 1):
+            from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
 
-        return [MPGeneric(SetPasswordMixin), MPGeneric(SetUnusablePasswordMixin), *_need_generic]
+            return [MPGeneric(SetPasswordMixin), MPGeneric(SetUnusablePasswordMixin), *_need_generic]
+        else:
+            from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
+
+            return [MPGeneric(SetPasswordForm), MPGeneric(AdminPasswordChangeForm), *_need_generic]
 
     except (ImproperlyConfigured, AppRegistryNotReady):
-        # logger.warning(
-        #     "`SetPasswordMixin` and `SetUnusablePasswordMixin` where not patched, django need to be configured "
-        #     "for this to be possible. Make sure to use `django_stubs_ext.monkeypatch()` after `django.setup()`.",
-        # )
+        # We cannot patch symbols in `django.contrib.auth.forms` if the `monkeypatch()` call
+        # is in the settings file because django is not initialized yet.
+        # To solve this, you'll have to call `monkeypatch()` again later, in an `AppConfig.ready` for ex.
+        # See https://docs.djangoproject.com/en/5.1/ref/applications/#django.apps.AppConfig.ready
         return _need_generic
 
 
