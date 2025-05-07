@@ -236,6 +236,8 @@ django.core.files.storage.memory.InMemoryStorage.file_permissions_mode
 django.core.files.storage.memory.InMemoryStorage.location
 django.core.handlers.asgi.ASGIRequest.COOKIES
 django.core.handlers.asgi.ASGIRequest.GET
+django.core.handlers.wsgi.WSGIRequest.COOKIES
+django.core.handlers.wsgi.WSGIRequest.GET
 django.core.management.commands.loaddata.Command.compression_formats
 django.core.management.commands.loaddata.Command.fixture_dirs
 django.core.management.commands.makemessages.BuildFile.is_templatized

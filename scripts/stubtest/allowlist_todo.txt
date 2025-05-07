@@ -431,10 +431,6 @@ django.core.files.utils.FileProxyMixin.tell
 django.core.files.utils.FileProxyMixin.truncate
 django.core.files.utils.FileProxyMixin.write
 django.core.files.utils.FileProxyMixin.writelines
-django.core.handlers.asgi.ASGIRequest.FILES
-django.core.handlers.wsgi.WSGIRequest.COOKIES
-django.core.handlers.wsgi.WSGIRequest.FILES
-django.core.handlers.wsgi.WSGIRequest.GET
 django.core.mail.backends.filebased.EmailBackend.__init__
 django.core.mail.backends.locmem.EmailBackend.send_messages
 django.core.mail.backends.smtp.EmailBackend.__init__
