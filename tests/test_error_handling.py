@@ -137,7 +137,7 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
         ),
     ],
 )
-def test_toml_misconfiguration_handling(capsys: Any, config_file_contents, message_part) -> None:
+def test_toml_misconfiguration_handling(capsys: Any, config_file_contents: str, message_part: str) -> None:
     with write_to_file(config_file_contents, suffix=".toml") as filename:
         with pytest.raises(SystemExit, match="2"):
             DjangoPluginConfig(filename)
@@ -163,7 +163,7 @@ def test_correct_toml_configuration(boolean_value: str) -> None:
 
 
 @pytest.mark.parametrize("boolean_value", ["true", "True", "false", "False"])
-def test_correct_configuration(boolean_value) -> None:
+def test_correct_configuration(boolean_value: str) -> None:
     """Django settings module gets extracted given valid configuration."""
     config_file_contents = "\n".join(
         [
@@ -198,7 +198,7 @@ def test_correct_toml_configuration_with_django_setting_from_env(boolean_value: 
 
 
 @pytest.mark.parametrize("boolean_value", ["true", "True", "false", "False"])
-def test_correct_configuration_with_django_setting_from_env(boolean_value) -> None:
+def test_correct_configuration_with_django_setting_from_env(boolean_value: str) -> None:
     """Django settings module gets extracted given valid configuration."""
     config_file_contents = "\n".join(
         [
