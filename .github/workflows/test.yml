@@ -70,7 +70,7 @@ jobs:
       - name: Run pytest tests
         run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
       - name: Run mypy on the test cases
-        run: mypy --strict tests/assert_type
+        run: mypy --strict tests
 
   stubtest:
     timeout-minutes: 10
