@@ -957,7 +957,6 @@ django.forms.fields.MultiValueField.__deepcopy__
 django.forms.fields.MultipleChoiceField.hidden_widget
 django.forms.fields.SplitDateTimeField.hidden_widget
 django.forms.forms.BaseForm.__init__
-django.forms.forms.DeclarativeFieldsMetaclass.__new__
 django.forms.formset_factory
 django.forms.formsets.BaseFormSet.__init__
 django.forms.formsets.ManagementForm.__init__
@@ -968,7 +967,6 @@ django.forms.modelformset_factory
 django.forms.models.BaseModelForm.__init__
 django.forms.models.BaseModelFormSet.model
 django.forms.models.ModelChoiceField.__deepcopy__
-django.forms.models.ModelFormMetaclass.__new__
 django.forms.models.ModelMultipleChoiceField.hidden_widget
 django.forms.models.inlineformset_factory
 django.forms.models.modelform_factory
@@ -977,7 +975,6 @@ django.forms.renderers.DjangoDivFormRenderer
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__
-django.forms.widgets.MediaDefiningClass.__new__
 django.forms.widgets.MultiWidget.use_fieldset
 django.forms.widgets.RadioSelect.id_for_label
 django.forms.widgets.RadioSelect.use_fieldset

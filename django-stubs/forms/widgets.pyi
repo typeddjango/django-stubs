@@ -2,6 +2,7 @@ import datetime
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from typing import Any, Literal, Protocol, TypeAlias, type_check_only
 
+import _typeshed
 from django.core.files.base import File
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import _DataT, _FilesT
@@ -45,7 +46,13 @@ class Media:
     def merge(*lists: Iterable[Any]) -> list[Any]: ...
     def __add__(self, other: Media) -> Media: ...
 
-class MediaDefiningClass(type): ...
+class MediaDefiningClass(type):
+    def __new__(
+        mcs: type[_typeshed.Self],  # noqa: TID251
+        name: str,
+        bases: tuple[type, ...],
+        attrs: dict[str, Any],
+    ) -> _typeshed.Self: ...  # noqa: TID251
 
 class Widget(metaclass=MediaDefiningClass):
     needs_multipart_form: bool
