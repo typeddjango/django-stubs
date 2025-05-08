@@ -13,6 +13,7 @@ from typing_extensions import deprecated
 VOID_ELEMENTS: frozenset[str]
 MAX_URL_LENGTH: int
 MAX_STRIP_TAGS_DEPTH: int
+long_open_tag_without_closing_re: SimpleLazyObject
 
 def escape(text: Any) -> SafeString: ...
 def escapejs(value: Any) -> SafeString: ...
