@@ -9,7 +9,7 @@ mysqlclient==2.2.7
 
 # Django deps:
 psycopg2-binary
-Django==5.2.0
+Django==5.2.1
 -e ./ext
 -e .[redis,compatible-mypy,oracle]
 
