@@ -68,7 +68,7 @@ jobs:
 
       # Must match `shard` definition in the test matrix:
       - name: Run pytest tests
-        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests --durations=0
+        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
       - name: Run mypy on the test cases
         run: mypy --strict tests
 
