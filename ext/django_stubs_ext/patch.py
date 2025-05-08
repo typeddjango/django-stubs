@@ -116,7 +116,7 @@ def _get_need_generic() -> list[MPGeneric[Any]]:
         # We cannot patch symbols in `django.contrib.auth.forms` if the `monkeypatch()` call
         # is in the settings file because django is not initialized yet.
         # To solve this, you'll have to call `monkeypatch()` again later, in an `AppConfig.ready` for ex.
-        # See https://docs.djangoproject.com/en/5.1/ref/applications/#django.apps.AppConfig.ready
+        # See https://docs.djangoproject.com/en/5.2/ref/applications/#django.apps.AppConfig.ready
         return _need_generic
 
 

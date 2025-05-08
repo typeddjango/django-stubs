@@ -165,7 +165,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
    You can add extra types to patch with `django_stubs_ext.monkeypatch(extra_classes=[YourDesiredType])`
 
    **If you use generic symbols in `django.contrib.auth.forms`**, you will have to do the monkeypatching
-   again in your first [`AppConfig.ready`](https://docs.djangoproject.com/en/5.1/ref/applications/#django.apps.AppConfig.ready).
+   again in your first [`AppConfig.ready`](https://docs.djangoproject.com/en/5.2/ref/applications/#django.apps.AppConfig.ready).
    This is currently required because `django.contrib.auth.forms` cannot be imported until django is initialized.
 
 
