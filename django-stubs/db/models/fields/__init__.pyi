@@ -506,6 +506,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
 
 class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_set_type: str | time | real_datetime | Combinable
@@ -621,16 +622,17 @@ class DurationField(Field[_ST, _GT]):
 class AutoFieldMixin:
     db_returning: bool
     def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
+    def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...
 
 class AutoFieldMeta(type): ...
 
-class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):
+class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):  # type: ignore[misc]
     _pyi_private_set_type: Combinable | int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 
-class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...
-class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...
+class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...  # type: ignore[misc]
+class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...  # type: ignore[misc]
 
 __all__ = [
     "AutoField",

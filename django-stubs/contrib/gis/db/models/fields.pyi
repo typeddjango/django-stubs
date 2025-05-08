@@ -13,6 +13,7 @@ from django.contrib.gis.geos import (
     Polygon,
 )
 from django.core.validators import _ValidatorCallable
+from django.db.models import Model
 from django.db.models.expressions import Combinable, Expression
 from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
 from django.utils.choices import _Choices
@@ -121,6 +122,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         srid: Any = ...,
         **kwargs: Any,
     ) -> forms.GeometryField: ...
+    def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
 
 class PointField(GeometryField[_ST, _GT]):
     _pyi_private_set_type: Point | Combinable
@@ -184,4 +186,5 @@ class ExtentField(Field):
 class RasterField(BaseSpatialField):
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
+    def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
     def get_transform(self, name: Any) -> Any: ...

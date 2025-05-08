@@ -117,7 +117,6 @@ django.contrib.auth.views.PasswordResetView.form_class
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_field
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_fk_field
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.template
-django.contrib.contenttypes.fields.GenericRelation.contribute_to_class
 django.contrib.contenttypes.fields.GenericRelation.get_extra_restriction
 django.contrib.contenttypes.forms.generic_inlineformset_factory
 django.contrib.contenttypes.management.inject_rename_contenttypes_operations
@@ -166,7 +165,6 @@ django.contrib.gis.db.models.CharField.description
 django.contrib.gis.db.models.CharField.formfield
 django.contrib.gis.db.models.CheckConstraint.validate
 django.contrib.gis.db.models.Count.__init__
-django.contrib.gis.db.models.DateField.contribute_to_class
 django.contrib.gis.db.models.DateField.formfield
 django.contrib.gis.db.models.DateTimeField.formfield
 django.contrib.gis.db.models.DecimalField.context
@@ -202,7 +200,6 @@ django.contrib.gis.db.models.Field.rel_db_type
 django.contrib.gis.db.models.Field.unique
 django.contrib.gis.db.models.FileField.__get__
 django.contrib.gis.db.models.FileField.attr_class
-django.contrib.gis.db.models.FileField.contribute_to_class
 django.contrib.gis.db.models.FileField.descriptor_class
 django.contrib.gis.db.models.FileField.formfield
 django.contrib.gis.db.models.FilePathField.formfield
@@ -237,10 +234,8 @@ django.contrib.gis.db.models.ForeignObjectRel.identity
 django.contrib.gis.db.models.ForeignObjectRel.path_infos
 django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.GenericIPAddressField.formfield
-django.contrib.gis.db.models.GeometryField.contribute_to_class
 django.contrib.gis.db.models.ImageField.__get__
 django.contrib.gis.db.models.ImageField.attr_class
-django.contrib.gis.db.models.ImageField.contribute_to_class
 django.contrib.gis.db.models.ImageField.descriptor_class
 django.contrib.gis.db.models.ImageField.formfield
 django.contrib.gis.db.models.IntegerField.formfield
@@ -251,7 +246,6 @@ django.contrib.gis.db.models.Lookup.allowed_default
 django.contrib.gis.db.models.Lookup.lookup_name
 django.contrib.gis.db.models.Lookup.output_field
 django.contrib.gis.db.models.ManyToManyField.__get__
-django.contrib.gis.db.models.ManyToManyField.contribute_to_class
 django.contrib.gis.db.models.ManyToManyField.formfield
 django.contrib.gis.db.models.ManyToManyField.path_infos
 django.contrib.gis.db.models.ManyToManyField.reverse_path_infos
@@ -273,7 +267,6 @@ django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
 django.contrib.gis.db.models.Q.XOR
 django.contrib.gis.db.models.QuerySet.__deepcopy__
 django.contrib.gis.db.models.QuerySet.__xor__
-django.contrib.gis.db.models.RasterField.contribute_to_class
 django.contrib.gis.db.models.SlugField.formfield
 django.contrib.gis.db.models.SmallAutoField.rel_db_type
 django.contrib.gis.db.models.StdDev.__init__
@@ -297,8 +290,6 @@ django.contrib.gis.db.models.Window.as_sqlite
 django.contrib.gis.db.models.aggregates.Extent.is_extent
 django.contrib.gis.db.models.aggregates.Extent3D.is_extent
 django.contrib.gis.db.models.aggregates.GeoAggregate.as_sql
-django.contrib.gis.db.models.fields.GeometryField.contribute_to_class
-django.contrib.gis.db.models.fields.RasterField.contribute_to_class
 django.contrib.gis.db.models.functions.Area.as_sql
 django.contrib.gis.db.models.functions.GeoFuncMixin.__init__
 django.contrib.gis.db.models.functions.GeoFuncMixin.as_sql
@@ -527,7 +518,6 @@ django.db.models.CharField.description
 django.db.models.CharField.formfield
 django.db.models.CheckConstraint.validate
 django.db.models.Count.__init__
-django.db.models.DateField.contribute_to_class
 django.db.models.DateField.formfield
 django.db.models.DateTimeField.formfield
 django.db.models.DecimalField.context
@@ -561,7 +551,6 @@ django.db.models.Field.rel_db_type
 django.db.models.Field.unique
 django.db.models.FileField.__get__
 django.db.models.FileField.attr_class
-django.db.models.FileField.contribute_to_class
 django.db.models.FileField.descriptor_class
 django.db.models.FileField.formfield
 django.db.models.FilePathField.formfield
@@ -598,7 +587,6 @@ django.db.models.Func.allowed_default
 django.db.models.GenericIPAddressField.formfield
 django.db.models.ImageField.__get__
 django.db.models.ImageField.attr_class
-django.db.models.ImageField.contribute_to_class
 django.db.models.ImageField.descriptor_class
 django.db.models.ImageField.formfield
 django.db.models.IntegerField.formfield
@@ -609,7 +597,6 @@ django.db.models.Lookup.lookup_name
 django.db.models.Lookup.allowed_default
 django.db.models.Lookup.output_field
 django.db.models.ManyToManyField.__get__
-django.db.models.ManyToManyField.contribute_to_class
 django.db.models.ManyToManyField.formfield
 django.db.models.ManyToManyField.path_infos
 django.db.models.ManyToManyField.reverse_path_infos
@@ -705,7 +692,6 @@ django.db.models.expressions.register_combinable_fields
 django.db.models.fields.AutoField.rel_db_type
 django.db.models.fields.AutoFieldMixin.__init__
 django.db.models.fields.AutoFieldMixin.check
-django.db.models.fields.AutoFieldMixin.contribute_to_class
 django.db.models.fields.AutoFieldMixin.formfield
 django.db.models.fields.AutoFieldMixin.get_db_prep_value
 django.db.models.fields.AutoFieldMixin.validate
@@ -716,7 +702,6 @@ django.db.models.fields.BooleanField.formfield
 django.db.models.fields.CharField.cast_db_type
 django.db.models.fields.CharField.description
 django.db.models.fields.CharField.formfield
-django.db.models.fields.DateField.contribute_to_class
 django.db.models.fields.DateField.formfield
 django.db.models.fields.DateTimeCheckMixin.check
 django.db.models.fields.DateTimeField.formfield
@@ -764,12 +749,10 @@ django.db.models.fields.URLField.formfield
 django.db.models.fields.UUIDField.formfield
 django.db.models.fields.files.FileField.__get__
 django.db.models.fields.files.FileField.attr_class
-django.db.models.fields.files.FileField.contribute_to_class
 django.db.models.fields.files.FileField.descriptor_class
 django.db.models.fields.files.FileField.formfield
 django.db.models.fields.files.ImageField.__get__
 django.db.models.fields.files.ImageField.attr_class
-django.db.models.fields.files.ImageField.contribute_to_class
 django.db.models.fields.files.ImageField.descriptor_class
 django.db.models.fields.files.ImageField.formfield
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
@@ -815,7 +798,6 @@ django.db.models.fields.related.ForeignObjectRel.get_extra_restriction
 django.db.models.fields.related.ForeignObjectRel.identity
 django.db.models.fields.related.ForeignObjectRel.path_infos
 django.db.models.fields.related.ManyToManyField.__get__
-django.db.models.fields.related.ManyToManyField.contribute_to_class
 django.db.models.fields.related.ManyToManyField.formfield
 django.db.models.fields.related.ManyToManyField.path_infos
 django.db.models.fields.related.ManyToManyField.reverse_path_infos
