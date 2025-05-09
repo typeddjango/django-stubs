@@ -1,4 +1,4 @@
-from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo
+from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo, Var
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
 from mypy.types import (
@@ -18,6 +18,25 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.lib import fullnames, helpers
 
 
+# TODO: [mypy 1.14+] Remove this backport of `TypeInfo.enum_members`.
+def _get_enum_members(info: TypeInfo) -> list[str]:
+    try:
+        return info.enum_members
+    except AttributeError:  # mypy < 1.14
+        pass
+
+    return [
+        name
+        for name, sym in info.names.items()
+        if (
+            isinstance(sym.node, Var)
+            and name not in ("_ignore_", "_order_", "__order__")
+            and not name.startswith("__")
+            and sym.node.has_explicit_value
+        )
+    ]
+
+
 def _has_lazy_label(node: TypeInfo) -> bool:
     """
     Check whether a choices type has any lazy strings for labels.
@@ -33,7 +52,8 @@ def _has_lazy_label(node: TypeInfo) -> bool:
             # If the empty label is lazy, then we don't need to check all the members.
             return True
 
-    for member_name in node.enum_members:
+    # TODO: [mypy 1.14+] Use `node.enum_members` and remove `_get_enum_members()` backport.
+    for member_name in _get_enum_members(node):
         if (sym := node.get(member_name)) is None:
             continue
 
