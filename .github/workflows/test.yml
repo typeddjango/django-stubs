@@ -21,6 +21,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13']
+        mypy-version: ['1.13', '1.14', '1.15', 'latest']
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +32,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip "setuptools<79.0.0" wheel
-          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements-base.txt
+          if [ "${{ matrix.mypy-version }}" == "latest" ]; then
+            pip install git+https://github.com/python/mypy.git@master
+          else
+            pip install mypy==${{ matrix.mypy-version }}
+          fi
 
       - name: Run mypy on plugin code
         run: mypy --strict mypy_django_plugin
