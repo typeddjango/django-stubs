@@ -1,3 +1,6 @@
+import inspect
+from typing import Any
+
 from mypy.checkmember import analyze_member_access
 from mypy.errorcodes import ATTR_DEFINED
 from mypy.nodes import CallExpr, MemberExpr
@@ -20,6 +23,12 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
     str_info = helpers.lookup_fully_qualified_typeinfo(helpers.get_typechecker_api(ctx), "builtins.str")
     assert str_info is not None
     str_type = Instance(str_info, [])
+
+    # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
+    extra: dict[str, Any] = {}
+    if "msg" in inspect.signature(analyze_member_access).parameters:  # mypy < 1.16
+        extra["msg"] = ctx.api.msg
+
     return analyze_member_access(
         method_name,
         str_type,
@@ -28,7 +37,7 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
         is_super=False,
         # operators are already handled with magic methods defined in the stubs for _StrPromise
         is_operator=False,
-        msg=ctx.api.msg,
         original_type=ctx.type,
         chk=helpers.get_typechecker_api(ctx),
+        **extra,
     )
