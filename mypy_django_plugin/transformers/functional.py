@@ -1,4 +1,3 @@
-import inspect
 from typing import Any
 
 from mypy.checkmember import analyze_member_access
@@ -7,8 +6,11 @@ from mypy.nodes import CallExpr, MemberExpr
 from mypy.plugin import AttributeContext
 from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
+from mypy.version import __version__ as mypy_version
 
 from mypy_django_plugin.lib import helpers
+
+mypy_version_info = tuple(map(int, mypy_version.partition("+")[0].split(".")))
 
 
 def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
@@ -26,7 +28,7 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
 
     # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
     extra: dict[str, Any] = {}
-    if "msg" in inspect.signature(analyze_member_access).parameters:  # mypy < 1.16
+    if mypy_version_info < (1, 16):
         extra["msg"] = ctx.api.msg
 
     return analyze_member_access(
