@@ -48,9 +48,6 @@ django.core.checks.commands
 django.core.checks.registry.Tags.commands
 django.core.handlers.wsgi.LimitedStream.read
 django.core.handlers.wsgi.LimitedStream.readline
-django.core.management.commands.shell.Command.get_auto_imports
-django.core.management.commands.shell.Command.get_namespace
-django.core.management.utils.run_formatters
 django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_lookups
 django.db.backends.base.schema.BaseDatabaseSchemaEditor.sql_pk_constraint
