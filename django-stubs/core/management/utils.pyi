@@ -2,7 +2,7 @@ import sys
 from collections.abc import Iterable, Sequence
 from typing import Any
 
-from _typeshed import StrOrBytesPath, StrPath
+from _typeshed import StrOrBytesPath, StrPath, SupportsWrite
 from django.apps.config import AppConfig
 from django.db.models.base import Model
 
@@ -20,5 +20,7 @@ def normalize_path_patterns(patterns: Iterable[str]) -> list[str]: ...
 def is_ignored_path(path: StrPath, ignore_patterns: Iterable[str]) -> bool: ...
 def find_formatters() -> dict[str, str | None]: ...
 def run_formatters(
-    written_files: Sequence[StrOrBytesPath], black_path: str = ..., stderr: object = sys.stderr
+    written_files: Sequence[StrOrBytesPath],
+    black_path: str = ...,
+    stderr: SupportsWrite[str] = ...
 ) -> None: ...
