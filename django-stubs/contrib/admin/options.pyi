@@ -25,7 +25,7 @@ from django.forms.models import (
     ModelForm,
     ModelMultipleChoiceField,
 )
-from django.forms.widgets import Media
+from django.forms.widgets import Media, MediaDefiningClass
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.template.response import _TemplateForResponseT
@@ -84,7 +84,7 @@ _ListDisplayT: TypeAlias = _ListOrTuple[_DisplayT[_ModelT]]
 
 # Options `form`, `list_display`, `list_display_links` and `actions` are not marked as `ClassVar` due to the
 # limitations of the current type system: `ClassVar` cannot contain type variables.
-class BaseModelAdmin(Generic[_ModelT]):
+class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     autocomplete_fields: ClassVar[_ListOrTuple[str]]
     raw_id_fields: ClassVar[_ListOrTuple[str]]
     fields: ClassVar[_FieldGroups | None]

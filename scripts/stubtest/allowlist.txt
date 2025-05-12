@@ -161,7 +161,6 @@ django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
 django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor.related_manager_cls
 django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_extent
-django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.mysql.features.DatabaseFeatures.supports_geometry_field_unique_index
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.collect
 django.contrib.gis.db.backends.mysql.operations.MySQLOperations.from_text
@@ -180,6 +179,7 @@ django.contrib.gis.db.models.ForeignObject.foreign_related_fields
 django.contrib.gis.db.models.ForeignObject.local_related_fields
 django.contrib.gis.db.models.ForeignObject.related_fields
 django.contrib.gis.db.models.ForeignObject.reverse_related_fields
+django.contrib.gis.db.models.ForeignObjectRel.accessor_name
 django.contrib.gis.db.models.ForeignObjectRel.cache_name
 django.contrib.gis.db.models.ForeignObjectRel.hidden
 django.contrib.gis.db.models.ForeignObjectRel.many_to_many
@@ -236,6 +236,8 @@ django.core.files.storage.memory.InMemoryStorage.file_permissions_mode
 django.core.files.storage.memory.InMemoryStorage.location
 django.core.handlers.asgi.ASGIRequest.COOKIES
 django.core.handlers.asgi.ASGIRequest.GET
+django.core.handlers.wsgi.WSGIRequest.COOKIES
+django.core.handlers.wsgi.WSGIRequest.GET
 django.core.management.commands.loaddata.Command.compression_formats
 django.core.management.commands.loaddata.Command.fixture_dirs
 django.core.management.commands.makemessages.BuildFile.is_templatized
@@ -306,6 +308,7 @@ django.db.models.ForeignObject.foreign_related_fields
 django.db.models.ForeignObject.local_related_fields
 django.db.models.ForeignObject.related_fields
 django.db.models.ForeignObject.reverse_related_fields
+django.db.models.ForeignObjectRel.accessor_name
 django.db.models.ForeignObjectRel.cache_name
 django.db.models.ForeignObjectRel.hidden
 django.db.models.ForeignObjectRel.many_to_many
@@ -334,6 +337,7 @@ django.db.models.fields.related.ForeignObject.foreign_related_fields
 django.db.models.fields.related.ForeignObject.local_related_fields
 django.db.models.fields.related.ForeignObject.related_fields
 django.db.models.fields.related.ForeignObject.reverse_related_fields
+django.db.models.fields.related.ForeignObjectRel.accessor_name
 django.db.models.fields.related.ForeignObjectRel.cache_name
 django.db.models.fields.related.ForeignObjectRel.hidden
 django.db.models.fields.related.ForeignObjectRel.many_to_many
@@ -352,6 +356,7 @@ django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.RelatedOb
 django.db.models.fields.related_descriptors.ManyToManyDescriptor.related_manager_cls
 django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor.related_manager_cls
 django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.RelatedObjectDoesNotExist
+django.db.models.fields.reverse_related.ForeignObjectRel.accessor_name
 django.db.models.fields.reverse_related.ForeignObjectRel.cache_name
 django.db.models.fields.reverse_related.ForeignObjectRel.hidden
 django.db.models.fields.reverse_related.ForeignObjectRel.many_to_many
@@ -369,6 +374,10 @@ django.db.models.options.Options.default_manager
 django.db.models.options.Options.fields
 django.db.models.options.Options.fields_map
 django.db.models.options.Options.managers
+django.db.models.options.Options.concrete_fields
+django.db.models.options.Options.local_concrete_fields
+django.db.models.options.Options.many_to_many
+django.db.models.options.Options.related_objects
 django.db.models.options.Options.managers_map
 django.db.models.options.Options.swapped
 django.db.models.options.Options.total_unique_constraints
@@ -395,8 +404,11 @@ django.forms.renderers.Jinja2.backend
 django.forms.renderers.Jinja2DivFormRenderer.__init__
 django.http.HttpRequest.accepted_types
 django.http.HttpRequest.headers
+django.http.HttpResponse.text
 django.http.request.HttpRequest.accepted_types
 django.http.request.HttpRequest.headers
+django.http.request.MediaType.quality
+django.http.response.HttpResponse.text
 django.middleware.csrf.CsrfViewMiddleware.allowed_origin_subdomains
 django.middleware.csrf.CsrfViewMiddleware.allowed_origins_exact
 django.middleware.csrf.CsrfViewMiddleware.csrf_trusted_origins_hosts
@@ -423,6 +435,15 @@ django.db.models.Q.referenced_base_fields
 django.db.models.query_utils.Q.referenced_base_fields
 django.contrib.gis.db.models.Q.referenced_base_fields
 django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
+django.contrib.gis.db.models.CompositePrimaryKey.cached_col
+django.contrib.gis.db.models.CompositePrimaryKey.columns
+django.contrib.gis.db.models.CompositePrimaryKey.fields
+django.db.models.CompositePrimaryKey.cached_col
+django.db.models.CompositePrimaryKey.columns
+django.db.models.CompositePrimaryKey.fields
+django.db.models.fields.composite.CompositePrimaryKey.cached_col
+django.db.models.fields.composite.CompositePrimaryKey.columns
+django.db.models.fields.composite.CompositePrimaryKey.fields
 
 # Ignore missing inner `Meta` class, see PR #2000 for the related discussion
 django.contrib.auth.base_user.AbstractBaseUser.Meta
@@ -579,3 +600,23 @@ django.db.models.fields.generated.GeneratedField.__init__
 # https://github.com/python/cpython/blob/5abff6960b4aecb0d5c81c7482cf3faa74e1983d/Lib/copyreg.py#L112-L161
 # Some Django classes get copied at import time, which leads stubtest to detect it.
 .*\.__slotnames__
+
+# These are dynamically added when using `save(commit=False)`
+# See https://docs.djangoproject.com/en/5.2/topics/forms/modelforms/#the-save-method
+django.forms.BaseModelForm.save_m2m
+django.forms.BaseModelFormSet.save_m2m
+django.forms.models.BaseModelForm.save_m2m
+django.forms.models.BaseModelFormSet.save_m2m
+django.contrib.gis.forms.BaseModelForm.save_m2m
+django.contrib.gis.forms.BaseModelFormSet.save_m2m
+
+# Dynamically generated in https://github.com/django/django/blob/0ee06c04e0256094270db3ffe8b5dafa6a8457a3/django/core/mail/backends/locmem.py#L24
+django.core.mail.outbox
+
+# Variable is supposed to be a set but is initialised to an empty dict
+django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geojson_options
+
+# We declare more strict types for this in stubs to avoid RuntimeErrors.
+# Django uses a `*args` parameter but crash if it contains more than 1 element.
+django.http.QueryDict.pop
+django.http.request.QueryDict.pop

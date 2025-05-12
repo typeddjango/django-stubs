@@ -12,7 +12,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     geom_func_prefix: str
     Adapter: Any
     @cached_property
-    def mariadb(self) -> bool: ...
+    def mariadb(self) -> bool: ...  # type: ignore[override]
     @cached_property
     def mysql(self) -> bool: ...  # type: ignore[override]
     @cached_property

@@ -18,6 +18,7 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
+from django.utils.functional import cached_property
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
@@ -227,6 +228,8 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     content: bytes
     resolver_match: ResolverMatch
     redirect_chain: list[tuple[str, int]]
+    @cached_property
+    def text(self) -> str: ...
 
 @type_check_only
 class _MonkeyPatchedASGIResponse(_ASGIResponse):
@@ -479,3 +482,13 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
         query_params: Mapping[Any, Any] | None = ...,
         **extra: Any,
     ) -> _MonkeyPatchedASGIResponse: ...
+
+__all__ = (
+    "AsyncClient",
+    "AsyncRequestFactory",
+    "Client",
+    "RedirectCycleError",
+    "RequestFactory",
+    "encode_file",
+    "encode_multipart",
+)

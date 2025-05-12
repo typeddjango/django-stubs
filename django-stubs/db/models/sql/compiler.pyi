@@ -10,11 +10,12 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression, Ref
 from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
+from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import cached_property
 
 _ParamT: TypeAlias = str | int
 
-_ParamsT: TypeAlias = list[_ParamT]
+_ParamsT: TypeAlias = _ListOrTuple[_ParamT]
 _AsSqlType: TypeAlias = tuple[str, _ParamsT]
 
 class PositionRef(Ref):
@@ -87,7 +88,6 @@ class SQLCompiler:
         restricted: bool | None = None,
     ) -> list[dict[str, Any]]: ...
     def get_select_for_update_of_arguments(self) -> list[Any]: ...
-    def deferred_to_columns(self) -> dict[type[Model], set[str]]: ...
     def get_converters(self, expressions: list[Expression]) -> dict[int, tuple[list[Callable], Expression]]: ...
     def apply_converters(
         self, rows: Iterable[Iterable[Any]], converters: dict[int, tuple[list[Callable], Expression]]
@@ -119,7 +119,6 @@ class SQLCompiler:
     def execute_sql(
         self, result_type: Literal["multi"] = "multi", chunked_fetch: bool = False, chunk_size: int = 100
     ) -> Iterable[list[Sequence[Any]]] | None: ...
-    def as_subquery_condition(self, alias: str, columns: list[str], compiler: SQLCompiler) -> _AsSqlType: ...
     def explain_query(self) -> Iterator[str]: ...
 
 class SQLInsertCompiler(SQLCompiler):

@@ -1,7 +1,6 @@
 import collections
-from collections import namedtuple
-from collections.abc import Iterable, Iterator, Sequence
-from typing import Any, Literal
+from collections.abc import Callable, Iterable, Iterator, Sequence
+from typing import Any, Literal, NamedTuple
 
 from django.db.backends.utils import CursorWrapper
 from django.db.models import Field, FilteredRelation, Model, Q
@@ -13,7 +12,13 @@ from django.db.models.sql.datastructures import BaseTable, Join
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
 
-JoinInfo = namedtuple("JoinInfo", ("final_field", "targets", "opts", "joins", "path", "transform_function"))
+class JoinInfo(NamedTuple):
+    final_field: Field
+    targets: tuple[Any, ...]
+    opts: Any
+    joins: list[str]
+    path: list[Any]
+    transform_function: Callable[[Field, str], Expression]
 
 class RawQuery:
     high_mark: int | None
@@ -231,3 +236,5 @@ class JoinPromoter:
     def __init__(self, connector: str, num_children: int, negated: bool) -> None: ...
     def add_votes(self, votes: Iterable[str]) -> None: ...
     def update_join_types(self, query: Query) -> set[str]: ...
+
+__all__ = ["Query", "RawQuery"]

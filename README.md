@@ -49,6 +49,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
+| 5.2.0          | 1.13+        | 5.2            | 5.1                    | 3.10 - 3.13    |
 | 5.1.3          | 1.13+        | 5.1            | 4.2                    | 3.9 - 3.13     |
 | 5.1.2          | 1.13+        | 5.1            | 4.2                    | 3.9 - 3.13     |
 | 5.1.1          | 1.13.x       | 5.1            | 4.2                    | 3.8 - 3.12     |
@@ -162,6 +163,11 @@ This happens because these Django classes do not support [`__class_getitem__`](h
    ```
 
    You can add extra types to patch with `django_stubs_ext.monkeypatch(extra_classes=[YourDesiredType])`
+
+   **If you use generic symbols in `django.contrib.auth.forms`**, you will have to do the monkeypatching
+   again in your first [`AppConfig.ready`](https://docs.djangoproject.com/en/5.2/ref/applications/#django.apps.AppConfig.ready).
+   This is currently required because `django.contrib.auth.forms` cannot be imported until django is initialized.
+
 
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 

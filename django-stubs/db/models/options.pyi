@@ -36,7 +36,7 @@ def make_immutable_fields_list(name: str, data: Iterable[_T]) -> ImmutableList[_
 _M = TypeVar("_M", bound=Model)
 
 class Options(Generic[_M]):
-    constraints: list[BaseConstraint]
+    constraints: _ListOrTuple[BaseConstraint]
     FORWARD_PROPERTIES: set[str]
     REVERSE_PROPERTIES: set[str]
     default_apps: Any
@@ -52,18 +52,18 @@ class Options(Generic[_M]):
     db_table: str
     db_table_comment: str
     ordering: Sequence[str] | None
-    indexes: list[Any]
+    indexes: _ListOrTuple[Any]
     unique_together: Sequence[tuple[str, ...]]  # Are always normalized
     index_together: Sequence[tuple[str, ...]]  # Are always normalized
     select_on_save: bool
     default_permissions: Sequence[str]
-    permissions: list[Any]
+    permissions: _ListOrTuple[Any]
     object_name: str | None
     app_label: str
     get_latest_by: Sequence[str] | None
     order_with_respect_to: str | None
     db_tablespace: str
-    required_db_features: list[str]
+    required_db_features: _ListOrTuple[str]
     required_db_vendor: Literal["sqlite", "postgresql", "mysql", "oracle"] | None
     meta: type | None
     pk: Field
@@ -88,8 +88,6 @@ class Options(Generic[_M]):
     def label_lower(self) -> str: ...
     @property
     def app_config(self) -> AppConfig: ...
-    @property
-    def installed(self) -> bool: ...
     def contribute_to_class(self, cls: type[Model], name: str) -> None: ...
     def add_manager(self, manager: Manager) -> None: ...
     def add_field(self, field: GenericForeignKey | Field[Any, Any], private: bool = False) -> None: ...
@@ -114,6 +112,14 @@ class Options(Generic[_M]):
     def default_manager(self) -> Manager | None: ...
     @cached_property
     def fields(self) -> ImmutableList[Field[Any, Any]]: ...
+    @cached_property
+    def concrete_fields(self) -> ImmutableList[Field[Any, Any]]: ...
+    @cached_property
+    def many_to_many(self) -> ImmutableList[ManyToManyField[Any, Any]]: ...
+    @cached_property
+    def related_objects(self) -> ImmutableList[ForeignObjectRel]: ...
+    @cached_property
+    def local_concrete_fields(self) -> ImmutableList[Field[Any, Any]]: ...
     def get_field(self, field_name: str) -> Field | ForeignObjectRel | GenericForeignKey: ...
     def get_base_chain(self, model: type[Model]) -> list[type[Model]]: ...
     @cached_property

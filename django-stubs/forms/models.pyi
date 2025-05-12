@@ -279,6 +279,7 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
         blank: bool = False,
         **kwargs: Any,
     ) -> None: ...
+    def validate_no_null_characters(self, value: Any) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
@@ -312,3 +313,18 @@ def _get_foreign_key(
 def _get_foreign_key(
     parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[False] = False
 ) -> ForeignKey: ...
+
+__all__ = (
+    "ModelForm",
+    "BaseModelForm",
+    "model_to_dict",
+    "fields_for_model",
+    "ModelChoiceField",
+    "ModelMultipleChoiceField",
+    "ALL_FIELDS",
+    "BaseModelFormSet",
+    "modelformset_factory",
+    "BaseInlineFormSet",
+    "inlineformset_factory",
+    "modelform_factory",
+)

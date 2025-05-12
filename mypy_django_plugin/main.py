@@ -123,10 +123,10 @@ class NewSemanalDjangoPlugin(Plugin):
                 # forward relations
                 self.django_context.get_model_related_fields(model_class),
                 # reverse relations - `related_objects` is private API (according to docstring)
-                model_class._meta.related_objects,  # type: ignore[attr-defined]
+                model_class._meta.related_objects,
             ):
                 try:
-                    related_model_cls = self.django_context.get_field_related_model_cls(field)
+                    related_model_cls = self.django_context.get_field_related_model_cls(field)  # type: ignore[arg-type]
                 except UnregisteredModelError:
                     continue
                 related_model_module = related_model_cls.__module__
@@ -136,7 +136,7 @@ class NewSemanalDjangoPlugin(Plugin):
         return list(deps) + [
             # for QuerySet.annotate
             self._new_dependency("django_stubs_ext"),
-            # For BaseManager.from_queryset
+            # For Manager.from_queryset
             self._new_dependency("django.db.models.query"),
         ]
 
@@ -277,10 +277,14 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
 
-        if info and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME) and attr_name in ("choices", "values"):
+        if (
+            info
+            and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
+            and attr_name in ("choices", "labels", "values", "__empty__")
+        ):
             return choices.transform_into_proper_attr_type
 
-        if info and info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name == "value":
+        if info and info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in ("label", "value"):
             return choices.transform_into_proper_attr_type
 
         return None

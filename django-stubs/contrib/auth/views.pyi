@@ -31,7 +31,6 @@ class LogoutView(RedirectURLMixin, TemplateView):
     extra_context: Any
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
-    def get_next_page(self) -> str | None: ...
 
 def logout_then_login(request: HttpRequest, login_url: str | None = ...) -> HttpResponseRedirect: ...
 def redirect_to_login(
@@ -51,7 +50,6 @@ class PasswordResetView(PasswordContextMixin, FormView):
     title: Any
     token_generator: Any
 
-INTERNAL_RESET_URL_TOKEN: str
 INTERNAL_RESET_SESSION_TOKEN: str
 
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):

@@ -62,11 +62,13 @@ class ErrorList(UserList[ValidationError | _StrOrPromise], RenderableErrorMixin)
     template_name_ul: str
     error_class: str
     renderer: BaseRenderer
+    field_name: str | None
     def __init__(
         self,
         initlist: ErrorList | Sequence[str | Exception] | None = None,
         error_class: str | None = None,
         renderer: BaseRenderer | None = None,
+        field_id: str | None = None,
     ) -> None: ...
     def as_data(self) -> list[ValidationError]: ...
     def get_json_data(self, escape_html: bool = False) -> list[dict[str, str]]: ...
