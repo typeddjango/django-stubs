@@ -8,12 +8,12 @@ from django.db.models.base import Model
 from django.db.models.fields import _AllLimitChoicesTo, _LimitChoicesTo
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
-from django.forms.fields import ChoiceField, Field
+from django.forms.fields import ChoiceField, Field, _WidgetTypeOrInstance
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, _DataT, _FilesT
-from django.forms.widgets import Widget
+from django.forms.widgets import HiddenInput, Widget
 from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
@@ -222,6 +222,7 @@ def inlineformset_factory(
 ) -> type[BaseInlineFormSet[_M, _ParentM, _ModelFormT]]: ...
 
 class InlineForeignKeyField(Field):
+    widget: _WidgetTypeOrInstance[HiddenInput]  # type: ignore[assignment]
     disabled: bool
     help_text: _StrOrPromise
     required: bool

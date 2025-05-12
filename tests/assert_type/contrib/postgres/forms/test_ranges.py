@@ -3,18 +3,19 @@ from django.contrib.postgres.forms.ranges import (
     DateTimeRangeField,
     DecimalRangeField,
     IntegerRangeField,
+    RangeWidget,
 )
-from django.forms.widgets import Widget
+from django.forms.widgets import TextInput
 from typing_extensions import assert_type
 
-assert_type(IntegerRangeField.widget, type[Widget] | Widget)
-assert_type(IntegerRangeField().widget, Widget)
+assert_type(IntegerRangeField.widget, type[TextInput] | TextInput)
+assert_type(IntegerRangeField().widget, RangeWidget)
 
-assert_type(DecimalRangeField.widget, type[Widget] | Widget)
-assert_type(DecimalRangeField().widget, Widget)
+assert_type(DecimalRangeField.widget, type[TextInput] | TextInput)
+assert_type(DecimalRangeField().widget, RangeWidget)
 
-assert_type(DateTimeRangeField.widget, type[Widget] | Widget)
-assert_type(DateTimeRangeField().widget, Widget)
+assert_type(DateTimeRangeField.widget, type[TextInput] | TextInput)
+assert_type(DateTimeRangeField().widget, RangeWidget)
 
-assert_type(DateRangeField.widget, type[Widget] | Widget)
-assert_type(DateRangeField().widget, Widget)
+assert_type(DateRangeField.widget, type[TextInput] | TextInput)
+assert_type(DateRangeField().widget, RangeWidget)

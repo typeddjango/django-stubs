@@ -8,29 +8,29 @@ from django.contrib.gis.forms import (
     PointField,
     PolygonField,
 )
-from django.forms.widgets import Widget
+from django.contrib.gis.forms.widgets import OpenLayersWidget
 from typing_extensions import assert_type
 
-assert_type(GeometryField.widget, type[Widget] | Widget)
-assert_type(GeometryField().widget, Widget)
+assert_type(GeometryField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(GeometryField().widget, OpenLayersWidget)
 
-assert_type(GeometryCollectionField.widget, type[Widget] | Widget)
-assert_type(GeometryCollectionField().widget, Widget)
+assert_type(GeometryCollectionField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(GeometryCollectionField().widget, OpenLayersWidget)
 
-assert_type(PointField.widget, type[Widget] | Widget)
-assert_type(PointField().widget, Widget)
+assert_type(PointField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(PointField().widget, OpenLayersWidget)
 
-assert_type(MultiPointField.widget, type[Widget] | Widget)
-assert_type(MultiPointField().widget, Widget)
+assert_type(MultiPointField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(MultiPointField().widget, OpenLayersWidget)
 
-assert_type(LineStringField.widget, type[Widget] | Widget)
-assert_type(LineStringField().widget, Widget)
+assert_type(LineStringField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(LineStringField().widget, OpenLayersWidget)
 
-assert_type(MultiLineStringField.widget, type[Widget] | Widget)
-assert_type(MultiLineStringField().widget, Widget)
+assert_type(MultiLineStringField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(MultiLineStringField().widget, OpenLayersWidget)
 
-assert_type(PolygonField.widget, type[Widget] | Widget)
-assert_type(PolygonField().widget, Widget)
+assert_type(PolygonField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(PolygonField().widget, OpenLayersWidget)
 
-assert_type(MultiPolygonField.widget, type[Widget] | Widget)
-assert_type(MultiPolygonField().widget, Widget)
+assert_type(MultiPolygonField.widget, type[OpenLayersWidget] | OpenLayersWidget)
+assert_type(MultiPolygonField().widget, OpenLayersWidget)

@@ -1,8 +1,11 @@
 from typing import Any
 
 from django import forms
+from django.contrib.gis.forms.widgets import OpenLayersWidget
+from django.forms.fields import _WidgetTypeOrInstance
 
 class GeometryField(forms.Field):
+    widget: _WidgetTypeOrInstance[OpenLayersWidget]  # type: ignore[assignment]
     geom_type: str
     srid: Any
     def __init__(self, *, srid: Any | None = ..., geom_type: Any | None = ..., **kwargs: Any) -> None: ...
