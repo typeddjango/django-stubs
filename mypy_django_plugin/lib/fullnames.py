@@ -11,6 +11,7 @@ ONETOONE_FIELD_FULLNAME = "django.db.models.fields.related.OneToOneField"
 MANYTOMANY_FIELD_FULLNAME = "django.db.models.fields.related.ManyToManyField"
 DUMMY_SETTINGS_BASE_CLASS = "django.conf._DjangoConfLazyObject"
 AUTH_USER_MODEL_FULLNAME = "django.conf.settings.AUTH_USER_MODEL"
+STORAGE_HANDLER_CLASS_FULLNAME = "django.core.files.storage.handler.StorageHandler"
 
 QUERYSET_CLASS_FULLNAME = "django.db.models.query.QuerySet"
 BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"

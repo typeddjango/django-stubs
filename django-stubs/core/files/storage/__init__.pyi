@@ -1,3 +1,5 @@
+from typing import TypeAlias
+
 from django.utils.functional import LazyObject
 
 from .base import Storage
@@ -18,6 +20,9 @@ __all__ = (
 
 class DefaultStorage(LazyObject): ...
 
+# This is our "placeholder" type the mypy plugin refines to configured
+# 'STORAGES["default"]["BACKEND"]' wherever it is used as a type.
+_DefaultStorage: TypeAlias = DefaultStorage
+
 storages: StorageHandler
-# default_storage is actually an instance of DefaultStorage, but it proxies through to a Storage
-default_storage: Storage
+default_storage: _DefaultStorage
