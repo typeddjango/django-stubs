@@ -15,14 +15,14 @@
     main: |
       from django.contrib.staticfiles import finders
 
-      reveal_type(finders.find("filepath", all=True))  # N: Revealed type is "builtins.list[builtins.str]"
+      reveal_type(finders.find("filepath", find_all=True))  # N: Revealed type is "builtins.list[builtins.str]"
 
       for finder in finders.get_finders():
-          reveal_type(finder.find("filepath", all=True))  # N: Revealed type is "builtins.list[builtins.str]"
+          reveal_type(finder.find("filepath", find_all=True))  # N: Revealed type is "builtins.list[builtins.str]"
 
-      reveal_type(finders.FileSystemFinder().find("filepath", all=True)) # N: Revealed type is "builtins.list[builtins.str]"
-      reveal_type(finders.AppDirectoriesFinder().find("filepath", all=True)) # N: Revealed type is "builtins.list[builtins.str]"
-      reveal_type(finders.DefaultStorageFinder().find("filepath", all=True)) # N: Revealed type is "builtins.list[builtins.str]"
+      reveal_type(finders.FileSystemFinder().find("filepath", find_all=True)) # N: Revealed type is "builtins.list[builtins.str]"
+      reveal_type(finders.AppDirectoriesFinder().find("filepath", find_all=True)) # N: Revealed type is "builtins.list[builtins.str]"
+      reveal_type(finders.DefaultStorageFinder().find("filepath", find_all=True)) # N: Revealed type is "builtins.list[builtins.str]"
 
 -   case: test_file_system_finder  # test methods *only* on FileSystemFinder
     main: |
