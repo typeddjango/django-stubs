@@ -173,7 +173,6 @@ django.contrib.gis.db.models.DurationField.formfield
 django.contrib.gis.db.models.DurationField.get_db_converters
 django.contrib.gis.db.models.EmailField.formfield
 django.contrib.gis.db.models.Exists.empty_result_set_value
-django.contrib.gis.db.models.Expression.identity
 django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.Extent.is_extent
 django.contrib.gis.db.models.Extent3D.is_extent
@@ -520,7 +519,6 @@ django.db.models.DurationField.formfield
 django.db.models.DurationField.get_db_converters
 django.db.models.EmailField.formfield
 django.db.models.Exists.empty_result_set_value
-django.db.models.Expression.identity
 django.db.models.ExpressionWrapper.allowed_default
 django.db.models.Field.__copy__
 django.db.models.Field.__deepcopy__
@@ -662,7 +660,6 @@ django.db.models.expressions.Func.allowed_default
 django.db.models.expressions.When.allowed_default
 django.db.models.expressions.Col.relabeled_clone
 django.db.models.expressions.Exists.empty_result_set_value
-django.db.models.expressions.Expression.identity
 django.db.models.expressions.OrderBy.as_oracle
 django.db.models.expressions.OrderBy.as_sql
 django.db.models.expressions.Ref.relabeled_clone
