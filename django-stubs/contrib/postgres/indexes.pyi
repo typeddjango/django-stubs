@@ -51,6 +51,7 @@ class BTreeIndex(PostgresIndex):
         self,
         *expressions: BaseExpression | Combinable | str,
         fillfactor: int | None = None,
+        deduplicate_items: bool | None = None,
         fields: Sequence[str] = ...,
         name: str | None = ...,
         db_tablespace: str | None = ...,

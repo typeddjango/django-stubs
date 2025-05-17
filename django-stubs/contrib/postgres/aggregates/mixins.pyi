@@ -9,7 +9,11 @@ from typing_extensions import Self
 class OrderableAggMixin:
     order_by: OrderByList
     def __init__(
-        self, *expressions: BaseExpression | Combinable | str, ordering: Sequence[str] = ..., **extra: Any
+        self,
+        *expressions: BaseExpression | Combinable | str,
+        ordering: Sequence[str] = ...,
+        order_by: Sequence[str] = ...,
+        **extra: Any,
     ) -> None: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Self: ...
     def get_source_expressions(self) -> list[Expression]: ...

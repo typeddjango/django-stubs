@@ -35,8 +35,6 @@ django.contrib.gis.management
 django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
 django.contrib.gis.management.commands.ogrinspect
-django.contrib.postgres.aggregates.mixins.OrderableAggMixin.__init__
-django.contrib.postgres.indexes.BTreeIndex.__init__
 django.contrib.sessions.backends.base.SessionBase.pop
 django.core.checks.Tags.commands
 django.core.checks.commands
