@@ -13,3 +13,4 @@ pip-wheel-metadata/
 stubgen/
 build/
 dist/
+ext/dist/
