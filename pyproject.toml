@@ -1,3 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-stubs"
+version = "5.2.0"
+description = "Mypy stubs for Django"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.md"]
+requires-python = ">=3.10"
+authors = [
+    { name = "Maksim Kurnikov", email = "maxim.kurnikov@gmail.com" },
+]
+maintainers = [
+    { name = "Marti Raudsepp", email = "marti@juffo.org" },
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+    "Framework :: Django",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+]
+dependencies = [
+    "django",
+    "asgiref",
+    "django-stubs-ext>=5.2.0",
+    "tomli; python_version < '3.11'",
+    # Types:
+    "typing-extensions>=4.11.0",
+    "types-PyYAML",
+]
+
+[project.optional-dependencies]
+compatible-mypy = ["mypy>=1.13,<1.16"]
+oracle = ["oracledb"]
+redis = ["redis"]
+
+[project.urls]
+Homepage = "https://github.com/typeddjango/django-stubs"
+Funding = "https://github.com/sponsors/typeddjango"
+"Release notes" = "https://github.com/typeddjango/django-stubs/releases"
+
+[tool.hatch.build]
+packages = ["django-stubs", "mypy_django_plugin"]
+
+
 [tool.codespell]
 ignore-words-list = "aadd,acount,nam,asend"
 
@@ -50,6 +105,3 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
-
-[build-system]
-requires = ["setuptools<79.0.0", "wheel"]
