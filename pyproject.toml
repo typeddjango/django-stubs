@@ -43,7 +43,7 @@ dependencies = [
 [project.optional-dependencies]
 compatible-mypy = ["mypy>=1.13,<1.16"]
 oracle = ["oracledb"]
-redis = ["redis"]
+redis = ["redis", "types-redis"]
 
 [project.urls]
 Homepage = "https://github.com/typeddjango/django-stubs"
