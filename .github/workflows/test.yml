@@ -30,8 +30,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip "setuptools<79.0.0" wheel
-          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+          pip install -U pip
+          pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
         run: mypy --strict mypy_django_plugin
@@ -63,8 +63,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip "setuptools<79.0.0" wheel
-          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+          pip install -U pip
+          pip install -r ./requirements.txt
 
       # Must match `shard` definition in the test matrix:
       - name: Run pytest tests
@@ -91,8 +91,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip "setuptools<79.0.0" wheel
-          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+          pip install -U pip
+          pip install -r ./requirements.txt
 
       - name: Run stubtest
         run: ./scripts/stubtest.sh
@@ -112,8 +112,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip "setuptools<79.0.0" wheel
-          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+          pip install -U pip
+          pip install -r ./requirements.txt
       - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
         with:
@@ -146,8 +146,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -U pip "setuptools<79.0.0" wheel
-          SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+          pip install -U pip
+          pip install -r ./requirements.txt
           pip install "Django==${{ matrix.django-version }}"
           pip check
 
@@ -167,8 +167,8 @@ jobs:
         run: python3 -m pip install --upgrade build twine
       - name: Build
         run: |
-          python3 -m build --sdist --wheel .
-          python3 -m build --sdist --wheel ext/
+          python3 -m build .
+          python3 -m build ext/
       - name: Check package metadata
         run: |
           twine check --strict dist/*

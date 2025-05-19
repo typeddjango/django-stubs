@@ -1,3 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-stubs"
+version = "5.2.0"
+description = "Mypy stubs for Django"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.md"]
+requires-python = ">=3.10"
+authors = [
+  { name = "Maksim Kurnikov", email = "maxim.kurnikov@gmail.com" },
+]
+maintainers = [
+  { name = "Marti Raudsepp", email = "marti@juffo.org" },
+  { name = "Nikita Sobolev", email = "mail@sobolevn.me" },
+  { name = "Petter Friberg", email = "petter_friberg@hotmail.com" },
+  { name = "Adam Johnson", email = "me@adamj.eu" },
+]
+classifiers = [
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+  "Framework :: Django",
+  "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
+]
+dependencies = [
+  "django",
+  "django-stubs-ext>=5.2.0",
+  "tomli; python_version < '3.11'",
+  # Types:
+  "types-pyyaml",
+  "typing-extensions>=4.11.0",
+]
+
+[project.optional-dependencies]
+compatible-mypy = ["mypy>=1.13,<1.16"]
+oracle = ["oracledb"]
+redis = ["redis", "types-redis"]
+
+[project.urls]
+Homepage = "https://github.com/typeddjango/django-stubs"
+Funding = "https://github.com/sponsors/typeddjango"
+"Release notes" = "https://github.com/typeddjango/django-stubs/releases"
+
+[tool.hatch.build]
+packages = ["django-stubs", "mypy_django_plugin"]
+
+
 [tool.codespell]
 ignore-words-list = "aadd,acount,nam,asend"
 
@@ -9,35 +65,35 @@ target-version = "py310"
 [tool.ruff.lint]
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
 select = [
-    "B",        # bugbear
-    "E",        # pycodestyle
-    "F",        # pyflakes
-    "INP",      # flake8-tidy-imports
-    "W",        # pycodestyle
-    "I",        # isort
-    "UP",       # pyupgrade
-    "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
-    "PYI",      # flake8-pyi
-    "RUF100",   # Equivalent to flake8-noqa NQA103
-    "PGH004",   # Equivalent to flake8-noqa NQA104
-    "PGH003",   # Disallowed blanket `type: ignore` annotations.
+  "B",        # bugbear
+  "E",        # pycodestyle
+  "F",        # pyflakes
+  "INP",      # flake8-tidy-imports
+  "W",        # pycodestyle
+  "I",        # isort
+  "UP",       # pyupgrade
+  "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
+  "PYI",      # flake8-pyi
+  "RUF100",   # Equivalent to flake8-noqa NQA103
+  "PGH004",   # Equivalent to flake8-noqa NQA104
+  "PGH003",   # Disallowed blanket `type: ignore` annotations.
 ]
 ignore = [
-    "PYI021", # We have a few meaningful docstrings for stubs only constructs/utilities.
-    "PYI041", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
-    "PYI043",
+  "PYI021", # We have a few meaningful docstrings for stubs only constructs/utilities.
+  "PYI041", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
+  "PYI043",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "*.pyi" = [
-    "B",
-    "E501",
-    "E741",
-    "E743",
-    "F403", # Use wildcard import
-    "F405",
-    "F822",
-    "F821",
+  "B",
+  "E501",
+  "E741",
+  "E743",
+  "F403", # Use wildcard import
+  "F405",
+  "F822",
+  "F821",
 ]
 "tests/*.py" = ["INP001", "PGH003"]
 "ext/tests/*.py" = ["INP001"]
@@ -50,6 +106,3 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
 split-on-trailing-comma = false
-
-[build-system]
-requires = ["setuptools<79.0.0", "wheel"]

@@ -44,7 +44,7 @@ source .venv/bin/activate
 Then install the dev requirements:
 
 ```bash
-SETUPTOOLS_ENABLE_FEATURES=legacy-editable pip install -r ./requirements.txt
+pip install -r ./requirements.txt
 ```
 
 Finally, install the pre-commit hooks:
