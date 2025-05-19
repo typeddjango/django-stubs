@@ -15,9 +15,11 @@ authors = [
 ]
 maintainers = [
     { name = "Marti Raudsepp", email = "marti@juffo.org" },
+    { name = "Nikita Sobolev", email = "mail@sobolevn.me" },
+    { name = "Petter Friberg", email = "petter_friberg@hotmail.com" },
+    { name = "Adam Johnson", email = "me@adamj.eu" },
 ]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -31,12 +33,11 @@ classifiers = [
 ]
 dependencies = [
     "django",
-    "asgiref",
     "django-stubs-ext>=5.2.0",
     "tomli; python_version < '3.11'",
     # Types:
+    "types-pyyaml",
     "typing-extensions>=4.11.0",
-    "types-PyYAML",
 ]
 
 [project.optional-dependencies]

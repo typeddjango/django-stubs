@@ -12,14 +12,16 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE.md"]
 maintainers = [
-  { name = "Marti Raudsepp", email = "marti@juffo.org" },
+    { name = "Marti Raudsepp", email = "marti@juffo.org" },
+    { name = "Nikita Sobolev", email = "mail@sobolevn.me" },
+    { name = "Petter Friberg", email = "petter_friberg@hotmail.com" },
+    { name = "Adam Johnson", email = "me@adamj.eu" },
 ]
 authors = [
   { name = "Simula Proxy" },
 ]
 requires-python = ">=3.10"
 classifiers = [
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
