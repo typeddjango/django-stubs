@@ -12,26 +12,26 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE.md"]
 maintainers = [
-    { name = "Marti Raudsepp", email = "marti@juffo.org" },
-    { name = "Nikita Sobolev", email = "mail@sobolevn.me" },
-    { name = "Petter Friberg", email = "petter_friberg@hotmail.com" },
-    { name = "Adam Johnson", email = "me@adamj.eu" },
+  { name = "Marti Raudsepp", email = "marti@juffo.org" },
+  { name = "Nikita Sobolev", email = "mail@sobolevn.me" },
+  { name = "Petter Friberg", email = "petter_friberg@hotmail.com" },
+  { name = "Adam Johnson", email = "me@adamj.eu" },
 ]
 authors = [
   { name = "Simula Proxy" },
 ]
 requires-python = ">=3.10"
 classifiers = [
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Typing :: Typed",
-    "Framework :: Django",
-    "Framework :: Django :: 5.0",
-    "Framework :: Django :: 5.1",
-    "Framework :: Django :: 5.2",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+  "Framework :: Django",
+  "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
 ]
 dependencies = [
   "django",
