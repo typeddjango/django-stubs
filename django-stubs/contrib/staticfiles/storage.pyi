@@ -52,4 +52,8 @@ class ManifestFilesMixin(HashedFilesMixin):
 class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage): ...  # type: ignore[misc]
 class ConfiguredStorage(LazyObject): ...
 
-staticfiles_storage: Storage
+# This is our "placeholder" type the mypy plugin refines to configured
+# 'STORAGES["staticfiles"]["BACKEND"]' wherever it is used as a type.
+_ConfiguredStorage: TypeAlias = ConfiguredStorage
+
+staticfiles_storage: _ConfiguredStorage

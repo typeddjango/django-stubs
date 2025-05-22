@@ -35,6 +35,7 @@ from mypy_django_plugin.transformers import (
     orm_lookups,
     querysets,
     settings,
+    storage,
 )
 from mypy_django_plugin.transformers.auth import get_user_model
 from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
@@ -98,8 +99,29 @@ class NewSemanalDjangoPlugin(Plugin):
         if file.fullname == "django.conf" and self.django_context.django_settings_module:
             return [self._new_dependency(self.django_context.django_settings_module, PRI_MED)]
 
+        # for settings.STORAGES["staticfiles"]
+        if (
+            file.fullname == "django.contrib.staticfiles.storage"
+            and isinstance(storage_config := self.django_context.settings.STORAGES.get("staticfiles"), dict)
+            and isinstance(storage_backend := storage_config.get("BACKEND"), str)
+            and "." in storage_backend
+        ):
+            return [self._new_dependency(storage_backend.rsplit(".", 1)[0])]
+
+        # for settings.STORAGES
+        elif file.fullname == "django.core.files.storage":
+            return [
+                self._new_dependency(storage_backend.rsplit(".", 1)[0])
+                for storage_config in self.django_context.settings.STORAGES.values()
+                if (
+                    isinstance(storage_config, dict)
+                    and isinstance(storage_backend := storage_config.get("BACKEND"), str)
+                    and "." in storage_backend
+                )
+            ]
+
         # for values / values_list
-        if file.fullname == "django.db.models":
+        elif file.fullname == "django.db.models":
             return [self._new_dependency("typing"), self._new_dependency("django_stubs_ext")]
 
         # for `get_user_model()`
@@ -200,6 +222,9 @@ class NewSemanalDjangoPlugin(Plugin):
             }
             return hooks.get(class_fullname)
 
+        elif method_name == "__getitem__" and class_fullname == fullnames.STORAGE_HANDLER_CLASS_FULLNAME:
+            return partial(storage.extract_proper_type_for_getitem, django_context=self.django_context)
+
         if method_name in self.manager_and_queryset_method_hooks:
             info = self._get_typeinfo_or_none(class_fullname)
             if info and helpers.has_any_of_bases(
@@ -298,6 +323,10 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(handle_annotated_type, fullname=fullname)
         elif fullname == "django.contrib.auth.models._User":
             return partial(get_user_model, django_context=self.django_context)
+        elif fullname == "django.contrib.staticfiles.storage._ConfiguredStorage":
+            return partial(storage.get_storage, alias="staticfiles", django_context=self.django_context)
+        elif fullname == "django.core.files.storage._DefaultStorage":
+            return partial(storage.get_storage, alias="default", django_context=self.django_context)
         return None
 
     def get_dynamic_class_hook(self, fullname: str) -> Callable[[DynamicClassDefContext], None] | None:
@@ -311,9 +340,20 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
-        extra_data = {}
-        # In all places we use '_User' alias as a type we want to clear cache if
-        # AUTH_USER_MODEL setting changes
+        extra_data: dict[str, Any] = {}
+        # In all places we use '_DefaultStorage' or '_ConfiguredStorage' aliases as a type we want to clear the cache
+        # if STORAGES setting changes
+        if ctx.id.startswith("django.contrib.staticfiles") or ctx.id.startswith("django.core.files.storage"):
+            extra_data["STORAGES"] = [
+                storage_backend
+                for storage_config in self.django_context.settings.STORAGES.values()
+                if (
+                    isinstance(storage_config, dict)
+                    and isinstance(storage_backend := storage_config.get("BACKEND"), str)
+                    and "." in storage_backend
+                )
+            ]
+        # In all places we use '_User' alias as a type we want to clear the cache if AUTH_USER_MODEL setting changes
         if ctx.id.startswith("django.contrib.auth") or ctx.id in {"django.http.request", "django.test.client"}:
             extra_data["AUTH_USER_MODEL"] = self.django_context.settings.AUTH_USER_MODEL
         return self.plugin_config.to_json(extra_data)
