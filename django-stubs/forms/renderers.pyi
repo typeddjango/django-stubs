@@ -14,6 +14,7 @@ class BaseRenderer:
     form_template_name: str
     formset_template_name: str
     field_template_name: str
+    bound_field_class: None
     def get_template(self, template_name: str) -> Any: ...
     def render(self, template_name: str, context: dict[str, Any], request: HttpRequest | None = None) -> str: ...
 

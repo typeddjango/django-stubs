@@ -111,4 +111,3 @@ django.forms.BaseForm.bound_field_class
 django.forms.BoundField.aria_describedby
 django.forms.boundfield.BoundField.aria_describedby
 django.forms.forms.BaseForm.bound_field_class
-django.forms.renderers.BaseRenderer.bound_field_class
