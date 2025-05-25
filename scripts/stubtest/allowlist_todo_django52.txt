@@ -107,7 +107,3 @@ django.db.models.options.Options.pk_fields
 django.db.models.sql.compiler.SQLCompiler.composite_fields_to_tuples
 django.db.models.sql.compiler.SQLCompiler.has_composite_fields
 django.db.models.sql.compiler.SQLInsertCompiler.field_as_sql
-django.forms.BaseForm.bound_field_class
-django.forms.BoundField.aria_describedby
-django.forms.boundfield.BoundField.aria_describedby
-django.forms.forms.BaseForm.bound_field_class
