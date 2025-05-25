@@ -102,8 +102,3 @@ django.db.models.fields.related.ForeignKey.cast_db_type
 django.db.models.fields.tuple_lookups
 django.db.models.functions.JSONObject.join
 django.db.models.functions.json.JSONObject.join
-django.db.models.options.Options.is_composite_pk
-django.db.models.options.Options.pk_fields
-django.db.models.sql.compiler.SQLCompiler.composite_fields_to_tuples
-django.db.models.sql.compiler.SQLCompiler.has_composite_fields
-django.db.models.sql.compiler.SQLInsertCompiler.field_as_sql
