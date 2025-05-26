@@ -96,4 +96,3 @@ django.db.models.fields.related.ForeignKey.cast_db_type
 django.db.models.fields.tuple_lookups
 django.db.models.functions.JSONObject.join
 django.db.models.functions.json.JSONObject.join
-django.db.models.options.Options.pk_fields
