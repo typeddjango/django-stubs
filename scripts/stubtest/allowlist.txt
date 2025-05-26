@@ -444,6 +444,7 @@ django.db.models.CompositePrimaryKey.fields
 django.db.models.fields.composite.CompositePrimaryKey.cached_col
 django.db.models.fields.composite.CompositePrimaryKey.columns
 django.db.models.fields.composite.CompositePrimaryKey.fields
+django.db.models.options.Options.pk_fields
 
 # Ignore missing inner `Meta` class, see PR #2000 for the related discussion
 django.contrib.auth.base_user.AbstractBaseUser.Meta

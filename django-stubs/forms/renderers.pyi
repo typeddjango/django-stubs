@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.forms.boundfield import BoundField
 from django.http import HttpRequest
 from django.template.backends.base import BaseEngine
 from django.template.backends.django import DjangoTemplates as DjangoTemplatesR
@@ -14,6 +15,7 @@ class BaseRenderer:
     form_template_name: str
     formset_template_name: str
     field_template_name: str
+    bound_field_class: type[BoundField] | None
     def get_template(self, template_name: str) -> Any: ...
     def render(self, template_name: str, context: dict[str, Any], request: HttpRequest | None = None) -> str: ...
 

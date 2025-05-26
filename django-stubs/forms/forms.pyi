@@ -32,6 +32,7 @@ class BaseForm(RenderableFormMixin):
     template_name_table: str
     template_name_ul: str
     template_name_label: str
+    bound_field_class: type[BoundField] | None
     def __init__(
         self,
         data: _DataT | None = None,
