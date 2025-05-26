@@ -6,6 +6,7 @@ from uuid import UUID
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
+from django.db.models import Field
 from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression, Ref
 from django.db.models.sql.query import Query
