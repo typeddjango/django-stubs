@@ -97,7 +97,8 @@ class classproperty(Generic[_Get]):
 
 @type_check_only
 class _Getter(Protocol[_Get]):  # noqa: PYI046
-    """Type fake to declare some read-only properties (until `property` builtin is generic)
+    """
+    Type fake to declare some read-only properties (until `property` builtin is generic).
 
     We can use something like `Union[_Getter[str], str]` in base class to avoid errors
     when redefining attribute with property or property with attribute.
