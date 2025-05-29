@@ -130,7 +130,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     model: type[Model]
     name: str
     verbose_name: _StrOrPromise
-    description: str | _Getter[str]
+    description: _StrOrPromise | _Getter[_StrOrPromise]
     blank: bool
     null: bool
     unique: bool
