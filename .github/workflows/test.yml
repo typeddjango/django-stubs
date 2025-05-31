@@ -24,24 +24,23 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
 
       - name: Run mypy on plugin code
-        run: mypy --strict mypy_django_plugin
-
+        run: uv run mypy --strict mypy_django_plugin
       - name: Run mypy on ext code
-        run: mypy --strict ext
+        run: uv run mypy--strict ext
       - name: Run mypy on scripts and utils
-        run: mypy --strict scripts
+        run: uv run mypy --strict scripts
       - name: Run mypy on stubs
-        run: mypy --cache-dir=/dev/null --no-incremental django-stubs
+        run: uv run mypy --cache-dir=/dev/null --no-incremental django-stubs
 
   test:
     timeout-minutes: 15
@@ -57,20 +56,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
 
       # Must match `shard` definition in the test matrix:
       - name: Run pytest tests
-        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
+        run: uv run pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
       - name: Run mypy on the test cases
-        run: mypy --strict tests
+        run: uv run mypy --strict tests
 
   stubtest:
     timeout-minutes: 10
@@ -81,6 +78,8 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -89,13 +88,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
 
       - name: Run stubtest
-        run: ./scripts/stubtest.sh
+        run: uv run ./scripts/stubtest.sh
 
   run-pyright:
     timeout-minutes: 10
@@ -111,9 +106,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
+        run: uv sync
       - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
         with:
@@ -136,6 +129,8 @@ jobs:
         django-version: ['5.0', '5.1', '5.2']
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -144,15 +139,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
-          pip install "Django==${{ matrix.django-version }}"
-          pip check
 
       - name: Run django-stubs-ext tests
-        run: PYTHONPATH='.' pytest ext
+        run: uv run --with "django==${{ matrix.django-version }}" pytest ext
 
   build-and-check:
     runs-on: ubuntu-latest

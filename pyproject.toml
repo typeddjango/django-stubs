@@ -45,14 +45,34 @@ compatible-mypy = ["mypy>=1.13,<1.16"]
 oracle = ["oracledb"]
 redis = ["redis", "types-redis"]
 
+[dependency-groups]
+dev = [
+    "django==5.2.1",
+    "django-stubs[compatible-mypy,oracle,redis]",
+    # tests
+    "pytest==8.3.5",
+    "pytest-mypy-plugins==3.2.0",
+    "pytest-shard==0.1.2",
+    "pytest-xdist==3.7.0",
+    # stubtest
+    "mysqlclient==2.2.7",
+    "psycopg2-binary==2.9.10",
+    # type-checking
+    "mypy==1.15.0",
+    "pyright==1.1.401"
+]
+
 [project.urls]
 Homepage = "https://github.com/typeddjango/django-stubs"
 Funding = "https://github.com/sponsors/typeddjango"
 "Release notes" = "https://github.com/typeddjango/django-stubs/releases"
 
+[tool.uv.sources]
+django-stubs = { workspace = true }
+django-stubs-ext = { path = "ext", editable = true }
+
 [tool.hatch.build]
 packages = ["django-stubs", "mypy_django_plugin"]
-
 
 [tool.codespell]
 ignore-words-list = "aadd,acount,nam,asend"

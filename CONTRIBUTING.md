@@ -37,14 +37,8 @@ In order to be able to continuously sync your fork with the origin repository's 
 After your repository is setup you will then need to create and activate a git ignored virtual env, e.g.:
 
 ```bash
-python3 -m venv .venv
+uv sync
 source .venv/bin/activate
-```
-
-Then install the dev requirements:
-
-```bash
-pip install -r ./requirements.txt
 ```
 
 Finally, install the pre-commit hooks:
