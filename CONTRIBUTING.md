@@ -30,21 +30,17 @@ Additionally, the following resources might be useful:
 ### Repository Setup
 
 As a first step you will need to fork this repository and clone your fork locally.
-In order to be able to continuously sync your fork with the origin repository's master branch, you will need to set up an upstream master. To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
+In order to be able to continuously sync your fork with the origin repository's master branch, you will need to set up an upstream master.
+To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
 ### Dependency Setup
+We use [uv](https://github.com/astral-sh/uv) to manage our dev dependencies.
+To install it, see their [installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 
-After your repository is setup you will then need to create and activate a git ignored virtual env, e.g.:
-
+Once it's done, simply run the following command to automatically setup a virtual environment and install dev dependencies:
 ```bash
-python3 -m venv .venv
+uv sync
 source .venv/bin/activate
-```
-
-Then install the dev requirements:
-
-```bash
-pip install -r ./requirements.txt
 ```
 
 Finally, install the pre-commit hooks:

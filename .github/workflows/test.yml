@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  UV_FROZEN: true # https://docs.astral.sh/uv/configuration/environment/#uv_frozen
+  UV_NO_SYNC: true # prevent `uv run` cmd from bringing very dev dependencies
+
 permissions:
   contents: read
 
@@ -24,24 +28,26 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
+        run: uv sync --no-dev --group tests
 
       - name: Run mypy on plugin code
-        run: mypy --strict mypy_django_plugin
-
+        run: uv run mypy --strict mypy_django_plugin
       - name: Run mypy on ext code
-        run: mypy --strict ext
+        run: uv run mypy --strict ext
       - name: Run mypy on scripts and utils
-        run: mypy --strict scripts
+        run: uv run mypy --strict scripts
       - name: Run mypy on stubs
-        run: mypy --cache-dir=/dev/null --no-incremental django-stubs
+        run: uv run mypy --cache-dir=/dev/null --no-incremental django-stubs
+      - name: Run mypy on the test cases
+        run: uv run mypy --strict tests
 
   test:
     timeout-minutes: 15
@@ -57,20 +63,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
+        run: uv sync --no-dev --group tests
 
       # Must match `shard` definition in the test matrix:
       - name: Run pytest tests
-        run: PYTHONPATH='.' pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
-      - name: Run mypy on the test cases
-        run: mypy --strict tests
+        run: uv run pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
+
 
   stubtest:
     timeout-minutes: 10
@@ -85,17 +91,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
+        run: uv sync --no-dev --group tests
 
       - name: Run stubtest
-        run: ./scripts/stubtest.sh
+        run: uv run ./scripts/stubtest.sh
 
   run-pyright:
     timeout-minutes: 10
@@ -106,14 +113,20 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
+        run: uv sync --no-dev --group pyright
+
+      # See https://github.com/jakebailey/pyright-action#providing-a-pyright-version-sourced-from-preexisting-dependencies
+      - name: Add venv to path
+        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
       - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
         with:
@@ -140,19 +153,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r ./requirements.txt
-          pip install "Django==${{ matrix.django-version }}"
-          pip check
+        run: uv sync --no-dev --group tests
 
       - name: Run django-stubs-ext tests
-        run: PYTHONPATH='.' pytest ext
+        run: uv run --with "django==${{ matrix.django-version }}" pytest ext
 
   build-and-check:
     runs-on: ubuntu-latest
