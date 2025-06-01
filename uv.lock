@@ -208,6 +208,12 @@ dev = [
 mypy = [
     { name = "mypy" },
 ]
+tests = [
+    { name = "pytest" },
+    { name = "pytest-mypy-plugins" },
+    { name = "pytest-shard" },
+    { name = "pytest-xdist" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -237,6 +243,12 @@ dev = [
     { name = "pytest-xdist", specifier = "==3.7.0" },
 ]
 mypy = [{ name = "mypy", specifier = "==1.15.0" }]
+tests = [
+    { name = "pytest", specifier = "==8.3.5" },
+    { name = "pytest-mypy-plugins", specifier = "==3.2.0" },
+    { name = "pytest-shard", specifier = "==0.1.2" },
+    { name = "pytest-xdist", specifier = "==3.7.0" },
+]
 
 [[package]]
 name = "django-stubs-ext"

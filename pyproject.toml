@@ -47,14 +47,19 @@ redis = ["redis", "types-redis"]
 
 [dependency-groups]
 mypy = ["mypy==1.15.0"]
-dev = [
-    "django==5.2.1",
-    "django-stubs[compatible-mypy,oracle,redis]",
-    # tests
+
+tests = [
     "pytest==8.3.5",
     "pytest-mypy-plugins==3.2.0",
     "pytest-shard==0.1.2",
     "pytest-xdist==3.7.0",
+]
+
+dev = [
+    "django==5.2.1",
+    "django-stubs[compatible-mypy,oracle,redis]",
+    # tests
+    {include-group = "tests"},
     # stubtest
     "mysqlclient==2.2.7",
     "psycopg2-binary==2.9.10",
