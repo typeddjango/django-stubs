@@ -54,13 +54,13 @@ tests = [
     "pytest-xdist==3.7.0",
     # Django deps:
     "django==5.2.1",
-    "django-stubs[compatible-mypy,oracle,redis]",
     "mysqlclient==2.2.7",
     "psycopg2-binary==2.9.10",
     "jinja2==3.1.6",
     "pyyaml==6.0.2",
     # typing:
-    "mypy==1.15.0"
+    "mypy==1.15.0",
+    "django-stubs[compatible-mypy,oracle,redis]",
 ]
 pyright = ["pyright==1.1.401"]
 
