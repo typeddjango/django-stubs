@@ -9,6 +9,7 @@ on:
 
 env:
   UV_FROZEN: true # https://docs.astral.sh/uv/configuration/environment/#uv_frozen
+  UV_NO_SYNC: true # prevent `uv run` cmd from bringing very dev dependencies
 
 permissions:
   contents: read
@@ -27,10 +28,8 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-
       - name: Install uv
         uses: astral-sh/setup-uv@v5
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -70,6 +69,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: uv sync --no-dev --group tests
 
@@ -87,16 +87,19 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --no-dev --group stubtest
 
       - name: Run stubtest
         run: uv run ./scripts/stubtest.sh
@@ -116,8 +119,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --no-dev --group pyright
+
+      # See https://github.com/jakebailey/pyright-action#providing-a-pyright-version-sourced-from-preexisting-dependencies
+      - name: Add venv to path
+        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
       - name: Run pyright on the stubs
         uses: jakebailey/pyright-action@v2
         with:
@@ -140,16 +149,19 @@ jobs:
         django-version: ['5.0', '5.1', '5.2']
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --no-dev --group tests
 
       - name: Run django-stubs-ext tests
         run: uv run --with "django==${{ matrix.django-version }}" pytest ext

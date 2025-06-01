@@ -46,26 +46,28 @@ oracle = ["oracledb"]
 redis = ["redis", "types-redis"]
 
 [dependency-groups]
-mypy = ["mypy==1.15.0"]
-
 tests = [
     "pytest==8.3.5",
     "pytest-mypy-plugins==3.2.0",
     "pytest-shard==0.1.2",
     "pytest-xdist==3.7.0",
 ]
-
-dev = [
+stubtest = [
     "django==5.2.1",
     "django-stubs[compatible-mypy,oracle,redis]",
-    # tests
-    {include-group = "tests"},
-    # stubtest
     "mysqlclient==2.2.7",
     "psycopg2-binary==2.9.10",
-    # type-checking
+    "jinja2==3.1.6",
+    "pyyaml==6.0.2",
+]
+mypy = ["mypy==1.15.0"]
+pyright = ["pyright==1.1.401"]
+
+dev = [
+    {include-group = "tests"},
+    {include-group = "stubtest"},
     {include-group = "mypy"},
-    "pyright==1.1.401"
+    {include-group = "pyright"},
 ]
 
 [project.urls]

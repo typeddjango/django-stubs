@@ -196,6 +196,7 @@ redis = [
 dev = [
     { name = "django" },
     { name = "django-stubs", extra = ["compatible-mypy", "oracle", "redis"] },
+    { name = "jinja2" },
     { name = "mypy" },
     { name = "mysqlclient" },
     { name = "psycopg2-binary" },
@@ -204,9 +205,21 @@ dev = [
     { name = "pytest-mypy-plugins" },
     { name = "pytest-shard" },
     { name = "pytest-xdist" },
+    { name = "pyyaml" },
 ]
 mypy = [
     { name = "mypy" },
+]
+pyright = [
+    { name = "pyright" },
+]
+stubtest = [
+    { name = "django" },
+    { name = "django-stubs", extra = ["compatible-mypy", "oracle", "redis"] },
+    { name = "jinja2" },
+    { name = "mysqlclient" },
+    { name = "psycopg2-binary" },
+    { name = "pyyaml" },
 ]
 tests = [
     { name = "pytest" },
@@ -233,6 +246,7 @@ provides-extras = ["compatible-mypy", "oracle", "redis"]
 dev = [
     { name = "django", specifier = "==5.2.1" },
     { name = "django-stubs", extras = ["compatible-mypy", "oracle", "redis"], editable = "." },
+    { name = "jinja2", specifier = "==3.1.6" },
     { name = "mypy", specifier = "==1.15.0" },
     { name = "mysqlclient", specifier = "==2.2.7" },
     { name = "psycopg2-binary", specifier = "==2.9.10" },
@@ -241,8 +255,18 @@ dev = [
     { name = "pytest-mypy-plugins", specifier = "==3.2.0" },
     { name = "pytest-shard", specifier = "==0.1.2" },
     { name = "pytest-xdist", specifier = "==3.7.0" },
+    { name = "pyyaml", specifier = "==6.0.2" },
 ]
 mypy = [{ name = "mypy", specifier = "==1.15.0" }]
+pyright = [{ name = "pyright", specifier = "==1.1.401" }]
+stubtest = [
+    { name = "django", specifier = "==5.2.1" },
+    { name = "django-stubs", extras = ["compatible-mypy", "oracle", "redis"], editable = "." },
+    { name = "jinja2", specifier = "==3.1.6" },
+    { name = "mysqlclient", specifier = "==2.2.7" },
+    { name = "psycopg2-binary", specifier = "==2.9.10" },
+    { name = "pyyaml", specifier = "==6.0.2" },
+]
 tests = [
     { name = "pytest", specifier = "==8.3.5" },
     { name = "pytest-mypy-plugins", specifier = "==3.2.0" },
