@@ -36,7 +36,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --no-dev --group mypy
+        run: uv sync --no-dev --group tests
 
       - name: Run mypy on plugin code
         run: uv run mypy --strict mypy_django_plugin
@@ -99,7 +99,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --no-dev --group stubtest
+        run: uv sync --no-dev --group tests
 
       - name: Run stubtest
         run: uv run ./scripts/stubtest.sh
