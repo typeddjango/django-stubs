@@ -46,6 +46,7 @@ oracle = ["oracledb"]
 redis = ["redis", "types-redis"]
 
 [dependency-groups]
+mypy = ["mypy==1.15.0"]
 dev = [
     "django==5.2.1",
     "django-stubs[compatible-mypy,oracle,redis]",
@@ -58,7 +59,7 @@ dev = [
     "mysqlclient==2.2.7",
     "psycopg2-binary==2.9.10",
     # type-checking
-    "mypy==1.15.0",
+    {include-group = "mypy"},
     "pyright==1.1.401"
 ]
 
