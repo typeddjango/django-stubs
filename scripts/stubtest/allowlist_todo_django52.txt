@@ -68,7 +68,6 @@ django.db.backends.postgresql.base.DatabaseWrapper.close_pool
 django.db.backends.postgresql.base.DatabaseWrapper.pool
 django.db.backends.postgresql.compiler
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_skips
-django.db.backends.postgresql.features.DatabaseFeatures.is_postgresql_17
 django.db.backends.postgresql.features.DatabaseFeatures.supports_nulls_distinct_unique_constraints
 django.db.backends.postgresql.psycopg_any
 django.db.backends.sqlite3.base.DatabaseWrapper.transaction_modes
