@@ -137,6 +137,7 @@ django.contrib.gis.admin.GISModelAdmin.gis_widget
 django.contrib.gis.admin.options.GISModelAdmin.gis_widget
 django.contrib.gis.admin.options.GeoModelAdminMixin
 django.contrib.gis.admin.site
+django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
 django.contrib.gis.db.backends.postgis.schema.PostGISSchemaEditor.rast_index_template
@@ -428,8 +429,10 @@ django.db.backends.mysql.introspection.InfoLine._fields
 django.db.backends.mysql.introspection.InfoLine.comment
 django.db.backends.mysql.introspection.TableInfo
 django.db.backends.mysql.schema.DatabaseSchemaEditor.sql_alter_column_comment
+django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_collation_on_charfield
+django.db.backends.oracle.features.DatabaseFeatures.supports_frame_exclusion
 django.db.backends.postgresql.base.DatabaseWrapper.Database
 django.db.backends.postgresql.base.DatabaseWrapper.ops
 django.db.backends.postgresql.base.DatabaseWrapper.tzinfo_factory
