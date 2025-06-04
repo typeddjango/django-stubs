@@ -57,9 +57,6 @@ django.contrib.auth.hashers.Argon2PasswordHasher.params
 django.contrib.auth.hashers.ScryptPasswordHasher
 django.contrib.auth.hashers.must_update_salt
 django.contrib.auth.hashers.reset_hashers
-django.contrib.auth.management.commands.createsuperuser.Command.get_input_data
-django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
-django.contrib.auth.management.commands.createsuperuser.PASSWORD_FIELD
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
 django.contrib.auth.models.AbstractUser.date_joined
