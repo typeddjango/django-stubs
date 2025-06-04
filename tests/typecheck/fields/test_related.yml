@@ -779,10 +779,10 @@
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
     main: |
         from myapp.models import User
-        reveal_type(User().parent)  # N: Revealed type is "myapp.models.User"
+        reveal_type(User().parent)  # N: Revealed type is "myapp.models.AbstractUser"
         reveal_type(User().parent_id)  # N: Revealed type is "builtins.int"
 
-        reveal_type(User().parent2)  # N: Revealed type is "Union[myapp.models.User, None]"
+        reveal_type(User().parent2)  # N: Revealed type is "Union[myapp.models.AbstractUser, None]"
         reveal_type(User().parent2_id)  # N: Revealed type is "Union[builtins.int, None]"
     installed_apps:
         - myapp

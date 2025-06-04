@@ -11,6 +11,10 @@
     main:4: note:         def __iter__(self) -> Iterator[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]]
     main:4: note:     Got:
     main:4: note:         def __iter__(self) -> Iterator[str]
+    main:4: note:     Expected:
+    main:4: note:         def __iter__(self) -> Iterator[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]]
+    main:4: note:     Got:
+    main:4: note:         def __iter__(self) -> Iterator[str]
 
 - case: db_models_integerfield_invalid_choices
   main: |
@@ -21,6 +25,10 @@
   out: |
     main:4: error: Argument "choices" to "IntegerField" has incompatible type "str"; expected "Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any], Type[Choices], Callable[[], Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any]]], None]"  [arg-type]
     main:4: note: Following member(s) of "str" have conflicts:
+    main:4: note:     Expected:
+    main:4: note:         def __iter__(self) -> Iterator[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]]
+    main:4: note:     Got:
+    main:4: note:         def __iter__(self) -> Iterator[str]
     main:4: note:     Expected:
     main:4: note:         def __iter__(self) -> Iterator[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]]
     main:4: note:     Got:
