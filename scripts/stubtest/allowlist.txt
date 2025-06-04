@@ -158,6 +158,7 @@ django.utils.functional.cached_property.name
 # Ignore @cached_property error "cannot reconcile @property on stub with runtime object"
 django.contrib.admin.helpers.Fieldset.is_collapsible
 django.contrib.admin.helpers.InlineAdminFormSet.is_collapsible
+django.contrib.auth.management.commands.createsuperuser.Command.username_is_unique
 django.contrib.contenttypes.fields.GenericForeignKey.cache_name
 django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor.related_manager_cls
 django.contrib.gis.db.backends.base.operations.BaseSpatialOperations.select_extent
