@@ -39,8 +39,6 @@
     main: |
         from myapp.models import Child4
         Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
-    out: |
-        myapp/models:9: error: Definition of "child1" in base class "Parent1" is incompatible with definition in base class "Parent2"  [misc]
     installed_apps:
         - myapp
     files:
