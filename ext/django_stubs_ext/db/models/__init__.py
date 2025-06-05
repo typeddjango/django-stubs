@@ -36,8 +36,8 @@ if TYPE_CHECKING:
         required_db_vendor: ClassVar[Literal["sqlite", "postgresql", "mysql", "oracle"]]
         select_on_save: ClassVar[bool]  # default: False
         indexes: ClassVar[_ListOrTuple[Index]]
-        unique_together: ClassVar[Sequence[Sequence[str]] | Sequence[str]]
-        index_together: ClassVar[Sequence[Sequence[str]] | Sequence[str]]  # Deprecated in Django 4.2
+        unique_together: ClassVar[Sequence[Sequence[str]]]
+        index_together: ClassVar[Sequence[Sequence[str]]]  # Deprecated in Django 4.2
         constraints: ClassVar[_ListOrTuple[BaseConstraint]]
         verbose_name: ClassVar[StrOrPromise]
         verbose_name_plural: ClassVar[StrOrPromise]
