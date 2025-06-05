@@ -269,7 +269,7 @@ django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geo
 django.http.QueryDict.pop
 django.http.request.QueryDict.pop
 
-# Django incorrectly decorates this with `@classmethod`.
+# Django incorrectly uses a signature of `(cls, **kwargs)` when it should be `(cls, *args, **kwargs)`.
 django.test.selenium.SeleniumTestCase.__init_subclass__
 
 # Django incorrectly uses a signature of `(self, *args, **kwargs)` when it should be `(self)`.
