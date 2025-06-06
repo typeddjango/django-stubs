@@ -18,6 +18,9 @@
       class TestModel(models.Model):
           pass
 
+      class TestModelForm(ModelForm[TestModel]):
+          pass
+
       class A(admin.ModelAdmin[TestModel]):
           # BaseModelAdmin
           autocomplete_fields = ("strs",)
@@ -32,7 +35,7 @@
               ("group", {"fields": ("c",), "classes": ("a",), "description": "foo"}),
               (_("lazy"), {"fields": ["bar"]})
           ]
-          form = ModelForm
+          form = TestModelForm
           filter_vertical = ("fields",)
           filter_horizontal = ("plenty", "of", "fields")
           radio_fields = {
