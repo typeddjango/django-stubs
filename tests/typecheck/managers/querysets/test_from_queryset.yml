@@ -24,11 +24,11 @@
                     def test_custom_manager(self) -> Self: ...
 
                 class BaseQuerySet(models.QuerySet[M]):
-                    def example_dict(self) -> Dict[str, Self]: ...
+                    def example_dict(self) -> dict[str, Self]: ...
 
                 class MyQuerySet(BaseQuerySet[M]):
                     def example_simple(self) -> Self: ...
-                    def example_list(self) -> List[Self]: ...
+                    def example_list(self) -> list[Self]: ...
                     def just_int(self) -> int: ...
 
                 NewManager = CustomManager.from_queryset(MyQuerySet)
@@ -310,7 +310,7 @@
     main: |
         from myapp.models import MyModel1, MyModel2
         import typing
-        kls: typing.Type[typing.Union[MyModel1, MyModel2]] = MyModel1
+        kls: type[typing.Union[MyModel1, MyModel2]] = MyModel1
         reveal_type(kls.objects)  # N: Revealed type is "Union[myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel1], myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel2]]"
         reveal_type(kls.objects.all())  # N: Revealed type is "Union[myapp.models.ModelQuerySet1, myapp.models.ModelQuerySet2]"
         reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"
@@ -945,10 +945,10 @@
             ...
         reveal_type(Manager[models.Model].from_queryset(NonQSGeneric[int]))
     out: |
-        main:12: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
-        main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[int]]"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
+        main:12: note: Revealed type is "type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "type[QuerySet[Model, Model]]"  [arg-type]
+        main:17: note: Revealed type is "type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "type[NonQSGeneric[int]]"; expected "type[QuerySet[Model, Model]]"  [arg-type]
 
 -   case: test_reverse_manager_with_foreign_key
     main: |

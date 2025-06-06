@@ -40,7 +40,7 @@
             form_class = MyForm
             def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
-                reveal_type(form_class)  # N: Revealed type is "Type[main.MyForm]"
+                reveal_type(form_class)  # N: Revealed type is "type[main.MyForm]"
                 reveal_type(self.get_form(None))  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form())  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form(form_class))  # N: Revealed type is "main.MyForm"

@@ -5,10 +5,10 @@
 
       class Foo:
           @cached_property
-          def attr(self) -> List[str]: ...
+          def attr(self) -> list[str]: ...
 
           @cached_property  # E: Too many arguments for property  [misc]
-          def attr2(self, arg2: str) -> List[str]: ...
+          def attr2(self, arg2: str) -> list[str]: ...
 
           reveal_type(attr)  # N: Revealed type is "def (self: main.Foo) -> builtins.list[builtins.str]"
 
@@ -16,21 +16,21 @@
 
       f = Foo()
       reveal_type(f.attr)  # N: Revealed type is "builtins.list[builtins.str]"
-      f.attr.func  # E: "List[str]" has no attribute "func"  [attr-defined]
+      f.attr.func  # E: "list[str]" has no attribute "func"  [attr-defined]
 
       # May be overridden by @property
       class Bar(Foo):
           @property
-          def attr(self) -> List[str]: ...
+          def attr(self) -> list[str]: ...
 
       # May be overridden by ClassVar
       class Quux(Foo):
-          attr: ClassVar[List[str]] = []
+          attr: ClassVar[list[str]] = []
 
       # ClassVar may not be overridden by cached_property
       class Baz(Quux):
           @cached_property
-          def attr(self) -> List[str]: ...  # E: Cannot override writeable attribute with read-only property  [override]
+          def attr(self) -> list[str]: ...  # E: Cannot override writeable attribute with read-only property  [override]
 
 -   case: str_promise_proxy
     main:  |
@@ -45,7 +45,7 @@
       reveal_type(s.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(s.capitalize())    # N: Revealed type is "builtins.str"
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
-      reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> Tuple[builtins.str]"
+      reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> tuple[builtins.str]"
       s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"  [attr-defined]
       f: Union[_StrPromise, str]
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"

@@ -8,7 +8,7 @@
 
         model_cls = type(instance)
 
-        reveal_type(model_cls) # N: Revealed type is "Union[Type[myapp.models.Order], Type[myapp.models.User]]"
+        reveal_type(model_cls) # N: Revealed type is "Union[type[myapp.models.Order], type[myapp.models.User]]"
         reveal_type(model_cls.objects)  # N: Revealed type is "Union[myapp.models.ManagerFromMyQuerySet[myapp.models.Order], myapp.models.ManagerFromMyQuerySet[myapp.models.User]]"
         reveal_type(model_cls.objects.my_method())  # N: Revealed type is "myapp.models.MyQuerySet"
     installed_apps:

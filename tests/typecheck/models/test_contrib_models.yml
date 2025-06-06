@@ -27,7 +27,7 @@
         reveal_type(Permission().codename)  # N: Revealed type is "builtins.str"
 
         from django.contrib.auth.models import PermissionsMixin
-        p: Type[PermissionsMixin]
+        p: type[PermissionsMixin]
         reveal_type(p().is_superuser)  # N: Revealed type is "builtins.bool"
 
         from django.contrib.auth.models import Group
@@ -105,7 +105,7 @@
         reveal_type(Other().unq_user)
     out: |
         main:2: note: Revealed type is "myapp.models.MyUser"
-        main:3: note: Revealed type is "Type[other.models.Other_users]"
+        main:3: note: Revealed type is "type[other.models.Other_users]"
         main:4: note: Revealed type is "myapp.models.MyUser"
         main:5: note: Revealed type is "myapp.models.MyUser"
 

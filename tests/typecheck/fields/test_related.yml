@@ -47,7 +47,7 @@
         reveal_type(book.publisher_id)  # N: Revealed type is "uuid.UUID"
         book.publisher_id = '821850bb-c105-426f-b340-3974419d00ca'
         book.publisher_id = UUID('821850bb-c105-426f-b340-3974419d00ca')
-        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "List[int]", variable has type "Union[str, UUID]")  [assignment]
+        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "list[int]", variable has type "Union[str, UUID]")  [assignment]
         book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "Union[str, UUID]")  [assignment]
     installed_apps:
         - myapp
@@ -377,7 +377,7 @@
         reveal_type(User.friends.through().from_user_id)  # N: Revealed type is "builtins.int"
         reveal_type(User.friends.through().to_user)  # N: Revealed type is "myapp.models.User"
         reveal_type(User.friends.through().to_user_id)  # N: Revealed type is "builtins.int"
-        reveal_type(User.friends.through)  # N: Revealed type is "Type[myapp.models.User_friends]"
+        reveal_type(User.friends.through)  # N: Revealed type is "type[myapp.models.User_friends]"
     installed_apps:
         - myapp
     files:
@@ -435,9 +435,9 @@
 
         reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int"
         Book2(publisher_id=1)
-        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
+        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "Union[float, int, str, Combinable]")  [misc]
         Book2.objects.create(publisher_id=1)
-        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
+        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "Union[float, int, str, Combinable]")  [misc]
     installed_apps:
         - myapp
     files:
@@ -625,7 +625,7 @@
     main: |
         from myapp.models import Author, Blog, Publisher, Profile
         reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Blog, myapp.models.Author_blogs]"
-        reveal_type(Author.blogs.through)  # N: Revealed type is "Type[myapp.models.Author_blogs]"
+        reveal_type(Author.blogs.through)  # N: Revealed type is "type[myapp.models.Author_blogs]"
         reveal_type(Author().blogs)  # N: Revealed type is "myapp.models.Blog_ManyRelatedManager[myapp.models.Author_blogs]"
         reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.Publisher, django.db.models.expressions.Combinable], myapp.models.Publisher]]"
         reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor[django.db.models.fields.related.OneToOneField[Union[myapp.models.Profile, django.db.models.expressions.Combinable], myapp.models.Profile]]"
@@ -1134,11 +1134,11 @@
             other.has_explicit_name = Other()
             other.has_explicit_name = None
     out: |
-        main:2: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        main:2: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor[myapp.models.Other, myapp.models.MyModel]"
         main:4: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        main:5: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
-        main:6: note: Revealed type is "Type[django.core.exceptions.ObjectDoesNotExist]"
+        main:5: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
+        main:6: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         main:9: note: Revealed type is "myapp.models.MyModel"
         main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")  [assignment]
         main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")  [assignment]
@@ -1217,12 +1217,12 @@
         main:15: note: Revealed type is "builtins.int"
         main:16: note: Revealed type is "myapp.models.Other"
         main:17: note: Revealed type is "builtins.int"
-        main:19: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
+        main:19: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
         main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.MyModel, django.db.models.expressions.Combinable], myapp.models.MyModel]]"
         main:21: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
-        main:23: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
+        main:23: note: Revealed type is "type[myapp.models.MyModel_other_again]"
         main:24: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.MyModel, myapp.models.MyModel_auto_through]"
-        main:25: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
+        main:25: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
         main:26: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:28: note: Revealed type is "builtins.str"
         main:29: note: Revealed type is "builtins.str"
@@ -1230,13 +1230,13 @@
         main:32: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:35: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
-        main:36: note: Revealed type is "Type[myapp.models.MyModel_auto_through]"
+        main:36: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
         main:37: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[Union[django.db.models.expressions.Combinable, builtins.int, builtins.str, None], builtins.int]]"
         main:38: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
-        main:39: note: Revealed type is "Type[myapp.models.MyModel_other_again]"
+        main:39: note: Revealed type is "type[myapp.models.MyModel_other_again]"
         main:40: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[Union[django.db.models.expressions.Combinable, builtins.int, builtins.str, None], builtins.int]]"
         main:41: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
-        main:42: note: Revealed type is "Type[myapp.models.CustomThrough]"
+        main:42: note: Revealed type is "type[myapp.models.CustomThrough]"
         main:43: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[Union[django.db.models.expressions.Combinable, builtins.int, builtins.str], builtins.int]]"
     installed_apps:
         -   myapp
@@ -1359,7 +1359,7 @@
     main: |
         from myapp.models import MyModel
         from typing import Type
-        def f(arg: Type[MyModel]) -> MyModel:
+        def f(arg: type[MyModel]) -> MyModel:
             instance = arg(field=1, unknown=2)
             reveal_type(instance.field)  # N: Revealed type is "Any"
             reveal_type(instance.unknown)  # N: Revealed type is "Any"
@@ -1458,13 +1458,13 @@
         reveal_type(First().others)  # N: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.First_others]"
         reveal_type(First().others.get())  # N: Revealed type is "myapp.models.Other"
         reveal_type(First.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Other, myapp.models.First_others]"
-        reveal_type(First.others.through)  # N: Revealed type is "Type[myapp.models.First_others]"
+        reveal_type(First.others.through)  # N: Revealed type is "type[myapp.models.First_others]"
         reveal_type(First.others.through.objects.get())  # N: Revealed type is "myapp.models.First_others"
 
         reveal_type(Second().others)  # N: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.Second_others]"
         reveal_type(Second().others.get())  # N: Revealed type is "myapp.models.Other"
         reveal_type(Second.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Other, myapp.models.Second_others]"
-        reveal_type(Second.others.through)  # N: Revealed type is "Type[myapp.models.Second_others]"
+        reveal_type(Second.others.through)  # N: Revealed type is "type[myapp.models.Second_others]"
         reveal_type(Second.others.through.objects.get())  # N: Revealed type is "myapp.models.Second_others"
     installed_apps:
         - myapp
@@ -1494,13 +1494,13 @@
         reveal_type(First().others)  # N: Revealed type is "myapp.models.First_ManyRelatedManager[myapp.models.First_others]"
         reveal_type(First().others.get())  # N: Revealed type is "myapp.models.First"
         reveal_type(First.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.First, myapp.models.First_others]"
-        reveal_type(First.others.through)  # N: Revealed type is "Type[myapp.models.First_others]"
+        reveal_type(First.others.through)  # N: Revealed type is "type[myapp.models.First_others]"
         reveal_type(First.others.through.objects.get())  # N: Revealed type is "myapp.models.First_others"
 
         reveal_type(Second().others)  # N: Revealed type is "myapp.models.Second_ManyRelatedManager[myapp.models.Second_others]"
         reveal_type(Second().others.get())  # N: Revealed type is "myapp.models.Second"
         reveal_type(Second.others)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Second, myapp.models.Second_others]"
-        reveal_type(Second.others.through)  # N: Revealed type is "Type[myapp.models.Second_others]"
+        reveal_type(Second.others.through)  # N: Revealed type is "type[myapp.models.Second_others]"
         reveal_type(Second.others.through.objects.get())  # N: Revealed type is "myapp.models.Second_others"
     installed_apps:
         - myapp
@@ -1553,11 +1553,11 @@
         # With builtin manager/queryset
         Author().book_set.filter(featured=True)
         Author().book_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().book_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, Tuple[builtins.bool]]"
+        reveal_type(Author().book_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[builtins.bool]]"
         Author().book_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
         reveal_type(Author().book_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': builtins.bool})]"
         Author().book_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().book_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, Tuple[builtins.bool]]"
+        reveal_type(Author().book_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[builtins.bool]]"
         Author().book_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
         reveal_type(Author().book_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': builtins.bool})]"
         Author().book_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
@@ -1565,11 +1565,11 @@
         # With a custom manager/queryset
         Author().other_set.filter(featured=True)
         Author().other_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().other_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, Tuple[builtins.bool]]"
+        reveal_type(Author().other_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, tuple[builtins.bool]]"
         Author().other_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
         reveal_type(Author().other_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': builtins.bool})]"
         Author().other_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().other_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, Tuple[builtins.bool]]"
+        reveal_type(Author().other_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, tuple[builtins.bool]]"
         Author().other_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
         reveal_type(Author().other_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': builtins.bool})]"
         Author().other_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]

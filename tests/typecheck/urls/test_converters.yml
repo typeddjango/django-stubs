@@ -33,4 +33,4 @@
           def to_url(self, value: str) -> int:
               return int(value)
 
-      register_converter(BigIntConverter, "bigint")  # E: Argument 1 to "register_converter" has incompatible type "Type[BigIntConverter]"; expected "Type[_Converter]"  [arg-type]
+      register_converter(BigIntConverter, "bigint")  # E: Argument 1 to "register_converter" has incompatible type "type[BigIntConverter]"; expected "type[_Converter]"  [arg-type]

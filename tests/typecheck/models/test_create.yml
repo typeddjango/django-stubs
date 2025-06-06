@@ -2,7 +2,7 @@
     main: |
         from myapp.models import User
         User.objects.create(pk=1, name='Max', age=10)
-        User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
+        User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "list[Any]", expected "Union[float, int, str, Combinable]")  [misc]
     installed_apps:
         - myapp
     files:
@@ -160,7 +160,7 @@
         from myapp.models import User
         async def amain() -> None:
             reveal_type(await User.objects.acreate(pk=1, name='Max', age=10))  # N: Revealed type is "myapp.models.User"
-            await User.objects.acreate(age=[])  # E: Incompatible type for "age" of "User" (got "List[Any]", expected "Union[float, int, str, Combinable]")  [misc]
+            await User.objects.acreate(age=[])  # E: Incompatible type for "age" of "User" (got "list[Any]", expected "Union[float, int, str, Combinable]")  [misc]
     installed_apps:
         - myapp
     files:
