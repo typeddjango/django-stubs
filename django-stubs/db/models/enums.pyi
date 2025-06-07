@@ -13,9 +13,9 @@ else:
     from enum import EnumMeta as EnumType
     from types import DynamicClassAttribute as enum_property
 
-    class ReprEnum(enum.Enum): ...  # type: ignore[misc]
-    class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
-    class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
+    class ReprEnum(enum.Enum): ...  # type: ignore[misc, unused-ignore]
+    class IntEnum(int, ReprEnum): ...  # type: ignore[misc, unused-ignore]
+    class StrEnum(str, ReprEnum): ...  # type: ignore[misc, unused-ignore]
 
 _Self = TypeVar("_Self", bound=ChoicesType)
 
