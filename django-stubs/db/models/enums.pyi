@@ -38,7 +38,7 @@ class ChoicesType(EnumType):
 @deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
 class ChoicesMeta(ChoicesType): ...
 
-class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
+class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc, unused-ignore]
     _label_: _StrOrPromise
     do_not_call_in_templates: Literal[True]
 

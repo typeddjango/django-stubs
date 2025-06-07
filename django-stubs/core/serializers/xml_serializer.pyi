@@ -1,5 +1,5 @@
 from typing import IO, Any
-from xml.sax.expatreader import ExpatParser
+from xml.sax.expatreader import ExpatParser  # type: ignore[import-not-found, unused-ignore]
 
 from django.core.serializers import base
 
