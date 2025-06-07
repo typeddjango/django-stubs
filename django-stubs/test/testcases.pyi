@@ -12,7 +12,7 @@ from django.db import connections as connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.query import QuerySet, RawQuerySet
-from django.forms import BaseFormSet, Form
+from django.forms import BaseForm, BaseFormSet
 from django.forms.fields import EmailField
 from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponseBase
@@ -101,7 +101,7 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertFormError(
         self,
-        form: Form,
+        form: BaseForm,
         field: str | None,
         errors: list[str] | str,
         msg_prefix: str = ...,
