@@ -246,7 +246,7 @@
         from myapp2.models import Profile
         reveal_type(Profile().user)  # N: Revealed type is "myapp.models.user.User"
         reveal_type(Profile().user.profile)  # N: Revealed type is "myapp2.models.Profile"
-        reveal_type(Profile.user.field)  # N: Revealed type is "django.db.models.fields.related.OneToOneField[Union[myapp.models.user.User, django.db.models.expressions.Combinable], myapp.models.user.User]"
+        reveal_type(Profile.user.field)  # N: Revealed type is "django.db.models.fields.related.OneToOneField[myapp.models.user.User | django.db.models.expressions.Combinable, myapp.models.user.User]"
     installed_apps:
         - myapp
         - myapp2
@@ -627,8 +627,8 @@
         reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Blog, myapp.models.Author_blogs]"
         reveal_type(Author.blogs.through)  # N: Revealed type is "type[myapp.models.Author_blogs]"
         reveal_type(Author().blogs)  # N: Revealed type is "myapp.models.Blog_ManyRelatedManager[myapp.models.Author_blogs]"
-        reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.Publisher, django.db.models.expressions.Combinable], myapp.models.Publisher]]"
-        reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor[django.db.models.fields.related.OneToOneField[Union[myapp.models.Profile, django.db.models.expressions.Combinable], myapp.models.Profile]]"
+        reveal_type(Blog.publisher)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[myapp.models.Publisher | django.db.models.expressions.Combinable, myapp.models.Publisher]]"
+        reveal_type(Publisher.profile)  # N: Revealed type is "django.db.models.fields.related_descriptors.ForwardOneToOneDescriptor[django.db.models.fields.related.OneToOneField[myapp.models.Profile | django.db.models.expressions.Combinable, myapp.models.Profile]]"
         reveal_type(Author.file)  # N: Revealed type is "django.db.models.fields.files.FileDescriptor"
 
     installed_apps:
@@ -686,8 +686,8 @@
         user = MyUser()
         reveal_type(user.book_set) # N: Revealed type is "myapp.models.Book_RelatedManager"
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
-        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Book, builtins.int], bulk: builtins.bool =)"
-        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: Union[myapp.models.Article, builtins.int], bulk: builtins.bool =)"
+        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: myapp.models.Book | builtins.int, bulk: builtins.bool =)"
+        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: myapp.models.Article | builtins.int, bulk: builtins.bool =)"
         reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
         reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
         reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
@@ -782,8 +782,8 @@
         reveal_type(User().parent)  # N: Revealed type is "myapp.models.AbstractUser"
         reveal_type(User().parent_id)  # N: Revealed type is "builtins.int"
 
-        reveal_type(User().parent2)  # N: Revealed type is "Union[myapp.models.AbstractUser, None]"
-        reveal_type(User().parent2_id)  # N: Revealed type is "Union[builtins.int, None]"
+        reveal_type(User().parent2)  # N: Revealed type is "myapp.models.AbstractUser | None"
+        reveal_type(User().parent2_id)  # N: Revealed type is "builtins.int | None"
     installed_apps:
         - myapp
     files:
@@ -802,7 +802,7 @@
 -   case: nullable_foreign_key_with_init_overridden
     main: |
         from myapp.models import A
-        reveal_type(A.objects.get().b)  # N: Revealed type is "Union[myapp.models.B, None]"
+        reveal_type(A.objects.get().b)  # N: Revealed type is "myapp.models.B | None"
     installed_apps:
         -   myapp
     files:
@@ -1220,7 +1220,7 @@
         main:16: note: Revealed type is "myapp.models.Other"
         main:17: note: Revealed type is "builtins.int"
         main:19: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[Union[myapp.models.MyModel, django.db.models.expressions.Combinable], myapp.models.MyModel]]"
+        main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[myapp.models.MyModel | django.db.models.expressions.Combinable, myapp.models.MyModel]]"
         main:21: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:23: note: Revealed type is "type[myapp.models.MyModel_other_again]"
         main:24: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.MyModel, myapp.models.MyModel_auto_through]"
@@ -1228,18 +1228,18 @@
         main:26: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:28: note: Revealed type is "builtins.str"
         main:29: note: Revealed type is "builtins.str"
-        main:30: note: Revealed type is "def (*objs: Union[myapp.models.MyModel, builtins.int], through_defaults: Union[typing.Mapping[builtins.str, Any], None] =)"
+        main:30: note: Revealed type is "def (*objs: myapp.models.MyModel | builtins.int, through_defaults: typing.Mapping[builtins.str, Any] | None =)"
         main:32: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:35: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
         main:36: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:37: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[Union[django.db.models.expressions.Combinable, builtins.int, builtins.str, None], builtins.int]]"
+        main:37: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
         main:38: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
         main:39: note: Revealed type is "type[myapp.models.MyModel_other_again]"
-        main:40: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[Union[django.db.models.expressions.Combinable, builtins.int, builtins.str, None], builtins.int]]"
+        main:40: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
         main:41: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
         main:42: note: Revealed type is "type[myapp.models.CustomThrough]"
-        main:43: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[Union[django.db.models.expressions.Combinable, builtins.int, builtins.str], builtins.int]]"
+        main:43: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str, builtins.int]]"
     installed_apps:
         -   myapp
     files:

@@ -74,31 +74,31 @@
 
       def empty_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
       def str_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = ['It works!']
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
       def bytes_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = [b'It works!']
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
       def object_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = [_('It works!')]
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
       def mixed_response(request: HttpRequest) -> StreamingHttpResponse:
           response = StreamingHttpResponse()
           response.streaming_content = [_('Yes'), '/', _('No')]
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
 -   case: streaming_http_response_async
@@ -142,7 +142,7 @@
           async def str_iterator() -> typing.AsyncIterator[str]:
               yield 'It works!'
           response.streaming_content = str_iterator()
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
       def bytes_response(request: HttpRequest) -> StreamingHttpResponse:
@@ -158,7 +158,7 @@
           async def object_iterator() -> typing.AsyncIterator[object]:
               yield _('It works!')
           response.streaming_content = object_iterator()
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response
 
       def mixed_response(request: HttpRequest) -> StreamingHttpResponse:
@@ -168,5 +168,5 @@
               yield '/'
               yield _('No')
           response.streaming_content = mixed_iterator()
-          reveal_type(response.streaming_content)  # N: Revealed type is "Union[typing.Iterator[builtins.bytes], typing.AsyncIterator[builtins.bytes]]"
+          reveal_type(response.streaming_content)  # N: Revealed type is "typing.Iterator[builtins.bytes] | typing.AsyncIterator[builtins.bytes]"
           return response

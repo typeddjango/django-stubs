@@ -14,9 +14,9 @@
         reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field10)  # N: Revealed type is "builtins.bool"
         reveal_type(user.my_custom_field11)  # N: Revealed type is "builtins.bool"
-        reveal_type(user.my_custom_field12)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
-        reveal_type(user.my_custom_field13)  # N: Revealed type is "Union[myapp.models.CustomFieldValue, None]"
-        reveal_type(user.my_custom_field14)  # N: Revealed type is "Union[builtins.bool, None]"
+        reveal_type(user.my_custom_field12)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
+        reveal_type(user.my_custom_field13)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
+        reveal_type(user.my_custom_field14)  # N: Revealed type is "builtins.bool | None"
         reveal_type(user.my_custom_field15)  # N: Revealed type is "None"
 
         reveal_type(user.my_custom_field_any1)  # N: Revealed type is "Any"

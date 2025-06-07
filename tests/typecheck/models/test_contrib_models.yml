@@ -9,7 +9,7 @@
         reveal_type(User().is_staff)  # N: Revealed type is "builtins.bool"
         reveal_type(User().is_active)  # N: Revealed type is "builtins.bool"
         reveal_type(User().date_joined)  # N: Revealed type is "datetime.datetime"
-        reveal_type(User().last_login)  # N: Revealed type is "Union[datetime.datetime, None]"
+        reveal_type(User().last_login)  # N: Revealed type is "datetime.datetime | None"
         reveal_type(User().is_authenticated)  # N: Revealed type is "Literal[True]"
         reveal_type(User().is_anonymous)  # N: Revealed type is "Literal[False]"
         reveal_type(User().groups.get())  # N: Revealed type is "django.contrib.auth.models.Group"

@@ -48,7 +48,7 @@
       f: _StrPromise | str
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
-      reveal_type("asd" + f)         # N: Revealed type is "Union[Any, builtins.str]"
+      reveal_type("asd" + f)         # N: Revealed type is "Any | builtins.str"
 
       reveal_type(s + "bar")         # N: Revealed type is "builtins.str"
       reveal_type("foo" + s)         # N: Revealed type is "Any"
