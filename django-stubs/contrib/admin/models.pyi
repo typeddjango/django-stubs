@@ -15,7 +15,7 @@ class LogEntryManager(models.Manager[LogEntry]):
     @deprecated("log_action() is deprecated and will be removed in Django 6.0. Use log_action_new() instead.")
     def log_action(
         self,
-        user_id: int,
+        user_id: int | str | UUID,
         content_type_id: int,
         object_id: int | str | UUID,
         object_repr: str,
@@ -24,7 +24,7 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> LogEntry: ...
     def log_actions(
         self,
-        user_id: int,
+        user_id: int | str | UUID,
         queryset: QuerySet[Model],
         action_flag: int,
         change_message: str | list[Any] = "",
