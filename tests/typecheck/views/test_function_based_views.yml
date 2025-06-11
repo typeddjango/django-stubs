@@ -18,6 +18,7 @@
 
 -   case: http_response_content
     main: |
+      from typing_extensions import reveal_type
       from django.http.request import HttpRequest
       from django.http.response import HttpResponse
       from django.utils.translation import gettext_lazy as _
@@ -68,6 +69,7 @@
 
 -   case: streaming_http_response_streaming_content
     main: |
+      from typing_extensions import reveal_type
       from django.http.request import HttpRequest
       from django.http.response import StreamingHttpResponse
       from django.utils.translation import gettext_lazy as _
@@ -133,6 +135,7 @@
 -   case: streaming_http_response_async_streaming_content
     main: |
       import typing
+      from typing_extensions import reveal_type
       from django.http.request import HttpRequest
       from django.http.response import StreamingHttpResponse
       from django.utils.translation import gettext_lazy as _

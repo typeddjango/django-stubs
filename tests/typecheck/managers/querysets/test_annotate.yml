@@ -1,6 +1,6 @@
 -   case: annotate_using_with_annotations
     main: |
-        from typing_extensions import Annotated
+        from typing_extensions import Annotated, reveal_type
         from myapp.models import User
         from django_stubs_ext import WithAnnotations, Annotations
         from django.db.models.expressions import Value
@@ -46,7 +46,7 @@
 -   case: annotate_using_with_annotations_typeddict
     main: |
         from typing import Any
-        from typing_extensions import Annotated, TypedDict
+        from typing_extensions import Annotated, TypedDict, reveal_type
         from myapp.models import User
         from django_stubs_ext import WithAnnotations, Annotations
         from django.db.models.expressions import Value
@@ -128,6 +128,7 @@
 
 -   case: annotate_basic
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models.expressions import F
 
@@ -153,6 +154,7 @@
 
 -   case: annotate_no_field_name
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Count
 
@@ -202,6 +204,7 @@
 
 -   case: annotate_twice_works
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models.expressions import F
 
@@ -229,7 +232,7 @@
         from django_stubs_ext import WithAnnotations
         from django.db.models import QuerySet
         from django.db.models.expressions import F
-        from typing_extensions import TypedDict
+        from typing_extensions import TypedDict, reveal_type
 
         qs = User.objects.filter(id=1)
 
@@ -275,6 +278,7 @@
 
 -   case: annotate_values_or_values_list_before_or_after_annotate_broadens_type
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         from django.db.models.expressions import F
 
@@ -399,6 +403,7 @@
 
 - case: test_annotate_allows_any_lookups_in_filter
   main: |
+    from typing_extensions import reveal_type
     from django.db import models
     from myapp.models import Blog
 
@@ -409,9 +414,9 @@
     qs.filter(distance__lt__lt=10)
     qs.filter(distance__unknown_lookup=10)
   out: |
-    main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
     main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
     main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
+    main:8: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})], myapp.models.Blog@AnnotatedWith[TypedDict({'distance': Any})]]"
   installed_apps:
     - myapp
   files:

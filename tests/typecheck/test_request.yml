@@ -1,5 +1,6 @@
 -   case: request_object_has_user_of_type_auth_user_model
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
         reveal_type(HttpRequest().user)  # N: Revealed type is "myapp.models.MyUser | django.contrib.auth.models.AnonymousUser"
         # check that other fields work ok
@@ -16,6 +17,7 @@
                     pass
 -   case: request_object_user_can_be_discriminated
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
         request = HttpRequest()
         reveal_type(request.user) # N: Revealed type is "django.contrib.auth.models.User | django.contrib.auth.models.AnonymousUser"
@@ -28,6 +30,7 @@
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')
 -   case: request_object_user_without_auth_and_contenttypes_apps
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
         request = HttpRequest()
         reveal_type(request.user) # N: Revealed type is "django.contrib.auth.base_user.AbstractBaseUser | django.contrib.auth.models.AnonymousUser"
@@ -35,6 +38,7 @@
             reveal_type(request.user) # N: Revealed type is "django.contrib.auth.base_user.AbstractBaseUser"
 -   case: request_object_user_without_auth_but_with_contenttypes_apps
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
         request = HttpRequest()
         reveal_type(request.user) # N: Revealed type is "django.contrib.auth.base_user.AbstractBaseUser | django.contrib.auth.models.AnonymousUser"
@@ -44,6 +48,7 @@
         INSTALLED_APPS = ('django.contrib.contenttypes',)
 -   case: subclass_request_not_changed_user_type
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
         class MyRequest(HttpRequest):
             foo: int # Just do something
@@ -55,6 +60,7 @@
 
 -   case: subclass_request_changed_user_type
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
         from django.contrib.auth.models import User
         class MyRequest(HttpRequest):
@@ -67,6 +73,7 @@
 
 -   case: request_get_post
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
 
         request = HttpRequest()
@@ -85,6 +92,7 @@
 
 -   case: request_get_post_unreachable
     main: |
+        from typing_extensions import reveal_type
         from django.http.request import HttpRequest
 
         request = HttpRequest()

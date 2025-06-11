@@ -1,5 +1,6 @@
 -   case: contrib_auth_model_fields
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.models import User
         reveal_type(User().username)  # N: Revealed type is "builtins.str"
         reveal_type(User().password)  # N: Revealed type is "builtins.str"
@@ -36,6 +37,7 @@
 
 -   case: can_override_abstract_user_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyBaseUser, MyUser
         reveal_type(MyBaseUser.objects)  # N: Revealed type is "myapp.models.MyBaseUserManager"
         reveal_type(MyBaseUser.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyBaseUser, myapp.models.MyBaseUser]"
@@ -64,6 +66,7 @@
 
 -   case: can_combine_permissions_mixin_and_abstract_base_user
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.base_user import AbstractBaseUser
         from django.contrib.auth.models import PermissionsMixin
         from myapp.models import AuthUser
@@ -72,10 +75,10 @@
         reveal_type(PermissionsMixin._meta)
         reveal_type(AbstractBaseUser._meta)
     out: |
-        main:4: note: Revealed type is "django.db.models.options.Options[myapp.models.AuthUser]"
         main:5: note: Revealed type is "django.db.models.options.Options[myapp.models.AuthUser]"
-        main:6: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.models.PermissionsMixin]"
-        main:7: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.base_user.AbstractBaseUser]"
+        main:6: note: Revealed type is "django.db.models.options.Options[myapp.models.AuthUser]"
+        main:7: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.models.PermissionsMixin]"
+        main:8: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.base_user.AbstractBaseUser]"
     installed_apps:
         - django.contrib.auth
         - myapp
@@ -93,6 +96,7 @@
 
 -   case: test_relation_specified_by_auth_user_model
     main: |
+        from typing_extensions import reveal_type
         from other.models import Other
         reveal_type(Other().users.get())
         reveal_type(Other.users.through)
@@ -103,14 +107,14 @@
 
         reveal_type(Other().unq_user)
     out: |
-        main:2: note: Revealed type is "myapp.models.MyUser"
-        main:3: note: Revealed type is "type[other.models.Other_users]"
-        main:4: note: Revealed type is "myapp.models.MyUser"
+        main:3: note: Revealed type is "myapp.models.MyUser"
+        main:4: note: Revealed type is "type[other.models.Other_users]"
         main:5: note: Revealed type is "myapp.models.MyUser"
+        main:6: note: Revealed type is "myapp.models.MyUser"
 
-        main:7: note: Revealed type is "myapp.models.MyUser"
+        main:8: note: Revealed type is "myapp.models.MyUser"
 
-        main:9: note: Revealed type is "myapp.models.MyUser"
+        main:10: note: Revealed type is "myapp.models.MyUser"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp', 'other')
         AUTH_USER_MODEL='myapp.MyUser'
@@ -135,10 +139,11 @@
 
 -   case: test_relate_to_auth_user_model_when_auth_not_installed
     main: |
+        from typing_extensions import reveal_type
         from other.models import Other
         reveal_type(Other().user)
     out: |
-        main:2: note: Revealed type is "myapp.models.MyUser"
+        main:3: note: Revealed type is "myapp.models.MyUser"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'myapp', 'other')
         AUTH_USER_MODEL='myapp.MyUser'
@@ -161,6 +166,7 @@
 
 -   case: test_permissions_inherited_reverse_relations
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.models import Group, Permission
         from django.contrib.contenttypes.models import ContentType
         reveal_type(Permission().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager[django.contrib.auth.models.User_user_permissions]"

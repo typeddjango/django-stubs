@@ -1,30 +1,32 @@
 -   case: is_naive_correct
     main: |
+      from typing_extensions import reveal_type
       from django.utils.timezone import is_naive
       from datetime import date, time, datetime
       reveal_type(is_naive(date(2020, 1, 1)))
       reveal_type(is_naive(datetime(2020, 1, 1)))
       reveal_type(is_naive(time()))
     out: |
-      main:3: error: No overload variant of "is_naive" matches argument type "date"  [call-overload]
-      main:3: note: Possible overload variants:
-      main:3: note:     def is_naive(value: time) -> Literal[True]
-      main:3: note:     def is_naive(value: datetime) -> bool
-      main:3: note: Revealed type is "Any"
-      main:4: note: Revealed type is "builtins.bool"
-      main:5: note: Revealed type is "Literal[True]"
+      main:4: error: No overload variant of "is_naive" matches argument type "date"  [call-overload]
+      main:4: note: Possible overload variants:
+      main:4: note:     def is_naive(value: time) -> Literal[True]
+      main:4: note:     def is_naive(value: datetime) -> bool
+      main:4: note: Revealed type is "Any"
+      main:5: note: Revealed type is "builtins.bool"
+      main:6: note: Revealed type is "Literal[True]"
 -   case: is_aware_correct
     main: |
+      from typing_extensions import reveal_type
       from django.utils.timezone import is_aware
       from datetime import date, time, datetime
       reveal_type(is_aware(date(2020, 1, 1)))
       reveal_type(is_aware(datetime(2020, 1, 1)))
       reveal_type(is_aware(time()))
     out: |
-      main:3: error: No overload variant of "is_aware" matches argument type "date"  [call-overload]
-      main:3: note: Possible overload variants:
-      main:3: note:     def is_aware(value: time) -> Literal[False]
-      main:3: note:     def is_aware(value: datetime) -> bool
-      main:3: note: Revealed type is "Any"
-      main:4: note: Revealed type is "builtins.bool"
-      main:5: note: Revealed type is "Literal[False]"
+      main:4: error: No overload variant of "is_aware" matches argument type "date"  [call-overload]
+      main:4: note: Possible overload variants:
+      main:4: note:     def is_aware(value: time) -> Literal[False]
+      main:4: note:     def is_aware(value: datetime) -> bool
+      main:4: note: Revealed type is "Any"
+      main:5: note: Revealed type is "builtins.bool"
+      main:6: note: Revealed type is "Literal[False]"

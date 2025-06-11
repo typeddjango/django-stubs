@@ -1,5 +1,6 @@
 - case: test_contenttypes_models
   main: |
+    from typing_extensions import reveal_type
     from django.contrib.contenttypes.models import ContentType
 
     c = ContentType.objects.create(app_label='abc', model='abc')

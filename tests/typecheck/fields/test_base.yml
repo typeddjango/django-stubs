@@ -1,5 +1,6 @@
 -   case: test_model_fields_classes_present_as_primitives
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         user = User(small_int=1, name='user', slug='user', text='user')
         reveal_type(user.id)  # N: Revealed type is "builtins.int"
@@ -23,6 +24,7 @@
 
 -   case: test_model_field_classes_from_existing_locations
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Booking
         booking = Booking()
         reveal_type(booking.id)  # N: Revealed type is "builtins.int"
@@ -46,6 +48,7 @@
 -   case: test_add_id_field_if_no_primary_key_defined
     disable_cache: true
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().id)  # N: Revealed type is "builtins.int"
     installed_apps:
@@ -61,6 +64,7 @@
 -   case: test_do_not_add_id_if_field_with_primary_key_True_defined
     disable_cache: true
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().my_pk)  # N: Revealed type is "builtins.int"
         User().id  # E: "User" has no attribute "id"  [attr-defined]
@@ -76,6 +80,7 @@
 
 -   case: blank_and_null_char_field_allows_none
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         MyModel(nulltext="")
         MyModel(nulltext=None)
@@ -93,6 +98,7 @@
 
 -   case: blank_and_not_null_charfield_does_not_allow_none
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "str | int | Combinable")  [misc]
         MyModel(notnulltext="")
@@ -110,6 +116,7 @@
 
 -   case: if_field_called_on_class_return_field_itself
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
     installed_apps:
@@ -124,6 +131,7 @@
 
 -   case: fields_on_non_model_classes_resolve_to_field_type
     main: |
+        from typing_extensions import reveal_type
         from django.db import models
         class MyClass:
             myfield: models.IntegerField[int, int]
@@ -133,6 +141,7 @@
 
 -   case: fields_inside_mixins_used_in_model_subclasses_resolved_as_primitives
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, AuthMixin
         reveal_type(MyModel().username)  # N: Revealed type is "builtins.str"
     installed_apps:
@@ -152,6 +161,7 @@
 -   case: can_narrow_field_type
     main: |
         from typing import cast, NewType
+        from typing_extensions import reveal_type
         from django.db import models
         Year = NewType("Year", int)
         class Book(models.Model):
@@ -166,6 +176,7 @@
 
 -  case: test_binary_field_return_types
    main: |
+        from typing_extensions import reveal_type
         from django.db import models
         class EncodedMessage(models.Model):
             message = models.BinaryField()
@@ -175,6 +186,7 @@
 
 -  case: test_small_auto_field_class_presents_as_int
    main: |
+        from typing_extensions import reveal_type
         from django.db import models
         class MyModel(models.Model):
             small = models.SmallAutoField(primary_key=True)
@@ -187,6 +199,7 @@
         # Ref: https://github.com/typeddjango/django-stubs/issues/1261
         # Django modifies the model so it doesn't have 'modelname', but we don't follow
         # along. But the 'name=' argument to a field isn't a documented feature.
+        from typing_extensions import reveal_type
         from myapp.models import RenamedField
         instance = RenamedField()
         reveal_type(instance.modelname) # N: Revealed type is "builtins.int"

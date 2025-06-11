@@ -1,5 +1,6 @@
 -   case: register_filter_unnamed
     main: |
+        from typing_extensions import reveal_type
         from django import template
         register = template.Library()
 
@@ -11,6 +12,7 @@
 
 -   case: register_filter_named
     main: |
+        from typing_extensions import reveal_type
         from django import template
         register = template.Library()
 
@@ -22,6 +24,7 @@
 
 -   case: register_simple_tag_no_args
     main: |
+        from typing_extensions import reveal_type
         import datetime
         from django import template
         register = template.Library()
@@ -34,6 +37,7 @@
 
 -   case: register_simple_tag_context
     main: |
+        from typing_extensions import reveal_type
         from django import template
         from typing import Any
         register = template.Library()
@@ -47,6 +51,7 @@
 
 -   case: register_simple_tag_named
     main: |
+        from typing_extensions import reveal_type
         from django import template
         register = template.Library()
 
@@ -58,6 +63,7 @@
 
 -   case: register_simple_tag_via_call
     main: |
+        from typing_extensions import reveal_type
         from django import template
         register = template.Library()
 
@@ -68,6 +74,7 @@
 
 -   case: register_simple_block_tag
     main: |
+        from typing_extensions import reveal_type
         import datetime
         from django import template
         register = template.Library()
@@ -91,6 +98,7 @@
 
 -   case: register_tag_no_args
     main: |
+        from typing_extensions import reveal_type
         from django import template
         from django.template.base import Parser, Token
         from django.template.defaulttags import CycleNode
@@ -104,6 +112,7 @@
 
 -   case: register_tag_named
     main: |
+        from typing_extensions import reveal_type
         from django import template
         from django.template.base import Parser, Token
         from django.template.defaulttags import CycleNode
@@ -117,6 +126,7 @@
 
 -   case: register_inclusion_tag
     main: |
+        from typing_extensions import reveal_type
         from django import template
         register = template.Library()
 

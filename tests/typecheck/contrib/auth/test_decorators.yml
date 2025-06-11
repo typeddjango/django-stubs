@@ -1,6 +1,7 @@
 -   case: login_required_bare
     main: |
         from typing import Any
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import login_required
         from django.http import HttpRequest, HttpResponse
         @login_required
@@ -9,6 +10,7 @@
 -   case: login_required_bare_async
     main: |
         from typing import Any
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import login_required
         from django.http import HttpRequest, HttpResponse
         @login_required
@@ -16,6 +18,7 @@
         reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 -   case: login_required_fancy
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import login_required
         from django.core.handlers.wsgi import WSGIRequest
         from django.http import HttpResponse
@@ -24,6 +27,7 @@
         reveal_type(view_func)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: builtins.str) -> django.http.response.HttpResponse"
 -   case: login_required_fancy_async
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import login_required
         from django.core.handlers.asgi import ASGIRequest
         from django.http import HttpResponse
@@ -32,6 +36,7 @@
         reveal_type(view_func)  # N: Revealed type is "def (request: django.core.handlers.asgi.ASGIRequest, arg: builtins.str) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 -   case: login_required_weird
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import login_required
         from django.http import HttpRequest, HttpResponse
         # This is non-conventional usage, but covered in Django tests, so we allow it.
@@ -46,6 +51,7 @@
         def view_func2(request: Any) -> str: ...
 -   case: user_passes_test
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import user_passes_test
         from django.http import HttpRequest, HttpResponse
         @user_passes_test(lambda u: u.get_username().startswith('super'))
@@ -53,6 +59,7 @@
         reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 -   case: user_passes_test_async
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import user_passes_test
         from django.http import HttpRequest, HttpResponse
         @user_passes_test(lambda u: u.get_username().startswith('super'))
@@ -66,6 +73,7 @@
         def view_func(request: HttpRequest) -> HttpResponse: ...
 -   case: permission_required
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import permission_required
         from django.http import HttpRequest, HttpResponse
         @permission_required('polls.can_vote')
@@ -73,6 +81,7 @@
         reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 -   case: permission_required_async
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth.decorators import permission_required
         from django.http import HttpRequest, HttpResponse
         @permission_required('polls.can_vote')

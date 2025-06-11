@@ -2,6 +2,7 @@
     main: |
       from django.utils.functional import cached_property
       from typing import ClassVar
+      from typing_extensions import reveal_type
 
       class Foo:
           @cached_property
@@ -34,6 +35,7 @@
 
 -   case: str_promise_proxy
     main:  |
+      from typing_extensions import reveal_type
       from django.utils.functional import Promise, lazystr, _StrPromise
 
       s = lazystr("asd")
@@ -67,6 +69,7 @@
     main: |
       from typing import Any
       from django.utils.functional import classproperty
+      from typing_extensions import reveal_type
 
       class Foo:
           @classproperty

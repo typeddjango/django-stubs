@@ -1,6 +1,7 @@
 -   case: settings_loaded_from_different_files
     disable_cache: true
     main: |
+        from typing_extensions import reveal_type
         from django.conf import settings
         # standard settings
         reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is "builtins.str"
@@ -22,6 +23,7 @@
 
 -   case: global_settings_are_always_loaded
     main: |
+        from typing_extensions import reveal_type
         from django.conf import settings
         reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is "builtins.str"
         reveal_type(settings.AUTHENTICATION_BACKENDS)  # N: Revealed type is "typing.Sequence[builtins.str]"
@@ -36,6 +38,7 @@
     custom_settings: |
         from settings.basic_settings import *
     main: |
+        from typing_extensions import reveal_type
         from django.conf import settings
         reveal_type(settings.MEDIA_ROOT)  # N: Revealed type is "pathlib.Path"
         reveal_type(settings.MEDIA_ROOT / 'part')  # N: Revealed type is "pathlib.Path"
@@ -48,21 +51,23 @@
 
 -   case: settings_hasattr
     main: |
+      from typing_extensions import reveal_type
       from django.conf import settings
       if hasattr(settings, 'AUTH_USER_MODEL') and settings.AUTH_USER_MODEL:
           reveal_type(settings.AUTH_USER_MODEL)
       if hasattr(settings, 'NON_EXISTENT_SETTING') and settings.NON_EXISTENT_SETTING:
           reveal_type(settings.NON_EXISTENT_SETTING)
     out: |
-      main:3: note: Revealed type is "builtins.str"
-      main:4: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
+      main:4: note: Revealed type is "builtins.str"
       main:5: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
-      main:5: note: Revealed type is "Any"
+      main:6: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
+      main:6: note: Revealed type is "Any"
 
 
 -   case: settings_loaded_from_runtime_magic
     disable_cache: true
     main: |
+        from typing_extensions import reveal_type
         from django.conf import settings
 
         # Global:
@@ -83,6 +88,7 @@
 -   case: settings_loaded_from_runtime_magic_strict_default
     disable_cache: true
     main: |
+        from typing_extensions import reveal_type
         from django.conf import settings
 
         # Global:

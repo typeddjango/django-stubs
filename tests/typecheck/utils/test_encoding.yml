@@ -1,5 +1,6 @@
 -   case: force_bytes_or_str
     main: |
+      from typing_extensions import reveal_type
       from django.utils.encoding import force_bytes, force_str
       class S(str):
           pass

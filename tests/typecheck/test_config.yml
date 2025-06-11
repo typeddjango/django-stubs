@@ -1,5 +1,6 @@
 -   case: pyproject_toml_config
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         mymodel = MyModel(user_id=1)
         reveal_type(mymodel.id)  # N: Revealed type is "builtins.int"
@@ -15,6 +16,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing_extensions import reveal_type
                 from typing import TYPE_CHECKING
                 from typing_extensions import reveal_type
                 from django.db import models
@@ -25,6 +27,7 @@
 
 -   case: generate_pyproject_toml_and_settings_file_from_installed_apps_key
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         mymodel = MyModel(user_id=1)
         reveal_type(mymodel.id)  # N: Revealed type is "builtins.int"

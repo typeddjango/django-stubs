@@ -1,5 +1,6 @@
 -   case: from_queryset_self_return_management
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, MyModelWithoutSelf
         reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
@@ -47,6 +48,7 @@
 
 -   case: from_queryset_model_inheritance
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Base, Sub
         reveal_type(Base.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.Base]"
         reveal_type(Sub.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.Sub]"
@@ -72,6 +74,7 @@
 
 -   case: from_queryset_with_base_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -99,6 +102,7 @@
 
 -   case: from_queryset_queryset_imported_from_other_module
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
@@ -149,6 +153,7 @@
 
 -   case: from_queryset_custom_manager_subclass
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import NewManager
         reveal_type(NewManager().example())  # N: Revealed type is "myapp.models.MyModel"
     installed_apps:
@@ -185,6 +190,7 @@
                     objects = NewManager()
 -   case: handles_subclasses_of_queryset
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
     installed_apps:
@@ -221,6 +227,7 @@
 
 -   case: from_queryset_generated_manager_imported_from_other_module
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.querysets.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -271,6 +278,7 @@
 
 -   case: from_queryset_annotates_manager_variable_as_type
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import NewManager
         reveal_type(NewManager)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
     installed_apps:
@@ -288,6 +296,7 @@
 
 -   case: from_queryset_with_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -310,6 +319,7 @@
 
 -   case: from_queryset_with_manager_of_union
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel1, MyModel2
         kls: type[MyModel1 | MyModel2] = MyModel1
         reveal_type(kls.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel1] | myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel2]"
@@ -342,6 +352,7 @@
 
 -   case: from_queryset_returns_intersection_of_manager_and_queryset
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, NewManager
         reveal_type(NewManager())  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[myapp.models.MyModel]"
@@ -368,6 +379,7 @@
 
 -   case: from_queryset_with_class_name_provided
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, NewManager, OtherModel, OtherManager
         reveal_type(NewManager())  # N: Revealed type is "myapp.models.NewManager[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
@@ -402,6 +414,7 @@
 
 -   case: from_queryset_with_class_inheritance
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -426,6 +439,7 @@
 
 -   case: from_queryset_with_manager_in_another_directory_and_imports
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -455,6 +469,7 @@
 -   case: from_queryset_with_inherited_manager_and_typing_no_return
     disable_cache: true
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -487,6 +502,7 @@
 
 -   case: from_queryset_with_decorated_queryset_methods
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
@@ -515,6 +531,7 @@
 
 -   case: from_queryset_model_gets_generated_manager_as_default_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
@@ -551,6 +568,7 @@
 
 -   case: from_queryset_can_resolve_explicit_any_methods
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.queryset_method(1))  # N: Revealed type is "Any"
@@ -580,6 +598,7 @@
 
 -   case: test_queryset_in_model_class_body
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
@@ -610,6 +629,7 @@
 
 -   case: test_queryset_in_model_class_body_subclass
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.BaseManagerFromBaseQuerySet"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.BaseModel"
@@ -638,6 +658,7 @@
 
 -   case: from_queryset_includes_methods_returning_queryset
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
@@ -717,6 +738,7 @@
 
 -   case: reuses_type_when_called_twice_identically
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, FirstManager, SecondManager
         reveal_type(FirstManager)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
         reveal_type(SecondManager)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
@@ -742,6 +764,7 @@
 
 -   case: handles_name_collision_with_generated_type
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
@@ -763,6 +786,7 @@
 
 -   case: resolves_name_collision_with_other_module_level_object
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, Generated, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
         reveal_type(Generated())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[Never]"
@@ -786,6 +810,7 @@
 
 -   case: accepts_explicit_none_as_class_name
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import PositionalNone, NoneAsKwarg
         reveal_type(PositionalNone)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
         reveal_type(NoneAsKwarg)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
@@ -806,6 +831,7 @@
 
 -   case: uses_fallback_class_name_when_argument_is_not_string_expression
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import StrCallable
         reveal_type(StrCallable)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
     installed_apps:
@@ -824,6 +850,7 @@
 
 -   case: queryset_inheritable_does_not_clobber_super_init
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import BaseManager
 
         reveal_type(BaseManager().ttl)  # N: Revealed type is "builtins.int"
@@ -855,6 +882,7 @@
 
 -   case: test_from_queryset_with_deferral
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Concrete
         reveal_type(Concrete.objects.qs_meth())  # N: Revealed type is "builtins.int"
         reveal_type(Concrete.objects.manager_meth())  # N: Revealed type is "builtins.str"
@@ -890,6 +918,7 @@
 
 -   case: test_from_queryset_with_concrete_subclass
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Concrete
         reveal_type(Concrete.objects)  # N: Revealed type is "myapp.models.ConcreteManager"
         reveal_type(Concrete.objects.get())  # N: Revealed type is "myapp.models.Concrete"
@@ -926,7 +955,7 @@
 -   case: test_queryset_arg_as_unsupported_expressions
     main: |
         from typing import Generic, TypeVar
-        from typing_extensions import TypeAlias
+        from typing_extensions import TypeAlias, reveal_type
         from django.db import models
         from django.db.models.manager import Manager
 
@@ -950,6 +979,7 @@
 
 -   case: test_reverse_manager_with_foreign_key
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import B
         reveal_type(B().a_set.filter(field="something"))  # N: Revealed type is "myapp.models.QS"
     installed_apps:
