@@ -65,7 +65,7 @@
             example = models.CharField(max_length=100)
             class Meta(TypedModelMeta):
                 abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
-                verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "list[str]", base class "TypedModelMeta" defined the type as "Union[str, _StrPromise]")  [assignment]
+                verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "list[str]", base class "TypedModelMeta" defined the type as "str | _StrPromise")  [assignment]
                 unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "dict[int, int]", base class "TypedModelMeta" defined the type as "Sequence[Sequence[str]]")  [assignment]
                 unknown_attr = True  # can't check this
 

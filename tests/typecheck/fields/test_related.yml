@@ -47,8 +47,8 @@
         reveal_type(book.publisher_id)  # N: Revealed type is "uuid.UUID"
         book.publisher_id = '821850bb-c105-426f-b340-3974419d00ca'
         book.publisher_id = UUID('821850bb-c105-426f-b340-3974419d00ca')
-        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "list[int]", variable has type "Union[str, UUID]")  [assignment]
-        book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "Union[str, UUID]")  [assignment]
+        book.publisher_id = [1]  # E: Incompatible types in assignment (expression has type "list[int]", variable has type "str | UUID")  [assignment]
+        book.publisher_id = Publisher()  # E: Incompatible types in assignment (expression has type "Publisher", variable has type "str | UUID")  [assignment]
     installed_apps:
         - myapp
     files:
@@ -429,15 +429,15 @@
         reveal_type(Book().publisher_id)  # N: Revealed type is "builtins.str"
         Book(publisher_id=1)
         Book(publisher_id='hello')
-        Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "Union[str, int, Combinable]")  [misc]
+        Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "str | int | Combinable")  [misc]
         Book.objects.create(publisher_id=1)
         Book.objects.create(publisher_id='hello')
 
         reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int"
         Book2(publisher_id=1)
-        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "Union[float, int, str, Combinable]")  [misc]
+        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
         Book2.objects.create(publisher_id=1)
-        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "Union[float, int, str, Combinable]")  [misc]
+        Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
         - myapp
     files:
@@ -1140,8 +1140,8 @@
         main:5: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         main:6: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         main:9: note: Revealed type is "myapp.models.MyModel"
-        main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")  [assignment]
-        main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "Optional[MyModel]")  [assignment]
+        main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "MyModel | None")  [assignment]
+        main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "MyModel | None")  [assignment]
     installed_apps:
         -   myapp
     files:

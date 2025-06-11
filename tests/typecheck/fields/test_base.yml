@@ -94,9 +94,9 @@
 -   case: blank_and_not_null_charfield_does_not_allow_none
     main: |
         from myapp.models import MyModel
-        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "Union[str, int, Combinable]")  [misc]
+        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "str | int | Combinable")  [misc]
         MyModel(notnulltext="")
-        MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")  [assignment]
+        MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "str | int | Combinable")  [assignment]
         reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
