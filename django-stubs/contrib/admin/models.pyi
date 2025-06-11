@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any, ClassVar
 from uuid import UUID
 
