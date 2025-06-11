@@ -200,8 +200,6 @@ class DjangoContext:
 
     def get_expected_types(self, api: TypeChecker, model_cls: type[Model], *, method: str) -> dict[str, MypyType]:
         contenttypes_in_apps = self.apps_registry.is_installed("django.contrib.contenttypes")
-        if contenttypes_in_apps:
-            from django.contrib.contenttypes.fields import GenericForeignKey
 
         expected_types = {}
         # add pk if not abstract=True
@@ -256,17 +254,20 @@ class DjangoContext:
 
                     expected_types[field_name] = model_set_type
 
-            elif contenttypes_in_apps and isinstance(field, GenericForeignKey):
-                # it's generic, so cannot set specific model
-                field_name = field.name
-                gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                if gfk_info is None:
-                    gfk_set_type: MypyType = AnyType(TypeOfAny.unannotated)
-                else:
-                    gfk_set_type = helpers.get_private_descriptor_type(
-                        gfk_info, "_pyi_private_set_type", is_nullable=True
-                    )
-                expected_types[field_name] = gfk_set_type
+            elif contenttypes_in_apps:
+                from django.contrib.contenttypes.fields import GenericForeignKey
+
+                if isinstance(field, GenericForeignKey):
+                    # it's generic, so cannot set specific model
+                    field_name = field.name
+                    gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
+                    if gfk_info is None:
+                        gfk_set_type: MypyType = AnyType(TypeOfAny.unannotated)
+                    else:
+                        gfk_set_type = helpers.get_private_descriptor_type(
+                            gfk_info, "_pyi_private_set_type", is_nullable=True
+                        )
+                    expected_types[field_name] = gfk_set_type
 
         return expected_types
 
