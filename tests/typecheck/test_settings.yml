@@ -12,7 +12,7 @@
         from base import *
         SECRET_KEY = 112233
         NUMBERS = ['one', 'two']
-        DICT = {}  # type: ignore
+        DICT = {}  # type: ignore[var-annotated]
     files:
         -   path: base.py
             content: |
