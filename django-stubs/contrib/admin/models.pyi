@@ -25,7 +25,7 @@ class LogEntryManager(models.Manager[LogEntry]):
     def log_actions(
         self,
         user_id: int | str | UUID,
-        queryset: QuerySet[Model],
+        queryset: Iterable[Model],
         action_flag: int,
         change_message: str | list[Any] = "",
         *,
