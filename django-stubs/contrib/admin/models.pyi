@@ -2,7 +2,6 @@ from typing import Any, ClassVar
 from uuid import UUID
 
 from django.db import models
-from django.db.models import QuerySet
 from django.db.models.base import Model
 from typing_extensions import deprecated
 
