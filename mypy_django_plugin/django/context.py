@@ -511,7 +511,7 @@ class DjangoContext:
         for lookup_base in helpers.iter_bases(lookup_info):
             if lookup_base.args and isinstance((lookup_type := get_proper_type(lookup_base.args[0])), Instance):
                 # if it's Field, consider lookup_type a __get__ of current field
-                if isinstance(lookup_type, Instance) and lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
+                if lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
                     field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
                     if field_info is None:
                         return AnyType(TypeOfAny.explicit)

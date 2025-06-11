@@ -258,8 +258,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
                 "builtins.dict", [api.named_generic_type("builtins.str", []), AnyType(TypeOfAny.from_omitted_generics)]
             )
         elif isinstance(original_row_type, TupleType):
-            fallback: Instance = original_row_type.partial_fallback
-            if fallback is not None and fallback.type.has_base("typing.NamedTuple"):
+            if original_row_type.partial_fallback.type.has_base("typing.NamedTuple"):
                 # TODO: Use a NamedTuple which contains the known fields, but also
                 #  falls back to allowing any attribute access.
                 row_type = AnyType(TypeOfAny.implementation_artifact)
