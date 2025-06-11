@@ -534,10 +534,11 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
 
     See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#prefetch-objects
     """
+    api = helpers.get_typechecker_api(ctx)
+
     if not (
         isinstance(ctx.type, Instance)
         and isinstance((default_return_type := get_proper_type(ctx.default_return_type)), Instance)
-        and (api := helpers.get_typechecker_api(ctx))
         and (qs_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
         and ctx.args
         and ctx.arg_types

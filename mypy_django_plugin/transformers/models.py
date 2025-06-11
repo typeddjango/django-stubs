@@ -317,7 +317,7 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # We also need to override existing `pk` definition from `stubs`:
         auto_field = model_cls._meta.pk
-        if auto_field:
+        if auto_field is not None:
             self.create_autofield(
                 auto_field=auto_field,
                 dest_name="pk",
