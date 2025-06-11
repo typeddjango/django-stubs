@@ -1,8 +1,8 @@
-from typing import Any, ClassVar
+from collections.abc import Iterable
+from typing import Any, ClassVar, Literal, overload
 from uuid import UUID
 
 from django.db import models
-from django.db.models import QuerySet
 from django.db.models.base import Model
 from typing_extensions import deprecated
 
@@ -22,15 +22,26 @@ class LogEntryManager(models.Manager[LogEntry]):
         action_flag: int,
         change_message: Any = ...,
     ) -> LogEntry: ...
+    @overload
     def log_actions(
         self,
         user_id: int | str | UUID,
-        queryset: QuerySet[Model],
+        queryset: Iterable[Model],
         action_flag: int,
         change_message: str | list[Any] = "",
         *,
-        single_object: bool = False,
-    ) -> list[LogEntry] | LogEntry: ...
+        single_object: Literal[True] = ...,
+    ) -> LogEntry: ...
+    @overload
+    def log_actions(
+        self,
+        user_id: int | str | UUID,
+        queryset: Iterable[Model],
+        action_flag: int,
+        change_message: str | list[Any] = "",
+        *,
+        single_object: Literal[False] = ...,
+    ) -> list[LogEntry]: ...
 
 class LogEntry(models.Model):
     action_time: models.DateTimeField
