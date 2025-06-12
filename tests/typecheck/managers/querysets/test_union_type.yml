@@ -1,10 +1,9 @@
 -   case: union_queryset_custom_method
     main: |
-        from typing import Union
         from django.db.models import QuerySet
         from myapp.models import User, Order
 
-        instance: Union[Order, User] = User()
+        instance: Order | User = User()
 
         model_cls = type(instance)
 

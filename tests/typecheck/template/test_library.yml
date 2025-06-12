@@ -35,11 +35,11 @@
 -   case: register_simple_tag_context
     main: |
         from django import template
-        from typing import Dict, Any
+        from typing import Any
         register = template.Library()
 
         @register.simple_tag(takes_context=True)
-        def current_time(context: Dict[str, Any], format_string: str) -> str:
+        def current_time(context: dict[str, Any], format_string: str) -> str:
             timezone = context['timezone']
             return "test"
 
@@ -48,7 +48,6 @@
 -   case: register_simple_tag_named
     main: |
         from django import template
-        from typing import Dict, Any
         register = template.Library()
 
         @register.simple_tag(name='minustwo')
@@ -119,11 +118,10 @@
 -   case: register_inclusion_tag
     main: |
         from django import template
-        from typing import List
         register = template.Library()
 
         @register.inclusion_tag('results.html')
-        def format_results(results: List[str]) -> str:
+        def format_results(results: list[str]) -> str:
             return ', '.join(results)
 
         reveal_type(format_results) # N: Revealed type is "def (results: builtins.list[builtins.str]) -> builtins.str"

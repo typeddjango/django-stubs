@@ -1,6 +1,5 @@
 -   case: test_contributions_from_modelbase_metaclass
     main: |
-        from typing import Type
         from myapp.models import Abstract1, Abstract2, Concrete1, Concrete2, Concrete3
         from django.db import models
 

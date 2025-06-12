@@ -1,6 +1,5 @@
 -   case: union_combinable_reduced_to_non_union
     main: |
-        from typing import List
         from myapp.models import MyModel
         array_val: list[int] = [1]
         MyModel(array=array_val)  # E: Incompatible type for "array" of "MyModel" (got "list[int]", expected "Sequence[str] | Combinable")  [misc]

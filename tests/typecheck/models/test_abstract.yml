@@ -75,7 +75,7 @@
 - case: test_abstract_model_type_cannot_be_used_as_runtime_arg
   main: |
       from myapp.models import Abstract, Concrete, LiteralAbstract
-      from typing import Generic, Type, TypeVar, overload, Union
+      from typing import Generic, TypeVar, overload
 
       Abstract()  # E: Cannot instantiate abstract class "Abstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
       LiteralAbstract()  # E: Cannot instantiate abstract class "LiteralAbstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
@@ -104,7 +104,7 @@
       def o(klass: type[T], arg: str) -> None: ...
       @overload
       def o(klass: type[T], arg: int) -> None: ...
-      def o(klass: type[T], arg: Union[str, int]) -> None:
+      def o(klass: type[T], arg: str | int) -> None:
           return None
 
       o(Abstract, "a")  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
@@ -123,7 +123,7 @@
           def overloaded(self, arg: str, klass: type[Abstract]) -> None:
               ...
 
-          def overloaded(self, arg: Union[str, int], klass: type[Abstract]) -> None:
+          def overloaded(self, arg: str | int, klass: type[Abstract]) -> None:
               return None
 
       M().method(Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
@@ -177,7 +177,7 @@
     -   path: myapp/__init__.py
     -   path: myapp/models.py
         content: |
-            from typing import Protocol, Type, TypeVar
+            from typing import Protocol, TypeVar
             from django.db import models
             from django_stubs_ext.db.models import TypedModelMeta
 

@@ -1,7 +1,7 @@
 -   case: cached_property_class_vs_instance_attributes
     main: |
       from django.utils.functional import cached_property
-      from typing import List, ClassVar
+      from typing import ClassVar
 
       class Foo:
           @cached_property
@@ -34,8 +34,6 @@
 
 -   case: str_promise_proxy
     main:  |
-      from typing import Union
-
       from django.utils.functional import Promise, lazystr, _StrPromise
 
       s = lazystr("asd")
@@ -47,7 +45,7 @@
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
       reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> tuple[builtins.str]"
       s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"  [attr-defined]
-      f: Union[_StrPromise, str]
+      f: _StrPromise | str
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
       reveal_type("asd" + f)         # N: Revealed type is "Union[Any, builtins.str]"

@@ -62,8 +62,7 @@
 -   case: queryset_method_of_union
     main: |
         from myapp.models import MyModel1, MyModel2
-        import typing
-        kls: type[typing.Union[MyModel1, MyModel2]] = MyModel1
+        kls: type[MyModel1 | MyModel2] = MyModel1
         reveal_type(kls.objects)  # N: Revealed type is "Union[django.db.models.manager.Manager[myapp.models.MyModel1], django.db.models.manager.Manager[myapp.models.MyModel2]]"
         reveal_type(kls.objects.all())  # N: Revealed type is "Union[django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1], django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]]"
         reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"

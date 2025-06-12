@@ -41,12 +41,12 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar, Generic, Type
+                from typing import Generic, TypeVar
                 from django.db import models
 
                 _T = TypeVar('_T', bound=models.Model)
                 class Base(Generic[_T]):
-                    def __init__(self, model_cls: Type[_T]) -> None:
+                    def __init__(self, model_cls: type[_T]) -> None:
                         self.model_cls = model_cls
                         reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
                 class MyModel(models.Model):
@@ -66,12 +66,12 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar, Generic, Type
+                from typing import Generic, TypeVar
                 from django.db import models
 
                 _T = TypeVar('_T', bound=models.Model)
                 class Base(Generic[_T]):
-                    def __init__(self, model_cls: Type[_T]) -> None:
+                    def __init__(self, model_cls: type[_T]) -> None:
                         self.model_cls = model_cls
                         reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
                 class MyModel(models.Model):

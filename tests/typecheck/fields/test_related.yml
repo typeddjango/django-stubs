@@ -985,10 +985,12 @@
 
 -   case: many_to_many_field_can_be_used_in_alias
     main: |
-        from typing import TypeVar, Sequence, Union
+        from collections.abc import Sequence
+        from typing import TypeVar
+        from typing_extensions import TypeAlias
         from django.db import models
         T = TypeVar("T", bound=models.Model)
-        ManyToManyFieldAlias = Union["models.ManyToManyField[T, T]"]
+        ManyToManyFieldAlias: TypeAlias = models.ManyToManyField[T, T]
 
 -   case: callable_reverse_manager
     main: |
@@ -1358,7 +1360,6 @@
 -   case: test_relations_with_bad_arguments
     main: |
         from myapp.models import MyModel
-        from typing import Type
         def f(arg: type[MyModel]) -> MyModel:
             instance = arg(field=1, unknown=2)
             reveal_type(instance.field)  # N: Revealed type is "Any"
