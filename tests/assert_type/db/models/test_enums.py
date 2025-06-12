@@ -270,24 +270,24 @@ assert_type(Award.values, list[str])
 assert_type(Award.choices, list[tuple[str, str]])  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for mixing multiple choices types with consistent base types - only `IntegerChoices`.
-x = (Suit, Vehicle)
-assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
-assert_type([member.value for choices in x for member in choices], list[int])
+x0 = (Suit, Vehicle)
+assert_type([member.label for choices in x0 for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x0 for member in choices], list[int])
 
 # Assertions for mixing multiple choices types with consistent base types - only `TextChoices`.
-x = (Medal, Gender)
-assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
-assert_type([member.value for choices in x for member in choices], list[str])
+x1 = (Medal, Gender)
+assert_type([member.label for choices in x1 for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x1 for member in choices], list[str])
 
 # Assertions for mixing multiple choices types with different base types - `IntegerChoices` and `TextChoices`.
-x = (Medal, Suit)
-assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
-assert_type([member.value for choices in x for member in choices], list[int | str])
+x2 = (Medal, Suit)
+assert_type([member.label for choices in x2 for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x2 for member in choices], list[int | str])
 
 # Assertions for mixing multiple choices types with consistent base types - custom types.
-x = (Constants, Separator)
-assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
-assert_type([member.value for choices in x for member in choices], list[Any])
+x3 = (Constants, Separator)
+assert_type([member.label for choices in x3 for member in choices], list[_StrOrPromise])
+assert_type([member.value for choices in x3 for member in choices], list[Any])
 
 
 # Assertions for choices objects defined and aliased in a model.
