@@ -9,6 +9,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Combinable, Expression, Func
 from django.db.models.query_utils import Q
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from typing_extensions import override
 
 class Index:
     suffix: str
@@ -48,6 +49,7 @@ class IndexExpression(Func):
     def set_wrapper_classes(self, connection: Any | None = None) -> None: ...
     @classmethod
     def register_wrappers(cls, *wrapper_classes: type[Expression]) -> None: ...
+    @override
     def resolve_expression(
         self,
         query: Any | None = None,
@@ -56,6 +58,7 @@ class IndexExpression(Func):
         summarize: bool = False,
         for_save: bool = False,
     ) -> IndexExpression: ...
+    @override
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 __all__ = ["Index"]

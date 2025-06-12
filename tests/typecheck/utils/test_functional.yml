@@ -2,7 +2,7 @@
     main: |
       from django.utils.functional import cached_property
       from typing import ClassVar
-      from typing_extensions import reveal_type
+      from typing_extensions import override, reveal_type
 
       class Foo:
           @cached_property
@@ -22,6 +22,7 @@
       # May be overridden by @property
       class Bar(Foo):
           @property
+          @override
           def attr(self) -> list[str]: ...
 
       # May be overridden by ClassVar
@@ -31,6 +32,7 @@
       # ClassVar may not be overridden by cached_property
       class Baz(Quux):
           @cached_property
+          @override
           def attr(self) -> list[str]: ...  # E: Cannot override writeable attribute with read-only property  [override]
 
 -   case: str_promise_proxy

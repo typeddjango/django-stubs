@@ -4,8 +4,10 @@
         from django.contrib.auth import login as auth_login
         from django.http import HttpResponseRedirect
         from django.contrib.auth.forms import AuthenticationForm
+        from typing_extensions import override
 
         class MyLoginView(LoginView):
+            @override
             def form_valid(self, form: AuthenticationForm) -> HttpResponseRedirect:
                 """Ensure that form can have type AuthenticationForm."""
                 form.get_user()
@@ -17,8 +19,10 @@
         from typing import Any
         from django.http import HttpRequest, HttpResponse
         from django.views.generic.base import View
+        from typing_extensions import override
 
         class MyView(View):
+            @override
             def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
                 response: HttpResponse
                 return response
@@ -29,8 +33,10 @@
         from typing import Any
         from django.http import HttpRequest, StreamingHttpResponse
         from django.views.generic.base import View
+        from typing_extensions import override
 
         class MyView(View):
+            @override
             def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> StreamingHttpResponse:
                 response: StreamingHttpResponse
                 return response

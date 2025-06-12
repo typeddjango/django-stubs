@@ -2,12 +2,13 @@ from typing import IO
 
 from django.core.files.base import File
 from django.utils.functional import cached_property
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 class UploadedFile(File):
     content_type: str | None
     charset: str | None
     content_type_extra: dict[str, bytes] | None
+    @override
     @cached_property
     def size(self) -> int | None: ...  # type: ignore[override]
     name: str | None
@@ -44,6 +45,7 @@ class InMemoryUploadedFile(UploadedFile):
         charset: str | None,
         content_type_extra: dict[str, bytes] | None = None,
     ) -> None: ...
+    @override
     def open(self, mode: str | None = None) -> Self: ...  # type: ignore[override]
 
 class SimpleUploadedFile(InMemoryUploadedFile):

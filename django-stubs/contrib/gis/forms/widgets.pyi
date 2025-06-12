@@ -2,6 +2,7 @@ from logging import Logger
 from typing import Any
 
 from django.forms.widgets import Widget
+from typing_extensions import override
 
 logger: Logger
 
@@ -16,6 +17,7 @@ class BaseGeometryWidget(Widget):
     def __init__(self, attrs: Any | None = ...) -> None: ...
     def serialize(self, value: Any) -> Any: ...
     def deserialize(self, value: Any) -> Any: ...
+    @override
     def get_context(self, name: Any, value: Any, attrs: Any) -> Any: ...
 
 class OpenLayersWidget(BaseGeometryWidget):
@@ -27,7 +29,9 @@ class OpenLayersWidget(BaseGeometryWidget):
         css: Any
         js: Any
 
+    @override
     def serialize(self, value: Any) -> Any: ...
+    @override
     def deserialize(self, value: Any) -> Any: ...
 
 class OSMWidget(OpenLayersWidget):

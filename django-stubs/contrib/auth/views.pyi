@@ -6,6 +6,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
+from typing_extensions import override
 
 UserModel = _UserModel
 _AuthForm = TypeVar("_AuthForm", bound=AuthenticationForm, default=AuthenticationForm)
@@ -30,6 +31,7 @@ class LogoutView(RedirectURLMixin, TemplateView):
     next_page: str | None
     redirect_field_name: str
     extra_context: Any
+    @override
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
 

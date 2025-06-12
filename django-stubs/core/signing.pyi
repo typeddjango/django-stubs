@@ -1,6 +1,8 @@
 from datetime import timedelta
 from typing import Any, Protocol, type_check_only
 
+from typing_extensions import override
+
 BASE62_ALPHABET: str
 
 class BadSignature(Exception): ...
@@ -71,5 +73,7 @@ class Signer:
 
 class TimestampSigner(Signer):
     def timestamp(self) -> str: ...
+    @override
     def sign(self, value: str) -> str: ...
+    @override
     def unsign(self, value: str, max_age: int | timedelta | None = None) -> str: ...

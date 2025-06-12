@@ -3,6 +3,7 @@ from typing import Any
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.postgresql.base import DatabaseWrapper
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     connection: DatabaseWrapper
@@ -44,14 +45,18 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_json_operators: bool
     json_key_contains_list_matching_requires_list: bool
     @cached_property
+    @override
     def django_test_skips(self) -> dict[str, set[str]]: ...  # type: ignore[override]
     @cached_property
+    @override
     def django_test_expected_failures(self) -> set[str]: ...  # type: ignore[override]
     @cached_property
     def uses_server_side_binding(self) -> bool: ...
     @cached_property
+    @override
     def prohibits_null_characters_in_text_exception(self) -> tuple[type[Exception], str]: ...  # type: ignore[override]
     @cached_property
+    @override
     def introspected_field_types(self) -> dict[str, str]: ...  # type: ignore[override]
     @cached_property
     def is_postgresql_15(self) -> bool: ...
@@ -64,6 +69,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_rows_from_update: bool
     supports_aggregate_order_by_clause: bool
     @property
+    @override
     def supports_nulls_distinct_unique_constraints(self) -> bool: ...  # type: ignore[override]
     @property
+    @override
     def supports_any_value(self) -> bool: ...  # type: ignore[override]

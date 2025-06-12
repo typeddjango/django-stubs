@@ -264,7 +264,7 @@
             content: |
               from typing import Generic, TypeVar
               from django.db import models
-              from typing_extensions import Self
+              from typing_extensions import Self, override as typing_override
 
               T = TypeVar("T", bound=models.Model)
               T_2 = TypeVar("T_2", bound=models.Model)
@@ -285,12 +285,16 @@
 
               class _MyModelQuerySet2(SomeMixin, _MyModelQuerySet[T_2]):
                   def example_2(self) -> T_2: ...
+                  @typing_override
                   def override(self) -> T_2: ...
+                  @typing_override
                   def override2(self) -> T_2: ...
+                  @typing_override
                   def dummy_override(self) -> T_2: ...  # type: ignore[override]
                   def test_self(self) -> Self: ...
 
               class MyModelQuerySet(_MyModelQuerySet2["MyModel"]):
+                  @typing_override
                   def override(self) -> "MyModel": ...
 
               class MyModel(models.Model):

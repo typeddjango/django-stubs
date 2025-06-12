@@ -6,6 +6,7 @@ from typing import Any, final
 from unittest import mock
 
 import django
+from typing_extensions import override
 
 from django_stubs_ext.patch import MPGeneric
 
@@ -20,6 +21,7 @@ class GenericInheritanceVisitor(ast.NodeVisitor):
     def __init__(self) -> None:
         self.generic_classes: set[str] = set()
 
+    @override
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         for base in node.bases:
             if (

@@ -5,6 +5,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
 from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from typing_extensions import override
 
 class MySQLSHA2Mixin:
     def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
@@ -72,6 +73,7 @@ class Reverse(Transform):
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Right(Left):
+    @override
     def get_substr(self) -> Substr: ...
 
 class RPad(LPad): ...

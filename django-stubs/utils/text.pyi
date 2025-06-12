@@ -6,6 +6,7 @@ from typing import Any, ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject, _StrOrPromise, _StrPromise, cached_property
+from typing_extensions import override
 
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
 _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
@@ -46,6 +47,7 @@ def phone2numeric(phone: _StrOrPromiseT) -> _StrOrPromiseT: ...
 def compress_string(s: bytes, *, max_random_bytes: int | None = None) -> bytes: ...
 
 class StreamingBuffer(BytesIO):
+    @override
     def read(self) -> bytes: ...  # type: ignore[override]
 
 def compress_sequence(sequence: Iterable[bytes], *, max_random_bytes: int | None = None) -> Iterator[bytes]: ...

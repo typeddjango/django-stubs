@@ -14,7 +14,7 @@ from django.forms.utils import ErrorDict, ErrorList
 from django.forms.widgets import Media, Widget
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, override
 
 ACTION_CHECKBOX_NAME: str
 
@@ -183,6 +183,7 @@ class InlineAdminForm(AdminForm):
         model_admin: ModelAdmin | None = ...,
         view_on_site_url: str | None = ...,
     ) -> None: ...
+    @override
     def __iter__(self) -> Iterator[InlineFieldset]: ...
     def needs_explicit_pk_field(self) -> bool | AutoField: ...
     def pk_field(self) -> AdminField: ...
@@ -192,6 +193,7 @@ class InlineAdminForm(AdminForm):
 class InlineFieldset(Fieldset):
     formset: Any
     def __init__(self, formset: Any, *args: Any, **kwargs: Any) -> None: ...
+    @override
     def __iter__(self) -> Iterator[Fieldline]: ...
 
 class AdminErrorList(forms.utils.ErrorList):

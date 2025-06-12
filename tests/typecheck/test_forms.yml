@@ -32,6 +32,7 @@
         from django import forms
         from django.http import HttpRequest, HttpResponse
         from django.views.generic.edit import FormView
+        from typing_extensions import override
 
         class MyForm(forms.ModelForm):
             pass
@@ -41,6 +42,8 @@
         # FormView generic param provided
         class MyView(FormView[MyForm]):
             form_class = MyForm
+
+            @override
             def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
                 reveal_type(form_class)  # N: Revealed type is "type[main.MyForm]"
@@ -53,6 +56,8 @@
         # FormView generic param omitted -- fallback to TypeVar default
         class MyView2(FormView):
             form_class = MyForm
+
+            @override
             def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
                 reveal_type(form_class)  # N: Revealed type is "type[Any]"
@@ -67,6 +72,7 @@
         from django.http import HttpRequest, HttpResponse
         from django.forms import models
         from django.views.generic.edit import FormView
+        from typing_extensions import override
 
         class RegistrationForm(models.ModelForm): ...
 
@@ -74,6 +80,7 @@
             form_class = RegistrationForm
             template_name = 'web_app/registration.html'
 
+            @override
             def form_valid(self, form: RegistrationForm) -> HttpResponse:
                  form.save()
                  return super().form_valid(form)
@@ -82,6 +89,7 @@
             form_class = RegistrationForm
             template_name = 'web_app/registration.html'
 
+            @override
             def form_valid(self, form: RegistrationForm) -> HttpResponse:
                  form.save()
                  return super().form_valid(form)
@@ -92,11 +100,14 @@
         from django import forms
         from django.http import HttpResponse
         from django.views.generic.edit import UpdateView
+        from typing_extensions import override
 
         class MyForm(forms.ModelForm):
             pass
         class MyView(UpdateView):
             form_class = MyForm
+
+            @override
             def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
                 reveal_type(form.save)  # N: Revealed type is "def (commit: builtins.bool =) -> Any"
                 return HttpResponse()
@@ -116,17 +127,21 @@
     main: |
         from django import forms
         from myapp.models import Article, Category
+        from typing_extensions import override
 
         class ArticleChoiceField(forms.ModelChoiceField[Article]):
+            @override
             def label_from_instance(self, obj: Article) -> str:
                 return obj.name
 
         class BrokenArticleChoiceField(forms.ModelChoiceField[Article]):
+            @override
             def label_from_instance(self, obj: Article) -> str:
                 obj.title # E: "Article" has no attribute "title"  [attr-defined]
                 return 'a'
 
         class ArticleMultipleChoiceField(forms.ModelMultipleChoiceField[Article]):
+            @override
             def label_from_instance(self, obj: Article) -> str:
                 return obj.name
 

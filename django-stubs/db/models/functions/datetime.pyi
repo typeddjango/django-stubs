@@ -7,6 +7,7 @@ from django.db.models import Func, Transform
 from django.db.models.expressions import Combinable
 from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from typing_extensions import override
 
 class TimezoneMixin:
     tzinfo: Any
@@ -18,6 +19,7 @@ class Extract(TimezoneMixin, Transform):
     def __init__(
         self, expression: Combinable | str, lookup_name: str | None = None, tzinfo: Any | None = None, **extra: Any
     ) -> None: ...
+    @override
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class ExtractYear(Extract): ...
@@ -51,6 +53,7 @@ class TruncBase(TimezoneMixin, Transform):
         tzinfo: tzinfo | None = None,
         **extra: Any,
     ) -> None: ...
+    @override
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class Trunc(TruncBase):

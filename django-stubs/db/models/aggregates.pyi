@@ -7,6 +7,7 @@ from django.db.models.fields import IntegerField
 from django.db.models.functions.mixins import FixDurationInputMixin, NumericOutputFieldMixin
 from django.db.models.query import _OrderByFieldName
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from typing_extensions import override
 
 class Aggregate(Func):
     name: str | None
@@ -25,11 +26,13 @@ class Aggregate(Func):
     ) -> None: ...
     @property
     def default_alias(self) -> str: ...
+    @override
     def as_sql(  # type: ignore[override]
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
 
 class AnyValue(Aggregate):
+    @override
     def as_sql(  # type: ignore[override]
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
@@ -50,6 +53,7 @@ class StringAgg(Aggregate):
     def __init__(self, expression: Combinable | str, delimiter: str | Combinable, **extra: Any) -> None: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
     def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
+    @override
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Sum(FixDurationInputMixin, Aggregate): ...

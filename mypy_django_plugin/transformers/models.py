@@ -29,6 +29,7 @@ from mypy.typeanal import TypeAnalyser
 from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
+from typing_extensions import override
 
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
@@ -213,6 +214,7 @@ class AddAnnotateUtilities(ModelClassInitializer):
             ...
     """
 
+    @override
     def run(self) -> None:
         annotations = self.lookup_typeinfo_or_incomplete_defn_error("django_stubs_ext.Annotations")
         exception_bases = {
@@ -266,6 +268,7 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     to get around incompatible Meta inner classes for different models.
     """
 
+    @override
     def run(self) -> None:
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
@@ -280,6 +283,7 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         auto_field = model_cls._meta.auto_field
         if auto_field:
@@ -309,6 +313,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
 
 class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # We also need to override existing `pk` definition from `stubs`:
         auto_field = model_cls._meta.pk
@@ -321,6 +326,7 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
 
 
 class AddRelatedModelsId(ModelClassInitializer):
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         for field in self.django_context.get_model_foreign_keys(model_cls):
             try:
@@ -379,6 +385,7 @@ class AddManagers(ModelClassInitializer):
         manager_type = helpers.fill_manager(manager_info, Instance(self.model_classdef.info, []))
         self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         manager_info: TypeInfo | None
 
@@ -478,6 +485,7 @@ class AddManagers(ModelClassInitializer):
 
 
 class AddDefaultManagerAttribute(ModelClassInitializer):
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         if "_default_manager" in self.model_classdef.info.names:
             return None
@@ -611,6 +619,7 @@ class AddReverseLookups(ModelClassInitializer):
             fullname=new_related_manager_info.fullname,
         )
 
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # add related managers etc.
         processing_incomplete = False
@@ -625,6 +634,7 @@ class AddReverseLookups(ModelClassInitializer):
 
 
 class AddExtraFieldMethods(ModelClassInitializer):
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # get_FOO_display for choices
         for field in self.django_context.get_model_fields(model_cls):
@@ -704,6 +714,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     model_bases.append(base.type.defn)
                     processed_models.add(base.type.fullname)
 
+    @override
     def run(self) -> None:
         if self.is_model_abstract:
             # TODO: Create abstract through models?
@@ -1072,6 +1083,7 @@ class MetaclassAdjustments(ModelClassInitializer):
                 MDEF, model_exc_type, plugin_generated=True
             )
 
+    @override
     def run(self) -> None:
         self.add_exception_classes()
 

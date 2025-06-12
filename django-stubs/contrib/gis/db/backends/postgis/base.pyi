@@ -5,12 +5,15 @@ from django.db.backends.postgresql.base import DatabaseWrapper as Psycopg2Databa
 from psycopg import BaseConnection
 from psycopg.adapt import Dumper
 from psycopg.pq import Format
+from typing_extensions import override
 
 class BaseBinaryDumper(Dumper):
     format: Format
+    @override
     def dump(self, obj: Any) -> bytes: ...
 
 class BaseTextDumper(Dumper):
+    @override
     def dump(self, obj: Any) -> bytes: ...
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
@@ -19,6 +22,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
     ops: Any
     introspection: Any
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
+    @override
     def prepare_database(self) -> None: ...
     def register_geometry_adapters(self, pg_connection: BaseConnection[bytes], clear_caches: bool = False) -> None: ...
 

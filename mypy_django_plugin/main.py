@@ -19,6 +19,7 @@ from mypy.plugin import (
     ReportConfigContext,
 )
 from mypy.types import Type as MypyType
+from typing_extensions import override
 
 from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
@@ -83,6 +84,7 @@ class NewSemanalDjangoPlugin(Plugin):
         fake_lineno = -1
         return (priority, module, fake_lineno)
 
+    @override
     def get_additional_deps(self, file: MypyFile) -> list[tuple[int, str, int]]:
         # for settings
         if file.fullname == "django.conf" and self.django_context.django_settings_module:
@@ -133,6 +135,7 @@ class NewSemanalDjangoPlugin(Plugin):
             self._new_dependency("django.db.models.query"),
         ]
 
+    @override
     def get_function_hook(self, fullname: str) -> Callable[[FunctionContext], MypyType] | None:
         info = self._get_typeinfo_or_none(fullname)
         if info:
@@ -191,6 +194,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "only": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=False),
         }
 
+    @override
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
         class_fullname, _, method_name = fullname.rpartition(".")
         # Methods called very often -- short circuit for minor speed up
@@ -223,17 +227,20 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
+    @override
     def get_customize_class_mro_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         info = self._get_typeinfo_or_none(fullname)
         if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
             return reparametrize_any_manager_hook
         return None
 
+    @override
     def get_metaclass_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         if fullname == fullnames.MODEL_METACLASS_FULLNAME:
             return partial(MetaclassAdjustments.adjust_model_class, plugin_config=self.plugin_config)
         return None
 
+    @override
     def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         # Base class is a Model class definition
         info = self._get_typeinfo_or_none(fullname)
@@ -249,6 +256,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return add_as_manager_to_queryset_class
         return None
 
+    @override
     def get_attribute_hook(self, fullname: str) -> Callable[[AttributeContext], MypyType] | None:
         class_name, _, attr_name = fullname.rpartition(".")
 
@@ -293,6 +301,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         return None
 
+    @override
     def get_type_analyze_hook(self, fullname: str) -> Callable[[AnalyzeTypeContext], MypyType] | None:
         if fullname in fullnames.ANNOTATED_TYPES_FULLNAMES:
             return partial(handle_annotated_type, fullname=fullname)
@@ -300,6 +309,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(get_user_model, django_context=self.django_context)
         return None
 
+    @override
     def get_dynamic_class_hook(self, fullname: str) -> Callable[[DynamicClassDefContext], None] | None:
         # Create a new manager class definition when a manager's '.from_queryset' classmethod is called
         class_name, _, method_name = fullname.rpartition(".")
@@ -309,6 +319,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 return create_new_manager_class_from_from_queryset_method
         return None
 
+    @override
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {

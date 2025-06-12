@@ -1,6 +1,6 @@
 from django.apps.config import AppConfig
 from django.utils.functional import cached_property
-from typing_extensions import assert_type
+from typing_extensions import assert_type, override
 
 
 class FooConfig(AppConfig):
@@ -12,6 +12,7 @@ class BarConfig(AppConfig):
     name = "foo"
 
     @property
+    @override
     def default_auto_field(self) -> str:  # type: ignore[override]  # pyrefly: ignore[bad-override]
         return "django.db.models.BigAutoField"
 
@@ -20,6 +21,7 @@ class BazConfig(AppConfig):
     name = "foo"
 
     @cached_property
+    @override
     def default_auto_field(self) -> str:  # type: ignore[override]  # pyrefly: ignore[bad-override]
         return "django.db.models.BigAutoField"
 
