@@ -406,11 +406,6 @@ See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/
 - [`pytest-mypy-plugins`](https://github.com/typeddjango/pytest-mypy-plugins) - `pytest` plugin that we use for testing `mypy` stubs and plugins.
 - [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template) - Create new typed Django projects in seconds.
 
-## To get help
-
-We have Gitter here: <https://gitter.im/mypy-django/Lobby>
-If you think you have more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
-
 ## Contributing
 
 This project is open source and community driven. As such we encourage contributions big and small. You can contribute by doing any of the following:
