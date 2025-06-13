@@ -39,9 +39,6 @@ def __class_getitem__(cls, *args, **kwargs):
 
 For help with django-stubs, please view the main repository at <https://github.com/typeddjango/django-stubs>
 
-We have a Gitter chat here: <https://gitter.im/mypy-django/Lobby>
-If you think you have a more generic typing issue, please refer to <https://github.com/python/mypy> and their Gitter.
-
 ## Contributing
 
 The django-stubs-ext package is part of the [django-stubs](https://github.com/typeddjango/django-stubs) monorepo. If you would like to contribute, please view the django-stubs [contribution guide](https://github.com/typeddjango/django-stubs/blob/master/CONTRIBUTING.md).
