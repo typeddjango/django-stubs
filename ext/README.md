@@ -2,7 +2,6 @@
 
 [![Build status](https://github.com/typeddjango/django-stubs/workflows/test/badge.svg?branch=master&event=push)](https://github.com/typeddjango/django-stubs/actions?query=workflow%3Atest)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
-[![Gitter](https://badges.gitter.im/mypy-django/Lobby.svg)](https://gitter.im/mypy-django/Lobby)
 
 
 This package contains extensions and monkey-patching functions for the [django-stubs](https://github.com/typeddjango/django-stubs) package. Certain features of django-stubs (i.e. generic django classes that don't define the `__class_getitem__` method) require runtime monkey-patching, which can't be done with type stubs. These extensions were split into a separate package so library consumers don't need `mypy` as a runtime dependency ([#526](https://github.com/typeddjango/django-stubs/pull/526#pullrequestreview-525798031)).
