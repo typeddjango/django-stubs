@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-stubs"
-version = "5.2.0"
+version = "5.2.1"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
@@ -33,7 +33,7 @@ classifiers = [
 ]
 dependencies = [
   "django",
-  "django-stubs-ext>=5.2.0",
+  "django-stubs-ext>=5.2.1",
   "tomli; python_version < '3.11'",
   # Types:
   "types-pyyaml",
