@@ -170,7 +170,7 @@ wheels = [
 
 [[package]]
 name = "django-stubs"
-version = "5.2.0"
+version = "5.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
@@ -270,7 +270,7 @@ tests = [
 
 [[package]]
 name = "django-stubs-ext"
-version = "5.2.0"
+version = "5.2.1"
 source = { editable = "ext" }
 dependencies = [
     { name = "django" },
