@@ -135,5 +135,5 @@ def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: b
 
     # Add `reveal_type` and `reveal_locals` helpers if needed:
     if include_builtins:
-        builtins.reveal_type = lambda _: None
+        builtins.reveal_type = lambda obj, /: obj
         builtins.reveal_locals = lambda: None
