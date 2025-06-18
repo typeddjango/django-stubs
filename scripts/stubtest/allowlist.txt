@@ -274,3 +274,7 @@ django.test.selenium.SeleniumTestCase.__init_subclass__
 
 # Django incorrectly uses a signature of `(self, *args, **kwargs)` when it should be `(self)`.
 django.forms.renderers.Jinja2DivFormRenderer.__init__
+
+# mypy does not understand __getitem__ unpacking python/mypy#2220
+django.urls.ResolverMatch.__iter__
+django.urls.resolvers.ResolverMatch.__iter__
