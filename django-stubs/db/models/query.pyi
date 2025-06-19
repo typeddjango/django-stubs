@@ -194,11 +194,16 @@ class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
     def __getitem__(self, s: slice) -> Self: ...
 
 class RawQuerySet(Iterable[_Model], Sized):
+    raw_query: RawQuery | str
+    model: type[_Model] | None
     query: RawQuery
+    params: tuple[Any, ...] | None
+    translations: dict[str, str]
+
     def __init__(
         self,
         raw_query: RawQuery | str,
-        model: type[Model] | None = None,
+        model: type[_Model] | None = None,
         query: Query | None = None,
         params: tuple[Any, ...] = (),
         translations: dict[str, str] | None = None,
