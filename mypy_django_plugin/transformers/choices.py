@@ -21,7 +21,7 @@ from mypy_django_plugin.lib import fullnames, helpers
 # TODO: [mypy 1.14+] Remove this backport of `TypeInfo.enum_members`.
 def _get_enum_members(info: TypeInfo) -> list[str]:
     try:
-        return info.enum_members
+        return info.enum_members  # type: ignore[attr-defined, no-any-return, unused-ignore]
     except AttributeError:  # mypy < 1.14
         pass
 
