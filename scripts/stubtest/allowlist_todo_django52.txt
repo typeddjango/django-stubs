@@ -93,5 +93,3 @@ django.db.models.expressions.OutputFieldIsNoneError
 django.db.models.fields.Field.has_db_default
 django.db.models.fields.related.ForeignKey.cast_db_type
 django.db.models.fields.tuple_lookups
-django.db.models.functions.JSONObject.join
-django.db.models.functions.json.JSONObject.join

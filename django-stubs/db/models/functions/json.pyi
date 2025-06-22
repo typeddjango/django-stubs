@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any, ClassVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -27,3 +28,4 @@ class JSONObject(Func):
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
+    def join(self, args: Sequence[Any]) -> str: ...
