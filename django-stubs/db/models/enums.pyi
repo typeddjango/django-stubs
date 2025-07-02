@@ -13,9 +13,9 @@ else:
     from enum import EnumMeta as EnumType
     from types import DynamicClassAttribute as enum_property
 
-    class ReprEnum(enum.Enum): ...  # type: ignore[misc]
-    class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
-    class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
+    class ReprEnum(enum.Enum): ...  # type: ignore[misc, unused-ignore]
+    class IntEnum(int, ReprEnum): ...  # type: ignore[misc, unused-ignore]
+    class StrEnum(str, ReprEnum): ...  # type: ignore[misc, unused-ignore]
 
 _Self = TypeVar("_Self", bound=ChoicesType)
 
@@ -38,7 +38,7 @@ class ChoicesType(EnumType):
 @deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
 class ChoicesMeta(ChoicesType): ...
 
-class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
+class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc, unused-ignore]
     _label_: _StrOrPromise
     do_not_call_in_templates: Literal[True]
 
