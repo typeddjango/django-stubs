@@ -1,7 +1,7 @@
 import enum
 from typing import Any, Literal, TypeVar
 
-from django.db.models import Choices, IntegerChoices, TextChoices
+from django.db.models import Choices, IntegerChoices, Model, TextChoices
 from django.utils.functional import _StrOrPromise
 from django.utils.translation import gettext_lazy as _
 from typing_extensions import assert_type
@@ -121,6 +121,18 @@ class ShoutyTextChoices(TextChoices):
     @property
     def label(self) -> str:
         return super().label.upper()
+
+
+class DeckModel(Model):
+    # Alias with the same name.
+    Suit = Suit
+
+    # Alias with a different name.
+    House = Suit
+
+    class Joker(TextChoices):
+        BLACK = "B"
+        RED = "R"
 
 
 # Assertions for an integer choices type that uses a lazy translatable string for all labels.
@@ -276,3 +288,9 @@ assert_type([member.value for choices in x for member in choices], list[int | st
 x = (Constants, Separator)
 assert_type([member.label for choices in x for member in choices], list[_StrOrPromise])
 assert_type([member.value for choices in x for member in choices], list[Any])
+
+
+# Assertions for choices objects defined and aliased in a model.
+assert_type(DeckModel.Suit.choices, list[tuple[int, _StrOrPromise]])
+assert_type(DeckModel.House.choices, list[tuple[int, _StrOrPromise]])
+assert_type(DeckModel.Joker.choices, list[tuple[str, str]])  # pyright: ignore[reportAssertTypeFailure]
