@@ -5,6 +5,7 @@ from mypy.types import (
     AnyType,
     Instance,
     LiteralType,
+    Overloaded,
     ProperType,
     TupleType,
     TypeOfAny,
@@ -184,6 +185,8 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
             _node_type = get_proper_type(_node_type.upper_bound)
         if isinstance(_node_type, Instance):
             node = _node_type.type
+        if isinstance(_node_type, Overloaded) and _node_type.is_type_obj():
+            node = _node_type.type_object()
 
     if node is None:
         if isinstance(_node_type, UnionType):
