@@ -4,7 +4,6 @@ from typing import Any
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import BaseExpression, Combinable, Expression, OrderByList
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
-from typing_extensions import Self
 
 class OrderableAggMixin:
     order_by: OrderByList

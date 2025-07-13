@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Literal
 
 from django.contrib.auth.models import _AnyUser
 from django.http import HttpRequest, HttpResponseBase, HttpResponseRedirect
-from django.utils.deprecation import MiddlewareMixin, _GetResponseCallable, _AsyncGetResponseCallable
+from django.utils.deprecation import MiddlewareMixin, _AsyncGetResponseCallable, _GetResponseCallable
 
 def get_user(request: HttpRequest) -> _AnyUser: ...
 async def auser(request: HttpRequest) -> _AnyUser: ...
@@ -40,7 +40,6 @@ class RemoteUserMiddleware:
     def clean_username(self, username: str, request: HttpRequest) -> str: ...
     def process_request(self, request: HttpRequest) -> None: ...
     async def aprocess_request(self, request: HttpRequest) -> None: ...
-
 
 class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     force_logout_if_no_header: bool
