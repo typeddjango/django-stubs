@@ -9,7 +9,6 @@ from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
-from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.core.files.utils import FileProxyMixin
 from django.core.paginator import Paginator
 from django.db.models.expressions import ExpressionWrapper
@@ -101,31 +100,12 @@ _need_generic: list[MPGeneric[Any]] = [
 ]
 
 
-def _get_need_generic() -> list[MPGeneric[Any]]:
-    try:
-        if VERSION >= (5, 1):
-            from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
-
-            return [MPGeneric(SetPasswordMixin), MPGeneric(SetUnusablePasswordMixin), *_need_generic]
-        else:
-            from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
-
-            return [MPGeneric(SetPasswordForm), MPGeneric(AdminPasswordChangeForm), *_need_generic]
-
-    except (ImproperlyConfigured, AppRegistryNotReady):
-        # We cannot patch symbols in `django.contrib.auth.forms` if the `monkeypatch()` call
-        # is in the settings file because django is not initialized yet.
-        # To solve this, you'll have to call `monkeypatch()` again later, in an `AppConfig.ready` for ex.
-        # See https://docs.djangoproject.com/en/5.2/ref/applications/#django.apps.AppConfig.ready
-        return _need_generic
-
-
 def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: bool = True) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
     # Add the __class_getitem__ dunder.
     suited_for_this_version = filter(
         lambda spec: spec.version is None or VERSION[:2] <= spec.version,
-        _get_need_generic(),
+        _need_generic,
     )
     for el in suited_for_this_version:
         el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
