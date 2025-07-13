@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable
-from typing import Any, Protocol, TypeAlias, type_check_only
+from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
@@ -33,8 +33,8 @@ class _AsyncGetResponseCallable(Protocol):
     def __call__(self, request: HttpRequest, /) -> Awaitable[HttpResponseBase]: ...
 
 class MiddlewareMixin:
-    sync_capable: bool
-    async_capable: bool
+    sync_capable: ClassVar[bool]
+    async_capable: ClassVar[bool]
 
     get_response: _GetResponseCallable | _AsyncGetResponseCallable
     def __init__(self, get_response: _GetResponseCallable | _AsyncGetResponseCallable) -> None: ...
