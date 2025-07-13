@@ -223,7 +223,8 @@ class _MonkeyPatchedWSGIResponse(_WSGIResponse):
     # `HTTPResponse` when API failed and `TemplateResponse` when successful.
     # https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.Response.context
     context: ContextList | dict[str, Any]
-    context_data: ContextList | dict[str, Any]
+    # Must match `django.template.response.SimpleTemplateResponse.context_data`
+    context_data: dict[str, Any] | None
 
     content: bytes
     resolver_match: ResolverMatch
@@ -244,7 +245,8 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
     # `HTTPResponse` when API failed and `TemplateResponse` when successful.
     # https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.Response.context
     context: ContextList | dict[str, Any]
-    context_data: ContextList | dict[str, Any]
+    # Must match `django.template.response.SimpleTemplateResponse.context_data`
+    context_data: dict[str, Any] | None
 
     content: bytes
     resolver_match: ResolverMatch
