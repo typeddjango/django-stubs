@@ -175,10 +175,10 @@ This happens because these Django classes do not support [`__class_getitem__`](h
     class ClientsConfig(AppConfig):
         name = "clients"
 
-        def ready(self):
+        def ready(self) -> None:
             from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
 
-            # For Django 5.1+, use `extra_classes=[SetPasswordForm, AdminPasswordChangeForm]` instead.
+            # For Django version prior to 5.1, use `extra_classes=[SetPasswordForm, AdminPasswordChangeForm]` instead.
             django_stubs_ext.monkeypatch(extra_classes=[SetPasswordMixin, SetUnusablePasswordMixin])
     ```
 
