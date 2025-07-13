@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Awaitable
 from typing import Any, ClassVar, Literal
 
 from django.contrib.auth.models import _AnyUser
@@ -42,4 +42,4 @@ class RemoteUserMiddleware:
     async def aprocess_request(self, request: HttpRequest) -> None: ...
 
 class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
-    force_logout_if_no_header: bool
+    force_logout_if_no_header: ClassVar[bool]
