@@ -1,4 +1,4 @@
-from collections.abc import Callable, Awaitable
+from collections.abc import Awaitable, Callable
 from typing import Any, ClassVar, Literal
 
 from django.contrib.auth.models import _AnyUser
