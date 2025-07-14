@@ -142,3 +142,32 @@
                 class Blog(models.Model):
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100, blank=True)
+
+-   case: queryset_values_with_expressions
+    main: |
+        from django.db.models import F
+        from django.db.models.functions import Lower
+        from myapp.models import Blog
+
+        reveal_type(Blog.objects.values("id"))
+        reveal_type(Blog.objects.values("id", "num_posts", "text"))
+        reveal_type(Blog.objects.values(foo=F("id"))) # WRONG
+        reveal_type(Blog.objects.values("id", foo=F("id"))) # WRONG
+        reveal_type(Blog.objects.values("id", lower_text=Lower("text"))) # WRONG
+    out: |
+      main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
+      main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})]"
+      main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})]"
+      main:8: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
+      main:9: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Blog(models.Model):
+                    num_posts = models.IntegerField()
+                    text = models.CharField(max_length=100)
