@@ -151,15 +151,15 @@
 
         reveal_type(Blog.objects.values("id"))
         reveal_type(Blog.objects.values("id", "num_posts", "text"))
-        reveal_type(Blog.objects.values(foo=F("id"))) # WRONG
-        reveal_type(Blog.objects.values("id", foo=F("id"))) # WRONG
-        reveal_type(Blog.objects.values("id", lower_text=Lower("text"))) # WRONG
+        reveal_type(Blog.objects.values(foo=F("id")))
+        reveal_type(Blog.objects.values("id", foo=F("id")))
+        reveal_type(Blog.objects.values("id", lower_text=Lower("text")))
     out: |
       main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
       main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})]"
-      main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})]"
-      main:8: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
-      main:9: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
+      main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'foo': Any})]"
+      main:8: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'foo': Any})]"
+      main:9: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'lower_text': Any})]"
     installed_apps:
         - myapp
     files:
