@@ -219,7 +219,7 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
             continue
         if any(kind not in named for kind in ctx.arg_kinds[i]):
             # Only named arguments supported
-            return None
+            continue
         for j in range(len(ctx.arg_names[i])):
             name = ctx.arg_names[i][j]
             assert name is not None
