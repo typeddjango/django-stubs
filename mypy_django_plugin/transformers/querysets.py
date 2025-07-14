@@ -219,12 +219,47 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
             continue
         if any(kind not in named for kind in ctx.arg_kinds[i]):
             # Only named arguments supported
-            return None
+            continue
         for j in range(len(ctx.arg_names[i])):
             name = ctx.arg_names[i][j]
             assert name is not None
             kwargs[name] = ctx.arg_types[i][j]
     return kwargs
+
+
+def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType] | None:
+    kwargs = gather_kwargs(ctx)
+    if not kwargs:
+        return None
+
+    # For now, we don't try to resolve the output_field of the field would be, but use Any.
+    # NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
+    # get stuck with mypy interpreting an overload ambiguity towards the
+    # overloaded 'Field.__get__' method when its 'model' argument gets matched. This
+    # is because the model argument gets matched with a model subclass that is
+    # parametrized with a type that contains the 'Any' below and then mypy runs in
+    # to a (false?) ambiguity, due to 'Any', and can't decide what overload/return
+    # type to select
+    #
+    # Example:
+    #   class MyModel(models.Model):
+    #       field = models.CharField()
+    #
+    #   # Our plugin auto generates the following subclass
+    #   class MyModel_WithAnnotations(MyModel, django_stubs_ext.Annotations[_Annotations]):
+    #       ...
+    #   # Assume
+    #   x = MyModel.objects.annotate(foo=F("id")).get()
+    #   reveal_type(x)  # MyModel_WithAnnotations[TypedDict({"foo": Any})]
+    #   # Then, on an attribute access of 'field' like
+    #   reveal_type(x.field)
+    #
+    # Now 'CharField.__get__', which is overloaded, is passed 'x' as the 'model'
+    # argument and mypy consider it ambiguous to decide which overload method to
+    # select due to the 'Any' in 'TypedDict({"foo": Any})'. But if we specify the
+    # 'Any' as 'TypeOfAny.special_form' mypy doesn't consider the model instance to
+    # contain 'Any' and the ambiguity goes away.
+    return {name: AnyType(TypeOfAny.special_form) for name, _ in kwargs.items()}
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -240,45 +275,14 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         return AnyType(TypeOfAny.from_omitted_generics)
 
     api = helpers.get_typechecker_api(ctx)
-
-    field_types: dict[str, MypyType] | None = None
-    kwargs = gather_kwargs(ctx)
-    if kwargs:
-        # For now, we don't try to resolve the output_field of the field would be, but use Any.
-        # NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
-        # get stuck with mypy interpreting an overload ambiguity towards the
-        # overloaded 'Field.__get__' method when its 'model' argument gets matched. This
-        # is because the model argument gets matched with a model subclass that is
-        # parametrized with a type that contains the 'Any' below and then mypy runs in
-        # to a (false?) ambiguity, due to 'Any', and can't decide what overload/return
-        # type to select
-        #
-        # Example:
-        #   class MyModel(models.Model):
-        #       field = models.CharField()
-        #
-        #   # Our plugin auto generates the following subclass
-        #   class MyModel_WithAnnotations(MyModel, django_stubs_ext.Annotations[_Annotations]):
-        #       ...
-        #   # Assume
-        #   x = MyModel.objects.annotate(foo=F("id")).get()
-        #   reveal_type(x)  # MyModel_WithAnnotations[TypedDict({"foo": Any})]
-        #   # Then, on an attribute access of 'field' like
-        #   reveal_type(x.field)
-        #
-        # Now 'CharField.__get__', which is overloaded, is passed 'x' as the 'model'
-        # argument and mypy consider it ambiguous to decide which overload method to
-        # select due to the 'Any' in 'TypedDict({"foo": Any})'. But if we specify the
-        # 'Any' as 'TypeOfAny.special_form' mypy doesn't consider the model instance to
-        # contain 'Any' and the ambiguity goes away.
-        field_types = {name: AnyType(TypeOfAny.special_form) for name, _ in kwargs.items()}
+    expression_types = gather_expression_types(ctx)
 
     fields_dict = None
-    if field_types is not None:
+    if expression_types is not None:
         fields_dict = helpers.make_typeddict(
             api,
-            fields=field_types,
-            required_keys=set(field_types.keys()),
+            fields=expression_types,
+            required_keys=set(expression_types.keys()),
             readonly_keys=set(),
         )
 
@@ -321,6 +325,11 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: Dj
 
 
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """
+    Extract proper return type for QuerySet.values(*fields, **expressions) method calls.
+
+    See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#values
+    """
     # called on QuerySet, return QuerySet of something
     if not isinstance(ctx.type, Instance):
         return ctx.default_return_type
@@ -340,11 +349,14 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if field_lookups is None:
         return AnyType(TypeOfAny.from_error)
 
-    if len(field_lookups) == 0:
+    # Bare `.values()` case
+    if len(field_lookups) == 0 and not ctx.args[1]:
         for field in django_context.get_model_fields(model_cls):
             field_lookups.append(field.attname)
 
     column_types: OrderedDict[str, MypyType] = OrderedDict()
+
+    # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:
         field_lookup_type = get_field_type_from_lookup(
             ctx, django_context, model_cls, lookup=field_lookup, method="values"
@@ -353,6 +365,11 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             return helpers.reparametrize_instance(default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
         column_types[field_lookup] = field_lookup_type
+
+    # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
+    expression_types = gather_expression_types(ctx)
+    if expression_types is not None:
+        column_types.update(expression_types)
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
     return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
