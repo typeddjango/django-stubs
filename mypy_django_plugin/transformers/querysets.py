@@ -325,6 +325,11 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: Dj
 
 
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """
+    Extract proper return type for QuerySet.values(*fields, **expressions) method calls.
+
+    See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#values
+    """
     # called on QuerySet, return QuerySet of something
     if not isinstance(ctx.type, Instance):
         return ctx.default_return_type
@@ -344,11 +349,14 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if field_lookups is None:
         return AnyType(TypeOfAny.from_error)
 
-    if len(field_lookups) == 0:
+    # Bare `.values()` case
+    if len(field_lookups) == 0 and not ctx.args[1]:
         for field in django_context.get_model_fields(model_cls):
             field_lookups.append(field.attname)
 
     column_types: OrderedDict[str, MypyType] = OrderedDict()
+
+    # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:
         field_lookup_type = get_field_type_from_lookup(
             ctx, django_context, model_cls, lookup=field_lookup, method="values"
@@ -357,6 +365,11 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             return helpers.reparametrize_instance(default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
 
         column_types[field_lookup] = field_lookup_type
+
+    # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
+    expression_types = gather_expression_types(ctx)
+    if expression_types is not None:
+        column_types.update(expression_types)
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
     return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
