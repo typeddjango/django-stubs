@@ -2,10 +2,12 @@ import ast
 import glob
 import importlib
 import os
-from typing import final
+from typing import Any, final
 from unittest import mock
 
 import django
+
+from django_stubs_ext.patch import MPGeneric
 
 # The root directory of the django-stubs package
 STUBS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "django-stubs"))
@@ -70,10 +72,7 @@ def test_find_classes_inheriting_from_generic() -> None:
     print(f"Processed {len(pyi_files)} .pyi files.")
     print(f"Found {len(all_generic_classes)} unique classes inheriting from Generic in stubs")
 
-    # Class patched in `ext/django_stubs_ext/patch.py`
-    import django_stubs_ext
-
-    patched_classes = {mp_generic.cls.__name__ for mp_generic in django_stubs_ext.patch._get_need_generic()}
+    patched_classes = {mp_generic.cls.__name__ for mp_generic in _get_need_generic()}
 
     # Pretty-print missing patch in `ext/django_stubs_ext/patch.py`
     errors = []
@@ -88,3 +87,23 @@ def test_find_classes_inheriting_from_generic() -> None:
 def _get_module_from_pyi(pyi_path: str) -> str:
     py_module = "django." + pyi_path.replace(".pyi", "").replace("/", ".")
     return py_module.removesuffix(".__init__")
+
+
+def _get_need_generic() -> list[MPGeneric[Any]]:
+    """
+    Symbols in `django.contrib.auth.forms` are very hard to patch automatically
+    because we end up importing the User model and it crashes if `django.setup()` was not called beforehand.
+    It can also very easily introduce circular imports so we require the user to monkeypatch it manually.
+    See README.md for more details
+    """
+
+    import django_stubs_ext
+
+    if django.VERSION >= (5, 1):
+        from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
+
+        return [MPGeneric(SetPasswordMixin), MPGeneric(SetUnusablePasswordMixin), *django_stubs_ext.patch._need_generic]
+    else:
+        from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
+
+        return [MPGeneric(SetPasswordForm), MPGeneric(AdminPasswordChangeForm), *django_stubs_ext.patch._need_generic]
