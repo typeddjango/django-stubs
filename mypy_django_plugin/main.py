@@ -277,14 +277,13 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
 
-        if (
-            info
-            and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
-            and attr_name in ("choices", "labels", "values", "__empty__")
+        if info and (
+            (
+                info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
+                and attr_name in {"choices", "labels", "values", "__empty__"}
+            )
+            or (info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in {"label", "value"})
         ):
-            return choices.transform_into_proper_attr_type
-
-        if info and info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in ("label", "value"):
             return choices.transform_into_proper_attr_type
 
         return None
