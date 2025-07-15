@@ -1,8 +1,6 @@
 from collections.abc import Callable
 from typing import Any
 
-from django.utils.functional import _StrOrPromise
-
 UNUSABLE_PASSWORD_PREFIX: str
 UNUSABLE_PASSWORD_SUFFIX_LENGTH: int
 
