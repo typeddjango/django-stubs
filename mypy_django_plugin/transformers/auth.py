@@ -10,17 +10,18 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
 
 
+def _get_abstract_base_user(api: SemanticAnalyzer) -> ProperType:
+    sym = api.lookup_fully_qualified(fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME)
+    assert isinstance(sym.node, TypeInfo)
+    return fill_typevars_with_any(sym.node)
+
+
 def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.api, TypeAnalyser)
     assert isinstance(ctx.api.api, SemanticAnalyzer)
 
-    def get_abstract_base_user(api: SemanticAnalyzer) -> ProperType:
-        sym = api.lookup_fully_qualified(fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME)
-        assert isinstance(sym.node, TypeInfo)
-        return fill_typevars_with_any(sym.node)
-
     if not django_context.is_contrib_auth_installed:
-        return get_abstract_base_user(ctx.api.api)
+        return _get_abstract_base_user(ctx.api.api)
 
     auth_user_model = django_context.settings.AUTH_USER_MODEL
     model_info = helpers.resolve_lazy_reference(
@@ -33,6 +34,6 @@ def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> My
             # we notice that its value is recognised we'll return a placeholder for
             # the class as we expect it to exist later on.
             return PlaceholderType(fullname=fullname, args=[], line=ctx.context.line)
-        return get_abstract_base_user(ctx.api.api)
+        return _get_abstract_base_user(ctx.api.api)
 
     return fill_typevars_with_any(model_info)
