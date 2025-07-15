@@ -37,7 +37,7 @@
                     abstract = True
 
                 def lock(self) -> None:
-                    reveal_type(type(self).objects.values_list("pk"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.BaseModel, Tuple[Any]]"
+                    reveal_type(type(self).objects.values_list("pk"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.BaseModel, tuple[Any]]"
 
             class MyModel(BaseModel):
                 field = models.IntegerField()
@@ -51,7 +51,7 @@
     Recursive(parent=Recursive(parent=None))
     Concrete(parent=Concrete(parent=None))
   out: |
-    main:4: error: "Type[Recursive]" has no attribute "objects"  [attr-defined]
+    main:4: error: "type[Recursive]" has no attribute "objects"  [attr-defined]
     main:5: error: Cannot instantiate abstract class "Recursive" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
     main:5: error: Unexpected attribute "parent" for model "Recursive"  [misc]
   installed_apps:
@@ -75,66 +75,66 @@
 - case: test_abstract_model_type_cannot_be_used_as_runtime_arg
   main: |
       from myapp.models import Abstract, Concrete, LiteralAbstract
-      from typing import Generic, Type, TypeVar, overload, Union
+      from typing import Generic, TypeVar, overload
 
       Abstract()  # E: Cannot instantiate abstract class "Abstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
       LiteralAbstract()  # E: Cannot instantiate abstract class "LiteralAbstract" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
 
-      def f(klass: Type[Abstract]) -> None:
+      def f(klass: type[Abstract]) -> None:
           return None
 
-      f(Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
+      f(Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
       f(Concrete)
 
-      def second_arg(arg: str, klass: Type[Abstract]) -> None:
+      def second_arg(arg: str, klass: type[Abstract]) -> None:
           return None
 
-      second_arg("abc", Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
-      second_arg(Abstract, Concrete)  # E: Argument 1 to "second_arg" has incompatible type "Type[Abstract]"; expected "str"  [arg-type]
+      second_arg("abc", Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
+      second_arg(Abstract, Concrete)  # E: Argument 1 to "second_arg" has incompatible type "type[Abstract]"; expected "str"  [arg-type]
 
       T = TypeVar("T", bound=Abstract)
 
-      def g(klass: Type[T]) -> None:
+      def g(klass: type[T]) -> None:
           return None
 
-      g(Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
+      g(Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
       g(Concrete)
 
       @overload
-      def o(klass: Type[T], arg: str) -> None: ...
+      def o(klass: type[T], arg: str) -> None: ...
       @overload
-      def o(klass: Type[T], arg: int) -> None: ...
-      def o(klass: Type[T], arg: Union[str, int]) -> None:
+      def o(klass: type[T], arg: int) -> None: ...
+      def o(klass: type[T], arg: str | int) -> None:
           return None
 
-      o(Abstract, "a")  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
-      o(Abstract, 1)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
+      o(Abstract, "a")  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
+      o(Abstract, 1)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
       o(Concrete, 1)
 
       class M:
-          def method(self, klass: Type[Abstract]) -> None:
+          def method(self, klass: type[Abstract]) -> None:
               return None
 
           @overload
-          def overloaded(self, arg: int, klass: Type[Abstract]) -> None:
+          def overloaded(self, arg: int, klass: type[Abstract]) -> None:
               ...
 
           @overload
-          def overloaded(self, arg: str, klass: Type[Abstract]) -> None:
+          def overloaded(self, arg: str, klass: type[Abstract]) -> None:
               ...
 
-          def overloaded(self, arg: Union[str, int], klass: Type[Abstract]) -> None:
+          def overloaded(self, arg: str | int, klass: type[Abstract]) -> None:
               return None
 
-      M().method(Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
-      M().overloaded(1, Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
-      M().overloaded("1", Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
+      M().method(Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
+      M().overloaded(1, Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
+      M().overloaded("1", Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
 
       class G(Generic[T]):
-          def method(self, klass: Type[T]) -> None:
+          def method(self, klass: type[T]) -> None:
               return None
 
-      G[Abstract]().method(Abstract)  # E: Only concrete class can be given where "Type[Abstract]" is expected  [type-abstract]
+      G[Abstract]().method(Abstract)  # E: Only concrete class can be given where "type[Abstract]" is expected  [type-abstract]
       # Additional plugin coverage
       unknown(Abstract)  # E: Name "unknown" is not defined  [name-defined]
       M().unknown(Abstract)  # E: "M" has no attribute "unknown"  [attr-defined]
@@ -165,9 +165,9 @@
   main: |
     from myapp.models import create_animal, create_animal_generic, Cat, Animal, ExplicitConcrete
     create_animal(Cat, "Garfield")
-    create_animal(Animal, "Animal")  # E: Only concrete class can be given where "Type[Animal]" is expected  [type-abstract]
+    create_animal(Animal, "Animal")  # E: Only concrete class can be given where "type[Animal]" is expected  [type-abstract]
     create_animal_generic(Cat, "Grumpy")
-    create_animal_generic(Animal, "Animal")  # E: Only concrete class can be given where "Type[Animal]" is expected  [type-abstract]
+    create_animal_generic(Animal, "Animal")  # E: Only concrete class can be given where "type[Animal]" is expected  [type-abstract]
 
     Animal()  # E: Cannot instantiate abstract class "Animal" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
     ExplicitConcrete()
@@ -177,7 +177,7 @@
     -   path: myapp/__init__.py
     -   path: myapp/models.py
         content: |
-            from typing import Protocol, Type, TypeVar
+            from typing import Protocol, TypeVar
             from django.db import models
             from django_stubs_ext.db.models import TypedModelMeta
 
@@ -196,17 +196,17 @@
                     abstract = False
 
             def f() -> None:
-                x: Type[Animal]
+                x: type[Animal]
                 x()
                 return None
 
-            def create_animal(klass: Type[Animal], name: str) -> Animal:
+            def create_animal(klass: type[Animal], name: str) -> Animal:
                 obj = klass(name=name)
                 obj.save()
                 return obj
 
             T = TypeVar("T", bound=Animal)
 
-            def create_animal_generic(klass: Type[T], name: str) -> T:
-                reveal_type(klass)  # N: Revealed type is "Type[T`-1]"
+            def create_animal_generic(klass: type[T], name: str) -> T:
+                reveal_type(klass)  # N: Revealed type is "type[T`-1]"
                 return klass._default_manager.create(name=name)

@@ -15,7 +15,7 @@
             content: |
                 from django.db import models
                 from django.db.models.manager import Manager
-                from typing import List, Dict, TypeVar
+                from typing import TypeVar
                 from typing_extensions import Self
 
                 M = TypeVar("M", covariant=True, bound=models.Model)
@@ -24,11 +24,11 @@
                     def test_custom_manager(self) -> Self: ...
 
                 class BaseQuerySet(models.QuerySet[M]):
-                    def example_dict(self) -> Dict[str, Self]: ...
+                    def example_dict(self) -> dict[str, Self]: ...
 
                 class MyQuerySet(BaseQuerySet[M]):
                     def example_simple(self) -> Self: ...
-                    def example_list(self) -> List[Self]: ...
+                    def example_list(self) -> list[Self]: ...
                     def just_int(self) -> int: ...
 
                 NewManager = CustomManager.from_queryset(MyQuerySet)
@@ -115,7 +115,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/querysets.py
             content: |
-                from typing import TYPE_CHECKING, Iterable, Sequence
+                from collections.abc import Iterable, Sequence
+                from typing import TYPE_CHECKING
                 from django.db import models
                 if TYPE_CHECKING:
                     from .models import MyModel
@@ -235,7 +236,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/querysets.py
             content: |
-                from typing import TYPE_CHECKING, Iterable, Sequence
+                from collections.abc import Iterable, Sequence
+                from typing import TYPE_CHECKING
                 from django.db import models
                 from django.db.models.manager import Manager
                 if TYPE_CHECKING:
@@ -309,12 +311,11 @@
 -   case: from_queryset_with_manager_of_union
     main: |
         from myapp.models import MyModel1, MyModel2
-        import typing
-        kls: typing.Type[typing.Union[MyModel1, MyModel2]] = MyModel1
-        reveal_type(kls.objects)  # N: Revealed type is "Union[myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel1], myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel2]]"
-        reveal_type(kls.objects.all())  # N: Revealed type is "Union[myapp.models.ModelQuerySet1, myapp.models.ModelQuerySet2]"
-        reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"
-        reveal_type(kls.objects.queryset_method())  # N: Revealed type is "Union[builtins.int, builtins.str]"
+        kls: type[MyModel1 | MyModel2] = MyModel1
+        reveal_type(kls.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel1] | myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel2]"
+        reveal_type(kls.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
+        reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
+        reveal_type(kls.objects.queryset_method())  # N: Revealed type is "builtins.int | builtins.str"
     installed_apps:
         - myapp
     files:
@@ -428,8 +429,8 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: Union[builtins.str, None] =) -> Union[builtins.str, None]"
-        reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "Union[builtins.str, None]"
+        reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: builtins.str | None =) -> builtins.str | None"
+        reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "builtins.str | None"
     installed_apps:
         - myapp
     files:
@@ -443,11 +444,10 @@
                     objects = NewManager()
         -   path: myapp/managers.py
             content: |
-                from typing import Optional
                 from django.db import models
 
                 class ModelQuerySet(models.QuerySet):
-                    def queryset_method(self, param: Optional[str] = None) -> Optional[str]:
+                    def queryset_method(self, param: str | None = None) -> str | None:
                         return param
 
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
@@ -458,7 +458,7 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: Union[builtins.int, builtins.str]) -> Never"
+        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: builtins.int | builtins.str) -> Never"
         reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "Never"
     installed_apps:
         - myapp
@@ -479,10 +479,10 @@
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
         -   path: myapp/base_queryset.py
             content: |
-                from typing import NoReturn, Union
+                from typing import NoReturn
                 from django.db import models
                 class BaseQuerySet(models.QuerySet):
-                    def base_queryset_method(self, param: Union[int, str]) -> NoReturn:
+                    def base_queryset_method(self, param: int | str) -> NoReturn:
                         raise ValueError
 
 -   case: from_queryset_with_decorated_queryset_methods
@@ -529,7 +529,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Union, overload
+                from typing import overload
                 from django.db import models
 
                 class ModelQuerySet(models.QuerySet):
@@ -542,9 +542,7 @@
                     @overload
                     def overloaded_method(self, arg: str) -> str: ...
 
-                    def overloaded_method(
-                        self, arg: Union[int, str],
-                    ) -> Union[int, str]:
+                    def overloaded_method(self, arg: int | str) -> int | str:
                         return arg
 
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
@@ -649,7 +647,7 @@
         reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: Union[builtins.dict[builtins.str, Any], None] =, where: Union[typing.Sequence[builtins.str], None] =, params: Union[typing.Sequence[Any], None] =, tables: Union[typing.Sequence[builtins.str], None] =, order_by: Union[typing.Sequence[builtins.str], None] =, select_params: Union[typing.Sequence[Any], None] =) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: builtins.dict[builtins.str, Any] | None =, where: typing.Sequence[builtins.str] | None =, params: typing.Sequence[Any] | None =, tables: typing.Sequence[builtins.str] | None =, order_by: typing.Sequence[builtins.str] | None =, select_params: typing.Sequence[Any] | None =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
@@ -660,7 +658,7 @@
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.select_related)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, all: builtins.bool =) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: Union[builtins.str, None]) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: builtins.str | None) -> myapp.models.MyQuerySet"
     installed_apps:
         - myapp
     files:
@@ -709,7 +707,7 @@
         -   path: users/querysets.py
             content: |
                 from django.db import models
-                from typing import Optional, TYPE_CHECKING
+                from typing import TYPE_CHECKING
 
                 if TYPE_CHECKING:
                     from .models import User
@@ -927,7 +925,7 @@
 
 -   case: test_queryset_arg_as_unsupported_expressions
     main: |
-        from typing import Union, Generic, TypeVar
+        from typing import Generic, TypeVar
         from typing_extensions import TypeAlias
         from django.db import models
         from django.db.models.manager import Manager
@@ -937,7 +935,7 @@
         class QS2(models.QuerySet[models.Model]):
             ...
 
-        Alias: TypeAlias = Union[QS1, QS2]
+        Alias: TypeAlias = QS1 | QS2
         reveal_type(Manager[models.Model].from_queryset(Alias))
 
         T = TypeVar("T")
@@ -945,10 +943,10 @@
             ...
         reveal_type(Manager[models.Model].from_queryset(NonQSGeneric[int]))
     out: |
-        main:12: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "<typing special form>"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
-        main:17: note: Revealed type is "Type[django.db.models.manager.Manager[django.db.models.base.Model]]"
-        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "Type[NonQSGeneric[int]]"; expected "Type[QuerySet[Model, Model]]"  [arg-type]
+        main:12: note: Revealed type is "type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:12: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "UnionType[QS1, QS2]"; expected "type[QuerySet[Model, Model]]"  [arg-type]
+        main:17: note: Revealed type is "type[django.db.models.manager.Manager[django.db.models.base.Model]]"
+        main:17: error: Argument 1 to "from_queryset" of "BaseManager" has incompatible type "type[NonQSGeneric[int]]"; expected "type[QuerySet[Model, Model]]"  [arg-type]
 
 -   case: test_reverse_manager_with_foreign_key
     main: |

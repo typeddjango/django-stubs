@@ -1,15 +1,14 @@
 -   case: union_queryset_custom_method
     main: |
-        from typing import Union
         from django.db.models import QuerySet
         from myapp.models import User, Order
 
-        instance: Union[Order, User] = User()
+        instance: Order | User = User()
 
         model_cls = type(instance)
 
-        reveal_type(model_cls) # N: Revealed type is "Union[Type[myapp.models.Order], Type[myapp.models.User]]"
-        reveal_type(model_cls.objects)  # N: Revealed type is "Union[myapp.models.ManagerFromMyQuerySet[myapp.models.Order], myapp.models.ManagerFromMyQuerySet[myapp.models.User]]"
+        reveal_type(model_cls) # N: Revealed type is "type[myapp.models.Order] | type[myapp.models.User]"
+        reveal_type(model_cls.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.Order] | myapp.models.ManagerFromMyQuerySet[myapp.models.User]"
         reveal_type(model_cls.objects.my_method())  # N: Revealed type is "myapp.models.MyQuerySet"
     installed_apps:
         - myapp

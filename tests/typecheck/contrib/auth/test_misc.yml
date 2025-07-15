@@ -18,7 +18,6 @@
         get_user(Client())
 -   case: test_user_fields
     main: |
-        from typing import Union
         from django.contrib.auth.models import AnonymousUser, User
 
         anonymous: AnonymousUser
@@ -33,7 +32,7 @@
         user_is_superuser: bool = user.is_superuser
         user_is_authenticated: bool = user.is_authenticated
 
-        union: Union[User, AnonymousUser]
+        union: User | AnonymousUser
         union_is_staff: bool = union.is_staff
         union_is_active: bool = union.is_active
         union_is_superuser: bool = union.is_superuser

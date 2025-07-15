@@ -136,7 +136,7 @@
 
       class A(admin.ModelAdmin):
           formfield_overrides = {
-              "not a field": {  # E: Dict entry 0 has incompatible type "str": "Dict[str, Any]"; expected "Type[Field[Any, Any]]": "Mapping[str, Any]"  [dict-item]
+              "not a field": {  # E: Dict entry 0 has incompatible type "str": "dict[str, Any]"; expected "type[Field[Any, Any]]": "Mapping[str, Any]"  [dict-item]
                   "widget": Textarea
               }
           }
@@ -152,7 +152,7 @@
           pass
 
       class A(admin.ModelAdmin[MyModel]):
-          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Union[Callable[[A, HttpRequest, QuerySet[MyModel, MyModel]], Optional[HttpResponseBase]], str]"  [list-item]
+          actions = [an_action]  # E: List item 0 has incompatible type "Callable[[None], None]"; expected "Callable[[A, HttpRequest, QuerySet[MyModel, MyModel]], HttpResponseBase | None] | str"  [list-item]
 -   case: errors_for_invalid_model_admin_generic
     main: |
       from django.contrib.admin import ModelAdmin
@@ -162,4 +162,4 @@
           pass
 
       class A(ModelAdmin[TestModel]):
-          model = int  # E: Incompatible types in assignment (expression has type "Type[int]", base class "ModelAdmin" defined the type as "Type[TestModel]")  [assignment]
+          model = int  # E: Incompatible types in assignment (expression has type "type[int]", base class "ModelAdmin" defined the type as "type[TestModel]")  [assignment]

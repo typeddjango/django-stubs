@@ -80,7 +80,7 @@
         MyModel(nulltext="")
         MyModel(nulltext=None)
         MyModel().nulltext=None
-        reveal_type(MyModel().nulltext)  # N: Revealed type is "Union[builtins.str, None]"
+        reveal_type(MyModel().nulltext)  # N: Revealed type is "builtins.str | None"
     installed_apps:
         - myapp
     files:
@@ -94,9 +94,9 @@
 -   case: blank_and_not_null_charfield_does_not_allow_none
     main: |
         from myapp.models import MyModel
-        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "Union[str, int, Combinable]")  [misc]
+        MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "str | int | Combinable")  [misc]
         MyModel(notnulltext="")
-        MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "Union[str, int, Combinable]")  [assignment]
+        MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "str | int | Combinable")  [assignment]
         reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str"
     installed_apps:
         - myapp
@@ -111,7 +111,7 @@
 -   case: if_field_called_on_class_return_field_itself
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[Union[builtins.str, builtins.int, django.db.models.expressions.Combinable], builtins.str]"
+        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
     installed_apps:
         - myapp
     files:
@@ -171,7 +171,7 @@
             message = models.BinaryField()
         obj = EncodedMessage(b'\x010')
 
-        reveal_type(obj.message) # N: Revealed type is "Union[builtins.bytes, builtins.memoryview[builtins.int]]"
+        reveal_type(obj.message) # N: Revealed type is "builtins.bytes | builtins.memoryview[builtins.int]"
 
 -  case: test_small_auto_field_class_presents_as_int
    main: |

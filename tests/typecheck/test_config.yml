@@ -16,6 +16,7 @@
         -   path: myapp/models.py
             content: |
                 from typing import TYPE_CHECKING
+                from typing_extensions import reveal_type
                 from django.db import models
                 class MyModel(models.Model):
                     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)

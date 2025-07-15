@@ -14,17 +14,17 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from typing import List, Dict, TypeVar, ClassVar
+                from typing import ClassVar, TypeVar
                 from typing_extensions import Self
 
                 M = TypeVar("M", bound=models.Model, covariant=True)
 
                 class BaseQuerySet(models.QuerySet[M]):
-                    def example_dict(self) -> Dict[str, Self]: ...
+                    def example_dict(self) -> dict[str, Self]: ...
 
                 class MyQuerySet(BaseQuerySet[M]):
                     def example_simple(self) -> Self: ...
-                    def example_list(self) -> List[Self]: ...
+                    def example_list(self) -> list[Self]: ...
                     def just_int(self) -> int: ...
 
                 class MyModel(models.Model):
@@ -132,8 +132,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from collections.abc import Sequence
                 from django.db import models
-                from typing import Sequence
 
                 class ModelQuerySet(models.QuerySet["MyModel"]):
                     def custom_queryset_method(self) -> "ModelQuerySet":
@@ -148,20 +148,19 @@
 -   case: includes_custom_queryset_methods_on_unions
     main: |
         from myapp.models import MyModel1, MyModel2
-        import typing
-        kls: typing.Type[typing.Union[MyModel1, MyModel2]] = MyModel1
-        reveal_type(kls.objects.custom_queryset_method())  # N: Revealed type is "Union[myapp.models.ModelQuerySet1, myapp.models.ModelQuerySet2]"
-        reveal_type(kls.objects.all().custom_queryset_method())  # N: Revealed type is "Union[myapp.models.ModelQuerySet1, myapp.models.ModelQuerySet2]"
-        reveal_type(kls.objects.returns_thing())  # N: Revealed type is "Union[builtins.int, builtins.str]"
-        reveal_type(kls.objects.get())  # N: Revealed type is "Union[myapp.models.MyModel1, myapp.models.MyModel2]"
+        kls: type[MyModel1 | MyModel2] = MyModel1
+        reveal_type(kls.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
+        reveal_type(kls.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
+        reveal_type(kls.objects.returns_thing())  # N: Revealed type is "builtins.int | builtins.str"
+        reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from collections.abc import Sequence
                 from django.db import models
-                from typing import Sequence
 
                 class ModelQuerySet1(models.QuerySet["MyModel1"]):
                     def custom_queryset_method(self) -> "ModelQuerySet1":
@@ -236,7 +235,7 @@
         reveal_type(MyModel.objects.dummy_override())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_mixin(MyModel()))  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.objects.example_union())  # N: Revealed type is "Union[myapp.models.MyModel, builtins.list[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_union())  # N: Revealed type is "myapp.models.MyModel | builtins.list[myapp.models.MyModel]"
         reveal_type(MyOtherModel.objects.example())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.example_2())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.override())  # N: Revealed type is "myapp.models.MyOtherModel"
@@ -246,14 +245,14 @@
         reveal_type(MyOtherModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.test_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
         reveal_type(MyOtherModel.objects.test_sub_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
-        reveal_type(MyOtherModel.objects.example_union())  # N: Revealed type is "Union[myapp.models.MyOtherModel, builtins.list[myapp.models.MyOtherModel]]"
+        reveal_type(MyOtherModel.objects.example_union())  # N: Revealed type is "myapp.models.MyOtherModel | builtins.list[myapp.models.MyOtherModel]"
     installed_apps:
         - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-              from typing import TypeVar, Generic, Union, List
+              from typing import Generic, TypeVar
               from django.db import models
               from typing_extensions import Self
 
@@ -265,7 +264,7 @@
 
               class OtherMixin(models.QuerySet[T]):
                   def example_other_mixin(self) -> T: ...
-                  def example_union(self) -> Union[T, List[T]]: ...
+                  def example_union(self) -> T | list[T]: ...
 
               class _MyModelQuerySet(OtherMixin[T], models.QuerySet[T], Generic[T]):
                   def example(self) -> T: ...
@@ -295,12 +294,12 @@
         from myapp.models import MyModel, BaseQuerySet
         reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_type())  # N: Revealed type is "Type[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_tuple_simple())  # N: Revealed type is "Tuple[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_type())  # N: Revealed type is "type[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_tuple_simple())  # N: Revealed type is "tuple[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_tuple_list())  # N: Revealed type is "builtins.tuple[myapp.models.MyModel, ...]"
-        reveal_type(MyModel.objects.example_tuple_double())  # N: Revealed type is "Tuple[builtins.int, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_tuple_double())  # N: Revealed type is "tuple[builtins.int, myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_class())  # N: Revealed type is "myapp.models.Example[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_type_class())  # N: Revealed type is "Type[myapp.models.Example[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_type_class())  # N: Revealed type is "type[myapp.models.Example[myapp.models.MyModel]]"
         reveal_type(MyModel.objects.example_collection())  # N: Revealed type is "typing.Collection[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_set())  # N: Revealed type is "builtins.set[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyModel]"
@@ -316,7 +315,8 @@
         -   path: myapp/models.py
             content: |
                 from __future__ import annotations
-                from typing import TypeVar, Generic, Collection
+                from collections.abc import Collection
+                from typing import Generic, TypeVar
 
                 from django.db import models
 

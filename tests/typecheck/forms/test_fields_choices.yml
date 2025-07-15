@@ -5,7 +5,7 @@
     class MyForm(forms.Form):
         my_choice = forms.ChoiceField(choices='test')
   out: |
-    main:4: error: Argument "choices" to "ChoiceField" has incompatible type "str"; expected "Union[Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any], Type[Choices], Callable[[], Union[Iterable[Union[Tuple[Any, Any], Tuple[str, Iterable[Tuple[Any, Any]]]]], Mapping[Any, Any]]]], _ChoicesCallable]"  [arg-type]
+    main:4: error: Argument "choices" to "ChoiceField" has incompatible type "str"; expected "Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices] | Callable[[], Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any]] | _ChoicesCallable"  [arg-type]
     main:4: note: "str" is missing following "_ChoicesCallable" protocol member:
     main:4: note:     __call__
 

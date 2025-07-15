@@ -1,11 +1,10 @@
 -   case: union_combinable_reduced_to_non_union
     main: |
-        from typing import List
         from myapp.models import MyModel
-        array_val: List[int] = [1]
-        MyModel(array=array_val)  # E: Incompatible type for "array" of "MyModel" (got "List[int]", expected "Union[Sequence[str], Combinable]")  [misc]
+        array_val: list[int] = [1]
+        MyModel(array=array_val)  # E: Incompatible type for "array" of "MyModel" (got "list[int]", expected "Sequence[str] | Combinable")  [misc]
         non_init = MyModel()
-        non_init.array = array_val  # E: Incompatible types in assignment (expression has type "List[int]", variable has type "Union[Sequence[str], Combinable]")  [assignment]
+        non_init.array = array_val  # E: Incompatible types in assignment (expression has type "list[int]", variable has type "Sequence[str] | Combinable")  [assignment]
     installed_apps:
         - myapp
     files:

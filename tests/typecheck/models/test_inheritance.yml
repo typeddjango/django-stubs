@@ -124,7 +124,7 @@
 
                 from django.db.models import Model
                 from django.db.models.manager import Manager
-                from typing import TypeVar, Generic, ClassVar
+                from typing import ClassVar, Generic, TypeVar
                 from typing_extensions import Self
 
                 M = TypeVar("M", bound=Model, covariant=True)

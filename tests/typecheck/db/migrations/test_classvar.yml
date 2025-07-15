@@ -1,22 +1,22 @@
 - case: explicit
   main: |
-    from typing import ClassVar, List
+    from typing import ClassVar
     from django.db import migrations
     from django.db.migrations.operations.base import Operation
 
     class Migration(migrations.Migration):
-        operations: ClassVar[List[Operation]] = []
+        operations: ClassVar[list[Operation]] = []
         initial: ClassVar[bool] = True
 
 - case: explicit_incorrect
   expect_fail: true
   main: |
-    from typing import ClassVar, List
+    from typing import ClassVar
     from django.db import migrations
     from django.db.migrations.operations.base import Operation
 
     class Migration(migrations.Migration):
-        operations: List[Operation] = []
+        operations: list[Operation] = []
         initial: bool = True
 
 - case: implicit

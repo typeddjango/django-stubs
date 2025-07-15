@@ -1,6 +1,5 @@
 -   case: contrib_auth_model_fields
     main: |
-        from typing import Type
         from django.contrib.auth.models import User
         reveal_type(User().username)  # N: Revealed type is "builtins.str"
         reveal_type(User().password)  # N: Revealed type is "builtins.str"
@@ -10,7 +9,7 @@
         reveal_type(User().is_staff)  # N: Revealed type is "builtins.bool"
         reveal_type(User().is_active)  # N: Revealed type is "builtins.bool"
         reveal_type(User().date_joined)  # N: Revealed type is "datetime.datetime"
-        reveal_type(User().last_login)  # N: Revealed type is "Union[datetime.datetime, None]"
+        reveal_type(User().last_login)  # N: Revealed type is "datetime.datetime | None"
         reveal_type(User().is_authenticated)  # N: Revealed type is "Literal[True]"
         reveal_type(User().is_anonymous)  # N: Revealed type is "Literal[False]"
         reveal_type(User().groups.get())  # N: Revealed type is "django.contrib.auth.models.Group"
@@ -27,7 +26,7 @@
         reveal_type(Permission().codename)  # N: Revealed type is "builtins.str"
 
         from django.contrib.auth.models import PermissionsMixin
-        p: Type[PermissionsMixin]
+        p: type[PermissionsMixin]
         reveal_type(p().is_superuser)  # N: Revealed type is "builtins.bool"
 
         from django.contrib.auth.models import Group
@@ -105,7 +104,7 @@
         reveal_type(Other().unq_user)
     out: |
         main:2: note: Revealed type is "myapp.models.MyUser"
-        main:3: note: Revealed type is "Type[other.models.Other_users]"
+        main:3: note: Revealed type is "type[other.models.Other_users]"
         main:4: note: Revealed type is "myapp.models.MyUser"
         main:5: note: Revealed type is "myapp.models.MyUser"
 
