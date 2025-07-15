@@ -51,8 +51,8 @@ class SingleZipReader(zipfile.ZipFile):
     # Incompatible override
     #     zipfile.ZipFile.read(
     #         self,
-    #         name: typing.Union[typing.Text, zipfile.ZipInfo],
-    #         pwd: Optional[bytes] = ...,
+    #         name: typing.Text | zipfile.ZipInfo,
+    #         pwd: bytes | None = ...,
     #     ) -> bytes: ...
     def read(self) -> bytes: ...  # type: ignore[override]
 
