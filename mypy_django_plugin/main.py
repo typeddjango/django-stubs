@@ -112,7 +112,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 return []
             return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
-        # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
+        # ensure that all mentions to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
             return []
