@@ -28,8 +28,12 @@ def get_actual_types(ctx: MethodContext | FunctionContext, expected_keys: list[s
 
 
 def typecheck_model_method(
-    ctx: FunctionContext | MethodContext, django_context: DjangoContext, model_cls: type[Model], method: str
-) -> MypyType:
+    ctx: FunctionContext | MethodContext,
+    django_context: DjangoContext,
+    model_cls: type[Model],
+    method: str,
+) -> None:
+    """Type-checks positional and keyword arguments for Model methods like __init__(), create(), and acreate()."""
     typechecker_api = helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
     expected_keys = [key for key in expected_types.keys() if key != "pk"]
@@ -45,40 +49,34 @@ def typecheck_model_method(
             error_message=f'Incompatible type for "{actual_name}" of "{model_cls.__name__}"',
         )
 
-    return ctx.default_return_type
 
-
-def redefine_and_typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
     assert isinstance(default_return_type, Instance)
 
-    model_fullname = default_return_type.type.fullname
-    model_cls = django_context.get_model_class_by_fullname(model_fullname)
-    if model_cls is None:
-        return ctx.default_return_type
+    model_cls = django_context.get_model_class_by_fullname(default_return_type.type.fullname)
+    if model_cls is not None:
+        typecheck_model_method(ctx, django_context, model_cls, "__init__")
 
-    return typecheck_model_method(ctx, django_context, model_cls, "__init__")
+    return ctx.default_return_type
 
 
-def redefine_and_typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+def typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         # only work with ctx.default_return_type = model Instance
         return ctx.default_return_type
 
-    model_fullname = default_return_type.type.fullname
-    model_cls = django_context.get_model_class_by_fullname(model_fullname)
-    if model_cls is None:
-        return ctx.default_return_type
+    model_cls = django_context.get_model_class_by_fullname(default_return_type.type.fullname)
+    if model_cls is not None:
+        typecheck_model_method(ctx, django_context, model_cls, "create")
 
-    return typecheck_model_method(ctx, django_context, model_cls, "create")
+    return ctx.default_return_type
 
 
-def redefine_and_typecheck_model_acreate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+def typecheck_model_acreate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
-
     if not isinstance(default_return_type, Instance):
-        # only work with ctx.default_return_type = model Instance
         return ctx.default_return_type
 
     # default_return_type at this point should be of type Coroutine[Any, Any, <Model>]
@@ -86,9 +84,8 @@ def redefine_and_typecheck_model_acreate(ctx: MethodContext, django_context: Dja
     if not isinstance(model, Instance):
         return ctx.default_return_type
 
-    model_fullname = model.type.fullname
-    model_cls = django_context.get_model_class_by_fullname(model_fullname)
-    if model_cls is None:
-        return ctx.default_return_type
+    model_cls = django_context.get_model_class_by_fullname(model.type.fullname)
+    if model_cls is not None:
+        typecheck_model_method(ctx, django_context, model_cls, "acreate")
 
-    return typecheck_model_method(ctx, django_context, model_cls, "acreate")
+    return ctx.default_return_type
