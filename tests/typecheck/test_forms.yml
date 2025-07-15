@@ -36,7 +36,9 @@
             pass
         class MyForm2(forms.ModelForm):
             pass
-        class MyView(FormView):
+
+        # FormView generic param provided
+        class MyView(FormView[MyForm]):
             form_class = MyForm
             def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
@@ -44,7 +46,19 @@
                 reveal_type(self.get_form(None))  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form())  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form(form_class))  # N: Revealed type is "main.MyForm"
-                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "main.MyForm2"
+                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "main.MyForm" # E: Argument 1 to "get_form" of "FormMixin" has incompatible type "type[MyForm2]"; expected "type[MyForm] | None"  [arg-type]
+                return HttpResponse()
+
+        # FormView generic param omitted -- fallback to TypeVar default
+        class MyView2(FormView):
+            form_class = MyForm
+            def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
+                form_class = self.get_form_class()
+                reveal_type(form_class)  # N: Revealed type is "type[django.forms.forms.BaseForm]"
+                reveal_type(self.get_form(None))  # N: Revealed type is "django.forms.forms.BaseForm"
+                reveal_type(self.get_form())  # N: Revealed type is "django.forms.forms.BaseForm"
+                reveal_type(self.get_form(form_class))  # N: Revealed type is "django.forms.forms.BaseForm"
+                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "django.forms.forms.BaseForm"
                 return HttpResponse()
 
 -   case: updateview_form_valid_has_form_save

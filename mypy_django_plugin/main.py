@@ -53,15 +53,6 @@ from mypy_django_plugin.transformers.models import (
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
 
 
-def transform_form_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata_bases(sym.node, "baseform_bases")
-        bases[ctx.cls.fullname] = 1
-
-    forms.make_meta_nested_class_inherit_from_any(ctx)
-
-
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -182,16 +173,6 @@ class NewSemanalDjangoPlugin(Plugin):
             if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
                 return partial(check_querydict_is_mutable, django_context=self.django_context)
 
-        elif method_name == "get_form_class":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-                return forms.extract_proper_type_for_get_form_class
-
-        elif method_name == "get_form":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.FORM_MIXIN_CLASS_FULLNAME):
-                return forms.extract_proper_type_for_get_form
-
         elif method_name == "__get__":
             hooks = {
                 fullnames.MANYTOMANY_FIELD_FULLNAME: manytomany.refine_many_to_many_related_manager,
@@ -237,7 +218,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # Base class is a Form class definition
         if fullname in self._get_current_form_bases():
-            return transform_form_class
+            return forms.transform_form_class
 
         # Base class is a QuerySet class definition
         if sym is not None and isinstance(sym.node, TypeInfo) and sym.node.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
