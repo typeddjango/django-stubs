@@ -23,6 +23,13 @@ CHOICES_TYPE_METACLASS_FULLNAME = "django.db.models.enums.ChoicesType"
 WITH_ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.WithAnnotations"
 ANNOTATIONS_FULLNAME = "django_stubs_ext.annotations.Annotations"
 
+ANNOTATED_TYPES_FULLNAMES = {
+    "typing.Annotated",
+    "typing_extensions.Annotated",
+    WITH_ANNOTATIONS_FULLNAME,
+}
+
+
 BASEFORM_CLASS_FULLNAME = "django.forms.forms.BaseForm"
 FORM_CLASS_FULLNAME = "django.forms.forms.Form"
 MODELFORM_CLASS_FULLNAME = "django.forms.models.ModelForm"

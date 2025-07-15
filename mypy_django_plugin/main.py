@@ -289,11 +289,7 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_type_analyze_hook(self, fullname: str) -> Callable[[AnalyzeTypeContext], MypyType] | None:
-        if fullname in {
-            "typing.Annotated",
-            "typing_extensions.Annotated",
-            "django_stubs_ext.annotations.WithAnnotations",
-        }:
+        if fullname in fullnames.ANNOTATED_TYPES_FULLNAMES:
             return partial(handle_annotated_type, fullname=fullname)
         elif fullname == "django.contrib.auth.models._User":
             return partial(get_user_model, django_context=self.django_context)
