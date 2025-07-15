@@ -112,7 +112,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 return []
             return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
-        # ensure that all mentioned to='someapp.SomeModel' are loaded with corresponding related Fields
+        # ensure that all mentions to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
             return []
@@ -147,7 +147,7 @@ class NewSemanalDjangoPlugin(Plugin):
                 return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
             if helpers.is_model_type(info):
-                return partial(init_create.redefine_and_typecheck_model_init, django_context=self.django_context)
+                return partial(init_create.typecheck_model_init, django_context=self.django_context)
 
             if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return querysets.determine_proper_manager_type
@@ -164,8 +164,8 @@ class NewSemanalDjangoPlugin(Plugin):
             ),
             "alias": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
             "annotate": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
-            "create": partial(init_create.redefine_and_typecheck_model_create, django_context=self.django_context),
-            "acreate": partial(init_create.redefine_and_typecheck_model_acreate, django_context=self.django_context),
+            "create": partial(init_create.typecheck_model_create, django_context=self.django_context),
+            "acreate": partial(init_create.typecheck_model_acreate, django_context=self.django_context),
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
@@ -277,24 +277,19 @@ class NewSemanalDjangoPlugin(Plugin):
         if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
 
-        if (
-            info
-            and info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
-            and attr_name in ("choices", "labels", "values", "__empty__")
+        if info and (
+            (
+                info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
+                and attr_name in {"choices", "labels", "values", "__empty__"}
+            )
+            or (info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in {"label", "value"})
         ):
-            return choices.transform_into_proper_attr_type
-
-        if info and info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in ("label", "value"):
             return choices.transform_into_proper_attr_type
 
         return None
 
     def get_type_analyze_hook(self, fullname: str) -> Callable[[AnalyzeTypeContext], MypyType] | None:
-        if fullname in (
-            "typing.Annotated",
-            "typing_extensions.Annotated",
-            "django_stubs_ext.annotations.WithAnnotations",
-        ):
+        if fullname in fullnames.ANNOTATED_TYPES_FULLNAMES:
             return partial(handle_annotated_type, fullname=fullname)
         elif fullname == "django.contrib.auth.models._User":
             return partial(get_user_model, django_context=self.django_context)
