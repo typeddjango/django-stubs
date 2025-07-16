@@ -61,6 +61,34 @@
                 reveal_type(self.get_form(MyForm2))  # N: Revealed type is "django.forms.forms.BaseForm"
                 return HttpResponse()
 
+-   case: formview_form_valid_proper_type
+    main: |
+        from django.http import HttpRequest, HttpResponse
+        from django.forms import models
+        from django.views.generic.edit import FormView
+
+        class RegistrationForm(models.ModelForm): ...
+
+        class RegistrationViewNoGeneric(FormView):
+            form_class = RegistrationForm
+            template_name = 'web_app/registration.html'
+
+            def form_valid(self, form: RegistrationForm) -> HttpResponse:
+                 form.save()
+                 return super().form_valid(form)
+
+        class RegistrationViewWithGeneric(FormView[RegistrationForm]):
+            form_class = RegistrationForm
+            template_name = 'web_app/registration.html'
+
+            def form_valid(self, form: RegistrationForm) -> HttpResponse:
+                 form.save()
+                 return super().form_valid(form)
+    out: |
+        main:11: error: Argument 1 of "form_valid" is incompatible with supertype "django.views.generic.edit.FormMixin"; supertype defines the argument type as "BaseForm"  [override]
+        main:11: note: This violates the Liskov substitution principle
+        main:11: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
+
 -   case: updateview_form_valid_has_form_save
     main: |
         from django import forms
