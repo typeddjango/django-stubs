@@ -15,10 +15,14 @@
 -   case: get_field_returns_proper_field_type
     main: |
         from myapp.models import MyUser
-        reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is "django.db.models.fields.CharField[Any, Any]"
-        reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is "django.db.models.fields.CharField[Any, Any]"
-        reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is "django.db.models.fields.IntegerField[Any, Any]"
-        reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is "django.db.models.fields.related.ForeignKey[Any, Any]"
+        reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
+        reveal_type(MyUser.base_name.field)  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
+        reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
+        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
+        reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable, builtins.int]"
+        reveal_type(MyUser.age.field)  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable, builtins.int]"
+        reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.MyUser | django.db.models.expressions.Combinable, myapp.models.MyUser]"
+        reveal_type(MyUser.to_user.field)  # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.MyUser | django.db.models.expressions.Combinable, myapp.models.MyUser]"
 
         MyUser._meta.get_field('unknown')  # E: MyUser has no field named 'unknown'  [misc]
     installed_apps:
@@ -40,7 +44,8 @@
         from myapp.models import AbstractModel
         class MyModel(AbstractModel):
             pass
-        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "django.db.models.fields.Field[Any, Any] | django.db.models.fields.reverse_related.ForeignObjectRel | django.contrib.contenttypes.fields.GenericForeignKey"
+
+        MyModel._meta.get_field('field')  # E: MyModel has no field named 'field'  [misc]
     installed_apps:
         - myapp
     files:
@@ -53,8 +58,7 @@
                 class AbstractModel(models.Model):
                     class Meta(TypedModelMeta):
                         abstract = True
-                class MyModel(AbstractModel):
-                    field = ArrayField(models.IntegerField(), default=[])
+
 -   case: base_model_meta_incompatible_types
     main: |
         from django.db import models
@@ -90,8 +94,10 @@
             content: |
                 from django.db import models
                 class AbstractModel(models.Model):
+                    base = models.TextField()
+
                     class Meta:
                         abstract = True
-                    base = models.TextField()
+
                 class MyModel(AbstractModel):
                     field = models.IntegerField()
