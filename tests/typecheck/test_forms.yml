@@ -36,7 +36,9 @@
             pass
         class MyForm2(forms.ModelForm):
             pass
-        class MyView(FormView):
+
+        # FormView generic param provided
+        class MyView(FormView[MyForm]):
             form_class = MyForm
             def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
@@ -44,8 +46,44 @@
                 reveal_type(self.get_form(None))  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form())  # N: Revealed type is "main.MyForm"
                 reveal_type(self.get_form(form_class))  # N: Revealed type is "main.MyForm"
-                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "main.MyForm2"
+                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "main.MyForm" # E: Argument 1 to "get_form" of "FormMixin" has incompatible type "type[MyForm2]"; expected "type[MyForm] | None"  [arg-type]
                 return HttpResponse()
+
+        # FormView generic param omitted -- fallback to TypeVar default
+        class MyView2(FormView):
+            form_class = MyForm
+            def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
+                form_class = self.get_form_class()
+                reveal_type(form_class)  # N: Revealed type is "type[Any]"
+                reveal_type(self.get_form(None))  # N: Revealed type is "Any"
+                reveal_type(self.get_form())  # N: Revealed type is "Any"
+                reveal_type(self.get_form(form_class))  # N: Revealed type is "Any"
+                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "Any"
+                return HttpResponse()
+
+-   case: formview_form_valid_proper_type
+    main: |
+        from django.http import HttpRequest, HttpResponse
+        from django.forms import models
+        from django.views.generic.edit import FormView
+
+        class RegistrationForm(models.ModelForm): ...
+
+        class RegistrationViewNoGeneric(FormView):
+            form_class = RegistrationForm
+            template_name = 'web_app/registration.html'
+
+            def form_valid(self, form: RegistrationForm) -> HttpResponse:
+                 form.save()
+                 return super().form_valid(form)
+
+        class RegistrationViewWithGeneric(FormView[RegistrationForm]):
+            form_class = RegistrationForm
+            template_name = 'web_app/registration.html'
+
+            def form_valid(self, form: RegistrationForm) -> HttpResponse:
+                 form.save()
+                 return super().form_valid(form)
 
 -   case: updateview_form_valid_has_form_save
     main: |
