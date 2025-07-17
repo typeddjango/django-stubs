@@ -54,11 +54,11 @@
             form_class = MyForm
             def post(self, request: HttpRequest, *args: Any, **kwds: Any) -> HttpResponse:
                 form_class = self.get_form_class()
-                reveal_type(form_class)  # N: Revealed type is "type[django.forms.forms.BaseForm]"
-                reveal_type(self.get_form(None))  # N: Revealed type is "django.forms.forms.BaseForm"
-                reveal_type(self.get_form())  # N: Revealed type is "django.forms.forms.BaseForm"
-                reveal_type(self.get_form(form_class))  # N: Revealed type is "django.forms.forms.BaseForm"
-                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "django.forms.forms.BaseForm"
+                reveal_type(form_class)  # N: Revealed type is "type[Any]"
+                reveal_type(self.get_form(None))  # N: Revealed type is "Any"
+                reveal_type(self.get_form())  # N: Revealed type is "Any"
+                reveal_type(self.get_form(form_class))  # N: Revealed type is "Any"
+                reveal_type(self.get_form(MyForm2))  # N: Revealed type is "Any"
                 return HttpResponse()
 
 -   case: formview_form_valid_proper_type
@@ -84,10 +84,6 @@
             def form_valid(self, form: RegistrationForm) -> HttpResponse:
                  form.save()
                  return super().form_valid(form)
-    out: |
-        main:11: error: Argument 1 of "form_valid" is incompatible with supertype "django.views.generic.edit.FormMixin"; supertype defines the argument type as "BaseForm"  [override]
-        main:11: note: This violates the Liskov substitution principle
-        main:11: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
 
 -   case: updateview_form_valid_has_form_save
     main: |

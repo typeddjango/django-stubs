@@ -8,7 +8,7 @@ from django.utils.datastructures import _ListOrTuple
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
 
-_FormT = TypeVar("_FormT", bound=BaseForm, default=BaseForm)
+_FormT = TypeVar("_FormT", bound=BaseForm)
 _ModelFormT = TypeVar("_ModelFormT", bound=BaseModelForm)
 _M = TypeVar("_M", bound=models.Model)
 
