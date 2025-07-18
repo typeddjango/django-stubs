@@ -46,6 +46,9 @@
             pass
 
         MyModel._meta.get_field('field')  # E: MyModel has no field named 'field'  [misc]
+
+        field: str
+        reveal_type(MyModel._meta.get_field(field))  # N: Revealed type is "django.db.models.fields.Field[Any, Any] | django.db.models.fields.reverse_related.ForeignObjectRel | django.contrib.contenttypes.fields.GenericForeignKey"
     installed_apps:
         - myapp
     files:
