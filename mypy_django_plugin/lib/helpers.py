@@ -195,6 +195,14 @@ def get_class_fullname(klass: type) -> str:
     return klass.__module__ + "." + klass.__qualname__
 
 
+def get_min_argument_count(ctx: MethodContext | FunctionContext) -> int:
+    """
+    Return the number of non-star arguments passed to the function.
+    Excludes *args and **kwargs since their count is indeterminate.
+    """
+    return sum(not kind.is_star() for kinds in ctx.arg_kinds for kind in kinds)
+
+
 def get_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str) -> Expression | None:
     """
     Return the expression for the specific argument.

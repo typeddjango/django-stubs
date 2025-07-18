@@ -315,3 +315,30 @@
                     )
                     default_set_type = models.IntegerField()
                     unset_set_type = cast("models.Field", models.IntegerField())
+
+-   case: too_many_positional_arguments_on_init
+    main: |
+        from myapp.models import MyUser
+        default_args: list[int]
+        default_kwargs: dict[str, int]
+
+        MyUser(1, "BB")  # E: Too many arguments for "MyUser"  [call-arg]
+        MyUser("bbb", id=2)  # E: Too many arguments for "MyUser"  [call-arg]
+        MyUser(1, "BB", *default_args)  # E: Too many arguments for "MyUser"  [call-arg]
+        MyUser(1, "BB", **default_kwargs)  # E: Too many arguments for "MyUser"  [call-arg]
+
+        # Should be ok because we cannot easily determine arg count
+        MyUser(*"BB")
+        MyUser(1, *["BB"])
+        MyUser(1, *("BB",))
+        MyUser(1, *default_args)
+        MyUser(1, **default_kwargs)
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
