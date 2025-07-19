@@ -1,4 +1,5 @@
 from django.db.models.base import Model
+from mypy.errorcodes import CALL_ARG
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import Instance, get_proper_type
 from mypy.types import Type as MypyType
@@ -12,7 +13,7 @@ def get_actual_types(ctx: MethodContext | FunctionContext, expected_keys: list[s
     # positionals
     for pos, (actual_name, actual_type) in enumerate(zip(ctx.arg_names[0], ctx.arg_types[0], strict=False)):
         if actual_name is None:
-            if ctx.callee_arg_names[0] == "kwargs":
+            if ctx.callee_arg_names[0] == "kwargs" or pos >= len(expected_keys):
                 # unpacked dict as kwargs is not supported
                 continue
             actual_name = expected_keys[pos]
@@ -38,9 +39,12 @@ def typecheck_model_method(
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
     expected_keys = [key for key in expected_types.keys() if key != "pk"]
 
+    min_arg_count = helpers.get_min_argument_count(ctx)
+
     for actual_name, actual_type in get_actual_types(ctx, expected_keys):
         if actual_name not in expected_types:
             ctx.api.fail(f'Unexpected attribute "{actual_name}" for model "{model_cls.__name__}"', ctx.context)
+            min_arg_count -= 1  # To avoid double error (Unexpected attribute + too many arguments)
             continue
         helpers.check_types_compatible(
             ctx,
@@ -48,6 +52,9 @@ def typecheck_model_method(
             actual_type=actual_type,
             error_message=f'Incompatible type for "{actual_name}" of "{model_cls.__name__}"',
         )
+
+    if min_arg_count > len(expected_keys):
+        ctx.api.fail(f'Too many arguments for "{model_cls.__name__}"', ctx.context, code=CALL_ARG)
 
 
 def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:

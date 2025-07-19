@@ -171,3 +171,17 @@
                 class User(models.Model):
                     name = models.CharField(max_length=100)
                     age = models.IntegerField()
+
+-   case: too_many_keyword_arguments_on_create
+    main: |
+        from myapp.models import MyUser
+        MyUser.objects.create(id=1, foo="bbb")  # E: Unexpected attribute "foo" for model "MyUser"  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyUser(models.Model):
+                    pass
