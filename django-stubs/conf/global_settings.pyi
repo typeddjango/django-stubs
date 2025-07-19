@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from pathlib import Path
 from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
@@ -114,7 +115,15 @@ EMAIL_TIMEOUT: int | None
 # List of strings representing installed apps.
 INSTALLED_APPS: list[str]
 
-TEMPLATES: list[dict[str, Any]]
+@type_check_only
+class _TemplateConfig(TypedDict):
+    BACKEND: str
+    NAME: NotRequired[str]
+    DIRS: NotRequired[list[str | Path]]
+    APP_DIRS: NotRequired[bool]
+    OPTIONS: NotRequired[dict[str, Any]]
+
+TEMPLATES: list[_TemplateConfig]
 
 # Default form rendering class.
 FORM_RENDERER: str
