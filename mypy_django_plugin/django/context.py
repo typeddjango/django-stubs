@@ -78,7 +78,7 @@ class LookupsAreUnsupported(Exception):
     pass
 
 
-def _get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> Instance | None:
+def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> Instance | None:
     if info is None:
         return None
     field_node = info.get(field_name)
@@ -95,7 +95,7 @@ def _get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str)
 
 
 def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = _get_field_type_from_model_type_info(info, field_name)
+    field_type = get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[0]
     else:
@@ -103,7 +103,7 @@ def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: 
 
 
 def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = _get_field_type_from_model_type_info(info, field_name)
+    field_type = get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[1]
     else:
