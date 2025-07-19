@@ -5,7 +5,7 @@ from typing_extensions import NotRequired
 
 
 @type_check_only
-class _TemplatesSetting(TypedDict):
+class TemplatesSetting(TypedDict):
     BACKEND: str
     NAME: NotRequired[str]
     DIRS: NotRequired[list[str | Path]]
@@ -13,4 +13,4 @@ class _TemplatesSetting(TypedDict):
     OPTIONS: NotRequired[dict[str, Any]]
 
 
-__all__ = ["_TemplatesSetting"]
+__all__ = ["TemplatesSetting"]

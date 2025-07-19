@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from django_stubs_ext.settings import _TemplatesSetting
+from django_stubs_ext.settings import TemplatesSetting
 
 BASE_DIR = Path(__file__).resolve().parent
 
 # Example taken from various doc pages
 # https://docs.djangoproject.com/en/5.2/ref/settings/#templates
-TEMPLATES: list[_TemplatesSetting] = [
+TEMPLATES: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
@@ -14,7 +14,7 @@ TEMPLATES: list[_TemplatesSetting] = [
 ]
 
 # https://docs.djangoproject.com/en/5.2/ref/templates/api/#the-dirs-option
-TEMPLATES_2: list[_TemplatesSetting] = [
+TEMPLATES_2: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
@@ -25,13 +25,13 @@ TEMPLATES_2: list[_TemplatesSetting] = [
 ]
 
 # https://docs.djangoproject.com/en/5.2/ref/templates/api/#template-loaders
-TEMPLATES_3: list[_TemplatesSetting] = [
+TEMPLATES_3: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
     }
 ]
-TEMPLATES_4: list[_TemplatesSetting] = [
+TEMPLATES_4: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "OPTIONS": {
@@ -45,7 +45,7 @@ TEMPLATES_4: list[_TemplatesSetting] = [
     }
 ]
 # https://docs.djangoproject.com/en/5.2/ref/templates/api/#django.template.loaders.cached.Loader
-TEMPLATES_5: list[_TemplatesSetting] = [
+TEMPLATES_5: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
@@ -64,7 +64,7 @@ TEMPLATES_5: list[_TemplatesSetting] = [
     }
 ]
 # https://docs.djangoproject.com/en/5.2/ref/templates/api/#django.template.loaders.cached.Loader
-TEMPLATES_6: list[_TemplatesSetting] = [
+TEMPLATES_6: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "OPTIONS": {
@@ -80,7 +80,7 @@ TEMPLATES_6: list[_TemplatesSetting] = [
     }
 ]
 # https://docs.djangoproject.com/en/5.2/topics/templates/#configuration
-TEMPLATES_7: list[_TemplatesSetting] = [
+TEMPLATES_7: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
@@ -91,7 +91,7 @@ TEMPLATES_7: list[_TemplatesSetting] = [
     },
 ]
 # https://docs.djangoproject.com/en/5.2/topics/templates/#django.template.backends.base.Template.render
-TEMPLATES_8: list[_TemplatesSetting] = [
+TEMPLATES_8: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
@@ -108,7 +108,7 @@ TEMPLATES_8: list[_TemplatesSetting] = [
 ]
 
 # Custom jinja backend
-TEMPLATES_9: list[_TemplatesSetting] = [
+TEMPLATES_9: list[TemplatesSetting] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates" / "django"],
