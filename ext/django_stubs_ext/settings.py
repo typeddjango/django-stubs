@@ -7,6 +7,7 @@ from typing_extensions import NotRequired
 @type_check_only
 class TemplatesSetting(TypedDict):
     """Typing helper if you want to type `TEMPLATE` setting."""
+
     BACKEND: str
     NAME: NotRequired[str]
     DIRS: NotRequired[list[str | Path]]
