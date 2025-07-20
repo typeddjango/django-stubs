@@ -7,6 +7,8 @@ from typing import Any, Literal, Protocol, TypeAlias, TypedDict, type_check_only
 
 from typing_extensions import NotRequired
 
+from django_stubs_ext.settings import TemplatesSetting
+
 _Admins: TypeAlias = list[tuple[str, str]]
 
 ####################
@@ -114,7 +116,7 @@ EMAIL_TIMEOUT: int | None
 # List of strings representing installed apps.
 INSTALLED_APPS: list[str]
 
-TEMPLATES: list[dict[str, Any]]
+TEMPLATES: list[TemplatesSetting]
 
 # Default form rendering class.
 FORM_RENDERER: str
