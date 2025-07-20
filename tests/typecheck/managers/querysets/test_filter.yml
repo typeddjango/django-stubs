@@ -254,3 +254,32 @@
                     username = models.TextField()
                     username2 = models.TextField()
                     age = models.IntegerField()
+
+
+- case: alias_and_annotate_can_be_used_with_dynamic_new_fields
+  main: |
+    from django.db import models
+    from myapp.models import Blog
+
+    Blog.objects.alias(alias_entries=models.Count("entry")).annotate(
+        annotate_entries=models.Count("entry"),
+    ).filter(alias_entries__gt=5, annotate_entries__gt=5)
+    Blog.objects.alias(alias_entries=models.Count("entry")).filter(alias_entries=5)
+    Blog.objects.alias(alias_entries=models.Count("entry")).filter(alias_entries__gt=5)
+    Blog.objects.alias(  # E: Cannot resolve keyword 'alias_e' into field. Choices are: entry, id, alias_entries  [misc]
+        alias_entries=models.Count("entry")
+    ).filter(
+        # Wrong name:
+        alias_e=5
+    )
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class Blog(models.Model):
+            pass
+        class Entry(models.Model):
+            blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
