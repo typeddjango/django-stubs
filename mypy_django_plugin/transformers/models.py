@@ -1006,21 +1006,10 @@ class MetaclassAdjustments(ModelClassInitializer):
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
             return
 
-        does_not_exist = ctx.cls.info.names.get("DoesNotExist")
-        if does_not_exist is not None and isinstance(does_not_exist.node, Var) and not does_not_exist.plugin_generated:
-            del ctx.cls.info.names["DoesNotExist"]
-
-        multiple_objects_returned = ctx.cls.info.names.get("MultipleObjectsReturned")
-        if (
-            multiple_objects_returned is not None
-            and isinstance(multiple_objects_returned.node, Var)
-            and not multiple_objects_returned.plugin_generated
-        ):
-            del ctx.cls.info.names["MultipleObjectsReturned"]
-
-        objects = ctx.cls.info.names.get("objects")
-        if objects is not None and isinstance(objects.node, Var) and not objects.plugin_generated:
-            del ctx.cls.info.names["objects"]
+        for attr_name in ["DoesNotExist", "MultipleObjectsReturned", "objects"]:
+            attr = ctx.cls.info.names.get(attr_name)
+            if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
+                del ctx.cls.info.names[attr_name]
 
         return
 
