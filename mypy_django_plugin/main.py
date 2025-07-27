@@ -171,7 +171,7 @@ class NewSemanalDjangoPlugin(Plugin):
         if class_fullname.endswith("QueryDict"):
             info = self._get_typeinfo_or_none(class_fullname)
             if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
-                return partial(check_querydict_is_mutable, django_context=self.django_context)
+                return check_querydict_is_mutable
 
         elif method_name == "__get__":
             hooks = {
