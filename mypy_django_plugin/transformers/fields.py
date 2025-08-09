@@ -53,7 +53,7 @@ def reparametrize_related_field_type(related_field_type: Instance, set_type: Myp
         helpers.convert_any_to_type(related_field_type.args[0], set_type),
         helpers.convert_any_to_type(related_field_type.args[1], get_type),
     ]
-    return helpers.reparametrize_instance(related_field_type, new_args=args)
+    return related_field_type.copy_modified(args=args)
 
 
 def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
@@ -177,7 +177,7 @@ def set_descriptor_types_for_field(
                 ctx.context,
             )
 
-    return helpers.reparametrize_instance(default_return_type, [set_type, get_type])
+    return default_return_type.copy_modified(args=[set_type, get_type])
 
 
 def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
@@ -229,7 +229,7 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
 
         args.append(helpers.convert_any_to_type(default_arg, new_type))
 
-    return helpers.reparametrize_instance(default_return_type, args)
+    return default_return_type.copy_modified(args=args)
 
 
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:

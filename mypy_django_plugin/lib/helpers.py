@@ -187,10 +187,6 @@ def lookup_class_typeinfo(api: TypeChecker, klass: type | None) -> TypeInfo | No
     return field_info
 
 
-def reparametrize_instance(instance: Instance, new_args: list[MypyType]) -> Instance:
-    return Instance(instance.type, args=new_args, line=instance.line, column=instance.column)
-
-
 def get_class_fullname(klass: type) -> str:
     return klass.__module__ + "." + klass.__qualname__
 
@@ -393,7 +389,7 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
                 args.append(referred_to_type)
             else:
                 args.append(default_arg)
-        return reparametrize_instance(proper_type, args)
+        return proper_type.copy_modified(args=args)
 
     if isinstance(proper_type, AnyType):
         return referred_to_type
