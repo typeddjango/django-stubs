@@ -50,7 +50,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     ):
         return default_return_type
 
-    return helpers.reparametrize_instance(default_return_type, [outer_model_info.self_type])
+    return default_return_type.copy_modified(args=[outer_model_info.self_type])
 
 
 def get_field_type_from_lookup(
@@ -198,7 +198,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
-        return helpers.reparametrize_instance(default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
+        return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
 
     # account for possible None
     flat = flat or False
@@ -207,7 +207,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     row_type = get_values_list_row_type(
         ctx, django_context, model_cls, is_annotated=is_annotated, flat=flat, named=named
     )
-    return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
+    return default_return_type.copy_modified(args=[model_type, row_type])
 
 
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
@@ -311,7 +311,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
             row_type = annotated_type
     else:
         row_type = annotated_type
-    return helpers.reparametrize_instance(default_return_type, [annotated_type, row_type])
+    return default_return_type.copy_modified(args=[annotated_type, row_type])
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:
@@ -362,7 +362,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             ctx, django_context, model_cls, lookup=field_lookup, method="values"
         )
         if field_lookup_type is None:
-            return helpers.reparametrize_instance(default_return_type, [model_type, AnyType(TypeOfAny.from_error)])
+            return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
 
         column_types[field_lookup] = field_lookup_type
 
@@ -372,4 +372,4 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
         column_types.update(expression_types)
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
-    return helpers.reparametrize_instance(default_return_type, [model_type, row_type])
+    return default_return_type.copy_modified(args=[model_type, row_type])

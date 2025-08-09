@@ -16,7 +16,7 @@ from mypy.types import (
 )
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import fullnames
 
 
 # TODO: [mypy 1.14+] Remove this backport of `TypeInfo.enum_members`.
@@ -232,7 +232,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
             new_value_arg = _try_replace_value(value_arg, base_type, has_empty_label)
             if new_label_arg is not label_arg or new_value_arg is not value_arg:
                 new_choice_arg = choice_arg.copy_modified(items=[new_value_arg, new_label_arg])
-                return helpers.reparametrize_instance(default_attr_type, [new_choice_arg])
+                return default_attr_type.copy_modified(args=[new_choice_arg])
 
     elif (
         name == "labels"
@@ -243,7 +243,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         label_arg = get_proper_type(default_attr_type.args[0])
         new_label_arg = _try_replace_label(label_arg, has_lazy_label)
         if new_label_arg is not label_arg:
-            return helpers.reparametrize_instance(default_attr_type, [new_label_arg])
+            return default_attr_type.copy_modified(args=[new_label_arg])
 
     elif (
         name == "values"
@@ -254,7 +254,7 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
         value_arg = get_proper_type(default_attr_type.args[0])
         new_value_arg = _try_replace_value(value_arg, base_type, has_empty_label)
         if new_value_arg is not value_arg:
-            return helpers.reparametrize_instance(default_attr_type, [new_value_arg])
+            return default_attr_type.copy_modified(args=[new_value_arg])
 
     elif name in ("__empty__", "label"):
         return _try_replace_label(default_attr_type, has_lazy_label)
