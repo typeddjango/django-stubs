@@ -4,6 +4,7 @@ from typing import Any, Literal, TypeAlias
 from django.http.request import QueryDict
 from django.http.response import HttpResponseBase
 from django.urls.resolvers import ResolverMatch
+from django.utils.functional import _StrPromise
 
 # https://github.com/python/typeshed/blob/87f599dc8312ac67b941b5f2b47274534a1a2d3a/stdlib/urllib/parse.pyi#L136-L138
 _QueryType: TypeAlias = (
@@ -11,19 +12,28 @@ _QueryType: TypeAlias = (
 )
 
 def resolve(path: str, urlconf: str | None = ...) -> ResolverMatch: ...
+
+# NOTE: make sure `reverse` and `reverse_lazy` objects are in sync:
 def reverse(
     viewname: Callable[..., HttpResponseBase] | str | None,
-    urlconf: str | None = ...,
-    args: Sequence[Any] | None = ...,
-    kwargs: dict[str, Any] | None = ...,
-    current_app: str | None = ...,
+    urlconf: str | None = None,
+    args: Sequence[Any] | None = None,
+    kwargs: dict[str, Any] | None = None,
+    current_app: str | None = None,
     *,
-    query: QueryDict | _QueryType | None = ...,
-    fragment: str | None = ...,
+    query: QueryDict | _QueryType | None = None,
+    fragment: str | None = None,
 ) -> str: ...
-
-reverse_lazy: Any
-
+def reverse_lazy(
+    viewname: Callable[..., HttpResponseBase] | str | None,
+    urlconf: str | None = None,
+    args: Sequence[Any] | None = None,
+    kwargs: dict[str, Any] | None = None,
+    current_app: str | None = None,
+    *,
+    query: QueryDict | _QueryType | None = None,
+    fragment: str | None = None,
+) -> _StrPromise: ...
 def clear_url_caches() -> None: ...
 def set_script_prefix(prefix: str) -> None: ...
 def get_script_prefix() -> str: ...
