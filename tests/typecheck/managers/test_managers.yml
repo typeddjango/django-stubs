@@ -434,7 +434,7 @@
                     movie = models.TextField()
 
 
--   case: override_manager_create1
+-   case: override_manager_create_no_type_param
     main: |
         from myapp.models import MyModel
     installed_apps:
@@ -458,7 +458,7 @@
                     objects = MyModelManager()
 
 
--   case: override_manager_create2
+-   case: override_manager_create_with_type_param
     main: |
         from myapp.models import MyModel
         MyModel.objects.create()
@@ -477,6 +477,32 @@
 
                 class MyModel(models.Model):
                     objects = MyModelManager()
+
+-   case: override_manager_create_with_incoherent_type_param
+    main: |
+        from myapp.models import MyModel
+        MyModel.objects.create()
+    installed_apps:
+        - myapp
+    out: |
+      myapp/models:5: error: Return type "MyModel" of "create" incompatible with return type "MyOtherModel" in supertype "django.db.models.manager.Manager"  [override]
+      myapp/models:6: error: Incompatible return value type (got "MyOtherModel", expected "MyModel")  [return-value]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any
+                from django.db import models
+                class MyModelManager(models.Manager['MyOtherModel']):
+
+                    def create(self, **kwargs: Any) -> 'MyModel':
+                        return super().create(**kwargs)
+
+                class MyModel(models.Model):
+                    objects = MyModelManager()
+
+                class MyOtherModel(models.Model):
+                    pass
 
 -   case: regression_manager_scope_foreign
     main: |
