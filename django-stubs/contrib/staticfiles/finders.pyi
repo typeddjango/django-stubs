@@ -2,7 +2,7 @@ from collections.abc import Iterable, Iterator, Sequence
 from typing import Any, Literal, overload
 
 from django.core.checks.messages import CheckMessage
-from django.core.files.storage import FileSystemStorage, Storage
+from django.core.files.storage import FileSystemStorage, Storage, _DefaultStorage
 
 searched_locations: Any
 
@@ -16,7 +16,7 @@ class BaseFinder:
 
 class FileSystemFinder(BaseFinder):
     locations: list[tuple[str, str]]
-    storages: dict[str, Any]
+    storages: dict[str, FileSystemStorage]
     def __init__(self, app_names: Sequence[str] | None = None, *args: Any, **kwargs: Any) -> None: ...
     def find_location(self, root: str, path: str, prefix: str | None = None) -> str | None: ...
     @overload
@@ -48,7 +48,7 @@ class BaseStorageFinder(BaseFinder):
     def list(self, ignore_patterns: Iterable[str] | None) -> Iterable[Any]: ...
 
 class DefaultStorageFinder(BaseStorageFinder):
-    storage: Storage
+    storage: _DefaultStorage
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 @overload
