@@ -5,6 +5,7 @@ from re import Pattern
 # django.utils.translation -- that module depends on the settings.
 from typing import Any, Literal, Protocol, TypeAlias, TypedDict, type_check_only
 
+from django.utils.functional import _StrOrPromise
 from typing_extensions import NotRequired
 
 from django_stubs_ext.settings import TemplatesSetting
@@ -391,7 +392,7 @@ AUTH_USER_MODEL: str
 
 AUTHENTICATION_BACKENDS: Sequence[str]
 
-LOGIN_URL: str
+LOGIN_URL: _StrOrPromise
 
 LOGIN_REDIRECT_URL: str
 
