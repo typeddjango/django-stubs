@@ -5,6 +5,7 @@ from django.forms.forms import BaseForm
 from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse
 from django.utils.datastructures import _ListOrTuple
+from django.utils.functional import _StrOrPromise
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
 
@@ -15,7 +16,7 @@ _M = TypeVar("_M", bound=models.Model)
 class FormMixin(Generic[_FormT], ContextMixin):
     initial: dict[str, Any]
     form_class: type[_FormT] | None
-    success_url: str | None
+    success_url: _StrOrPromise | None = None
     prefix: str | None
     def get_initial(self) -> dict[str, Any]: ...
     def get_prefix(self) -> str | None: ...
@@ -59,7 +60,7 @@ class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView[_M, _ModelFor
     template_name_suffix: str
 
 class DeletionMixin(Generic[_M]):
-    success_url: str | None
+    success_url: _StrOrPromise | None = None
     object: _M
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def delete(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
