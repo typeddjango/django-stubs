@@ -8,8 +8,8 @@
         model_cls = type(instance)
 
         reveal_type(model_cls) # N: Revealed type is "type[myapp.models.Order] | type[myapp.models.User]"
-        reveal_type(model_cls.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.Order] | myapp.models.ManagerFromMyQuerySet[myapp.models.User]"
-        reveal_type(model_cls.objects.my_method())  # N: Revealed type is "myapp.models.MyQuerySet"
+        reveal_type(model_cls.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.Order, myapp.models.MyQuerySet[myapp.models.Order, myapp.models.Order]] | myapp.models.ManagerFromMyQuerySet[myapp.models.User, myapp.models.MyQuerySet[myapp.models.User, myapp.models.User]]"
+        reveal_type(model_cls.objects.my_method())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.Order, myapp.models.Order] | myapp.models.MyQuerySet[myapp.models.User, myapp.models.User]"
     installed_apps:
         - myapp
     files:
