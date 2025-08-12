@@ -27,7 +27,7 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Set up Python ${{ matrix.python-version }}
@@ -58,7 +58,7 @@ jobs:
         shard: [0, 1, 2, 3]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -86,7 +86,7 @@ jobs:
         python-version: ['3.12', '3.13']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -112,7 +112,7 @@ jobs:
         python-version: ['3.12']  # TODO: enable on other versions
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Set up Python ${{ matrix.python-version }}
@@ -148,7 +148,7 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13']
         django-version: ['5.0', '5.1', '5.2']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup system dependencies
         run: |
           sudo apt-get update
@@ -169,7 +169,7 @@ jobs:
   build-and-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-tags: true
       - uses: actions/setup-python@v5
