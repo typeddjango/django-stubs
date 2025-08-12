@@ -20,7 +20,7 @@ from django.template.base import Template
 from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
-from django.utils.functional import classproperty
+from django.utils.functional import _StrOrPromise, classproperty
 from typing_extensions import Self
 
 def to_list(value: Any) -> list[Any]: ...
@@ -78,8 +78,8 @@ class SimpleTestCase(unittest.TestCase):
     ) -> None: ...
     def assertURLEqual(
         self,
-        url1: str | Any,  # Any for reverse_lazy() support
-        url2: str | Any,
+        url1: _StrOrPromise,
+        url2: _StrOrPromise,
         msg_prefix: str = ...,
     ) -> None: ...
     def assertContains(
