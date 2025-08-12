@@ -762,6 +762,49 @@
                     generic_manager_from_generic_queryset = GenericManagerFromGenericQuerySet()
                     generic_manager_from_populated_queryset = GenericManagerFromPopulatedQuerySet()
 
+-   case: manager_with_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.my_untyped_manager) # N: Revealed type is "myapp.models.MyUntypedManager[myapp.models.MyModel, django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
+        reveal_type(MyModel.my_untyped_manager.all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.my_untyped_manager.get()) # N: Revealed type is "myapp.models.MyModel"
+
+        reveal_type(MyModel.my_typed_manager) # N: Revealed type is "myapp.models.MyTypedManager"
+        reveal_type(MyModel.my_typed_manager.all()) # N: Revealed type is "myapp.models.MyOtherQuerySet"
+        reveal_type(MyModel.my_typed_manager.get()) # N: Revealed type is "myapp.models.MyModel"
+
+        reveal_type(MyModel.my_typed_manager_confilicting_generic) # N: Revealed type is "myapp.models.MyOtherManagerConflictingGeneric"
+        reveal_type(MyModel.my_typed_manager_confilicting_generic.all()) # N: Revealed type is "myapp.models.MyQuerySet"
+        reveal_type(MyModel.my_typed_manager_confilicting_generic.get()) # N: Revealed type is "myapp.models.MyModel"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import Self
+
+                class MyQuerySet(models.QuerySet["MyModel"]): ...
+                class MyOtherQuerySet(models.QuerySet["MyModel"]): ...
+
+                class MyUntypedManager(models.Manager):
+                    def get_queryset(self) -> MyQuerySet: # E: Return type "MyQuerySet" of "get_queryset" incompatible with return type "_QS" in supertype "django.db.models.manager.BaseManager"  [override]
+                        return MyQuerySet(self.model, using=self._db)
+
+                class MyTypedManager(models.Manager["MyModel", MyOtherQuerySet]):
+                    pass
+
+                class MyOtherManagerConflictingGeneric(models.Manager["MyModel", MyQuerySet]):
+                    def get_queryset(self) -> MyOtherQuerySet: # E: Return type "MyOtherQuerySet" of "get_queryset" incompatible with return type "MyQuerySet" in supertype "django.db.models.manager.BaseManager"  [override]
+                        return MyOtherQuerySet(self.model, using=self._db)
+
+                class MyModel(models.Model):
+                    my_untyped_manager = MyUntypedManager()
+                    my_typed_manager = MyTypedManager()
+                    my_typed_manager_confilicting_generic = MyOtherManagerConflictingGeneric()
+
 # Regression test for #2304
 -   case: test_objects_managers_is_kept_with_specific_import_graph
     main: |

@@ -42,6 +42,7 @@ from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
     reparametrize_any_manager_hook,
+    reparametrize_any_queryset_hook,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -196,12 +197,13 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_customize_class_mro_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         sym = self.lookup_fully_qualified(fullname)
-        if (
-            sym is not None
-            and isinstance(sym.node, TypeInfo)
-            and sym.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-        ):
-            return reparametrize_any_manager_hook
+        if sym is not None and isinstance(sym.node, TypeInfo):
+            if sym.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+                return reparametrize_any_manager_hook
+            elif sym.node.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+                return reparametrize_any_queryset_hook
+            else:
+                return None
         else:
             return None
 
