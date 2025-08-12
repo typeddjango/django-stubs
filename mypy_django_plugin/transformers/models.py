@@ -29,6 +29,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
 from mypy.types import (
     AnyType,
+    CallableType,
     ExtraAttrs,
     Instance,
     ProperType,
@@ -207,6 +208,62 @@ class ModelClassInitializer:
 
         return queryset_info
 
+    def build_manager_instance(
+        self, manager_cls: type["Manager[Any]"], manager_info: TypeInfo, model_instance: MypyType
+    ) -> Instance:
+        """Builds an Instance of a Manager, filling in the Model and QuerySet type if possible."""
+        try:
+            queryset_info = self.get_queryset_info_from_manager(manager_cls, manager_info)
+            queryset_instance = helpers.fill_instance(queryset_info, [model_instance, model_instance])
+            return helpers.fill_instance(manager_info, [model_instance, queryset_instance])
+        except helpers.IncompleteDefnException:
+            return helpers.fill_instance(manager_info, [model_instance])
+
+    def get_queryset_info_from_manager(
+        self, manager_cls: type["Manager[Any]"], manager_info: TypeInfo | None = None
+    ) -> TypeInfo:
+        """
+        Extract the QuerySet TypeInfo from a manager class and type info.
+        This tries to be extra accommodating for loosely typed custom managers.
+        """
+        if manager_info is not None:
+            # 1. Use the queryset type param if provided
+            #    Ex:
+            #        class MyManager(models.Manager[MyModel, MyQuerySet]):
+            #            ...
+            for base in manager_info.bases:
+                if (
+                    base.type.fullname == fullnames.MANAGER_CLASS_FULLNAME
+                    and len(base.args) == 2
+                    and isinstance((queryset_type := get_proper_type(base.args[1])), Instance)
+                ):
+                    return queryset_type.type
+
+            # 2. Use the return type param of `get_queryset` if explicitly defined
+            #    Ex:
+            #        class MyManager(models.Manager[MyModel]):
+            #            def get_queryset(self) -> MyQuerySet:
+            #                ...
+            if (
+                (get_queryset_sym := manager_info.names.get("get_queryset"))
+                and (get_queryset_type := get_proper_type(get_queryset_sym.type)) is not None
+                and isinstance(get_queryset_type, CallableType)
+                and get_queryset_type.ret_type is not None
+                and (get_queryset_ret_type := get_proper_type(self.api.anal_type(get_queryset_type.ret_type)))
+                is not None
+                and isinstance(get_queryset_ret_type, Instance)
+            ):
+                return get_queryset_ret_type.type
+
+        # 3. Fallback to the `_queryset_class` of the manager that django always populate on class creation
+        #    Ex:
+        #        class MyManager(models.Manager):
+        #            _queryset_class = MyQuerySet
+        queryset_klass = manager_cls()._queryset_class
+        queryset_fullname = helpers.get_class_fullname(klass=queryset_klass)
+        queryset_info = self.lookup_typeinfo_or_incomplete_defn_error(queryset_fullname)
+        return queryset_info
+
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         raise NotImplementedError(f"Implement this in subclass {self.__class__.__name__}")
 
@@ -373,7 +430,7 @@ class AddManagers(ModelClassInitializer):
 
         assert manager_info is not None
         # Reparameterize dynamically created manager with model type
-        manager_type = helpers.fill_manager(manager_info, Instance(self.model_classdef.info, []))
+        manager_type = helpers.fill_instance(manager_info, [Instance(self.model_classdef.info, [])])
         self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
@@ -392,15 +449,19 @@ class AddManagers(ModelClassInitializer):
 
             if manager_info is None:
                 # We couldn't find a manager type, see if we should create one
-                manager_info = self.create_manager_from_from_queryset(manager_name)
+                manager_info = self.try_create_manager_from_from_queryset(manager_name)
 
             if manager_info is None:
                 incomplete_manager_defs.add(manager_name)
                 continue
 
             assert self.model_classdef.info.self_type is not None
-            manager_type = helpers.fill_manager(manager_info, self.model_classdef.info.self_type)
-            self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
+            manager_instance = self.build_manager_instance(
+                manager_cls=manager.__class__,
+                manager_info=manager_info,
+                model_instance=self.model_classdef.info.self_type,
+            )
+            self.add_new_node_to_model_class(manager_name, manager_instance, is_classvar=True)
 
         if incomplete_manager_defs:
             if not self.api.final_iteration:
@@ -416,7 +477,7 @@ class AddManagers(ModelClassInitializer):
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 if fallback_manager_info is not None:
                     assert self.model_classdef.info.self_type is not None
-                    manager_type = helpers.fill_manager(fallback_manager_info, self.model_classdef.info.self_type)
+                    manager_type = helpers.fill_instance(fallback_manager_info, [self.model_classdef.info.self_type])
                     self.add_new_node_to_model_class(manager_name, manager_type, is_classvar=True)
 
                 # Find expression for e.g. `objects = SomeManager()`
@@ -455,12 +516,14 @@ class AddManagers(ModelClassInitializer):
 
         return self.lookup_typeinfo(generated_manager_name)
 
-    def create_manager_from_from_queryset(self, name: str) -> TypeInfo | None:
+    def try_create_manager_from_from_queryset(self, name: str) -> TypeInfo | None:
         """
         Try to create a manager from a .from_queryset call:
 
             class MyModel(models.Model):
                 objects = MyManager.from_queryset(MyQuerySet)()
+
+        module level cases are resolved in `create_new_manager_class_from_from_queryset_method`
         """
 
         assign_statement = self.get_manager_expression(name)
@@ -477,6 +540,10 @@ class AddManagers(ModelClassInitializer):
 class AddDefaultManagerAttribute(ModelClassInitializer):
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         if "_default_manager" in self.model_classdef.info.names:
+            return None
+
+        if model_cls._meta.default_manager is None:
+            # Abstract django model
             return None
 
         default_manager_cls = model_cls._meta.default_manager.__class__
@@ -497,7 +564,11 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                     return None
             default_manager_info = generated_manager_info
 
-        default_manager = helpers.fill_manager(default_manager_info, Instance(self.model_classdef.info, []))
+        default_manager = self.build_manager_instance(
+            manager_cls=default_manager_cls,
+            manager_info=default_manager_info,
+            model_instance=Instance(self.model_classdef.info, []),
+        )
         self.add_new_node_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
@@ -522,6 +593,7 @@ class AddReverseLookups(ModelClassInitializer):
 
         to_model_cls = self.django_context.get_field_related_model_cls(relation)
         to_model_info = self.lookup_class_typeinfo_or_incomplete_defn_error(to_model_cls)
+        to_model_instance = Instance(to_model_info, [])
 
         reverse_lookup_declared = attname in self.model_classdef.info.names
         if isinstance(relation, OneToOneRel):
@@ -530,7 +602,7 @@ class AddReverseLookups(ModelClassInitializer):
                     attname,
                     Instance(
                         self.reverse_one_to_one_descriptor,
-                        [Instance(self.model_classdef.info, []), Instance(to_model_info, [])],
+                        [Instance(self.model_classdef.info, []), to_model_instance],
                     ),
                 )
             return
@@ -542,16 +614,20 @@ class AddReverseLookups(ModelClassInitializer):
                 through_model_info = self.lookup_typeinfo_or_incomplete_defn_error(through_fullname)
                 self.add_new_node_to_model_class(
                     attname,
-                    Instance(
-                        self.many_to_many_descriptor, [Instance(to_model_info, []), Instance(through_model_info, [])]
-                    ),
+                    Instance(self.many_to_many_descriptor, [to_model_instance, Instance(through_model_info, [])]),
                     is_classvar=True,
                 )
             return
-        elif not reverse_lookup_declared:
-            # ManyToOneRel
+        elif not reverse_lookup_declared:  # ManyToOneRel
+            # default_manager can only be None on abstract models, which cannot be used in ManyToOneRel.
+            assert to_model_cls._meta.default_manager is not None
+
+            queryset_info = self.get_queryset_info_from_manager(to_model_cls._meta.default_manager.__class__)
+            queryset_instance = Instance(queryset_info, [to_model_instance, to_model_instance])
             self.add_new_node_to_model_class(
-                attname, Instance(self.reverse_many_to_one_descriptor, [Instance(to_model_info, [])]), is_classvar=True
+                attname,
+                Instance(self.reverse_many_to_one_descriptor, [to_model_instance, queryset_instance]),
+                is_classvar=True,
             )
 
         related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
@@ -593,7 +669,7 @@ class AddReverseLookups(ModelClassInitializer):
 
         # Create a reverse manager subclassed from the default manager of the related
         # model and 'RelatedManager'
-        related_manager = Instance(related_manager_info, [Instance(to_model_info, [])])
+        related_manager = Instance(related_manager_info, [to_model_instance])
         # The reverse manager is based on the related model's manager, so it makes most sense to add the new
         # related manager in that module
         new_related_manager_info = helpers.add_new_class_for_module(

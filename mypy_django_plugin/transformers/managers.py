@@ -310,6 +310,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     """
     Insert a new manager class node for a: '<Name> = <Manager>.from_queryset(<QuerySet>)'.
     When the assignment expression lives at module level.
+
+    class level cases are resolved in `AddManagers.try_create_manager_from_from_queryset`
     """
     semanal_api = helpers.get_semanal_api(ctx)
 
@@ -494,6 +496,11 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
 
 
 def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
+    """
+    Insert a new manager class node for a: '<Manager> = <QuerySet>.as_manager()'.
+
+    Similar to `create_manager_info_from_from_queryset_call`
+    """
     semanal_api = helpers.get_semanal_api(ctx)
 
     def _defer() -> None:
@@ -573,7 +580,9 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         ctx.cls,
         "as_manager",
         args=[],
-        return_type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]),
+        return_type=Instance(
+            new_manager_info, [AnyType(TypeOfAny.from_omitted_generics), AnyType(TypeOfAny.from_omitted_generics)]
+        ),
         is_classmethod=True,
     )
 
