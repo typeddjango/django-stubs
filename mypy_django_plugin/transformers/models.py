@@ -814,6 +814,9 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     model_fullname=f"{self.model_classdef.info.module_name}.{through_model_name}",
                     m2m_args=args,
                 )
+                if through_model is not None:
+                    self.add_through_table_managers(through_model)
+
                 container = self.model_classdef.info.get_containing_type_info(m2m_field_name)
                 if (
                     through_model is not None
@@ -963,21 +966,26 @@ class ProcessManyToManyFields(ModelClassInitializer):
         # Add the foreign key's '_id' field: <other_model>_id or to_<model>_id
         other_pk = self.get_pk_instance(m2m_args.to.model.type)
         helpers.add_new_sym_for_info(through_model, name=f"{to_name}_id", sym_type=other_pk.copy_modified())
-        # Add a manager named 'objects'
-        helpers.add_new_sym_for_info(
-            through_model,
-            name="objects",
-            sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
-            is_classvar=True,
-        )
-        # Also add manager as '_default_manager' attribute
-        helpers.add_new_sym_for_info(
-            through_model,
-            name="_default_manager",
-            sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
-            is_classvar=True,
-        )
         return through_model
+
+    def add_through_table_managers(self, through_model: TypeInfo) -> None:
+        """The `self.manager_info` lookup might trigger a deferral pass so this has to be idempotent"""
+        # Add a manager named 'objects'
+        if through_model.names.get("objects") is None:
+            helpers.add_new_sym_for_info(
+                through_model,
+                name="objects",
+                sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
+                is_classvar=True,
+            )
+        # Also add manager as '_default_manager' attribute
+        if through_model.names.get("_default_manager") is None:
+            helpers.add_new_sym_for_info(
+                through_model,
+                name="_default_manager",
+                sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
+                is_classvar=True,
+            )
 
     def resolve_many_to_many_arguments(self, call: CallExpr, /, context: Context) -> M2MArguments | None:
         """
