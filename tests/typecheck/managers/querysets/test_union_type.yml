@@ -18,9 +18,10 @@
             content: |
                 from __future__ import annotations
                 from django.db import models
+                from typing_extensions import Self
 
                 class MyQuerySet(models.QuerySet):
-                    def my_method(self) -> MyQuerySet:
+                    def my_method(self) -> Self:
                       pass
 
                 UserManager = models.Manager.from_queryset(MyQuerySet)
