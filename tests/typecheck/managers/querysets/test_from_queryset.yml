@@ -998,3 +998,63 @@
                     objects_my_manager = MyManager()
                     objects_from_queryset = models.Manager.from_queryset(MyQuerySet)()
 
+# regression test for #1067
+-   case: inherited_custom_manager_method
+    main: |
+      from myapp.models import User
+      User.objects.create_user("foo@mail.com", "password", is_staff=True)
+      User.objects.create_user("foo@mail.com", "password", is_staff=12) # E: Argument "is_staff" to "create_user" of "UserProfileManager" has incompatible type "int"; expected "bool"  [arg-type]
+
+    installed_apps:
+      - django.contrib.auth
+      - myapp
+    files:
+      - path: myapp/__init__.py
+      - path: myapp/django_tenant.py
+        content: |
+          from django.contrib.auth.models import AbstractBaseUser
+          from django.contrib.auth.base_user import BaseUserManager
+
+          class UserProfileManager(BaseUserManager):
+              def create_user(
+                      self,
+                      email: str | None = None,
+                      password: str | None = None,
+                      is_staff: bool = False,
+                  ) -> None:...
+
+          class PermissionsMixinFacade: ...
+
+          class UserProfile(AbstractBaseUser, PermissionsMixinFacade):
+              objects = UserProfileManager()
+
+      - path: myapp/models.py
+        content: |
+          from .django_tenant import UserProfile
+
+          class User(UserProfile):
+              """This User model replaces default user model."""
+
+# regression test for #1067
+# See https://github.com/typeddjango/django-stubs/issues/1067#issuecomment-1216350505
+-   case: custom_queryset_method_available_on_manager
+    main: |
+        from myapp.models import Attachment
+        Attachment.objects.load(1)
+        Attachment.objects.load("12") # E: Argument 1 to "load" of "AttachmentQS" has incompatible type "str"; expected "int"  [arg-type]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class AttachmentQS(models.QuerySet['Attachment']):
+                     def load(self, pk: int) -> 'Attachment': ...
+
+                AttachmentManager = models.Manager.from_queryset(AttachmentQS)
+
+                class Attachment(models.Model):
+                     # ...
+                     objects = AttachmentManager()
