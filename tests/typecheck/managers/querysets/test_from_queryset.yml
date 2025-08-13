@@ -968,3 +968,33 @@
                     field = models.CharField()
                     b = models.ForeignKey(B, on_delete=models.CASCADE)
                     objects = Manager()
+
+# regression test for #2602
+-   case: custom_manager_and_from_queryset_for_untyped_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects_my_manager.all())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects_my_manager.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects_my_manager.all().get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects_from_queryset.all())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects_from_queryset.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects_from_queryset.all().get())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyQuerySet(models.QuerySet):
+                    pass
+
+                class MyManager(models.Manager["MyModel", MyQuerySet["MyModel"]]):
+                    def get_queryset(self) -> MyQuerySet["MyModel"]:
+                        return MyQuerySet(self.model, using=self._db)
+
+                class MyModel(models.Model):
+                    objects_my_manager = MyManager()
+                    objects_from_queryset = models.Manager.from_queryset(MyQuerySet)()
+
