@@ -475,3 +475,41 @@
                 from django.contrib.auth.models import AbstractUser
 
                 class Account(AbstractUser): pass
+
+# regression test for #1023
+-   case: queryset_as_manager_from_untyped_custom_queryset
+    main: |
+        from myapp.models import AbstractNotification, Notification
+        reveal_type(AbstractNotification.objects) # N: Revealed type is "myapp.models.ManagerFromNotificationQuerySet[myapp.models.AbstractNotification, myapp.models.NotificationQuerySet[myapp.models.AbstractNotification, myapp.models.AbstractNotification]]"
+        reveal_type(Notification.objects) # N: Revealed type is "myapp.models.ManagerFromNotificationQuerySet[myapp.models.Notification]"
+        reveal_type(Notification.objects.all()) # N: Revealed type is "myapp.models.NotificationQuerySet[myapp.models.Notification, myapp.models.Notification]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import Self
+
+                class NotificationQuerySet(models.query.QuerySet):
+                    ''' Notification QuerySet '''
+                    def unsent(self) -> Self:
+                        return self.filter(emailed=False)
+
+                    def sent(self) -> Self:
+                        return self.filter(emailed=True)
+
+                class AbstractNotification(models.Model):
+                    actor_object_id = models.CharField('actor object id', max_length=255)
+
+                    objects = NotificationQuerySet.as_manager()
+
+                    class Meta:
+                        abstract = True
+                        verbose_name = 'Notification'
+                        verbose_name_plural = 'Notifications'
+
+                class Notification(AbstractNotification):
+                    class Meta(AbstractNotification.Meta):
+                        abstract = False

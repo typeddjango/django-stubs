@@ -880,3 +880,40 @@
                 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
                 class UserProfile(AbstractBaseUser, PermissionsMixin):
                     pass
+
+# Regression test for #1023
+-   case: inherited_default_objects_manager
+    main: |
+        from myapp.models import Base, Foo, Bar, UUIDPrimaryKeyAbstractModel, FooModel
+        reveal_type(Base.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Base, django.db.models.query.QuerySet[myapp.models.Base, myapp.models.Base]]"
+        reveal_type(FooModel.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.FooModel, django.db.models.query.QuerySet[myapp.models.FooModel, myapp.models.FooModel]]"
+        reveal_type(Foo.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Foo, django.db.models.query.QuerySet[myapp.models.Foo, myapp.models.Foo]]"
+        reveal_type(Bar.objects) # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Bar, django.db.models.query.QuerySet[myapp.models.Bar, myapp.models.Bar]]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                import uuid
+
+                class Base(models.Model):
+                    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+                class FooModel(Base):
+                    foo = models.CharField(max_length=100)
+                    bar = models.BooleanField()
+
+                # From https://github.com/typeddjango/django-stubs/issues/1023#issuecomment-1174243283
+                class UUIDPrimaryKeyAbstractModel(models.Model):
+                    id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
+
+                    class Meta:
+                        abstract = True
+
+                class Foo(UUIDPrimaryKeyAbstractModel):
+                    pass
+
+                class Bar(UUIDPrimaryKeyAbstractModel):
+                    foo = models.ForeignKey(Foo, on_delete=models.CASCADE)
