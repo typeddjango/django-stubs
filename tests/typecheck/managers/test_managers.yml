@@ -917,3 +917,37 @@
 
                 class Bar(UUIDPrimaryKeyAbstractModel):
                     foo = models.ForeignKey(Foo, on_delete=models.CASCADE)
+
+# regression test for #728
+-   case: typed_manager_from_untyped_custom_queryset
+    main: |
+        from myapp.models import Transaction
+        reveal_type(Transaction.objects) # N: Revealed type is "myapp.models.TransactionManager[myapp.models.Transaction, myapp.models.TransactionQuerySet[myapp.models.Transaction, myapp.models.Transaction]]"
+        reveal_type(Transaction.objects.select_related()) # N: Revealed type is "myapp.models.TransactionQuerySet[myapp.models.Transaction, myapp.models.Transaction]"
+        reveal_type(Transaction.objects.all().get()) # N: Revealed type is "myapp.models.Transaction"
+        reveal_type(Transaction.objects.get()) # N: Revealed type is "myapp.models.Transaction"
+
+        Transaction.objects.with_status()
+        Transaction.objects.select_related().with_status()
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import Self
+
+                class TransactionQuerySet(models.QuerySet):
+                    def with_status(self) -> Self:
+                        return self.filter(status=...)
+
+                class TransactionManager(models.Manager):
+                    def get_queryset(self) -> TransactionQuerySet: # E: Return type "TransactionQuerySet[Any, Any]" of "get_queryset" incompatible with return type "_QS" in supertype "django.db.models.manager.BaseManager"  [override]
+                        return TransactionQuerySet(self.model, using=self._db)
+                    def with_status(self) -> TransactionQuerySet:
+                        return self.get_queryset().with_status()
+
+                class Transaction(models.Model):
+                    objects = TransactionManager()
