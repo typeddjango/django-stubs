@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
+from typing import Any, ClassVar, Generic, Protocol, TypeVar, overload, type_check_only
 from uuid import UUID
 
 from django.core.files import File
@@ -10,25 +10,46 @@ from django.core.validators import _ValidatorCallable
 from django.db.models.fields import _ErrorMessagesDict, _ErrorMessagesMapping
 from django.forms.boundfield import BoundField
 from django.forms.forms import BaseForm
-from django.forms.widgets import Widget
+from django.forms.widgets import (
+    CheckboxInput,
+    ClearableFileInput,
+    DateInput,
+    DateTimeInput,
+    EmailInput,
+    NullBooleanSelect,
+    NumberInput,
+    Select,
+    SelectMultiple,
+    SplitDateTimeWidget,
+    Textarea,
+    TextInput,
+    TimeInput,
+    URLInput,
+    Widget,
+)
 from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
 
-# Problem: attribute `widget` is always of type `Widget` after field instantiation.
-# However, on class level it can be set to `Type[Widget]` too.
-# If we annotate it as `Union[Widget, Type[Widget]]`, every code that uses field
-# instances will not typecheck.
-# If we annotate it as `Widget`, any widget subclasses that do e.g.
-# `widget = Select` will not typecheck.
-# `Any` gives too much freedom, but does not create false positives.
-_ClassLevelWidgetT: TypeAlias = Any
+_ClassWidget = TypeVar("_ClassWidget", bound=Widget)
+_InstanceWidget = TypeVar("_InstanceWidget", bound=Widget, default=_ClassWidget)
+
+@type_check_only
+class _WidgetTypeOrInstance(Generic[_ClassWidget, _InstanceWidget]):
+    @overload
+    def __get__(self, instance: None, owner: type[Field]) -> type[_ClassWidget] | _ClassWidget: ...
+    @overload
+    def __get__(self, instance: Field, owner: type[Field]) -> _InstanceWidget: ...
+    @overload
+    def __set__(self, instance: None, value: type[_ClassWidget] | _ClassWidget) -> None: ...
+    @overload
+    def __set__(self, instance: Field, value: _InstanceWidget) -> None: ...
 
 class Field:
     initial: Any
     label: _StrOrPromise | None
     required: bool
-    widget: _ClassLevelWidgetT
+    widget: _WidgetTypeOrInstance[TextInput]
     hidden_widget: type[Widget]
     default_validators: list[_ValidatorCallable]
     default_error_messages: ClassVar[_ErrorMessagesDict]
@@ -96,6 +117,7 @@ class CharField(Field):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class IntegerField(Field):
+    widget: _WidgetTypeOrInstance[NumberInput]  # type: ignore[assignment]
     max_value: int | None
     min_value: int | None
     step_size: int | None
@@ -193,10 +215,12 @@ class BaseTemporalField(Field):
     def strptime(self, value: str, format: str) -> Any: ...
 
 class DateField(BaseTemporalField):
+    widget: _WidgetTypeOrInstance[DateInput]  # type: ignore[assignment]
     def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.date | None: ...
     def strptime(self, value: str, format: str) -> datetime.date: ...
 
 class TimeField(BaseTemporalField):
+    widget: _WidgetTypeOrInstance[TimeInput]  # type: ignore[assignment]
     def to_python(self, value: None | str | datetime.time) -> datetime.time | None: ...
     def strptime(self, value: str, format: str) -> datetime.time: ...
 
@@ -204,6 +228,7 @@ class DateTimeFormatsIterator:
     def __iter__(self) -> Iterator[str]: ...
 
 class DateTimeField(BaseTemporalField):
+    widget: _WidgetTypeOrInstance[DateTimeInput]  # type: ignore[assignment]
     def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.datetime | None: ...
     def strptime(self, value: str, format: str) -> datetime.datetime: ...
 
@@ -235,6 +260,7 @@ class RegexField(CharField):
     ) -> None: ...
 
 class EmailField(CharField):
+    widget: _WidgetTypeOrInstance[EmailInput]  # type: ignore[assignment]
     def __init__(
         self,
         *,
@@ -256,6 +282,7 @@ class EmailField(CharField):
     ) -> None: ...
 
 class FileField(Field):
+    widget: _WidgetTypeOrInstance[ClearableFileInput]  # type: ignore[assignment]
     allow_empty_file: bool
     max_length: int | None
     def __init__(
@@ -285,6 +312,7 @@ class ImageField(FileField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class URLField(CharField):
+    widget: _WidgetTypeOrInstance[URLInput]  # type: ignore[assignment]
     def __init__(
         self,
         *,
@@ -308,20 +336,22 @@ class URLField(CharField):
     def to_python(self, value: Any | None) -> str | None: ...
 
 class BooleanField(Field):
+    widget: _WidgetTypeOrInstance[CheckboxInput]  # type: ignore[assignment]
     def to_python(self, value: Any | None) -> bool: ...
     def validate(self, value: Any) -> None: ...
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class NullBooleanField(BooleanField):
+    widget: _WidgetTypeOrInstance[NullBooleanSelect]  # type: ignore[assignment]
     def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore[override]
     def validate(self, value: Any) -> None: ...
 
 class ChoiceField(Field):
+    widget: _WidgetTypeOrInstance[Select]  # type: ignore[assignment]
     choices: _PropertyDescriptor[
         _ChoicesInput | _ChoicesCallable | CallableChoiceIterator,
         _ChoicesInput | CallableChoiceIterator,
     ]
-    widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
@@ -372,6 +402,7 @@ class TypedChoiceField(ChoiceField):
     def clean(self, value: Any) -> Any: ...
 
 class MultipleChoiceField(ChoiceField):
+    widget: _WidgetTypeOrInstance[SelectMultiple]  # type: ignore[assignment]
     def to_python(self, value: Any | None) -> list[str]: ...
     def validate(self, value: Any) -> None: ...
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...
@@ -475,6 +506,7 @@ class FilePathField(ChoiceField):
     ) -> None: ...
 
 class SplitDateTimeField(MultiValueField):
+    widget: _WidgetTypeOrInstance[SplitDateTimeWidget]  # type: ignore[assignment]
     def __init__(
         self,
         *,
@@ -549,7 +581,7 @@ class JSONString(str): ...
 
 class JSONField(CharField):
     default_error_messages: ClassVar[_ErrorMessagesDict]
-    widget: _ClassLevelWidgetT
+    widget: _WidgetTypeOrInstance[Textarea]  # type: ignore[assignment]
     encoder: Any
     decoder: Any
     def __init__(self, encoder: Any | None = None, decoder: Any | None = None, **kwargs: Any) -> None: ...
