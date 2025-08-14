@@ -1607,3 +1607,82 @@
 
         p: Person
         reveal_type(p.friends)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[main.Person, main.Person_friends]"
+
+# regression test for #1918
+-   case: related_manager_with_typed_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.all()) # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(list(MyModel.objects.all())[0]) # N: Revealed type is "myapp.models.MyModel"
+        for x in MyModel.objects.all():
+            reveal_type(x) # N: Revealed type is "myapp.models.MyModel"
+            reveal_type(x.relatedobject_set.all()) # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.RelatedObject]"
+            reveal_type(list(x.relatedobject_set.all())[0]) # N: Revealed type is "myapp.models.RelatedObject"
+            for y in x.relatedobject_set.all():
+                reveal_type(y) # N: Revealed type is "myapp.models.RelatedObject"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from typing import List, Dict
+                from typing_extensions import Self
+                from typing import TypeVar, Generic
+
+                T = TypeVar("T", bound=models.Model)
+
+                class MyQuerySet(models.QuerySet[T], Generic[T]): ...
+
+                class MyModel(models.Model):
+                    objects = MyQuerySet.as_manager()
+
+                class RelatedObject(models.Model):
+                    objects = MyQuerySet.as_manager()
+                    parent = models.ForeignKey(MyModel, models.PROTECT)
+
+# regression test for #1918
+-   case: related_manager_subclassing_with_typed_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.all()) # N: Revealed type is "myapp.models.BaseQuerySet[myapp.models.MyModel]"
+        reveal_type(list(MyModel.objects.all())[0]) # N: Revealed type is "myapp.models.MyModel"
+        for x in MyModel.objects.all():
+            reveal_type(x) # N: Revealed type is "myapp.models.MyModel"
+            reveal_type(x.relatedobject_set.all()) # N: Revealed type is "myapp.models.BaseQuerySet[myapp.models.RelatedObject]"
+            reveal_type(list(x.relatedobject_set.all())[0]) # N: Revealed type is "myapp.models.RelatedObject"
+            for y in x.relatedobject_set.all():
+                reveal_type(y) # N: Revealed type is "myapp.models.RelatedObject"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from typing import List, Dict
+                from typing_extensions import Self
+                from typing import TypeVar, Generic
+
+                T = TypeVar("T", bound=models.Model)
+
+                class BaseQuerySet(models.QuerySet[T], Generic[T]): ...
+
+                class BaseModel(models.Model):
+                    objects = BaseQuerySet.as_manager()
+                    class Meta:
+                        abstract = True
+
+                class MyModel(BaseModel):
+                    pass
+
+                class RelatedObjectQuerySet(BaseQuerySet["RelatedObject"]):
+                    pass
+
+                class RelatedObject(BaseModel):
+                    parent = models.ForeignKey(MyModel, models.PROTECT)
