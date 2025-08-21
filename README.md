@@ -237,17 +237,17 @@ class MyManager(models.Manager["MyModel"]):
     ...
 ```
 
-If your manager also use a custom queryset, you might face a similar error
+If your manager also declare a custom queryset via `get_queryset`, you might face a similar error
 
 > Return type "MyQuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QS" in supertype "django.db.models.manager.BaseManager"
 
-To fix this issue, you should also declare your custom queryset as the second type variable:
+To fix this issue, you have to properly pass custom `QuerySet` and `Manager` generic params:
 ```python
-class MyQuerySet(models.QuerySet):
+class MyQuerySet(models.QuerySet["MyModel"]):
   ...
 
-class MyStaffManager(models.Manager["MyModel", MyQuerySet["MyModel"]]):
-     def get_queryset(self) -> MyQuerySet["MyModel"]:
+class MyStaffManager(models.Manager["MyModel", MyQuerySet]):
+     def get_queryset(self) -> MyQuerySet:
          return MyQuerySet(self.model, using=self._db)
 ```
 
