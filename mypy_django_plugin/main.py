@@ -160,6 +160,9 @@ class NewSemanalDjangoPlugin(Plugin):
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
+            "prefetch_related": partial(
+                querysets.extract_prefetch_related_annotations, django_context=self.django_context
+            ),
         }
 
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
