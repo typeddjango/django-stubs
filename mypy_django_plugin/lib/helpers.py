@@ -202,7 +202,12 @@ def get_min_argument_count(ctx: MethodContext | FunctionContext) -> int:
 def get_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str) -> Expression | None:
     """
     Return the expression for the specific argument.
-    This helper should only be used with non-star arguments.
+    This helper supports named and positional arguments and should only be used with non-star arguments.
+
+    Ex:
+        Given `def my_func(a: int, b: str), `get_call_argument_by_name(ctx, "b")` works for`
+        - `my_func(1, b="x")`
+        - `my_func(1, "x")`
     """
     # try and pull the named argument from the caller first
     for kinds, argnames, args in zip(ctx.arg_kinds, ctx.arg_names, ctx.args, strict=False):
@@ -212,6 +217,7 @@ def get_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str) -
 
     if name not in ctx.callee_arg_names:
         return None
+
     idx = ctx.callee_arg_names.index(name)
     args = ctx.args[idx]
     if len(args) != 1:
