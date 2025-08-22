@@ -32,16 +32,13 @@ def fill_model_args_for_many_to_many_field(
     django_context: DjangoContext,
 ) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
-    if (
-        not ctx.args
-        or not ctx.args[0]
-        or not isinstance(default_return_type, Instance)
-        or len(default_return_type.args) < 2
+    if not (
+        ctx.args
+        and ctx.args[0]
+        and isinstance(default_return_type, Instance)
+        and len(default_return_type.args) >= 2
+        and (args := get_m2m_arguments(ctx=ctx, model_info=model_info, django_context=django_context))
     ):
-        return ctx.default_return_type
-
-    args = get_m2m_arguments(ctx=ctx, model_info=model_info, django_context=django_context)
-    if args is None:
         return ctx.default_return_type
 
     default_to_arg = get_proper_type(default_return_type.args[0])
