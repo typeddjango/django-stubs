@@ -310,6 +310,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     """
     Insert a new manager class node for a: '<Name> = <Manager>.from_queryset(<QuerySet>)'.
     When the assignment expression lives at module level.
+
+    class level cases are resolved in `AddManagers.try_create_manager_from_from_queryset`
     """
     semanal_api = helpers.get_semanal_api(ctx)
 
@@ -494,6 +496,11 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
 
 
 def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
+    """
+    Insert a new manager class node for a: '<Manager> = <QuerySet>.as_manager()'.
+
+    Similar to `create_manager_info_from_from_queryset_call`
+    """
     semanal_api = helpers.get_semanal_api(ctx)
 
     def _defer() -> None:
@@ -573,9 +580,53 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         ctx.cls,
         "as_manager",
         args=[],
-        return_type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]),
+        return_type=Instance(
+            new_manager_info, [AnyType(TypeOfAny.from_omitted_generics), AnyType(TypeOfAny.from_omitted_generics)]
+        ),
         is_classmethod=True,
     )
+
+
+def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) -> None:
+    """
+    Add implicit generics to classes that are defined without generic.
+
+    Note that this does not happen if mypy is run with disallow_any_generics = True,
+    as not specifying the generic type is then considered an error.
+    """
+    class_info = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if class_info is None or class_info.node is None:
+        return
+    assert isinstance(class_info.node, TypeInfo)
+
+    if class_info.node.type_vars:
+        # We've already been here or the class is already declared with generic types
+        return
+
+    parent_class = next(
+        (base for base in class_info.node.bases if base.type.has_base(base_class_fullname)),
+        None,
+    )
+    if parent_class is None or len(parent_class.args) < 1:
+        return
+
+    model_param = get_proper_type(parent_class.args[0])
+    if not isinstance(model_param, AnyType) or model_param.type_of_any is not TypeOfAny.from_omitted_generics:
+        return
+
+    type_vars = tuple(parent_class.type.defn.type_vars)
+
+    # If we end up with placeholders we need to defer so the placeholders are
+    # resolved in a future iteration
+    if any(has_placeholder(type_var) for type_var in type_vars):
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+        else:
+            return
+
+    parent_class.args = type_vars
+    class_info.node.defn.type_vars = list(type_vars)
+    class_info.node.add_type_vars()
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
@@ -588,43 +639,24 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
 
     is interpreted as:
 
-        _T = TypeVar('_T', covariant=True)
-        class MyManager(models.Manager[_T]): ...
-
-    Note that this does not happen if mypy is run with disallow_any_generics = True,
-    as not specifying the generic type is then considered an error.
+        _T = TypeVar("_T", bound=Model, covariant=True)
+        _QS = TypeVar("_QS", bound=QuerySet[Any], covariant=True, default=QuerySet[_T])
+        class MyManager(models.Manager[_T, _QS]): ...
     """
+    reparametrize_generic_class(ctx, fullnames.BASE_MANAGER_CLASS_FULLNAME)
 
-    manager = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
-    if manager is None or manager.node is None:
-        return
-    assert isinstance(manager.node, TypeInfo)
 
-    if manager.node.type_vars:
-        # We've already been here
-        return
+def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
+    """
+    Add implicit generics to queryset classes that are defined without generic.
 
-    parent_manager = next(
-        (base for base in manager.node.bases if base.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)),
-        None,
-    )
-    if parent_manager is None or len(parent_manager.args) != 1:
-        return
+    Eg.
 
-    model_param = get_proper_type(parent_manager.args[0])
-    if not isinstance(model_param, AnyType) or model_param.type_of_any is not TypeOfAny.from_omitted_generics:
-        return
+        class MyQuerySet(models.QuerySet): ...
 
-    type_vars = tuple(parent_manager.type.defn.type_vars)
+    is interpreted as:
 
-    # If we end up with placeholders we need to defer so the placeholders are
-    # resolved in a future iteration
-    if any(has_placeholder(type_var) for type_var in type_vars):
-        if not ctx.api.final_iteration:
-            ctx.api.defer()
-        else:
-            return
-
-    parent_manager.args = type_vars
-    manager.node.defn.type_vars = list(type_vars)
-    manager.node.add_type_vars()
+        _T = TypeVar("_T", bound=Model, covariant=True)
+        class MyQuerySet(models.QuerySet[_T]): ...
+    """
+    reparametrize_generic_class(ctx, fullnames.QUERYSET_CLASS_FULLNAME)

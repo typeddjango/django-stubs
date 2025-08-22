@@ -28,9 +28,9 @@ class ModelState:
 
 class ModelBase(type):
     @property
-    def _default_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
+    def _default_manager(cls: type[_Self]) -> Manager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
     @property
-    def _base_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
+    def _base_manager(cls: type[_Self]) -> Manager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
 
 class Model(metaclass=ModelBase):
     # Note: these two metaclass generated attributes don't really exist on the 'Model'

@@ -136,7 +136,7 @@
                 queryset=Article.objects.none(),
             )
             best_category = ArticleChoiceField(
-                queryset=Category.objects.none(), # E: Argument "queryset" to "ArticleChoiceField" has incompatible type "QuerySet[Category, Category]"; expected "Manager[Article] | QuerySet[Article, Article] | None"  [arg-type]
+                queryset=Category.objects.none(), # E: Argument "queryset" to "ArticleChoiceField" has incompatible type "QuerySet[Category, Category]"; expected "Manager[Article, QuerySet[Article, Article]] | QuerySet[Article, Article] | None"  [arg-type]
             )
     installed_apps:
         - myapp

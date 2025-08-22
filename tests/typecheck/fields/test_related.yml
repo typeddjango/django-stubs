@@ -4,7 +4,7 @@
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
         publisher = Publisher()
-        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
     installed_apps:
         - myapp
     files:
@@ -70,8 +70,8 @@
         reveal_type(book.publisher2)  # N: Revealed type is "myapp.models.Publisher"
 
         publisher = Publisher()
-        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
-        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
+        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
     installed_apps:
         - myapp
     files:
@@ -160,9 +160,9 @@
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
-                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
-                        reveal_type(self.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Member]"
-                        reveal_type(self.sheets)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Sheet]"
+                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View, django.db.models.query.QuerySet[myapp.models.View, myapp.models.View]]"
+                        reveal_type(self.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Member, django.db.models.query.QuerySet[myapp.models.Member, myapp.models.Member]]"
+                        reveal_type(self.sheets)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Sheet, django.db.models.query.QuerySet[myapp.models.Sheet, myapp.models.Sheet]]"
                         reveal_type(self.profile)  # N: Revealed type is "myapp.models.Profile"
                 class View(models.Model):
                     app = models.ForeignKey(to=App, related_name='views', on_delete=models.CASCADE)
@@ -176,7 +176,7 @@
 -   case: test_circular_dependency_in_imports_with_string_based
     main: |
         from myapp.models import View
-        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
+        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View, django.db.models.query.QuerySet[myapp.models.View, myapp.models.View]]"
         View().app.unknown  # E: "App" has no attribute "unknown"  [attr-defined]
     installed_apps:
         - myapp
@@ -195,13 +195,13 @@
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
-                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
+                        reveal_type(self.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View, django.db.models.query.QuerySet[myapp.models.View, myapp.models.View]]"
 
 -   case: models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model
     main: |
         from myapp.models import App
-        reveal_type(App().views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
-        reveal_type(App().views2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View2]"
+        reveal_type(App().views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View, django.db.models.query.QuerySet[myapp.models.View, myapp.models.View]]"
+        reveal_type(App().views2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View2, django.db.models.query.QuerySet[myapp.models.View2, myapp.models.View2]]"
     installed_apps:
         - myapp
     files:
@@ -219,7 +219,7 @@
 -   case: models_imported_inside_init_file_foreign_key
     main: |
         from myapp2.models import View
-        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp2.models.View]"
+        reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp2.models.View, django.db.models.query.QuerySet[myapp2.models.View, myapp2.models.View]]"
     installed_apps:
         - myapp
         - myapp2
@@ -408,7 +408,7 @@
 -   case: if_no_related_name_is_passed_create_default_related_managers
     main: |
         from myapp.models import Publisher
-        reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
     installed_apps:
         - myapp
     files:
@@ -510,7 +510,7 @@
 
         publisher = Publisher()
         reveal_type(publisher.books)
-        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
+        reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
     out: |
         main:6: error: "Publisher" has no attribute "books"; maybe "books2"?  [attr-defined]
         main:6: note: Revealed type is "Any"
@@ -600,8 +600,8 @@
 -   case: related_manager_name_defined_by_pattern
     main: |
         from myapp.models import Publisher
-        reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
-        reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
+        reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
+        reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article, django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]]"
     installed_apps:
         - myapp
     files:
@@ -656,8 +656,8 @@
         reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
 
         user = MyUser()
-        reveal_type(user.book_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
-        reveal_type(user.article_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
+        reveal_type(user.book_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book, django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]]"
+        reveal_type(user.article_set) # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article, django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]]"
     installed_apps:
         - myapp
     files:
@@ -688,9 +688,9 @@
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
         reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: myapp.models.Book | builtins.int, bulk: builtins.bool =)"
         reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: myapp.models.Article | builtins.int, bulk: builtins.bool =)"
-        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
+        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book, myapp.models.Book]"
         reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
-        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet"
+        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article, myapp.models.Article]"
         reveal_type(user.article_set.get())  # N: Revealed type is "myapp.models.Article"
         reveal_type(user.book_set.queryset_method())  # N: Revealed type is "builtins.int"
         reveal_type(user.article_set.queryset_method())  # N: Revealed type is "builtins.int"
@@ -742,7 +742,7 @@
                 Transaction().test()
 
 
--   case: foreign_key_relationship_for_models_with_custom_manager_unsolvable
+-   case: foreign_key_relationship_for_models_with_generated_custom_manager
     main: |
         from myapp.models import Transaction
     installed_apps:
@@ -771,7 +771,7 @@
                 class TransactionLog(models.Model):
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
-        myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
+        myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog, django.db.models.query.QuerySet[myapp.models.TransactionLog, myapp.models.TransactionLog]]"
         myapp/models:15: note: Revealed type is "myapp.models.ManagerFromTransactionQuerySet[myapp.models.Transaction]"
         myapp/models:16: note: Revealed type is "None"
 
@@ -1088,7 +1088,7 @@
 -   case: test_explicit_reverse_many_to_one_descriptor
     main: |
         from myapp.models import Other
-        reveal_type(Other.explicit_descriptor)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[myapp.models.MyModel]"
+        reveal_type(Other.explicit_descriptor)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[myapp.models.MyModel, django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(Other().explicit_descriptor)  # N: Revealed type is "myapp.models.MyModel_RelatedManager"
         reveal_type(Other().explicit_descriptor.custom_method())  # N: Revealed type is "builtins.int"
     installed_apps:
@@ -1426,8 +1426,8 @@
         from other.models import Other
         reveal_type(MyModel.m2m_1.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_m2m_1]"
         reveal_type(Other.auto_through.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_m2m_1]"
-        reveal_type(MyModel.m2m_2.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Through]"
-        reveal_type(Other.custom_through.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Through]"
+        reveal_type(MyModel.m2m_2.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Through, django.db.models.query.QuerySet[myapp.models.Through, myapp.models.Through]]"
+        reveal_type(Other.custom_through.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.Through, django.db.models.query.QuerySet[myapp.models.Through, myapp.models.Through]]"
     installed_apps:
         -   other
         -   myapp
@@ -1607,3 +1607,82 @@
 
         p: Person
         reveal_type(p.friends)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[main.Person, main.Person_friends]"
+
+# regression test for #1918
+-   case: related_manager_with_typed_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.all()) # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
+        reveal_type(list(MyModel.objects.all())[0]) # N: Revealed type is "myapp.models.MyModel"
+        for x in MyModel.objects.all():
+            reveal_type(x) # N: Revealed type is "myapp.models.MyModel"
+            reveal_type(x.relatedobject_set.all()) # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.RelatedObject]"
+            reveal_type(list(x.relatedobject_set.all())[0]) # N: Revealed type is "myapp.models.RelatedObject"
+            for y in x.relatedobject_set.all():
+                reveal_type(y) # N: Revealed type is "myapp.models.RelatedObject"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from typing import List, Dict
+                from typing_extensions import Self
+                from typing import TypeVar, Generic
+
+                T = TypeVar("T", bound=models.Model)
+
+                class MyQuerySet(models.QuerySet[T], Generic[T]): ...
+
+                class MyModel(models.Model):
+                    objects = MyQuerySet.as_manager()
+
+                class RelatedObject(models.Model):
+                    objects = MyQuerySet.as_manager()
+                    parent = models.ForeignKey(MyModel, models.PROTECT)
+
+# regression test for #1918
+-   case: related_manager_subclassing_with_typed_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.all()) # N: Revealed type is "myapp.models.BaseQuerySet[myapp.models.MyModel]"
+        reveal_type(list(MyModel.objects.all())[0]) # N: Revealed type is "myapp.models.MyModel"
+        for x in MyModel.objects.all():
+            reveal_type(x) # N: Revealed type is "myapp.models.MyModel"
+            reveal_type(x.relatedobject_set.all()) # N: Revealed type is "myapp.models.BaseQuerySet[myapp.models.RelatedObject]"
+            reveal_type(list(x.relatedobject_set.all())[0]) # N: Revealed type is "myapp.models.RelatedObject"
+            for y in x.relatedobject_set.all():
+                reveal_type(y) # N: Revealed type is "myapp.models.RelatedObject"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+                from typing import List, Dict
+                from typing_extensions import Self
+                from typing import TypeVar, Generic
+
+                T = TypeVar("T", bound=models.Model)
+
+                class BaseQuerySet(models.QuerySet[T], Generic[T]): ...
+
+                class BaseModel(models.Model):
+                    objects = BaseQuerySet.as_manager()
+                    class Meta:
+                        abstract = True
+
+                class MyModel(BaseModel):
+                    pass
+
+                class RelatedObjectQuerySet(BaseQuerySet["RelatedObject"]):
+                    pass
+
+                class RelatedObject(BaseModel):
+                    parent = models.ForeignKey(MyModel, models.PROTECT)

@@ -39,7 +39,7 @@
 -   case: declares_manager_type_like_django
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel, myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -80,9 +80,9 @@
 -   case: model_gets_generated_manager_as_default_manager
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -102,8 +102,8 @@
     main: |
         from myapp.models import MyModel, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -185,8 +185,8 @@
 -   case: handles_call_outside_of_model_class_definition
     main: |
         from myapp.models import MyModel, MyModelManager
-        reveal_type(MyModelManager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Any]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModelManager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Any, Any]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet]"
         reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
     installed_apps:
         - myapp
@@ -206,8 +206,8 @@
 -   case: handles_name_collision_when_declared_outside_of_model_class_body
     main: |
         from myapp.models import MyModel, ManagerFromModelQuerySet
-        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Any]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Any, Any]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet]"
         reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
     installed_apps:
         - myapp
@@ -352,8 +352,8 @@
 -   case: reuses_generated_type_when_called_identically_for_multiple_managers
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects_1)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects_2)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects_1)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet]"
+        reveal_type(MyModel.objects_2)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet]"
         reveal_type(MyModel.objects_1.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
         reveal_type(MyModel.objects_2.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
     installed_apps:
@@ -374,7 +374,7 @@
 -   case: generates_new_manager_class_when_name_colliding_with_explicit_manager
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet]"
         reveal_type(MyModel.objects.custom_method())  # N: Revealed type is "builtins.int"
     installed_apps:
         - myapp
@@ -397,9 +397,9 @@
 -   case: handles_type_collision_with_from_queryset
     main: |
         from myapp.models import MyModel, FromQuerySet
-        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T`1]"
-        reveal_type(MyModel.from_queryset)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.as_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = django.db.models.query.QuerySet[_T`1, _T`1]] () -> myapp.models.ManagerFromModelQuerySet[_T`1, _QS`2 = django.db.models.query.QuerySet[_T`1, _T`1]]"
+        reveal_type(MyModel.from_queryset)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet]"
+        reveal_type(MyModel.as_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet]"
     installed_apps:
         - myapp
     files:
@@ -419,7 +419,7 @@
 -   case: nested_queryset_class_definition
     main: |
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel, myapp.models.MyModel.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -475,3 +475,41 @@
                 from django.contrib.auth.models import AbstractUser
 
                 class Account(AbstractUser): pass
+
+# regression test for #1023
+-   case: queryset_as_manager_from_untyped_custom_queryset
+    main: |
+        from myapp.models import AbstractNotification, Notification
+        reveal_type(AbstractNotification.objects) # N: Revealed type is "myapp.models.ManagerFromNotificationQuerySet[myapp.models.AbstractNotification, myapp.models.NotificationQuerySet[myapp.models.AbstractNotification, myapp.models.AbstractNotification]]"
+        reveal_type(Notification.objects) # N: Revealed type is "myapp.models.ManagerFromNotificationQuerySet[myapp.models.Notification]"
+        reveal_type(Notification.objects.all()) # N: Revealed type is "myapp.models.NotificationQuerySet[myapp.models.Notification, myapp.models.Notification]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import Self
+
+                class NotificationQuerySet(models.query.QuerySet):
+                    ''' Notification QuerySet '''
+                    def unsent(self) -> Self:
+                        return self.filter(emailed=False)
+
+                    def sent(self) -> Self:
+                        return self.filter(emailed=True)
+
+                class AbstractNotification(models.Model):
+                    actor_object_id = models.CharField('actor object id', max_length=255)
+
+                    objects = NotificationQuerySet.as_manager()
+
+                    class Meta:
+                        abstract = True
+                        verbose_name = 'Notification'
+                        verbose_name_plural = 'Notifications'
+
+                class Notification(AbstractNotification):
+                    class Meta(AbstractNotification.Meta):
+                        abstract = False

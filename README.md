@@ -143,7 +143,7 @@ option to get extra information about the error.
 ### I cannot use QuerySet or Manager with type annotations
 
 You can get a `TypeError: 'type' object is not subscriptable`
-when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other Django-based Generic types.
+when you will try to use `QuerySet[MyModel]`, `Manager[MyModel, MyQuerySet]` or some other Django-based Generic types.
 
 This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
 
@@ -235,6 +235,20 @@ should declare your manager with your model as the type variable:
 ```python
 class MyManager(models.Manager["MyModel"]):
     ...
+```
+
+If your manager also declare a custom queryset via `get_queryset`, you might face a similar error
+
+> Return type "MyQuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "_QS" in supertype "django.db.models.manager.BaseManager"
+
+To fix this issue, you have to properly pass custom `QuerySet` and `Manager` generic params:
+```python
+class MyQuerySet(models.QuerySet["MyModel"]):
+  ...
+
+class MyStaffManager(models.Manager["MyModel", MyQuerySet]):
+     def get_queryset(self) -> MyQuerySet:
+         return MyQuerySet(self.model, using=self._db)
 ```
 
 ### How do I annotate cases where I called QuerySet.annotate?

@@ -165,7 +165,7 @@
         from django.contrib.contenttypes.models import ContentType
         reveal_type(Permission().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager[django.contrib.auth.models.User_user_permissions]"
         reveal_type(Group().user_set)  # N: Revealed type is "django.contrib.auth.models.User_ManyRelatedManager[django.contrib.auth.models.User_groups]"
-        reveal_type(ContentType.permission_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[django.contrib.auth.models.Permission]"
+        reveal_type(ContentType.permission_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[django.contrib.auth.models.Permission, django.db.models.query.QuerySet[django.contrib.auth.models.Permission, django.contrib.auth.models.Permission]]"
         reveal_type(ContentType().permission_set)  # N: Revealed type is "django.contrib.auth.models.Permission_RelatedManager"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth')

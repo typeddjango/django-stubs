@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from django.db.models.fields import Field
@@ -563,5 +563,11 @@ def get_model_from_expression(
     return None
 
 
-def fill_manager(manager: TypeInfo, typ: MypyType) -> Instance:
-    return Instance(manager, [typ] if manager.is_generic() else [])
+def fill_instance(typ: TypeInfo, args: Sequence[MypyType]) -> Instance:
+    """
+    The type might not be generic, for ex with user defined managers:
+
+        class CustomManager(models.Manager["MyModel"]):
+            pass
+    """
+    return Instance(typ, args if typ.is_generic() else [])
