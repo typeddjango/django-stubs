@@ -6,7 +6,7 @@ from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, AssignmentStmt, CallExpr, Expression, FuncDef, MypyFile, NameExpr
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
@@ -34,42 +34,6 @@ def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker)
         model = get_proper_type(base_type.args[0])
         if isinstance(model, Instance) and helpers.is_model_type(model.type):
             return model
-    return None
-
-
-def _resolve_prefetch_call_expr(expr: Expression, api: TypeChecker) -> CallExpr | None:
-    """
-    Resolve a Prefetch call expression from either an inline call or a variable assignment.
-
-    Inline call:
-        MyModel.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="every_tags"))
-
-    Variable assignment:
-        tag_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
-        MyModel.objects.prefetch_related(tag_prefetch)
-    """
-    if isinstance(expr, CallExpr):
-        return expr
-
-    if not isinstance(expr, NameExpr):
-        return None
-
-    for scope in reversed(api.scope.stack):
-        if isinstance(scope, FuncDef):
-            statements = scope.body.body
-        elif isinstance(scope, MypyFile):
-            statements = scope.defs
-        else:
-            continue
-
-        for stmt in statements:
-            if (
-                isinstance(stmt, AssignmentStmt)
-                and any(isinstance(lval, NameExpr) and lval.name == expr.name for lval in stmt.lvalues)
-                and isinstance(stmt.rvalue, CallExpr)
-            ):
-                return stmt.rvalue
-
     return None
 
 
@@ -449,14 +413,14 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         if not (
             isinstance(typ, Instance)
             and typ.type.fullname == fullnames.PREFETCH_CLASS_FULLNAME
-            and (prefetch_call := _resolve_prefetch_call_expr(expr, api))
-            and (to_attr_expr := helpers.get_class_init_argument_by_name(prefetch_call, "to_attr"))
+            and isinstance(expr, CallExpr)
+            and (to_attr_expr := helpers.get_class_init_argument_by_name(expr, "to_attr"))
             and (to_attr_value := helpers.resolve_string_attribute_value(to_attr_expr, django_context))
         ):
             continue
 
         # Determine model type from the `queryset` attr
-        queryset_expr = helpers.get_class_init_argument_by_name(prefetch_call, "queryset")
+        queryset_expr = helpers.get_class_init_argument_by_name(expr, "queryset")
         elem_model = _infer_prefetch_element_model_type(queryset_expr, api)
         value_type = api.named_generic_type(
             "builtins.list",

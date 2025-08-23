@@ -30,18 +30,6 @@
             ).get().every_articles
         )
 
-        # Intermediary variable -- function scope
-        def foo() -> None:
-            tag_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
-            reveal_type(Article.objects.prefetch_related(tag_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})]]"
-
-        # Intermediary variable -- module scope
-        tag_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
-        reveal_type(Article.objects.prefetch_related(tag_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})]]"
-
-        article_prefetch = Prefetch("article_set", Article.objects.all(), to_attr="every_articles")
-        reveal_type(Tag.objects.prefetch_related(article_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Tag@AnnotatedWith[TypedDict({'every_articles': builtins.list[myapp.models.Article]})], myapp.models.Tag@AnnotatedWith[TypedDict({'every_articles': builtins.list[myapp.models.Article]})]]"
-
         # Member expr
         reveal_type(
             Article.objects.prefetch_related( # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})]]"
@@ -64,13 +52,6 @@
         reveal_type(multi_qs.get().ts) # N: Revealed type is "builtins.list[myapp.models.Tag]"
         reveal_type(multi_qs.get().ts2) # N: Revealed type is "builtins.list[myapp.models.Tag]"
 
-        # Mixed inline `Prefetch` and variable `Prefetch` in one call
-        mixed_qs = Article.objects.prefetch_related(
-            tag_prefetch,
-            Prefetch("article_set", Article.objects.all(), to_attr="arts2"),
-        )
-        reveal_type(mixed_qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'arts2': builtins.list[myapp.models.Article]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'arts2': builtins.list[myapp.models.Article]})]]"
-
         # Mixed inline `Prefetch` and plain lookup string in one call; string should be ignored
         mixed_plain = Article.objects.prefetch_related(
             "article_set",
@@ -78,9 +59,28 @@
         )
         reveal_type(mixed_plain) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'arts3': builtins.list[myapp.models.Article]})], myapp.models.Article@AnnotatedWith[TypedDict({'arts3': builtins.list[myapp.models.Article]})]]"
 
+
+        ## Not Supported
+
         # Prefetch with `to_attr` arg but without the `queryset` arg
         # TODO: We should be able to resolve a more accurate type using existing lookup `resolve_lookup_expected_type` machinery
         reveal_type(Article.objects.prefetch_related(models.Prefetch("tags", to_attr="just_tags")).get().just_tags) # N: Revealed type is "builtins.list[Any]"
+
+        # Intermediary variable -- function scope
+        def foo() -> None:
+            tag_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
+            reveal_type(Article.objects.prefetch_related(tag_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
+
+        # Intermediary variable -- module scope
+        tag_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
+        reveal_type(Article.objects.prefetch_related(tag_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
+
+        # Mixed inline `Prefetch` and variable `Prefetch` in one call
+        mixed_qs = Article.objects.prefetch_related(
+            tag_prefetch,
+            Prefetch("article_set", Article.objects.all(), to_attr="arts2"),
+        )
+        reveal_type(mixed_qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'arts2': builtins.list[myapp.models.Article]})], myapp.models.Article@AnnotatedWith[TypedDict({'arts2': builtins.list[myapp.models.Article]})]]"
 
     installed_apps:
         - myapp
