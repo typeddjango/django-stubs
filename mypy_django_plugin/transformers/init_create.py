@@ -59,10 +59,10 @@ def typecheck_model_method(
 
 def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
-
-    model_cls = django_context.get_model_class_by_fullname(default_return_type.type.fullname)
-    if model_cls is not None:
+    if (
+        isinstance(default_return_type, Instance)
+        and (model_cls := django_context.get_model_class_by_fullname(default_return_type.type.fullname)) is not None
+    ):
         typecheck_model_method(ctx, django_context, model_cls, "__init__")
 
     return ctx.default_return_type
@@ -70,12 +70,10 @@ def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) ->
 
 def typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
-    if not isinstance(default_return_type, Instance):
-        # only work with ctx.default_return_type = model Instance
-        return ctx.default_return_type
-
-    model_cls = django_context.get_model_class_by_fullname(default_return_type.type.fullname)
-    if model_cls is not None:
+    if (
+        isinstance(default_return_type, Instance)
+        and (model_cls := django_context.get_model_class_by_fullname(default_return_type.type.fullname)) is not None
+    ):
         typecheck_model_method(ctx, django_context, model_cls, "create")
 
     return ctx.default_return_type
@@ -83,16 +81,12 @@ def typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) ->
 
 def typecheck_model_acreate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
-    if not isinstance(default_return_type, Instance):
-        return ctx.default_return_type
-
-    # default_return_type at this point should be of type Coroutine[Any, Any, <Model>]
-    model = get_proper_type(default_return_type.args[-1])
-    if not isinstance(model, Instance):
-        return ctx.default_return_type
-
-    model_cls = django_context.get_model_class_by_fullname(model.type.fullname)
-    if model_cls is not None:
+    if (
+        isinstance(default_return_type, Instance)
+        # default_return_type at this point should be of type Coroutine[Any, Any, <Model>]
+        and isinstance((model := get_proper_type(default_return_type.args[-1])), Instance)
+        and (model_cls := django_context.get_model_class_by_fullname(model.type.fullname)) is not None
+    ):
         typecheck_model_method(ctx, django_context, model_cls, "acreate")
 
     return ctx.default_return_type
