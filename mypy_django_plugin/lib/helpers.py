@@ -13,12 +13,14 @@ from mypy.nodes import (
     ArgKind,
     AssignmentStmt,
     Block,
+    CallExpr,
     ClassDef,
     Context,
     Expression,
     MemberExpr,
     MypyFile,
     NameExpr,
+    Node,
     RefExpr,
     StrExpr,
     SymbolNode,
@@ -39,6 +41,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import make_optional_type
 from mypy.types import (
     AnyType,
+    CallableType,
     Instance,
     LiteralType,
     NoneTyp,
@@ -196,6 +199,44 @@ def get_min_argument_count(ctx: MethodContext | FunctionContext) -> int:
     Excludes *args and **kwargs since their count is indeterminate.
     """
     return sum(not kind.is_star() for kinds in ctx.arg_kinds for kind in kinds)
+
+
+def _get_class_init_type(call: CallExpr) -> CallableType | None:
+    callee_node: Node | None = call.callee
+
+    if isinstance(callee_node, RefExpr):
+        callee_node = callee_node.node
+
+    if (
+        isinstance(callee_node, TypeInfo)
+        and (init_sym := callee_node.get("__init__"))
+        and isinstance((init_type := get_proper_type(init_sym.type)), CallableType)
+    ):
+        return init_type
+    return None
+
+
+def get_class_init_argument_by_name(call: CallExpr, name: str) -> Expression | None:
+    """Adaptation of `mypy.plugins.common._get_argument` for class initializers"""
+    callee_type = _get_class_init_type(call)
+    if not callee_type:
+        return None
+
+    argument = callee_type.argument_by_name(name)
+    if not argument:
+        return None
+    assert argument.name
+
+    for i, (attr_name, attr_value) in enumerate(
+        zip(call.arg_names, call.args, strict=False),
+        start=1,  # Start at one to skip first `self` arg
+    ):
+        if argument.pos is not None and not attr_name and i == argument.pos:
+            return attr_value
+        if attr_name == argument.name:
+            return attr_value
+
+    return None
 
 
 def get_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str) -> Expression | None:

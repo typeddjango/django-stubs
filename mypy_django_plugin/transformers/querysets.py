@@ -5,7 +5,7 @@ from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, Expression
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
@@ -372,3 +372,82 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
     return default_return_type.copy_modified(args=[model_type, row_type])
+
+
+def _infer_prefetch_element_model_type(queryset_expr: Expression | None, api: TypeChecker) -> Instance | None:
+    """Infer the model Instance from `Prefetch(queryset=...)`"""
+    if queryset_expr is None:
+        # TODO: Infer the model type from the lookup in `Prefetch(lookup=..., to_attr=...)`
+        return None
+    try:
+        qs_type = get_proper_type(api.expr_checker.accept(queryset_expr))
+    except Exception:
+        return None
+    if isinstance(qs_type, Instance):
+        return _extract_model_type_from_queryset(qs_type, api)
+    return None
+
+
+def extract_prefetch_related_annotations(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """
+    Extract annotated attributes via `prefetch_related(Prefetch(..., to_attr=...))`
+
+    See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#prefetch-objects
+    """
+    if not (
+        isinstance(ctx.type, Instance)
+        and isinstance((default_return_type := get_proper_type(ctx.default_return_type)), Instance)
+        and (api := helpers.get_typechecker_api(ctx))
+        and (model_type := _extract_model_type_from_queryset(ctx.type, api)) is not None
+        and ctx.args
+        and ctx.arg_types
+        and ctx.arg_types[0]
+    ):
+        return ctx.default_return_type
+
+    fields: dict[str, MypyType] = {}
+
+    for expr, typ in zip(ctx.args[0], ctx.arg_types[0], strict=False):
+        typ = get_proper_type(typ)
+        if not (
+            isinstance(typ, Instance)
+            and typ.type.fullname == fullnames.PREFETCH_CLASS_FULLNAME
+            and isinstance(expr, CallExpr)
+            and (to_attr_expr := helpers.get_class_init_argument_by_name(expr, "to_attr"))
+            and (to_attr_value := helpers.resolve_string_attribute_value(to_attr_expr, django_context))
+        ):
+            continue
+
+        # Determine model type from the `queryset` attr
+        queryset_expr = helpers.get_class_init_argument_by_name(expr, "queryset")
+        elem_model = _infer_prefetch_element_model_type(queryset_expr, api)
+        value_type = api.named_generic_type(
+            "builtins.list",
+            [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
+        )
+
+        fields[to_attr_value] = value_type
+
+    if not fields:
+        return ctx.default_return_type
+
+    fields_dict = helpers.make_typeddict(
+        api,
+        fields=fields,
+        required_keys=set(fields.keys()),
+        readonly_keys=set(),
+    )
+
+    annotated_model = get_annotated_type(api, model_type, fields_dict=fields_dict)
+
+    # Keep row shape; if row is a model instance, update it to annotated
+    # Todo: consolidate with `extract_proper_type_queryset_annotate` row handling above.
+    if len(default_return_type.args) > 1:
+        original_row = get_proper_type(default_return_type.args[1])
+        row_type: MypyType = original_row
+        if isinstance(original_row, Instance) and helpers.is_model_type(original_row.type):
+            row_type = annotated_model
+    else:
+        row_type = annotated_model
+
+    return default_return_type.copy_modified(args=[annotated_model, row_type])
