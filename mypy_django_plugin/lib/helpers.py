@@ -347,12 +347,12 @@ def add_new_class_for_module(
 
 
 def get_current_module(api: TypeChecker) -> MypyFile:
-    current_module = None
-    for item in reversed(api.scope.stack):
-        if isinstance(item, MypyFile):
-            current_module = item
-            break
-    assert current_module is not None
+    """
+    Scope is guaranteed to be initialized with the module as the first element of the stack.
+    Inspired from https://github.com/python/mypy/blob/15b8ca967cc6187effcab23e6613da2db4546584/mypy/checker.py#L5788
+    """
+    current_module = api.scope.stack[0]
+    assert isinstance(current_module, MypyFile)
     return current_module
 
 
