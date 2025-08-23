@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from collections.abc import Sequence
 
 from django.core.exceptions import FieldError
@@ -109,7 +108,7 @@ def get_values_list_row_type(
             assert lookup_type is not None
             return lookup_type
         elif named:
-            column_types: OrderedDict[str, MypyType] = OrderedDict()
+            column_types: dict[str, MypyType] = {}
             for field in django_context.get_model_fields(model_cls):
                 column_type = django_context.get_field_get_type(
                     typechecker_api, model_info, field, method="values_list"
@@ -137,7 +136,7 @@ def get_values_list_row_type(
         typechecker_api.fail("'flat' is not valid when 'values_list' is called with more than one field", ctx.context)
         return AnyType(TypeOfAny.from_error)
 
-    column_types = OrderedDict()
+    column_types = {}
     for field_lookup in field_lookups:
         lookup_field_type = get_field_type_from_lookup(
             ctx, django_context, model_cls, lookup=field_lookup, method="values_list", silent_on_error=is_annotated
@@ -354,7 +353,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
         for field in django_context.get_model_fields(model_cls):
             field_lookups.append(field.attname)
 
-    column_types: OrderedDict[str, MypyType] = OrderedDict()
+    column_types: dict[str, MypyType] = {}
 
     # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:

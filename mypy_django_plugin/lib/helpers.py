@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from collections.abc import Iterable, Iterator
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -357,7 +356,7 @@ def get_current_module(api: TypeChecker) -> MypyFile:
 
 
 def make_oneoff_named_tuple(
-    api: TypeChecker, name: str, fields: "OrderedDict[str, MypyType]", extra_bases: list[Instance] | None = None
+    api: TypeChecker, name: str, fields: "dict[str, MypyType]", extra_bases: list[Instance] | None = None
 ) -> TupleType:
     current_module = get_current_module(api)
     if extra_bases is None:
