@@ -442,7 +442,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     ):
         return ctx.default_return_type
 
-    fields: OrderedDict[str, MypyType] = OrderedDict()
+    fields: dict[str, MypyType] = {}
 
     for expr, typ in zip(ctx.args[0], ctx.arg_types[0], strict=False):
         typ = get_proper_type(typ)
