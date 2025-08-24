@@ -142,37 +142,25 @@ def get_values_list_row_type(
 
 
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    # called on the Instance, returns QuerySet of something
-    if not isinstance(ctx.type, Instance):
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None:
         return ctx.default_return_type
+
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
-
-    model_type = _extract_model_type_from_queryset(ctx.type, helpers.get_typechecker_api(ctx))
-    if model_type is None:
-        return AnyType(TypeOfAny.from_omitted_generics)
-
-    is_annotated = helpers.is_annotated_model(model_type.type)
-    model_cls = (
-        django_context.get_model_class_by_fullname(model_type.type.bases[0].type.fullname)
-        if is_annotated
-        else django_context.get_model_class_by_fullname(model_type.type.fullname)
-    )
-    if model_cls is None:
-        return default_return_type
 
     flat = helpers.get_bool_call_argument_by_name(ctx, "flat", default=False)
     named = helpers.get_bool_call_argument_by_name(ctx, "named", default=False)
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
-        return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
+        return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
 
     row_type = get_values_list_row_type(
-        ctx, django_context, model_cls, is_annotated=is_annotated, flat=flat, named=named
+        ctx, django_context, django_model.cls, is_annotated=django_model.is_annotated, flat=flat, named=named
     )
-    return default_return_type.copy_modified(args=[model_type, row_type])
+    return default_return_type.copy_modified(args=[django_model.typ, row_type])
 
 
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
