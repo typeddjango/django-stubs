@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Iterator
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, cast
 
+from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
@@ -52,6 +53,7 @@ from mypy.types import (
     get_proper_type,
 )
 from mypy.types import Type as MypyType
+from mypy.typevars import fill_typevars
 from typing_extensions import TypedDict
 
 from mypy_django_plugin.lib import fullnames
@@ -199,6 +201,66 @@ def get_min_argument_count(ctx: MethodContext | FunctionContext) -> int:
     Excludes *args and **kwargs since their count is indeterminate.
     """
     return sum(not kind.is_star() for kinds in ctx.arg_kinds for kind in kinds)
+
+
+class DjangoModel(NamedTuple):
+    """A small wrapper around a django model runtime object and associated mypy type info"""
+
+    # The Django model at runtime
+    cls: type[Model]
+    # The associated Mypy Instance
+    typ: Instance
+    # Is an annotated variant of a model ie `MyModel@AnnotatedWith`. See `AddAnnotateUtilities`
+    is_annotated: bool
+
+    @property
+    def info(self) -> TypeInfo:
+        return self.typ.type
+
+
+def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
+    """Extract the django model `Instance` associated to a queryset `Instance`"""
+    if queryset_type.type.has_base(fullnames.MANAGER_CLASS_FULLNAME):
+        to_model_fullname = get_manager_to_model(queryset_type.type)
+        if to_model_fullname is not None:
+            to_model = lookup_fully_qualified_typeinfo(api, to_model_fullname)
+            if to_model is not None:
+                to_model_instance = fill_typevars(to_model)
+                assert isinstance(to_model_instance, Instance)
+                return to_model_instance
+
+    for base_type in [queryset_type, *queryset_type.type.bases]:
+        if not len(base_type.args):
+            continue
+        model = get_proper_type(base_type.args[0])
+        if isinstance(model, Instance) and is_model_type(model.type):
+            return model
+    return None
+
+
+def get_model_info_from_qs_ctx(
+    ctx: MethodContext,
+    django_context: "DjangoContext",
+) -> DjangoModel | None:
+    """
+    Extract DjangoModel details from a queryset/manager `MethodContext`
+    """
+    api = get_typechecker_api(ctx)
+    if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type, api))):
+        return None
+
+    model_info = model_type.type
+    is_annotated = is_annotated_model(model_info)
+
+    model_cls = (
+        django_context.get_model_class_by_fullname(model_info.bases[0].type.fullname)
+        if is_annotated
+        else django_context.get_model_class_by_fullname(model_info.fullname)
+    )
+    if model_cls is None:
+        return None
+
+    return DjangoModel(cls=model_cls, typ=model_type, is_annotated=is_annotated)
 
 
 def _get_class_init_type(call: CallExpr) -> CallableType | None:

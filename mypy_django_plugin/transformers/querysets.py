@@ -9,30 +9,10 @@ from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers.models import get_annotated_type
-
-
-def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
-    if queryset_type.type.has_base(fullnames.MANAGER_CLASS_FULLNAME):
-        to_model_fullname = helpers.get_manager_to_model(queryset_type.type)
-        if to_model_fullname is not None:
-            to_model = helpers.lookup_fully_qualified_typeinfo(api, to_model_fullname)
-            if to_model is not None:
-                to_model_instance = fill_typevars(to_model)
-                assert isinstance(to_model_instance, Instance)
-                return to_model_instance
-
-    for base_type in [queryset_type, *queryset_type.type.bases]:
-        if not len(base_type.args):
-            continue
-        model = get_proper_type(base_type.args[0])
-        if isinstance(model, Instance) and helpers.is_model_type(model.type):
-            return model
-    return None
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -370,7 +350,7 @@ def _infer_prefetch_element_model_type(queryset_expr: Expression | None, api: Ty
     except Exception:
         return None
     if isinstance(qs_type, Instance):
-        return _extract_model_type_from_queryset(qs_type, api)
+        return helpers.extract_model_type_from_queryset(qs_type, api)
     return None
 
 
@@ -384,7 +364,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         isinstance(ctx.type, Instance)
         and isinstance((default_return_type := get_proper_type(ctx.default_return_type)), Instance)
         and (api := helpers.get_typechecker_api(ctx))
-        and (model_type := _extract_model_type_from_queryset(ctx.type, api)) is not None
+        and (model_type := helpers.extract_model_type_from_queryset(ctx.type, api)) is not None
         and ctx.args
         and ctx.arg_types
         and ctx.arg_types[0]
