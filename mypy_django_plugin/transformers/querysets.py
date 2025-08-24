@@ -295,20 +295,13 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#values
     """
-    # called on QuerySet, return QuerySet of something
-    if not isinstance(ctx.type, Instance):
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None or django_model.is_annotated:
         return ctx.default_return_type
+
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
-
-    model_type = _extract_model_type_from_queryset(ctx.type, helpers.get_typechecker_api(ctx))
-    if model_type is None:
-        return AnyType(TypeOfAny.from_omitted_generics)
-
-    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
-    if model_cls is None:
-        return default_return_type
 
     field_lookups = resolve_field_lookups(ctx.args[0], django_context)
     if field_lookups is None:
@@ -316,7 +309,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     # Bare `.values()` case
     if len(field_lookups) == 0 and not ctx.args[1]:
-        for field in django_context.get_model_fields(model_cls):
+        for field in django_context.get_model_fields(django_model.cls):
             field_lookups.append(field.attname)
 
     column_types: dict[str, MypyType] = {}
@@ -324,10 +317,10 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:
         field_lookup_type = get_field_type_from_lookup(
-            ctx, django_context, model_cls, lookup=field_lookup, method="values"
+            ctx, django_context, django_model.cls, lookup=field_lookup, method="values"
         )
         if field_lookup_type is None:
-            return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
+            return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
 
         column_types[field_lookup] = field_lookup_type
 
@@ -337,7 +330,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
         column_types.update(expression_types)
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
-    return default_return_type.copy_modified(args=[model_type, row_type])
+    return default_return_type.copy_modified(args=[django_model.typ, row_type])
 
 
 def _infer_prefetch_element_model_type(queryset_expr: Expression | None, api: TypeChecker) -> Instance | None:
