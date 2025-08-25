@@ -283,3 +283,49 @@
             pass
         class Entry(models.Model):
             blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+# Regression test for #1172
+-   case: chained_filter_lookups
+    main: |
+        from myapp.models import Cheese
+
+        Cheese.objects.filter(field=True).filter(field2=True)
+        qs = Cheese.objects.all()
+        qs.filter(field=True)
+    out: |
+      main:3: error: Cannot resolve keyword 'field' into field. Choices are: a, id  [misc]
+      main:3: error: Cannot resolve keyword 'field2' into field. Choices are: a, id  [misc]
+      main:5: error: Cannot resolve keyword 'field' into field. Choices are: a, id  [misc]
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Cheese(models.Model):
+                    a = models.BooleanField()
+
+-   case: lookups_from_custom_queryset
+    main: |
+        from myapp.models import MyModel
+        qs = MyModel.objects.all()
+
+        qs.filter(unknown_field=True)  # E: Cannot resolve keyword 'unknown_field' into field. Choices are: age, id  [misc]
+        qs.filter(age=MyModel()) # E: Incompatible type for lookup 'age': (got "MyModel", expected "str | int")  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyQuerySet(models.QuerySet["MyModel"]):
+                    ...
+
+                class MyModel(models.Model):
+                    age = models.IntegerField()
+                    objects = MyQuerySet.as_manager()
