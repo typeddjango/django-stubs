@@ -9,30 +9,10 @@ from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers.models import get_annotated_type
-
-
-def _extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
-    if queryset_type.type.has_base(fullnames.MANAGER_CLASS_FULLNAME):
-        to_model_fullname = helpers.get_manager_to_model(queryset_type.type)
-        if to_model_fullname is not None:
-            to_model = helpers.lookup_fully_qualified_typeinfo(api, to_model_fullname)
-            if to_model is not None:
-                to_model_instance = fill_typevars(to_model)
-                assert isinstance(to_model_instance, Instance)
-                return to_model_instance
-
-    for base_type in [queryset_type, *queryset_type.type.bases]:
-        if not len(base_type.args):
-            continue
-        model = get_proper_type(base_type.args[0])
-        if isinstance(model, Instance) and helpers.is_model_type(model.type):
-            return model
-    return None
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -162,37 +142,25 @@ def get_values_list_row_type(
 
 
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    # called on the Instance, returns QuerySet of something
-    if not isinstance(ctx.type, Instance):
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None:
         return ctx.default_return_type
+
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
-
-    model_type = _extract_model_type_from_queryset(ctx.type, helpers.get_typechecker_api(ctx))
-    if model_type is None:
-        return AnyType(TypeOfAny.from_omitted_generics)
-
-    is_annotated = helpers.is_annotated_model(model_type.type)
-    model_cls = (
-        django_context.get_model_class_by_fullname(model_type.type.bases[0].type.fullname)
-        if is_annotated
-        else django_context.get_model_class_by_fullname(model_type.type.fullname)
-    )
-    if model_cls is None:
-        return default_return_type
 
     flat = helpers.get_bool_call_argument_by_name(ctx, "flat", default=False)
     named = helpers.get_bool_call_argument_by_name(ctx, "named", default=False)
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
-        return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
+        return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
 
     row_type = get_values_list_row_type(
-        ctx, django_context, model_cls, is_annotated=is_annotated, flat=flat, named=named
+        ctx, django_context, django_model.cls, is_annotated=django_model.is_annotated, flat=flat, named=named
     )
-    return default_return_type.copy_modified(args=[model_type, row_type])
+    return default_return_type.copy_modified(args=[django_model.typ, row_type])
 
 
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
@@ -248,16 +216,13 @@ def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType] | None:
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    # called on the Instance, returns QuerySet of something
-    if not isinstance(ctx.type, Instance):
-        return ctx.default_return_type
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None:
+        return AnyType(TypeOfAny.from_omitted_generics)
+
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
-
-    model_type = _extract_model_type_from_queryset(ctx.type, helpers.get_typechecker_api(ctx))
-    if model_type is None:
-        return AnyType(TypeOfAny.from_omitted_generics)
 
     api = helpers.get_typechecker_api(ctx)
     expression_types = gather_expression_types(ctx)
@@ -272,9 +237,9 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         )
 
     if fields_dict is not None:
-        annotated_type = get_annotated_type(api, model_type, fields_dict=fields_dict)
+        annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
     else:
-        annotated_type = model_type
+        annotated_type = django_model.typ
 
     row_type: MypyType
     if len(default_return_type.args) > 1:
@@ -315,20 +280,13 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#values
     """
-    # called on QuerySet, return QuerySet of something
-    if not isinstance(ctx.type, Instance):
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None or django_model.is_annotated:
         return ctx.default_return_type
+
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
-
-    model_type = _extract_model_type_from_queryset(ctx.type, helpers.get_typechecker_api(ctx))
-    if model_type is None:
-        return AnyType(TypeOfAny.from_omitted_generics)
-
-    model_cls = django_context.get_model_class_by_fullname(model_type.type.fullname)
-    if model_cls is None:
-        return default_return_type
 
     field_lookups = resolve_field_lookups(ctx.args[0], django_context)
     if field_lookups is None:
@@ -336,7 +294,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     # Bare `.values()` case
     if len(field_lookups) == 0 and not ctx.args[1]:
-        for field in django_context.get_model_fields(model_cls):
+        for field in django_context.get_model_fields(django_model.cls):
             field_lookups.append(field.attname)
 
     column_types: dict[str, MypyType] = {}
@@ -344,10 +302,10 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:
         field_lookup_type = get_field_type_from_lookup(
-            ctx, django_context, model_cls, lookup=field_lookup, method="values"
+            ctx, django_context, django_model.cls, lookup=field_lookup, method="values"
         )
         if field_lookup_type is None:
-            return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
+            return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
 
         column_types[field_lookup] = field_lookup_type
 
@@ -357,7 +315,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
         column_types.update(expression_types)
 
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
-    return default_return_type.copy_modified(args=[model_type, row_type])
+    return default_return_type.copy_modified(args=[django_model.typ, row_type])
 
 
 def _infer_prefetch_element_model_type(queryset_expr: Expression | None, api: TypeChecker) -> Instance | None:
@@ -370,7 +328,7 @@ def _infer_prefetch_element_model_type(queryset_expr: Expression | None, api: Ty
     except Exception:
         return None
     if isinstance(qs_type, Instance):
-        return _extract_model_type_from_queryset(qs_type, api)
+        return helpers.extract_model_type_from_queryset(qs_type, api)
     return None
 
 
@@ -384,7 +342,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         isinstance(ctx.type, Instance)
         and isinstance((default_return_type := get_proper_type(ctx.default_return_type)), Instance)
         and (api := helpers.get_typechecker_api(ctx))
-        and (model_type := _extract_model_type_from_queryset(ctx.type, api)) is not None
+        and (model_type := helpers.extract_model_type_from_queryset(ctx.type, api)) is not None
         and ctx.args
         and ctx.arg_types
         and ctx.arg_types[0]
