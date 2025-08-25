@@ -266,6 +266,18 @@ def get_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str) -
     return args[0]
 
 
+def get_bool_call_argument_by_name(ctx: FunctionContext | MethodContext, name: str, *, default: bool) -> bool:
+    """
+    Return the boolean value for an argument or the default if it's not found.
+    """
+    arg_value = get_call_argument_by_name(ctx, name)
+    if arg_value is not None:
+        parsed_value = parse_bool(arg_value)
+        if parsed_value is not None:
+            return parsed_value
+    return default
+
+
 def get_call_argument_type_by_name(ctx: FunctionContext | MethodContext, name: str) -> MypyType | None:
     """Return the type for the specific argument.
 
