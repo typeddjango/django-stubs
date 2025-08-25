@@ -216,16 +216,13 @@ def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType] | None:
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    # called on the Instance, returns QuerySet of something
-    if not isinstance(ctx.type, Instance):
-        return ctx.default_return_type
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None:
+        return AnyType(TypeOfAny.from_omitted_generics)
+
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
-
-    model_type = _extract_model_type_from_queryset(ctx.type, helpers.get_typechecker_api(ctx))
-    if model_type is None:
-        return AnyType(TypeOfAny.from_omitted_generics)
 
     api = helpers.get_typechecker_api(ctx)
     expression_types = gather_expression_types(ctx)
@@ -240,9 +237,9 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         )
 
     if fields_dict is not None:
-        annotated_type = get_annotated_type(api, model_type, fields_dict=fields_dict)
+        annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
     else:
-        annotated_type = model_type
+        annotated_type = django_model.typ
 
     row_type: MypyType
     if len(default_return_type.args) > 1:
