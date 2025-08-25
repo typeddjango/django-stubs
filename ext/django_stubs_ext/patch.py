@@ -22,7 +22,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.lookups import Lookup
 from django.db.models.manager import BaseManager
 from django.db.models.options import Options
-from django.db.models.query import BaseIterable, ModelIterable, QuerySet, RawQuerySet
+from django.db.models.query import BaseIterable, ModelIterable, Prefetch, QuerySet, RawQuerySet
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField, ModelFormOptions
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
@@ -97,6 +97,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(BaseIterable),
     MPGeneric(ForwardManyToOneDescriptor),
     MPGeneric(ReverseOneToOneDescriptor),
+    MPGeneric(Prefetch),
 ]
 
 
