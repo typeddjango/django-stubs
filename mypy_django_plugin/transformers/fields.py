@@ -13,7 +13,6 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
@@ -141,15 +140,12 @@ def set_descriptor_types_for_field(
 ) -> Instance:
     default_return_type = cast(Instance, ctx.default_return_type)
 
-    is_nullable = False
-    null_expr = helpers.get_call_argument_by_name(ctx, "null")
-    if null_expr is not None:
-        is_nullable = parse_bool(null_expr) or False
+    is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
+    is_primary_key = helpers.get_bool_call_argument_by_name(ctx, "primary_key", default=False)
     # Allow setting field value to `None` when a field is primary key and has a default that can produce a value
     default_expr = helpers.get_call_argument_by_name(ctx, "default")
-    primary_key_expr = helpers.get_call_argument_by_name(ctx, "primary_key")
-    if default_expr is not None and primary_key_expr is not None:
-        is_set_nullable = parse_bool(primary_key_expr) or False
+    if default_expr is not None:
+        is_set_nullable = is_primary_key
 
     set_type, get_type = get_field_descriptor_types(
         default_return_type.type,

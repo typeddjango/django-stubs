@@ -13,7 +13,6 @@ from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.helpers import parse_bool
 from mypy_django_plugin.transformers.models import get_annotated_type
 
 
@@ -183,25 +182,12 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     if model_cls is None:
         return default_return_type
 
-    flat_expr = helpers.get_call_argument_by_name(ctx, "flat")
-    if flat_expr is not None:
-        flat = parse_bool(flat_expr)
-    else:
-        flat = False
-
-    named_expr = helpers.get_call_argument_by_name(ctx, "named")
-    if named_expr is not None:
-        named = parse_bool(named_expr)
-    else:
-        named = False
+    flat = helpers.get_bool_call_argument_by_name(ctx, "flat", default=False)
+    named = helpers.get_bool_call_argument_by_name(ctx, "named", default=False)
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
         return default_return_type.copy_modified(args=[model_type, AnyType(TypeOfAny.from_error)])
-
-    # account for possible None
-    flat = flat or False
-    named = named or False
 
     row_type = get_values_list_row_type(
         ctx, django_context, model_cls, is_annotated=is_annotated, flat=flat, named=named
