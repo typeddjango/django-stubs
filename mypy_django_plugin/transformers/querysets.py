@@ -326,7 +326,6 @@ def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -
         return None
     if isinstance(qs_type, Instance):
         return qs_type
-        # return helpers.extract_model_type_from_queryset(qs_type, api)
     return None
 
 
