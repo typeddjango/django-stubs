@@ -143,6 +143,9 @@ class NewSemanalDjangoPlugin(Plugin):
             if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
                 return querysets.determine_proper_manager_type
 
+            if info.has_base(fullnames.PREFETCH_CLASS_FULLNAME):
+                return partial(querysets.specialize_prefetch_type, django_context=self.django_context)
+
         return None
 
     @cached_property

@@ -15,6 +15,12 @@ _Model = TypeVar("_Model", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True, default=_Model)  # ONLY use together with _Model
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
 
+# The type of the prefetched model
+_PrefetchedQuerySetT = TypeVar("_PrefetchedQuerySetT", bound=QuerySet[Model], covariant=True, default=QuerySet[Model])
+# The attribute name to use to store the prefetched list[_PrefetchedQuerySetT]
+# This will be specialized to a `LiteralString` in the plugin for further processing and validation
+_ToAttrT = TypeVar("_ToAttrT", bound=str, covariant=True, default=str)
+
 MAX_GET_RESULTS: int
 REPR_OUTPUT_SIZE: int
 
@@ -234,12 +240,14 @@ class RawQuerySet(Iterable[_Model], Sized):
 # Deprecated alias of QuerySet, for compatibility only.
 _QuerySet: TypeAlias = QuerySet  # noqa: PYI047
 
-class Prefetch:
+class Prefetch(Generic[_PrefetchedQuerySetT, _ToAttrT]):
     prefetch_through: str
     prefetch_to: str
-    queryset: QuerySet | None
-    to_attr: str | None
-    def __init__(self, lookup: str, queryset: QuerySet | None = None, to_attr: str | None = None) -> None: ...
+    queryset: _PrefetchedQuerySetT | None
+    to_attr: _ToAttrT | None
+    def __init__(
+        self, lookup: str, queryset: _PrefetchedQuerySetT | None = None, to_attr: _ToAttrT | None = None
+    ) -> None: ...
     def __getstate__(self) -> dict[str, Any]: ...
     def add_prefix(self, prefix: str) -> None: ...
     def get_current_prefetch_to(self, level: int) -> str: ...
@@ -247,8 +255,8 @@ class Prefetch:
     @deprecated(
         "get_current_queryset() is deprecated and will be removed in Django 6.0. Use get_current_querysets() instead."
     )
-    def get_current_queryset(self, level: int) -> QuerySet | None: ...
-    def get_current_querysets(self, level: int) -> list[QuerySet] | None: ...
+    def get_current_queryset(self, level: int) -> _PrefetchedQuerySetT | None: ...
+    def get_current_querysets(self, level: int) -> list[_PrefetchedQuerySetT] | None: ...
 
 def prefetch_related_objects(model_instances: Iterable[_Model], *related_lookups: str | Prefetch) -> None: ...
 async def aprefetch_related_objects(model_instances: Iterable[_Model], *related_lookups: str | Prefetch) -> None: ...
