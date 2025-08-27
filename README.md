@@ -79,6 +79,10 @@ https://github.com/typeddjango/django-stubs/discussions/2101#discussioncomment-9
 
 ### Type checking of Model Meta attributes
 
+> [!NOTE]
+> If you are using the mypy plugin and have `django_stub_ext` installed, your model `Meta` classes
+> will be automatically type-checked without further changes.
+
 By inheriting from the `TypedModelMeta` class, you can ensure you're using correct types for
 attributes:
 
