@@ -76,6 +76,58 @@
                 unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "dict[int, int]", base class "TypedModelMeta" defined the type as "Sequence[Sequence[str]]")  [assignment]
                 unknown_attr = True  # can't check this
 
+        class MyModelMultipleBaseMeta(models.Model):
+          class Meta(MyModel.Meta, TypedModelMeta):
+              abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
+
+-   case: auto_base_model_meta_incompatible_types
+    main: |
+        from myapp.models import MyModelWithAutoTypedMeta
+    installed_apps:
+      - myapp
+    files:
+      - path: myapp/__init__.py
+      - path: myapp/models.py
+        content: |
+            from django.db import models
+
+            class MyModelWithAutoTypedMeta(models.Model):
+                example = models.CharField(max_length=100)
+                class Meta:
+                    abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
+                    verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "list[str]", base class "TypedModelMeta" defined the type as "str | _StrPromise")  [assignment]
+                    unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "dict[int, int]", base class "TypedModelMeta" defined the type as "Sequence[Sequence[str]]")  [assignment]
+
+            class DefinitelyNotAModel:
+                class Meta:
+                    abstract = 7
+                    verbose_name = ['test']
+                    unique_together = {1: 2}
+                    unknown_attr = True
+
+-   case: auto_base_model_meta_incompatible_types_multiple_inheritance
+    main: |
+        from myapp.models import MyModel, MyModel2, MyModel3
+    installed_apps:
+      - myapp
+    files:
+      - path: myapp/__init__.py
+      - path: myapp/models.py
+        content: |
+            from django.db import models
+
+            class MyModel(models.Model):
+                class Meta:
+                    abstract = 5  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
+
+            class MyModel2(models.Model):
+                class Meta:
+                    abstract = 5  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
+
+            class MyModel3(models.Model):
+                class Meta(MyModel.Meta, MyModel2.Meta):
+                    verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "list[str]", base class "TypedModelMeta" defined the type as "str | _StrPromise")  [assignment]
+                    unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "dict[int, int]", base class "TypedModelMeta" defined the type as "Sequence[Sequence[str]]")  [assignment]
 
 -   case: instantiate_abstract_model
     main: |

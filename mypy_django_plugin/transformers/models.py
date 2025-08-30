@@ -262,8 +262,12 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                 pass
     with
         class MyModel(models.Model):
-            class Meta(Any):
+            class Meta(TypedModelMeta):
                 pass
+
+    to provide proper typing of attributes in Meta inner classes.
+
+    If TypedModelMeta is not available, fallback to Any as a base
     to get around incompatible Meta inner classes for different models.
     """
 
@@ -272,6 +276,12 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         if meta_node is None:
             return None
         meta_node.fallback_to_any = True
+
+        typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
+        if typed_model_meta_info and not meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME):
+            # Insert TypedModelMeta just before `object` to leverage mypy's class-body semantic analysis.
+            meta_node.mro.insert(-1, typed_model_meta_info)
+        return None
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):

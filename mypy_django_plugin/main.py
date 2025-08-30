@@ -125,9 +125,11 @@ class NewSemanalDjangoPlugin(Plugin):
                     deps.add(self._new_dependency(related_model_module))
 
         return list(deps) + [
-            # for QuerySet.annotate
+            # For `QuerySet.annotate`
             self._new_dependency("django_stubs_ext"),
-            # For Manager.from_queryset
+            # For `TypedModelMeta` lookup in model transformers
+            self._new_dependency("django_stubs_ext.db.models"),
+            # For `Manager.from_queryset`
             self._new_dependency("django.db.models.query"),
         ]
 
