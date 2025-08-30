@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         managed: ClassVar[bool]  # default: True
         order_with_respect_to: ClassVar[str]
         ordering: ClassVar[Sequence[str | OrderBy]]
-        permissions: ClassVar[_ListOrTuple[tuple[str, str]]]
+        permissions: ClassVar[_ListOrTuple[tuple[str, StrOrPromise]]]
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False
         required_db_features: ClassVar[_ListOrTuple[str]]
