@@ -151,3 +151,25 @@
 
     installed_apps:
         - django.contrib.auth
+
+-   case: prefetch_related_conflict_with_annotate
+    main: |
+        from django.db.models import Prefetch, F
+        from django.contrib.auth.models import User, Group
+
+        # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
+        # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
+        annotate_into_prefetch = (
+            User.objects
+            .annotate(foo=F("username"))
+            .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
+            .get().foo
+        )
+        reveal_type(annotate_into_prefetch)  # N: Revealed type is "Any"
+        prefetch_into_annotate = (
+            User.objects
+            .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
+            .annotate(foo=F("username"))
+            .get().foo
+        )
+        reveal_type(prefetch_into_annotate)  # N: Revealed type is "Any"
