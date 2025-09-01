@@ -5,9 +5,9 @@ from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, CallExpr, Expression
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, LiteralType, TupleType, TypedDictType, TypeOfAny, get_proper_type
+from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
@@ -349,6 +349,27 @@ def specialize_prefetch_type(ctx: FunctionContext, django_context: DjangoContext
     return default.copy_modified(args=[default.args[0], to_attr_type])
 
 
+def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, ProperType]]:
+    """
+    Flatten all arguments into a uniform list of (expr, typ) pairs.
+
+    This helper iterates over positional and named arguments and expands any starred
+    arguments when their type is a TupleType with statically known items.
+    """
+    lookups: list[tuple[Expression | None, ProperType]] = []
+    for expr, typ, kind in zip(ctx.args[0], ctx.arg_types[0], ctx.arg_kinds[0], strict=False):
+        ptyp = get_proper_type(typ)
+        if kind == ARG_STAR:
+            # Expand starred tuple items if statically known
+            if isinstance(ptyp, TupleType):
+                for item_typ in ptyp.items:
+                    lookups.append((None, get_proper_type(item_typ)))
+            # If not a TupleType (e.g. list/Iterable), we cannot expand statically
+            continue
+        lookups.append((expr, ptyp))
+    return lookups
+
+
 def extract_prefetch_related_annotations(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     """
     Extract annotated attributes via `prefetch_related(Prefetch(..., to_attr=...))`
@@ -368,8 +389,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
 
     fields: dict[str, MypyType] = {}
 
-    for expr, typ in zip(ctx.args[0], ctx.arg_types[0], strict=False):
-        typ = get_proper_type(typ)
+    for expr, typ in gather_flat_args(ctx):
         if not (isinstance(typ, Instance) and typ.type.has_base(fullnames.PREFETCH_CLASS_FULLNAME)):
             continue
 
