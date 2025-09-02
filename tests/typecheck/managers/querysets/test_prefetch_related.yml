@@ -163,13 +163,15 @@
             User.objects
             .annotate(foo=F("username"))
             .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
-            .get().foo
+            .get()
         )
-        reveal_type(annotate_into_prefetch)  # N: Revealed type is "Any"
+        reveal_type(annotate_into_prefetch)  # N: Revealed type is "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
         prefetch_into_annotate = (
             User.objects
             .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
             .annotate(foo=F("username"))
-            .get().foo
+            .get()
         )
-        reveal_type(prefetch_into_annotate)  # N: Revealed type is "Any"
+        reveal_type(prefetch_into_annotate)  # N: Revealed type is "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
+    installed_apps:
+        - django.contrib.auth
