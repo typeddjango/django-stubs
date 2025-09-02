@@ -381,7 +381,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         isinstance(ctx.type, Instance)
         and isinstance((default_return_type := get_proper_type(ctx.default_return_type)), Instance)
         and (api := helpers.get_typechecker_api(ctx))
-        and (model_type := helpers.extract_model_type_from_queryset(ctx.type, api)) is not None
+        and (qs_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
         and ctx.args
         and ctx.arg_types
         and ctx.arg_types[0]
@@ -437,11 +437,9 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
                     continue
 
                 if lookup_value := helpers.resolve_string_attribute_value(lookup_expr, django_context):
-                    if django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context):
+                    if qs_model := helpers.get_model_info_from_qs_ctx(ctx, django_context):
                         try:
-                            observed_model_cls = django_context.resolve_lookup_into_field(
-                                django_model.cls, lookup_value
-                            )[1]
+                            observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup_value)[1]
                             if model_info := helpers.lookup_class_typeinfo(api, observed_model_cls):
                                 elem_model = Instance(model_info, [])
                         except (FieldError, LookupsAreUnsupported):
@@ -452,11 +450,11 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
         )
 
-        if model_type.type.get(to_attr_value):
+        if qs_model.typ.type.get(to_attr_value):
             ctx.api.fail(
-                f'Attribute "{to_attr_value}" already defined on "{model_type.type.name}"', ctx.context, code=NO_REDEF
+                f'Attribute "{to_attr_value}" already defined on "{qs_model.typ.type.name}"', ctx.context, code=NO_REDEF
             )
-        elif not (model_type.extra_attrs and to_attr_value in model_type.extra_attrs.attrs):
+        elif not (qs_model.typ.extra_attrs and to_attr_value in qs_model.typ.extra_attrs.attrs):
             # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
             # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
             # So only add the annotation here if it doesn't exist yet.
@@ -472,7 +470,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         readonly_keys=set(),
     )
 
-    annotated_model = get_annotated_type(api, model_type, fields_dict=fields_dict)
+    annotated_model = get_annotated_type(api, qs_model.typ, fields_dict=fields_dict)
 
     # Keep row shape; if row is a model instance, update it to annotated
     # Todo: consolidate with `extract_proper_type_queryset_annotate` row handling above.
