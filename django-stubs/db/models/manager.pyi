@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, NoReturn, TypeVar, overload
+from typing import Any, Generic, Literal, NoReturn, TypeVar, overload
 
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, OrderBy
@@ -108,9 +108,18 @@ class Manager(BaseManager[_T]):
     def values(self, *fields: str | Combinable, **expressions: Any) -> QuerySet[_T, dict[str, Any]]: ...
     # The type of values_list may be overridden to be more specific in the mypy plugin, depending on the fields param
     def values_list(self, *fields: str | Combinable, flat: bool = ..., named: bool = ...) -> QuerySet[_T, Any]: ...
-    def dates(self, field_name: str, kind: str, order: str = ...) -> QuerySet[_T, datetime.date]: ...
+    def dates(
+        self,
+        field_name: str,
+        kind: Literal["year", "month", "week", "day"],
+        order: Literal["ASC", "DESC"] = "ASC",
+    ) -> QuerySet[_T, datetime.date]: ...
     def datetimes(
-        self, field_name: str, kind: str, order: str = ..., tzinfo: datetime.tzinfo | None = ...
+        self,
+        field_name: str,
+        kind: Literal["year", "month", "week", "day", "hour", "minute", "second"],
+        order: Literal["ASC", "DESC"] = "ASC",
+        tzinfo: datetime.tzinfo | None = None,
     ) -> QuerySet[_T, datetime.datetime]: ...
     def none(self) -> QuerySet[_T]: ...
     def filter(self, *args: Any, **kwargs: Any) -> QuerySet[_T]: ...

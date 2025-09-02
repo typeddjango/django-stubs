@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
-from typing import Any, Generic, NamedTuple, TypeAlias, overload
+from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload
 
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
@@ -150,9 +150,18 @@ class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
     def values_list(
         self, *fields: str | Combinable, flat: bool = False, named: bool = False
     ) -> QuerySet[_Model, Any]: ...
-    def dates(self, field_name: str, kind: str, order: str = "ASC") -> QuerySet[_Model, datetime.date]: ...
+    def dates(
+        self,
+        field_name: str,
+        kind: Literal["year", "month", "week", "day"],
+        order: Literal["ASC", "DESC"] = "ASC",
+    ) -> QuerySet[_Model, datetime.date]: ...
     def datetimes(
-        self, field_name: str, kind: str, order: str = "ASC", tzinfo: datetime.tzinfo | None = None
+        self,
+        field_name: str,
+        kind: Literal["year", "month", "week", "day", "hour", "minute", "second"],
+        order: Literal["ASC", "DESC"] = "ASC",
+        tzinfo: datetime.tzinfo | None = None,
     ) -> QuerySet[_Model, datetime.datetime]: ...
     def none(self) -> Self: ...
     def all(self) -> Self: ...
