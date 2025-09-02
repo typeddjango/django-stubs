@@ -94,7 +94,7 @@
             class MyModelWithAutoTypedMeta(models.Model):
                 example = models.CharField(max_length=100)
                 class Meta:
-                    abstract = 7  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
+                    abstract = 0  # E: Incompatible types in assignment (expression has type "int", base class "TypedModelMeta" defined the type as "bool")  [assignment]
                     verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "list[str]", base class "TypedModelMeta" defined the type as "str | _StrPromise")  [assignment]
                     unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "dict[int, int]", base class "TypedModelMeta" defined the type as "Sequence[Sequence[str]]")  [assignment]
 
@@ -126,6 +126,7 @@
 
             class MyModel3(models.Model):
                 class Meta(MyModel.Meta, MyModel2.Meta):
+                    abstract = 0 # OK because both base classes currently define this as int
                     verbose_name = ['test']  # E: Incompatible types in assignment (expression has type "list[str]", base class "TypedModelMeta" defined the type as "str | _StrPromise")  [assignment]
                     unique_together = {1: 2}  # E: Incompatible types in assignment (expression has type "dict[int, int]", base class "TypedModelMeta" defined the type as "Sequence[Sequence[str]]")  [assignment]
 
