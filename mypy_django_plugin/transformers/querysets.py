@@ -385,6 +385,9 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         and ctx.args
         and ctx.arg_types
         and ctx.arg_types[0]
+        # Only process the correct overload, i.e.
+        #     def prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
+        and "lookups" in ctx.callee_arg_names
     ):
         return ctx.default_return_type
 
@@ -418,7 +421,9 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             elem_model = helpers.extract_model_type_from_queryset(queryset_type, api)
 
         # Fallback: parse inline call expression
-        if elem_model is None and isinstance(expr, CallExpr):
+        if (elem_model is None or elem_model.type.fullname == fullnames.MODEL_CLASS_FULLNAME) and isinstance(
+            expr, CallExpr
+        ):
             queryset_expr = helpers.get_class_init_argument_by_name(expr, "queryset")
             if queryset_expr is not None and isinstance(
                 (inferred_queryset_type := _infer_prefetch_queryset_type(queryset_expr, api)), Instance

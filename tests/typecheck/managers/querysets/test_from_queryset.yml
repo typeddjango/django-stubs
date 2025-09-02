@@ -653,7 +653,7 @@
         reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "def (*lookups: Any) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "Overload(def () -> myapp.models.MyQuerySet, def (None) -> myapp.models.MyQuerySet, def (*lookups: builtins.str | django.db.models.query.Prefetch[_PrefetchedQuerySetT`-1 = django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], _ToAttrT`-2 = builtins.str]) -> myapp.models.MyQuerySet)"
         reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.select_related)  # N: Revealed type is "Overload(def () -> myapp.models.MyQuerySet, def (None) -> myapp.models.MyQuerySet, def (*fields: builtins.str) -> myapp.models.MyQuerySet)"
