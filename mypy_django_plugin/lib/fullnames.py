@@ -56,7 +56,7 @@ COMBINABLE_EXPRESSION_FULLNAME = "django.db.models.expressions.Combinable"
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 
 ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
-
+TYPED_MODEL_META_FULLNAME = "django_stubs_ext.db.models.TypedModelMeta"
 STR_PROMISE_FULLNAME = "django.utils.functional._StrPromise"
 
 OBJECT_DOES_NOT_EXIST = "django.core.exceptions.ObjectDoesNotExist"

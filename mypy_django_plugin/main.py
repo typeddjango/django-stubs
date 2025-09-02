@@ -64,9 +64,9 @@ class NewSemanalDjangoPlugin(Plugin):
         self.django_context = DjangoContext(self.plugin_config.django_settings_module)
 
     def _get_current_form_bases(self) -> dict[str, int]:
-        model_sym = self.lookup_fully_qualified(fullnames.BASEFORM_CLASS_FULLNAME)
-        if model_sym is not None and isinstance(model_sym.node, TypeInfo):
-            bases = helpers.get_django_metadata_bases(model_sym.node, "baseform_bases")
+        model_info = self._get_typeinfo_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
+        if model_info:
+            bases = helpers.get_django_metadata_bases(model_info, "baseform_bases")
             bases[fullnames.BASEFORM_CLASS_FULLNAME] = 1
             bases[fullnames.FORM_CLASS_FULLNAME] = 1
             bases[fullnames.MODELFORM_CLASS_FULLNAME] = 1
@@ -125,9 +125,11 @@ class NewSemanalDjangoPlugin(Plugin):
                     deps.add(self._new_dependency(related_model_module))
 
         return list(deps) + [
-            # for QuerySet.annotate
+            # For `QuerySet.annotate`
             self._new_dependency("django_stubs_ext"),
-            # For Manager.from_queryset
+            # For `TypedModelMeta` lookup in model transformers
+            self._new_dependency("django_stubs_ext.db.models"),
+            # For `Manager.from_queryset`
             self._new_dependency("django.db.models.query"),
         ]
 
@@ -201,12 +203,8 @@ class NewSemanalDjangoPlugin(Plugin):
         return None
 
     def get_customize_class_mro_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
-        sym = self.lookup_fully_qualified(fullname)
-        if (
-            sym is not None
-            and isinstance(sym.node, TypeInfo)
-            and sym.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-        ):
+        info = self._get_typeinfo_or_none(fullname)
+        if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
             return reparametrize_any_manager_hook
         else:
             return None
@@ -218,8 +216,8 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         # Base class is a Model class definition
-        sym = self.lookup_fully_qualified(fullname)
-        if sym is not None and isinstance(sym.node, TypeInfo) and helpers.is_model_type(sym.node):
+        info = self._get_typeinfo_or_none(fullname)
+        if info and helpers.is_model_type(info):
             return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Form class definition
@@ -227,7 +225,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return forms.transform_form_class
 
         # Base class is a QuerySet class definition
-        if sym is not None and isinstance(sym.node, TypeInfo) and sym.node.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+        if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
             return add_as_manager_to_queryset_class
         return None
 

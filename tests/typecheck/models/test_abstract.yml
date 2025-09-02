@@ -145,7 +145,7 @@
     -   path: myapp/models.py
         content: |
             from django.db import models
-            from typing import Literal
+            from typing import Literal, ClassVar
 
             class Abstract(models.Model):
                 field = models.CharField()
@@ -158,7 +158,7 @@
 
             class LiteralAbstract(models.Model):
                 class Meta:
-                    abstract: Literal[True]
+                    abstract: ClassVar[Literal[True]]
 
 
 - case: test_use_abstract_model
