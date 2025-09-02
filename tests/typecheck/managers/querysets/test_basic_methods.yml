@@ -83,6 +83,20 @@
         from myapp.models import Book
         reveal_type(Book.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
         reveal_type(Book.objects.filter(pk=1).select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+
+        Book.objects.select_related()
+        Book.objects.all().select_related()
+        Book.objects.select_related(None)
+        Book.objects.all().select_related(None)
+        Book.objects.select_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+        Book.objects.all().select_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+
+        Book.objects.select_related("None", None) # Should be Error !
+        Book.objects.all().select_related("None", None) # Should be Error !
+        Book.objects.select_related(1) # Should be Error !
+        Book.objects.all().select_related(1) # Should be Error !
+        Book.objects.select_related(True) # Should be Error !
+        Book.objects.all().select_related(True) # Should be Error !
     installed_apps:
         - myapp
     files:
