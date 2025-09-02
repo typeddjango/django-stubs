@@ -656,7 +656,7 @@
         reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "def (*lookups: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.select_related)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.select_related)  # N: Revealed type is "Overload(def () -> myapp.models.MyQuerySet, def (None) -> myapp.models.MyQuerySet, def (*fields: builtins.str) -> myapp.models.MyQuerySet)"
         reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: Any, all: builtins.bool =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: builtins.str | None) -> myapp.models.MyQuerySet"
     installed_apps:

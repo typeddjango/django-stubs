@@ -81,8 +81,8 @@
 -   case: select_related_returns_queryset
     main: |
         from myapp.models import Book
-        reveal_type(Book.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
-        reveal_type(Book.objects.filter(pk=1).select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+        reveal_type(Book.objects.select_related())
+        reveal_type(Book.objects.filter(pk=1).select_related())
 
         Book.objects.select_related()
         Book.objects.all().select_related()
@@ -91,12 +91,46 @@
         Book.objects.select_related("author", "dd") # Should be Error on invalid lookup 'dd' !
         Book.objects.all().select_related("author", "dd") # Should be Error on invalid lookup 'dd' !
 
-        Book.objects.select_related("None", None) # Should be Error !
-        Book.objects.all().select_related("None", None) # Should be Error !
-        Book.objects.select_related(1) # Should be Error !
-        Book.objects.all().select_related(1) # Should be Error !
-        Book.objects.select_related(True) # Should be Error !
-        Book.objects.all().select_related(True) # Should be Error !
+        Book.objects.select_related("None", None)
+        Book.objects.all().select_related("None", None)
+        Book.objects.select_related(1)
+        Book.objects.all().select_related(1)
+        Book.objects.select_related(True)
+        Book.objects.all().select_related(True)
+    out: |
+      main:2: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+      main:3: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+      main:12: error: No overload variant of "select_related" of "Manager" matches argument types "str", "None"  [call-overload]
+      main:12: note: Possible overload variants:
+      main:12: note:     def select_related(self) -> QuerySet[Book, Book]
+      main:12: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
+      main:12: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+      main:13: error: No overload variant of "select_related" of "QuerySet" matches argument types "str", "None"  [call-overload]
+      main:13: note: Possible overload variants:
+      main:13: note:     def select_related(self) -> QuerySet[Book, Book]
+      main:13: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
+      main:13: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+      main:14: error: No overload variant of "select_related" of "Manager" matches argument type "int"  [call-overload]
+      main:14: note: Possible overload variants:
+      main:14: note:     def select_related(self) -> QuerySet[Book, Book]
+      main:14: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
+      main:14: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+      main:15: error: No overload variant of "select_related" of "QuerySet" matches argument type "int"  [call-overload]
+      main:15: note: Possible overload variants:
+      main:15: note:     def select_related(self) -> QuerySet[Book, Book]
+      main:15: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
+      main:15: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+      main:16: error: No overload variant of "select_related" of "Manager" matches argument type "bool"  [call-overload]
+      main:16: note: Possible overload variants:
+      main:16: note:     def select_related(self) -> QuerySet[Book, Book]
+      main:16: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
+      main:16: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+      main:17: error: No overload variant of "select_related" of "QuerySet" matches argument type "bool"  [call-overload]
+      main:17: note: Possible overload variants:
+      main:17: note:     def select_related(self) -> QuerySet[Book, Book]
+      main:17: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
+      main:17: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+
     installed_apps:
         - myapp
     files:
