@@ -172,7 +172,7 @@
     installed_apps:
         - django.contrib.auth
 
--   case: prefetch_related_conflict_with_annotate
+-   case: prefetch_related_to_attr_conflict_with_annotate
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -195,3 +195,40 @@
         reveal_type(prefetch_into_annotate)  # N: Revealed type is "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
     installed_apps:
         - django.contrib.auth
+
+
+-   case: prefetch_related_to_attr_conflict_with_model_attr
+    main: |
+        from django.db.models import Prefetch, F
+        from myapp.models import Article, Tag
+
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="pk"))  # E: Attribute "pk" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="id"))  # E: Attribute "id" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tags"))  # E: Attribute "tags" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_property"))  # E: Attribute "my_property" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "Article"  [no-redef]
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Tag(models.Model): ...
+                class Article(models.Model):
+                    tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
+
+                    @property
+                    def my_property(self) -> int: ...
+
+                    def my_method(self) -> int: ...
+
+                    @staticmethod
+                    def my_staticmethod() -> int: ...
+
+                    @classmethod
+                    def my_classmethod(cls) -> int:  ...

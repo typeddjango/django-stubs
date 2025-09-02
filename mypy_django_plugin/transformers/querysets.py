@@ -5,6 +5,7 @@ from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
+from mypy.errorcodes import NO_REDEF
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
@@ -446,7 +447,11 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
         )
 
-        if not (model_type.extra_attrs and to_attr_value in model_type.extra_attrs.attrs):
+        if model_type.type.get(to_attr_value):
+            ctx.api.fail(
+                f'Attribute "{to_attr_value}" already defined on "{model_type.type.name}"', ctx.context, code=NO_REDEF
+            )
+        elif not (model_type.extra_attrs and to_attr_value in model_type.extra_attrs.attrs):
             # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
             # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
             # So only add the annotation here if it doesn't exist yet.
