@@ -446,7 +446,11 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
         )
 
-        fields[to_attr_value] = value_type
+        if not (model_type.extra_attrs and to_attr_value in model_type.extra_attrs.attrs):
+            # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
+            # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
+            # So only add the annotation here if it doesn't exist yet.
+            fields[to_attr_value] = value_type
 
     if not fields:
         return ctx.default_return_type
