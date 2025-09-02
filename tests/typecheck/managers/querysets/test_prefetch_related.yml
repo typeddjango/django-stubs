@@ -196,7 +196,6 @@
     installed_apps:
         - django.contrib.auth
 
-
 -   case: prefetch_related_to_attr_conflict_with_model_attr
     main: |
         from django.db.models import Prefetch, F
@@ -232,3 +231,24 @@
 
                     @classmethod
                     def my_classmethod(cls) -> int:  ...
+
+-   case: raw_queryset_prefetch_related_signatures
+    main: |
+        from myapp.models import Person, Book
+        from django.db.models import Prefetch
+
+        raw_qs = Book.objects.raw("SELECT 1")
+        reveal_type(raw_qs.prefetch_related())  # N: Revealed type is "django.db.models.query.RawQuerySet[myapp.models.Book]"
+        reveal_type(raw_qs.prefetch_related(None))  # N: Revealed type is "django.db.models.query.RawQuerySet[myapp.models.Book]"
+        reveal_type(raw_qs.prefetch_related("author"))  # N: Revealed type is "django.db.models.query.RawQuerySet[myapp.models.Book]"
+        reveal_type(raw_qs.prefetch_related(Prefetch("author")))  # N: Revealed type is "django.db.models.query.RawQuerySet[myapp.models.Book]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Person(models.Model): ...
+                class Book(models.Model):
+                    author = models.ForeignKey(Person, on_delete=models.CASCADE)
