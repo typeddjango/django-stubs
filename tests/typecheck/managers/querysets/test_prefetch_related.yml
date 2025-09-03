@@ -213,6 +213,9 @@
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "Article"  [no-redef]
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "Article"  [no-redef]
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "Article"  [no-redef]
+
+        Tag.objects.prefetch_related(Prefetch("articles", Article.objects.all(), to_attr="articles"))  # E: Attribute "articles" already defined on "Tag"  [no-redef]
+
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
