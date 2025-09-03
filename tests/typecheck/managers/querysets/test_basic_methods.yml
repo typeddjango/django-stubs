@@ -18,7 +18,7 @@
         reveal_type(qs.none()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
         reveal_type(qs.update_or_create()) # N: Revealed type is "tuple[myapp.models.Blog, builtins.bool]"
         reveal_type(qs.explain()) # N: Revealed type is "builtins.str"
-        reveal_type(qs.raw(qs.explain())) # N: Revealed type is "django.db.models.query.RawQuerySet[Any]"
+        reveal_type(qs.raw(qs.explain())) # N: Revealed type is "django.db.models.query.RawQuerySet[myapp.models.Blog]"
         reveal_type(qs.distinct()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
         reveal_type(qs.distinct("created_at")) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, myapp.models.Blog]"
         # .dates / .datetimes
@@ -109,34 +109,146 @@
       main:3: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
       main:12: error: No overload variant of "select_related" of "Manager" matches argument types "str", "None"  [call-overload]
       main:12: note: Possible overload variants:
-      main:12: note:     def select_related(self) -> QuerySet[Book, Book]
       main:12: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
       main:12: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
       main:13: error: No overload variant of "select_related" of "QuerySet" matches argument types "str", "None"  [call-overload]
       main:13: note: Possible overload variants:
-      main:13: note:     def select_related(self) -> QuerySet[Book, Book]
       main:13: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
       main:13: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
       main:14: error: No overload variant of "select_related" of "Manager" matches argument type "int"  [call-overload]
       main:14: note: Possible overload variants:
-      main:14: note:     def select_related(self) -> QuerySet[Book, Book]
       main:14: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
       main:14: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
       main:15: error: No overload variant of "select_related" of "QuerySet" matches argument type "int"  [call-overload]
       main:15: note: Possible overload variants:
-      main:15: note:     def select_related(self) -> QuerySet[Book, Book]
       main:15: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
       main:15: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
       main:16: error: No overload variant of "select_related" of "Manager" matches argument type "bool"  [call-overload]
       main:16: note: Possible overload variants:
-      main:16: note:     def select_related(self) -> QuerySet[Book, Book]
       main:16: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
       main:16: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
       main:17: error: No overload variant of "select_related" of "QuerySet" matches argument type "bool"  [call-overload]
       main:17: note: Possible overload variants:
-      main:17: note:     def select_related(self) -> QuerySet[Book, Book]
       main:17: note:     def select_related(self, None, /) -> QuerySet[Book, Book]
       main:17: note:     def select_related(self, *fields: str) -> QuerySet[Book, Book]
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Person(models.Model):
+                    pass
+
+                class Book(models.Model):
+                    author = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+-   case: prefetch_related_returns_queryset
+    main: |
+        from myapp.models import Book
+        reveal_type(Book.objects.prefetch_related())
+        reveal_type(Book.objects.filter(pk=1).prefetch_related())
+
+        Book.objects.prefetch_related()
+        Book.objects.all().prefetch_related()
+        Book.objects.prefetch_related(None)
+        Book.objects.all().prefetch_related(None)
+        Book.objects.prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+        Book.objects.all().prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+
+        Book.objects.prefetch_related("None", None)
+        Book.objects.all().prefetch_related("None", None)
+        Book.objects.prefetch_related(1)
+        Book.objects.all().prefetch_related(1)
+        Book.objects.prefetch_related(True)
+        Book.objects.all().prefetch_related(True)
+    out: |
+      main:2: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+      main:3: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, myapp.models.Book]"
+      main:12: error: No overload variant of "prefetch_related" of "Manager" matches argument types "str", "None"  [call-overload]
+      main:12: note: Possible overload variants:
+      main:12: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
+      main:12: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:13: error: No overload variant of "prefetch_related" of "QuerySet" matches argument types "str", "None"  [call-overload]
+      main:13: note: Possible overload variants:
+      main:13: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
+      main:13: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:14: error: No overload variant of "prefetch_related" of "Manager" matches argument type "int"  [call-overload]
+      main:14: note: Possible overload variants:
+      main:14: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
+      main:14: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:15: error: No overload variant of "prefetch_related" of "QuerySet" matches argument type "int"  [call-overload]
+      main:15: note: Possible overload variants:
+      main:15: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
+      main:15: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:16: error: No overload variant of "prefetch_related" of "Manager" matches argument type "bool"  [call-overload]
+      main:16: note: Possible overload variants:
+      main:16: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
+      main:16: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:17: error: No overload variant of "prefetch_related" of "QuerySet" matches argument type "bool"  [call-overload]
+      main:17: note: Possible overload variants:
+      main:17: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
+      main:17: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Person(models.Model):
+                    pass
+
+                class Book(models.Model):
+                    author = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+-   case: prefetch_related_returns_raw_queryset
+    main: |
+        from myapp.models import Book
+        raw_qs = Book.objects.raw("SELECT 1")
+        raw_qs_from_manager = Book.objects.raw("SELECT 1")
+
+        raw_qs_from_manager.prefetch_related()
+        raw_qs.prefetch_related()
+        raw_qs_from_manager.prefetch_related(None)
+        raw_qs.prefetch_related(None)
+        raw_qs_from_manager.prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+        raw_qs.prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+
+        raw_qs_from_manager.prefetch_related("None", None)
+        raw_qs.prefetch_related("None", None)
+        raw_qs_from_manager.prefetch_related(1)
+        raw_qs.prefetch_related(1)
+        raw_qs_from_manager.prefetch_related(True)
+        raw_qs.prefetch_related(True)
+    out: |
+      main:12: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument types "str", "None"  [call-overload]
+      main:12: note: Possible overload variants:
+      main:12: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
+      main:12: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:13: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument types "str", "None"  [call-overload]
+      main:13: note: Possible overload variants:
+      main:13: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
+      main:13: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:14: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "int"  [call-overload]
+      main:14: note: Possible overload variants:
+      main:14: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
+      main:14: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:15: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "int"  [call-overload]
+      main:15: note: Possible overload variants:
+      main:15: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
+      main:15: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:16: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "bool"  [call-overload]
+      main:16: note: Possible overload variants:
+      main:16: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
+      main:16: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:17: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "bool"  [call-overload]
+      main:17: note: Possible overload variants:
+      main:17: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
+      main:17: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
 
     installed_apps:
         - myapp
