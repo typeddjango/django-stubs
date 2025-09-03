@@ -13,6 +13,7 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.helpers import DjangoModel
 from mypy_django_plugin.transformers.models import get_annotated_type
 
 
@@ -181,10 +182,10 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
     return kwargs
 
 
-def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType] | None:
+def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType]:
     kwargs = gather_kwargs(ctx)
     if not kwargs:
-        return None
+        return {}
 
     # For now, we don't try to resolve the output_field of the field would be, but use Any.
     # NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
@@ -226,21 +227,21 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         return ctx.default_return_type
 
     api = helpers.get_typechecker_api(ctx)
-    expression_types = gather_expression_types(ctx)
+    expression_types = {
+        attr_name: typ
+        for attr_name, typ in gather_expression_types(ctx).items()
+        if not check_conflicting_attr_value(ctx, django_model, attr_name)
+    }
 
-    fields_dict = None
-    if expression_types is not None:
+    annotated_type: ProperType = django_model.typ
+    if expression_types:
         fields_dict = helpers.make_typeddict(
             api,
             fields=expression_types,
             required_keys=set(expression_types.keys()),
             readonly_keys=set(),
         )
-
-    if fields_dict is not None:
         annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
-    else:
-        annotated_type = django_model.typ
 
     row_type: MypyType
     if len(default_return_type.args) > 1:
@@ -311,10 +312,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
         column_types[field_lookup] = field_lookup_type
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
-    expression_types = gather_expression_types(ctx)
-    if expression_types is not None:
-        column_types.update(expression_types)
-
+    column_types.update(gather_expression_types(ctx))
     row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
     return default_return_type.copy_modified(args=[django_model.typ, row_type])
 
@@ -372,6 +370,44 @@ def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, Proper
     return lookups
 
 
+def check_conflicting_attr_value(
+    ctx: MethodContext, model: DjangoModel, attr_name: str, new_attrs: dict[str, MypyType] | None = None
+) -> bool:
+    """
+    Check if adding `attr_name` would conflict with existing symbols on `model`.
+
+    Args:
+        - model: The Django model being analyzed
+        - attr_name: The name of the attribute to be added
+        - fields: A mapping of field names to types currently being added to the model
+    """
+    is_conflicting_attr_value = bool(
+        # 1. Conflict with another symbol on the model.
+        # Ex:
+        #     User.objects.prefetch_related(Prefetch(..., to_attr="id"))
+        model.typ.type.get(attr_name)
+        # 2. Conflict with a previous annotation.
+        # Ex:
+        #     User.objects.annotate(foo=...).prefetch_related(Prefetch(...,to_attr="foo"))
+        #     User.objects.prefetch_related(Prefetch(...,to_attr="foo")).prefetch_related(Prefetch(...,to_attr="foo"))
+        or (model.typ.extra_attrs and attr_name in model.typ.extra_attrs.attrs)
+        # 3. Conflict with another symbol added in the current processing.
+        # Ex:
+        #     User.objects.prefetch_related(
+        #        Prefetch("groups", Group.objects.filter(name="test"), to_attr="new_attr"),
+        #        Prefetch("groups", Group.objects.all(), to_attr="new_attr"), # E: Not OK!
+        #     )
+        or (new_attrs is not None and attr_name in new_attrs)
+    )
+    if is_conflicting_attr_value:
+        ctx.api.fail(
+            f'Attribute "{attr_name}" already defined on "{model.typ.type.name}"',
+            ctx.context,
+            code=NO_REDEF,
+        )
+    return is_conflicting_attr_value
+
+
 def extract_prefetch_related_annotations(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     """
     Extract annotated attributes via `prefetch_related(Prefetch(..., to_attr=...))`
@@ -392,7 +428,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     ):
         return ctx.default_return_type
 
-    fields: dict[str, MypyType] = {}
+    new_attrs: dict[str, MypyType] = {}
 
     for expr, typ in gather_flat_args(ctx):
         if not (isinstance(typ, Instance) and typ.type.has_base(fullnames.PREFETCH_CLASS_FULLNAME)):
@@ -450,23 +486,16 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
         )
 
-        if qs_model.typ.type.get(to_attr_value):
-            ctx.api.fail(
-                f'Attribute "{to_attr_value}" already defined on "{qs_model.typ.type.name}"', ctx.context, code=NO_REDEF
-            )
-        elif not (qs_model.typ.extra_attrs and to_attr_value in qs_model.typ.extra_attrs.attrs):
-            # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
-            # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
-            # So only add the annotation here if it doesn't exist yet.
-            fields[to_attr_value] = value_type
+        if not check_conflicting_attr_value(ctx, qs_model, to_attr_value, new_attrs):
+            new_attrs[to_attr_value] = value_type
 
-    if not fields:
+    if not new_attrs:
         return ctx.default_return_type
 
     fields_dict = helpers.make_typeddict(
         api,
-        fields=fields,
-        required_keys=set(fields.keys()),
+        fields=new_attrs,
+        required_keys=set(new_attrs.keys()),
         readonly_keys=set(),
     )
 
