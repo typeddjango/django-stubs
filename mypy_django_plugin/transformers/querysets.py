@@ -358,14 +358,15 @@ def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, Proper
     arguments when their type is a TupleType with statically known items.
     """
     lookups: list[tuple[Expression | None, ProperType]] = []
+    arg_start_idx = 0
     for expr, typ, kind in zip(ctx.args[0], ctx.arg_types[0], ctx.arg_kinds[0], strict=False):
         ptyp = get_proper_type(typ)
         if kind == ARG_STAR:
             # Expand starred tuple items if statically known
             if isinstance(ptyp, TupleType):
-                for item_typ in ptyp.items:
-                    lookups.append((None, get_proper_type(item_typ)))
+                lookups.append((None, get_proper_type(ptyp.items[arg_start_idx])))
             # If not a TupleType (e.g. list/Iterable), we cannot expand statically
+            arg_start_idx += 1
             continue
         lookups.append((expr, ptyp))
     return lookups
