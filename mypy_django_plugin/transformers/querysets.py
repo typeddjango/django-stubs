@@ -387,7 +387,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         and ctx.arg_types[0]
         # Only process the correct overload, i.e.
         #     def prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
-        and "lookups" in ctx.callee_arg_names
+        and None not in ctx.callee_arg_names
     ):
         return ctx.default_return_type
 
