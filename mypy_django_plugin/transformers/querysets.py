@@ -437,13 +437,12 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
                     continue
 
                 if lookup_value := helpers.resolve_string_attribute_value(lookup_expr, django_context):
-                    if qs_model := helpers.get_model_info_from_qs_ctx(ctx, django_context):
-                        try:
-                            observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup_value)[1]
-                            if model_info := helpers.lookup_class_typeinfo(api, observed_model_cls):
-                                elem_model = Instance(model_info, [])
-                        except (FieldError, LookupsAreUnsupported):
-                            pass
+                    try:
+                        observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup_value)[1]
+                        if model_info := helpers.lookup_class_typeinfo(api, observed_model_cls):
+                            elem_model = Instance(model_info, [])
+                    except (FieldError, LookupsAreUnsupported):
+                        pass
 
         value_type = api.named_generic_type(
             "builtins.list",
