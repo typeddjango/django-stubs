@@ -1,4 +1,6 @@
 -   case: prefetch_related_to_attr
+    installed_apps:
+        - myapp
     main: |
         from myapp.models import Article, Tag
         from django.db.models import Prefetch, F, QuerySet
@@ -143,8 +145,7 @@
             return prefetch_objs
 
         reveal_type(Article.objects.prefetch_related(*_get_prefetches()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})]]"
-    installed_apps:
-        - myapp
+
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -156,6 +157,8 @@
                     tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
 
 -   case: prefetch_related_and_annotate
+    installed_apps:
+        - django.contrib.auth
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -169,10 +172,11 @@
         reveal_type(user.annotated_user) # N: Revealed type is "Any"
         reveal_type(user.to_attr_groups) # N: Revealed type is "builtins.list[django.contrib.auth.models.Group]"
 
-    installed_apps:
-        - django.contrib.auth
+
 
 -   case: prefetch_related_to_attr_conflict_with_annotate
+    installed_apps:
+        - django.contrib.auth
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -193,10 +197,11 @@
             .get()
         )
         reveal_type(prefetch_into_annotate)  # N: Revealed type is "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
-    installed_apps:
-        - django.contrib.auth
+
 
 -   case: prefetch_related_to_attr_conflict_with_model_attr
+    installed_apps:
+        - myapp
     main: |
         from django.db.models import Prefetch, F
         from myapp.models import Article, Tag
@@ -208,9 +213,6 @@
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "Article"  [no-redef]
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "Article"  [no-redef]
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "Article"  [no-redef]
-
-    installed_apps:
-        - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
