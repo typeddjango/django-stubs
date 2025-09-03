@@ -645,7 +645,7 @@
         reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.defer)  # N: Revealed type is "def (*fields: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: builtins.str) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: builtins.dict[builtins.str, Any] | None =, where: typing.Sequence[builtins.str] | None =, params: typing.Sequence[Any] | None =, tables: typing.Sequence[builtins.str] | None =, order_by: typing.Sequence[builtins.str] | None =, select_params: typing.Sequence[Any] | None =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
