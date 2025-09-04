@@ -401,7 +401,7 @@ def check_conflicting_attr_value(
     )
     if is_conflicting_attr_value:
         ctx.api.fail(
-            f'Attribute "{attr_name}" already defined on "{model.typ.type.name}"',
+            f'Attribute "{attr_name}" already defined on "{model.typ}"',
             ctx.context,
             code=NO_REDEF,
         )

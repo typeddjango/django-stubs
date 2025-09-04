@@ -185,13 +185,13 @@
         # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
         # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
         annotate_into_prefetch = (
-            User.objects # E: Attribute "foo" already defined on "User@AnnotatedWith"  [no-redef]
+            User.objects # E: Attribute "foo" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"  [no-redef]
             .annotate(foo=F("username"))
             .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
             .get()
         )
         prefetch_into_annotate = (
-            User.objects  # E: Attribute "foo" already defined on "User@AnnotatedWith"  [no-redef]
+            User.objects  # E: Attribute "foo" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': builtins.list[django.contrib.auth.models.Group]})]"  [no-redef]
             .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
             .annotate(foo=F("username"))
             .get()
@@ -205,15 +205,15 @@
         from django.db.models import Prefetch, F
         from myapp.models import Article, Tag
 
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="pk"))  # E: Attribute "pk" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="id"))  # E: Attribute "id" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tags"))  # E: Attribute "tags" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_property"))  # E: Attribute "my_property" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="pk"))  # E: Attribute "pk" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="id"))  # E: Attribute "id" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tags"))  # E: Attribute "tags" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_property"))  # E: Attribute "my_property" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "myapp.models.Article"  [no-redef]
 
-        Tag.objects.prefetch_related(Prefetch("articles", Article.objects.all(), to_attr="articles"))  # E: Attribute "articles" already defined on "Tag"  [no-redef]
+        Tag.objects.prefetch_related(Prefetch("articles", Article.objects.all(), to_attr="articles"))  # E: Attribute "articles" already defined on "myapp.models.Tag"  [no-redef]
 
     files:
         -   path: myapp/__init__.py
@@ -264,11 +264,11 @@
         from django.db.models import Prefetch
         from django.contrib.auth.models import User, Group
 
-        User.objects.prefetch_related( # E: Attribute "new_attr" already defined on "User"  [no-redef]
+        User.objects.prefetch_related( # E: Attribute "new_attr" already defined on "django.contrib.auth.models.User"  [no-redef]
            Prefetch("groups", Group.objects.filter(name="test"), to_attr="new_attr"),
            Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
         )
-        User.objects.prefetch_related( # E: Attribute "new_attr" already defined on "User@AnnotatedWith"  [no-redef]
+        User.objects.prefetch_related( # E: Attribute "new_attr" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'new_attr': builtins.list[django.contrib.auth.models.Group]})]"  [no-redef]
            Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
         ).prefetch_related(
            Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
