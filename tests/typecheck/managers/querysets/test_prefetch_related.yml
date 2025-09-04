@@ -1,4 +1,6 @@
 -   case: prefetch_related_to_attr
+    installed_apps:
+        - myapp
     main: |
         from myapp.models import Article, Tag
         from django.db.models import Prefetch, F, QuerySet
@@ -128,12 +130,13 @@
         first_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
         second_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags2")
         third_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags3")
+        fourth_prefetch = Prefetch("tags", Tag.objects.all(), to_attr="every_tags4")
         prefetch_objs = (first_prefetch, second_prefetch)
 
         reveal_type(Article.objects.prefetch_related(*prefetch_objs).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})]]"
         reveal_type(Article.objects.prefetch_related(third_prefetch, *prefetch_objs).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags3': builtins.list[myapp.models.Tag], 'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags3': builtins.list[myapp.models.Tag], 'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})]]"
         reveal_type(Article.objects.prefetch_related(*prefetch_objs, third_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag], 'every_tags3': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag], 'every_tags3': builtins.list[myapp.models.Tag]})]]"
-        reveal_type(Article.objects.prefetch_related(first_prefetch, *prefetch_objs, third_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag], 'every_tags3': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag], 'every_tags3': builtins.list[myapp.models.Tag]})]]"
+        reveal_type(Article.objects.prefetch_related(fourth_prefetch, *prefetch_objs, third_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags4': builtins.list[myapp.models.Tag], 'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag], 'every_tags3': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags4': builtins.list[myapp.models.Tag], 'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag], 'every_tags3': builtins.list[myapp.models.Tag]})]]"
 
         # *args prefetch from helper function
         def _get_prefetches() -> tuple[
@@ -143,8 +146,7 @@
             return prefetch_objs
 
         reveal_type(Article.objects.prefetch_related(*_get_prefetches()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'every_tags2': builtins.list[myapp.models.Tag]})]]"
-    installed_apps:
-        - myapp
+
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -156,6 +158,8 @@
                     tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
 
 -   case: prefetch_related_and_annotate
+    installed_apps:
+        - django.contrib.auth
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -169,10 +173,11 @@
         reveal_type(user.annotated_user) # N: Revealed type is "Any"
         reveal_type(user.to_attr_groups) # N: Revealed type is "builtins.list[django.contrib.auth.models.Group]"
 
-    installed_apps:
-        - django.contrib.auth
+
 
 -   case: prefetch_related_to_attr_conflict_with_annotate
+    installed_apps:
+        - django.contrib.auth
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -180,37 +185,36 @@
         # When mixing `.annotate(foo=...)` and `prefetch_related(Prefetch(...,to_attr=foo))`
         # The last annotate in the chain takes precedence (even if it is prior to the prefetch_related)
         annotate_into_prefetch = (
-            User.objects
+            User.objects # E: Attribute "foo" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"  [no-redef]
             .annotate(foo=F("username"))
             .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
             .get()
         )
-        reveal_type(annotate_into_prefetch)  # N: Revealed type is "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
         prefetch_into_annotate = (
-            User.objects
+            User.objects  # E: Attribute "foo" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': builtins.list[django.contrib.auth.models.Group]})]"  [no-redef]
             .prefetch_related(Prefetch("groups", Group.objects.all(), to_attr="foo"))
             .annotate(foo=F("username"))
             .get()
         )
-        reveal_type(prefetch_into_annotate)  # N: Revealed type is "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
-    installed_apps:
-        - django.contrib.auth
+
 
 -   case: prefetch_related_to_attr_conflict_with_model_attr
+    installed_apps:
+        - myapp
     main: |
         from django.db.models import Prefetch, F
         from myapp.models import Article, Tag
 
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="pk"))  # E: Attribute "pk" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="id"))  # E: Attribute "id" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tags"))  # E: Attribute "tags" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_property"))  # E: Attribute "my_property" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "Article"  [no-redef]
-        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="pk"))  # E: Attribute "pk" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="id"))  # E: Attribute "id" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tags"))  # E: Attribute "tags" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_property"))  # E: Attribute "my_property" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_method"))  # E: Attribute "my_method" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_classmethod"))  # E: Attribute "my_classmethod" already defined on "myapp.models.Article"  [no-redef]
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_staticmethod"))  # E: Attribute "my_staticmethod" already defined on "myapp.models.Article"  [no-redef]
 
-    installed_apps:
-        - myapp
+        Tag.objects.prefetch_related(Prefetch("articles", Article.objects.all(), to_attr="articles"))  # E: Attribute "articles" already defined on "myapp.models.Tag"  [no-redef]
+
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -252,3 +256,23 @@
                 class Person(models.Model): ...
                 class Book(models.Model):
                     author = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+-   case: prefetch_related_conflicting_prefetches_on_same_attr
+    installed_apps:
+        - django.contrib.auth
+    main: |
+        from django.db.models import Prefetch
+        from django.contrib.auth.models import User, Group
+
+        User.objects.prefetch_related( # E: Attribute "new_attr" already defined on "django.contrib.auth.models.User"  [no-redef]
+           Prefetch("groups", Group.objects.filter(name="test"), to_attr="new_attr"),
+           Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
+        )
+        User.objects.prefetch_related( # E: Attribute "new_attr" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'new_attr': builtins.list[django.contrib.auth.models.Group]})]"  [no-redef]
+           Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
+        ).prefetch_related(
+           Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
+        )
+        User.objects.prefetch_related("groups", Prefetch("groups")) # Ok
+        User.objects.prefetch_related("groups", Prefetch("groups", Group.objects.filter(name="test"))) # TODO: Should be Not OK!
+        User.objects.prefetch_related(Prefetch("groups", Group.objects.filter(name="test")), "groups") # TODO: Should be Not OK! (but OK at runtime :/)
