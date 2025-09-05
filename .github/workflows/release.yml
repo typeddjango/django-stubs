@@ -17,7 +17,7 @@ jobs:
       id-token: write
     steps:
       - name: Setup python to build package
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install build
@@ -42,7 +42,7 @@ jobs:
       id-token: write
     steps:
       - name: Setup python to build package
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install build
