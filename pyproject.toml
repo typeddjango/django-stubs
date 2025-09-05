@@ -62,7 +62,9 @@ tests = [
     "mypy==1.17.0",
     "django-stubs[compatible-mypy,oracle,redis]",
 ]
-pyright = ["pyright==1.1.401"]
+pyright = [
+    "pyright==1.1.405",
+]
 
 dev = [
     {include-group = "tests"},
