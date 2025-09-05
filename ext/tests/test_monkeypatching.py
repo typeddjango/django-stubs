@@ -15,9 +15,6 @@ from django_stubs_ext.patch import _need_generic, _VersionSpec
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.monkeypatch import MonkeyPatch
-
 
 class _MakeGenericClasses(Protocol):
     """Used to represent a type of ``make_generic_classes`` fixture."""
@@ -32,8 +29,8 @@ class _MakeGenericClasses(Protocol):
 
 @pytest.fixture(scope="function")
 def make_generic_classes(
-    request: FixtureRequest,
-    monkeypatch: MonkeyPatch,
+    request: pytest.FixtureRequest,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> _MakeGenericClasses:
     _extra_classes: list[type] = []
 
