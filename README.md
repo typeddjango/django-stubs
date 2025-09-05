@@ -340,6 +340,8 @@ strict_settings = false
 And then:
 
 ```python
+from typing import reveal_type
+
 # Works:
 reveal_type(settings.EXISTS_AT_RUNTIME)  # N: Any
 

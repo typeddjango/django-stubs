@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import builtins
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django import VERSION
@@ -123,7 +122,7 @@ if VERSION >= (6, 0):
     )
 
 
-def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: bool = True) -> None:
+def monkeypatch(extra_classes: Iterable[type] | None = None) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
     # Add the __class_getitem__ dunder.
     suited_for_this_version = filter(
@@ -135,8 +134,3 @@ def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: b
     if extra_classes:
         for cls in extra_classes:
             cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
-
-    # Add `reveal_type` and `reveal_locals` helpers if needed:
-    if include_builtins:
-        builtins.reveal_type = lambda obj, /: obj
-        builtins.reveal_locals = lambda: None
