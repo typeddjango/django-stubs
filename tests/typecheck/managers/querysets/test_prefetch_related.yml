@@ -5,7 +5,7 @@
         from myapp.models import Article, Tag
         from django.db.models import Prefetch, F, QuerySet
         from django.db import models
-        from typing_extensions import Literal, TypedDict
+        from typing_extensions import Literal, TypedDict, reveal_type
         from django_stubs_ext import WithAnnotations
 
         ### Noop (to_attr not provided)
@@ -163,6 +163,7 @@
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
+        from typing_extensions import reveal_type
 
         user = (
             User.objects
@@ -238,6 +239,7 @@
 
 -   case: raw_queryset_prefetch_related_signatures
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Person, Book
         from django.db.models import Prefetch
 

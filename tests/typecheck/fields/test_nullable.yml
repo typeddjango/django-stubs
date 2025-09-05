@@ -33,6 +33,7 @@
                     id = models.AutoField(primary_key=True)
 -   case: nullable_field_with_strict_optional_true
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().text)  # N: Revealed type is "builtins.str"
         reveal_type(MyModel().text_nullable)  # N: Revealed type is "builtins.str | None"
@@ -51,6 +52,7 @@
 
 -   case: nullable_array_field
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().lst)  # N: Revealed type is "builtins.list[builtins.str] | None"
     installed_apps:
@@ -67,6 +69,7 @@
 
 -   case: nullable_foreign_key
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Publisher, Book
         reveal_type(Book().publisher)  # N: Revealed type is "myapp.models.Publisher | None"
         Book().publisher = 11  # E: Incompatible types in assignment (expression has type "int", variable has type "Publisher | Combinable | None")  [assignment]
@@ -85,6 +88,7 @@
 
 -   case: nullable_self_foreign_key
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Inventory
         parent = Inventory()
         core = Inventory(parent_id=parent.id)

@@ -1,6 +1,7 @@
 - case: queryset_isinstance_check
   main: |
     from typing import Any
+    from typing_extensions import reveal_type
     from django.db.models.query import QuerySet
     from django_stubs_ext import QuerySetAny
 

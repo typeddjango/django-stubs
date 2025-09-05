@@ -2,6 +2,7 @@
   main: |
     from collections.abc import Sequence
     from typing import Any
+    from typing_extensions import reveal_type
 
     from django.apps.config import AppConfig
     from django.core.checks import register, Warning, CheckMessage

@@ -1,5 +1,6 @@
 -   case: test_find_one
     main: |
+      from typing_extensions import reveal_type
       from django.contrib.staticfiles import finders
 
       reveal_type(finders.find("filepath"))  # N: Revealed type is "builtins.str | None"
@@ -13,6 +14,7 @@
 
 -   case: test_find_all
     main: |
+      from typing_extensions import reveal_type
       from django.contrib.staticfiles import finders
 
       reveal_type(finders.find("filepath", find_all=True))  # N: Revealed type is "builtins.list[builtins.str]"
@@ -26,6 +28,7 @@
 
 -   case: test_file_system_finder  # test methods *only* on FileSystemFinder
     main: |
+      from typing_extensions import reveal_type
       from django.contrib.staticfiles.finders import FileSystemFinder
 
       finder = FileSystemFinder()
@@ -33,6 +36,7 @@
 
 -   case: test_app_directories_finder  # test methods *only* on AppDirectoriesFinder
     main: |
+      from typing_extensions import reveal_type
       from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
       finder = AppDirectoriesFinder()

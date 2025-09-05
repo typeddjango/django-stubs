@@ -1,6 +1,7 @@
 -   case: multivaluedict
     main: |
       from django.utils.datastructures import MultiValueDict
+      from typing_extensions import reveal_type
 
       # check constructors
       var1 = MultiValueDict()  # E: Need type annotation for "var1"  [var-annotated]

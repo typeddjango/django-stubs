@@ -256,7 +256,7 @@ class DjangoContext:
 
                     expected_types[field_name] = model_set_type
 
-            elif contenttypes_in_apps and isinstance(field, GenericForeignKey):
+            elif contenttypes_in_apps and isinstance(field, GenericForeignKey):  # type: ignore[possibly-undefined]
                 # it's generic, so cannot set specific model
                 field_name = field.name
                 gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
@@ -510,7 +510,7 @@ class DjangoContext:
         for lookup_base in helpers.iter_bases(lookup_info):
             if lookup_base.args and isinstance((lookup_type := get_proper_type(lookup_base.args[0])), Instance):
                 # if it's Field, consider lookup_type a __get__ of current field
-                if isinstance(lookup_type, Instance) and lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
+                if lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
                     field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
                     if field_info is None:
                         return AnyType(TypeOfAny.explicit)

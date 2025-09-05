@@ -28,6 +28,7 @@
 -   case: formview_methods_on_forms_return_proper_types
     main: |
         from typing import Any
+        from typing_extensions import reveal_type
         from django import forms
         from django.http import HttpRequest, HttpResponse
         from django.views.generic.edit import FormView
@@ -87,6 +88,7 @@
 
 -   case: updateview_form_valid_has_form_save
     main: |
+        from typing_extensions import reveal_type
         from django import forms
         from django.http import HttpResponse
         from django.views.generic.edit import UpdateView

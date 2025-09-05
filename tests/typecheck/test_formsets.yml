@@ -1,6 +1,7 @@
 - case: inlineformset_factory
   main: |
     from typing import Any
+    from typing_extensions import reveal_type
     from django import forms
     from myapp.models import Article, Category
     ArticleFS: type[forms.BaseInlineFormSet[Article, Category, Any]] = forms.inlineformset_factory(Category, Article)

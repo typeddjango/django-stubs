@@ -1,5 +1,6 @@
 -   case: meta_attribute_has_a_type_of_current_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         reveal_type(MyUser._meta)  # N: Revealed type is "django.db.models.options.Options[myapp.models.MyUser]"
     installed_apps:
@@ -14,6 +15,7 @@
 
 -   case: get_field_returns_proper_field_type
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
         reveal_type(MyUser.base_name.field)  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
@@ -41,6 +43,7 @@
 
 -   case: get_field_with_abstract_inheritance
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import AbstractModel
         class MyModel(AbstractModel):
             pass

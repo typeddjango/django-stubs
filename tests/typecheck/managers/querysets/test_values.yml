@@ -1,5 +1,6 @@
 -   case: queryset_values_method_returns_typeddict
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         values = Blog.objects.values('num_posts', 'text').get()
         reveal_type(values)  # N: Revealed type is "TypedDict({'num_posts': builtins.int, 'text': builtins.str})"
@@ -22,6 +23,7 @@
 
 -   case: queryset_values_all_values
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         all_values_dict = Blog.objects.values().get()
         reveal_type(all_values_dict)  # N: Revealed type is "TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})"
@@ -43,6 +45,7 @@
 
 -   case: queryset_foreign_key_object_always_a_primary_key
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         values1 = Blog.objects.values('publisher').get()
         reveal_type(values1)  # N: Revealed type is "TypedDict({'publisher': builtins.int})"
@@ -69,6 +72,7 @@
 
 -   case: values_with_related_model_fields
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Entry
         values = Entry.objects.values('blog__num_articles', 'blog__publisher__name').get()
         reveal_type(values)  # N: Revealed type is "TypedDict({'blog__num_articles': builtins.int, 'blog__publisher__name': builtins.str})"
@@ -92,6 +96,7 @@
 
 -   case: select_all_related_model_values_for_every_current_value
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Publisher
         related_model_values = Publisher.objects.values('id', 'blog__name').get()
         reveal_type(related_model_values)  # N: Revealed type is "TypedDict({'id': builtins.int, 'blog__name': builtins.str})"
@@ -110,6 +115,7 @@
 
 -   case: values_of_many_to_many_field
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Author, Book
         reveal_type(Book.objects.values('authors'))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'authors': builtins.int})]"
         reveal_type(Author.objects.values('books'))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Author, TypedDict({'books': builtins.int})]"
@@ -127,6 +133,7 @@
 
 -   case: queryset_values_blank_charfield
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         values = Blog.objects.values('text').get()
         reveal_type(values)  # N: Revealed type is "TypedDict({'text': builtins.str})"
@@ -145,6 +152,7 @@
 
 -   case: queryset_values_with_expressions
     main: |
+        from typing_extensions import reveal_type
         from django.db.models import F
         from django.db.models.functions import Lower
         from myapp.models import Blog
@@ -155,11 +163,11 @@
         reveal_type(Blog.objects.values("id", foo=F("id")))
         reveal_type(Blog.objects.values("id", lower_text=Lower("text")))
     out: |
-      main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
-      main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})]"
-      main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'foo': Any})]"
-      main:8: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'foo': Any})]"
-      main:9: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'lower_text': Any})]"
+      main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int})]"
+      main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'num_posts': builtins.int, 'text': builtins.str})]"
+      main:8: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'foo': Any})]"
+      main:9: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'foo': Any})]"
+      main:10: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, TypedDict({'id': builtins.int, 'lower_text': Any})]"
     installed_apps:
         - myapp
     files:
@@ -174,6 +182,7 @@
 
 -   case: queryset_values_m2m_fk_with_expressions
     main: |
+        from typing_extensions import reveal_type
         from django.db.models import F
         from django.db.models.functions import Lower
         from myapp.models import Book
@@ -181,8 +190,8 @@
         reveal_type(Book.objects.values(premium_price=F("premiumbookdetails__price")))
         reveal_type(Book.objects.values(team_name=F("authors__name")))
     out: |
-      main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'premium_price': Any})]"
-      main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'team_name': Any})]"
+      main:6: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'premium_price': Any})]"
+      main:7: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'team_name': Any})]"
     installed_apps:
         - myapp
     files:

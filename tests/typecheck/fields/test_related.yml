@@ -1,5 +1,6 @@
 -   case: test_foreign_key_field_with_related_name
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book, Publisher
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
@@ -20,6 +21,7 @@
 
 -   case: foreign_key_field_creates_attribute_with_underscore_id
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book
         book = Book()
         reveal_type(book.publisher_id)  # N: Revealed type is "builtins.int"
@@ -40,6 +42,7 @@
 
 -   case: foreign_key_field_custom_to_field
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book, Publisher
         from uuid import UUID
         book = Book()
@@ -64,6 +67,7 @@
 
 -   case: foreign_key_field_different_order_of_params
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book, Publisher
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
@@ -88,6 +92,7 @@
 
 -   case: foreign_key_subclass
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import A
         reveal_type(A.objects.get().b)  # N: Revealed type is "myapp.models.B"
     installed_apps:
@@ -111,6 +116,7 @@
 
 -   case: to_parameter_as_string_with_application_name__model_imported
     main: |
+        from typing_extensions import reveal_type
         from myapp2.models import Book
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
@@ -133,6 +139,7 @@
 
 -   case: one_to_one_field_no_related_name
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User, Profile
         reveal_type(User().profile)  # N: Revealed type is "myapp.models.Profile"
         reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User"
@@ -157,6 +164,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing_extensions import reveal_type
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
@@ -175,6 +183,7 @@
 
 -   case: test_circular_dependency_in_imports_with_string_based
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import View
         reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
         View().app.unknown  # E: "App" has no attribute "unknown"  [attr-defined]
@@ -192,6 +201,7 @@
         -   path: myapp2/__init__.py
         -   path: myapp2/models.py
             content: |
+                from typing_extensions import reveal_type
                 from django.db import models
                 class App(models.Model):
                     def method(self) -> None:
@@ -199,6 +209,7 @@
 
 -   case: models_related_managers_work_with_direct_model_inheritance_and_with_inheritance_from_other_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import App
         reveal_type(App().views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View]"
         reveal_type(App().views2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.View2]"
@@ -218,6 +229,7 @@
 
 -   case: models_imported_inside_init_file_foreign_key
     main: |
+        from typing_extensions import reveal_type
         from myapp2.models import View
         reveal_type(View().app.views)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp2.models.View]"
     installed_apps:
@@ -243,6 +255,7 @@
 
 -   case: models_imported_inside_init_file_one_to_one_field
     main: |
+        from typing_extensions import reveal_type
         from myapp2.models import Profile
         reveal_type(Profile().user)  # N: Revealed type is "myapp.models.user.User"
         reveal_type(Profile().user.profile)  # N: Revealed type is "myapp2.models.Profile"
@@ -270,6 +283,7 @@
 
 -   case: models_triple_circular_reference
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import App
         reveal_type(App().owner)  # N: Revealed type is "myapp.models.user.User"
         reveal_type(App().owner.profile)  # N: Revealed type is "myapp.models.profile.Profile"
@@ -300,6 +314,7 @@
 
 -   case: many_to_many_field_converts_to_queryset_of_model_type
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import App, Member
         reveal_type(Member().apps)  # N: Revealed type is "myapp.models.App_ManyRelatedManager[myapp.models.Member_apps]"
         reveal_type(Member().apps.get())  # N: Revealed type is "myapp.models.App"
@@ -333,6 +348,7 @@
 
 -   case: many_to_many_works_with_string_if_imported
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Member
         reveal_type(Member().apps)  # N: Revealed type is "myapp2.models.App_ManyRelatedManager[myapp.models.Member_apps]"
     installed_apps:
@@ -354,6 +370,7 @@
 
 -   case: foreign_key_with_self
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().parent)  # N: Revealed type is "myapp.models.User"
     installed_apps:
@@ -368,6 +385,7 @@
 
 -   case: many_to_many_with_self
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().friends)  # N: Revealed type is "myapp.models.User_ManyRelatedManager[myapp.models.User_friends]"
         reveal_type(User().friends.get())  # N: Revealed type is "myapp.models.User"
@@ -407,6 +425,7 @@
 
 -   case: if_no_related_name_is_passed_create_default_related_managers
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Publisher
         reveal_type(Publisher().book_set)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     installed_apps:
@@ -424,6 +443,7 @@
 -   case: underscore_id_attribute_has_set_type_of_primary_key_if_explicit
     main: |
         import datetime
+        from typing_extensions import reveal_type
         from myapp.models import Book, Book2
 
         reveal_type(Book().publisher_id)  # N: Revealed type is "builtins.str"
@@ -458,6 +478,7 @@
 
 -   case: if_model_is_defined_as_name_of_the_class_look_for_it_in_the_same_app
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book
         reveal_type(Book().publisher)  # N: Revealed type is "myapp.models.publisher.Publisher"
     installed_apps:
@@ -504,6 +525,7 @@
 
 -   case: test_foreign_key_field_without_backwards_relation
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book, Publisher
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
@@ -512,8 +534,8 @@
         reveal_type(publisher.books)
         reveal_type(publisher.books2)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
     out: |
-        main:6: error: "Publisher" has no attribute "books"; maybe "books2"?  [attr-defined]
-        main:6: note: Revealed type is "Any"
+        main:7: error: "Publisher" has no attribute "books"; maybe "books2"?  [attr-defined]
+        main:7: note: Revealed type is "Any"
     installed_apps:
         - myapp
     files:
@@ -531,6 +553,7 @@
 
 -   case: to_parameter_could_be_resolved_if_passed_from_settings
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Book
         book = Book()
         reveal_type(book.publisher)  # N: Revealed type is "myapp.models.Publisher"
@@ -552,6 +575,7 @@
 
 -   case: foreign_key_with_custom_app_name
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyMain
         reveal_type(MyMain().user)  # N: Revealed type is "myapp2.models.MyUser"
     installed_apps:
@@ -580,6 +604,7 @@
 
 -   case: related_field_to_extracted_from_function
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Profile
         reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User"
     installed_apps:
@@ -599,6 +624,7 @@
 
 -   case: related_manager_name_defined_by_pattern
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Publisher
         reveal_type(Publisher().books)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Book]"
         reveal_type(Publisher().articles)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Article]"
@@ -623,6 +649,7 @@
 
 -   case: test_related_fields_returned_as_descriptors_from_model_class
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Author, Blog, Publisher, Profile
         reveal_type(Author.blogs)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Blog, myapp.models.Author_blogs]"
         reveal_type(Author.blogs.through)  # N: Revealed type is "type[myapp.models.Author_blogs]"
@@ -651,6 +678,7 @@
 
 -   case: test_foreign_key_from_superclass_inherits_correctly
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser, Book, Article, LibraryEntity
         reveal_type(Book().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
         reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
@@ -679,6 +707,7 @@
 
 -   case: test_foreign_key_from_superclass_inherits_correctly_when_also_inheriting_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser, Book, Article, LibraryEntity
         reveal_type(Book().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
         reveal_type(Article().registered_by_user)  # N: Revealed type is "myapp.models.MyUser"
@@ -751,6 +780,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing_extensions import reveal_type
                 from django.db import models
                 from django.db.models.manager import Manager
                 class TransactionQuerySet(models.QuerySet):
@@ -771,13 +801,14 @@
                 class TransactionLog(models.Model):
                     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
     out: |
-        myapp/models:13: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
-        myapp/models:15: note: Revealed type is "myapp.models.ManagerFromTransactionQuerySet[myapp.models.Transaction]"
-        myapp/models:16: note: Revealed type is "None"
+        myapp/models:14: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.TransactionLog]"
+        myapp/models:16: note: Revealed type is "myapp.models.ManagerFromTransactionQuerySet[myapp.models.Transaction]"
+        myapp/models:17: note: Revealed type is "None"
 
 
 -   case: resolve_primary_keys_for_foreign_keys_with_abstract_self_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().parent)  # N: Revealed type is "myapp.models.AbstractUser"
         reveal_type(User().parent_id)  # N: Revealed type is "builtins.int"
@@ -801,6 +832,7 @@
 
 -   case: nullable_foreign_key_with_init_overridden
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import A
         reveal_type(A.objects.get().b)  # N: Revealed type is "myapp.models.B | None"
     installed_apps:
@@ -827,6 +859,7 @@
 
 -   case: related_manager_is_a_subclass_of_default_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User, Order, Product
         reveal_type(User().orders)  # N: Revealed type is "myapp.models.Order_RelatedManager"
         reveal_type(User().orders.get())  # N: Revealed type is "myapp.models.Order"
@@ -867,6 +900,7 @@
 
 -   case: related_manager_shared_between_multiple_relations
     main: |
+        from typing_extensions import reveal_type
         from myapp.models.store import Store
         from myapp.models.user import User
         reveal_type(Store().purchases)  # N: Revealed type is "myapp.models.purchase.Purchase_RelatedManager"
@@ -926,6 +960,7 @@
 
 -   case: explicitly_declared_related_manager_is_not_overridden
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().purchases)  # N: Revealed type is "builtins.int"
         User().purchases.filter()  # E: "int" has no attribute "filter"  [attr-defined]
@@ -994,6 +1029,7 @@
 
 -   case: callable_reverse_manager
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import SalesMan
         sales_man = SalesMan()
         reveal_type(sales_man.client) # N: Revealed type is "myapp.models.CustomUser_ManyRelatedManager[myapp.models.SalesMan_client]"
@@ -1087,6 +1123,7 @@
 
 -   case: test_explicit_reverse_many_to_one_descriptor
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Other
         reveal_type(Other.explicit_descriptor)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[myapp.models.MyModel]"
         reveal_type(Other().explicit_descriptor)  # N: Revealed type is "myapp.models.MyModel_RelatedManager"
@@ -1117,6 +1154,7 @@
 
 -   case: test_reverse_one_to_one_descriptor
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, Other
         reveal_type(MyModel.first.RelatedObjectDoesNotExist)
         reveal_type(Other.mymodel)
@@ -1136,14 +1174,14 @@
             other.has_explicit_name = Other()
             other.has_explicit_name = None
     out: |
-        main:2: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
-        main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor[myapp.models.Other, myapp.models.MyModel]"
-        main:4: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        main:5: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
+        main:3: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
+        main:4: note: Revealed type is "django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor[myapp.models.Other, myapp.models.MyModel]"
+        main:5: note: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         main:6: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
-        main:9: note: Revealed type is "myapp.models.MyModel"
-        main:14: error: Incompatible types in assignment (expression has type "Other", variable has type "MyModel | None")  [assignment]
-        main:17: error: Incompatible types in assignment (expression has type "Other", variable has type "MyModel | None")  [assignment]
+        main:7: note: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
+        main:10: note: Revealed type is "myapp.models.MyModel"
+        main:15: error: Incompatible types in assignment (expression has type "Other", variable has type "MyModel | None")  [assignment]
+        main:18: error: Incompatible types in assignment (expression has type "Other", variable has type "MyModel | None")  [assignment]
     installed_apps:
         -   myapp
     files:
@@ -1162,6 +1200,7 @@
 
 -   case: test_many_to_many
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel, Other
         reveal_type(MyModel.auto_through.through.objects.get())
         reveal_type(MyModel().auto_through.get())
@@ -1206,40 +1245,40 @@
         reveal_type(MyModel().custom_through.through)
         reveal_type(MyModel().custom_through.through.my_model_id)
     out: |
-        main:2: note: Revealed type is "myapp.models.MyModel_auto_through"
-        main:3: note: Revealed type is "myapp.models.Other"
-        main:4: note: Revealed type is "myapp.models.MyModel"
-        main:6: note: Revealed type is "myapp.models.CustomThrough"
-        main:7: note: Revealed type is "myapp.models.Other"
-        main:8: note: Revealed type is "builtins.int"
-        main:9: note: Revealed type is "myapp.models.MyModel"
-        main:12: note: Revealed type is "builtins.int"
+        main:3: note: Revealed type is "myapp.models.MyModel_auto_through"
+        main:4: note: Revealed type is "myapp.models.Other"
+        main:5: note: Revealed type is "myapp.models.MyModel"
+        main:7: note: Revealed type is "myapp.models.CustomThrough"
+        main:8: note: Revealed type is "myapp.models.Other"
+        main:9: note: Revealed type is "builtins.int"
+        main:10: note: Revealed type is "myapp.models.MyModel"
         main:13: note: Revealed type is "builtins.int"
-        main:14: note: Revealed type is "myapp.models.MyModel"
-        main:15: note: Revealed type is "builtins.int"
-        main:16: note: Revealed type is "myapp.models.Other"
-        main:17: note: Revealed type is "builtins.int"
-        main:19: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:20: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[myapp.models.MyModel | django.db.models.expressions.Combinable, myapp.models.MyModel]]"
-        main:21: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
-        main:23: note: Revealed type is "type[myapp.models.MyModel_other_again]"
-        main:24: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.MyModel, myapp.models.MyModel_auto_through]"
-        main:25: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:26: note: Revealed type is "myapp.models.MyModel_auto_through"
-        main:28: note: Revealed type is "builtins.str"
+        main:14: note: Revealed type is "builtins.int"
+        main:15: note: Revealed type is "myapp.models.MyModel"
+        main:16: note: Revealed type is "builtins.int"
+        main:17: note: Revealed type is "myapp.models.Other"
+        main:18: note: Revealed type is "builtins.int"
+        main:20: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
+        main:21: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[myapp.models.MyModel | django.db.models.expressions.Combinable, myapp.models.MyModel]]"
+        main:22: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:24: note: Revealed type is "type[myapp.models.MyModel_other_again]"
+        main:25: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.MyModel, myapp.models.MyModel_auto_through]"
+        main:26: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
+        main:27: note: Revealed type is "myapp.models.MyModel_auto_through"
         main:29: note: Revealed type is "builtins.str"
-        main:30: note: Revealed type is "def (*objs: myapp.models.MyModel | builtins.int, through_defaults: typing.Mapping[builtins.str, Any] | None =)"
-        main:32: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:30: note: Revealed type is "builtins.str"
+        main:31: note: Revealed type is "def (*objs: myapp.models.MyModel | builtins.int, through_defaults: typing.Mapping[builtins.str, Any] | None =)"
         main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
-        main:35: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
-        main:36: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:37: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
-        main:38: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
-        main:39: note: Revealed type is "type[myapp.models.MyModel_other_again]"
-        main:40: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
-        main:41: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
-        main:42: note: Revealed type is "type[myapp.models.CustomThrough]"
-        main:43: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str, builtins.int]]"
+        main:34: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
+        main:36: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
+        main:37: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
+        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
+        main:39: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
+        main:40: note: Revealed type is "type[myapp.models.MyModel_other_again]"
+        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
+        main:42: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
+        main:43: note: Revealed type is "type[myapp.models.CustomThrough]"
+        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str, builtins.int]]"
     installed_apps:
         -   myapp
     files:
@@ -1277,6 +1316,7 @@
 
 -   case: test_many_to_many_with_lazy_references
     main: |
+        from typing_extensions import reveal_type
         from first.models import First
         reveal_type(First().thirds.get())
         reveal_type(First.thirds.through.objects.get())
@@ -1287,12 +1327,12 @@
         reveal_type(Third().fourths.get())
         reveal_type(Third.fourths.through.objects.get())
     out: |
-        main:2: note: Revealed type is "third.models.Third"
-        main:3: note: Revealed type is "second.models.Second"
-        main:4: note: Revealed type is "first.models.First"
-        main:5: note: Revealed type is "third.models.Third"
-        main:8: note: Revealed type is "third.models.Fourth"
-        main:9: note: Revealed type is "third.models.Third_fourths"
+        main:3: note: Revealed type is "third.models.Third"
+        main:4: note: Revealed type is "second.models.Second"
+        main:5: note: Revealed type is "first.models.First"
+        main:6: note: Revealed type is "third.models.Third"
+        main:9: note: Revealed type is "third.models.Fourth"
+        main:10: note: Revealed type is "third.models.Third_fourths"
     installed_apps:
         -   first
         -   second
@@ -1326,12 +1366,13 @@
 
 -   case: test_many_to_many_lazy_references_with_implicit_app_label
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Child
         reveal_type(Child.parents)
         reveal_type(Child().parents)
     out: |
-        main:2: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[Any, Any]"
-        main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any, Any]"
+        main:3: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[Any, Any]"
+        main:4: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[Any, Any]"
         myapp/models/child:5: error: Need type annotation for "parents"  [var-annotated]
         myapp/models/child:6: error: Need type annotation for "other_parents"  [var-annotated]
     installed_apps:
@@ -1359,6 +1400,7 @@
 
 -   case: test_relations_with_bad_arguments
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         def f(arg: type[MyModel]) -> MyModel:
             instance = arg(field=1, unknown=2)
@@ -1381,6 +1423,7 @@
 
 -   case: test_reverse_of_inherited_many_to_many_fields
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Other
         other = Other()
         reveal_type(other.abstract_of_concrete_parent)  # N: Revealed type is "myapp.models.ConcreteParent_ManyRelatedManager[myapp.models.ConcreteParent_m2m_1]"
@@ -1422,6 +1465,7 @@
 
 -   case: test_m2m_related_managers_supports_renamed_imports
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         from other.models import Other
         reveal_type(MyModel.m2m_1.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_m2m_1]"
@@ -1455,6 +1499,7 @@
 
 -   case: test_m2m_from_abstract_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import First, Second
         reveal_type(First().others)  # N: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.First_others]"
         reveal_type(First().others.get())  # N: Revealed type is "myapp.models.Other"
@@ -1491,6 +1536,7 @@
 
 -   case: test_m2m_self_on_abstract_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import First, Second
         reveal_type(First().others)  # N: Revealed type is "myapp.models.First_ManyRelatedManager[myapp.models.First_others]"
         reveal_type(First().others.get())  # N: Revealed type is "myapp.models.First"
@@ -1550,6 +1596,7 @@
 
 -   case: test_reverse_m2m_relation_checks_other_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Author
         # With builtin manager/queryset
         Author().book_set.filter(featured=True)
@@ -1601,6 +1648,7 @@
 
 -   case: test_many_to_many_field_null
     main: |
+        from typing_extensions import reveal_type
         from django.db import models
         class Person(models.Model):
             friends = models.ManyToManyField("self", null=True, blank=True)

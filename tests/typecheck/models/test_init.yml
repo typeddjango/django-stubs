@@ -261,6 +261,7 @@
 
 -   case: field_set_type_honors_type_redefinition
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         non_init = MyModel()
         reveal_type(non_init.redefined_set_type)
@@ -282,19 +283,19 @@
             unset_set_type=[],
         )
     out: |
-        main:3: note: Revealed type is "builtins.int"
         main:4: note: Revealed type is "builtins.int"
-        main:5: note: Revealed type is "builtins.list[builtins.int]"
-        main:6: note: Revealed type is "builtins.int"
-        main:7: note: Revealed type is "Any"
-        main:8: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
-        main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int | float")  [assignment]
-        main:11: error: Incompatible types in assignment (expression has type "list[str]", variable has type "Sequence[int | float]")  [assignment]
-        main:12: error: Incompatible types in assignment (expression has type "list[Never]", variable has type "float | int | str | Combinable")  [assignment]
-        main:14: error: Incompatible type for "redefined_set_type" of "MyModel" (got "str", expected "int")  [misc]
-        main:14: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "int | float")  [misc]
-        main:14: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[int | float]")  [misc]
-        main:14: error: Incompatible type for "default_set_type" of "MyModel" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
+        main:5: note: Revealed type is "builtins.int"
+        main:6: note: Revealed type is "builtins.list[builtins.int]"
+        main:7: note: Revealed type is "builtins.int"
+        main:8: note: Revealed type is "Any"
+        main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
+        main:10: error: Incompatible types in assignment (expression has type "str", variable has type "int | float")  [assignment]
+        main:12: error: Incompatible types in assignment (expression has type "list[str]", variable has type "Sequence[int | float]")  [assignment]
+        main:13: error: Incompatible types in assignment (expression has type "list[Never]", variable has type "float | int | str | Combinable")  [assignment]
+        main:15: error: Incompatible type for "redefined_set_type" of "MyModel" (got "str", expected "int")  [misc]
+        main:15: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "int | float")  [misc]
+        main:15: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[int | float]")  [misc]
+        main:15: error: Incompatible type for "default_set_type" of "MyModel" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
         - myapp
     files:

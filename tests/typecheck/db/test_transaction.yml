@@ -1,11 +1,13 @@
 -   case: atomic_bare
     main: |
+      from typing_extensions import reveal_type
       from django.db.transaction import atomic
       @atomic
       def func(x: int) -> list: ...
       reveal_type(func)  # N: Revealed type is "def (x: builtins.int) -> builtins.list[Any]"
 -   case: atomic_args
     main: |
+      from typing_extensions import reveal_type
       from django.db.transaction import atomic
       @atomic(using='bla', savepoint=False)
       def func(x: int) -> list: ...
@@ -13,6 +15,7 @@
 -   case: non_atomic_requests_bare
     main: |
       from typing import Any
+      from typing_extensions import reveal_type
       from django.db.transaction import non_atomic_requests
       from django.http import HttpRequest, HttpResponse
       @non_atomic_requests
@@ -21,6 +24,7 @@
 
 -   case: non_atomic_requests_args
     main: |
+      from typing_extensions import reveal_type
       from django.http.request import HttpRequest
       from django.http.response import HttpResponse
       from django.db.transaction import non_atomic_requests

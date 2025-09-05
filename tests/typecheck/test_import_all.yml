@@ -680,4 +680,7 @@
         import django.views.static
     mypy_config: |
         [mypy-redis.*]
-        ignore_errors = True
+        ignore_errors = true
+        [mypy-yaml.*]
+        disallow_untyped_defs = false
+        disallow_incomplete_defs = false

@@ -2,7 +2,7 @@
 -   case: annotated_should_not_interfere
     main: |
         from dataclasses import dataclass
-        from typing_extensions import Annotated, TypedDict
+        from typing_extensions import Annotated, TypedDict, reveal_type
         from myapp.models import Blog
 
         class IntegerType:

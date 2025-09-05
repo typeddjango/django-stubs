@@ -1,5 +1,6 @@
 -   case: test_contributions_from_modelbase_metaclass
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Abstract1, Abstract2, Concrete1, Concrete2, Concrete3
         from django.db import models
 
@@ -75,6 +76,7 @@
 
 -   case: test_custom_model_base_metaclass
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import This, Other
 
         this = This(field=Other())

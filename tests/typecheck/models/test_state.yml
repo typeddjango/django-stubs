@@ -1,5 +1,6 @@
 -   case: state_attribute_has_a_type_of_model_state
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         user = MyUser(pk=1)
         reveal_type(user._state)  # N: Revealed type is "django.db.models.base.ModelState"

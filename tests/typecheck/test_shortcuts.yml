@@ -1,5 +1,6 @@
 -   case: get_object_or_404_returns_proper_types
     main: |
+        from typing_extensions import reveal_type
         from django.shortcuts import get_object_or_404, get_list_or_404
         from myapp.models import MyModel
 
@@ -22,6 +23,7 @@
 
 -   case: get_user_model_returns_proper_class
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth import get_user_model
         UserModel = get_user_model()
         reveal_type(UserModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyUser]"
@@ -39,7 +41,7 @@
 -   case: check_render_function_arguments_annotations
     main: |
         from typing import Any
-        from typing_extensions import TypedDict
+        from typing_extensions import TypedDict, reveal_type
         from django.shortcuts import render
         from django.http.request import HttpRequest
 
@@ -50,6 +52,7 @@
 
 -   case: check_redirect_return_annotation
     main: |
+        from typing_extensions import reveal_type
         from django.shortcuts import redirect
         reveal_type(redirect(to = '', permanent = True)) # N: Revealed type is "django.http.response.HttpResponsePermanentRedirect"
         reveal_type(redirect(to = '', permanent = False)) # N: Revealed type is "django.http.response.HttpResponseRedirect"

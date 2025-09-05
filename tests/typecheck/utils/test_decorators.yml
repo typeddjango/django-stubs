@@ -1,5 +1,6 @@
 -   case: classonlymethod
     main: |
+      from typing_extensions import reveal_type
       from django.utils.decorators import classonlymethod
 
       class Bananaman:
@@ -10,6 +11,7 @@
       reveal_type(Bananaman.count_bananas)  # N: Revealed type is "def () -> builtins.int"
 -   case: method_decorator_class
     main: |
+      from typing_extensions import reveal_type
       from django.views.generic.base import View
       from django.utils.decorators import method_decorator
       from django.contrib.auth.decorators import login_required
@@ -19,6 +21,7 @@
 -   case: method_decorator_function
     main: |
       from typing import Any
+      from typing_extensions import reveal_type
       from django.views.generic.base import View
       from django.utils.decorators import method_decorator
       from django.contrib.auth.decorators import login_required

@@ -56,6 +56,7 @@
 
 -   case: QuerySet_type_vars
     main: |
+        from typing_extensions import reveal_type
         from django.db.models.query import QuerySet
         from django.contrib.auth.models import User
         from django_stubs_ext import ValuesQuerySet

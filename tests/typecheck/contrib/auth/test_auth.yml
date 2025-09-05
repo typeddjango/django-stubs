@@ -1,5 +1,6 @@
 -   case: test_objects_using_auth_user_model_picks_up_configured_type
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth import authenticate, aauthenticate, get_user, get_user_model, login
         from django.contrib.auth.backends import ModelBackend
         from django.contrib.auth.decorators import user_passes_test
@@ -32,6 +33,7 @@
 
 -   case: test_objects_using_auth_user_model_uses_builtin_auth_user_per_default
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth import authenticate, aauthenticate, get_user, get_user_model, login
         from django.contrib.auth.backends import ModelBackend
         from django.contrib.auth.decorators import user_passes_test
@@ -62,6 +64,7 @@
 
 -   case: test_objects_for_auth_user_model_returns_stub_types_when_contrib_auth_is_not_installed
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.auth import authenticate, aauthenticate, get_user, get_user_model, login
         from django.contrib.auth.backends import ModelBackend
         from django.contrib.auth.base_user import AbstractBaseUser

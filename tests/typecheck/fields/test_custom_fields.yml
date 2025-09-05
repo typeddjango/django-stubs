@@ -1,5 +1,6 @@
 -   case: test_custom_model_fields_with_generic_type
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User, CustomFieldValue
         user = User()
         reveal_type(user.id)  # N: Revealed type is "builtins.int"

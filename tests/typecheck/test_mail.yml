@@ -1,5 +1,6 @@
 -   case: check_email_message_attach
     main: |
+        from typing_extensions import reveal_type
         from email.mime.text import MIMEText
         from email.mime.image import MIMEImage
         from django.core.mail.message import EmailMessage

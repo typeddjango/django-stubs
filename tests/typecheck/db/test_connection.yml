@@ -1,5 +1,6 @@
 -   case: raw_default_connection
     main: |
+      from typing_extensions import reveal_type
       from django.db import connection
       with connection.cursor() as cursor:
         reveal_type(cursor)  # N: Revealed type is "django.db.backends.utils.CursorWrapper"
@@ -16,6 +17,7 @@
 
 -   case: raw_connections
     main: |
+      from typing_extensions import reveal_type
       from django.db import connections
       reveal_type(connections["test"])  # N: Revealed type is "django.db.backends.base.base.BaseDatabaseWrapper"
       for connection in connections.all():

@@ -1,5 +1,6 @@
 -   case: sync_for
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
 
         for user in User.objects.all():
@@ -17,6 +18,7 @@
 
 -   case: async_for
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
 
         async def main() -> None:

@@ -1,5 +1,6 @@
 -   case: generic_foreign_key_could_point_to_any_model_and_is_always_optional
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Tag, User
         myuser = User()
         Tag(content_object=None)
@@ -21,6 +22,7 @@
                     content_object = fields.GenericForeignKey()
 -   case: generic_foreign_key_subclass_could_point_to_any_model_and_is_always_optional
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Tag, User
         myuser = User()
         Tag(content_object=None)

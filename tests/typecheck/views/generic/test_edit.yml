@@ -38,6 +38,7 @@
 
 -   case: generic_form_views
     main: |
+        from typing_extensions import reveal_type
         from django.views.generic.edit import CreateView, UpdateView
         from django import forms
         from myapp.models import Article
@@ -66,6 +67,7 @@
 
 -   case: generic_form_views_different_form_classes
     main: |
+        from typing_extensions import reveal_type
         from django.views.generic.edit import CreateView
         from django import forms
         from myapp.models import Article

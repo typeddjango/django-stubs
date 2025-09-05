@@ -1,5 +1,6 @@
 -   case: values_list_simple_field_returns_queryset_of_tuples
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         reveal_type(MyUser.objects.values_list('name').get())  # N: Revealed type is "tuple[builtins.str]"
         reveal_type(MyUser.objects.values_list('id', 'name').get())  # N: Revealed type is "tuple[builtins.int, builtins.str]"
@@ -28,6 +29,7 @@
 
 -   case: values_list_field_repetition
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
 
         # Values tuples can have the same field repeated
@@ -49,6 +51,7 @@
 
 -   case: values_list_types_are_field_types
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Concrete
         ret = list(Concrete.objects.values_list('id', 'data'))
         reveal_type(ret)  # N: Revealed type is "builtins.list[tuple[builtins.int, builtins.dict[builtins.str, builtins.str]]]"
@@ -69,6 +72,7 @@
 
 -   case: values_list_supports_queryset_methods
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         from django.db.models.functions import Length
         query = MyUser.objects.values_list('name')
@@ -92,6 +96,7 @@
 
 -   case: values_list_related_model_fields
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Post, Blog
         values_tuple = Post.objects.values_list('blog', 'blog__num_posts', 'blog__publisher', 'blog__publisher__name').get()
         reveal_type(values_tuple[0])  # N: Revealed type is "builtins.int"
@@ -119,6 +124,7 @@
 
 -   case: values_list_flat_true_methods
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser, MyUser2
         reveal_type(MyUser.objects.values_list('name', flat=True).get())  # N: Revealed type is "builtins.str"
         reveal_type(MyUser.objects.values_list('name', 'age', flat=True).get())
@@ -127,8 +133,8 @@
         reveal_type(MyUser.objects.values_list(flat=True)[0])  # N: Revealed type is "builtins.int"
         reveal_type(MyUser2.objects.values_list(flat=True)[0])  # N: Revealed type is "builtins.str"
     out: |
-        main:3: error: 'flat' is not valid when 'values_list' is called with more than one field  [misc]
-        main:3: note: Revealed type is "Any"
+        main:4: error: 'flat' is not valid when 'values_list' is called with more than one field  [misc]
+        main:4: note: Revealed type is "Any"
     installed_apps:
         - myapp
     files:
@@ -144,6 +150,7 @@
 
 -   case: values_list_named_true
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         values_named_tuple = MyUser.objects.values_list('name', 'age', named=True).get()
         reveal_type(values_named_tuple)  # N: Revealed type is "tuple[builtins.str, builtins.int, fallback=main.Row]"
@@ -180,11 +187,12 @@
 
 -   case: values_list_flat_true_named_true_error
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         reveal_type(MyUser.objects.values_list('name', flat=True, named=True).get())
     out: |
-        main:2: error: 'flat' and 'named' can't be used together  [misc]
-        main:2: note: Revealed type is "Any"
+        main:3: error: 'flat' and 'named' can't be used together  [misc]
+        main:3: note: Revealed type is "Any"
     installed_apps:
         - myapp
     files:
@@ -197,19 +205,20 @@
 
 -   case: invalid_lookups
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         reveal_type(Blog.objects.values_list('unknown').get())
         reveal_type(Blog.objects.values_list('unknown', flat=True).get())
         reveal_type(Blog.objects.values_list('unknown', named=True).get())
         reveal_type(Blog.objects.values_list('publisher__unknown').get())
     out: |
-        main:2: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
-        main:2: note: Revealed type is "Any"
         main:3: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
         main:3: note: Revealed type is "Any"
         main:4: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
         main:4: note: Revealed type is "Any"
-        main:5: note: Revealed type is "tuple[Any]"
+        main:5: error: Cannot resolve keyword 'unknown' into field. Choices are: id, publisher, publisher_id  [misc]
+        main:5: note: Revealed type is "Any"
+        main:6: note: Revealed type is "tuple[Any]"
     installed_apps:
         - myapp
     files:
@@ -224,6 +233,7 @@
 
 -   case: named_true_with_related_model_fields
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Entry, Blog
         values = Entry.objects.values_list('blog__num_articles', 'blog__publisher__name', named=True).get()
         reveal_type(values.blog__num_articles)  # N: Revealed type is "builtins.int"
@@ -254,6 +264,7 @@
 
 -   case: values_list_flat_true_with_ids
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog, Publisher
         reveal_type(Blog.objects.values_list('id', flat=True))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, builtins.int]"
         reveal_type(Blog.objects.values_list('publisher', flat=True))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, builtins.int]"
@@ -274,6 +285,7 @@
 
 -   case: subclass_of_queryset_has_proper_typings_on_methods
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import TransactionQuerySet
         reveal_type(TransactionQuerySet())  # N: Revealed type is "myapp.models.TransactionQuerySet"
         reveal_type(TransactionQuerySet().values())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Transaction, TypedDict({'id': builtins.int, 'total': builtins.int})]"
@@ -292,6 +304,7 @@
 
 -   case: values_list_of_many_to_many_field
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Author, Book
         reveal_type(Book.objects.values_list('authors'))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[builtins.int]]"
         reveal_type(Author.objects.values_list('books'))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Author, tuple[builtins.int]]"
@@ -308,6 +321,7 @@
                     authors = models.ManyToManyField(Author, related_name='books')
 -   case: queryset_values_list_blank_charfield
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog
         values = Blog.objects.values_list('text').get()
         reveal_type(values)  # N: Revealed type is "tuple[builtins.str]"
@@ -324,6 +338,7 @@
                     text = models.CharField(max_length=100, blank=True)
 -   case: handles_field_with_same_name_on_other_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import A
         reveal_type(A.objects.values_list("name", "b__name").get())  # N: Revealed type is "tuple[builtins.int, builtins.str]"
     installed_apps:

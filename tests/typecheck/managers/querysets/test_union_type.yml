@@ -1,5 +1,6 @@
 -   case: union_queryset_custom_method
     main: |
+        from typing_extensions import reveal_type
         from django.db.models import QuerySet
         from myapp.models import User, Order
 

@@ -1,5 +1,6 @@
 - case: test_access_to_id_field_through_self_if_no_primary_key_defined
   main: |
+    from typing_extensions import reveal_type
     from myapp.models import MyModel
     x = MyModel.objects.get(id=1)
     reveal_type(x.id)  # N: Revealed type is "builtins.int"
@@ -12,6 +13,7 @@
     - path: myapp/__init__.py
     - path: myapp/models.py
       content: |
+        from typing_extensions import reveal_type
         from django.db import models
         class MyModel(models.Model):
             def __str__(self) -> str:
@@ -22,6 +24,7 @@
 
 - case: test_access_to_id_field_through_self_if_primary_key_is_defined
   main: |
+    from typing_extensions import reveal_type
     from myapp.models import MyModel
     x = MyModel.objects.get(id='a')
     reveal_type(x.id)  # N: Revealed type is "builtins.str"
@@ -34,6 +37,7 @@
     - path: myapp/__init__.py
     - path: myapp/models.py
       content: |
+        from typing_extensions import reveal_type
         from django.db import models
         class MyModel(models.Model):
             id = models.CharField(max_length=10, primary_key=True)
@@ -45,6 +49,7 @@
 
 - case: test_access_to_id_field_through_self_if_primary_key_has_different_name
   main: |
+    from typing_extensions import reveal_type
     from myapp.models import MyModel
     x = MyModel.objects.get(primary='a')
     reveal_type(x.primary)  # N: Revealed type is "builtins.str"
@@ -59,6 +64,7 @@
     - path: myapp/__init__.py
     - path: myapp/models.py
       content: |
+        from typing_extensions import reveal_type
         from django.db import models
         class MyModel(models.Model):
             primary = models.CharField(max_length=10, primary_key=True)

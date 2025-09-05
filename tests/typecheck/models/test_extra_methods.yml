@@ -1,5 +1,6 @@
 -   case: if_field_has_choices_set_model_has_get_FIELDNAME_display_method
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         user = MyUser(name='user', gender='M')
         user.get_name_display()  # E: "MyUser" has no attribute "get_name_display"; maybe "get_gender_display"?  [attr-defined]
@@ -29,6 +30,7 @@
         disallow_any_generics = {{ allow_any }}
         disallow_any_explicit = {{ allow_any }}
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyUser
         reveal_type(MyUser().get_next_by_date())  # N: Revealed type is "myapp.models.MyUser"
         reveal_type(MyUser().get_next_by_datetime())  # N: Revealed type is "myapp.models.MyUser"

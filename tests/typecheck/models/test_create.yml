@@ -17,6 +17,7 @@
 
 -   case: model_recognises_parent_attributes
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Child
         c = Child.objects.create(name='Maxim', lastname='Maxim2')
         reveal_type(c.id)  # N: Revealed type is "builtins.int"
@@ -115,6 +116,7 @@
 
 -   case: when_default_for_primary_key_is_specified_allow_none_to_be_set
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         first = MyModel(id=None)
         reveal_type(first.id)  # N: Revealed type is "builtins.int"
@@ -157,6 +159,7 @@
 -   case: default_manager_acreate_is_typechecked
     main: |
         import asyncio
+        from typing_extensions import reveal_type
         from myapp.models import User
         async def amain() -> None:
             reveal_type(await User.objects.acreate(pk=1, name='Max', age=10))  # N: Revealed type is "myapp.models.User"

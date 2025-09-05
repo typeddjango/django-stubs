@@ -1,5 +1,6 @@
 -   case: foreign_key_to_proxy_model_accepts_first_non_proxy_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import Blog, Publisher, PublisherProxy
         Blog(publisher=Publisher())
         Blog.objects.create(publisher=Publisher())

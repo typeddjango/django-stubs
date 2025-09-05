@@ -1,5 +1,6 @@
 - case: client_methods
   main: |
+      from typing_extensions import reveal_type
       from django.test.client import Client
       client = Client()
       response = client.get('foo')
@@ -15,6 +16,7 @@
       response.json()
 - case: async_client_methods
   main: |
+      from typing_extensions import reveal_type
       from django.test.client import AsyncClient
       async def main() -> None:
         client = AsyncClient()
@@ -30,6 +32,7 @@
         response.json()
 - case: request_factories
   main: |
+      from typing_extensions import reveal_type
       from django.test.client import RequestFactory, AsyncRequestFactory
       factory = RequestFactory()
       request = factory.get('foo')

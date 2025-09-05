@@ -12,6 +12,7 @@
 
 -   case: transaction_atomic_decorator
     main: |
+        from typing_extensions import reveal_type
         from django.db import transaction
 
         @transaction.atomic()
@@ -46,6 +47,7 @@
 
 -   case: mark_safe_decorator_and_function
     main: |
+        from typing_extensions import reveal_type
         from django.utils.safestring import mark_safe
         s = 'hello'
         reveal_type(mark_safe(s))  # N: Revealed type is "django.utils.safestring.SafeString"
