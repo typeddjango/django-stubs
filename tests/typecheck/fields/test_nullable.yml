@@ -49,6 +49,27 @@
                     text_nullable = models.CharField(max_length=100, null=True)
                     text = models.CharField(max_length=100)
 
+-   case: nullable_field_with_strict_optional_false
+    main: |
+        from myapp.models import MyModel
+        reveal_type(MyModel().text_nullable)  # N: Revealed type is "builtins.str | None"
+    installed_apps:
+        - myapp
+    mypy_config: |
+      [mypy]
+      strict_optional = True
+
+      [mypy-myapp.*]
+      strict_optional = False
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    text_nullable = models.CharField(max_length=100, null=True)
+
+
 -   case: nullable_array_field
     main: |
         from myapp.models import MyModel
