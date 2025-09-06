@@ -1,0 +1,57 @@
+- case: test_storage_defaults
+  main: |
+    from django.core.files.storage import default_storage, storages
+
+    reveal_type(default_storage)  # N: Revealed type is "django.core.files.storage.filesystem.FileSystemStorage"
+    reveal_type(storages["default"])  # N: Revealed type is "django.core.files.storage.filesystem.FileSystemStorage"
+    reveal_type(storages["staticfiles"])  # N: Revealed type is "django.contrib.staticfiles.storage.StaticFilesStorage"
+
+- case: test_custom_storages
+  main: |
+    from django.core.files.storage import default_storage, storages
+
+    reveal_type(default_storage)  # N: Revealed type is "myapp.storage.MyDefaultStorage"
+    reveal_type(storages["default"])  # N: Revealed type is "myapp.storage.MyDefaultStorage"
+    reveal_type(storages["custom"])  # N: Revealed type is "myapp.storage.MyStorage"
+    reveal_type(storages["staticfiles"])  # N: Revealed type is "django.contrib.staticfiles.storage.StaticFilesStorage"
+
+  custom_settings: |
+    from django.conf.global_settings import STORAGES as DEFAULT_STORAGES
+
+    STORAGES = {
+        **DEFAULT_STORAGES,
+        "default": {"BACKEND": "myapp.storage.MyDefaultStorage"},
+        "custom": {
+            "BACKEND": "myapp.storage.MyStorage",
+            "OPTIONS": {"option_enabled": False, "key": "test"},
+        }
+    }
+
+  files:
+    - path: myapp/storage.py
+      content: |
+        from django.core.files.storage import Storage
+
+        class MyDefaultStorage(Storage):
+            pass
+
+        class MyStorage(Storage):
+            pass
+
+- case: test_improperly_configured_storages
+  main: |
+    from django.core.files.storage import default_storage, storages
+
+    reveal_type(default_storage)  # N: Revealed type is "_DefaultStorage?"
+    reveal_type(storages["default"])  # E: "default" in settings.STORAGES is improperly configured.  [misc] # N: Revealed type is "Never"
+    reveal_type(storages["custom"])  # E: "custom" in settings.STORAGES is improperly configured.  [misc] # N: Revealed type is "Never"
+    reveal_type(storages["custom_two"])  # E: "custom_two" in settings.STORAGES is improperly configured.  [misc] # N: Revealed type is "Never"
+    reveal_type(storages["staticfiles"])  # E: Could not find config for "staticfiles" in settings.STORAGES.  [misc] # N: Revealed type is "Never"
+
+  custom_settings: |
+    STORAGES = {
+        "custom": {"BACKEND": "MyStorage"},
+        "custom_two": ["MyStorage"],
+        "default": True,
+        # "staticfiles" is missing
+    }

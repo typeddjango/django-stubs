@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib.staticfiles.storage import _ConfiguredStorage
 from django.core.files.storage import Storage
 from django.core.management.base import BaseCommand
 from django.utils.functional import cached_property
@@ -9,7 +10,7 @@ class Command(BaseCommand):
     symlinked_files: Any
     unmodified_files: Any
     post_processed_files: Any
-    storage: Any
+    storage: _ConfiguredStorage
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     @cached_property
     def local(self) -> bool: ...
