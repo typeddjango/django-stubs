@@ -1,7 +1,5 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
-default_language_version:
-  python: python3.12
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -17,7 +15,7 @@ repos:
         args: [--fix=lf]
       - id: check-case-conflict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+    rev: v0.12.12
     hooks:
       - id: ruff
         args: ["--fix", "--exit-non-zero-on-fix"]
@@ -27,11 +25,11 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies:
-        - tomli
+          - tomli
 
 ci:
-    autofix_commit_msg: '[pre-commit.ci] auto fixes from pre-commit.com hooks'
-    autofix_prs: true
-    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-    autoupdate_schedule: weekly
-    submodules: false
+  autofix_commit_msg: "[pre-commit.ci] auto fixes from pre-commit.com hooks"
+  autofix_prs: true
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  submodules: false
