@@ -88,6 +88,7 @@ class ModelClassInitializer:
         var._fullname = self.model_classdef.info.fullname + "." + name
         var.is_initialized_in_class = True
         var.is_inferred = True
+        var.has_explicit_value = True
         return var
 
     def add_new_node_to_model_class(

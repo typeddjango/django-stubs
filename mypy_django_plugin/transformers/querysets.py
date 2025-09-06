@@ -6,7 +6,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, Var
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
@@ -385,7 +385,8 @@ def check_conflicting_attr_value(
         # 1. Conflict with another symbol on the model.
         # Ex:
         #     User.objects.prefetch_related(Prefetch(..., to_attr="id"))
-        model.typ.type.get(attr_name)
+        (sym := model.typ.type.get(attr_name))
+        and not (isinstance(sym.node, Var) and not sym.node.has_explicit_value)
         # 2. Conflict with a previous annotation.
         # Ex:
         #     User.objects.annotate(foo=...).prefetch_related(Prefetch(...,to_attr="foo"))

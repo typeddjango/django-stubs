@@ -205,6 +205,8 @@
         from django.db.models import Prefetch, F
         from myapp.models import Article, Tag
 
+        Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="my_type_annotation"))  # Ok
+
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="pk"))  # E: Attribute "pk" already defined on "myapp.models.Article"  [no-redef]
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="id"))  # E: Attribute "id" already defined on "myapp.models.Article"  [no-redef]
         Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tags"))  # E: Attribute "tags" already defined on "myapp.models.Article"  [no-redef]
@@ -224,6 +226,8 @@
                 class Tag(models.Model): ...
                 class Article(models.Model):
                     tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
+
+                    my_type_annotation: str | None
 
                     @property
                     def my_property(self) -> int: ...

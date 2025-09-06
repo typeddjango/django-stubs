@@ -448,6 +448,7 @@ def add_new_class_for_module(
             var = Var(field_name, type=field_type)
             var.info = new_typeinfo
             var._fullname = new_typeinfo.fullname + "." + field_name
+            var.has_explicit_value = True
             new_typeinfo.names[field_name] = SymbolTableNode(
                 MDEF, var, plugin_generated=True, no_serialize=no_serialize
             )
@@ -571,6 +572,7 @@ def add_new_sym_for_info(
     var.is_initialized_in_class = True
     var.is_inferred = True
     var.is_classvar = is_classvar
+    var.has_explicit_value = True
     info.names[name] = SymbolTableNode(MDEF, var, plugin_generated=True, no_serialize=no_serialize)
 
 
