@@ -619,3 +619,79 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         row_type = annotated_model
 
     return default_return_type.copy_modified(args=[annotated_model, row_type])
+
+
+def _get_select_related_field_choices(model_cls: type[Model]) -> set[str]:
+    """
+    Get valid field choices for select_related lookups.
+    Based on Django's SQLCompiler.get_related_selections._get_field_choices method.
+    """
+    opts = model_cls._meta
+
+    # Direct relation fields (forward relations)
+    direct_choices = (f.name for f in opts.fields if f.is_relation)
+
+    # Reverse relation fields (backward relations with unique=True)
+    reverse_choices = (f.field.related_query_name() for f in opts.related_objects if f.field.unique)
+    return {*direct_choices, *reverse_choices}
+
+
+def _validate_select_related_lookup(
+    ctx: MethodContext,
+    django_context: DjangoContext,
+    model_cls: type[Model],
+    lookup: str,
+) -> bool:
+    """Validate a single select_related lookup string."""
+    if not lookup.strip():
+        ctx.api.fail(
+            f'Invalid field name "{lookup}" in select_related lookup. Cannot be whitespace-only',
+            ctx.context,
+        )
+        return False
+
+    lookup_parts = lookup.split("__")
+    observed_model = model_cls
+    for i, part in enumerate(lookup_parts):
+        valid_choices = _get_select_related_field_choices(observed_model)
+
+        if part not in valid_choices:
+            ctx.api.fail(
+                f'Invalid field name "{part}" in select_related lookup. '
+                f"Choices are: {', '.join(sorted(valid_choices)) or '(none)'}",
+                ctx.context,
+            )
+            return False
+
+        if i < len(lookup_parts) - 1:  # Not the last part
+            try:
+                field, observed_model = django_context.resolve_lookup_into_field(observed_model, part)
+                if field is None:
+                    return False
+            except (FieldError, LookupsAreUnsupported):
+                # For good measure, but we should never reach this since we already validated the part name
+                return False
+
+    return True
+
+
+def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """
+    Validates that all lookup strings passed to select_related() resolve to actual model fields and relations.
+
+    Extracted and adapted from `django.db.models.sql.compiler.SQLCompiler.get_related_selections`
+    """
+    if not (
+        isinstance(ctx.type, Instance)
+        and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
+        and ctx.arg_types
+        and ctx.arg_types[0]
+    ):
+        return ctx.default_return_type
+
+    for lookup_type in ctx.arg_types[0]:
+        lookup_value = helpers.get_literal_str_type(get_proper_type(lookup_type))
+        if lookup_value is not None:
+            _validate_select_related_lookup(ctx, django_context, django_model.cls, lookup_value)
+
+    return ctx.default_return_type

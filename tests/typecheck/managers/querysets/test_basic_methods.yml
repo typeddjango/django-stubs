@@ -99,8 +99,8 @@
         Book.objects.all().select_related()
         Book.objects.select_related(None)
         Book.objects.all().select_related(None)
-        Book.objects.select_related("author", "dd") # Should be Error on invalid lookup 'dd' !
-        Book.objects.all().select_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+        Book.objects.select_related("author", "dd") # E: Invalid field name "dd" in select_related lookup. Choices are: author  [misc]
+        Book.objects.all().select_related("author", "dd") # E: Invalid field name "dd" in select_related lookup. Choices are: author  [misc]
 
         Book.objects.select_related("None", None)
         Book.objects.all().select_related("None", None)
