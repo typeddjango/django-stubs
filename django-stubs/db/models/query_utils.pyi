@@ -14,7 +14,6 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
 from django.utils import tree
 from django.utils.functional import cached_property
-from typing_extensions import Self
 
 class PathInfo(NamedTuple):
     from_opts: Options
