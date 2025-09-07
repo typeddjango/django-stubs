@@ -11,17 +11,17 @@
         ### Noop (to_attr not provided)
         reveal_type(Article.objects.prefetch_related(Prefetch("tags")).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
         reveal_type(Article.objects.prefetch_related(Prefetch("tags", Tag.objects.all())).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
-        reveal_type(Prefetch("tags")) # N: Revealed type is "django.db.models.query.Prefetch[django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], builtins.str]"
-        reveal_type(Prefetch("tags", Tag.objects.all())) # N: Revealed type is "django.db.models.query.Prefetch[django.db.models.query.QuerySet[myapp.models.Tag, myapp.models.Tag], builtins.str]"
+        reveal_type(Prefetch("tags")) # N: Revealed type is "django.db.models.query.Prefetch[Literal['tags'], django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], builtins.str]"
+        reveal_type(Prefetch("tags", Tag.objects.all())) # N: Revealed type is "django.db.models.query.Prefetch[Literal['tags'], django.db.models.query.QuerySet[myapp.models.Tag, myapp.models.Tag], builtins.str]"
 
         # Prefetch created in a function with no to_attr
-        def get_prefetch_no_to_attr() -> Prefetch[QuerySet[Tag]]:
+        def get_prefetch_no_to_attr() -> Prefetch[Literal["tags"], QuerySet[Tag]]:
             return Prefetch("tags", Tag.objects.all())
 
         reveal_type(Article.objects.prefetch_related(get_prefetch_no_to_attr()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
 
         # Prefetch created in a function with no to_attr and no queryset
-        def get_prefetch_no_to_attr_no_qs() -> Prefetch:
+        def get_prefetch_no_to_attr_no_qs() -> Prefetch[Literal["tags"]]:
             return Prefetch("tags")
 
         reveal_type(Article.objects.prefetch_related(get_prefetch_no_to_attr_no_qs()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article, myapp.models.Article]"
@@ -87,17 +87,17 @@
         reveal_type(Article.objects.prefetch_related(tag_prefetch).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})]]"
 
         # Prefetch created in a function
-        def get_invalid_prefetch() -> Prefetch[QuerySet[Tag], Literal["every_tags"]]:
-            return Prefetch("tags", Tag.objects.all(), to_attr="foo") # E: Incompatible return value type (got "Prefetch[QuerySet[Tag, Tag], Literal['foo']]", expected "Prefetch[QuerySet[Tag, Tag], Literal['every_tags']]")  [return-value] # E: Argument "to_attr" to "Prefetch" has incompatible type "Literal['foo']"; expected "Literal['every_tags'] | None"  [arg-type]
+        def get_invalid_prefetch() -> Prefetch[Literal["tags"], QuerySet[Tag], Literal["every_tags"]]:
+            return Prefetch("tags", Tag.objects.all(), to_attr="foo") # E: Incompatible return value type (got "Prefetch[Literal['tags'], QuerySet[Tag, Tag], Literal['foo']]", expected "Prefetch[Literal['tags'], QuerySet[Tag, Tag], Literal['every_tags']]")  [return-value] # E: Argument "to_attr" to "Prefetch" has incompatible type "Literal['foo']"; expected "Literal['every_tags'] | None"  [arg-type]
 
-        def get_prefetch() -> Prefetch[QuerySet[Tag], Literal["every_tags"]]:
+        def get_prefetch() -> Prefetch[Literal["tags"], QuerySet[Tag], Literal["every_tags"]]:
             return Prefetch("tags", Tag.objects.all(), to_attr="every_tags")
 
         reveal_type(Article.objects.prefetch_related(get_prefetch()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})]]"
 
         # Prefetch created in a function with to_attr as an intermediary variable
-        def get_prefetch_with_var() -> Prefetch[QuerySet[Tag], Literal["every_tags"]]:
-            to_attr = "every_tags" # TODO: RM error next line
+        def get_prefetch_with_var() -> Prefetch[Literal["tags"], QuerySet[Tag], Literal["every_tags"]]:
+            to_attr = "every_tags"
             return Prefetch("tags", Tag.objects.all(), to_attr) # E: Argument 3 to "Prefetch" has incompatible type "str"; expected "Literal['every_tags'] | None"  [arg-type]
 
         reveal_type(Article.objects.prefetch_related(get_prefetch_with_var()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag]})]]"
@@ -120,7 +120,7 @@
         class MyDict(TypedDict):
             foo: str
 
-        def get_prefetch_with_annotations() -> Prefetch[QuerySet[WithAnnotations[Tag, MyDict]], Literal["every_tags"]]:
+        def get_prefetch_with_annotations() -> Prefetch[Literal["tags"], QuerySet[WithAnnotations[Tag, MyDict]], Literal["every_tags"]]:
             return Prefetch("tags", Tag.objects.annotate(foo=F("id")), "every_tags")
 
         reveal_type(Article.objects.prefetch_related(get_prefetch_with_annotations()).all()) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag@AnnotatedWith[TypedDict('main.MyDict', {'foo': builtins.str})]]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag@AnnotatedWith[TypedDict('main.MyDict', {'foo': builtins.str})]]})]]"
@@ -140,8 +140,8 @@
 
         # *args prefetch from helper function
         def _get_prefetches() -> tuple[
-          Prefetch[QuerySet[Tag], Literal["every_tags"]],
-          Prefetch[QuerySet[Tag], Literal["every_tags2"]],
+          Prefetch[Literal["tags"], QuerySet[Tag], Literal["every_tags"]],
+          Prefetch[Literal["tags"], QuerySet[Tag], Literal["every_tags2"]],
         ]:
             return prefetch_objs
 
