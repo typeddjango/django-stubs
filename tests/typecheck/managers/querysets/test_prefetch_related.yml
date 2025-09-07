@@ -308,26 +308,26 @@
         Author.objects.prefetch_related("article_set")
         Author.objects.prefetch_related("article_set__tags")
 
-        Article.objects.prefetch_related("xyz") # E: Cannot find "xyz" on "Article" object, "xyz" is an invalid parameter to prefetch_related()  [misc]
-        Article.objects.prefetch_related("id") # E: "id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Article.objects.prefetch_related("xyz") # E: Cannot find "xyz" on "Article" object, "xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Article.objects.prefetch_related("id") # E: "id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
 
         ## M2M -- forward / backward
-        Article.objects.prefetch_related("tags__xyz") # E: Cannot find "xyz" on "Tag" object, "tags__xyz" is an invalid parameter to prefetch_related()  [misc]
-        Article.objects.prefetch_related("tags__id") # E: "tags__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
-        Tag.objects.prefetch_related("articles__xyz") # E: Cannot find "xyz" on "Article" object, "articles__xyz" is an invalid parameter to prefetch_related()  [misc]
-        Tag.objects.prefetch_related("articles__id") # E: "articles__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Article.objects.prefetch_related("tags__xyz") # E: Cannot find "xyz" on "Tag" object, "tags__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Article.objects.prefetch_related("tags__id") # E: "tags__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
+        Tag.objects.prefetch_related("articles__xyz") # E: Cannot find "xyz" on "Article" object, "articles__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Tag.objects.prefetch_related("articles__id") # E: "articles__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
 
         ## FK -- forward / backward
-        Article.objects.prefetch_related("author__xyz") # E: Cannot find "xyz" on "Author" object, "author__xyz" is an invalid parameter to prefetch_related()  [misc]
-        Author.objects.prefetch_related("article_set__xyz") # E: Cannot find "xyz" on "Article" object, "article_set__xyz" is an invalid parameter to prefetch_related()  [misc]
-        Article.objects.prefetch_related("author__id") # E: "author__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
-        Author.objects.prefetch_related("article_set__id") # E: "article_set__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Article.objects.prefetch_related("author__xyz") # E: Cannot find "xyz" on "Author" object, "author__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Author.objects.prefetch_related("article_set__xyz") # E: Cannot find "xyz" on "Article" object, "article_set__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Article.objects.prefetch_related("author__id") # E: "author__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
+        Author.objects.prefetch_related("article_set__id") # E: "article_set__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
 
         ## OneToOne -- forward / backward
-        Author.objects.prefetch_related("user__xyz") # E: Cannot find "xyz" on "User" object, "user__xyz" is an invalid parameter to prefetch_related()  [misc]
-        User.objects.prefetch_related("author_profile__xyz") # E: Cannot find "xyz" on "Author" object, "author_profile__xyz" is an invalid parameter to prefetch_related()  [misc]
-        Author.objects.prefetch_related("user__id") # E: "user__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
-        User.objects.prefetch_related("author_profile__id") # E: "author_profile__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Author.objects.prefetch_related("user__xyz") # E: Cannot find "xyz" on "User" object, "user__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        User.objects.prefetch_related("author_profile__xyz") # E: Cannot find "xyz" on "Author" object, "author_profile__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Author.objects.prefetch_related("user__id") # E: "user__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
+        User.objects.prefetch_related("author_profile__id") # E: "author_profile__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
 
         ## Generic FK -- forward / backward
         Article.objects.prefetch_related("subject")
@@ -339,8 +339,8 @@
         Tag.objects.prefetch_related("tagged_items")
         Category.objects.prefetch_related("tagged_items")
         Tag.objects.prefetch_related("tagged_items__content_object")
-        Tag.objects.prefetch_related("tagged_items__xyz") # E: Cannot find "xyz" on "TaggedItem" object, "tagged_items__xyz" is an invalid parameter to prefetch_related()  [misc]
-        Tag.objects.prefetch_related("tagged_items__id") # E: "tagged_items__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Tag.objects.prefetch_related("tagged_items__xyz") # E: Cannot find "xyz" on "TaggedItem" object, "tagged_items__xyz" is an invalid parameter to "prefetch_related()"  [misc]
+        Tag.objects.prefetch_related("tagged_items__id") # E: "tagged_items__id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
 
     installed_apps:
         - myapp

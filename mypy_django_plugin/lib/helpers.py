@@ -363,7 +363,7 @@ def parse_bool(expr: Expression) -> bool | None:
     return None
 
 
-def get_literal_type(typ: Type) -> str | None:
+def get_literal_str_type(typ: Type) -> str | None:
     """Extract the str value of a string like type if possible"""
     typ = get_proper_type(typ)
     if (isinstance(typ, LiteralType) and isinstance((literal_value := typ.value), str)) or (

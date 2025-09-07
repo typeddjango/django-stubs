@@ -341,7 +341,7 @@ def _resolve_prefetch_string_argument(
     arg_name: str,
 ) -> str | None:
     # First try to get value from specialized type arg
-    arg_value = helpers.get_literal_type(type_arg)
+    arg_value = helpers.get_literal_str_type(type_arg)
     if arg_value is not None:
         return arg_value
 
@@ -477,7 +477,7 @@ def check_valid_prefetch_related_lookup(
             ctx.api.fail(
                 (
                     f'Cannot find "{through_attr}" on "{current_model_cls.__name__}" object, '
-                    f'"{lookup}" is an invalid parameter to prefetch_related()'
+                    f'"{lookup}" is an invalid parameter to "prefetch_related()"'
                 ),
                 ctx.context,
             )
@@ -508,7 +508,7 @@ def check_valid_prefetch_related_lookup(
             ctx.api.fail(
                 (
                     f'"{lookup}" does not resolve to an item that supports prefetching '
-                    f"- this is an invalid parameter to prefetch_related()"
+                    '- this is an invalid parameter to "prefetch_related()"'
                 ),
                 ctx.context,
             )
@@ -554,7 +554,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     for expr, typ in gather_flat_args(ctx):
         if not (isinstance(typ, Instance) and typ.type.has_base(fullnames.PREFETCH_CLASS_FULLNAME)):
             # Handle plain string lookups (not Prefetch instances)
-            lookup = helpers.get_literal_type(typ)
+            lookup = helpers.get_literal_str_type(typ)
             queryset_type = None
             if lookup is not None:
                 check_valid_prefetch_related_lookup(ctx, lookup, qs_model, django_context)
