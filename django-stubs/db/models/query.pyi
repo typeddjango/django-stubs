@@ -15,9 +15,12 @@ _Model = TypeVar("_Model", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True, default=_Model)  # ONLY use together with _Model
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
 
-# The type of the prefetched model
+# The type of the lookup passed to Prefetch(...)
+# This will be specialized to a `LiteralString` in the plugin for further processing and validation
+_LookupT = TypeVar("_LookupT", bound=str, covariant=True)
+# The type of the queryset passed to Prefetch(...)
 _PrefetchedQuerySetT = TypeVar("_PrefetchedQuerySetT", bound=QuerySet[Model], covariant=True, default=QuerySet[Model])
-# The attribute name to use to store the prefetched list[_PrefetchedQuerySetT]
+# The attribute name to store the prefetched list[_PrefetchedQuerySetT]
 # This will be specialized to a `LiteralString` in the plugin for further processing and validation
 _ToAttrT = TypeVar("_ToAttrT", bound=str, covariant=True, default=str)
 
@@ -183,7 +186,7 @@ class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
     @overload
     def prefetch_related(self, clear: None, /) -> Self: ...
     @overload
-    def prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
+    def prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
     def annotate(self, *args: Any, **kwargs: Any) -> Self: ...
     def alias(self, *args: Any, **kwargs: Any) -> Self: ...
     def order_by(self, *field_names: str | OrderBy) -> Self: ...
@@ -254,20 +257,20 @@ class RawQuerySet(Iterable[_Model], Sized):
     @overload
     def prefetch_related(self, clear: None, /) -> Self: ...
     @overload
-    def prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
+    def prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
     def resolve_model_init_order(self) -> tuple[list[str], list[int], list[tuple[str, int]]]: ...
     def using(self, alias: str | None) -> Self: ...
 
 # Deprecated alias of QuerySet, for compatibility only.
 _QuerySet: TypeAlias = QuerySet  # noqa: PYI047
 
-class Prefetch(Generic[_PrefetchedQuerySetT, _ToAttrT]):
+class Prefetch(Generic[_LookupT, _PrefetchedQuerySetT, _ToAttrT]):
     prefetch_through: str
     prefetch_to: str
     queryset: _PrefetchedQuerySetT | None
     to_attr: _ToAttrT | None
     def __init__(
-        self, lookup: str, queryset: _PrefetchedQuerySetT | None = None, to_attr: _ToAttrT | None = None
+        self, lookup: _LookupT, queryset: _PrefetchedQuerySetT | None = None, to_attr: _ToAttrT | None = None
     ) -> None: ...
     def __getstate__(self) -> dict[str, Any]: ...
     def add_prefix(self, prefix: str) -> None: ...

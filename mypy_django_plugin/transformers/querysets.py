@@ -3,6 +3,12 @@ from collections.abc import Sequence
 from django.core.exceptions import FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
+from django.db.models.fields.related_descriptors import (
+    ForwardManyToOneDescriptor,
+    ManyToManyDescriptor,
+    ReverseManyToOneDescriptor,
+    ReverseOneToOneDescriptor,
+)
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
@@ -230,7 +236,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     expression_types = {
         attr_name: typ
         for attr_name, typ in gather_expression_types(ctx).items()
-        if not check_conflicting_attr_value(ctx, django_model, attr_name)
+        if check_valid_attr_value(ctx, django_model, attr_name)
     }
 
     annotated_type: ProperType = django_model.typ
@@ -328,24 +334,75 @@ def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -
     return None
 
 
+def _resolve_prefetch_string_argument(
+    type_arg: MypyType,
+    expr: Expression | None,
+    django_context: DjangoContext,
+    arg_name: str,
+) -> str | None:
+    # First try to get value from specialized type arg
+    arg_value = helpers.get_literal_str_type(type_arg)
+    if arg_value is not None:
+        return arg_value
+
+    # Fallback: parse inline call expression
+    if isinstance(expr, CallExpr):
+        arg_expr = helpers.get_class_init_argument_by_name(expr, arg_name)
+        if arg_expr:
+            return helpers.resolve_string_attribute_value(arg_expr, django_context)
+    return None
+
+
+def _resolve_prefetch_queryset_argument(
+    type_arg: MypyType,
+    expr: Expression | None,
+    api: TypeChecker,
+) -> Instance | None:
+    # First try to get queryset type from specialized type arg
+    queryset_type = get_proper_type(type_arg)
+    if isinstance(queryset_type, Instance):
+        elem_model = helpers.extract_model_type_from_queryset(queryset_type, api)
+        # If we got a valid specific model type, return the queryset type
+        if elem_model is not None and elem_model.type.fullname != fullnames.MODEL_CLASS_FULLNAME:
+            return queryset_type
+
+    # Fallback: parse inline call expression
+    if isinstance(expr, CallExpr):
+        queryset_expr = helpers.get_class_init_argument_by_name(expr, "queryset")
+        if queryset_expr is not None:
+            return _infer_prefetch_queryset_type(queryset_expr, api)
+
+    return None
+
+
+def _specialize_string_arg_to_literal(
+    ctx: FunctionContext, django_context: DjangoContext, arg_name: str, fallback_type: MypyType
+) -> MypyType:
+    """
+    Helper to specialize a string argument to a Literal[str] type.
+
+    This allows the plugin to extract the actual string value for further processing
+    and validation in later analysis phases.
+    """
+
+    if arg_expr := helpers.get_call_argument_by_name(ctx, arg_name):
+        if arg_value := helpers.resolve_string_attribute_value(arg_expr, django_context):
+            api = helpers.get_typechecker_api(ctx)
+            return LiteralType(value=arg_value, fallback=api.named_generic_type("builtins.str", []))
+
+    return fallback_type
+
+
 def specialize_prefetch_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    """Function hook for `Prefetch(...)` to specialize its `to_attr` generic parameters."""
+    """Function hook for `Prefetch(...)` to specialize its `lookup` and `to_attr` generic parameters."""
     default = get_proper_type(ctx.default_return_type)
     if not isinstance(default, Instance):
         return ctx.default_return_type
 
-    api = helpers.get_typechecker_api(ctx)
+    lookup_type = _specialize_string_arg_to_literal(ctx, django_context, "lookup", default.args[0])
+    to_attr_type = _specialize_string_arg_to_literal(ctx, django_context, "to_attr", default.args[2])
 
-    # Guaranteed to exist because the TypeVar has a default
-    to_attr_type = default.args[1]
-    # We specialize the `to_attr` str type to a Literal[str] so that it can be used later
-    # to annotate the correct attribute name on the model instances and do further validations
-    # See `extract_prefetch_related_annotations` below.
-    if to_attr_expr := helpers.get_call_argument_by_name(ctx, "to_attr"):
-        if to_attr_value := helpers.resolve_string_attribute_value(to_attr_expr, django_context):
-            to_attr_type = LiteralType(value=to_attr_value, fallback=api.named_generic_type("builtins.str", []))
-
-    return default.copy_modified(args=[default.args[0], to_attr_type])
+    return default.copy_modified(args=[lookup_type, default.args[1], to_attr_type])
 
 
 def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, ProperType]]:
@@ -370,7 +427,7 @@ def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, Proper
     return lookups
 
 
-def check_conflicting_attr_value(
+def check_valid_attr_value(
     ctx: MethodContext, model: DjangoModel, attr_name: str, new_attrs: dict[str, MypyType] | None = None
 ) -> bool:
     """
@@ -379,7 +436,7 @@ def check_conflicting_attr_value(
     Args:
         - model: The Django model being analyzed
         - attr_name: The name of the attribute to be added
-        - fields: A mapping of field names to types currently being added to the model
+        - new_attrs: A mapping of field names to types currently being added to the model
     """
     is_conflicting_attr_value = bool(
         # 1. Conflict with another symbol on the model.
@@ -405,7 +462,71 @@ def check_conflicting_attr_value(
             ctx.context,
             code=NO_REDEF,
         )
-    return is_conflicting_attr_value
+    return not is_conflicting_attr_value
+
+
+def check_valid_prefetch_related_lookup(
+    ctx: MethodContext, lookup: str, django_model: DjangoModel, django_context: DjangoContext
+) -> bool:
+    """Check if a lookup string resolve to something that can be prefetched"""
+    current_model_cls = django_model.cls
+    contenttypes_installed = django_context.apps_registry.is_installed("django.contrib.contenttypes")
+    for through_attr in lookup.split("__"):
+        rel_obj_descriptor = getattr(current_model_cls, through_attr, None)
+        if rel_obj_descriptor is None:
+            ctx.api.fail(
+                (
+                    f'Cannot find "{through_attr}" on "{current_model_cls.__name__}" object, '
+                    f'"{lookup}" is an invalid parameter to "prefetch_related()"'
+                ),
+                ctx.context,
+            )
+            return False
+        if isinstance(rel_obj_descriptor, ForwardManyToOneDescriptor):
+            current_model_cls = rel_obj_descriptor.field.remote_field.model
+        elif isinstance(rel_obj_descriptor, ReverseOneToOneDescriptor):
+            current_model_cls = rel_obj_descriptor.related.related_model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+        elif isinstance(rel_obj_descriptor, ManyToManyDescriptor):
+            current_model_cls = (
+                rel_obj_descriptor.rel.related_model if rel_obj_descriptor.reverse else rel_obj_descriptor.rel.model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+            )
+        elif isinstance(rel_obj_descriptor, ReverseManyToOneDescriptor):
+            if contenttypes_installed:
+                from django.contrib.contenttypes.fields import ReverseGenericManyToOneDescriptor
+
+                if isinstance(rel_obj_descriptor, ReverseGenericManyToOneDescriptor):
+                    current_model_cls = rel_obj_descriptor.rel.model
+                    continue
+            current_model_cls = rel_obj_descriptor.rel.related_model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+        else:
+            if contenttypes_installed:
+                from django.contrib.contenttypes.fields import GenericForeignKey
+
+                if isinstance(rel_obj_descriptor, GenericForeignKey):
+                    # Generic foreign keys can point to any model, so we use Model as the base type
+                    return True
+            ctx.api.fail(
+                (
+                    f'"{lookup}" does not resolve to an item that supports prefetching '
+                    '- this is an invalid parameter to "prefetch_related()"'
+                ),
+                ctx.context,
+            )
+            return False
+    return True
+
+
+def check_conflicting_lookups(
+    ctx: MethodContext, observed_attr: str, qs_types: dict[str, Instance | None], queryset_type: Instance | None
+) -> bool:
+    is_conflicting_lookup = bool(observed_attr in qs_types and qs_types[observed_attr] != queryset_type)
+    if is_conflicting_lookup:
+        ctx.api.fail(
+            f'Lookup "{observed_attr}" was already seen with a different queryset',
+            ctx.context,
+            code=NO_REDEF,
+        )
+    return is_conflicting_lookup
 
 
 def extract_prefetch_related_annotations(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -428,66 +549,52 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     ):
         return ctx.default_return_type
 
-    new_attrs: dict[str, MypyType] = {}
-
+    new_attrs: dict[str, MypyType] = {}  # A mapping of field_name / types to add to the model
+    qs_types: dict[str, Instance | None] = {}  # A mapping of field_name / associated queryset type
     for expr, typ in gather_flat_args(ctx):
         if not (isinstance(typ, Instance) and typ.type.has_base(fullnames.PREFETCH_CLASS_FULLNAME)):
+            # Handle plain string lookups (not Prefetch instances)
+            lookup = helpers.get_literal_str_type(typ)
+            queryset_type = None
+            if lookup is not None:
+                check_valid_prefetch_related_lookup(ctx, lookup, qs_model, django_context)
+                check_conflicting_lookups(ctx, lookup, qs_types, queryset_type)
+                qs_types[lookup] = queryset_type
             continue
 
-        # 1) Try to get to_attr from specialized type arg
-        to_attr_value: str | None = None
-        if (
-            len(typ.args) >= 2
-            and isinstance((to_attr_t := get_proper_type(typ.args[1])), LiteralType)
-            and isinstance(to_attr_t.value, str)
-        ):
-            to_attr_value = to_attr_t.value
+        # 1) Extract lookup value from specialized type arg or call expression
+        lookup = _resolve_prefetch_string_argument(typ.args[0], expr, django_context, "lookup")
 
-        # Fallback: parse inline call expression
-        if to_attr_value is None:
-            if not (
-                isinstance(expr, CallExpr)
-                and (to_attr_expr := helpers.get_class_init_argument_by_name(expr, "to_attr"))
-                and (to_attr_value := helpers.resolve_string_attribute_value(to_attr_expr, django_context))
-            ):
-                continue
+        # 2) Extract to_attr value from specialized type arg or call expression
+        to_attr = _resolve_prefetch_string_argument(typ.args[2], expr, django_context, "to_attr")
+        if to_attr is None and lookup is None:
+            continue
 
-        # 2) Determine element model type from specialized type arg
+        # 3.a) Determine queryset type from specialized type arg or call expression
+        queryset_type = _resolve_prefetch_queryset_argument(typ.args[1], expr, api)
+
+        # 3.b) Extract model type from queryset type (or from the lookup value)
         elem_model: Instance | None = None
-        if len(typ.args) >= 1 and isinstance((queryset_type := get_proper_type(typ.args[0])), Instance):
+        if queryset_type is not None and isinstance(queryset_type, Instance):
             elem_model = helpers.extract_model_type_from_queryset(queryset_type, api)
+        elif lookup:
+            try:
+                observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup)[1]
+                if model_info := helpers.lookup_class_typeinfo(api, observed_model_cls):
+                    elem_model = Instance(model_info, [])
+            except (FieldError, LookupsAreUnsupported):
+                pass
 
-        # Fallback: parse inline call expression
-        if (elem_model is None or elem_model.type.fullname == fullnames.MODEL_CLASS_FULLNAME) and isinstance(
-            expr, CallExpr
-        ):
-            queryset_expr = helpers.get_class_init_argument_by_name(expr, "queryset")
-            if queryset_expr is not None and isinstance(
-                (inferred_queryset_type := _infer_prefetch_queryset_type(queryset_expr, api)), Instance
-            ):
-                elem_model = helpers.extract_model_type_from_queryset(inferred_queryset_type, api)
-            else:
-                # Resolve model type using the "lookup" required first argument and
-                # the model associated with the current queryset.
-                lookup_expr = helpers.get_class_init_argument_by_name(expr, "lookup")
-                if lookup_expr is None:
-                    continue
-
-                if lookup_value := helpers.resolve_string_attribute_value(lookup_expr, django_context):
-                    try:
-                        observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup_value)[1]
-                        if model_info := helpers.lookup_class_typeinfo(api, observed_model_cls):
-                            elem_model = Instance(model_info, [])
-                    except (FieldError, LookupsAreUnsupported):
-                        pass
-
-        value_type = api.named_generic_type(
-            "builtins.list",
-            [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
-        )
-
-        if not check_conflicting_attr_value(ctx, qs_model, to_attr_value, new_attrs):
-            new_attrs[to_attr_value] = value_type
+        if to_attr and check_valid_attr_value(ctx, qs_model, to_attr, new_attrs):
+            new_attrs[to_attr] = api.named_generic_type(
+                "builtins.list",
+                [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
+            )
+            qs_types[to_attr] = queryset_type
+        if not to_attr and lookup:
+            check_valid_prefetch_related_lookup(ctx, lookup, qs_model, django_context)
+            check_conflicting_lookups(ctx, lookup, qs_types, queryset_type)
+            qs_types[lookup] = queryset_type
 
     if not new_attrs:
         return ctx.default_return_type

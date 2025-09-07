@@ -155,8 +155,8 @@
         Book.objects.all().prefetch_related()
         Book.objects.prefetch_related(None)
         Book.objects.all().prefetch_related(None)
-        Book.objects.prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
-        Book.objects.all().prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+        Book.objects.prefetch_related("author", "dd") # E: Cannot find "dd" on "Book" object, "dd" is an invalid parameter to "prefetch_related()"  [misc]
+        Book.objects.all().prefetch_related("author", "dd") # E: Cannot find "dd" on "Book" object, "dd" is an invalid parameter to "prefetch_related()"  [misc]
 
         Book.objects.prefetch_related("None", None)
         Book.objects.all().prefetch_related("None", None)
@@ -170,27 +170,27 @@
       main:12: error: No overload variant of "prefetch_related" of "Manager" matches argument types "str", "None"  [call-overload]
       main:12: note: Possible overload variants:
       main:12: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
-      main:12: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:12: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
       main:13: error: No overload variant of "prefetch_related" of "QuerySet" matches argument types "str", "None"  [call-overload]
       main:13: note: Possible overload variants:
       main:13: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
-      main:13: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:13: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
       main:14: error: No overload variant of "prefetch_related" of "Manager" matches argument type "int"  [call-overload]
       main:14: note: Possible overload variants:
       main:14: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
-      main:14: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:14: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
       main:15: error: No overload variant of "prefetch_related" of "QuerySet" matches argument type "int"  [call-overload]
       main:15: note: Possible overload variants:
       main:15: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
-      main:15: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:15: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
       main:16: error: No overload variant of "prefetch_related" of "Manager" matches argument type "bool"  [call-overload]
       main:16: note: Possible overload variants:
       main:16: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
-      main:16: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:16: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
       main:17: error: No overload variant of "prefetch_related" of "QuerySet" matches argument type "bool"  [call-overload]
       main:17: note: Possible overload variants:
       main:17: note:     def prefetch_related(self, None, /) -> QuerySet[Book, Book]
-      main:17: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
+      main:17: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> QuerySet[Book, Book]
 
     installed_apps:
         - myapp
@@ -228,27 +228,27 @@
       main:12: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument types "str", "None"  [call-overload]
       main:12: note: Possible overload variants:
       main:12: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
-      main:12: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:12: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
       main:13: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument types "str", "None"  [call-overload]
       main:13: note: Possible overload variants:
       main:13: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
-      main:13: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:13: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
       main:14: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "int"  [call-overload]
       main:14: note: Possible overload variants:
       main:14: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
-      main:14: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:14: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
       main:15: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "int"  [call-overload]
       main:15: note: Possible overload variants:
       main:15: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
-      main:15: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:15: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
       main:16: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "bool"  [call-overload]
       main:16: note: Possible overload variants:
       main:16: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
-      main:16: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:16: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
       main:17: error: No overload variant of "prefetch_related" of "RawQuerySet" matches argument type "bool"  [call-overload]
       main:17: note: Possible overload variants:
       main:17: note:     def prefetch_related(self, None, /) -> RawQuerySet[Book]
-      main:17: note:     def [_PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
+      main:17: note:     def [_LookupT: str, _PrefetchedQuerySetT: QuerySet[Model, Model], _ToAttrT: str] prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> RawQuerySet[Book]
 
     installed_apps:
         - myapp
