@@ -47,6 +47,7 @@ from mypy.types import (
     LiteralType,
     NoneTyp,
     TupleType,
+    Type,
     TypedDictType,
     TypeOfAny,
     UnionType,
@@ -359,6 +360,18 @@ def parse_bool(expr: Expression) -> bool | None:
             return True
         if expr.fullname == "builtins.False":
             return False
+    return None
+
+
+def get_literal_type(typ: Type) -> str | None:
+    """Extract the str value of a string like type if possible"""
+    typ = get_proper_type(typ)
+    if (isinstance(typ, LiteralType) and isinstance((literal_value := typ.value), str)) or (
+        isinstance(typ, Instance)
+        and isinstance(typ.last_known_value, LiteralType)
+        and isinstance((literal_value := typ.last_known_value.value), str)
+    ):
+        return literal_value
     return None
 
 
