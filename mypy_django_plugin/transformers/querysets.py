@@ -328,24 +328,34 @@ def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -
     return None
 
 
+def _specialize_string_arg_to_literal(
+    ctx: FunctionContext, django_context: DjangoContext, arg_name: str, fallback_type: MypyType
+) -> MypyType:
+    """
+    Helper to specialize a string argument to a Literal[str] type.
+
+    This allows the plugin to extract the actual string value for further processing
+    and validation in later analysis phases.
+    """
+
+    if arg_expr := helpers.get_call_argument_by_name(ctx, arg_name):
+        if arg_value := helpers.resolve_string_attribute_value(arg_expr, django_context):
+            api = helpers.get_typechecker_api(ctx)
+            return LiteralType(value=arg_value, fallback=api.named_generic_type("builtins.str", []))
+
+    return fallback_type
+
+
 def specialize_prefetch_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    """Function hook for `Prefetch(...)` to specialize its `to_attr` generic parameters."""
+    """Function hook for `Prefetch(...)` to specialize its `lookup` and `to_attr` generic parameters."""
     default = get_proper_type(ctx.default_return_type)
     if not isinstance(default, Instance):
         return ctx.default_return_type
 
-    api = helpers.get_typechecker_api(ctx)
+    lookup_type = _specialize_string_arg_to_literal(ctx, django_context, "lookup", default.args[0])
+    to_attr_type = _specialize_string_arg_to_literal(ctx, django_context, "to_attr", default.args[2])
 
-    # Guaranteed to exist because the TypeVar has a default
-    to_attr_type = default.args[1]
-    # We specialize the `to_attr` str type to a Literal[str] so that it can be used later
-    # to annotate the correct attribute name on the model instances and do further validations
-    # See `extract_prefetch_related_annotations` below.
-    if to_attr_expr := helpers.get_call_argument_by_name(ctx, "to_attr"):
-        if to_attr_value := helpers.resolve_string_attribute_value(to_attr_expr, django_context):
-            to_attr_type = LiteralType(value=to_attr_value, fallback=api.named_generic_type("builtins.str", []))
-
-    return default.copy_modified(args=[default.args[0], to_attr_type])
+    return default.copy_modified(args=[lookup_type, default.args[1], to_attr_type])
 
 
 def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, ProperType]]:
