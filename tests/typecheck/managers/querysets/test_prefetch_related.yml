@@ -32,7 +32,7 @@
         reveal_type(article_qs.get().every_tags) # N: Revealed type is "builtins.list[myapp.models.Tag]"
         reveal_type(
             Tag.objects.all().prefetch_related( # N: Revealed type is "builtins.list[myapp.models.Article]"
-                Prefetch("article_set", Article.objects.all(), to_attr="every_articles")
+                Prefetch("tags", Article.objects.all(), to_attr="every_articles")
             ).get().every_articles
         )
 
@@ -44,7 +44,7 @@
         )
         reveal_type(
             Tag.objects.prefetch_related( # N: Revealed type is "builtins.list[myapp.models.Article]"
-                Prefetch("article_set", Article.objects.all(), to_attr="every_articles")
+                Prefetch("tags", Article.objects.all(), to_attr="every_articles")
             ).get().every_articles
         )
 
@@ -72,8 +72,8 @@
 
         # Mixed inline `Prefetch` and plain lookup string in one call; string should be ignored
         mixed_plain = Article.objects.prefetch_related(
-            "article_set",
-            Prefetch("article_set", Article.objects.all(), to_attr="arts3"),
+            "tags",
+            Prefetch("tags", Article.objects.all(), to_attr="arts3"),
         )
         reveal_type(mixed_plain) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'arts3': builtins.list[myapp.models.Article]})], myapp.models.Article@AnnotatedWith[TypedDict({'arts3': builtins.list[myapp.models.Article]})]]"
 
@@ -105,7 +105,7 @@
         # Mixed inline `Prefetch` and variable `Prefetch` in one call
         mixed_qs = Article.objects.prefetch_related(
             tag_prefetch,
-            Prefetch("article_set", Article.objects.all(), to_attr="arts2"),
+            Prefetch("tags", Article.objects.all(), to_attr="arts2"),
         )
         reveal_type(mixed_qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'arts2': builtins.list[myapp.models.Article]})], myapp.models.Article@AnnotatedWith[TypedDict({'every_tags': builtins.list[myapp.models.Tag], 'arts2': builtins.list[myapp.models.Article]})]]"
 
@@ -273,6 +273,108 @@
         ).prefetch_related(
            Prefetch("groups", Group.objects.all(), to_attr="new_attr"),
         )
+
+# Mostly mirror https://github.com/django/django/blob/0a67611b81567687cd24d2be1c0e390931f06262/tests/prefetch_related/tests.py#L574-L619
+-   case: prefetch_related_ambiguous_prefetches
+    installed_apps:
+        - django.contrib.auth
+    main: |
+        from django.db.models import Prefetch
+        from django.contrib.auth.models import User, Group
+
         User.objects.prefetch_related("groups", Prefetch("groups")) # Ok
-        User.objects.prefetch_related("groups", Prefetch("groups", Group.objects.filter(name="test"))) # TODO: Should be Not OK!
-        User.objects.prefetch_related(Prefetch("groups", Group.objects.filter(name="test")), "groups") # TODO: Should be Not OK! (but OK at runtime :/)
+        User.objects.prefetch_related("groups", "groups__user_set") # Ok
+        User.objects.prefetch_related("groups__user_set", Prefetch("groups", to_attr="groups_lst")) # Ok
+        User.objects.prefetch_related("groups", Prefetch("groups", Group.objects.filter(name="test"), to_attr="another_attr")) # Ok
+
+        User.objects.prefetch_related("groups", Prefetch("groups", Group.objects.filter(name="test"))) # E: Lookup "groups" was already seen with a different queryset  [no-redef]
+        User.objects.prefetch_related(Prefetch("groups"), Prefetch("groups", Group.objects.filter(name="test"))) # E: Lookup "groups" was already seen with a different queryset  [no-redef]
+        User.objects.prefetch_related(Prefetch("groups", Group.objects.filter(name="test")), "groups") # E: Lookup "groups" was already seen with a different queryset  [no-redef]
+
+-   case: prefetch_related_check_valid_lookup
+    main: |
+        from django.db.models import Prefetch, F
+        from myapp.models import Article, Tag, Author, Category
+        from django.contrib.auth.models import User
+
+        Tag.objects.prefetch_related("tagged_items__content_object")
+
+        Article.objects.prefetch_related("tags")
+        Article.objects.prefetch_related("tags__articles")
+        Article.objects.prefetch_related("tags__articles__tags")
+        Article.objects.prefetch_related("related_articles__tags")
+        Article.objects.prefetch_related("subject")
+
+        Author.objects.prefetch_related("article_set")
+        Author.objects.prefetch_related("article_set__tags")
+
+        Article.objects.prefetch_related("xyz") # E: Cannot find "xyz" on "Article" object, "xyz" is an invalid parameter to prefetch_related()  [misc]
+        Article.objects.prefetch_related("id") # E: "id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+
+        ## M2M -- forward / backward
+        Article.objects.prefetch_related("tags__xyz") # E: Cannot find "xyz" on "Tag" object, "tags__xyz" is an invalid parameter to prefetch_related()  [misc]
+        Article.objects.prefetch_related("tags__id") # E: "tags__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Tag.objects.prefetch_related("articles__xyz") # E: Cannot find "xyz" on "Article" object, "articles__xyz" is an invalid parameter to prefetch_related()  [misc]
+        Tag.objects.prefetch_related("articles__id") # E: "articles__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+
+        ## FK -- forward / backward
+        Article.objects.prefetch_related("author__xyz") # E: Cannot find "xyz" on "Author" object, "author__xyz" is an invalid parameter to prefetch_related()  [misc]
+        Author.objects.prefetch_related("article_set__xyz") # E: Cannot find "xyz" on "Article" object, "article_set__xyz" is an invalid parameter to prefetch_related()  [misc]
+        Article.objects.prefetch_related("author__id") # E: "author__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        Author.objects.prefetch_related("article_set__id") # E: "article_set__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+
+        ## OneToOne -- forward / backward
+        Author.objects.prefetch_related("user__xyz") # E: Cannot find "xyz" on "User" object, "user__xyz" is an invalid parameter to prefetch_related()  [misc]
+        User.objects.prefetch_related("author_profile__xyz") # E: Cannot find "xyz" on "Author" object, "author_profile__xyz" is an invalid parameter to prefetch_related()  [misc]
+        Author.objects.prefetch_related("user__id") # E: "user__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+        User.objects.prefetch_related("author_profile__id") # E: "author_profile__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+
+        ## Generic FK -- forward / backward
+        Article.objects.prefetch_related("subject")
+        # Generic foreign keys can point to any model, so we cannot validate lookups after
+        Article.objects.prefetch_related("subject__xyz")
+        Article.objects.prefetch_related("subject__id")
+
+        ## GenericRelation -- forward / backward
+        Tag.objects.prefetch_related("tagged_items")
+        Category.objects.prefetch_related("tagged_items")
+        Tag.objects.prefetch_related("tagged_items__content_object")
+        Tag.objects.prefetch_related("tagged_items__xyz") # E: Cannot find "xyz" on "TaggedItem" object, "tagged_items__xyz" is an invalid parameter to prefetch_related()  [misc]
+        Tag.objects.prefetch_related("tagged_items__id") # E: "tagged_items__id" does not resolve to an item that supports prefetching - this is an invalid parameter to prefetch_related()  [misc]
+
+    installed_apps:
+        - myapp
+        - django.contrib.auth
+        - django.contrib.contenttypes
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.contrib.auth.models import User
+                from django.contrib.contenttypes.models import ContentType
+                from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+
+                class Category(models.Model):
+                    tagged_items = GenericRelation('TaggedItem')
+
+                class Tag(models.Model):
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="tags")
+                    tagged_items = GenericRelation('TaggedItem')
+
+                class Author(models.Model):
+                    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="author_profile")
+
+                class TaggedItem(models.Model):
+                    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+                    object_id = models.PositiveIntegerField()
+                    content_object = GenericForeignKey('content_type', 'object_id')
+
+                class Article(models.Model):
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag, related_name="articles", blank=True)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="articles")
+                    related_articles = models.ManyToManyField("self", related_name="articles", blank=True)
+                    subject_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+                    subject_id = models.PositiveIntegerField()
+                    subject = GenericForeignKey("subject_content_type", "subject_id")

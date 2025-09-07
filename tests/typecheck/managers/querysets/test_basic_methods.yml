@@ -155,8 +155,8 @@
         Book.objects.all().prefetch_related()
         Book.objects.prefetch_related(None)
         Book.objects.all().prefetch_related(None)
-        Book.objects.prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
-        Book.objects.all().prefetch_related("author", "dd") # Should be Error on invalid lookup 'dd' !
+        Book.objects.prefetch_related("author", "dd") # E: Cannot find "dd" on "Book" object, "dd" is an invalid parameter to prefetch_related()  [misc]
+        Book.objects.all().prefetch_related("author", "dd") # E: Cannot find "dd" on "Book" object, "dd" is an invalid parameter to prefetch_related()  [misc]
 
         Book.objects.prefetch_related("None", None)
         Book.objects.all().prefetch_related("None", None)
