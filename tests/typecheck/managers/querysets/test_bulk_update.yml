@@ -1,0 +1,146 @@
+-   case: bulk_update_valid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author, Category
+
+        # Valid single field updates
+        articles = Article.objects.all()
+        Article.objects.bulk_update(articles, ["title"])
+        Article.objects.bulk_update(articles, ["content"])
+        Article.objects.bulk_update(articles, ["published"])
+
+        # Valid multiple field updates
+        Article.objects.bulk_update(articles, ["title", "content"])
+        Article.objects.bulk_update(articles, ["title", "content", "published"])
+
+        # Valid foreign key field updates (by field name and attname)
+        Article.objects.bulk_update(articles, ["author"])
+        Article.objects.bulk_update(articles, ["author_id"])
+        Article.objects.bulk_update(articles, ["category"])
+        Article.objects.bulk_update(articles, ["category_id"])
+
+        # Valid updates on different models
+        authors = Author.objects.all()
+        Author.objects.bulk_update(authors, ["name"])
+        Author.objects.bulk_update(authors, ["email"])
+
+        categories = Category.objects.all()
+        Category.objects.bulk_update(categories, ["name"])
+        Category.objects.bulk_update(categories, ["parent"])
+        Category.objects.bulk_update(categories, ["parent_id"])
+
+        # Variables containing field names
+        field_name = "title"
+        Article.objects.bulk_update(articles, [field_name])
+
+        # Dynamic field lists
+        def get_fields() -> list[str]:
+            return ["title"]
+
+        Article.objects.bulk_update(articles, get_fields())
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Category(models.Model):
+                    name = models.CharField(max_length=100)
+                    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag)
+
+
+
+-   case: bulk_update_invalid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author, Category
+        from typing import Literal
+
+        articles = Article.objects.all()
+
+        # Empty fields list
+        Article.objects.bulk_update() # E: Missing positional arguments "objs", "fields" in call to "bulk_update" of "Manager"  [call-arg]
+        Article.objects.bulk_update(articles, [])  # E: Field names must be given to bulk_update()  [misc]
+
+        # Invalid field names (Django's FieldError)
+        Article.objects.bulk_update(articles, ["nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_update(articles, ["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
+
+        # Cannot update primary key fields
+        Article.objects.bulk_update(articles, ["id"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+
+        # Mixed valid and invalid fields
+        Article.objects.bulk_update(articles, ["title", "nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_update(articles, ["id", "title"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+
+        # Whitespace-only field names
+        Article.objects.bulk_update(articles, [""])  # E: Article has no field named ''  [misc]
+        Article.objects.bulk_update(articles, ["   "])  # E: Article has no field named '   '  [misc]
+
+        # ManyToMany is not a concrete updatable field
+        Article.objects.bulk_update(articles, ["tags"])  # E: bulk_update() can only be used with concrete fields. Got "tags"  [misc]
+
+        # Multiple invalid fields
+        Article.objects.bulk_update(articles, ["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
+
+        # Primary key with valid fields
+        Article.objects.bulk_update(articles, ["title", "id", "content"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+
+        # Literal type variables are validated
+        invalid_field: Literal["nonexistent"] = "nonexistent"
+        Article.objects.bulk_update(articles, [invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
+
+        pk_field: Literal["id"] = "id"
+        Article.objects.bulk_update(articles, [pk_field])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+
+        # Test with different models
+        authors = Author.objects.all()
+        Author.objects.bulk_update(authors, ["id"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Author.objects.bulk_update(authors, ["invalid"])  # E: Author has no field named 'invalid'  [misc]
+
+        categories = Category.objects.all()
+        Category.objects.bulk_update(categories, ["id"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Category.objects.bulk_update(categories, ["invalid"])  # E: Category has no field named 'invalid'  [misc]
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Category(models.Model):
+                    name = models.CharField(max_length=100)
+                    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField('myapp.Tag')
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)

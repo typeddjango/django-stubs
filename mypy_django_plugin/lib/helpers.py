@@ -549,6 +549,9 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: "Djang
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
+    if isinstance(attr_expr, NameExpr) and isinstance(attr_expr.node, Var) and attr_expr.node.type is not None:
+        return get_literal_str_type(attr_expr.node.type)
+
     # support extracting from settings, in general case it's unresolvable yet
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
