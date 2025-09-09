@@ -1,5 +1,6 @@
 -   case: test_related_name_custom_manager
     main: |
+      from typing_extensions import reveal_type
       from app1.models import Model1
       from app2.models import Model2
 
@@ -90,6 +91,7 @@
 
 -   case: test_related_name_foreign_object_multi_column
     main: |
+      from typing_extensions import reveal_type
       from app1.models import Model1, Model2
 
       reveal_type(Model2.model_1.field) # N: Revealed type is "django.db.models.fields.related.ForeignObject[app1.models.Model1, app1.models.Model1]"
@@ -126,6 +128,7 @@
 
 - case: test_processes_other_relations_when_one_field_is_broken
   main: |
+        from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().others)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Other]"
   installed_apps:
@@ -146,6 +149,7 @@
 
 - case: test_related_fields_with_two_generic_parameters
   main: |
+        from typing_extensions import reveal_type
         from myapp.models import Address, School, Student
         reveal_type(Student().school)  # N: Revealed type is "myapp.models.School"
         reveal_type(Student().address)  # N: Revealed type is "myapp.models.Address"
@@ -174,6 +178,7 @@
 - case: test_related_fields_with_one_generic_parameter
   expect_fail: True
   main: |
+        from typing_extensions import reveal_type
         from myapp.models import Address, School, Student
         reveal_type(Student().school)  # N: Revealed type is "myapp.models.School"
         reveal_type(Student().address)  # N: Revealed type is "myapp.models.Address"

@@ -1,5 +1,7 @@
 - case: test_admin_decorators_display
   main: |
+    from typing_extensions import reveal_type
+
     from django.db import models
 
     from django.contrib import admin
@@ -56,6 +58,8 @@
 
 - case: test_admin_decorators_action
   main: |
+    from typing_extensions import reveal_type
+
     from django.db import models
 
     from django.contrib import admin

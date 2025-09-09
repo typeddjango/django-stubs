@@ -18,6 +18,7 @@
         -   path: myapp/lib.py
             content: |
                 from typing import TYPE_CHECKING
+                from typing_extensions import reveal_type
                 import django.conf
 
                 settings = django.conf.settings

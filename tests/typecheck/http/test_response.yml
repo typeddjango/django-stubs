@@ -1,4 +1,5 @@
 - case: response_object_has_text_of_type_str
   main: |
+      from typing_extensions import reveal_type
       from django.http.response import HttpResponse
       reveal_type(HttpResponse().text)  # N: Revealed type is "builtins.str"

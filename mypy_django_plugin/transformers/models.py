@@ -317,7 +317,7 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # We also need to override existing `pk` definition from `stubs`:
         auto_field = model_cls._meta.pk
-        if auto_field:
+        if auto_field is not None:
             self.create_autofield(
                 auto_field=auto_field,
                 dest_name="pk",
@@ -1147,13 +1147,13 @@ def get_annotated_type(
     """
     if model_type.extra_attrs:
         extra_attrs = ExtraAttrs(
-            attrs={**model_type.extra_attrs.attrs, **(fields_dict.items if fields_dict is not None else {})},
+            attrs={**model_type.extra_attrs.attrs, **fields_dict.items},
             immutable=model_type.extra_attrs.immutable.copy(),
             mod_name=None,
         )
     else:
         extra_attrs = ExtraAttrs(
-            attrs=fields_dict.items if fields_dict is not None else {},
+            attrs=fields_dict.items,
             immutable=None,
             mod_name=None,
         )

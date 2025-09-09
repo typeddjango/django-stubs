@@ -48,6 +48,7 @@
 
 -   case: fail_if_no_such_attribute_on_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import B
         b_instance = B()
         reveal_type(b_instance.b_attr) # N: Revealed type is "builtins.int"
@@ -68,6 +69,7 @@
 
 -   case: fields_recognized_if_base_model_is_subclass_of_models_model
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().username)  # N: Revealed type is "builtins.str"
     installed_apps:
@@ -89,6 +91,7 @@
 
 -   case: django_contrib_gis_base_model_mixin_inheritance
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().name)  # N: Revealed type is "builtins.str"
         reveal_type(User().updated_at)  # N: Revealed type is "datetime.datetime"
@@ -112,6 +115,7 @@
 
 -   case: test_manager_typevar_through_bounds
     main: |
+        from typing_extensions import reveal_type
         from myapp.models import ResultProcessorConcrete
         reveal_type(ResultProcessorConcrete().f())  # N: Revealed type is "myapp.models.Concrete"
     installed_apps:

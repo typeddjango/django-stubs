@@ -1,5 +1,6 @@
 -   case: fields_getter_and_setter
     main: |
+        from typing_extensions import reveal_type
         from django.contrib.gis.geos import Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection
         from myapp.models import MyModel
         model = MyModel()
