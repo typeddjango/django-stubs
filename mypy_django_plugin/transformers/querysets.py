@@ -645,7 +645,7 @@ def _validate_select_related_lookup(
     """Validate a single select_related lookup string."""
     if not lookup.strip():
         ctx.api.fail(
-            f'Invalid field name "{lookup}" in select_related lookup. Cannot be whitespace-only',
+            f'Invalid field name "{lookup}" in select_related lookup',
             ctx.context,
         )
         return False

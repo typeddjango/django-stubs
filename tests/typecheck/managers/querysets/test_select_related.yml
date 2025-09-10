@@ -94,8 +94,8 @@
         Article.objects.select_related(invalid_lookup)  # No error - variables not validated
 
         # Intermediary variable validated if literal
-        invalid_lookup: Literal["nonexistent"] = "nonexistent"
-        Article.objects.select_related(invalid_lookup)  # E: Invalid field name "nonexistent" in select_related lookup. Choices are: author, category  [misc]
+        invalid_lookup2: Literal["nonexistent"] = "nonexistent"
+        Article.objects.select_related(invalid_lookup2)  # E: Invalid field name "nonexistent" in select_related lookup. Choices are: author, category  [misc]
 
         # Chaining with invalid lookups
         qs3 = Article.objects.select_related("author").select_related("invalid")  # E: Invalid field name "invalid" in select_related lookup. Choices are: author, category  [misc]
@@ -105,8 +105,8 @@
         Article.objects.select_related("author", "invalid", "category")  # E: Invalid field name "invalid" in select_related lookup. Choices are: author, category  [misc]
 
         # Whitespace-only lookup (invalid)
-        Article.objects.select_related("")   # E: Invalid field name "" in select_related lookup. Cannot be whitespace-only  [misc]
-        Article.objects.select_related("   ")  # E: Invalid field name "   " in select_related lookup. Cannot be whitespace-only  [misc]
+        Article.objects.select_related("")   # E: Invalid field name "" in select_related lookup  [misc]
+        Article.objects.select_related("   ")  # E: Invalid field name "   " in select_related lookup  [misc]
 
     files:
         -   path: myapp/__init__.py
