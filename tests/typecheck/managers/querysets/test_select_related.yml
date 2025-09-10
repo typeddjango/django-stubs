@@ -1,0 +1,137 @@
+-   case: select_related_valid_lookups
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author, Category, Blog, Post
+
+        # Valid forward relations
+        Article.objects.select_related("author")
+        Article.objects.select_related("category")
+
+        # Valid reverse relations (unique=True)
+        Author.objects.select_related("profile")
+
+        # Valid chained lookups
+        Article.objects.select_related("author__profile")
+        Article.objects.select_related("category__parent")
+        Post.objects.select_related("blog__owner")
+        Post.objects.select_related("category__parent__parent")
+
+        # Multiple valid lookups
+        Article.objects.select_related("author", "category")
+        Article.objects.select_related("author__profile", "category")
+
+        # Self-referential relationships
+        Category.objects.select_related("parent")
+        Category.objects.select_related("parent__parent")
+
+        # Variables containing strings
+        author_lookup = "aaa"
+        Article.objects.select_related(author_lookup)
+
+        # Dynamic lookups (should not be validated)
+        def get_lookup() -> str:
+            return "author"
+
+        Article.objects.select_related(get_lookup())
+
+        # Chaining select_related calls
+        qs1 = Article.objects.select_related("author")
+        qs2 = qs1.select_related("category")
+        Article.objects.select_related("author").select_related("category")
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Category(models.Model):
+                    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+                class Author(models.Model):
+                    pass
+
+                class AuthorProfile(models.Model):
+                    author = models.OneToOneField(Author, on_delete=models.CASCADE, related_name='profile')
+
+                class Blog(models.Model):
+                    owner = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)  # Keep for testing non-relation field
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+                class Post(models.Model):
+                    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+-   case: select_related_invalid_lookups
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author, Category, Post
+        from typing import Literal
+
+        # Invalid field names
+        Article.objects.select_related("nonexistent")  # E: Invalid field name "nonexistent" in select_related lookup. Choices are: author, category  [misc]
+        Article.objects.select_related("title")  # E: Invalid field name "title" in select_related lookup. Choices are: author, category  [misc]
+
+        # Invalid chained lookups
+        Article.objects.select_related("author__nonexistent")  # E: Invalid field name "nonexistent" in select_related lookup. Choices are: profile  [misc]
+        Article.objects.select_related("category__invalid")  # E: Invalid field name "invalid" in select_related lookup. Choices are: parent  [misc]
+
+        # Reverse many-to-many (not allowed)
+        Category.objects.select_related("article_set")  # E: Invalid field name "article_set" in select_related lookup. Choices are: parent  [misc]
+
+        # Mixed valid and invalid in same call
+        Post.objects.select_related("blog", "invalid")  # E: Invalid field name "invalid" in select_related lookup. Choices are: author, blog, category  [misc]
+
+        # Intermediary variable not validated if non literal
+        invalid_lookup = "nonexistent"
+        Article.objects.select_related(invalid_lookup)  # No error - variables not validated
+
+        # Intermediary variable validated if literal
+        invalid_lookup2: Literal["nonexistent"] = "nonexistent"
+        Article.objects.select_related(invalid_lookup2)  # E: Invalid field name "nonexistent" in select_related lookup. Choices are: author, category  [misc]
+
+        # Chaining with invalid lookups
+        qs3 = Article.objects.select_related("author").select_related("invalid")  # E: Invalid field name "invalid" in select_related lookup. Choices are: author, category  [misc]
+        Article.objects.select_related("author").select_related("invalid")  # E: Invalid field name "invalid" in select_related lookup. Choices are: author, category  [misc]
+
+        # Multiple arguments with invalid lookups
+        Article.objects.select_related("author", "invalid", "category")  # E: Invalid field name "invalid" in select_related lookup. Choices are: author, category  [misc]
+
+        # Whitespace-only lookup (invalid)
+        Article.objects.select_related("")   # E: Invalid field name "" in select_related lookup  [misc]
+        Article.objects.select_related("   ")  # E: Invalid field name "   " in select_related lookup  [misc]
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Category(models.Model):
+                    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+                class Author(models.Model):
+                    pass
+
+                class AuthorProfile(models.Model):
+                    author = models.OneToOneField(Author, on_delete=models.CASCADE, related_name='profile')
+
+                class Blog(models.Model):
+                    owner = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)  # Keep for testing non-relation field
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+                class Post(models.Model):
+                    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
