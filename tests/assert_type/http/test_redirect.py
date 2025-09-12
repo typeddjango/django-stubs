@@ -1,13 +1,13 @@
+from typing import assert_type
+
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
-from django.conf import settings
 
 from django_stubs_ext.aliases import StrOrPromise
 
-from typing import assert_type
-
-reversed_url = reverse('url')
-lazy_url = reverse_lazy('namespace:url')
+reversed_url = reverse("url")
+lazy_url = reverse_lazy("namespace:url")
 
 HttpResponseRedirect(reversed_url)
 HttpResponseRedirect(lazy_url)
