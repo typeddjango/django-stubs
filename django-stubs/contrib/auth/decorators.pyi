@@ -7,12 +7,6 @@ from django.utils.functional import _StrOrPromise
 
 _VIEW = TypeVar("_VIEW", bound=Callable[..., HttpResponseBase | Awaitable[HttpResponseBase]])
 
-def user_passes_test(
-    test_func: Callable[[_AnyUser], bool],
-    login_url: _StrOrPromise | None = ...,
-    redirect_field_name: str | None = ...,
-) -> Callable[[_VIEW], _VIEW]: ...
-
 # There are two ways of calling @login_required: @with(arguments) and @bare
 @overload
 def login_required(
