@@ -2,8 +2,6 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 
-from django_stubs_ext.aliases import StrOrPromise
-
 reversed_url = reverse("url")
 lazy_url = reverse_lazy("namespace:url")
 
