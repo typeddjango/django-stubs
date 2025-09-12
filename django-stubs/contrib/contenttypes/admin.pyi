@@ -11,7 +11,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
 
 class GenericInlineModelAdmin(InlineModelAdmin):
     template: str
-    formset: type[BaseGenericInlineFormSet]
+    formset: type[BaseGenericInlineFormSet]  # type: ignore[assignment]
 
 class GenericStackedInline(GenericInlineModelAdmin): ...
 class GenericTabularInline(GenericInlineModelAdmin): ...
