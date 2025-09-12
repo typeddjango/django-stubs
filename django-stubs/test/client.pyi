@@ -193,10 +193,10 @@ class _HTTPScope(TypedDict, total=False):
     http_version: str
     method: str
     scheme: str
-    path: _StrOrPromise
+    path: str
     raw_path: bytes
     query_string: bytes
-    root_path: _StrOrPromise
+    root_path: str
     headers: Iterable[tuple[bytes, bytes]]
     client: tuple[str, int] | None
     server: tuple[str, int | None] | None
