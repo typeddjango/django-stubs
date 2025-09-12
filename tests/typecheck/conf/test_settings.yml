@@ -43,7 +43,7 @@
 
 -   case: test_setting_login_urls
     main: |
-        from typing import reveal_type
+        from typing_extensions import reveal_type
         from django.conf import settings
 
         reveal_type(settings.LOGIN_URL)  # N: Revealed type is "str | _StrPromise"
