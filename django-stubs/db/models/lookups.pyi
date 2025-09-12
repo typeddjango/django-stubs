@@ -1,7 +1,6 @@
 from collections.abc import Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
-from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Combinable, Expression, Func
 from django.db.models.fields import BooleanField
@@ -89,11 +88,8 @@ class IntegerFieldFloatRounding:
 
 class IntegerFieldExact(IntegerFieldOverflow, Exact[int | float]): ...
 class IntegerGreaterThan(IntegerFieldOverflow, GreaterThan[int | float]): ...
-
 class IntegerGreaterThanOrEqual(IntegerFieldOverflow, IntegerFieldFloatRounding, GreaterThanOrEqual[int | float]): ...
-
 class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan[int | float]): ...
-
 class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual[int | float]): ...
 
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup[_T]):
