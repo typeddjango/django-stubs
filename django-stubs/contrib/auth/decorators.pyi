@@ -1,7 +1,6 @@
 from collections.abc import Awaitable, Callable, Iterable
 from typing import TypeVar, overload
 
-from django.contrib.auth.models import _AnyUser
 from django.http.response import HttpResponseBase
 from django.utils.functional import _StrOrPromise
 
