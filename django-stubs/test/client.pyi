@@ -18,8 +18,7 @@ from django.http.response import HttpResponseBase
 from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
-from django.utils.functional import cached_property
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import _StrOrPromise, cached_property
 
 BOUNDARY: str
 MULTIPART_CONTENT: str

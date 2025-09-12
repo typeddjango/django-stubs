@@ -1,9 +1,9 @@
 from django.test import Client
 from django.urls import reverse, reverse_lazy
 
-url_reverse = reverse('some:namespace')
-url_lazy = reverse_lazy('some:namespace')
-url_str = '/abc/def'
+url_reverse = reverse("some:namespace")
+url_lazy = reverse_lazy("some:namespace")
+url_str = "/abc/def"
 
 client = Client()
 client.get(url_reverse)
@@ -26,6 +26,6 @@ client.delete(url_reverse)
 client.delete(url_lazy)
 client.delete(url_str)
 
-client.generic('GET', url_reverse)
-client.generic('POST', url_lazy)
-client.generic('DELETE', url_str)
+client.generic("GET", url_reverse)
+client.generic("POST", url_lazy)
+client.generic("DELETE", url_str)
