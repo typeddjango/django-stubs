@@ -46,7 +46,7 @@
         from typing_extensions import reveal_type
         from django.conf import settings
 
-        reveal_type(settings.LOGIN_URL)  # N: Revealed type is "str | _StrPromise"
-        reveal_type(settings.LOGIN_REDIRECT_URL)  # N: Revealed type is "str | _StrPromise"
-        reveal_type(settings.LOGOUT_REDIRECT_URL)  # N: Revealed type is "str | _StrPromise | None"
+        reveal_type(settings.LOGIN_URL)  # N: Revealed type is "builtins.str | django.utils.functional._StrPromise"
+        reveal_type(settings.LOGIN_REDIRECT_URL)  # N: Revealed type is "builtins.str | django.utils.functional._StrPromise"
+        reveal_type(settings.LOGOUT_REDIRECT_URL)  # N: Revealed type is "builtins.str | django.utils.functional._StrPromise | None"
 
