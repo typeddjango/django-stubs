@@ -135,7 +135,7 @@ def _process_dynamic_method(
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
         ret_type = queryset_instance
-        variables = []
+        variables = ()
     args_types = method_type.arg_types[1:]
     if _has_compatible_type_vars(base_that_has_method):
         typed_var = manager_instance.args or queryset_info.bases[0].args
