@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
-from django.core.exceptions import EmptyResultSet
+from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Combinable, Expression, Func
 from django.db.models.fields import BooleanField
@@ -88,10 +88,17 @@ class IntegerFieldFloatRounding:
     def get_prep_lookup(self) -> Any: ...
 
 class IntegerFieldExact(IntegerFieldOverflow, Exact[int | float]): ...
-class IntegerGreaterThan(IntegerFieldOverflow, GreaterThan[int | float]): ...
-class IntegerGreaterThanOrEqual(IntegerFieldOverflow, IntegerFieldFloatRounding, GreaterThanOrEqual[int | float]): ...
-class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan[int | float]): ...
-class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual[int | float]): ...
+class IntegerGreaterThan(IntegerFieldOverflow, GreaterThan[int | float]):
+    overflow_exception: type[FullResultSet]
+    
+class IntegerGreaterThanOrEqual(IntegerFieldOverflow, IntegerFieldFloatRounding, GreaterThanOrEqual[int | float]):
+    overflow_exception: type[FullResultSet]
+
+class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan[int | float]):
+    overflow_exception: type[FullResultSet]
+
+class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual[int | float]):
+    overflow_exception: type[FullResultSet]
 
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup[_T]):
     def split_parameter_list_as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> Any: ...

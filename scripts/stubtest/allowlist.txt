@@ -55,10 +55,14 @@ django.utils.datastructures.ImmutableList.sort
 django.utils.datastructures.ImmutableList.reverse
 
 # Promise is lazy, see notes in .pyi
+django.utils.functional.Promise.__init__
 django.utils.functional.Promise.__add__
 django.utils.functional.Promise.__deepcopy__
 django.utils.functional.Promise.__radd__
 django.utils.functional.Promise.__mod__
+
+# `classonlymethod` is an alias for `@classmethod` which is disjoint:
+django.utils.decorators.classonlymethod
 
 # Lazy regex
 django.contrib.admin.utils.UNQUOTE_RE
