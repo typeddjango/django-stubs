@@ -13,4 +13,4 @@ UniqueConstraint(  # type: ignore[call-overload]
     name="unique_mess",
 )
 
-CheckConstraint(name="less_than_constraint", check=LessThan[Any](F("months"), 1))  # pyright: ignore[reportDeprecated]
+CheckConstraint(name="less_than_constraint", check=LessThan[Any](F("months"), 1))  # pyright: ignore[reportDeprecated]  # type: ignore[deprecated]
