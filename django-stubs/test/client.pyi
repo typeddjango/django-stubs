@@ -19,6 +19,7 @@ from django.template.base import Template
 from django.test.utils import ContextList
 from django.urls import ResolverMatch
 from django.utils.functional import cached_property
+from django.utils.functional import _StrOrPromise
 
 BOUNDARY: str
 MULTIPART_CONTENT: str
@@ -88,7 +89,7 @@ class _RequestFactory(Generic[_T]):
     def request(self, **request: Any) -> _T: ...
     def get(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: _GetDataType = ...,
         secure: bool = ...,
         *,
@@ -98,7 +99,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def post(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         secure: bool = ...,
@@ -109,7 +110,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def head(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         secure: bool = ...,
         *,
@@ -119,7 +120,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def trace(
         self,
-        path: str,
+        path: _StrOrPromise,
         secure: bool = ...,
         *,
         headers: Mapping[str, Any] | None = ...,
@@ -128,7 +129,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def options(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: dict[str, str] | str = ...,
         content_type: str = ...,
         secure: bool = ...,
@@ -139,7 +140,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def put(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         secure: bool = ...,
@@ -150,7 +151,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def patch(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         secure: bool = ...,
@@ -161,7 +162,7 @@ class _RequestFactory(Generic[_T]):
     ) -> _T: ...
     def delete(
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         secure: bool = ...,
@@ -173,7 +174,7 @@ class _RequestFactory(Generic[_T]):
     def generic(
         self,
         method: str,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str | None = ...,
         secure: bool = ...,
@@ -193,10 +194,10 @@ class _HTTPScope(TypedDict, total=False):
     http_version: str
     method: str
     scheme: str
-    path: str
+    path: _StrOrPromise
     raw_path: bytes
     query_string: bytes
-    root_path: str
+    root_path: _StrOrPromise
     headers: Iterable[tuple[bytes, bytes]]
     client: tuple[str, int] | None
     server: tuple[str, int | None] | None
@@ -283,7 +284,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     def request(self, **request: Any) -> _MonkeyPatchedWSGIResponse: ...
     def get(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: _GetDataType = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -294,7 +295,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def post(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -306,7 +307,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def head(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -317,7 +318,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def options(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: dict[str, str] | str = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -329,7 +330,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def put(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -341,7 +342,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def patch(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -353,7 +354,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def delete(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -365,7 +366,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     ) -> _MonkeyPatchedWSGIResponse: ...
     def trace(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -393,7 +394,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     async def request(self, **request: Any) -> _MonkeyPatchedASGIResponse: ...
     async def get(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: _GetDataType = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -404,7 +405,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def post(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -416,7 +417,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def head(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         follow: bool = ...,
         secure: bool = ...,
@@ -427,7 +428,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def options(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: dict[str, str] | str = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -439,7 +440,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def put(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -451,7 +452,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def patch(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -463,7 +464,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def delete(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         content_type: str = ...,
         follow: bool = ...,
@@ -475,7 +476,7 @@ class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGI
     ) -> _MonkeyPatchedASGIResponse: ...
     async def trace(  # type: ignore[override]
         self,
-        path: str,
+        path: _StrOrPromise,
         data: Any = ...,
         follow: bool = ...,
         secure: bool = ...,
