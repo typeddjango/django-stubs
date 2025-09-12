@@ -3,9 +3,7 @@ updates:
 - package-ecosystem: uv
   directory: "/"
   schedule:
-    interval: daily
-    time: "02:00"
-  open-pull-requests-limit: 10
+    interval: weekly
 
 - package-ecosystem: github-actions
   directory: "/"
