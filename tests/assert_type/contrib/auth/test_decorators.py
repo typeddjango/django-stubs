@@ -10,5 +10,5 @@ lazy_url = reverse_lazy("namespace:url")
 def my_view1(request: HttpRequest) -> HttpResponse: ...
 
 
-@user_passes_test(lambda user: user.is_stuff, login_url=lazy_url)
+@user_passes_test(lambda user: user.is_active, login_url=lazy_url)
 def my_view2(request: HttpRequest) -> HttpResponse: ...
