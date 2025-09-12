@@ -394,9 +394,9 @@ AUTHENTICATION_BACKENDS: Sequence[str]
 
 LOGIN_URL: _StrOrPromise
 
-LOGIN_REDIRECT_URL: str
+LOGIN_REDIRECT_URL: _StrOrPromise
 
-LOGOUT_REDIRECT_URL: str | None
+LOGOUT_REDIRECT_URL: _StrOrPromise | None
 
 # The number of seconds a password reset link is valid for
 PASSWORD_RESET_TIMEOUT: int
