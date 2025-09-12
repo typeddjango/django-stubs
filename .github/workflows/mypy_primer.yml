@@ -52,7 +52,7 @@ jobs:
           (
             mypy_primer \
             --new v${MYPY_VERSION} --old v${MYPY_VERSION} \
-            --known-dependency-selector django \
+            --known-dependency-selector django-stubs \
             --old-prepend-path django-stubs_base --new-prepend-path django-stubs_to_test \
             --num-shards 1 --shard-index ${{ matrix.shard-index }} \
             --debug \
