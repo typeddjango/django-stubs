@@ -39,3 +39,14 @@
                 else:
                     const_with_circular_import = 0
                     const_unresolvable_circular = ...
+
+
+-   case: test_setting_login_urls
+    main: |
+        from typing import reveal_type
+        from django.conf import settings
+
+        reveal_type(settings.LOGIN_URL)  # N: Revealed type is "str | _StrPromise"
+        reveal_type(settings.LOGIN_REDIRECT_URL)  # N: Revealed type is "str | _StrPromise"
+        reveal_type(settings.LOGOUT_REDIRECT_URL)  # N: Revealed type is "str | _StrPromise | None"
+

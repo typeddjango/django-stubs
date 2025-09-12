@@ -1,5 +1,3 @@
-from typing import assert_type
-
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
@@ -13,7 +11,3 @@ HttpResponseRedirect(reversed_url)
 HttpResponseRedirect(lazy_url)
 HttpResponseRedirect(settings.LOGIN_URL)
 HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
-
-assert_type(settings.LOGIN_URL, StrOrPromise)
-assert_type(settings.LOGIN_REDIRECT_URL, StrOrPromise)
-assert_type(settings.LOGOUT_REDIRECT_URL, StrOrPromise | None)
