@@ -24,6 +24,8 @@ _PrefetchedQuerySetT = TypeVar("_PrefetchedQuerySetT", bound=QuerySet[Model], co
 # This will be specialized to a `LiteralString` in the plugin for further processing and validation
 _ToAttrT = TypeVar("_ToAttrT", bound=str, covariant=True, default=str)
 
+_OrderByFieldName: TypeAlias = str | Combinable
+
 MAX_GET_RESULTS: int
 REPR_OUTPUT_SIZE: int
 
@@ -189,7 +191,7 @@ class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
     def prefetch_related(self, *lookups: str | Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> Self: ...
     def annotate(self, *args: Any, **kwargs: Any) -> Self: ...
     def alias(self, *args: Any, **kwargs: Any) -> Self: ...
-    def order_by(self, *field_names: str | Combinable) -> Self: ...
+    def order_by(self, *field_names: _OrderByFieldName) -> Self: ...
     def distinct(self, *field_names: str) -> Self: ...
     # extra() return type won't be supported any time soon
     def extra(
@@ -198,7 +200,7 @@ class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
         where: Sequence[str] | None = None,
         params: Sequence[Any] | None = None,
         tables: Sequence[str] | None = None,
-        order_by: Sequence[str] | None = None,
+        order_by: Sequence[_OrderByFieldName] | None = None,
         select_params: Sequence[Any] | None = None,
     ) -> QuerySet[Any, Any]: ...
     def reverse(self) -> Self: ...
