@@ -65,6 +65,31 @@
                     class Meta(TypedModelMeta):
                         abstract = True
 
+-   case: get_field_reverse_fk_with_related_query_name
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import ModelA
+
+        reveal_type(ModelA._meta.get_field("model_b")) # N: Revealed type is "django.db.models.fields.reverse_related.ManyToOneRel"
+        reveal_type(ModelA.modelb_set.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB]"
+
+        reveal_type(ModelA._meta.get_field("model_b_bis")) # N: Revealed type is "django.db.models.fields.reverse_related.ManyToOneRel"
+        reveal_type(ModelA.model_b_bis.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class ModelA(models.Model): ...
+
+                class ModelB(models.Model):
+                    model_a = models.ForeignKey(ModelA, on_delete=models.CASCADE, related_query_name="model_b")
+                    model_a_bis = models.ForeignKey(ModelA, on_delete=models.CASCADE, related_name="model_b_bis")
+
 -   case: base_model_meta_incompatible_types
     main: |
         from django.db import models
