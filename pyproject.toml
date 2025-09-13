@@ -130,7 +130,8 @@ ignore = [
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a noqa"
-"typing.assert_type".msg = "Use typing_extensions.assert_type instead."
+"typing.assert_type".msg = "Only available in Python 3.11 and above. Use `typing_extensions.assert_type` instead."
+"typing.Self".msg = "Only available in Python 3.11 and above. Use `typing_extensions.Self` instead."
 
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]

@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Iterator
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, cast
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
 
 from django.db.models.base import Model
 from django.db.models.fields import Field
@@ -54,7 +54,7 @@ from mypy.types import (
     get_proper_type,
 )
 from mypy.types import Type as MypyType
-from typing_extensions import TypedDict
+from typing_extensions import Self
 
 from mypy_django_plugin.lib import fullnames
 
@@ -209,6 +209,21 @@ class DjangoModel(NamedTuple):
     def info(self) -> TypeInfo:
         return self.typ.type
 
+    @classmethod
+    def from_model_type(cls, model_type: Instance, django_context: "DjangoContext") -> Self | None:
+        model_info = model_type.type
+        is_annotated = is_annotated_model(model_info)
+
+        model_cls = (
+            django_context.get_model_class_by_fullname(model_info.bases[0].type.fullname)
+            if is_annotated
+            else django_context.get_model_class_by_fullname(model_info.fullname)
+        )
+        if model_cls is None:
+            return None
+
+        return cls(cls=model_cls, typ=model_type, is_annotated=is_annotated)
+
 
 def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
     """Extract the django model `Instance` associated to a queryset `Instance`"""
@@ -242,18 +257,7 @@ def get_model_info_from_qs_ctx(
     if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type, api))):
         return None
 
-    model_info = model_type.type
-    is_annotated = is_annotated_model(model_info)
-
-    model_cls = (
-        django_context.get_model_class_by_fullname(model_info.bases[0].type.fullname)
-        if is_annotated
-        else django_context.get_model_class_by_fullname(model_info.fullname)
-    )
-    if model_cls is None:
-        return None
-
-    return DjangoModel(cls=model_cls, typ=model_type, is_annotated=is_annotated)
+    return DjangoModel.from_model_type(model_type, django_context)
 
 
 def _get_class_init_type(call: CallExpr) -> CallableType | None:
