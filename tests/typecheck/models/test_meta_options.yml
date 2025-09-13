@@ -44,11 +44,11 @@
 -   case: get_field_with_abstract_inheritance
     main: |
         from typing_extensions import reveal_type
-        from myapp.models import AbstractModel
-        class MyModel(AbstractModel):
-            pass
+        from myapp.models import MyModel
 
-        MyModel._meta.get_field('field')  # E: MyModel has no field named 'field'  [misc]
+        MyModel._meta.get_field('non_existant')  # E: MyModel has no field named 'non_existant'  [misc]
+
+        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[typing.Sequence[builtins.float | builtins.int | builtins.str] | django.db.models.expressions.Combinable, builtins.list[builtins.int]]"
 
         field: str
         reveal_type(MyModel._meta.get_field(field))  # N: Revealed type is "django.db.models.fields.Field[Any, Any] | django.db.models.fields.reverse_related.ForeignObjectRel | django.contrib.contenttypes.fields.GenericForeignKey"
@@ -64,6 +64,9 @@
                 class AbstractModel(models.Model):
                     class Meta(TypedModelMeta):
                         abstract = True
+
+                class MyModel(AbstractModel):
+                    field = ArrayField(models.IntegerField(), default=[])
 
 -   case: get_field_reverse_fk_with_related_query_name
     main: |
