@@ -1,9 +1,11 @@
+from django.core.exceptions import FieldDoesNotExist
 from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, get_field_type_from_model_type_info
 from mypy_django_plugin.lib import helpers
+from mypy_django_plugin.lib.helpers import DjangoModel
 
 
 def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -20,5 +22,15 @@ def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: 
     if field_type is not None:
         return field_type
 
-    ctx.api.fail(f"{model_type.type.name} has no field named {field_name!r}", ctx.context)
-    return AnyType(TypeOfAny.from_error)
+    if (django_model := DjangoModel.from_model_type(model_type, django_context)) is None:
+        return ctx.default_return_type
+
+    try:
+        field = django_model.cls._meta.get_field(field_name)
+        if field_info := helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__):
+            return Instance(field_info, [])
+    except FieldDoesNotExist as e:
+        ctx.api.fail(str(e), ctx.context)
+        return AnyType(TypeOfAny.from_error)
+
+    return ctx.default_return_type
