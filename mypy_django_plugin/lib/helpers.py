@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Iterator
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, Self, cast
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, cast
 
 from django.db.models.base import Model
 from django.db.models.fields import Field
@@ -54,7 +54,7 @@ from mypy.types import (
     get_proper_type,
 )
 from mypy.types import Type as MypyType
-from typing_extensions import TypedDict
+from typing_extensions import Self, TypedDict
 
 from mypy_django_plugin.lib import fullnames
 
