@@ -11,7 +11,7 @@ _QueryType: TypeAlias = (
     Mapping[Any, Any] | Mapping[Any, Sequence[Any]] | Sequence[tuple[Any, Any]] | Sequence[tuple[Any, Sequence[Any]]]
 )
 
-def resolve(path: str, urlconf: str | None = ...) -> ResolverMatch: ...
+def resolve(path: str | _StrPromise, urlconf: str | None = ...) -> ResolverMatch: ...
 
 # NOTE: make sure `reverse` and `reverse_lazy` objects are in sync:
 def reverse(
