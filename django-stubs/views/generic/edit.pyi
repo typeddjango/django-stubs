@@ -13,7 +13,7 @@ _FormT = TypeVar("_FormT", bound=BaseForm)
 _ModelFormT = TypeVar("_ModelFormT", bound=BaseModelForm)
 _M = TypeVar("_M", bound=models.Model)
 
-class FormMixin(Generic[_FormT], ContextMixin):
+class FormMixin(ContextMixin, Generic[_FormT]):
     initial: dict[str, Any]
     form_class: type[_FormT] | None
     success_url: _StrOrPromise | None = None
@@ -28,7 +28,7 @@ class FormMixin(Generic[_FormT], ContextMixin):
     def form_invalid(self, form: _FormT) -> HttpResponse: ...
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
-class ModelFormMixin(Generic[_M, _ModelFormT], FormMixin[_ModelFormT], SingleObjectMixin[_M]):
+class ModelFormMixin(FormMixin[_ModelFormT], SingleObjectMixin[_M], Generic[_M, _ModelFormT]):
     fields: _ListOrTuple[str] | Literal["__all__"] | None
     def get_form_class(self) -> type[_ModelFormT]: ...
     def get_form_kwargs(self) -> dict[str, Any]: ...
@@ -66,9 +66,9 @@ class DeletionMixin(Generic[_M]):
     def delete(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def get_success_url(self) -> str: ...
 
-class BaseDeleteView(Generic[_M, _ModelFormT], DeletionMixin[_M], FormMixin[_ModelFormT], BaseDetailView[_M]):
+class BaseDeleteView(DeletionMixin[_M], FormMixin[_ModelFormT], BaseDetailView[_M], Generic[_M, _ModelFormT]):
     object: _M
 
-class DeleteView(Generic[_M, _ModelFormT], SingleObjectTemplateResponseMixin, BaseDeleteView[_M, _ModelFormT]):
+class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView[_M, _ModelFormT], Generic[_M, _ModelFormT]):
     object: _M
     template_name_suffix: str

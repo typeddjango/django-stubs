@@ -25,7 +25,7 @@ class ManagementForm(Form):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def clean(self) -> dict[str, int | None]: ...
 
-class BaseFormSet(Generic[_F], Sized, RenderableFormMixin):
+class BaseFormSet(Sized, RenderableFormMixin, Generic[_F]):
     form: type[_F]
     extra: int
     can_order: bool

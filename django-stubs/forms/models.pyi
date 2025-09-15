@@ -67,7 +67,7 @@ class ModelFormOptions(Generic[_M]):
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass): ...
 
-class BaseModelForm(Generic[_M], BaseForm):
+class BaseModelForm(BaseForm, Generic[_M]):
     instance: _M
     _meta: ModelFormOptions[_M]
     def __init__(
@@ -108,7 +108,7 @@ def modelform_factory(
 
 _ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
 
-class BaseModelFormSet(Generic[_M, _ModelFormT], BaseFormSet[_ModelFormT]):
+class BaseModelFormSet(BaseFormSet[_ModelFormT], Generic[_M, _ModelFormT]):
     model: type[_M]
     edit_only: bool
     unique_fields: Collection[str]
@@ -171,7 +171,7 @@ def modelformset_factory(
     edit_only: bool = False,
 ) -> type[BaseModelFormSet[_M, _ModelFormT]]: ...
 
-class BaseInlineFormSet(Generic[_M, _ParentM, _ModelFormT], BaseModelFormSet[_M, _ModelFormT]):
+class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT], Generic[_M, _ParentM, _ModelFormT]):
     instance: _ParentM
     save_as_new: bool
     unique_fields: Collection[str]

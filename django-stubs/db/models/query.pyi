@@ -36,7 +36,7 @@ class BaseIterable(Generic[_T]):
     def __init__(self, queryset: QuerySet[Model], chunked_fetch: bool = False, chunk_size: int = 100) -> None: ...
     def __aiter__(self) -> AsyncIterator[_T]: ...
 
-class ModelIterable(Generic[_Model], BaseIterable[_Model]):
+class ModelIterable(BaseIterable[_Model], Generic[_Model]):
     def __iter__(self) -> Iterator[_Model]: ...
 
 class RawModelIterable(BaseIterable[dict[str, Any]]):
@@ -54,7 +54,7 @@ class NamedValuesListIterable(ValuesListIterable[NamedTuple]):
 class FlatValuesListIterable(BaseIterable[_T]):
     def __iter__(self) -> Iterator[_T]: ...
 
-class QuerySet(Generic[_Model, _Row], Iterable[_Row], Sized):
+class QuerySet(Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
     query: Query
     _iterable_class: type[BaseIterable]
