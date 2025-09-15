@@ -1,0 +1,5 @@
+- case: test_staticfiles_storage_defaults
+  main: |
+    from django.contrib.staticfiles.storage import staticfiles_storage
+
+    reveal_type(staticfiles_storage)  # N: Revealed type is "django.contrib.staticfiles.storage.StaticFilesStorage"
