@@ -70,12 +70,32 @@
 
 -   case: queryset_method_of_union
     main: |
-        from typing_extensions import reveal_type
+        from typing_extensions import TypedDict, reveal_type
+        from django.db import models
         from myapp.models import MyModel1, MyModel2
         kls: type[MyModel1 | MyModel2] = MyModel1
         reveal_type(kls.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel1] | django.db.models.manager.Manager[myapp.models.MyModel2]"
         reveal_type(kls.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1] | django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]"
         reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
+
+        foos = MyModel1.objects.all().values_list("name")
+        bars = MyModel2.objects.all().values_list("name")
+
+        reveal_type(foos.union(bars)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, tuple[builtins.str]]"
+        reveal_type(foos.intersection(bars)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, tuple[builtins.str]]"
+        reveal_type(foos.difference(bars)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, tuple[builtins.str]]"
+
+        def union_values_list() -> models.QuerySet[models.Model, tuple[str]]:
+            union = foos.union(bars)
+            return union
+
+        foos_dict = MyModel1.objects.all().values("name")
+        bars_dict = MyModel2.objects.all().values("name")
+
+        reveal_type(foos_dict.union(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+        reveal_type(foos_dict.intersection(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+        reveal_type(foos_dict.difference(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+
     installed_apps:
         - myapp
     files:
@@ -84,9 +104,9 @@
             content: |
                 from django.db import models
                 class MyModel1(models.Model):
-                    pass
+                    name = models.TextField(blank=False, null=False)
                 class MyModel2(models.Model):
-                    pass
+                    name = models.TextField(blank=False, null=False)
 
 -   case: select_related_returns_queryset
     main: |
