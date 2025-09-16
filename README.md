@@ -129,7 +129,7 @@ The supported settings are:
   Set to `false` if you want to keep `.objects`, `.DoesNotExist`,
   and `.MultipleObjectsReturned` attributes on `models.Model` type.
   [See here why](https://github.com/typeddjango/django-stubs?tab=readme-ov-file#how-to-use-typemodel-annotation-with-objects-attribute)
-  this is dangeours to do by default.
+  this is dangerous to do by default.
 
 
 ## FAQ
