@@ -124,6 +124,14 @@ The supported settings are:
 
   Set to `false` if using dynamic settings, as [described below](https://github.com/typeddjango/django-stubs#how-to-use-a-custom-library-to-handle-django-settings).
 
+- `strict_model_abstract_attrs`, a boolean, default `true`.
+
+  Set to `false` if you want to keep `.objects`, `.DoesNotExist`,
+  and `.MultipleObjectsReturned` attributes on `models.Model` type.
+  [See here why](https://github.com/typeddjango/django-stubs?tab=readme-ov-file#how-to-use-typemodel-annotation-with-objects-attribute)
+  this is dangerous to do by default.
+
+
 ## FAQ
 
 ### Is this an official Django project?
@@ -367,6 +375,11 @@ def assert_zero_count(model_type: type[models.Model]) -> None:
     assert model_type._default_manager.count() == 0
 ```
 
+Configurable with `strict_model_abstract_attrs = false`
+to skip removing `.objects`, `.DoesNotExist`, and `.MultipleObjectsReturned`
+attributes from `model.Model` if you are using our mypy plugin.
+
+Use this setting on your own risk, because it can hide valid errors.
 
 ### How to type a custom `models.Field`?
 

@@ -1,89 +1,122 @@
--   case: login_required_bare
+-   case: login_required
     main: |
         from typing import Any
         from typing_extensions import reveal_type
-        from django.contrib.auth.decorators import login_required
-        from django.http import HttpRequest, HttpResponse
-        @login_required
-        def view_func(request: HttpRequest) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
--   case: login_required_bare_async
-    main: |
-        from typing import Any
-        from typing_extensions import reveal_type
-        from django.contrib.auth.decorators import login_required
-        from django.http import HttpRequest, HttpResponse
-        @login_required
-        async def view_func(request: HttpRequest) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
--   case: login_required_fancy
-    main: |
-        from typing_extensions import reveal_type
-        from django.contrib.auth.decorators import login_required
-        from django.core.handlers.wsgi import WSGIRequest
-        from django.http import HttpResponse
-        @login_required(redirect_field_name='a', login_url='b')
-        def view_func(request: WSGIRequest, arg: str) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: builtins.str) -> django.http.response.HttpResponse"
--   case: login_required_fancy_async
-    main: |
-        from typing_extensions import reveal_type
-        from django.contrib.auth.decorators import login_required
         from django.core.handlers.asgi import ASGIRequest
-        from django.http import HttpResponse
-        @login_required(redirect_field_name='a', login_url='b')
-        async def view_func(request: ASGIRequest, arg: str) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.core.handlers.asgi.ASGIRequest, arg: builtins.str) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
--   case: login_required_weird
-    main: |
-        from typing_extensions import reveal_type
+        from django.core.handlers.wsgi import WSGIRequest
         from django.contrib.auth.decorators import login_required
         from django.http import HttpRequest, HttpResponse
+
+        # Bare:
+
+        @login_required
+        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
+
+        @login_required
+        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+
+        # Fancy:
+
+        @login_required(redirect_field_name='a', login_url='b')
+        def view_func3(request: WSGIRequest, arg: str) -> HttpResponse: ...
+        reveal_type(view_func3)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: builtins.str) -> django.http.response.HttpResponse"
+
+        @login_required(redirect_field_name='a', login_url='b')
+        async def view_func4(request: ASGIRequest, arg: str) -> HttpResponse: ...
+        reveal_type(view_func4)  # N: Revealed type is "def (request: django.core.handlers.asgi.ASGIRequest, arg: builtins.str) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+
         # This is non-conventional usage, but covered in Django tests, so we allow it.
-        def view_func(request: HttpRequest) -> HttpResponse: ...
-        wrapped_view = login_required(view_func, redirect_field_name='a', login_url='b')
+
+        def view_func5(request: HttpRequest) -> HttpResponse: ...
+        wrapped_view = login_required(view_func5, redirect_field_name='a', login_url='b')
         reveal_type(wrapped_view)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
--   case: login_required_incorrect_return
+
+        # Wrong:
+
+        @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
+        def view_func6(request: Any) -> str: ...
+
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
+        AUTH_USER_MODEL = "myapp.MyUser"
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from django.db import models
+
+              class MyUser(models.Model):
+                  ...
+
+
+-   case: login_required_default_settings
     main: |
         from typing import Any
+        from typing_extensions import reveal_type
+        from django.core.handlers.asgi import ASGIRequest
+        from django.core.handlers.wsgi import WSGIRequest
         from django.contrib.auth.decorators import login_required
+        from django.http import HttpRequest, HttpResponse
+
+        @login_required
+        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
+
+        @login_required
+        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+
         @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
-        def view_func2(request: Any) -> str: ...
+        def view_func3(request: Any) -> str: ...
+
+
 -   case: user_passes_test
     main: |
         from typing_extensions import reveal_type
         from django.contrib.auth.decorators import user_passes_test
         from django.http import HttpRequest, HttpResponse
+
+        @user_passes_test(lambda u: u.is_authenticated and u.is_active)
+        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
+
         @user_passes_test(lambda u: u.get_username().startswith('super'))
-        def view_func(request: HttpRequest) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
--   case: user_passes_test_async
-    main: |
-        from typing_extensions import reveal_type
-        from django.contrib.auth.decorators import user_passes_test
-        from django.http import HttpRequest, HttpResponse
-        @user_passes_test(lambda u: u.get_username().startswith('super'))
-        async def view_func(request: HttpRequest) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
--   case: user_passes_test_bare_is_error
-    main: |
-        from django.http import HttpRequest, HttpResponse
-        from django.contrib.auth.decorators import user_passes_test
-        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[AbstractBaseUser | AnonymousUser], bool]"  [arg-type]
-        def view_func(request: HttpRequest) -> HttpResponse: ...
+        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+
+        # Wrong:
+
+        @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[User | AnonymousUser], bool]"  [arg-type]
+        def view_func3(request: HttpRequest) -> HttpResponse: ...
+
+        @user_passes_test(lambda u: u.get_username().startswith('super'))  # E: Value of type variable "_VIEW" of function cannot be "Callable[[str], str]"  [type-var]
+        def view_func4(request: str) -> str: ...
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth")
+
 -   case: permission_required
     main: |
+        from typing import Any
         from typing_extensions import reveal_type
         from django.contrib.auth.decorators import permission_required
         from django.http import HttpRequest, HttpResponse
+
         @permission_required('polls.can_vote')
-        def view_func(request: HttpRequest) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
--   case: permission_required_async
-    main: |
-        from typing_extensions import reveal_type
-        from django.contrib.auth.decorators import permission_required
-        from django.http import HttpRequest, HttpResponse
-        @permission_required('polls.can_vote')
-        async def view_func(request: HttpRequest) -> HttpResponse: ...
-        reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
+
+        @permission_required(['polls.can_vote', 'polls.can_close'], login_url='/abc')
+        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+
+        # Wrong:
+
+        @permission_required('polls.can_vote')  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
+        def view_func3(request: Any) -> str: ...
+
+        @permission_required  # E: Argument 1 to "permission_required" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Iterable[str] | str"  [arg-type]
+        def view_func4(request: HttpRequest) -> HttpResponse: ...
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth")

@@ -16,6 +16,7 @@ TEMPLATE = """
 [mypy.plugins.django-stubs]
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
+strict_model_abstract_attrs = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
 """
@@ -26,6 +27,7 @@ TEMPLATE_TOML = """
 [tool.django-stubs]
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
+strict_model_abstract_attrs = bool (default: true)
 ...
 (django-stubs) mypy: error: {}
 """
@@ -49,20 +51,33 @@ def write_to_file(file_contents: str, suffix: str | None = None) -> Generator[st
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]", "\tnot_django_not_settings_module = badbadmodule"],
-            "missing required 'django_settings_module' config.\
- Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var",
+            (
+                "missing required 'django_settings_module' config.\n"
+                "Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var"
+            ),
             id="missing-settings-module",
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]"],
-            "missing required 'django_settings_module' config.\
- Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var",
+            (
+                "missing required 'django_settings_module' config.\n"
+                "Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var"
+            ),
             id="no-settings-given",
         ),
         pytest.param(
             ["[mypy.plugins.django-stubs]", "django_settings_module = some.module", "strict_settings = bad"],
             "invalid 'strict_settings': the setting must be a boolean",
-            id="missing-settings-module",
+            id="invalid-strict_settings",
+        ),
+        pytest.param(
+            [
+                "[mypy.plugins.django-stubs]",
+                "django_settings_module = some.module",
+                "strict_model_abstract_attrs = bad",
+            ],
+            "invalid 'strict_model_abstract_attrs': the setting must be a boolean",
+            id="invalid-strict_model_abstract_attrs",
         ),
     ],
 )
@@ -117,8 +132,10 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
             [tool.django-stubs]
             not_django_not_settings_module = "badbadmodule"
             """,
-            "missing required 'django_settings_module' config.\
- Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var",
+            (
+                "missing required 'django_settings_module' config.\n"
+                "Either specify this config or set your `DJANGO_SETTINGS_MODULE` env var"
+            ),
             id="missing django_settings_module",
         ),
         pytest.param(
@@ -134,6 +151,15 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
             """,
             "invalid 'strict_settings': the setting must be a boolean",
             id="invalid strict_settings type",
+        ),
+        pytest.param(
+            """
+            [tool.django-stubs]
+            django_settings_module = "some.module"
+            strict_model_abstract_attrs = "a"
+            """,
+            "invalid 'strict_model_abstract_attrs': the setting must be a boolean",
+            id="invalid strict_model_abstract_attrs type",
         ),
     ],
 )

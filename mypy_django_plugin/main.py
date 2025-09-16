@@ -212,7 +212,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_metaclass_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         if fullname == fullnames.MODEL_METACLASS_FULLNAME:
-            return MetaclassAdjustments.adjust_model_class
+            return partial(MetaclassAdjustments.adjust_model_class, plugin_config=self.plugin_config)
         return None
 
     def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
@@ -292,11 +292,9 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
-        extra_data = {}
-        # In all places we use '_User' alias as a type we want to clear cache if
-        # AUTH_USER_MODEL setting changes
-        if ctx.id.startswith("django.contrib.auth") or ctx.id in {"django.http.request", "django.test.client"}:
-            extra_data["AUTH_USER_MODEL"] = self.django_context.settings.AUTH_USER_MODEL
+        extra_data = {
+            "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
+        }
         return self.plugin_config.to_json(extra_data)
 
 

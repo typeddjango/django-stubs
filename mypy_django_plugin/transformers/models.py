@@ -40,6 +40,7 @@ from mypy.types import (
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
 
+from mypy_django_plugin.config import DjangoPluginConfig
 from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -991,13 +992,35 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
 class MetaclassAdjustments(ModelClassInitializer):
     @classmethod
-    def adjust_model_class(cls, ctx: ClassDefContext) -> None:
+    def adjust_model_class(cls, ctx: ClassDefContext, plugin_config: DjangoPluginConfig) -> None:
         """
         For the sake of type checkers other than mypy, some attributes that are
         dynamically added by Django's model metaclass has been annotated on
         `django.db.models.base.Model`. We remove those attributes and will handle them
         through the plugin.
+
+        Configurable with `strict_model_abstract_attrs = false` to skip removing any objects from models.
+
+        Basically, this code::
+
+            from django.db import models
+
+            def get_model_count(model_type: type[models.Model]) -> int:
+                return model_type.objects.count()
+
+        - Will raise an error
+          `"type[models.Model]" has no attribute "objects"  [attr-defined]`
+          when `strict_model_abstract_attrs = true` (default)
+        - Return without any type errors
+          when `strict_model_abstract_attrs = false`
+
+        But, beware that the code above can fail in runtime, as mypy correctly shows.
+        Example: `get_model_count(models.Model)`
+
+        Turn this setting off at your own risk.
         """
+        if not plugin_config.strict_model_abstract_attrs:
+            return
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
             return
 
@@ -1005,8 +1028,6 @@ class MetaclassAdjustments(ModelClassInitializer):
             attr = ctx.cls.info.names.get(attr_name)
             if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
                 del ctx.cls.info.names[attr_name]
-
-        return
 
     def get_exception_bases(self, name: str) -> list[Instance]:
         bases = []
