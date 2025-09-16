@@ -75,6 +75,7 @@
                   ...
 
 -   case: test_contributions_from_modelbase_metaclass_no_processing
+    disable_cache: true
     mypy_config: |
         [mypy.plugins.django-stubs]
         django_settings_module = mysettings
