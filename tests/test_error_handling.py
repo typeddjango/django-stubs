@@ -71,7 +71,11 @@ def write_to_file(file_contents: str, suffix: str | None = None) -> Generator[st
             id="invalid-strict_settings",
         ),
         pytest.param(
-            ["[mypy.plugins.django-stubs]", "django_settings_module = some.module", "strict_model_abstract_attrs = bad"],
+            [
+                "[mypy.plugins.django-stubs]",
+                "django_settings_module = some.module",
+                "strict_model_abstract_attrs = bad",
+            ],
             "invalid 'strict_model_abstract_attrs': the setting must be a boolean",
             id="invalid-strict_model_abstract_attrs",
         ),
