@@ -5,8 +5,8 @@
         MyModel(array=array_val)  # E: Incompatible type for "array" of "MyModel" (got "list[int]", expected "Sequence[str] | Combinable")  [misc]
         non_init = MyModel()
         non_init.array = array_val  # E: Incompatible types in assignment (expression has type "list[int]", variable has type "Sequence[str] | Combinable")  [assignment]
-    custom_settings: |
-        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
+    installed_apps:
+        - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -16,14 +16,12 @@
 
                 class MyModel(models.Model):
                     array = ArrayField(base_field=models.TextField())
-
-
 -   case: postgres_forms_simple_array_field
     main: |
         from myapp.forms import MyForm
         MyForm()
-    custom_settings: |
-        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
+    installed_apps:
+        - myapp
     files:
         -   path: myapp/__init__.py
         -   path: myapp/forms.py
