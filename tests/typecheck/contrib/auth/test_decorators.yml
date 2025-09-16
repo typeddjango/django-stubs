@@ -17,7 +17,6 @@
         async def view_func(request: HttpRequest) -> HttpResponse: ...
         reveal_type(view_func)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 -   case: login_required_fancy
-    disable_cache: true  # TODO: remove and find out why it was failing without it
     main: |
         from typing_extensions import reveal_type
         from django.contrib.auth.decorators import login_required
