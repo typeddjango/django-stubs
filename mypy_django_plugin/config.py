@@ -18,6 +18,7 @@ INI_USAGE = """
 [mypy.plugins.django-stubs]
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
+strict_model_abstract_attrs = bool (default: true)
 ...
 """
 TOML_USAGE = """
@@ -26,14 +27,17 @@ TOML_USAGE = """
 [tool.django-stubs]
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
+strict_model_abstract_attrs = bool (default: true)
 ...
 """
 INVALID_FILE = "mypy config file is not specified or found"
 COULD_NOT_LOAD_FILE = "could not load configuration file"
 MISSING_SECTION = "no section [{section}] found"
 DJANGO_SETTINGS_ENV_VAR = "DJANGO_SETTINGS_MODULE"
-MISSING_DJANGO_SETTINGS = f"missing required 'django_settings_module' config.\
- Either specify this config or set your `{DJANGO_SETTINGS_ENV_VAR}` env var"
+MISSING_DJANGO_SETTINGS = (
+    "missing required 'django_settings_module' config.\n"
+    f"Either specify this config or set your `{DJANGO_SETTINGS_ENV_VAR}` env var"
+)
 INVALID_BOOL_SETTING = "invalid {key!r}: the setting must be a boolean"
 
 
@@ -54,7 +58,8 @@ def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
 
 
 class DjangoPluginConfig:
-    __slots__ = ("django_settings_module", "strict_settings")
+    __slots__ = ("django_settings_module", "strict_settings", "strict_model_abstract_attrs")
+
     django_settings_module: str
     strict_settings: bool
 
@@ -96,6 +101,9 @@ class DjangoPluginConfig:
         self.strict_settings = config.get("strict_settings", True)
         if not isinstance(self.strict_settings, bool):
             toml_exit(INVALID_BOOL_SETTING.format(key="strict_settings"))
+        self.strict_model_abstract_attrs = config.get("strict_model_abstract_attrs", True)
+        if not isinstance(self.strict_model_abstract_attrs, bool):
+            toml_exit(INVALID_BOOL_SETTING.format(key="strict_model_abstract_attrs"))
 
     def parse_ini_file(self, filepath: Path) -> None:
         parser = configparser.ConfigParser()
@@ -124,10 +132,16 @@ class DjangoPluginConfig:
         except ValueError:
             exit_with_error(INVALID_BOOL_SETTING.format(key="strict_settings"))
 
+        try:
+            self.strict_model_abstract_attrs = parser.getboolean(section, "strict_model_abstract_attrs", fallback=True)
+        except ValueError:
+            exit_with_error(INVALID_BOOL_SETTING.format(key="strict_model_abstract_attrs"))
+
     def to_json(self, extra_data: dict[str, Any]) -> dict[str, Any]:
         """We use this method to reset mypy cache via `report_config_data` hook."""
         return {
             "django_settings_module": self.django_settings_module,
             "strict_settings": self.strict_settings,
+            "strict_model_abstract_attrs": self.strict_model_abstract_attrs,
             **dict(sorted(extra_data.items())),
         }

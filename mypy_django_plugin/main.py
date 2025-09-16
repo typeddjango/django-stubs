@@ -212,7 +212,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
     def get_metaclass_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         if fullname == fullnames.MODEL_METACLASS_FULLNAME:
-            return MetaclassAdjustments.adjust_model_class
+            return partial(MetaclassAdjustments.adjust_model_class, plugin_config=self.plugin_config)
         return None
 
     def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
