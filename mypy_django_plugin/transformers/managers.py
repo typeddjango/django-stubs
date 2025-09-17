@@ -264,6 +264,12 @@ def _replace_type_var(ret_type: MypyType, to_replace: str, replace_by: MypyType)
         return ret_type.copy_modified(
             items=[_replace_type_var(item, to_replace, replace_by) for item in ret_type.items]
         )
+    elif isinstance(ret_type, UnionType):
+        return UnionType.make_union(
+            items=[_replace_type_var(item, to_replace, replace_by) for item in ret_type.items],
+            line=ret_type.line,
+            column=ret_type.column,
+        )
     return ret_type
 
 
