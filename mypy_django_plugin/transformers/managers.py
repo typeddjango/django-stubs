@@ -29,6 +29,7 @@ from mypy.types import (
     Instance,
     Overloaded,
     ProperType,
+    TupleType,
     TypeOfAny,
     TypeType,
     TypeVarType,
@@ -250,15 +251,25 @@ def _replace_type_var(ret_type: MypyType, to_replace: str, replace_by: MypyType)
 
     if isinstance(ret_type, Instance):
         # Since it is an instance, recursively find the type var for all its args.
-        ret_type.args = tuple(_replace_type_var(item, to_replace, replace_by) for item in ret_type.args)
-        return ret_type
-
-    if hasattr(ret_type, "item"):
-        # For example TypeType has an item. find the type_var for this item
-        ret_type.item = _replace_type_var(ret_type.item, to_replace, replace_by)
-    if hasattr(ret_type, "items"):
-        # For example TypeList has items. find recursively type_var for its items
-        ret_type.items = [_replace_type_var(item, to_replace, replace_by) for item in ret_type.items]
+        return ret_type.copy_modified(
+            args=tuple(_replace_type_var(item, to_replace, replace_by) for item in ret_type.args)
+        )
+    elif isinstance(ret_type, TypeType):
+        return TypeType.make_normalized(
+            _replace_type_var(ret_type.item, to_replace, replace_by),
+            line=ret_type.line,
+            column=ret_type.column,
+        )
+    elif isinstance(ret_type, TupleType):
+        return ret_type.copy_modified(
+            items=[_replace_type_var(item, to_replace, replace_by) for item in ret_type.items]
+        )
+    elif isinstance(ret_type, UnionType):
+        return UnionType.make_union(
+            items=[_replace_type_var(item, to_replace, replace_by) for item in ret_type.items],
+            line=ret_type.line,
+            column=ret_type.column,
+        )
     return ret_type
 
 
