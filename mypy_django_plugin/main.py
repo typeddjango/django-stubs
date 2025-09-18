@@ -169,6 +169,8 @@ class NewSemanalDjangoPlugin(Plugin):
                 querysets.extract_prefetch_related_annotations, django_context=self.django_context
             ),
             "select_related": partial(querysets.validate_select_related, django_context=self.django_context),
+            "bulk_update": partial(querysets.validate_bulk_update, django_context=self.django_context),
+            "abulk_update": partial(querysets.validate_bulk_update, django_context=self.django_context),
         }
 
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
