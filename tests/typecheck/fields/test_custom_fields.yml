@@ -8,11 +8,11 @@
         reveal_type(user.my_custom_field2)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field3)  # N: Revealed type is "builtins.bool"
         reveal_type(user.my_custom_field4)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field5)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field5)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
         reveal_type(user.my_custom_field6)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field7)  # N: Revealed type is "builtins.bool"
-        reveal_type(user.my_custom_field8)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue"
+        reveal_type(user.my_custom_field7)  # N: Revealed type is "builtins.bool | None"
+        reveal_type(user.my_custom_field8)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
+        reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
         reveal_type(user.my_custom_field10)  # N: Revealed type is "builtins.bool"
         reveal_type(user.my_custom_field11)  # N: Revealed type is "builtins.bool"
         reveal_type(user.my_custom_field12)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
@@ -65,12 +65,12 @@
                     my_custom_field_any1 = FieldImplicitAny()
                     my_custom_field_any2 = FieldExplicitAny()
 
-                    # test null=True on fields with non-optional generic types throw error
-                    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)  # E: GenericField is nullable but its generic get type parameter is not optional  [misc]
-                    my_custom_field6 = CustomValueField(null=True)  # E: CustomValueField is nullable but its generic get type parameter is not optional  [misc]
-                    my_custom_field7 = SingleTypeField[bool](null=True)  # E: SingleTypeField is nullable but its generic get type parameter is not optional  [misc]
-                    my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)  # E: AdditionalTypeVarField is nullable but its generic get type parameter is not optional  [misc]
-                    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)  # E: Field is nullable but its generic get type parameter is not optional  [misc]
+                    # test null=True on fields with non-optional generic automatically make type optional
+                    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)
+                    my_custom_field6 = CustomValueField(null=True)
+                    my_custom_field7 = SingleTypeField[bool](null=True)
+                    my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)
+                    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)
 
                     # test overriding fields that set _pyi_private_set_type or _pyi_private_get_type
                     my_custom_field10 = fields.SmallIntegerField[bool, bool]()
