@@ -70,13 +70,88 @@
 
 -   case: queryset_method_of_union
     main: |
-        from typing_extensions import reveal_type
+        from typing_extensions import TypedDict, reveal_type
+        from django.contrib.auth.models import User
+        from django.db import models
         from myapp.models import MyModel1, MyModel2
         kls: type[MyModel1 | MyModel2] = MyModel1
+
         reveal_type(kls.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel1] | django.db.models.manager.Manager[myapp.models.MyModel2]"
         reveal_type(kls.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1] | django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]"
         reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
+
+        # Regular QuerySet
+        foos = MyModel1.objects.all()
+        bars = MyModel2.objects.all()
+
+        reveal_type(foos.union(bars)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1]"
+        reveal_type(foos.intersection(bars)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1]"
+        reveal_type(foos.difference(bars)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, myapp.models.MyModel1]"
+
+        # `values_list()` QuerySet
+        foos_list = MyModel1.objects.all().values_list("name")
+        bars_list = MyModel2.objects.all().values_list("name")
+
+        reveal_type(foos_list.union(bars_list)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, tuple[builtins.str]]"
+        reveal_type(foos_list.intersection(bars_list)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, tuple[builtins.str]]"
+        reveal_type(foos_list.difference(bars_list)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, tuple[builtins.str]]"
+
+        def union_values_list() -> models.QuerySet[models.Model, tuple[str]]:
+            union = foos_list.union(bars_list)
+            return union
+
+        # `values()` QuerySet -- One field, same name
+        foos_dict = MyModel1.objects.all().values("name")
+        bars_dict = MyModel2.objects.all().values("name")
+
+        reveal_type(foos_dict.union(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+        reveal_type(foos_dict.intersection(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+        reveal_type(foos_dict.difference(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+
+        # `values()` QuerySet -- One field, different name, the first one takes precedence.
+        # cf https://docs.djangoproject.com/en/5.2/ref/models/querysets/#django.db.models.query.QuerySet.union
+        foos_dict2 = MyModel1.objects.all().values("name")
+        bars_dict2 = MyModel2.objects.all().values("id")
+
+        reveal_type(foos_dict2.union(bars_dict2)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+        reveal_type(foos_dict2.intersection(bars_dict2)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+        reveal_type(foos_dict2.difference(bars_dict2)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
+
+        # `values()` QuerySet -- Multiple field, same names
+        foos_dict3 = MyModel1.objects.all().values("name", "id")
+        bars_dict3 = MyModel2.objects.all().values("name", "id")
+
+        reveal_type(foos_dict3.union(bars_dict3)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+        reveal_type(foos_dict3.intersection(bars_dict3)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+        reveal_type(foos_dict3.difference(bars_dict3)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+
+        # Mixing `values()` and `values_list()` is apparently ok and takes the type of the first queryset
+        foos_dict4 = MyModel1.objects.all().values("name", "id")
+        bars_list4 = MyModel2.objects.all().values_list("name", "id")
+
+        reveal_type(foos_dict4.union(bars_list4)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+        reveal_type(foos_dict4.intersection(bars_list4)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+        reveal_type(foos_dict4.difference(bars_list4)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+
+        # TODO: Should be an error (mixed number of selected columns) -- runtime raises 'The used SELECT statements have a different number of columns'
+        foos_dict5 = MyModel1.objects.all().values("name", "id")
+        bars_dict5 = MyModel2.objects.all().values("name")
+
+        reveal_type(foos_dict5.union(bars_dict5)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+        reveal_type(foos_dict5.intersection(bars_dict5)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+        reveal_type(foos_dict5.difference(bars_dict5)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str, 'id': builtins.int})]"
+
+        # TODO: Should be an error (mixed number of columns) -- runtime raises 'The used SELECT statements have a different number of columns'
+        model2_qs = MyModel2.objects.all()
+        user_qs = User.objects.all()
+
+        reveal_type(model2_qs.union(bars_dict5)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]"
+        reveal_type(model2_qs.intersection(bars_dict5)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]"
+        reveal_type(model2_qs.difference(bars_dict5)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel2, myapp.models.MyModel2]"
+
+
     installed_apps:
+        - django.contrib.auth
         - myapp
     files:
         -   path: myapp/__init__.py
@@ -84,9 +159,9 @@
             content: |
                 from django.db import models
                 class MyModel1(models.Model):
-                    pass
+                    name = models.TextField(blank=False, null=False)
                 class MyModel2(models.Model):
-                    pass
+                    name = models.TextField(blank=False, null=False)
 
 -   case: select_related_returns_queryset
     main: |
