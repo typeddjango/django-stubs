@@ -665,12 +665,12 @@
         reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.defer)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*fields: builtins.str) -> myapp.models.MyQuerySet)"
-        reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: builtins.str) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: builtins.dict[builtins.str, Any] | None =, where: typing.Sequence[builtins.str] | None =, params: typing.Sequence[Any] | None =, tables: typing.Sequence[builtins.str] | None =, order_by: typing.Sequence[builtins.str | django.db.models.expressions.Combinable] | None =, select_params: typing.Sequence[Any] | None =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: builtins.str) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: builtins.str | django.db.models.expressions.Combinable) -> myapp.models.MyQuerySet"
@@ -678,7 +678,7 @@
         reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.select_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*fields: builtins.str) -> myapp.models.MyQuerySet)"
-        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], all: builtins.bool =) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any], all: builtins.bool =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: builtins.str | None) -> myapp.models.MyQuerySet"
     installed_apps:
         - myapp
