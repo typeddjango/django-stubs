@@ -263,7 +263,7 @@ class FloatField(Field[_ST, _GT]):
 class DecimalField(Field[_ST, _GT]):
     _pyi_private_set_type: str | float | decimal.Decimal | Combinable
     _pyi_private_get_type: decimal.Decimal
-    _pyi_lookup_exact_type: str | decimal.Decimal
+    _pyi_lookup_exact_type: str | int | decimal.Decimal
     # attributes
     max_digits: int
     decimal_places: int
