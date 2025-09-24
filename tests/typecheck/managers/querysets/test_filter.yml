@@ -54,10 +54,7 @@
         MyModel.objects.filter(a=1)
         MyModel.objects.filter(a="1.0")
         MyModel.objects.filter(a=Decimal(1.0))
-        MyModel.objects.filter(a=1.0)
-    out: |
-      main:7: error: Incompatible type for lookup 'a': (got "float", expected "str | int | Decimal")  [misc]
-
+        MyModel.objects.filter(a=1.0)  # E: Incompatible type for lookup 'a': (got "float", expected "str | int | Decimal")  [misc]
     installed_apps:
         - myapp
     files:
