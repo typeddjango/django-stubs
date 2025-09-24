@@ -425,3 +425,72 @@
       content: |
         from django.db import models
         class Blog(models.Model): pass
+
+-   case: test_annotate_existing_field
+    installed_apps:
+        - django.contrib.auth
+    main: |
+        from typing import Any
+        from typing_extensions import TypedDict
+        from django.db import models
+        from django.db.models import Prefetch, F, QuerySet
+        from django.contrib.auth.models import User, Group
+        from django_stubs_ext.annotations import WithAnnotations
+
+        # Error on existing field / remapped field / previous annotation
+        User.objects.annotate(username=F("username")) # E: Attribute "username" already defined on "django.contrib.auth.models.User"  [no-redef]
+        User.objects.values(foo=F("id")).annotate(foo=F("username")) # E: Attribute "foo" already defined on "django.contrib.auth.models.User"  [no-redef]
+        User.objects.annotate(computed=F('id')).annotate(computed=F('username')) # E: Attribute "computed" already defined on "django.contrib.auth.models.User@AnnotatedWith[TypedDict({'computed': Any})]"  [no-redef]
+
+        # Should be ok if filtered with `values` / `values_list`
+        User.objects.values_list("id").annotate(username=F("username"))
+        User.objects.values("id").annotate(username=F("username"))
+        User.objects.values_list("id", named=True).annotate(username=F("username"))
+
+        def get_with_values_list() -> QuerySet[User, tuple[int]]:
+            return User.objects.values_list("id")
+
+        get_with_values_list().annotate(username=F("username"))
+
+        class OnlyIdDict(TypedDict):
+            id: int
+
+        def get_with_values() -> QuerySet[User, OnlyIdDict]:
+            return User.objects.values("id")
+
+        get_with_values().annotate(username=F("username"))
+
+        # But still cause issue if overlapping with other symbols (methods, ...)
+        User.objects.values_list("id").annotate(get_full_name=F("username")) # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+        User.objects.values("id").annotate(get_full_name=F("username")) # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+
+        # No false positive on approximative row types
+        tuple_any_row: models.QuerySet[User, tuple[Any, ...]]
+        tuple_any_row.annotate(username=F("username"))
+
+        any_row: models.QuerySet[User, Any]
+        any_row.annotate(username=F("username"))
+
+        dict_row: models.QuerySet[User, dict]
+        dict_row.annotate(username=F("username"))
+
+        # Ensure collisions with methods are still errors in approximate contexts
+        get_with_values_list().annotate(get_full_name=F("username")) # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+        tuple_any_row.annotate(get_full_name=F("username")) # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+        any_row.annotate(get_full_name=F("username")) # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+        dict_row.annotate(get_full_name=F("username")) # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+
+        # Named values_list
+
+        # Test name collision with model methods in named values_list - should still error
+        User.objects.values_list("id", named=True).annotate(get_full_name=F("username"))  # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+        User.objects.values_list("username", named=True).annotate(get_full_name=F("first_name"))  # E: Attribute "get_full_name" already defined on "django.contrib.auth.models.User"  [no-redef]
+        User.objects.values_list("id", named=True).annotate(is_anonymous=F("username"))  # E: Attribute "is_anonymous" already defined on "django.contrib.auth.models.User"  [no-redef]
+
+        # Test name collision with model fields when field is NOT in values_list - should be OK
+        User.objects.values_list("id", named=True).annotate(username=F("first_name"))
+        User.objects.values_list("first_name", named=True).annotate(username=F("last_name"))
+
+        # Test name collision with model fields when field IS in values_list - should error
+        User.objects.values_list("username", named=True).annotate(username=F("first_name"))  # E: Attribute "username" already defined on "django.contrib.auth.models.User"  [no-redef]
+        User.objects.values_list("id", "username", named=True).annotate(username=F("first_name"))  # E: Attribute "username" already defined on "django.contrib.auth.models.User"  [no-redef]
