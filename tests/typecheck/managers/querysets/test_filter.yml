@@ -45,6 +45,29 @@
                 class User(models.Model):
                     age = models.IntegerField()
 
+# Regression test for #2831
+-   case: filter_with_decimal
+    main: |
+        from myapp.models import MyModel
+        from decimal import Decimal
+
+        MyModel.objects.filter(a=1)
+        MyModel.objects.filter(a="1.0")
+        MyModel.objects.filter(a=Decimal(1.0))
+        MyModel.objects.filter(a=1.0)
+    out: |
+      main:7: error: Incompatible type for lookup 'a': (got "float", expected "str | int | Decimal")  [misc]
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyModel(models.Model):
+                    a = models.DecimalField()
 
 -   case: filter_with_multiple_fields
     main: |
