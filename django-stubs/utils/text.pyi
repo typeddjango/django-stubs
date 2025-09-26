@@ -5,7 +5,7 @@ from re import Pattern
 from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
-from django.utils.functional import SimpleLazyObject, _StrPromise, _StrOrPromise, cached_property
+from django.utils.functional import SimpleLazyObject, _StrOrPromise, _StrPromise, cached_property
 
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
 _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
