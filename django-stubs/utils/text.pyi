@@ -5,7 +5,7 @@ from re import Pattern
 from typing import ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
-from django.utils.functional import SimpleLazyObject, _StrOrPromise, cached_property
+from django.utils.functional import SimpleLazyObject, _StrPromise, _StrOrPromise, cached_property
 
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
 _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
@@ -59,4 +59,4 @@ def unescape_string_literal(s: _StrOrPromiseT) -> _StrOrPromiseT: ...
 def slugify(value: _StrOrPromiseT, allow_unicode: bool = False) -> _StrOrPromiseT: ...
 def camel_case_to_spaces(value: str) -> str: ...
 
-format_lazy: Callable[..., _StrOrPromise]
+format_lazy: Callable[..., _StrPromise]
