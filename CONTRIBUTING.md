@@ -116,7 +116,7 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
 
 ## Releasing `django-stubs`
 
-1. Open a pull request that updates `setup.py`, `ext/setup.py` and `README.md`
+1. Open a pull request that updates `pyproject.toml`, `ext/pyproject.toml` and `README.md`
    (anyone can open this PR, not just maintainers):
 
     - Version number `major.minor.patch` is formed as follows:
@@ -125,8 +125,9 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
 
       `patch` is sequentially increasing for each stubs release. Reset to `0` if `major.minor` was updated.
 
-    - Update the `version=` value within `setup(...)` call in **both** `setup.py` files. The versions must be in sync.
-    - Update `django-stubs-ext>=` dependency in root `setup.py` to the same version number.
+    - Update the `version =` value within `[project]` section in **both** `pyproject.toml` files. The versions must be in sync.
+    - Update `django-stubs-ext>=` dependency in root `pyproject.toml` to the same version number.
+    - Update lockfile, run: `uv lock`
     - Add a new row at the top of ['Version compatibility' table in README.md](README.md#version-compatibility).
     - Use pull request title "Version x.y.z release" by convention.
     - Add the correct classifiers to `setup.py` if support is added for a new Python or Django version
