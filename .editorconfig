@@ -11,3 +11,6 @@ trim_trailing_whitespace = true
 
 [*.{py, pyi}]
 indent_size = 4
+
+[*.toml]
+indent_size = 2
