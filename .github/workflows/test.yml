@@ -172,16 +172,17 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-tags: true
-      - uses: actions/setup-python@v6
+      - name: Install uv & Python
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: python3 -m pip install --upgrade build twine
+          python-version: "3.13"
+      - name: Ensure uv.lock is up to date
+        run: env --unset=UV_FROZEN uv lock --check
       - name: Build
         run: |
-          python3 -m build .
-          python3 -m build ext/
+          uv build .
+          uv build ext/
       - name: Check package metadata
         run: |
-          twine check --strict dist/*
-          twine check --strict ext/dist/*
+          uvx twine check --strict dist/*
+          uvx twine check --strict ext/dist/*
