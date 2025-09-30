@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           cd django-stubs_to_test
-          MYPY_VERSION=$(grep mypy== pyproject.toml | sed -n 's/    "mypy==\([^;]*\).*",/\1/p')
+          MYPY_VERSION=$(grep mypy== pyproject.toml | sed -n 's/  "mypy==\([^;]*\).*",/\1/p')
 
           echo "new commit"
           git checkout $GITHUB_SHA
