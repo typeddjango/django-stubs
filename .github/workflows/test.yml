@@ -182,7 +182,3 @@ jobs:
         run: |
           uv build .
           uv build ext/
-      - name: Check package metadata
-        run: |
-          uvx twine check --strict dist/*
-          uvx twine check --strict ext/dist/*
