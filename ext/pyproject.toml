@@ -1,7 +1,3 @@
-[build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling"]
-
 [project]
 name = "django-stubs-ext"
 # NB! For clarity, keep version major.minor.patch in sync with django-stubs.
@@ -43,5 +39,10 @@ Homepage = "https://github.com/typeddjango/django-stubs"
 Funding = "https://github.com/sponsors/typeddjango"
 "Release notes" = "https://github.com/typeddjango/django-stubs/releases"
 
-[tool.hatch.build]
-packages = ["django_stubs_ext"]
+[build-system]
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = ["django_stubs_ext"]
+module-root = ""
