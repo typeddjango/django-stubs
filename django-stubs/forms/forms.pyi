@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator, MutableMapping, Sequence, Mapping
+from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Sequence
 from typing import Any, ClassVar, overload
 
 from django.core.exceptions import ValidationError
@@ -60,7 +60,9 @@ class BaseForm(RenderableFormMixin):
     def non_field_errors(self) -> ErrorList: ...
     @overload
     def add_error(
-        self, field: None, error: Mapping[str, ValidationError | _StrOrPromise | Sequence[ValidationError | _StrOrPromise]]
+        self,
+        field: None,
+        error: Mapping[str, ValidationError | _StrOrPromise | Sequence[ValidationError | _StrOrPromise]],
     ) -> None: ...
     @overload
     def add_error(
