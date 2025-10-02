@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator, MutableMapping, Sequence
+from collections.abc import Iterable, Iterator, MutableMapping, Sequence, Mapping
 from typing import Any, ClassVar, overload
 
 from django.core.exceptions import ValidationError
