@@ -1,0 +1,166 @@
+-   case: test_authentication_middleware_basic
+    main: |
+        from django.contrib.auth.middleware import AuthenticationMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = AuthenticationMiddleware(get_response)
+        request = HttpRequest()
+        middleware.process_request(request)
+
+-   case: test_remote_user_middleware_instantiation
+    main: |
+        from django.contrib.auth.middleware import RemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = RemoteUserMiddleware(get_response)
+
+        # Test attributes
+        header: str = middleware.header
+        force_logout: bool = middleware.force_logout_if_no_header
+        sync_capable: bool = middleware.sync_capable
+        async_capable: bool = middleware.async_capable
+        is_async: bool = middleware.is_async
+
+-   case: test_remote_user_middleware_methods
+    main: |
+        from django.contrib.auth.middleware import RemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = RemoteUserMiddleware(get_response)
+        request = HttpRequest()
+
+        # Test public methods
+        middleware.process_request(request)
+        username: str = middleware.clean_username("testuser", request)
+
+        # Test private methods exist and are callable
+        middleware._remove_invalid_user(request)
+
+-   case: test_remote_user_middleware_async_methods
+    main: |
+        from django.contrib.auth.middleware import RemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        async def async_get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        async def test() -> None:
+            middleware = RemoteUserMiddleware(async_get_response)
+            request = HttpRequest()
+
+            # Test async methods
+            await middleware.aprocess_request(request)
+            await middleware._aremove_invalid_user(request)
+
+-   case: test_remote_user_middleware_call_sync
+    main: |
+        from django.contrib.auth.middleware import RemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse, HttpResponseBase
+        from collections.abc import Awaitable
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = RemoteUserMiddleware(get_response)
+        request = HttpRequest()
+
+        # __call__ returns either response or awaitable
+        result: HttpResponseBase | Awaitable[HttpResponseBase] = middleware(request)
+
+-   case: test_remote_user_middleware_call_async
+    main: |
+        from django.contrib.auth.middleware import RemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse, HttpResponseBase
+        from collections.abc import Awaitable
+
+        async def async_get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        async def test() -> None:
+            middleware = RemoteUserMiddleware(async_get_response)
+            request = HttpRequest()
+
+            # Test __acall__
+            response: HttpResponseBase = await middleware.__acall__(request)
+
+-   case: test_persistent_remote_user_middleware
+    main: |
+        from django.contrib.auth.middleware import PersistentRemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        # PersistentRemoteUserMiddleware inherits from RemoteUserMiddleware
+        middleware = PersistentRemoteUserMiddleware(get_response)
+
+        # Should have same methods as parent
+        request = HttpRequest()
+        middleware.process_request(request)
+        middleware._remove_invalid_user(request)
+
+        # Should override force_logout_if_no_header
+        force_logout: bool = middleware.force_logout_if_no_header
+
+-   case: test_login_required_middleware_basic
+    main: |
+        from django.contrib.auth.middleware import LoginRequiredMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = LoginRequiredMiddleware(get_response)
+
+        # Test class variable
+        redirect_field_name: str = middleware.redirect_field_name
+
+-   case: test_login_required_middleware_methods
+    main: |
+        from typing import Any
+        from django.contrib.auth.middleware import LoginRequiredMiddleware
+        from django.http import HttpRequest, HttpResponse, HttpResponseBase, HttpResponseRedirect
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        def view_func(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = LoginRequiredMiddleware(get_response)
+        request = HttpRequest()
+
+        # Test process_view
+        result: HttpResponseBase | None = middleware.process_view(
+            request, view_func, (), {}
+        )
+
+        # Test helper methods
+        login_url: str = middleware.get_login_url(view_func)
+        redirect_field: str = middleware.get_redirect_field_name(view_func)
+        redirect_response: HttpResponseRedirect = middleware.handle_no_permission(
+            request, view_func
+        )
+
+-   case: test_remote_user_middleware_custom_header
+    main: |
+        from django.contrib.auth.middleware import RemoteUserMiddleware
+        from django.http import HttpRequest, HttpResponse
+
+        class CustomRemoteUserMiddleware(RemoteUserMiddleware):
+            header = "HTTP_X_REMOTE_USER"
+
+        def get_response(request: HttpRequest) -> HttpResponse:
+            return HttpResponse()
+
+        middleware = CustomRemoteUserMiddleware(get_response)
+        custom_header: str = middleware.header
