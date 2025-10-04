@@ -20,8 +20,8 @@ class Person(models.Model):
 
 
 class PersonListAdmin(admin.ModelAdmin[Person]):
-    fields = [["first_name", "last_name"], "birthday"]
-    list_display = [upper_case_name, "birthday"]
+    fields = [["first_name", "last_name"], "birthday"]  # noqa: RUF012
+    list_display = [upper_case_name, "birthday"]  # noqa: RUF012
 
 
 class PersonTupleAdmin(admin.ModelAdmin[Person]):
@@ -30,7 +30,7 @@ class PersonTupleAdmin(admin.ModelAdmin[Person]):
 
 
 class PersonFieldsetListAdmin(admin.ModelAdmin[Person]):
-    fieldsets = [
+    fieldsets = [  # noqa: RUF012
         (
             "Personal Details",
             {
