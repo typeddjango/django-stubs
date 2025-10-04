@@ -718,9 +718,8 @@ def merge_extra_attrs(
             ),
             mod_name=None,
         )
-    else:
-        return ExtraAttrs(
-            attrs=new_attrs or {},
-            immutable=new_immutable,
-            mod_name=None,
-        )
+    return ExtraAttrs(
+        attrs=new_attrs or {},
+        immutable=new_immutable,
+        mod_name=None,
+    )
