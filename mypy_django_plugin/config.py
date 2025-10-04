@@ -2,10 +2,12 @@ import configparser
 import os
 import sys
 import textwrap
-from collections.abc import Callable
 from functools import partial
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import TYPE_CHECKING, Any, NoReturn
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 if sys.version_info[:2] >= (3, 11):
     import tomllib
