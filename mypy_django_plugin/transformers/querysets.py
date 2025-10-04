@@ -14,17 +14,7 @@ from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import (
-    AnyType,
-    ExtraAttrs,
-    Instance,
-    LiteralType,
-    ProperType,
-    TupleType,
-    TypedDictType,
-    TypeOfAny,
-    get_proper_type,
-)
+from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
@@ -183,7 +173,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         # For non-named values_list, the row type does not encode column names.
         # Attach selected field names to the returned QuerySet instance so that
         # subsequent annotate() can make an informed decision about name conflicts.
-        ret.extra_attrs = ExtraAttrs(attrs={}, immutable=set(field_lookups), mod_name=None)
+        ret.extra_attrs = helpers.merge_extra_attrs(ret.extra_attrs, new_immutable=set(field_lookups))
     return ret
 
 
