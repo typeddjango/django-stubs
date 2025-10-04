@@ -115,6 +115,7 @@ select = [
   "RET506",   # Unnecessary {branch} after raise statement
   "RET507",   # Unnecessary {branch} after continue statement
   "RET508",   # Unnecessary {branch} after break statement
+  "RUF",      # Ruff specific rules
   "TC",       # flake8-type-checking
 ]
 ignore = [
