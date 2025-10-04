@@ -43,6 +43,7 @@ from mypy.typeanal import make_optional_type
 from mypy.types import (
     AnyType,
     CallableType,
+    ExtraAttrs,
     Instance,
     LiteralType,
     NoneTyp,
@@ -694,3 +695,32 @@ def get_model_from_expression(
 
 def fill_manager(manager: TypeInfo, typ: MypyType) -> Instance:
     return Instance(manager, [typ] if manager.is_generic() else [])
+
+
+def merge_extra_attrs(
+    base_extra_attrs: ExtraAttrs | None,
+    *,
+    new_attrs: dict[str, MypyType] | None = None,
+    new_immutable: set[str] | None = None,
+) -> ExtraAttrs:
+    """
+    Create a new `ExtraAttrs` by merging new attributes/immutable fields into a base.
+
+    If base_extra_attrs is None, creates a fresh ExtraAttrs with only the new values.
+    """
+    if base_extra_attrs:
+        return ExtraAttrs(
+            attrs={**base_extra_attrs.attrs, **new_attrs} if new_attrs is not None else base_extra_attrs.attrs.copy(),
+            immutable=(
+                base_extra_attrs.immutable | new_immutable
+                if new_immutable is not None
+                else base_extra_attrs.immutable.copy()
+            ),
+            mod_name=None,
+        )
+    else:
+        return ExtraAttrs(
+            attrs=new_attrs or {},
+            immutable=new_immutable,
+            mod_name=None,
+        )
