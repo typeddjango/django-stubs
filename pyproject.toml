@@ -98,9 +98,12 @@ select = [
   "B",        # bugbear
   "E",        # pycodestyle
   "F",        # pyflakes
+  "FURB",     # refurb
   "INP",      # flake8-tidy-imports
   "W",        # pycodestyle
   "I",        # isort
+  "ISC001",   # Implicitly concatenated string literals on one line
+  "ISC002",   # Implicitly concatenated string literals over multiple lines
   "UP",       # pyupgrade
   "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
   "PYI",      # flake8-pyi
