@@ -88,26 +88,23 @@ def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) 
     if not isinstance(field_type, Instance):
         return None
     # Field declares a set and a get type arg. Fallback to `None` when we can't find any args
-    elif len(field_type.args) != 2:
+    if len(field_type.args) != 2:
         return None
-    else:
-        return field_type
+    return field_type
 
 
 def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
     field_type = get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[0]
-    else:
-        return None
+    return None
 
 
 def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
     field_type = get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[1]
-    else:
-        return None
+    return None
 
 
 class DjangoContext:
@@ -188,8 +185,7 @@ class DjangoContext:
             if not isinstance(rel_field, Field):
                 return None  # Not supported
             return rel_field
-        else:
-            return self.get_primary_key_field(related_model_cls)
+        return self.get_primary_key_field(related_model_cls)
 
     def get_primary_key_field(self, model_cls: type[Model]) -> "Field[Any, Any]":
         for field in model_cls._meta.get_fields():
@@ -365,8 +361,7 @@ class DjangoContext:
                 return AnyType(TypeOfAny.unannotated)
 
             return Instance(model_info, [])
-        else:
-            return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
+        return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
     def get_field_related_model_cls(self, field: Union["RelatedField[Any, Any]", ForeignObjectRel]) -> type[Model]:
         if isinstance(field, RelatedField):

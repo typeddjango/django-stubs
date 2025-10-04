@@ -59,7 +59,7 @@ def get_field_type_from_lookup(
 
     if lookup_field is None:
         return AnyType(TypeOfAny.implementation_artifact)
-    elif (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
+    if (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
         lookup_field, ForeignObjectRel
     ):
         model_cls = django_context.get_field_related_model_cls(lookup_field)
@@ -67,8 +67,7 @@ def get_field_type_from_lookup(
 
     api = helpers.get_typechecker_api(ctx)
     model_info = helpers.lookup_class_typeinfo(api, model_cls)
-    field_get_type = django_context.get_field_get_type(api, model_info, lookup_field, method=method)
-    return field_get_type
+    return django_context.get_field_get_type(api, model_info, lookup_field, method=method)
 
 
 def get_values_list_row_type(
@@ -94,7 +93,7 @@ def get_values_list_row_type(
             )
             assert lookup_type is not None
             return lookup_type
-        elif named:
+        if named:
             column_types: dict[str, MypyType] = {}
             for field in django_context.get_model_fields(model_cls):
                 column_type = django_context.get_field_get_type(
@@ -109,15 +108,13 @@ def get_values_list_row_type(
                     column_types,
                     extra_bases=[typechecker_api.named_generic_type(fullnames.ANY_ATTR_ALLOWED_CLASS_FULLNAME, [])],
                 )
-            else:
-                return helpers.make_oneoff_named_tuple(typechecker_api, "Row", column_types)
-        else:
-            # flat=False, named=False, all fields
-            if is_annotated:
-                return typechecker_api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
-            field_lookups = []
-            for field in django_context.get_model_fields(model_cls):
-                field_lookups.append(field.attname)
+            return helpers.make_oneoff_named_tuple(typechecker_api, "Row", column_types)
+        # flat=False, named=False, all fields
+        if is_annotated:
+            return typechecker_api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
+        field_lookups = []
+        for field in django_context.get_model_fields(model_cls):
+            field_lookups.append(field.attname)
 
     if len(field_lookups) > 1 and flat:
         typechecker_api.fail("'flat' is not valid when 'values_list' is called with more than one field", ctx.context)

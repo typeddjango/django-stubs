@@ -78,8 +78,7 @@ class ModelClassInitializer:
 
     def lookup_class_typeinfo_or_incomplete_defn_error(self, klass: type) -> TypeInfo:
         fullname = helpers.get_class_fullname(klass)
-        field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullname)
-        return field_info
+        return self.lookup_typeinfo_or_incomplete_defn_error(fullname)
 
     def create_new_var(self, name: str, typ: MypyType) -> Var:
         # type=: type of the variable itself
@@ -101,8 +100,7 @@ class ModelClassInitializer:
 
     def add_new_class_for_current_module(self, name: str, bases: list[Instance]) -> TypeInfo:
         current_module = self.api.modules[self.model_classdef.info.module_name]
-        new_class_info = helpers.add_new_class_for_module(current_module, name=name, bases=bases)
-        return new_class_info
+        return helpers.add_new_class_for_module(current_module, name=name, bases=bases)
 
     def run(self) -> None:
         model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
@@ -355,8 +353,7 @@ class AddRelatedModelsId(ModelClassInitializer):
             except helpers.IncompleteDefnException as exc:
                 if not self.api.final_iteration:
                     raise exc
-                else:
-                    continue
+                continue
 
             is_nullable = self.django_context.get_field_nullability(field, None)
             set_type, get_type = get_field_descriptor_types(
@@ -503,8 +500,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                 # see if another round could help figuring out the default manager type
                 if not self.api.final_iteration:
                     raise exc
-                else:
-                    return None
+                return None
             default_manager_info = generated_manager_info
 
         default_manager = helpers.fill_manager(default_manager_info, Instance(self.model_classdef.info, []))
@@ -544,7 +540,7 @@ class AddReverseLookups(ModelClassInitializer):
                     ),
                 )
             return
-        elif isinstance(relation, ManyToManyRel):
+        if isinstance(relation, ManyToManyRel):
             if not reverse_lookup_declared:
                 # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime.
                 assert relation.through is not None
@@ -558,7 +554,7 @@ class AddReverseLookups(ModelClassInitializer):
                     is_classvar=True,
                 )
             return
-        elif not reverse_lookup_declared:
+        if not reverse_lookup_declared:
             # ManyToOneRel
             self.add_new_node_to_model_class(
                 attname, Instance(self.reverse_many_to_one_descriptor, [Instance(to_model_info, [])]), is_classvar=True
@@ -838,7 +834,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
     ) -> TypeInfo | None:
         if not isinstance(m2m_args.to.model, Instance):
             return None
-        elif m2m_args.through is not None:
+        if m2m_args.through is not None:
             # Call has explicit 'through=', no need to create any implicit through table
             return m2m_args.through.model.type if isinstance(m2m_args.through.model, Instance) else None
 
