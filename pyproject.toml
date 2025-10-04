@@ -107,6 +107,11 @@ select = [
   "RUF100",   # Equivalent to flake8-noqa NQA103
   "PGH004",   # Equivalent to flake8-noqa NQA104
   "PGH003",   # Disallowed blanket `type: ignore` annotations.
+  "RET504",  # Unnecessary assignment to {name} before return statement
+  "RET505",  # Unnecessary {branch} after return statement
+  "RET506",  # Unnecessary {branch} after raise statement
+  "RET507",  # Unnecessary {branch} after continue statement
+  "RET508",  # Unnecessary {branch} after break statement
 ]
 ignore = [
   "PYI021", # We have a few meaningful docstrings for stubs only constructs/utilities.
