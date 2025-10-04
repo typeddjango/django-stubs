@@ -91,12 +91,12 @@ class UpperInfinite(models.Transform):
     output_field: ClassVar[models.BooleanField]
 
 __all__ = [
-    "RangeField",
-    "IntegerRangeField",
     "BigIntegerRangeField",
-    "DecimalRangeField",
-    "DateTimeRangeField",
     "DateRangeField",
+    "DateTimeRangeField",
+    "DecimalRangeField",
+    "IntegerRangeField",
     "RangeBoundary",
+    "RangeField",
     "RangeOperators",
 ]

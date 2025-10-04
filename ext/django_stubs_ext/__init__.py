@@ -7,12 +7,12 @@ from .patch import monkeypatch as monkeypatch
 from .types import AnyAttrAllowed as AnyAttrAllowed
 
 __all__ = [
-    "monkeypatch",
-    "QuerySetAny",
-    "ValuesQuerySet",
-    "WithAnnotations",
     "Annotations",
     "AnyAttrAllowed",
-    "StrPromise",
+    "QuerySetAny",
     "StrOrPromise",
+    "StrPromise",
+    "ValuesQuerySet",
+    "WithAnnotations",
+    "monkeypatch",
 ]

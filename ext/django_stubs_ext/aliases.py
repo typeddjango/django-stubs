@@ -17,4 +17,4 @@ else:
     QuerySetAny = QuerySet
     ValuesQuerySet = QuerySet
 
-__all__ = ["StrOrPromise", "StrPromise", "QuerySetAny", "ValuesQuerySet"]
+__all__ = ["QuerySetAny", "StrOrPromise", "StrPromise", "ValuesQuerySet"]

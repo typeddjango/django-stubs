@@ -249,4 +249,4 @@ class SerializeMixin:
 
 def connections_support_transactions(aliases: Iterable[str] | None = ...) -> bool: ...
 
-__all__ = ("TestCase", "TransactionTestCase", "SimpleTestCase", "skipIfDBFeature", "skipUnlessDBFeature")
+__all__ = ("SimpleTestCase", "TestCase", "TransactionTestCase", "skipIfDBFeature", "skipUnlessDBFeature")
