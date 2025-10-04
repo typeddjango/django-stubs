@@ -60,7 +60,7 @@ def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
 
 
 class DjangoPluginConfig:
-    __slots__ = ("django_settings_module", "strict_settings", "strict_model_abstract_attrs")
+    __slots__ = ("django_settings_module", "strict_model_abstract_attrs", "strict_settings")
 
     django_settings_module: str
     strict_settings: bool
