@@ -160,6 +160,7 @@
 -   case: prefetch_related_and_annotate
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -179,6 +180,7 @@
 -   case: prefetch_related_to_attr_conflict_with_annotate
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
     main: |
         from django.db.models import Prefetch, F
         from django.contrib.auth.models import User, Group
@@ -262,6 +264,7 @@
 -   case: prefetch_related_conflicting_prefetches_on_same_attr
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
     main: |
         from django.db.models import Prefetch
         from django.contrib.auth.models import User, Group
@@ -280,6 +283,7 @@
 -   case: prefetch_related_ambiguous_prefetches
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
     main: |
         from django.db.models import Prefetch
         from django.contrib.auth.models import User, Group

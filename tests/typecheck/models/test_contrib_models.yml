@@ -45,6 +45,7 @@
         reveal_type(MyUser.objects.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyUser, myapp.models.MyUser]"
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
         - myapp
     files:
         - path: myapp/__init__.py
@@ -81,6 +82,7 @@
         main:8: note: Revealed type is "django.db.models.options.Options[django.contrib.auth.base_user.AbstractBaseUser]"
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
         - myapp
     files:
         - path: myapp/__init__.py

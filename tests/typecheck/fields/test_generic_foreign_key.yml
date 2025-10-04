@@ -10,6 +10,7 @@
         reveal_type(Tag().content_object)  # N: Revealed type is "Any | None"
     installed_apps:
         - myapp
+        - django.contrib.contenttypes
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -32,6 +33,7 @@
         reveal_type(Tag().content_object)  # N: Revealed type is "Any | None"
     installed_apps:
         - myapp
+        - django.contrib.contenttypes
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py

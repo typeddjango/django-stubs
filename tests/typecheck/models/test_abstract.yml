@@ -9,6 +9,8 @@
     reveal_type(au.pk)  # N: Revealed type is "Any"
   installed_apps:
     - django.contrib.auth
+    - django.contrib.contenttypes
+
 
 - case: test_filter_on_abstract_user_pk_wrong_name
   main: |
@@ -16,6 +18,8 @@
     AbstractUser.objects.get(pkey=1)  # ER: Cannot resolve keyword 'pkey' into field..*
   installed_apps:
     - django.contrib.auth
+    - django.contrib.contenttypes
+
 
 - case: test_fetch_pk_with_custom_manager_on_abstract_model
   main: |

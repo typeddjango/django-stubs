@@ -152,6 +152,7 @@
 
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
         - myapp
     files:
         -   path: myapp/__init__.py
