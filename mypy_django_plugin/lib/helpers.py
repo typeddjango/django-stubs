@@ -493,7 +493,7 @@ def make_oneoff_named_tuple(
     if extra_bases is None:
         extra_bases = []
     namedtuple_info = add_new_class_for_module(
-        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", [])] + extra_bases, fields=fields
+        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 

@@ -123,7 +123,8 @@ class NewSemanalDjangoPlugin(Plugin):
                 if related_model_module != file.fullname:
                     deps.add(self._new_dependency(related_model_module))
 
-        return list(deps) + [
+        return [
+            *deps,
             # For `QuerySet.annotate`
             self._new_dependency("django_stubs_ext"),
             # For `TypedModelMeta` lookup in model transformers
