@@ -429,6 +429,7 @@
 -   case: test_annotate_existing_field
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
     main: |
         from typing import Any
         from typing_extensions import TypedDict

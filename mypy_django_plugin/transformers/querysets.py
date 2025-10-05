@@ -448,8 +448,7 @@ def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | Non
         if isinstance(row_type, TupleType):
             if row_type.partial_fallback.type.has_base("typing.NamedTuple"):
                 return {name for name, sym in row_type.partial_fallback.type.names.items() if sym.plugin_generated}
-            else:
-                return set()
+            return set()
         return set()
 
     # Fallback to explicit metadata attached to the QuerySet Instance
