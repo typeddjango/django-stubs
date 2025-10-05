@@ -26,17 +26,7 @@ from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
-from mypy.types import (
-    AnyType,
-    ExtraAttrs,
-    Instance,
-    ProperType,
-    TypedDictType,
-    TypeOfAny,
-    TypeType,
-    TypeVarType,
-    get_proper_type,
-)
+from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
 
@@ -1162,18 +1152,7 @@ def get_annotated_type(
     """
     Get a model type that can be used to represent an annotated model
     """
-    if model_type.extra_attrs:
-        extra_attrs = ExtraAttrs(
-            attrs={**model_type.extra_attrs.attrs, **fields_dict.items},
-            immutable=model_type.extra_attrs.immutable.copy(),
-            mod_name=None,
-        )
-    else:
-        extra_attrs = ExtraAttrs(
-            attrs=fields_dict.items,
-            immutable=None,
-            mod_name=None,
-        )
+    extra_attrs = helpers.merge_extra_attrs(model_type.extra_attrs, new_attrs=fields_dict.items)
 
     annotated_model: TypeInfo | None
     if helpers.is_annotated_model(model_type.type):

@@ -165,7 +165,13 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     row_type = get_values_list_row_type(
         ctx, django_context, django_model.cls, is_annotated=django_model.is_annotated, flat=flat, named=named
     )
-    return default_return_type.copy_modified(args=[django_model.typ, row_type])
+    ret = default_return_type.copy_modified(args=[django_model.typ, row_type])
+    if not named and (field_lookups := resolve_field_lookups(ctx.args[0], django_context)):
+        # For non-named values_list, the row type does not encode column names.
+        # Attach selected field names to the returned QuerySet instance so that
+        # subsequent annotate() can make an informed decision about name conflicts.
+        ret.extra_attrs = helpers.merge_extra_attrs(ret.extra_attrs, new_immutable=set(field_lookups))
+    return ret
 
 
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
@@ -230,10 +236,11 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         return ctx.default_return_type
 
     api = helpers.get_typechecker_api(ctx)
+
     expression_types = {
         attr_name: typ
         for attr_name, typ in gather_expression_types(ctx).items()
-        if check_valid_attr_value(ctx, django_model, attr_name)
+        if check_valid_attr_value(ctx, django_context, django_model, attr_name)
     }
 
     annotated_type: ProperType = django_model.typ
@@ -423,8 +430,42 @@ def gather_flat_args(ctx: MethodContext) -> list[tuple[Expression | None, Proper
     return lookups
 
 
+def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | None:
+    """
+    Derive selected field names from a QuerySet type.
+
+    Sources:
+      - values(): encoded in the row TypedDict keys
+      - values_list(named=True): row is a NamedTuple; extract field names from fallback TypeInfo
+      - values_list(named=False): stored in qs_type.extra_attrs.immutable
+    """
+    if len(qs_type.args) > 1:
+        row_type = get_proper_type(qs_type.args[1])
+        if isinstance(row_type, Instance) and helpers.is_model_type(row_type.type):
+            return None
+        if isinstance(row_type, TypedDictType):
+            return set(row_type.items.keys())
+        if isinstance(row_type, TupleType):
+            if row_type.partial_fallback.type.has_base("typing.NamedTuple"):
+                return {name for name, sym in row_type.partial_fallback.type.names.items() if sym.plugin_generated}
+            else:
+                return set()
+        return set()
+
+    # Fallback to explicit metadata attached to the QuerySet Instance
+    if qs_type.extra_attrs and qs_type.extra_attrs.immutable and isinstance(qs_type.extra_attrs.immutable, set):
+        return qs_type.extra_attrs.immutable
+
+    return None
+
+
 def check_valid_attr_value(
-    ctx: MethodContext, model: DjangoModel, attr_name: str, new_attrs: dict[str, MypyType] | None = None
+    ctx: MethodContext,
+    django_context: DjangoContext,
+    model: DjangoModel,
+    attr_name: str,
+    *,
+    new_attr_names: set[str] | None = None,
 ) -> bool:
     """
     Check if adding `attr_name` would conflict with existing symbols on `model`.
@@ -432,13 +473,23 @@ def check_valid_attr_value(
     Args:
         - model: The Django model being analyzed
         - attr_name: The name of the attribute to be added
-        - new_attrs: A mapping of field names to types currently being added to the model
+        - new_attr_names: A mapping of field names to types currently being added to the model
     """
+    deselected_fields: set[str] | None = None
+    if isinstance(ctx.type, Instance):
+        selected_fields = _get_selected_fields_from_queryset_type(ctx.type)
+        if selected_fields is not None:
+            model_field_names = {f.name for f in django_context.get_model_fields(model.cls)}
+            deselected_fields = model_field_names - selected_fields
+            new_attr_names = new_attr_names or set()
+            new_attr_names.update(selected_fields - model_field_names)
+
     is_conflicting_attr_value = bool(
-        # 1. Conflict with another symbol on the model.
+        # 1. Conflict with another symbol on the model (If not de-selected via a prior .values/.values_list call).
         # Ex:
         #     User.objects.prefetch_related(Prefetch(..., to_attr="id"))
         model.typ.type.get(attr_name)
+        and (deselected_fields is None or attr_name not in deselected_fields)
         # 2. Conflict with a previous annotation.
         # Ex:
         #     User.objects.annotate(foo=...).prefetch_related(Prefetch(...,to_attr="foo"))
@@ -450,7 +501,7 @@ def check_valid_attr_value(
         #        Prefetch("groups", Group.objects.filter(name="test"), to_attr="new_attr"),
         #        Prefetch("groups", Group.objects.all(), to_attr="new_attr"), # E: Not OK!
         #     )
-        or (new_attrs is not None and attr_name in new_attrs)
+        or (new_attr_names is not None and attr_name in new_attr_names)
     )
     if is_conflicting_attr_value:
         ctx.api.fail(
@@ -582,7 +633,9 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             except (FieldError, LookupsAreUnsupported):
                 pass
 
-        if to_attr and check_valid_attr_value(ctx, qs_model, to_attr, new_attrs):
+        if to_attr and check_valid_attr_value(
+            ctx, django_context, qs_model, to_attr, new_attr_names=set(new_attrs.keys())
+        ):
             new_attrs[to_attr] = api.named_generic_type(
                 "builtins.list",
                 [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
