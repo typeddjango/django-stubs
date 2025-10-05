@@ -43,10 +43,10 @@
         async def test_async_bulk_update() -> None:
             # Valid single field updates
             articles = Article.objects.all()
-            await Article.objects.abulk_update(articles, ["published"])
+            await Article.objects.abulk_update(articles, {"published"})
 
             # Valid multiple field updates
-            await Article.objects.abulk_update(articles, ["title", "content", "published"])
+            await Article.objects.abulk_update(articles, ("title", "content", "published"))
 
             # Valid foreign key field updates (by field name and attname)
             await Article.objects.abulk_update(articles, ["category_id"])
@@ -123,7 +123,7 @@
         Article.objects.bulk_update(articles, ["   "])  # E: Article has no field named '   '  [misc]
 
         # ManyToMany is not a concrete updatable field
-        Article.objects.bulk_update(articles, ["tags"])  # E: "bulk_update()" can only be used with concrete fields. Got "tags"  [misc]
+        Article.objects.bulk_update(articles, {"tags"})  # E: "bulk_update()" can only be used with concrete fields. Got "tags"  [misc]
 
         # Nested field lookups are not supported
         Article.objects.bulk_update(articles, ["author__name"])  # E: Article has no field named 'author__name'  [misc]
@@ -179,14 +179,14 @@
             await Article.objects.abulk_update(articles, ["category__parent__name"])  # E: Article has no field named 'category__parent__name'  [misc]
 
             # Multiple invalid fields
-            await Article.objects.abulk_update(articles, ["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
+            await Article.objects.abulk_update(articles, ("nonexistent1", "nonexistent2"))  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
 
             # Primary key with valid fields
             await Article.objects.abulk_update(articles, ["title", "id", "content"])  # E: "abulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
             # Literal type variables are validated
             invalid_field: Literal["nonexistent"] = "nonexistent"
-            await Article.objects.abulk_update(articles, [invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
+            await Article.objects.abulk_update(articles, {invalid_field})  # E: Article has no field named 'nonexistent'  [misc]
 
             pk_field: Literal["id"] = "id"
             await Article.objects.abulk_update(articles, [pk_field])  # E: "abulk_update()" cannot be used with primary key fields. Got "id"  [misc]
