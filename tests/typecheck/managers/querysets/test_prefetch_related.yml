@@ -445,3 +445,38 @@
                     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
                     object_id = models.PositiveIntegerField()
                     content_object = GenericForeignKey('content_type', 'object_id')
+
+
+-   case: uninstalled_django_contrib_contenttypes_generic_prefetch
+    installed_apps:
+        - myapp
+    main: |
+        from django.contrib.contenttypes.prefetch import GenericPrefetch
+        from myapp.models import Bookmark, Animal, TaggedItem
+        from typing_extensions import reveal_type
+
+        # Basic GenericPrefetch usage
+        prefetch = GenericPrefetch(
+            "content_object", [Bookmark.objects.all(), Animal.objects.only("name")]
+        )
+        reveal_type(prefetch)  # N: Revealed type is "django.contrib.contenttypes.prefetch.GenericPrefetch[Literal['content_object'], builtins.list[django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]], builtins.str]"
+
+        # Using GenericPrefetch with prefetch_related
+        qs = TaggedItem.objects.prefetch_related(prefetch).all() # E: Cannot find "content_object" on "TaggedItem" object, "content_object" is an invalid parameter to "prefetch_related()"  [misc]
+        reveal_type(qs)  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.TaggedItem, myapp.models.TaggedItem]"
+
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Bookmark(models.Model):
+                    url = models.URLField()
+
+                class Animal(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class TaggedItem(models.Model):
+                    tag = models.CharField(max_length=100)
