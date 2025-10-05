@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.base import Model
@@ -698,9 +699,7 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
 
 
 def _validate_bulk_update_field(
-    ctx: MethodContext,
-    model_cls: type[Model],
-    field_name: str,
+    ctx: MethodContext, model_cls: type[Model], field_name: str, method: Literal["bulk_update", "abulk_update"]
 ) -> bool:
     opts = model_cls._meta
     try:
@@ -710,7 +709,7 @@ def _validate_bulk_update_field(
         return False
 
     if not field.concrete or field.many_to_many:
-        ctx.api.fail(f'bulk_update() can only be used with concrete fields. Got "{field_name}"', ctx.context)
+        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
         return False
 
     all_pk_fields = set(opts.pk_fields)
@@ -718,13 +717,15 @@ def _validate_bulk_update_field(
         all_pk_fields.update(parent._meta.pk_fields)
 
     if field in all_pk_fields:
-        ctx.api.fail(f'bulk_update() cannot be used with primary key fields. Got "{field_name}"', ctx.context)
+        ctx.api.fail(f'"{method}()" cannot be used with primary key fields. Got "{field_name}"', ctx.context)
         return False
 
     return True
 
 
-def validate_bulk_update(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+def validate_bulk_update(
+    ctx: MethodContext, django_context: DjangoContext, method: Literal["bulk_update", "abulk_update"]
+) -> MypyType:
     """
     Type check the `fields` argument passed to `QuerySet.bulk_update(...)`.
 
@@ -741,12 +742,12 @@ def validate_bulk_update(ctx: MethodContext, django_context: DjangoContext) -> M
         return ctx.default_return_type
 
     if len(fields_args.items) == 0:
-        ctx.api.fail("Field names must be given to bulk_update()", ctx.context)
+        ctx.api.fail(f'Field names must be given to "{method}()"', ctx.context)
         return ctx.default_return_type
 
     for field_arg in fields_args.items:
         field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
         if field_name is not None:
-            _validate_bulk_update_field(ctx, django_model.cls, field_name)
+            _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
 
     return ctx.default_return_type

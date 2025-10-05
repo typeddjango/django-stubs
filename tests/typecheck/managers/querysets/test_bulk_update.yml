@@ -78,46 +78,46 @@
 
         # Empty fields list
         Article.objects.bulk_update() # E: Missing positional arguments "objs", "fields" in call to "bulk_update" of "Manager"  [call-arg]
-        Article.objects.bulk_update(articles, [])  # E: Field names must be given to bulk_update()  [misc]
+        Article.objects.bulk_update(articles, [])  # E: Field names must be given to "bulk_update()"  [misc]
 
         # Invalid field names (Django's FieldError)
         Article.objects.bulk_update(articles, ["nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
         Article.objects.bulk_update(articles, ["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
 
         # Cannot update primary key fields
-        Article.objects.bulk_update(articles, ["id"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Article.objects.bulk_update(articles, ["id"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
         # Mixed valid and invalid fields
         Article.objects.bulk_update(articles, ["title", "nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
-        Article.objects.bulk_update(articles, ["id", "title"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Article.objects.bulk_update(articles, ["id", "title"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
         # Whitespace-only field names
         Article.objects.bulk_update(articles, [""])  # E: Article has no field named ''  [misc]
         Article.objects.bulk_update(articles, ["   "])  # E: Article has no field named '   '  [misc]
 
         # ManyToMany is not a concrete updatable field
-        Article.objects.bulk_update(articles, ["tags"])  # E: bulk_update() can only be used with concrete fields. Got "tags"  [misc]
+        Article.objects.bulk_update(articles, ["tags"])  # E: "bulk_update()" can only be used with concrete fields. Got "tags"  [misc]
 
         # Multiple invalid fields
         Article.objects.bulk_update(articles, ["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
 
         # Primary key with valid fields
-        Article.objects.bulk_update(articles, ["title", "id", "content"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Article.objects.bulk_update(articles, ["title", "id", "content"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
         # Literal type variables are validated
         invalid_field: Literal["nonexistent"] = "nonexistent"
         Article.objects.bulk_update(articles, [invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
 
         pk_field: Literal["id"] = "id"
-        Article.objects.bulk_update(articles, [pk_field])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Article.objects.bulk_update(articles, [pk_field])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
         # Test with different models
         authors = Author.objects.all()
-        Author.objects.bulk_update(authors, ["id"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Author.objects.bulk_update(authors, ["id"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
         Author.objects.bulk_update(authors, ["invalid"])  # E: Author has no field named 'invalid'  [misc]
 
         categories = Category.objects.all()
-        Category.objects.bulk_update(categories, ["id"])  # E: bulk_update() cannot be used with primary key fields. Got "id"  [misc]
+        Category.objects.bulk_update(categories, ["id"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
         Category.objects.bulk_update(categories, ["invalid"])  # E: Category has no field named 'invalid'  [misc]
 
     files:
