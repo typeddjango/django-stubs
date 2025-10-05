@@ -11,8 +11,8 @@
         Article.objects.bulk_update(articles, ["published"])
 
         # Valid multiple field updates
-        Article.objects.bulk_update(articles, ["title", "content"])
-        Article.objects.bulk_update(articles, ["title", "content", "published"])
+        Article.objects.bulk_update(articles, ("title", "content"))
+        Article.objects.bulk_update(articles, {"title", "content", "published"})
 
         # Valid foreign key field updates (by field name and attname)
         Article.objects.bulk_update(articles, ["author"])
@@ -115,8 +115,8 @@
         Article.objects.bulk_update(articles, ["id"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
         # Mixed valid and invalid fields
-        Article.objects.bulk_update(articles, ["title", "nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
-        Article.objects.bulk_update(articles, ["id", "title"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
+        Article.objects.bulk_update(articles, {"title", "nonexistent"})  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_update(articles, ("id", "title"))  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
 
         # Whitespace-only field names
         Article.objects.bulk_update(articles, [""])  # E: Article has no field named ''  [misc]

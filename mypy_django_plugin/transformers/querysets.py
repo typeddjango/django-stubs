@@ -13,7 +13,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
@@ -737,7 +737,7 @@ def validate_bulk_update(
         and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
         and len(ctx.args) >= 2
         and ctx.args[1]
-        and isinstance((fields_args := ctx.args[1][0]), ListExpr)
+        and isinstance((fields_args := ctx.args[1][0]), (ListExpr, TupleExpr, SetExpr))
     ):
         return ctx.default_return_type
 
