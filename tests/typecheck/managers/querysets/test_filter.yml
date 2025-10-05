@@ -349,3 +349,34 @@
                 class MyModel(models.Model):
                     age = models.IntegerField()
                     objects = MyQuerySet.as_manager()
+
+-   case: async_filtering_with_aget
+    main: |
+        from myapp.models import User
+
+        async def test_async_get() -> None:
+            # Valid aget calls
+            user = await User.objects.aget(username='maksim')
+            user2 = await User.objects.aget(age=25)
+            user3 = await User.objects.aget(username__contains='hello')
+            user4 = await User.objects.aget(age__gt=1)
+
+            # Invalid field
+            await User.objects.aget(unknown_field=True)  # E: Cannot resolve keyword 'unknown_field' into field. Choices are: age, id, username  [misc]
+
+            # Invalid type
+            await User.objects.aget(age=User())  # E: Incompatible type for lookup 'age': (got "User", expected "str | int")  [misc]
+
+            # Invalid lookup type
+            await User.objects.aget(username__contains=1)  # E: Incompatible type for lookup 'username__contains': (got "int", expected "str")  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+                    age = models.IntegerField()
