@@ -635,8 +635,9 @@ class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...  # type: igno
 class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...  # type: ignore[misc]
 
 __all__ = [
-    "AutoField",
     "BLANK_CHOICE_DASH",
+    "NOT_PROVIDED",
+    "AutoField",
     "BigAutoField",
     "BigIntegerField",
     "BinaryField",
@@ -655,7 +656,6 @@ __all__ = [
     "GenericIPAddressField",
     "IPAddressField",
     "IntegerField",
-    "NOT_PROVIDED",
     "NullBooleanField",
     "PositiveBigIntegerField",
     "PositiveIntegerField",

@@ -161,7 +161,7 @@ def refine_many_to_many_related_manager(ctx: MethodContext) -> MypyType:
     if related_objects is None:
         return ctx.default_return_type
 
-    many_related_manager, related_model_instance, through_model_instance = related_objects
+    _, related_model_instance, through_model_instance = related_objects
     checker = helpers.get_typechecker_api(ctx)
     related_manager_info = helpers.get_many_to_many_manager_info(
         checker, to=related_model_instance.type, derived_from="_default_manager"

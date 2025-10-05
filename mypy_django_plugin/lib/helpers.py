@@ -2,7 +2,6 @@ from collections.abc import Iterable, Iterator
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
 
 from django.db.models.base import Model
-from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
@@ -60,6 +59,8 @@ from typing_extensions import Self
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
+    from django.db.models.fields import Field
+
     from mypy_django_plugin.django.context import DjangoContext
 
 
@@ -75,11 +76,11 @@ class DjangoTypeMetadata(TypedDict, total=False):
 
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
-    return cast(DjangoTypeMetadata, model_info.metadata.setdefault("django", {}))
+    return cast("DjangoTypeMetadata", model_info.metadata.setdefault("django", {}))
 
 
 def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases"]) -> dict[str, int]:
-    return get_django_metadata(model_info).setdefault(key, cast(dict[str, int], {}))
+    return get_django_metadata(model_info).setdefault(key, cast("dict[str, int]", {}))
 
 
 def get_reverse_manager_info(
@@ -492,7 +493,7 @@ def make_oneoff_named_tuple(
     if extra_bases is None:
         extra_bases = []
     namedtuple_info = add_new_class_for_module(
-        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", [])] + extra_bases, fields=fields
+        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 

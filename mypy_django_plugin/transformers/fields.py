@@ -138,7 +138,7 @@ def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context
 def set_descriptor_types_for_field(
     ctx: FunctionContext, *, is_set_nullable: bool = False, is_get_nullable: bool = False
 ) -> Instance:
-    default_return_type = cast(Instance, ctx.default_return_type)
+    default_return_type = cast("Instance", ctx.default_return_type)
 
     is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
     is_primary_key = helpers.get_bool_call_argument_by_name(ctx, "primary_key", default=False)

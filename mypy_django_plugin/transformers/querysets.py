@@ -488,8 +488,7 @@ def check_valid_attr_value(
         # 1. Conflict with another symbol on the model (If not de-selected via a prior .values/.values_list call).
         # Ex:
         #     User.objects.prefetch_related(Prefetch(..., to_attr="id"))
-        model.typ.type.get(attr_name)
-        and (deselected_fields is None or attr_name not in deselected_fields)
+        (model.typ.type.get(attr_name) and (deselected_fields is None or attr_name not in deselected_fields))
         # 2. Conflict with a previous annotation.
         # Ex:
         #     User.objects.annotate(foo=...).prefetch_related(Prefetch(...,to_attr="foo"))

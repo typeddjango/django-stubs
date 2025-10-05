@@ -50,8 +50,8 @@ class SimpleUploadedFile(InMemoryUploadedFile):
     def from_dict(cls, file_dict: dict[str, str | bytes]) -> Self: ...
 
 __all__ = (
-    "UploadedFile",
-    "TemporaryUploadedFile",
     "InMemoryUploadedFile",
     "SimpleUploadedFile",
+    "TemporaryUploadedFile",
+    "UploadedFile",
 )

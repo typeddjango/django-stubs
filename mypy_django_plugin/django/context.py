@@ -454,7 +454,7 @@ class DjangoContext:
         solved_lookup = self.solve_lookup_type(model_cls, lookup)
         if solved_lookup is None:
             return None, model_cls
-        lookup_parts, field_parts, is_expression = solved_lookup
+        lookup_parts, field_parts, _ = solved_lookup
         if lookup_parts:
             raise LookupsAreUnsupported()
         return self._resolve_field_from_parts(field_parts, model_cls)
