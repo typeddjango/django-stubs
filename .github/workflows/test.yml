@@ -180,5 +180,4 @@ jobs:
         run: env --unset=UV_FROZEN uv lock --check
       - name: Build
         run: |
-          uv build .
-          uv build ext/
+          uv build --all
