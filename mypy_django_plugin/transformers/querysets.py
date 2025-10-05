@@ -1,6 +1,7 @@
 from collections.abc import Sequence
+from typing import Literal
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.related_descriptors import (
@@ -12,7 +13,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression
+from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
 from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
@@ -766,5 +767,60 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
         lookup_value = helpers.get_literal_str_type(get_proper_type(lookup_type))
         if lookup_value is not None:
             _validate_select_related_lookup(ctx, django_context, django_model.cls, lookup_value)
+
+    return ctx.default_return_type
+
+
+def _validate_bulk_update_field(
+    ctx: MethodContext, model_cls: type[Model], field_name: str, method: Literal["bulk_update", "abulk_update"]
+) -> bool:
+    opts = model_cls._meta
+    try:
+        field = opts.get_field(field_name)
+    except FieldDoesNotExist as e:
+        ctx.api.fail(str(e), ctx.context)
+        return False
+
+    if not field.concrete or field.many_to_many:
+        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
+        return False
+
+    all_pk_fields = set(opts.pk_fields)
+    for parent in opts.all_parents:
+        all_pk_fields.update(parent._meta.pk_fields)
+
+    if field in all_pk_fields:
+        ctx.api.fail(f'"{method}()" cannot be used with primary key fields. Got "{field_name}"', ctx.context)
+        return False
+
+    return True
+
+
+def validate_bulk_update(
+    ctx: MethodContext, django_context: DjangoContext, method: Literal["bulk_update", "abulk_update"]
+) -> MypyType:
+    """
+    Type check the `fields` argument passed to `QuerySet.bulk_update(...)`.
+
+    Extracted and adapted from `django.db.models.query.QuerySet.bulk_update`
+    Mirrors tests from `django/tests/queries/test_bulk_update.py`
+    """
+    if not (
+        isinstance(ctx.type, Instance)
+        and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
+        and len(ctx.args) >= 2
+        and ctx.args[1]
+        and isinstance((fields_args := ctx.args[1][0]), (ListExpr, TupleExpr, SetExpr))
+    ):
+        return ctx.default_return_type
+
+    if len(fields_args.items) == 0:
+        ctx.api.fail(f'Field names must be given to "{method}()"', ctx.context)
+        return ctx.default_return_type
+
+    for field_arg in fields_args.items:
+        field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
+        if field_name is not None:
+            _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
 
     return ctx.default_return_type
