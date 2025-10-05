@@ -28,6 +28,7 @@
         reveal_type(book.owner_id)  # N: Revealed type is "builtins.int"
     installed_apps:
         - django.contrib.auth
+        - django.contrib.contenttypes
         - myapp
     files:
         -   path: myapp/__init__.py

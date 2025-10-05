@@ -10,10 +10,8 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
     if installed_apps and custom_settings:
         raise ValueError('"installed_apps" and "custom_settings" are not compatible, please use one or the other')
 
-    if installed_apps is not None:
+    if installed_apps:
         # custom_settings is empty, add INSTALLED_APPS
-        if "django.contrib.contenttypes" not in installed_apps:
-            installed_apps += ["django.contrib.contenttypes"]
         installed_apps_as_str = "(" + ",".join([repr(app) for app in installed_apps]) + ",)"
         custom_settings += "INSTALLED_APPS = " + installed_apps_as_str
 
