@@ -163,6 +163,7 @@ class NewSemanalDjangoPlugin(Plugin):
             "acreate": partial(init_create.typecheck_model_acreate, django_context=self.django_context),
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
+            "aget": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
             "prefetch_related": partial(
                 querysets.extract_prefetch_related_annotations, django_context=self.django_context
