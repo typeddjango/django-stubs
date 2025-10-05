@@ -135,7 +135,7 @@ ignore = [
   "F822",
   "F821",
 ]
-"tests/*.py" = ["INP001", "PGH003"]
+"tests/*.py" = ["INP001", "PGH003", "RUF012"]
 "ext/tests/*.py" = ["INP001"]
 "setup.py" = ["INP001"]
 
