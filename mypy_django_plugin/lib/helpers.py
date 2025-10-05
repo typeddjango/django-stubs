@@ -179,8 +179,7 @@ def lookup_class_typeinfo(api: TypeChecker, klass: type | None) -> TypeInfo | No
         return None
 
     fullname = get_class_fullname(klass)
-    field_info = lookup_fully_qualified_typeinfo(api, fullname)
-    return field_info
+    return lookup_fully_qualified_typeinfo(api, fullname)
 
 
 def get_class_fullname(klass: type) -> str:
@@ -536,13 +535,12 @@ def make_typeddict(
         fallback_type = api.named_generic_type("typing._TypedDict", [])
     else:
         fallback_type = api.named_type("typing._TypedDict", [])
-    typed_dict_type = TypedDictType(
+    return TypedDictType(
         fields,
         required_keys=required_keys,
         readonly_keys=readonly_keys,
         fallback=fallback_type,
     )
-    return typed_dict_type
 
 
 def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> str | None:
@@ -644,7 +642,7 @@ def resolve_lazy_reference(
         model_info = lookup_fully_qualified_typeinfo(api, fullname)
         if model_info is not None:
             return model_info
-        elif isinstance(api, SemanticAnalyzer) and not api.final_iteration:
+        if isinstance(api, SemanticAnalyzer) and not api.final_iteration:
             # Getting this far, where Django matched the reference but we still can't
             # find it, we want to defer
             api.defer()

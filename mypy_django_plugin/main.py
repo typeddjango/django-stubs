@@ -71,8 +71,7 @@ class NewSemanalDjangoPlugin(Plugin):
             bases[fullnames.FORM_CLASS_FULLNAME] = 1
             bases[fullnames.MODELFORM_CLASS_FULLNAME] = 1
             return bases
-        else:
-            return {}
+        return {}
 
     def _get_typeinfo_or_none(self, class_name: str) -> TypeInfo | None:
         sym = self.lookup_fully_qualified(class_name)
@@ -207,8 +206,7 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(fullname)
         if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
             return reparametrize_any_manager_hook
-        else:
-            return None
+        return None
 
     def get_metaclass_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         if fullname == fullnames.MODEL_METACLASS_FULLNAME:
@@ -277,7 +275,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def get_type_analyze_hook(self, fullname: str) -> Callable[[AnalyzeTypeContext], MypyType] | None:
         if fullname in fullnames.ANNOTATED_TYPES_FULLNAMES:
             return partial(handle_annotated_type, fullname=fullname)
-        elif fullname == "django.contrib.auth.models._User":
+        if fullname == "django.contrib.auth.models._User":
             return partial(get_user_model, django_context=self.django_context)
         return None
 

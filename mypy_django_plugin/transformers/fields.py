@@ -187,7 +187,7 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
         _type = get_proper_type(_type)
         if isinstance(_type, Instance) and _type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
             return None
-        elif isinstance(_type, UnionType):
+        if isinstance(_type, UnionType):
             items_without_combinable = []
             for item in _type.items:
                 reduced = drop_combinable(item)
@@ -202,10 +202,9 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
                     is_evaluated=_type.is_evaluated,
                     uses_pep604_syntax=_type.uses_pep604_syntax,
                 )
-            elif len(items_without_combinable) == 1:
+            if len(items_without_combinable) == 1:
                 return items_without_combinable[0]
-            else:
-                return None
+            return None
 
         return _type
 

@@ -104,16 +104,14 @@ Award: type[TextChoices] = Medal
 def get_suit_with_color(suit: Suit) -> str:
     if suit == Suit.DIAMOND or suit == Suit.HEART:
         return f"{suit.label} is red."
-    else:
-        return f"{suit.label} is black."
+    return f"{suit.label} is black."
 
 
 # Checks a single enum literal to test that the plugin resolves types correctly.
 def is_suit_a_diamond(suit: Suit) -> str:
     if suit == Suit.DIAMOND:
         return f"{suit.label}: Yes!"
-    else:
-        return f"{suit.label}: No!"
+    return f"{suit.label}: No!"
 
 
 # Choice type that overrides a property and uses `super()` to test the plugin resolve types correctly.

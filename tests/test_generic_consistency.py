@@ -103,7 +103,6 @@ def _get_need_generic() -> list[MPGeneric[Any]]:
         from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
 
         return [MPGeneric(SetPasswordMixin), MPGeneric(SetUnusablePasswordMixin), *django_stubs_ext.patch._need_generic]
-    else:
-        from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
+    from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
 
-        return [MPGeneric(SetPasswordForm), MPGeneric(AdminPasswordChangeForm), *django_stubs_ext.patch._need_generic]
+    return [MPGeneric(SetPasswordForm), MPGeneric(AdminPasswordChangeForm), *django_stubs_ext.patch._need_generic]
