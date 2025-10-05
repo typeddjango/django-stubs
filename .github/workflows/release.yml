@@ -16,21 +16,17 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Setup python to build package
-        uses: actions/setup-python@v6
+      - name: Install uv & Python
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.12'
-      - name: Install build
-        run: python -m pip install build
+          python-version: "3.13"
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Build ext package
-        run: python -m build ext/
+        run: uv build --package=django-stubs-ext
       - name: Publish ext to PyPI
         uses: pypa/gh-action-pypi-publish@v1.13.0
-        with:
-          packages-dir: ext/dist/
 
   build-and-publish:
     runs-on: ubuntu-latest
@@ -49,6 +45,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build package
-        run: uv build
+        run: uv build --package=django-stubs
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.13.0

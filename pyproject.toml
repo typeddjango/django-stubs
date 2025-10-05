@@ -74,7 +74,10 @@ Funding = "https://github.com/sponsors/typeddjango"
 
 [tool.uv.sources]
 django-stubs = { workspace = true }
-django-stubs-ext = { path = "ext", editable = true }
+django-stubs-ext = { workspace = true }
+
+[tool.uv.workspace]
+members = ["ext"]
 
 [build-system]
 requires = ["uv_build>=0.8.22,<0.9.0"]
