@@ -127,7 +127,7 @@ This rule helps us avoid tying in too closely to Django’s undocumented interna
 
     - Update the `version =` value within `[project]` section in **both** `pyproject.toml` files. The versions must be in sync.
     - Update `django-stubs-ext>=` dependency in root `pyproject.toml` to the same version number.
-    - Update lockfile, run: `uv lock`
+    - Run `uv lock` to update lockfile
     - Add a new row at the top of ['Version compatibility' table in README.md](README.md#version-compatibility).
     - Use pull request title "Version x.y.z release" by convention.
     - Add the correct classifiers to `classifiers =` if support is added for a new Python or Django version
