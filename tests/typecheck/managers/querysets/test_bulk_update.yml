@@ -40,6 +40,33 @@
 
         Article.objects.bulk_update(articles, get_fields())
 
+        async def test_async_bulk_update() -> None:
+            # Valid single field updates
+            articles = Article.objects.all()
+            await Article.objects.abulk_update(articles, ["published"])
+
+            # Valid multiple field updates
+            await Article.objects.abulk_update(articles, ["title", "content", "published"])
+
+            # Valid foreign key field updates (by field name and attname)
+            await Article.objects.abulk_update(articles, ["category_id"])
+
+            # Valid updates on different models
+            authors = Author.objects.all()
+            await Author.objects.abulk_update(authors, ["email"])
+
+            categories = Category.objects.all()
+            await Category.objects.abulk_update(categories, ["parent_id"])
+
+            # Variables containing field names
+            field_name = "title"
+            await Article.objects.abulk_update(articles, [field_name])
+
+            # Dynamic field lists
+            def get_fields() -> list[str]:
+                return ["title"]
+
+            await Article.objects.abulk_update(articles, get_fields())
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -119,6 +146,49 @@
         categories = Category.objects.all()
         Category.objects.bulk_update(categories, ["id"])  # E: "bulk_update()" cannot be used with primary key fields. Got "id"  [misc]
         Category.objects.bulk_update(categories, ["invalid"])  # E: Category has no field named 'invalid'  [misc]
+
+        # Async version
+        async def test_async_bulk_update_invalid() -> None:
+            articles = Article.objects.all()
+
+            # Empty fields list
+            await Article.objects.abulk_update() # E: Missing positional arguments "objs", "fields" in call to "abulk_update" of "Manager"  [call-arg]
+            await Article.objects.abulk_update(articles, [])  # E: Field names must be given to "abulk_update()"  [misc]
+
+            # Invalid field names (Django's FieldError)
+            await Article.objects.abulk_update(articles, ["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
+
+            # Cannot update primary key fields
+            await Article.objects.abulk_update(articles, ["id"])  # E: "abulk_update()" cannot be used with primary key fields. Got "id"  [misc]
+
+            # Mixed valid and invalid fields
+            await Article.objects.abulk_update(articles, ["id", "title"])  # E: "abulk_update()" cannot be used with primary key fields. Got "id"  [misc]
+
+            # Whitespace-only field names
+            await Article.objects.abulk_update(articles, ["   "])  # E: Article has no field named '   '  [misc]
+
+            # ManyToMany is not a concrete updatable field
+            await Article.objects.abulk_update(articles, ["tags"])  # E: "abulk_update()" can only be used with concrete fields. Got "tags"  [misc]
+
+            # Multiple invalid fields
+            await Article.objects.abulk_update(articles, ["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
+
+            # Primary key with valid fields
+            await Article.objects.abulk_update(articles, ["title", "id", "content"])  # E: "abulk_update()" cannot be used with primary key fields. Got "id"  [misc]
+
+            # Literal type variables are validated
+            invalid_field: Literal["nonexistent"] = "nonexistent"
+            await Article.objects.abulk_update(articles, [invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
+
+            pk_field: Literal["id"] = "id"
+            await Article.objects.abulk_update(articles, [pk_field])  # E: "abulk_update()" cannot be used with primary key fields. Got "id"  [misc]
+
+            # Test with different models
+            authors = Author.objects.all()
+            await Author.objects.abulk_update(authors, ["invalid"])  # E: Author has no field named 'invalid'  [misc]
+
+            categories = Category.objects.all()
+            await Category.objects.abulk_update(categories, ["invalid"])  # E: Category has no field named 'invalid'  [misc]
 
     files:
         -   path: myapp/__init__.py
