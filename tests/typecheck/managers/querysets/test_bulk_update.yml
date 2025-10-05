@@ -125,6 +125,10 @@
         # ManyToMany is not a concrete updatable field
         Article.objects.bulk_update(articles, ["tags"])  # E: "bulk_update()" can only be used with concrete fields. Got "tags"  [misc]
 
+        # Nested field lookups are not supported
+        Article.objects.bulk_update(articles, ["author__name"])  # E: Article has no field named 'author__name'  [misc]
+        Article.objects.bulk_update(articles, ["category__parent__name"])  # E: Article has no field named 'category__parent__name'  [misc]
+
         # Multiple invalid fields
         Article.objects.bulk_update(articles, ["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
 
@@ -169,6 +173,10 @@
 
             # ManyToMany is not a concrete updatable field
             await Article.objects.abulk_update(articles, ["tags"])  # E: "abulk_update()" can only be used with concrete fields. Got "tags"  [misc]
+
+            # Nested field lookups are not supported
+            await Article.objects.abulk_update(articles, ["author__name"])  # E: Article has no field named 'author__name'  [misc]
+            await Article.objects.abulk_update(articles, ["category__parent__name"])  # E: Article has no field named 'category__parent__name'  [misc]
 
             # Multiple invalid fields
             await Article.objects.abulk_update(articles, ["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
