@@ -179,5 +179,4 @@ jobs:
       - name: Ensure uv.lock is up to date
         run: env --unset=UV_FROZEN uv lock --check
       - name: Build
-        run: |
-          uv build --all
+        run: uv build --all-packages
