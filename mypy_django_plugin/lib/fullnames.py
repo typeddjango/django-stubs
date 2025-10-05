@@ -17,6 +17,7 @@ BASE_MANAGER_CLASS_FULLNAME = "django.db.models.manager.BaseManager"
 MANAGER_CLASS_FULLNAME = "django.db.models.manager.Manager"
 RELATED_MANAGER_CLASS = "django.db.models.fields.related_descriptors.RelatedManager"
 PREFETCH_CLASS_FULLNAME = "django.db.models.query.Prefetch"
+GENERIC_PREFETCH_CLASS_FULLNAME = "django.contrib.contenttypes.prefetch.GenericPrefetch"
 
 CHOICES_CLASS_FULLNAME = "django.db.models.enums.Choices"
 CHOICES_TYPE_METACLASS_FULLNAME = "django.db.models.enums.ChoicesType"
