@@ -784,9 +784,9 @@ def _validate_bulk_update_field(
         ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
         return False
 
-    all_pk_fields = set(opts.pk_fields)
+    all_pk_fields = set(getattr(opts, "pk_fields", [opts.pk]))
     for parent in opts.all_parents:
-        all_pk_fields.update(parent._meta.pk_fields)
+        all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
 
     if field in all_pk_fields:
         ctx.api.fail(f'"{method}()" cannot be used with primary key fields. Got "{field_name}"', ctx.context)
