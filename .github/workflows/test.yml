@@ -77,6 +77,36 @@ jobs:
       - name: Run pytest tests
         run: uv run pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
 
+  test-older-django:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [0, 1, 2, 3]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install binutils libproj-dev gdal-bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.13
+
+      - name: Install dependencies
+        run: uv sync --no-dev --group tests
+
+      - name: Downgrade Django
+        run: uv pip install django==5.0.0
+
+      # Exit 1 only if ont of the pytest error is a mypy crash
+      - name: Run pytest tests
+        run: "! uv run pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests | grep 'pytest_mypy_plugins.utils.TypecheckAssertionError: Critical error occurred'"
+
 
   stubtest:
     timeout-minutes: 10
