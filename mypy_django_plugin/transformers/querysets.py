@@ -785,7 +785,7 @@ def _validate_bulk_update_field(
         return False
 
     all_pk_fields = set(getattr(opts, "pk_fields", [opts.pk]))
-    for parent in opts.all_parents:
+    for parent in getattr(opts, "all_parents", opts.get_parent_list()):
         all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
 
     if field in all_pk_fields:
