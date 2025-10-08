@@ -2,7 +2,7 @@
 name = "django-stubs-ext"
 # NB! For clarity, keep version major.minor.patch in sync with django-stubs.
 # It's fine to skip django-stubs-ext releases, but when doing a release, update this to newest django-stubs version.
-version = "5.2.6"
+version = "5.2.7"
 description = "Monkey-patching and extensions for django-stubs"
 readme = "README.md"
 license = "MIT"

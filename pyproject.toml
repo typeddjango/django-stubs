@@ -1,6 +1,6 @@
 [project]
 name = "django-stubs"
-version = "5.2.6"
+version = "5.2.7"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
@@ -29,7 +29,7 @@ classifiers = [
 ]
 dependencies = [
   "django",
-  "django-stubs-ext>=5.2.6",
+  "django-stubs-ext>=5.2.7",
   "tomli; python_version < '3.11'",
   # Types:
   "types-pyyaml",
