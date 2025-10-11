@@ -100,6 +100,9 @@ DATABASE_ROUTERS: list[str | Router]
 # to a module that defines an EmailBackend class.
 EMAIL_BACKEND: str
 
+# The directory used by the file email backend to store output files.
+EMAIL_FILE_PATH: str
+
 # Host for sending email.
 EMAIL_HOST: str
 
