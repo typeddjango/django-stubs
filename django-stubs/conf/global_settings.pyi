@@ -77,6 +77,10 @@ MANAGERS: _Admins
 # Content-Type header.
 DEFAULT_CHARSET: str
 
+# A dictionary of modules containing serializer definitions (provided as strings), keyed by a string identifier for
+# that serialization type. For example, to define a YAML serializer, use: `{"yaml": "path.to.yaml_serializer"}`
+SERIALIZATION_MODULES: dict[str, str]
+
 # Email address that error messages come from.
 SERVER_EMAIL: str
 
@@ -170,6 +174,9 @@ ABSOLUTE_URL_OVERRIDES: dict[str, Any]
 #    ]
 IGNORABLE_404_URLS: list[Pattern[str]]
 
+# A string representing the full Python import path to your root URLconf, for example "mydjangoapps.urls".
+ROOT_URLCONF: str
+
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain
 # loudly.
@@ -188,6 +195,9 @@ MEDIA_ROOT: str
 # URL that handles the media served from MEDIA_ROOT.
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL: str
+
+# The ID, as an integer, of the current site in the `django_site` database table.
+SITE_ID: int
 
 # Absolute path to the directory static files should be collected to.
 # Example: "/var/www/example.com/static/"
