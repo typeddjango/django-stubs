@@ -77,9 +77,9 @@ MANAGERS: _Admins
 # Content-Type header.
 DEFAULT_CHARSET: str
 
-# A dictionary of modules containing serializer definitions (provided as strings), keyed by a string identifier for
-# that serialization type. For example, to define a YAML serializer, use: `{"yaml": "path.to.yaml_serializer"}`
-SERIALIZATION_MODULES: dict[str, str]
+# `SERIALIZATION_MODULES` is a dictionary (`dict[str, str]`) of modules containing serializer definitions.
+# Because Django doesn't define it, we can't provide its type here. Use `getattr` for type-safe access
+# e.g. `getattr(settings, "SERIALIZATION_MODULES")`
 
 # Email address that error messages come from.
 SERVER_EMAIL: str
@@ -100,8 +100,9 @@ DATABASE_ROUTERS: list[str | Router]
 # to a module that defines an EmailBackend class.
 EMAIL_BACKEND: str
 
-# The directory used by the file email backend to store output files.
-EMAIL_FILE_PATH: str
+# `EMAIL_FILE_PATH` is a `str` indicating the directory used by the file email backend to store output files.
+# Because Django doesn't define it, we can't provide its type here. Use `getattr` for type-safe access
+# e.g. `getattr(settings, "EMAIL_FILE_PATH")`
 
 # Host for sending email.
 EMAIL_HOST: str
@@ -177,8 +178,9 @@ ABSOLUTE_URL_OVERRIDES: dict[str, Any]
 #    ]
 IGNORABLE_404_URLS: list[Pattern[str]]
 
-# A string representing the full Python import path to your root URLconf, for example "mydjangoapps.urls".
-ROOT_URLCONF: str
+# `ROOT_URLCONF` is a string representing the full Python import path to the root `URLconf`.
+# Because Django doesn't define it, we can't provide its type here. Use `getattr` for type-safe access
+# e.g. `getattr(settings, "ROOT_URLCONF")`
 
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain
@@ -199,8 +201,9 @@ MEDIA_ROOT: str
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL: str
 
-# The ID, as an integer, of the current site in the `django_site` database table.
-SITE_ID: int
+# `SITE_ID` is the ID, as an integer, of the current site in the `django_site` database table.
+# Because Django doesn't define it, we can't provide its type here. Use `getattr` for type-safe access
+# e.g. `getattr(settings, "SITE_ID")`
 
 # Absolute path to the directory static files should be collected to.
 # Example: "/var/www/example.com/static/"
