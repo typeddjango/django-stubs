@@ -27,6 +27,7 @@ from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField, ModelFormOptions
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
 from django.utils.functional import LazyObject, classproperty
+from django.views import View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
@@ -89,6 +90,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(Subquery),
     MPGeneric(ReverseManyToOneDescriptor),
     MPGeneric(ModelIterable),
+    MPGeneric(View),
     # These types do have native `__class_getitem__` method since django 3.1:
     MPGeneric(QuerySet, (3, 1)),
     MPGeneric(BaseManager, (3, 1)),
