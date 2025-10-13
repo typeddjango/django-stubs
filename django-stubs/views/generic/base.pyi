@@ -4,6 +4,7 @@ from typing import Any, Generic, TypeVar
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
+from django.template.response import TemplateResponse
 from django.utils.functional import _Getter
 
 logger: logging.Logger
@@ -28,17 +29,19 @@ class View(Generic[_ViewResponse]):
     def http_method_not_allowed(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def options(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
 
-class TemplateResponseMixin:
+_TemplateResponse = TypeVar("_TemplateResponse", bound=HttpResponse, default=TemplateResponse)
+
+class TemplateResponseMixin(Generic[_TemplateResponse]):
     template_name: str | None
     template_engine: str | None
-    response_class: type[HttpResponse]
+    response_class: type[_TemplateResponse]
     content_type: str | None
     request: HttpRequest
-    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse: ...
+    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> _TemplateResponse: ...
     def get_template_names(self) -> list[str]: ...
 
-class TemplateView(TemplateResponseMixin, ContextMixin, View):
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
+class TemplateView(TemplateResponseMixin[_TemplateResponse], ContextMixin, View[_TemplateResponse]):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> _TemplateResponse: ...
 
 class RedirectView(View):
     permanent: bool
