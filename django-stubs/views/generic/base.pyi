@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
@@ -12,7 +12,9 @@ class ContextMixin:
     extra_context: Mapping[str, Any] | None
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
-class View:
+_ViewResponse = TypeVar("_ViewResponse", bound=HttpResponseBase, default=HttpResponseBase)
+
+class View(Generic[_ViewResponse]):
     http_method_names: Sequence[str]
     request: HttpRequest
     args: Any
@@ -20,9 +22,9 @@ class View:
     def __init__(self, **kwargs: Any) -> None: ...
     view_is_async: _Getter[bool] | bool
     @classmethod
-    def as_view(cls: Any, **initkwargs: Any) -> Callable[..., HttpResponseBase]: ...
+    def as_view(cls: Any, **initkwargs: Any) -> Callable[..., _ViewResponse]: ...
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None: ...
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> _ViewResponse: ...
     def http_method_not_allowed(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def options(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
 
