@@ -12,7 +12,7 @@ class BarConfig(AppConfig):
     name = "foo"
 
     @property
-    def default_auto_field(self) -> str:  # type: ignore[override]
+    def default_auto_field(self) -> str:  # type: ignore[override]  # pyrefly: ignore[bad-override]
         return "django.db.models.BigAutoField"
 
 
@@ -20,7 +20,7 @@ class BazConfig(AppConfig):
     name = "foo"
 
     @cached_property
-    def default_auto_field(self) -> str:  # type: ignore[override]
+    def default_auto_field(self) -> str:  # type: ignore[override]  # pyrefly: ignore[bad-override]
         return "django.db.models.BigAutoField"
 
 
