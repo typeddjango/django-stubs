@@ -85,7 +85,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertContains(
         self,
         response: HttpResponseBase,
-        text: bytes | int | str,
+        text: bytes | int | _StrOrPromise,
         count: int | None = ...,
         status_code: int = ...,
         msg_prefix: str = ...,
@@ -94,7 +94,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertNotContains(
         self,
         response: HttpResponseBase,
-        text: bytes | str,
+        text: bytes | int | _StrOrPromise,
         status_code: int = ...,
         msg_prefix: str = ...,
         html: bool = ...,
