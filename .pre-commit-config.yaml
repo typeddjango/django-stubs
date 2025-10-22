@@ -26,6 +26,10 @@ repos:
       - id: codespell
         additional_dependencies:
           - tomli
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.5
+    hooks:
+      - id: uv-lock
 
 ci:
   autofix_commit_msg: "[pre-commit.ci] auto fixes from pre-commit.com hooks"
@@ -33,3 +37,5 @@ ci:
   autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
   autoupdate_schedule: weekly
   submodules: false
+  skip:
+    - uv-lock
