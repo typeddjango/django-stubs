@@ -1,4 +1,4 @@
-from enum import auto, Enum
+from enum import Enum, auto
 
 from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo, Var
 from mypy.plugin import AttributeContext
