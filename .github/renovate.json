@@ -1,0 +1,13 @@
+{
+  "dependencyDashboard": true,
+  "mode": "full",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "automergeType": "branch",
+    "schedule": ["* * * * 1"],
+    "automergeSchedule": ["* * * * 2"]
+  },
+  "packageRules": [
+  ]
+}
