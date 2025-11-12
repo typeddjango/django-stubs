@@ -53,7 +53,7 @@ tests = [
   "mysqlclient==2.2.7",
   "psycopg2-binary==2.9.11",
   "jinja2==3.1.6",
-  "pyyaml==6.0.2",
+  "pyyaml==6.0.3",
   # typing:
   "mypy==1.18.2",
   "django-stubs[compatible-mypy,oracle,redis]",
