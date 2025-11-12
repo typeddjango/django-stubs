@@ -59,7 +59,7 @@ tests = [
   "django-stubs[compatible-mypy,oracle,redis]",
 ]
 pyright = [
-  "pyright==1.1.405",
+  "pyright==1.1.407",
 ]
 
 dev = [
