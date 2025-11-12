@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master
-      - "renovate/**"
+      # Renovate "automerge" branches -- there is no PR, so branch tests are used instead
+      - "renovate/lock-file-maintenance"
   pull_request:
   workflow_dispatch:
 
