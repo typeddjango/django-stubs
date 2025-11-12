@@ -28,6 +28,7 @@ _OrderByFieldName: TypeAlias = str | Combinable
 
 MAX_GET_RESULTS: int
 REPR_OUTPUT_SIZE: int
+PROHIBITED_FILTER_KWARGS: frozenset[str]
 
 class BaseIterable(Generic[_T]):
     queryset: QuerySet[Model]
