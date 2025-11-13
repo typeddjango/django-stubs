@@ -256,7 +256,6 @@ django.contrib.gis.db.models.PositiveIntegerField.formfield
 django.contrib.gis.db.models.PositiveIntegerField.integer_field_class
 django.contrib.gis.db.models.PositiveSmallIntegerField.formfield
 django.contrib.gis.db.models.PositiveSmallIntegerField.integer_field_class
-django.contrib.gis.db.models.Q.XOR
 django.contrib.gis.db.models.QuerySet.__deepcopy__
 django.contrib.gis.db.models.QuerySet.__xor__
 django.contrib.gis.db.models.SlugField.formfield
@@ -591,7 +590,6 @@ django.db.models.PositiveIntegerField.formfield
 django.db.models.PositiveIntegerField.integer_field_class
 django.db.models.PositiveSmallIntegerField.formfield
 django.db.models.PositiveSmallIntegerField.integer_field_class
-django.db.models.Q.XOR
 django.db.models.QuerySet.__deepcopy__
 django.db.models.QuerySet.__xor__
 django.db.models.SlugField.formfield
@@ -854,7 +852,6 @@ django.db.models.query.RelatedPopulator
 django.db.models.query.get_related_populators
 django.db.models.query.normalize_prefetch_lookups
 django.db.models.query.prefetch_one_level
-django.db.models.query_utils.Q.XOR
 django.db.models.query_utils.Q.identity
 django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
 django.db.models.query_utils.RegisterLookupMixin.get_class_lookups

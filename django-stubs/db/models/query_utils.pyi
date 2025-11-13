@@ -27,9 +27,11 @@ class PathInfo(NamedTuple):
 def subclasses(cls: type[RegisterLookupMixin]) -> Iterator[type[RegisterLookupMixin]]: ...
 
 class Q(tree.Node):
-    AND: str
-    OR: str
+    AND: Literal["AND"]
+    OR: Literal["OR"]
+    XOR: Literal["XOR"]
     conditional: bool
+    connectors: tuple[None, Literal["AND"], Literal["OR"], Literal["XOR"]]
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     # Fake signature, the real is
     # def __init__(self, *args: Any, _connector: Any | None = ..., _negated: bool = ..., **kwargs: Any) -> None: ...
