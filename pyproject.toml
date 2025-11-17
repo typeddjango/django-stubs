@@ -44,22 +44,22 @@ redis = ["redis", "types-redis"]
 [dependency-groups]
 tests = [
   # Dev tools:
-  "pytest==8.4.2",
+  "pytest==9.0.1",
   "pytest-mypy-plugins==3.2.0",
   "pytest-shard==0.1.2",
   "pytest-xdist==3.8.0",
   # Django deps:
-  "django==5.2.6",
+  "django==5.2.8",
   "mysqlclient==2.2.7",
-  "psycopg2-binary==2.9.10",
+  "psycopg2-binary==2.9.11",
   "jinja2==3.1.6",
-  "pyyaml==6.0.2",
+  "pyyaml==6.0.3",
   # typing:
-  "mypy==1.18.1",
+  "mypy==1.18.2",
   "django-stubs[compatible-mypy,oracle,redis]",
 ]
 pyright = [
-  "pyright==1.1.405",
+  "pyright==1.1.407",
 ]
 
 dev = [
@@ -80,7 +80,7 @@ django-stubs-ext = { workspace = true }
 members = ["ext"]
 
 [build-system]
-requires = ["uv_build>=0.8.22,<0.9.0"]
+requires = ["uv_build>=0.9.9,<0.10.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
