@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from typing import ClassVar, Literal
+    from typing import ClassVar
 
     from django.db.models import BaseConstraint, Index, OrderBy
     from django.utils.datastructures import _ListOrTuple
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False
         required_db_features: ClassVar[_ListOrTuple[str]]
-        required_db_vendor: ClassVar[Literal["sqlite", "postgresql", "mysql", "oracle"]]
+        required_db_vendor: ClassVar[str]
         select_on_save: ClassVar[bool]  # default: False
         indexes: ClassVar[_ListOrTuple[Index]]
         unique_together: ClassVar[Sequence[Sequence[str]]]
