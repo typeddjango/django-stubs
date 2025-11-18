@@ -46,7 +46,9 @@ class SimpleListFilter(FacetsMixin, ListFilter[_ModelT]):
     parameter_name: str | None
     lookup_choices: list[tuple[str, _StrOrPromise]]
     def value(self) -> str | None: ...
-    def lookups(self, request: HttpRequest, model_admin: ModelAdmin[_ModelT]) -> Iterable[tuple[str, _StrOrPromise]] | None: ...
+    def lookups(
+        self, request: HttpRequest, model_admin: ModelAdmin[_ModelT]
+    ) -> Iterable[tuple[str, _StrOrPromise]] | None: ...
 
 class FieldListFilter(FacetsMixin, ListFilter[_ModelT], Generic[_ModelT, _ST, _GT]):
     list_separator: ClassVar[str]
@@ -64,7 +66,10 @@ class FieldListFilter(FacetsMixin, ListFilter[_ModelT], Generic[_ModelT, _ST, _G
     ) -> None: ...
     @classmethod
     def register(
-        cls, test: Callable[[Field[_ST, _GT]], Any], list_filter_class: type[FieldListFilter[_ModelT, _ST, _GT]], take_priority: bool = ...
+        cls,
+        test: Callable[[Field[_ST, _GT]], Any],
+        list_filter_class: type[FieldListFilter[_ModelT, _ST, _GT]],
+        take_priority: bool = ...,
     ) -> None: ...
     @classmethod
     def create(
