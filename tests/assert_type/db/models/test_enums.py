@@ -227,12 +227,26 @@ assert_type(Constants.__empty__, str)  # pyright: ignore[reportAssertTypeFailure
 # Note: Suppress errors from pyright as the mypy plugin narrows the type of labels if non-lazy.
 assert_type(VoidChoices.names, list[str])
 assert_type(VoidChoices.labels, list[str])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(VoidChoices.values, list[Any | None])  # pyright: ignore[reportAssertTypeFailure]
-assert_type(VoidChoices.choices, list[tuple[Any | None, str]])  # pyright: ignore[reportAssertTypeFailure]
+
+assert_type(VoidChoices.values, list[int | None])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type(
+    VoidChoices.values,  # pyrefly: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+    list[Any | None],
+)
+
+assert_type(VoidChoices.choices, list[tuple[int | None, str]])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type(
+    VoidChoices.choices,  # pyrefly: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+    list[tuple[Any | None, str]],
+)
+
 assert_type(VoidChoices.ABYSS, Literal[VoidChoices.ABYSS])
 assert_type(VoidChoices.ABYSS.name, Literal["ABYSS"])
 assert_type(VoidChoices.ABYSS.label, str)  # pyright: ignore[reportAssertTypeFailure]
-assert_type(VoidChoices.ABYSS.value, Any)
+
+assert_type(VoidChoices.ABYSS.value, int)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type(VoidChoices.ABYSS.value, Any)  # pyrefly: ignore[assert-type]
+
 assert_type(VoidChoices.ABYSS.do_not_call_in_templates, Literal[True])
 assert_type(VoidChoices.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
@@ -274,7 +288,10 @@ assert_type([member.value for choices in x0 for member in choices], list[int])
 
 # Assertions for mixing multiple choices types with consistent base types - only `TextChoices`.
 x1 = (Medal, Gender)
-assert_type([member.label for choices in x1 for member in choices], list[_StrOrPromise])
+
+assert_type([member.label for choices in x1 for member in choices], list[str])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type([member.label for choices in x1 for member in choices], list[_StrOrPromise])  # pyrefly: ignore[assert-type]
+
 assert_type([member.value for choices in x1 for member in choices], list[str])
 
 # Assertions for mixing multiple choices types with different base types - `IntegerChoices` and `TextChoices`.
@@ -284,8 +301,12 @@ assert_type([member.value for choices in x2 for member in choices], list[int | s
 
 # Assertions for mixing multiple choices types with consistent base types - custom types.
 x3 = (Constants, Separator)
-assert_type([member.label for choices in x3 for member in choices], list[_StrOrPromise])
-assert_type([member.value for choices in x3 for member in choices], list[Any])
+
+assert_type([member.label for choices in x3 for member in choices], list[str])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type([member.label for choices in x3 for member in choices], list[_StrOrPromise])  # pyrefly: ignore[assert-type]
+
+assert_type([member.value for choices in x3 for member in choices], list[bytes | float])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type([member.value for choices in x3 for member in choices], list[Any])  # pyrefly: ignore[assert-type]
 
 
 # Assertions for choices objects defined and aliased in a model.

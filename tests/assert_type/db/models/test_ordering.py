@@ -35,15 +35,15 @@ query.add_extra(
 )
 
 # failure cases
-qs.order_by(123)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
-qs.order_by(["username"])  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
-qs.order_by({"username": "asc"})  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+qs.order_by(123)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
+qs.order_by(["username"])  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
+qs.order_by({"username": "asc"})  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
 
-qs.extra(order_by=[123])  # type: ignore[list-item] # pyright: ignore[reportArgumentType]
-qs.extra(order_by=["username", 456])  # type: ignore[list-item] # pyright: ignore[reportArgumentType]
+qs.extra(order_by=[123])  # type: ignore[list-item] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
+qs.extra(order_by=["username", 456])  # type: ignore[list-item] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
 
-query.add_ordering(123)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
-query.add_ordering(["username"])  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]
+query.add_ordering(123)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
+query.add_ordering(["username"])  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
 
 query.add_extra(
     select=None,
@@ -51,5 +51,5 @@ query.add_extra(
     where=None,
     params=None,
     tables=None,
-    order_by=[123, "username"],  # type: ignore[list-item] # pyright: ignore[reportArgumentType]
+    order_by=[123, "username"],  # type: ignore[list-item] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
 )

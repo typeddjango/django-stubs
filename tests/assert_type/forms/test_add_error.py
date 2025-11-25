@@ -27,9 +27,9 @@ assert_type(form.add_error(None, ValidationError(["error"])), None)
 assert_type(form.add_error("field", ValidationError(["error"])), None)
 assert_type(form.add_error(None, ValidationError({"field": "error"})), None)
 
-form.add_error("field", {"field": "error"})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
-form.add_error("field", {"field": lazystr("error")})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
-form.add_error("field", {"field": ValidationError("error")})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
-form.add_error("field", {"field": ["error"]})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
-form.add_error("field", {"field": [lazystr("error")]})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
-form.add_error("field", {"field": [ValidationError("error")]})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]
+form.add_error("field", {"field": "error"})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]
+form.add_error("field", {"field": lazystr("error")})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]
+form.add_error("field", {"field": ValidationError("error")})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]
+form.add_error("field", {"field": ["error"]})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]
+form.add_error("field", {"field": [lazystr("error")]})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]
+form.add_error("field", {"field": [ValidationError("error")]})  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]

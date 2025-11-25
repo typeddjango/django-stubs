@@ -1,0 +1,2 @@
+# Respect only `# pyrefly: ignore` (ignore `# type: ignore`)
+enabled-ignores = ["pyrefly"]

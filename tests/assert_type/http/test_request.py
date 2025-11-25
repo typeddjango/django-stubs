@@ -27,7 +27,7 @@ assert_type(q.lists(), Iterable[tuple[str, list[str]]])
 # Test MutableQueryDict
 mut_q = QueryDict(mutable=True)
 mut_q["a"] = "3"
-mut_q["a"] = ["1", "2"]  # type: ignore[assignment]  # pyright: ignore[reportArgumentType]
+mut_q["a"] = ["1", "2"]  # type: ignore[assignment]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[unsupported-operation]
 
 assert_type(mut_q.pop("a"), list[str])
 assert_type(mut_q.pop("a", 12), list[str] | int)

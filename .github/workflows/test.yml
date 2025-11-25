@@ -171,6 +171,31 @@ jobs:
           version: PATH
           project: ./pyrightconfig.testcases.json
 
+  run-pyrefly:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --no-dev --group pyrefly
+
+      - name: Add venv to path
+        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
+      - name: Run pyrefly on the test cases
+        run: pyrefly check tests/assert_type
+
   matrix-test:
     timeout-minutes: 10
     runs-on: ubuntu-latest

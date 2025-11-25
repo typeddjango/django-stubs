@@ -7,13 +7,13 @@ from django.db.models.lookups import LessThan
 UniqueConstraint(Lower("name").desc(), "category", name="unique_lower_name_category")
 UniqueConstraint(fields=["name"], name="unique_name")
 # There's no overload case for passing both expression and 'fields'
-UniqueConstraint(  # type: ignore[call-overload]
+UniqueConstraint(  # type: ignore[call-overload]  # pyrefly: ignore[no-matching-overload]
     Lower("name"),
     fields=["name"],  # pyright: ignore[reportArgumentType]
     name="unique_mess",
 )
 
-CheckConstraint(  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]
+CheckConstraint(  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]
     name="less_than_constraint",
     check=LessThan[Any](F("months"), 1),
 )
