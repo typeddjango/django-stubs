@@ -9,5 +9,9 @@
     "automergeSchedule": ["* * * * 2"]
   },
   "packageRules": [
+      {
+          "matchPackageNames": ["mypy"],
+          "rangeStrategy": "widen"
+      }
   ]
 }
