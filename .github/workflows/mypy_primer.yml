@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           cd django-stubs_to_test
-          MYPY_VERSION=$(uv tree --package=mypy --depth=0 -q | sed -n 's/  "mypy v\([^;]*\).*",/\1/p')
+          MYPY_VERSION=$(uv tree --package=mypy --depth=0 -q | sed -n 's/^mypy v\(.\+\)$/\1/p')
 
           echo "new commit"
           git checkout $GITHUB_SHA
