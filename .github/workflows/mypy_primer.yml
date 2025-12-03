@@ -27,13 +27,17 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
       - name: Install dependencies
-        run: pip install git+https://github.com/hauntsaninja/mypy_primer.git
+        run: |
+          uv venv
+          uv pip install git+https://github.com/hauntsaninja/mypy_primer.git
       - name: Run mypy_primer
         shell: bash
         run: |
           cd django-stubs_to_test
-          MYPY_VERSION=$(grep mypy== pyproject.toml | sed -n 's/  "mypy==\([^;]*\).*",/\1/p')
+          MYPY_VERSION=$(uv tree --package=mypy --depth=0 -q | sed -n 's/^mypy v\(.\+\)$/\1/p')
 
           echo "new commit"
           git checkout $GITHUB_SHA
@@ -50,7 +54,7 @@ jobs:
           cd ..
           # fail action if exit code isn't zero or one
           (
-            mypy_primer \
+            uv run mypy_primer \
             --new v${MYPY_VERSION} --old v${MYPY_VERSION} \
             --known-dependency-selector django-stubs \
             --old-prepend-path django-stubs_base --new-prepend-path django-stubs_to_test \
