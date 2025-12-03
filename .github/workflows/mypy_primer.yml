@@ -24,10 +24,11 @@ jobs:
         with:
           path: django-stubs_to_test
           fetch-depth: 0
-      - name: Install uv & Python
-        uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
       - name: Install dependencies
         run: pip install git+https://github.com/hauntsaninja/mypy_primer.git
       - name: Run mypy_primer
