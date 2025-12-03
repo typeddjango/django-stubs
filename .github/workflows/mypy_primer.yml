@@ -30,7 +30,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
       - name: Install dependencies
-        run: pip install git+https://github.com/hauntsaninja/mypy_primer.git
+        run: uv pip install git+https://github.com/hauntsaninja/mypy_primer.git
       - name: Run mypy_primer
         shell: bash
         run: |
