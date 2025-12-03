@@ -54,7 +54,7 @@ jobs:
           cd ..
           # fail action if exit code isn't zero or one
           (
-            mypy_primer \
+            uv run mypy_primer \
             --new v${MYPY_VERSION} --old v${MYPY_VERSION} \
             --known-dependency-selector django-stubs \
             --old-prepend-path django-stubs_base --new-prepend-path django-stubs_to_test \
