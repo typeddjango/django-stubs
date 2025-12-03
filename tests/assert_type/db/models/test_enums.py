@@ -229,14 +229,14 @@ assert_type(VoidChoices.names, list[str])
 assert_type(VoidChoices.labels, list[str])  # pyright: ignore[reportAssertTypeFailure]
 
 assert_type(VoidChoices.values, list[int | None])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
-assert_type(
-    VoidChoices.values,  # pyrefly: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type(  # pyrefly: ignore[assert-type]
+    VoidChoices.values,  # pyright: ignore[reportAssertTypeFailure]
     list[Any | None],
 )
 
 assert_type(VoidChoices.choices, list[tuple[int | None, str]])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
-assert_type(
-    VoidChoices.choices,  # pyrefly: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
+assert_type(  # pyrefly: ignore[assert-type]
+    VoidChoices.choices,  # pyright: ignore[reportAssertTypeFailure]
     list[tuple[Any | None, str]],
 )
 
