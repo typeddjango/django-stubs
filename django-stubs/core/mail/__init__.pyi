@@ -1,4 +1,4 @@
-from collections.abc import Iterable, MutableSequence, Sequence
+from collections.abc import Iterable, Sequence
 from typing import Any
 
 from django.utils.functional import _StrOrPromise
@@ -50,7 +50,7 @@ def mail_managers(
     html_message: str | None = None,
 ) -> None: ...
 
-outbox: MutableSequence[EmailMessage | EmailMultiAlternatives]
+outbox: list[EmailMessage | EmailMultiAlternatives]
 
 __all__ = [
     "DEFAULT_ATTACHMENT_MIME_TYPE",
