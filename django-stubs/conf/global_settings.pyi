@@ -541,3 +541,9 @@ SECURE_REDIRECT_EXEMPT: list[str]
 SECURE_REFERRER_POLICY: str
 SECURE_SSL_HOST: str | None
 SECURE_SSL_REDIRECT: bool
+
+##################
+# CSP MIDDLEWARE #
+##################
+SECURE_CSP: dict[str, Any] = {}
+SECURE_CSP_REPORT_ONLY: dict[str, Any] = {}
