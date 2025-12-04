@@ -1,7 +1,5 @@
 django.conf.FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG
 django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
-django.conf.global_settings.SECURE_CSP
-django.conf.global_settings.SECURE_CSP_REPORT_ONLY
 django.conf.global_settings.TASKS
 django.conf.global_settings.URLIZE_ASSUME_HTTPS
 django.contrib.admin.AdminSite.password_change_form
@@ -212,7 +210,6 @@ django.forms.ClearableFileInput.use_fieldset
 django.forms.models.BaseModelForm.validate_constraints
 django.forms.renderers.Jinja2DivFormRenderer
 django.forms.widgets.ClearableFileInput.use_fieldset
-django.middleware.csp
 django.tasks
 django.tasks.backends
 django.tasks.backends.base
@@ -223,7 +220,6 @@ django.tasks.checks
 django.tasks.exceptions
 django.tasks.signals
 django.template.base.PartialTemplate
-django.template.context_processors.csp
 django.template.defaulttags.PartialDefNode
 django.template.defaulttags.PartialNode
 django.template.defaulttags.partial_func
@@ -232,7 +228,6 @@ django.test.runner.QueryFormatter
 django.test.selenium.SeleniumTestCase.get_browser_logs
 django.test.testcases._AssertTemplateUsedContext.rendered_template_names
 django.utils.copy
-django.utils.csp
 django.utils.datastructures.DeferredSubDict
 django.utils.deprecation.RemovedInDjango60Warning
 django.utils.deprecation.RemovedInDjango70Warning
@@ -245,4 +240,3 @@ django.utils.itercompat
 django.utils.json
 django.utils.log.log_message
 django.utils.text.acompress_sequence
-django.views.decorators.csp
