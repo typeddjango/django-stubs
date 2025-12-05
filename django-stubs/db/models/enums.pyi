@@ -6,6 +6,8 @@ from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
 from typing_extensions import deprecated
 
+from django_stubs_ext.compat import MYPY
+
 if sys.version_info >= (3, 11):
     from enum import EnumType, IntEnum, StrEnum
     from enum import property as enum_property
@@ -59,10 +61,12 @@ class _IntegerChoicesType(ChoicesType):
 # all the arguments of `int.__new__`/`str.__new__` (e.g. `base`, `encoding`).
 # They are omitted on purpose to avoid having convoluted stubs for these enums:
 class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesType):  # type: ignore[misc]
-    @overload
-    def __init__(self, x: ConvertibleToInt) -> None: ...
-    @overload
-    def __init__(self, x: ConvertibleToInt, label: _StrOrPromise) -> None: ...
+    if not MYPY:  # noqa: PYI002
+        @overload
+        def __init__(self, x: ConvertibleToInt) -> None: ...
+        @overload
+        def __init__(self, x: ConvertibleToInt, label: _StrOrPromise) -> None: ...
+
     @enum_property
     def value(self) -> int: ...
 
@@ -75,10 +79,12 @@ class _TextChoicesType(ChoicesType):
     def values(self) -> list[str]: ...
 
 class TextChoices(Choices, StrEnum, metaclass=_TextChoicesType):  # type: ignore[misc]
-    @overload
-    def __init__(self, object: str) -> None: ...
-    @overload
-    def __init__(self, object: str, label: _StrOrPromise) -> None: ...
+    if not MYPY:  # noqa: PYI002
+        @overload
+        def __init__(self, object: str) -> None: ...
+        @overload
+        def __init__(self, object: str, label: _StrOrPromise) -> None: ...
+
     @enum_property
     def value(self) -> str: ...
 
