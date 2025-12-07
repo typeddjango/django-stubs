@@ -44,7 +44,7 @@ redis = ["redis", "types-redis"]
 [dependency-groups]
 tests = [
   # Dev tools:
-  "pytest==9.0.1",
+  "pytest==9.0.2",
   "pytest-mypy-plugins==3.2.0",
   "pytest-shard==0.1.2",
   "pytest-xdist==3.8.0",
