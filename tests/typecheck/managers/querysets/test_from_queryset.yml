@@ -999,3 +999,46 @@
                     field = models.CharField()
                     b = models.ForeignKey(B, on_delete=models.CASCADE)
                     objects = Manager()
+
+# Regression test for #2373: Ensure from_queryset handles repeated deferrals
+# correctly. When create_manager_info_from_from_queryset_call returns None due
+# to forward references, PlaceholderNode should only be added once, not on
+# every iteration.
+-   case: test_from_queryset_repeated_deferral_with_forward_metaclass
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects.custom_method())
+    out: |
+        main:3: error: Access to generic instance variables via class is ambiguous  [misc]
+        main:3: note: Revealed type is "builtins.str"
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+                from django.db.models.manager import Manager
+
+                M = TypeVar("M", bound=models.Model, covariant=True)
+
+                # Forward reference to metaclass triggers deferral, causing
+                # create_manager_info_from_from_queryset_call to return None
+                # on initial passes. The fix ensures PlaceholderNode is not
+                # re-added on each iteration, preventing progress flag from
+                # being set repeatedly.
+                class CustomQuerySet(models.QuerySet[M], metaclass=ForwardMCS):
+                    def custom_method(self) -> str:
+                        return "test"
+
+                CustomManager = Manager.from_queryset(CustomQuerySet)
+
+                class MyModel(models.Model):
+                    objects = CustomManager()
+
+                # Forward-referenced metaclass defined after use
+                class ForwardMCS(type):
+                    pass
