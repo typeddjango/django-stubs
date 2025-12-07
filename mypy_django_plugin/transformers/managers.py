@@ -334,9 +334,12 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     new_manager_info = create_manager_info_from_from_queryset_call(semanal_api, ctx.call, ctx.name)
     if new_manager_info is None:
         if not ctx.api.final_iteration:
-            # XXX: hack for python/mypy#17402
-            ph = PlaceholderNode(ctx.api.qualified_name(ctx.name), ctx.call, ctx.call.line, becomes_typeinfo=True)
-            ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, ph))
+            # Only add PlaceholderNode if it doesn't already exist to prevent
+            # infinite semantic analysis iterations (fixes #2373)
+            if not (manager_sym and isinstance(manager_sym.node, PlaceholderNode)):
+                # XXX: hack for python/mypy#17402
+                ph = PlaceholderNode(ctx.api.qualified_name(ctx.name), ctx.call, ctx.call.line, becomes_typeinfo=True)
+                ctx.api.add_symbol_table_node(ctx.name, SymbolTableNode(GDEF, ph))
             ctx.api.defer()
         return
 
