@@ -61,7 +61,7 @@ pyright = [
   "pyright==1.1.407",
 ]
 pyrefly = [
-  "pyrefly==0.44.2",
+  "pyrefly==0.45.0",
 ]
 
 dev = [
