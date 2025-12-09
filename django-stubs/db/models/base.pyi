@@ -2,8 +2,8 @@ from collections.abc import Collection, Iterable, Sequence
 from typing import Any, ClassVar, Final, TypeVar, overload
 
 from django.core.checks.messages import CheckMessage
-from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned, ObjectNotUpdated
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, ObjectNotUpdated, ValidationError
 from django.db.models import BaseConstraint, Field, QuerySet
 from django.db.models.manager import Manager
 from django.db.models.options import Options
