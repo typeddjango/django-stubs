@@ -120,13 +120,14 @@
                     mypk = models.IntegerField(primary_key=True)
 
 -   case: set_foreign_key_by_its_primary_key
+    skip: __import__("django").VERSION < (6, 0)
     main: |
         from datetime import datetime
         now = datetime.now()
 
         from myapp.models import Publisher, PublisherDatetime, Book
         Book(publisher_id=1, publisher_dt_id=now)
-        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "list[Any]", expected "Combinable | int | str")  [misc]
+        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
         Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "str | datetime | date | Combinable")  [misc]
     installed_apps:
         - myapp
