@@ -1280,7 +1280,7 @@
         main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable | None, builtins.int]]"
         main:42: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
         main:43: note: Revealed type is "type[myapp.models.CustomThrough]"
-        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable | None, builtins.int]]"
+        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable, builtins.int]]"
     installed_apps:
         -   myapp
     files:
