@@ -61,7 +61,6 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_primitives_in_json_
 django.db.backends.oracle.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.oracle.features.DatabaseFeatures.test_collations
 django.db.backends.oracle.introspection.TableInfo
-django.db.backends.oracle.oracledb_any
 django.db.backends.oracle.utils.BulkInsertMapper.NCLOB
 django.db.backends.oracle.utils.dsn
 django.db.backends.postgresql.base.DatabaseWrapper.close_pool
@@ -71,7 +70,6 @@ django.db.backends.postgresql.features.DatabaseFeatures.django_test_skips
 django.db.backends.postgresql.features.DatabaseFeatures.supports_nulls_distinct_unique_constraints
 django.db.backends.postgresql.psycopg_any
 django.db.backends.sqlite3.base.DatabaseWrapper.transaction_modes
-django.db.backends.sqlite3.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
 django.db.migrations.autodetector.MigrationAutodetector.generate_altered_constraints
