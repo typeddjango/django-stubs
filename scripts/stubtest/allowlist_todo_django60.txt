@@ -51,11 +51,9 @@ django.contrib.gis.db.models.CheckConstraint.check
 django.contrib.gis.db.models.ForeignObjectRel.get_joining_columns
 django.contrib.gis.db.models.GeneratedField.referenced_fields
 django.contrib.gis.db.models.Index.check
-django.contrib.gis.db.models.IntegerChoices.__init__
 django.contrib.gis.db.models.Model._do_update
 django.contrib.gis.db.models.Prefetch.get_current_queryset
 django.contrib.gis.db.models.StringAgg
-django.contrib.gis.db.models.TextChoices.__init__
 django.contrib.gis.db.models.UniqueConstraint.check
 django.contrib.gis.db.models.__all__
 django.contrib.gis.db.models.functions.GeometryType
@@ -193,11 +191,9 @@ django.db.models.CheckConstraint.check
 django.db.models.ForeignObjectRel.get_joining_columns
 django.db.models.GeneratedField.referenced_fields
 django.db.models.Index.check
-django.db.models.IntegerChoices.__init__
 django.db.models.Model._do_update
 django.db.models.Prefetch.get_current_queryset
 django.db.models.StringAgg
-django.db.models.TextChoices.__init__
 django.db.models.UniqueConstraint.check
 django.db.models.__all__
 django.db.models.aggregates.Aggregate.allow_order_by
@@ -211,8 +207,6 @@ django.db.models.constraints.CheckConstraint.__init__
 django.db.models.constraints.CheckConstraint.check
 django.db.models.constraints.UniqueConstraint.check
 django.db.models.enums.ChoicesMeta
-django.db.models.enums.IntegerChoices.__init__
-django.db.models.enums.TextChoices.__init__
 django.db.models.expressions.OrderByList.from_param
 django.db.models.fields.generated.GeneratedField.referenced_fields
 django.db.models.fields.json.HasKeyLookup.compile_json_path_final_key
@@ -264,8 +258,6 @@ django.utils.deprecation.django_file_prefixes
 django.utils.http.MAX_HEADER_LENGTH
 django.utils.http.parse_header_parameters
 django.utils.inspect.is_module_level_function
-django.utils.inspect.lock
-django.utils.inspect.safe_signature_from_callable
 django.utils.itercompat
 django.utils.json
 django.utils.log.log_message
