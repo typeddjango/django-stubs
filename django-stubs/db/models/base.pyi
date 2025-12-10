@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Final, TypeVar, overload
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ObjectNotUpdated, ValidationError
 from django.db.models import BaseConstraint, Field, QuerySet
 from django.db.models.manager import Manager
 from django.db.models.options import Options
@@ -40,6 +40,7 @@ class Model(metaclass=ModelBase):
     # and re-add them to correct concrete subclasses of 'Model'
     DoesNotExist: Final[type[ObjectDoesNotExist]]
     MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
+    NotUpdated: Final[type[ObjectNotUpdated]]
     # This 'objects' attribute will be deleted, via the plugin, in favor of managing it
     # to only exist on subclasses it exists on during runtime.
     objects: ClassVar[Manager[Self]]
