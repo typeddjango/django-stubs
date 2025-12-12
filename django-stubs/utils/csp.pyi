@@ -1,14 +1,17 @@
 import sys
+from collections.abc import Sequence
+
+from django.utils.functional import SimpleLazyObject
 
 if sys.version_info >= (3, 11):
-    from enum import StrEnum
+    from enum import StrEnum as _StrEnum
 else:
     from enum import Enum
 
-    class ReprEnum(Enum): ...  # type: ignore[misc]
-    class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
+    class _ReprEnum(Enum): ...  # type: ignore[misc]
+    class _StrEnum(str, _ReprEnum): ...  # type: ignore[misc]
 
-class CSP(StrEnum):
+class CSP(_StrEnum):
     HEADER_ENFORCE = "Content-Security-Policy"
     HEADER_REPORT_ONLY = "Content-Security-Policy-Report-Only"
 
@@ -22,3 +25,9 @@ class CSP(StrEnum):
     WASM_UNSAFE_EVAL = "'wasm-unsafe-eval'"
 
     NONCE = "<CSP_NONCE_SENTINEL>"
+
+class LazyNonce(SimpleLazyObject):
+    def __init__(self) -> None: ...
+    def __bool__(self) -> bool: ...
+
+def build_policy(config: dict[str, Sequence[str] | str], nonce: SimpleLazyObject | str | None = None) -> str: ...

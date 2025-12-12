@@ -545,5 +545,5 @@ SECURE_SSL_REDIRECT: bool
 ##################
 # CSP MIDDLEWARE #
 ##################
-SECURE_CSP: dict[str, Any] = {}
-SECURE_CSP_REPORT_ONLY: dict[str, Any] = {}
+SECURE_CSP: dict[str, Sequence[str] | str]
+SECURE_CSP_REPORT_ONLY: dict[str, Sequence[str] | str]
