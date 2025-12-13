@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Hashable
 
 from django.apps.registry import Apps
 from django.db.models.base import Model
@@ -12,14 +12,14 @@ class ModelSignal(Signal):
         receiver: Callable,
         sender: type[Model] | str | None = None,
         weak: bool = True,
-        dispatch_uid: str | None = None,
+        dispatch_uid: Hashable | None = None,
         apps: Apps | None = None,
     ) -> None: ...
     def disconnect(  # type: ignore[override]
         self,
         receiver: Callable | None = None,
         sender: type[Model] | str | None = None,
-        dispatch_uid: str | None = None,
+        dispatch_uid: Hashable | None = None,
         apps: Apps | None = None,
     ) -> bool | None: ...
 
