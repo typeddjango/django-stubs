@@ -12,6 +12,10 @@
       {
           "matchPackageNames": ["mypy"],
           "rangeStrategy": "widen"
+      },
+      {
+          "matchPackageNames": ["python"],
+          "allowedVersions": "3.10"
       }
   ]
 }
