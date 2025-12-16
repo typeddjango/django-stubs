@@ -97,6 +97,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
+          # NOTE: Keep renovate.json python "allowedVersions" in sync
           python-version: '3.10'
 
       - name: Install dependencies
