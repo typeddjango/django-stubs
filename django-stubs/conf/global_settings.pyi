@@ -547,3 +547,10 @@ SECURE_SSL_REDIRECT: bool
 ##################
 SECURE_CSP: Mapping[str, Collection[str] | str]
 SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
+
+####################
+# django-stubs-ext settings #
+####################
+FORMS_URLFIELD_ASSUME_HTTPS: bool
+TASKS: dict[str, dict[str, Any]]
+URLIZE_ASSUME_HTTPS: bool
