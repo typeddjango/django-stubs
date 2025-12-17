@@ -133,7 +133,7 @@ FORM_RENDERER: str
 # RemovedInDjango60Warning: It's a transitional setting helpful in early
 # adoption of "https" as the new default value of forms.URLField.assume_scheme.
 # Set to True to assume "https" during the Django 5.x release cycle.
-FORMS_URLFIELD_ASSUME_HTTPS: bool
+
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -548,9 +548,7 @@ SECURE_SSL_REDIRECT: bool
 SECURE_CSP: Mapping[str, Collection[str] | str]
 SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
 
-####################
-# django-stubs-ext settings #
-####################
 
 TASKS: dict[str, dict[str, Any]]
 URLIZE_ASSUME_HTTPS: bool
+FORMS_URLFIELD_ASSUME_HTTPS: bool
