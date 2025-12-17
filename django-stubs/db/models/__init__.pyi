@@ -8,6 +8,7 @@ from .aggregates import Count as Count
 from .aggregates import Max as Max
 from .aggregates import Min as Min
 from .aggregates import StdDev as StdDev
+from .aggregates import StringAgg as StringAgg
 from .aggregates import Sum as Sum
 from .aggregates import Variance as Variance
 from .base import DEFERRED as DEFERRED
@@ -185,6 +186,7 @@ __all__ = [
     "SmallAutoField",
     "SmallIntegerField",
     "StdDev",
+    "StringAgg",
     "Subquery",
     "Sum",
     "TextChoices",
