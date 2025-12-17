@@ -547,4 +547,3 @@ SECURE_SSL_REDIRECT: bool
 ##################
 SECURE_CSP: Mapping[str, Collection[str] | str]
 SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
-
