@@ -86,6 +86,7 @@ SERVER_EMAIL: str
 
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES: dict[str, dict[str, Any]]
+TASKS: dict[str, dict[str, Any]]
 
 # Classes used to implement DB routing behavior.
 @type_check_only
@@ -547,6 +548,3 @@ SECURE_SSL_REDIRECT: bool
 SECURE_CSP: Mapping[str, Collection[str] | str]
 SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
 
-TASKS: dict[str, dict[str, Any]]
-URLIZE_ASSUME_HTTPS: bool
-FORMS_URLFIELD_ASSUME_HTTPS: bool
