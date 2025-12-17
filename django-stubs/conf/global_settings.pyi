@@ -134,7 +134,6 @@ FORM_RENDERER: str
 # adoption of "https" as the new default value of forms.URLField.assume_scheme.
 # Set to True to assume "https" during the Django 5.x release cycle.
 
-
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL: str
@@ -547,7 +546,6 @@ SECURE_SSL_REDIRECT: bool
 ##################
 SECURE_CSP: Mapping[str, Collection[str] | str]
 SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
-
 
 TASKS: dict[str, dict[str, Any]]
 URLIZE_ASSUME_HTTPS: bool
