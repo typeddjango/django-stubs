@@ -75,8 +75,6 @@ django.contrib.postgres.operations.CryptoExtension.__init__
 django.contrib.postgres.operations.HStoreExtension.__init__
 django.contrib.postgres.operations.TrigramExtension.__init__
 django.contrib.postgres.operations.UnaccentExtension.__init__
-django.contrib.postgres.search.CombinedLexeme
-django.contrib.postgres.search.Lexeme
 django.contrib.postgres.search.LexemeCombinable
 django.contrib.postgres.search.multiple_spaces_re
 django.contrib.postgres.search.normalize_spaces
