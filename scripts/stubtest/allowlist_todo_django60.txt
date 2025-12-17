@@ -37,7 +37,8 @@ django.contrib.gis.db.models.GeneratedField.referenced_fields
 django.contrib.gis.db.models.Index.check
 django.contrib.gis.db.models.Model._do_update
 django.contrib.gis.db.models.Prefetch.get_current_queryset
-django.contrib.gis.db.models.StringAgg
+django.contrib.gis.db.models.StringAgg.as_mysql
+django.contrib.gis.db.models.StringAgg.as_oracle
 django.contrib.gis.db.models.UniqueConstraint.check
 django.contrib.gis.db.models.__all__
 django.contrib.gis.db.models.functions.GeometryType
@@ -172,12 +173,13 @@ django.db.models.GeneratedField.referenced_fields
 django.db.models.Index.check
 django.db.models.Model._do_update
 django.db.models.Prefetch.get_current_queryset
-django.db.models.StringAgg
 django.db.models.UniqueConstraint.check
 django.db.models.__all__
-django.db.models.aggregates.Aggregate.allow_order_by
+django.db.models.StringAgg.as_mysql
+django.db.models.StringAgg.as_oracle
 django.db.models.aggregates.AnyValue
-django.db.models.aggregates.StringAgg
+django.db.models.aggregates.StringAgg.as_mysql
+django.db.models.aggregates.StringAgg.as_oracle
 django.db.models.aggregates.__all__
 django.db.models.base.Model._do_update
 django.db.models.constraints.BaseConstraint.__init__
