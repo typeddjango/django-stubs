@@ -2,7 +2,7 @@ from typing import Any, ClassVar, TypeAlias
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Expression, Field, FloatField, TextField
-from django.db.models.expressions import Combinable, CombinedExpression, Func
+from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
 from django.db.models.lookups import Lookup
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from typing_extensions import Self
@@ -142,3 +142,16 @@ class TrigramWordDistance(TrigramWordBase): ...
 class TrigramStrictWordDistance(TrigramWordBase): ...
 class TrigramWordSimilarity(TrigramWordBase): ...
 class TrigramStrictWordSimilarity(TrigramWordBase): ...
+
+class Lexeme(Value):
+    def __init__(
+        self,
+        value: Any,
+        output_field: Any | None = None,
+        *,
+        invert: bool = False,
+        prefix: bool = False,
+        weight: Any | None = None,
+    ) -> None: ...
+
+class CombinedLexeme(CombinedExpression): ...
