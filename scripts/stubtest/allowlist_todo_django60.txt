@@ -88,14 +88,9 @@ django.core.mail.EmailMessage.__init__
 django.core.mail.EmailMessage.message
 django.core.mail.EmailMultiAlternatives.__init__
 django.core.mail.backends.smtp.EmailBackend.prep_address
-django.core.mail.get_connection
-django.core.mail.mail_admins
-django.core.mail.mail_managers
 django.core.mail.message.EmailMessage.__init__
 django.core.mail.message.EmailMessage.message
 django.core.mail.message.EmailMultiAlternatives.__init__
-django.core.mail.send_mail
-django.core.mail.send_mass_mail
 django.core.paginator.AsyncPage
 django.core.paginator.AsyncPaginator
 django.core.paginator.BasePaginator
