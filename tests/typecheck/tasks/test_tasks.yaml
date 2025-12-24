@@ -1,20 +1,20 @@
 -   case: task
     main: |
         from typing_extensions import reveal_type
-        from django.tasks import Task, task
+        from django.tasks import task
 
         @task
         def test_task(x: int) -> int:
             return x + 1
 
         reveal_type(test_task) # N: Revealed type is "django.tasks.base.Task[[x: builtins.int], builtins.int]"
-        reveal_type(test_task.call(1)) # N: Revealed type is "builtins.int"
-        reveal_type(test_task.enqueue(1)) # N: Revealed type is "django.tasks.base.TaskResult[[x: builtins.int], builtins.int]"
+        reveal_type(test_task.call) # N: Revealed type is "def (x: builtins.int) -> builtins.int"
+        reveal_type(test_task.enqueue) # N: Revealed type is "def (x: builtins.int) -> django.tasks.base.TaskResult[[x: builtins.int], builtins.int]"
 
 -   case: task_with_priority
     main: |
         from typing_extensions import reveal_type
-        from django.tasks import Task, task
+        from django.tasks import task
 
         @task(priority=5)
         def test_task(x: int) -> int:
