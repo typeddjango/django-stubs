@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Generic, TypeVar, overload
 
@@ -26,6 +27,7 @@ class TaskResultStatus(TextChoices):
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
 
+@dataclass(kw_only=True)
 class Task(Generic[_P, _R]):
     priority: int
     func: Callable[_P, _R]
@@ -33,16 +35,7 @@ class Task(Generic[_P, _R]):
     queue_name: str
     run_after: datetime | None
     takes_context: bool = ...
-    def __init__(
-        self,
-        *,
-        priority: int,
-        func: Callable[_P, _R],
-        backend: str,
-        queue_name: str,
-        run_after: datetime | None,
-        takes_context: bool = ...,
-    ) -> None: ...
+    def __post_init__(self) -> None: ...
     @property
     def name(self) -> str: ...
     def using(
@@ -81,13 +74,14 @@ def task(
     takes_context: bool = ...,
 ) -> Callable[[Callable[_P, _R]], Task[_P, _R]]: ...
 
+@dataclass(kw_only=True)
 class TaskError:
     exception_class_path: str
     traceback: str
-    def __init__(self, *, exception_class_path: str, traceback: str) -> None: ...
     @property
     def exception_class(self) -> type[BaseException]: ...
 
+@dataclass(kw_only=True)
 class TaskResult(Generic[_P, _R]):
     task: Task[_P, _R]
     id: str
@@ -101,22 +95,7 @@ class TaskResult(Generic[_P, _R]):
     backend: str
     errors: list[TaskError]
     worker_ids: list[str]
-    def __init__(
-        self,
-        *,
-        task: Task[_P, _R],
-        id: str,
-        status: TaskResultStatus,
-        enqueued_at: datetime | None,
-        started_at: datetime | None,
-        finished_at: datetime | None,
-        last_attempted_at: datetime | None,
-        args: list[Any],
-        kwargs: dict[str, Any],
-        backend: str,
-        errors: list[TaskError],
-        worker_ids: list[str],
-    ) -> None: ...
+    def __post_init__(self) -> None: ...
     @property
     def return_value(self) -> _R: ...
     @property
@@ -126,8 +105,8 @@ class TaskResult(Generic[_P, _R]):
     def refresh(self) -> None: ...
     async def arefresh(self) -> None: ...
 
+@dataclass(kw_only=True)
 class TaskContext(Generic[_P, _R]):
     task_result: TaskResult[_P, _R]
-    def __init__(self, *, task_result: TaskResult[_P, _R]) -> None: ...
     @property
     def attempt(self) -> int: ...
