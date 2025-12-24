@@ -7,6 +7,7 @@ from django import VERSION
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import BaseModelAdmin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
@@ -98,6 +99,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(ForwardManyToOneDescriptor),
     MPGeneric(ReverseOneToOneDescriptor),
     MPGeneric(Prefetch),
+    MPGeneric(SessionStore),
 ]
 
 
