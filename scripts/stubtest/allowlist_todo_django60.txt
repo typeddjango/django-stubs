@@ -209,6 +209,8 @@ django.tasks.Task.__post_init__
 django.tasks.TaskContext.__match_args__
 django.tasks.TaskResult.__match_args__
 django.tasks.TaskResult.__post_init__
+django.tasks.backends.base.BaseTaskBackend.enqueue
+django.tasks.backends.immediate.BaseTaskBackend.enqueue
 django.tasks.base.Task.__match_args__
 django.tasks.base.Task.__post_init__
 django.tasks.base.TaskContext.__match_args__
