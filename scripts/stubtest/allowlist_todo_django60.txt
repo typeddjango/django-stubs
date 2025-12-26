@@ -85,18 +85,13 @@ django.core.mail.message.EmailMultiAlternatives.__init__
 django.core.paginator.AsyncPage
 django.core.paginator.AsyncPaginator
 django.core.paginator.BasePaginator
-django.db.backends.base.client.BaseDatabaseClient.__del__
-django.db.backends.base.creation.BaseDatabaseCreation.__del__
 django.db.backends.base.creation.BaseDatabaseCreation.create_test_db
-django.db.backends.base.features.BaseDatabaseFeatures.__del__
 django.db.backends.base.features.BaseDatabaseFeatures.can_return_rows_from_update
 django.db.backends.base.features.BaseDatabaseFeatures.supports_aggregate_distinct_multiple_argument
 django.db.backends.base.features.BaseDatabaseFeatures.supports_aggregate_order_by_clause
 django.db.backends.base.features.BaseDatabaseFeatures.supports_any_value
 django.db.backends.base.features.BaseDatabaseFeatures.supports_json_negative_indexing
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_comparison_against_subquery
-django.db.backends.base.introspection.BaseDatabaseIntrospection.__del__
-django.db.backends.base.operations.BaseDatabaseOperations.__del__
 django.db.backends.base.operations.BaseDatabaseOperations.compile_json_path
 django.db.backends.base.operations.BaseDatabaseOperations.fetch_returned_insert_columns
 django.db.backends.base.operations.BaseDatabaseOperations.fetch_returned_rows
@@ -105,7 +100,6 @@ django.db.backends.base.operations.BaseDatabaseOperations.format_debug_sql
 django.db.backends.base.operations.BaseDatabaseOperations.format_json_path_numeric_index
 django.db.backends.base.operations.BaseDatabaseOperations.return_insert_columns
 django.db.backends.base.operations.BaseDatabaseOperations.returning_columns
-django.db.backends.base.validation.BaseDatabaseValidation.__del__
 django.db.backends.mysql.features.DatabaseFeatures.supports_aggregate_order_by_clause
 django.db.backends.mysql.features.DatabaseFeatures.supports_any_value
 django.db.backends.mysql.features.DatabaseFeatures.supports_json_negative_indexing
@@ -182,7 +176,6 @@ django.db.models.query.Prefetch.get_current_queryset
 django.db.models.sql.compiler.SQLUpdateCompiler.execute_returning_sql
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_fields
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_params
-django.db.utils.DatabaseErrorWrapper.__del__
 django.forms.BaseModelForm.validate_constraints
 django.forms.ClearableFileInput.use_fieldset
 django.forms.models.BaseModelForm.validate_constraints
