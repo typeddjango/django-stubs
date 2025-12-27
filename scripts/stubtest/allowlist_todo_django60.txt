@@ -75,13 +75,9 @@ django.core.checks.model_checks.check_all_models
 django.core.checks.model_checks.check_lazy_references
 django.core.checks.security.base.E026
 django.core.checks.security.base.check_csp_settings
-django.core.mail.EmailMessage.__init__
 django.core.mail.EmailMessage.message
-django.core.mail.EmailMultiAlternatives.__init__
 django.core.mail.backends.smtp.EmailBackend.prep_address
-django.core.mail.message.EmailMessage.__init__
 django.core.mail.message.EmailMessage.message
-django.core.mail.message.EmailMultiAlternatives.__init__
 django.core.paginator.AsyncPage
 django.core.paginator.AsyncPaginator
 django.core.paginator.BasePaginator
