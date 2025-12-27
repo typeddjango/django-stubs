@@ -5,8 +5,6 @@ django.conf.global_settings.URLIZE_ASSUME_HTTPS
 django.contrib.admin.AdminSite.password_change_form
 django.contrib.admin.ModelAdmin.log_deletion
 django.contrib.admin.models.LogEntryManager.log_action
-django.contrib.admin.options.BaseModelAdmin.lookup_allowed
-django.contrib.admin.options.ModelAdmin.log_deletion
 django.contrib.admin.sites.AdminSite.password_change_form
 django.contrib.admin.tests.AdminSeleniumTestCase.trigger_resize
 django.contrib.admin.tests.CSPMiddleware
