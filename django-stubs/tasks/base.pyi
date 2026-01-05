@@ -73,7 +73,6 @@ def task(
     backend: str | None = None,
     takes_context: bool = ...,
 ) -> Callable[[Callable[_P, _R]], Task[_P, _R]]: ...
-
 @dataclass(kw_only=True)
 class TaskError:
     exception_class_path: str
