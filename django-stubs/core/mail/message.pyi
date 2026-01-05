@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from email.message import Message
+from email.message import Message, MIMEPart
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
@@ -76,6 +76,7 @@ class EmailMessage:
         body: _StrOrPromise | None = "",
         from_email: str | None = None,
         to: Sequence[str] | None = None,
+        *,
         bcc: Sequence[str] | None = None,
         connection: Any | None = None,
         attachments: Sequence[MIMEBase | _AttachmentTuple] | None = None,
@@ -98,6 +99,8 @@ class EmailMessage:
     def attach(
         self, filename: str | None = None, content: _AttachmentContent | None = None, mimetype: str | None = None
     ) -> None: ...
+    @overload
+    def attach(self, filename: MIMEPart) -> None: ...
     def attach_file(self, path: str, mimetype: str | None = None) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
@@ -109,6 +112,7 @@ class EmailMultiAlternatives(EmailMessage):
         body: _StrOrPromise | None = "",
         from_email: str | None = None,
         to: Sequence[str] | None = None,
+        *,
         bcc: Sequence[str] | None = None,
         connection: Any | None = None,
         attachments: Sequence[MIMEBase | _AttachmentTuple] | None = None,
