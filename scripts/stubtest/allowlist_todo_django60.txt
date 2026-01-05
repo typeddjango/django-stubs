@@ -204,8 +204,6 @@ django.forms.renderers.Jinja2DivFormRenderer
 django.forms.widgets.ClearableFileInput.use_fieldset
 django.tasks.checks
 django.tasks.default_task_backend
-django.tasks.backends.base.BaseTaskBackend.enqueue
-django.tasks.backends.immediate.BaseTaskBackend.enqueue
 django.template.base.PartialTemplate
 django.template.defaulttags.PartialDefNode
 django.template.defaulttags.PartialNode

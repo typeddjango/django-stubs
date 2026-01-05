@@ -3,7 +3,7 @@ from typing import Any
 
 from django.tasks.base import Task, TaskResult
 
-from .base import BaseTaskBackend as BaseTaskBackend
+from .base import BaseTaskBackend
 
 logger: Logger
 
