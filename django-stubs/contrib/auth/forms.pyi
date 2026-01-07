@@ -45,6 +45,7 @@ class SetPasswordMixin(Generic[_UserType]):
     def set_password_and_save(
         self, user: _UserType, password_field_name: str = "password1", commit: bool = True
     ) -> _UserType: ...
+    def __class_getitem__(cls, *args: Any, **kwargs: Any) -> Any: ...
 
 class SetUnusablePasswordMixin(Generic[_UserType]):
     usable_password_help_text: _StrOrPromise
