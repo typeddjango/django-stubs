@@ -16,7 +16,6 @@ django.contrib.auth.admin.csrf_protect_m
 django.contrib.auth.admin.sensitive_post_parameters_m
 django.contrib.auth.checks.check_models_permissions
 django.contrib.auth.checks.check_user_model
-django.contrib.auth.forms.SetPasswordMixin.__class_getitem__
 django.contrib.auth.templatetags
 django.contrib.auth.templatetags.auth
 django.contrib.contenttypes.fields.GenericForeignKey.ct_field_attname
