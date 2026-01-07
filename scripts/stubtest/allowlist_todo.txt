@@ -294,11 +294,7 @@ django.contrib.gis.forms.FileField.bound_data
 django.contrib.gis.forms.Media.__html__
 django.contrib.gis.forms.ModelChoiceField.__deepcopy__
 django.contrib.gis.forms.MultiValueField.__deepcopy__
-django.contrib.gis.forms.MultiWidget.use_fieldset
 django.contrib.gis.forms.RadioSelect.id_for_label
-django.contrib.gis.forms.RadioSelect.use_fieldset
-django.contrib.gis.forms.SelectDateWidget.use_fieldset
-django.contrib.gis.forms.Widget.use_fieldset
 django.contrib.gis.forms.formset_factory
 django.contrib.gis.forms.inlineformset_factory
 django.contrib.gis.forms.modelformset_factory
@@ -884,11 +880,7 @@ django.forms.FileField.bound_data
 django.forms.Media.__html__
 django.forms.ModelChoiceField.__deepcopy__
 django.forms.MultiValueField.__deepcopy__
-django.forms.MultiWidget.use_fieldset
 django.forms.RadioSelect.id_for_label
-django.forms.RadioSelect.use_fieldset
-django.forms.SelectDateWidget.use_fieldset
-django.forms.Widget.use_fieldset
 django.forms.boundfield.BoundWidget.__html__
 django.forms.fields.ChoiceField.__deepcopy__
 django.forms.fields.Field.__deepcopy__
@@ -908,11 +900,7 @@ django.forms.models.modelformset_factory
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__
-django.forms.widgets.MultiWidget.use_fieldset
 django.forms.widgets.RadioSelect.id_for_label
-django.forms.widgets.RadioSelect.use_fieldset
-django.forms.widgets.SelectDateWidget.use_fieldset
-django.forms.widgets.Widget.use_fieldset
 django.template.VariableDoesNotExist.__init__
 django.template.base.FilterExpression.is_var
 django.template.base.VariableDoesNotExist.__init__
