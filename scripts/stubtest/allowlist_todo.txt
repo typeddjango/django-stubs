@@ -140,6 +140,7 @@ django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.conver
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.from_text
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.geom_lib_version
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.rttopo_version
+django.contrib.gis.db.models.Aggregate.__init__
 django.contrib.gis.db.models.Aggregate.as_sql
 django.contrib.gis.db.models.Aggregate.default_alias
 django.contrib.gis.db.models.Aggregate.name
@@ -472,6 +473,7 @@ django.db.migrations.utils.field_is_referenced
 django.db.migrations.utils.field_references
 django.db.migrations.utils.get_references
 django.db.migrations.utils.resolve_relation
+django.db.models.Aggregate.__init__
 django.db.models.Aggregate.as_sql
 django.db.models.Aggregate.default_alias
 django.db.models.Aggregate.name
@@ -604,6 +606,7 @@ django.db.models.When.as_sql
 django.db.models.When.allowed_default
 django.db.models.Window.as_sql
 django.db.models.Window.as_sqlite
+django.db.models.aggregates.Aggregate.__init__
 django.db.models.aggregates.Aggregate.as_sql
 django.db.models.aggregates.Aggregate.default_alias
 django.db.models.aggregates.Aggregate.name
