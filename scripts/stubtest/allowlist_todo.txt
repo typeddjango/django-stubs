@@ -30,6 +30,7 @@ django.contrib.admin.site
 django.contrib.admin.sites.site
 django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
+django.contrib.admin.tests.CSPMiddleware.process_response
 django.contrib.admin.utils.QUOTE_MAP
 django.contrib.admin.utils.UNQUOTE_MAP
 django.contrib.admin.utils.prepare_lookup_value
@@ -211,8 +212,10 @@ django.contrib.gis.db.models.ForeignObject.get_extra_descriptor_filter
 django.contrib.gis.db.models.ForeignObject.get_extra_restriction
 django.contrib.gis.db.models.ForeignObject.get_foreign_related_value
 django.contrib.gis.db.models.ForeignObject.get_instance_value_for_fields
+django.contrib.gis.db.models.ForeignObject.get_joining_columns
 django.contrib.gis.db.models.ForeignObject.get_local_related_value
 django.contrib.gis.db.models.ForeignObject.get_path_info
+django.contrib.gis.db.models.ForeignObject.get_reverse_joining_columns
 django.contrib.gis.db.models.ForeignObject.get_reverse_path_info
 django.contrib.gis.db.models.ForeignObject.path_infos
 django.contrib.gis.db.models.ForeignObject.related_accessor_class
@@ -394,6 +397,7 @@ django.core.servers.basehttp.ServerHandler.__init__
 django.core.servers.basehttp.ThreadedWSGIServer.__init__
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base.DatabaseWrapper.ops
+django.db.backends.mysql.features.DatabaseFeatures.can_rename_index
 django.db.backends.mysql.features.DatabaseFeatures.can_return_rows_from_bulk_insert
 django.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.db.backends.mysql.features.DatabaseFeatures.minimum_database_version
@@ -542,8 +546,10 @@ django.db.models.ForeignObject.get_extra_descriptor_filter
 django.db.models.ForeignObject.get_extra_restriction
 django.db.models.ForeignObject.get_foreign_related_value
 django.db.models.ForeignObject.get_instance_value_for_fields
+django.db.models.ForeignObject.get_joining_columns
 django.db.models.ForeignObject.get_local_related_value
 django.db.models.ForeignObject.get_path_info
+django.db.models.ForeignObject.get_reverse_joining_columns
 django.db.models.ForeignObject.get_reverse_path_info
 django.db.models.ForeignObject.path_infos
 django.db.models.ForeignObject.related_accessor_class
@@ -751,8 +757,10 @@ django.db.models.fields.related.ForeignObject.get_extra_descriptor_filter
 django.db.models.fields.related.ForeignObject.get_extra_restriction
 django.db.models.fields.related.ForeignObject.get_foreign_related_value
 django.db.models.fields.related.ForeignObject.get_instance_value_for_fields
+django.db.models.fields.related.ForeignObject.get_joining_columns
 django.db.models.fields.related.ForeignObject.get_local_related_value
 django.db.models.fields.related.ForeignObject.get_path_info
+django.db.models.fields.related.ForeignObject.get_reverse_joining_columns
 django.db.models.fields.related.ForeignObject.get_reverse_path_info
 django.db.models.fields.related.ForeignObject.path_infos
 django.db.models.fields.related.ForeignObject.related_accessor_class
@@ -908,6 +916,7 @@ django.forms.models.BaseModelFormSet.model
 django.forms.models.ModelChoiceField.__deepcopy__
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
+django.forms.renderers.DjangoDivFormRenderer
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__

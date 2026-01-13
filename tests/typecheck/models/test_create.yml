@@ -81,13 +81,12 @@
                 class Child(Base): pass
 
 -   case: optional_id_fields_for_create_is_error_if_not_autofield
-    skip: __import__("django").VERSION < (6, 0)
     main: |
         from myapp.models import Publisher, Book
 
         Book.objects.create(id=None)  # E: Incompatible type for "id" of "Book" (got "None", expected "float | int | str | Combinable")  [misc]
         Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Publisher | Combinable")  [misc]
-        Book.objects.create(publisher_id=None)  # E: Incompatible type for "publisher_id" of "Book" (got "None", expected "float | int | str | Combinable")  [misc]
+        Book.objects.create(publisher_id=None)  # E: Incompatible type for "publisher_id" of "Book" (got "None", expected "Combinable | int | str")  [misc]
     installed_apps:
         - myapp
     files:
