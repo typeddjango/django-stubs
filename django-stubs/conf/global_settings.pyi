@@ -10,9 +10,7 @@ from typing_extensions import NotRequired
 
 from django_stubs_ext.settings import TemplatesSetting
 
-# Note: the tuple element format for ADMINS or MANAGERS is deprecated. Use a
-# list of strings instead.
-_Admins: TypeAlias = list[str] | list[tuple[str, str]]
+_Admins: TypeAlias = list[tuple[str, str]]
 
 ####################
 # CORE             #
