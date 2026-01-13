@@ -177,8 +177,15 @@ django.forms.ClearableFileInput.use_fieldset
 django.forms.models.BaseModelForm.validate_constraints
 django.forms.renderers.Jinja2DivFormRenderer
 django.forms.widgets.ClearableFileInput.use_fieldset
+django.tasks
+django.tasks.backends
+django.tasks.backends.base
+django.tasks.backends.dummy
+django.tasks.backends.immediate
+django.tasks.base
 django.tasks.checks
-django.tasks.default_task_backend
+django.tasks.exceptions
+django.tasks.signals
 django.template.base.PartialTemplate
 django.template.defaulttags.PartialDefNode
 django.template.defaulttags.PartialNode

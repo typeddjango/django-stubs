@@ -255,11 +255,6 @@ django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geo
 django.http.QueryDict.pop
 django.http.request.QueryDict.pop
 
-# The `task` decorator supports both `@task` and `@task(...)` forms. Stubs use
-# overloads to type each case separately, so `function` doesn't accept `None`.
-django.tasks.task
-django.tasks.base.task
-
 # Django incorrectly uses a signature of `(cls, **kwargs)` when it should be `(cls, *args, **kwargs)`.
 django.test.selenium.SeleniumTestCase.__init_subclass__
 
