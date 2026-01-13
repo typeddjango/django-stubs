@@ -6,7 +6,6 @@
 .pytest_cache/
 .ruff_cache/
 .venv/
-venv/
 __pycache__/
 django-source/
 out/

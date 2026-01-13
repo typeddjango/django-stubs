@@ -1,4 +1,4 @@
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Sequence
 from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
@@ -10,9 +10,7 @@ from typing_extensions import NotRequired
 
 from django_stubs_ext.settings import TemplatesSetting
 
-# Note: the tuple element format for ADMINS or MANAGERS is deprecated. Use a
-# list of strings instead.
-_Admins: TypeAlias = list[str] | list[tuple[str, str]]
+_Admins: TypeAlias = list[tuple[str, str]]
 
 ####################
 # CORE             #
@@ -543,9 +541,3 @@ SECURE_REDIRECT_EXEMPT: list[str]
 SECURE_REFERRER_POLICY: str
 SECURE_SSL_HOST: str | None
 SECURE_SSL_REDIRECT: bool
-
-##################
-# CSP MIDDLEWARE #
-##################
-SECURE_CSP: Mapping[str, Collection[str] | str]
-SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]

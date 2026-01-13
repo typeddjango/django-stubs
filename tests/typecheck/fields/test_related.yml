@@ -1200,7 +1200,6 @@
                     )
 
 -   case: test_many_to_many
-    skip: __import__("django").VERSION < (6, 0)
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, Other
@@ -1274,13 +1273,13 @@
         main:34: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:36: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
         main:37: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable | None, builtins.int]]"
+        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
         main:39: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
         main:40: note: Revealed type is "type[myapp.models.MyModel_other_again]"
-        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable | None, builtins.int]]"
+        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str | None, builtins.int]]"
         main:42: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
         main:43: note: Revealed type is "type[myapp.models.CustomThrough]"
-        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable, builtins.int]]"
+        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.AutoField[django.db.models.expressions.Combinable | builtins.int | builtins.str, builtins.int]]"
     installed_apps:
         -   myapp
     files:

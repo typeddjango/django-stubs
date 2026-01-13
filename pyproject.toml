@@ -1,6 +1,6 @@
 [project]
 name = "django-stubs"
-version = "5.2.8"
+version = "5.2.9"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
@@ -29,7 +29,7 @@ classifiers = [
 ]
 dependencies = [
   "django",
-  "django-stubs-ext>=5.2.8",
+  "django-stubs-ext>=5.2.9",
   "tomli; python_version < '3.11'",
   # Types:
   "types-pyyaml",
@@ -49,8 +49,7 @@ tests = [
   "pytest-shard==0.1.2",
   "pytest-xdist==3.8.0",
   # Django deps:
-  "django==5.2.10; python_version < '3.12'",
-  "django==6.0.1; python_version >= '3.12'",
+  "django==5.2.10",
   "mysqlclient==2.2.7",
   "psycopg2-binary==2.9.11",
   "jinja2==3.1.6",

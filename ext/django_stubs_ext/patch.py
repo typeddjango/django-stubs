@@ -102,17 +102,6 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(SessionStore),
 ]
 
-if VERSION >= (6, 0):
-    from django.tasks import Task, TaskContext, TaskResult
-
-    _need_generic.extend(
-        [
-            MPGeneric(Task),
-            MPGeneric(TaskContext),
-            MPGeneric(TaskResult),
-        ]
-    )
-
 
 def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: bool = True) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
