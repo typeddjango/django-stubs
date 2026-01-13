@@ -1,4 +1,4 @@
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterator, Mapping
 from typing import Any, Protocol, type_check_only
 
 from django.core.checks.messages import CheckMessage
