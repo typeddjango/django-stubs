@@ -16,13 +16,12 @@ from .message import make_msgid as make_msgid
 from .utils import DNS_NAME as DNS_NAME
 from .utils import CachedDnsName as CachedDnsName
 
-def get_connection(backend: str | None = None, *, fail_silently: bool = False, **kwds: Any) -> Any: ...
+def get_connection(backend: str | None = None, fail_silently: bool = False, **kwds: Any) -> Any: ...
 def send_mail(
     subject: _StrOrPromise,
     message: _StrOrPromise,
     from_email: str | None,
     recipient_list: Sequence[str],
-    *,
     fail_silently: bool = False,
     auth_user: str | None = None,
     auth_password: str | None = None,
@@ -31,7 +30,6 @@ def send_mail(
 ) -> int: ...
 def send_mass_mail(
     datatuple: Iterable[tuple[str, str, str | None, list[str]]],
-    *,
     fail_silently: bool = False,
     auth_user: str | None = None,
     auth_password: str | None = None,
@@ -40,7 +38,6 @@ def send_mass_mail(
 def mail_admins(
     subject: _StrOrPromise,
     message: _StrOrPromise,
-    *,
     fail_silently: bool = False,
     connection: Any | None = None,
     html_message: str | None = None,
@@ -48,7 +45,6 @@ def mail_admins(
 def mail_managers(
     subject: _StrOrPromise,
     message: _StrOrPromise,
-    *,
     fail_silently: bool = False,
     connection: Any | None = None,
     html_message: str | None = None,
