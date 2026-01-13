@@ -1,4 +1,4 @@
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Sequence
 from re import Pattern
 
 # This is defined here as a do-nothing function because we can't import
@@ -543,9 +543,3 @@ SECURE_REDIRECT_EXEMPT: list[str]
 SECURE_REFERRER_POLICY: str
 SECURE_SSL_HOST: str | None
 SECURE_SSL_REDIRECT: bool
-
-##################
-# CSP MIDDLEWARE #
-##################
-SECURE_CSP: Mapping[str, Collection[str] | str]
-SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
