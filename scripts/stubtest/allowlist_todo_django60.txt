@@ -62,6 +62,15 @@ django.contrib.postgres.aggregates.mixins.OrderableAggMixin.as_sql
 django.contrib.postgres.aggregates.mixins.OrderableAggMixin.get_source_expressions
 django.contrib.postgres.aggregates.mixins.OrderableAggMixin.set_source_expressions
 django.contrib.postgres.constraints.ExclusionConstraint.check
+django.contrib.postgres.operations.BloomExtension.__init__
+django.contrib.postgres.operations.BtreeGinExtension.__init__
+django.contrib.postgres.operations.BtreeGistExtension.__init__
+django.contrib.postgres.operations.CITextExtension.__init__
+django.contrib.postgres.operations.CreateExtension.__init__
+django.contrib.postgres.operations.CryptoExtension.__init__
+django.contrib.postgres.operations.HStoreExtension.__init__
+django.contrib.postgres.operations.TrigramExtension.__init__
+django.contrib.postgres.operations.UnaccentExtension.__init__
 django.contrib.postgres.search.LexemeCombinable
 django.contrib.postgres.search.multiple_spaces_re
 django.contrib.postgres.search.normalize_spaces
