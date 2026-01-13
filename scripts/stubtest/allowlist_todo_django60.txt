@@ -21,6 +21,8 @@ django.contrib.auth.management.RenamePermission
 django.contrib.auth.management.rename_permissions
 django.contrib.auth.templatetags
 django.contrib.auth.templatetags.auth
+django.contrib.contenttypes.checks.check_generic_foreign_keys
+django.contrib.contenttypes.checks.check_model_name_lengths
 django.contrib.contenttypes.fields.GenericForeignKey.ct_field_attname
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_queryset
 django.contrib.contenttypes.management.get_contenttypes_and_models
