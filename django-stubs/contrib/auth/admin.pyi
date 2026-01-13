@@ -7,6 +7,9 @@ from django.http.response import HttpResponse
 
 _AbstractUserT = TypeVar("_AbstractUserT", bound=AbstractUser)
 
+csrf_protect_m: Any
+sensitive_post_parameters_m: Any
+
 class GroupAdmin(admin.ModelAdmin[Group]): ...
 
 class UserAdmin(admin.ModelAdmin[_AbstractUserT]):

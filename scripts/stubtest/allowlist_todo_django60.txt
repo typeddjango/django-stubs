@@ -12,6 +12,8 @@ django.contrib.admin.tests.AdminSeleniumTestCase.trigger_resize
 django.contrib.admin.tests.CSPMiddleware
 django.contrib.admin.widgets.DateTimeWidgetContextMixin
 django.contrib.auth.admin.UserAdmin.lookup_allowed
+django.contrib.auth.admin.csrf_protect_m
+django.contrib.auth.admin.sensitive_post_parameters_m
 django.contrib.auth.checks.check_models_permissions
 django.contrib.auth.checks.check_user_model
 django.contrib.auth.templatetags
