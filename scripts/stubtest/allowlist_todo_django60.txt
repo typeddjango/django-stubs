@@ -17,6 +17,8 @@ django.contrib.auth.admin.sensitive_post_parameters_m
 django.contrib.auth.checks.check_models_permissions
 django.contrib.auth.checks.check_user_model
 django.contrib.auth.forms.SetPasswordMixin.__class_getitem__
+django.contrib.auth.management.RenamePermission
+django.contrib.auth.management.rename_permissions
 django.contrib.auth.templatetags
 django.contrib.auth.templatetags.auth
 django.contrib.contenttypes.fields.GenericForeignKey.ct_field_attname
@@ -42,6 +44,7 @@ django.contrib.gis.db.models.functions.GeometryType
 django.contrib.gis.db.models.functions.Rotate
 django.contrib.gis.forms.BaseGeometryWidget.base_layer
 django.contrib.gis.forms.BaseModelForm.validate_constraints
+django.contrib.gis.forms.ClearableFileInput.use_fieldset
 django.contrib.gis.forms.OSMWidget.base_layer
 django.contrib.gis.forms.OpenLayersWidget.base_layer
 django.contrib.gis.forms.widgets.BaseGeometryWidget.base_layer
@@ -170,8 +173,10 @@ django.db.models.sql.compiler.SQLUpdateCompiler.execute_returning_sql
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_fields
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_params
 django.forms.BaseModelForm.validate_constraints
+django.forms.ClearableFileInput.use_fieldset
 django.forms.models.BaseModelForm.validate_constraints
 django.forms.renderers.Jinja2DivFormRenderer
+django.forms.widgets.ClearableFileInput.use_fieldset
 django.tasks.checks
 django.tasks.default_task_backend
 django.template.base.PartialTemplate
