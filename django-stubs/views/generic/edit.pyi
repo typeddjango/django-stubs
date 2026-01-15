@@ -66,9 +66,9 @@ class DeletionMixin(Generic[_M]):
     def delete(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def get_success_url(self) -> str: ...
 
-class BaseDeleteView(DeletionMixin[_M], FormMixin[_ModelFormT], BaseDetailView[_M], Generic[_M, _ModelFormT]):
+class BaseDeleteView(DeletionMixin[_M], FormMixin[_FormT], BaseDetailView[_M], Generic[_M, _FormT]):
     object: _M
 
-class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView[_M, _ModelFormT], Generic[_M, _ModelFormT]):
+class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView[_M, _FormT], Generic[_M, _FormT]):
     object: _M
     template_name_suffix: str
