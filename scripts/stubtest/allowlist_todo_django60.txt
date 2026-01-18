@@ -21,7 +21,6 @@ django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_queryset
 django.contrib.contenttypes.management.get_contenttypes_and_models
 django.contrib.gis.admin.AdminSite.password_change_form
 django.contrib.gis.admin.ModelAdmin.log_deletion
-django.contrib.gis.db.models.AnyValue
 django.contrib.gis.db.models.BaseConstraint.__init__
 django.contrib.gis.db.models.BaseConstraint.check
 django.contrib.gis.db.models.CheckConstraint.__init__
@@ -125,7 +124,6 @@ django.db.migrations.operations.base.Operation.__replace__
 django.db.migrations.serializer.DeconstructableSerializer
 django.db.migrations.serializer.DeconstructibleSerializer
 django.db.migrations.serializer.ZoneInfoSerializer
-django.db.models.AnyValue
 django.db.models.BaseConstraint.__init__
 django.db.models.BaseConstraint.check
 django.db.models.CheckConstraint.__init__
@@ -136,10 +134,8 @@ django.db.models.Index.check
 django.db.models.Model._do_update
 django.db.models.Prefetch.get_current_queryset
 django.db.models.UniqueConstraint.check
-django.db.models.__all__
 django.db.models.StringAgg.as_mysql
 django.db.models.StringAgg.as_oracle
-django.db.models.aggregates.AnyValue
 django.db.models.aggregates.StringAgg.as_mysql
 django.db.models.aggregates.StringAgg.as_oracle
 django.db.models.aggregates.__all__
