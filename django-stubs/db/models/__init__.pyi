@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist as ObjectDoesNotExist
 from . import lookups as lookups
 from . import signals as signals
 from .aggregates import Aggregate as Aggregate
+from .aggregates import AnyValue as AnyValue
 from .aggregates import Avg as Avg
 from .aggregates import Count as Count
 from .aggregates import Max as Max
@@ -115,6 +116,7 @@ __all__ = [
     "SET_DEFAULT",
     "SET_NULL",
     "Aggregate",
+    "AnyValue",
     "AutoField",
     "Avg",
     "BaseConstraint",

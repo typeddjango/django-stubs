@@ -1,10 +1,12 @@
 from collections.abc import Sequence
 from typing import Any, ClassVar
 
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Combinable, Func
 from django.db.models.fields import IntegerField
 from django.db.models.functions.mixins import FixDurationInputMixin, NumericOutputFieldMixin
 from django.db.models.query import _OrderByFieldName
+from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 class Aggregate(Func):
     filter_template: str
@@ -21,6 +23,11 @@ class Aggregate(Func):
         order_by: Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+
+class AnyValue(Aggregate):
+    def as_sql(  # type: ignore[override]
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
+    ) -> _AsSqlType: ...
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate): ...
 
