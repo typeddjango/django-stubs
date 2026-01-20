@@ -61,9 +61,6 @@ def test_find_classes_inheriting_from_generic() -> None:
         # For each Generic in the stubs, import the associated module and capture every class in the MRO
         if generic_visitor.generic_classes:
             module_name = _get_module_from_pyi(file_path)
-            # Skip tasks modules for Django < 6.0 because it's not available
-            if module_name.startswith("django.tasks") and django.VERSION < (6, 0):
-                continue
             django_module = importlib.import_module(module_name)
             all_generic_classes.update(
                 {

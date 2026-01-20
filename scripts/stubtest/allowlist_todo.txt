@@ -30,6 +30,7 @@ django.contrib.admin.site
 django.contrib.admin.sites.site
 django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
+django.contrib.admin.tests.CSPMiddleware.process_response
 django.contrib.admin.utils.QUOTE_MAP
 django.contrib.admin.utils.UNQUOTE_MAP
 django.contrib.admin.utils.prepare_lookup_value
@@ -140,6 +141,7 @@ django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.conver
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.from_text
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.geom_lib_version
 django.contrib.gis.db.backends.spatialite.operations.SpatiaLiteOperations.rttopo_version
+django.contrib.gis.db.models.Aggregate.__init__
 django.contrib.gis.db.models.Aggregate.as_sql
 django.contrib.gis.db.models.Aggregate.default_alias
 django.contrib.gis.db.models.Aggregate.name
@@ -210,8 +212,10 @@ django.contrib.gis.db.models.ForeignObject.get_extra_descriptor_filter
 django.contrib.gis.db.models.ForeignObject.get_extra_restriction
 django.contrib.gis.db.models.ForeignObject.get_foreign_related_value
 django.contrib.gis.db.models.ForeignObject.get_instance_value_for_fields
+django.contrib.gis.db.models.ForeignObject.get_joining_columns
 django.contrib.gis.db.models.ForeignObject.get_local_related_value
 django.contrib.gis.db.models.ForeignObject.get_path_info
+django.contrib.gis.db.models.ForeignObject.get_reverse_joining_columns
 django.contrib.gis.db.models.ForeignObject.get_reverse_path_info
 django.contrib.gis.db.models.ForeignObject.path_infos
 django.contrib.gis.db.models.ForeignObject.related_accessor_class
@@ -294,7 +298,11 @@ django.contrib.gis.forms.FileField.bound_data
 django.contrib.gis.forms.Media.__html__
 django.contrib.gis.forms.ModelChoiceField.__deepcopy__
 django.contrib.gis.forms.MultiValueField.__deepcopy__
+django.contrib.gis.forms.MultiWidget.use_fieldset
 django.contrib.gis.forms.RadioSelect.id_for_label
+django.contrib.gis.forms.RadioSelect.use_fieldset
+django.contrib.gis.forms.SelectDateWidget.use_fieldset
+django.contrib.gis.forms.Widget.use_fieldset
 django.contrib.gis.forms.formset_factory
 django.contrib.gis.forms.inlineformset_factory
 django.contrib.gis.forms.modelformset_factory
@@ -389,6 +397,7 @@ django.core.servers.basehttp.ServerHandler.__init__
 django.core.servers.basehttp.ThreadedWSGIServer.__init__
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base.DatabaseWrapper.ops
+django.db.backends.mysql.features.DatabaseFeatures.can_rename_index
 django.db.backends.mysql.features.DatabaseFeatures.can_return_rows_from_bulk_insert
 django.db.backends.mysql.features.DatabaseFeatures.django_test_skips
 django.db.backends.mysql.features.DatabaseFeatures.minimum_database_version
@@ -468,6 +477,7 @@ django.db.migrations.utils.field_is_referenced
 django.db.migrations.utils.field_references
 django.db.migrations.utils.get_references
 django.db.migrations.utils.resolve_relation
+django.db.models.Aggregate.__init__
 django.db.models.Aggregate.as_sql
 django.db.models.Aggregate.default_alias
 django.db.models.Aggregate.name
@@ -536,8 +546,10 @@ django.db.models.ForeignObject.get_extra_descriptor_filter
 django.db.models.ForeignObject.get_extra_restriction
 django.db.models.ForeignObject.get_foreign_related_value
 django.db.models.ForeignObject.get_instance_value_for_fields
+django.db.models.ForeignObject.get_joining_columns
 django.db.models.ForeignObject.get_local_related_value
 django.db.models.ForeignObject.get_path_info
+django.db.models.ForeignObject.get_reverse_joining_columns
 django.db.models.ForeignObject.get_reverse_path_info
 django.db.models.ForeignObject.path_infos
 django.db.models.ForeignObject.related_accessor_class
@@ -600,6 +612,7 @@ django.db.models.When.as_sql
 django.db.models.When.allowed_default
 django.db.models.Window.as_sql
 django.db.models.Window.as_sqlite
+django.db.models.aggregates.Aggregate.__init__
 django.db.models.aggregates.Aggregate.as_sql
 django.db.models.aggregates.Aggregate.default_alias
 django.db.models.aggregates.Aggregate.name
@@ -744,8 +757,10 @@ django.db.models.fields.related.ForeignObject.get_extra_descriptor_filter
 django.db.models.fields.related.ForeignObject.get_extra_restriction
 django.db.models.fields.related.ForeignObject.get_foreign_related_value
 django.db.models.fields.related.ForeignObject.get_instance_value_for_fields
+django.db.models.fields.related.ForeignObject.get_joining_columns
 django.db.models.fields.related.ForeignObject.get_local_related_value
 django.db.models.fields.related.ForeignObject.get_path_info
+django.db.models.fields.related.ForeignObject.get_reverse_joining_columns
 django.db.models.fields.related.ForeignObject.get_reverse_path_info
 django.db.models.fields.related.ForeignObject.path_infos
 django.db.models.fields.related.ForeignObject.related_accessor_class
@@ -880,7 +895,11 @@ django.forms.FileField.bound_data
 django.forms.Media.__html__
 django.forms.ModelChoiceField.__deepcopy__
 django.forms.MultiValueField.__deepcopy__
+django.forms.MultiWidget.use_fieldset
 django.forms.RadioSelect.id_for_label
+django.forms.RadioSelect.use_fieldset
+django.forms.SelectDateWidget.use_fieldset
+django.forms.Widget.use_fieldset
 django.forms.boundfield.BoundWidget.__html__
 django.forms.fields.ChoiceField.__deepcopy__
 django.forms.fields.Field.__deepcopy__
@@ -897,10 +916,15 @@ django.forms.models.BaseModelFormSet.model
 django.forms.models.ModelChoiceField.__deepcopy__
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
+django.forms.renderers.DjangoDivFormRenderer
 django.forms.widgets.ChoiceWidget.template_name
 django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__
+django.forms.widgets.MultiWidget.use_fieldset
 django.forms.widgets.RadioSelect.id_for_label
+django.forms.widgets.RadioSelect.use_fieldset
+django.forms.widgets.SelectDateWidget.use_fieldset
+django.forms.widgets.Widget.use_fieldset
 django.template.VariableDoesNotExist.__init__
 django.template.base.FilterExpression.is_var
 django.template.base.VariableDoesNotExist.__init__
