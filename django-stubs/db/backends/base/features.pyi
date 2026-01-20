@@ -22,6 +22,7 @@ class BaseDatabaseFeatures:
     can_use_chunked_reads: bool
     can_return_columns_from_insert: bool
     can_return_rows_from_bulk_insert: bool
+    can_return_rows_from_update: bool
     has_bulk_insert: bool
     uses_savepoints: bool
     can_release_savepoints: bool
@@ -96,6 +97,9 @@ class BaseDatabaseFeatures:
     supports_nulls_distinct_unique_constraints: bool
     requires_compound_order_by_subquery: bool
     supports_aggregate_filter_clause: bool
+    supports_aggregate_order_by_clause: bool
+    supports_aggregate_distinct_multiple_argument: bool
+    supports_any_value: bool
     supports_index_on_text_field: bool
     supports_over_clause: bool
     supports_frame_range_fixed_distance: bool
@@ -128,6 +132,7 @@ class BaseDatabaseFeatures:
     supports_json_field_contains: bool
     json_key_contains_list_matching_requires_list: bool
     has_json_object_function: bool
+    supports_json_negative_indexing: bool
     supports_collation_on_charfield: bool
     supports_collation_on_textfield: bool
     supports_non_deterministic_collations: bool
@@ -138,6 +143,7 @@ class BaseDatabaseFeatures:
     supports_logical_xor: bool
     prohibits_null_characters_in_text_exception: tuple[ValueError | DataError] | None
     supports_unlimited_charfield: bool
+    supports_tuple_comparison_against_subquery: bool
     test_collations: dict[str, str | None]
     test_now_utc_template: str | None
     insert_test_table_with_defaults: str | None
