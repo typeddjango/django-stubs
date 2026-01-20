@@ -88,6 +88,7 @@ SERVER_EMAIL: str
 
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES: dict[str, dict[str, Any]]
+TASKS: dict[str, dict[str, Any]]
 
 # Classes used to implement DB routing behavior.
 @type_check_only
@@ -135,7 +136,6 @@ FORM_RENDERER: str
 # RemovedInDjango60Warning: It's a transitional setting helpful in early
 # adoption of "https" as the new default value of forms.URLField.assume_scheme.
 # Set to True to assume "https" during the Django 5.x release cycle.
-FORMS_URLFIELD_ASSUME_HTTPS: bool
 
 # Default email address to use for various automated correspondence from
 # the site managers.
