@@ -57,3 +57,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_covering_gist_indexes: bool
     supports_non_deterministic_collations: bool
     supports_alternate_collation_providers: bool
+    can_return_rows_from_update: bool
+    supports_aggregate_order_by_clause: bool
+    @property
+    def supports_any_value(self) -> bool: ...  # type: ignore[override]

@@ -37,6 +37,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes: bool
     supports_order_by_nulls_modifier: bool
     order_by_nulls_first: bool
+    supports_aggregate_order_by_clause: bool
+    supports_json_negative_indexing: bool
 
     # fake properties (until `property` is generic)
     supports_frame_range_fixed_distance: bool
@@ -86,3 +88,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_index_column_ordering(self) -> bool: ...  # type: ignore[override]
     @cached_property
     def supports_expression_indexes(self) -> bool: ...  # type: ignore[override]
+    @cached_property
+    def supports_any_value(self) -> bool: ...  # type: ignore[override]

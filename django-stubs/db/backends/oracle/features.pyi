@@ -2,6 +2,7 @@ from typing import Any
 
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.oracle.base import DatabaseWrapper
+from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     connection: DatabaseWrapper
@@ -48,3 +49,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_multiple_constraints_on_same_fields: bool
     supports_primitives_in_json_field: bool
     supports_json_field_contains: bool
+    can_return_rows_from_update: bool
+    supports_aggregate_order_by_clause: bool
+    supports_any_value: bool
+    supports_tuple_comparison_against_subquery: bool
+    @cached_property
+    def supports_json_negative_indexing(self) -> bool: ...  # type: ignore[override]
